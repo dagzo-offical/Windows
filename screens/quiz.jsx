@@ -126,10 +126,10 @@ Return STRICT JSON only, no markdown: {"questions":[{"uz":"...","en":"..."},{"uz
   return (
     <div style={overlayStyle}>
       <div style={modalStyle} className="fade-up">
-        <ModalHeader phase={phase} onClose={onClose} />
+        <ModalHeader phase={phase} onClose={onClose} lessonNum={lessonNum} />
 
         <div style={{ padding: "0 32px 32px", flex: 1, overflowY: "auto", minHeight: 0 }}>
-          {phase === "intro" && <Intro onStart={generate} loading={loading} />}
+          {phase === "intro" && <Intro onStart={generate} loading={loading} lessonNum={lessonNum} />}
           {phase === "answering" && questions && (
             <Answering
               questions={questions} answers={answers} setAnswers={setAnswers}
@@ -141,7 +141,7 @@ Return STRICT JSON only, no markdown: {"questions":[{"uz":"...","en":"..."},{"uz
           {phase === "result" && results && (
             <Result
               results={results} questions={questions} answers={answers}
-              overall={overall} passed={passed}
+              overall={overall} passed={passed} lessonNum={lessonNum}
               onContinue={() => passed ? onPass() : onFail()}
             />
           )}
@@ -172,7 +172,14 @@ const modalStyle = {
   overflow: "hidden",
 };
 
-function ModalHeader({ phase, onClose }) {
+const LESSON_TITLES = {
+  1: { uz: "Windows arxitekturasi",   en: "Windows Architecture" },
+  2: { uz: "Kernel nima?",            en: "What is the Kernel?" },
+  3: { uz: "User mode va Kernel mode", en: "User Mode vs Kernel Mode" },
+  4: { uz: "Windows boot jarayoni",   en: "Windows Boot Process" },
+};
+
+function ModalHeader({ phase, onClose, lessonNum = 1 }) {
   const lang = useLang();
   const labels = {
     intro: { uz: "Test boshlash", en: "Begin assessment" },
@@ -180,6 +187,7 @@ function ModalHeader({ phase, onClose }) {
     grading: { uz: "AI tekshirmoqda...", en: "AI grading..." },
     result: { uz: "Natijalar", en: "Results" },
   };
+  const t = LESSON_TITLES[lessonNum] || LESSON_TITLES[1];
   return (
     <div style={{
       padding: "20px 32px",
@@ -194,7 +202,7 @@ function ModalHeader({ phase, onClose }) {
         <div>
           <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 600 }}>{lang === "en" ? labels[phase].en : labels[phase].uz}</div>
           <div style={{ fontSize: 11.5, color: "var(--text-3)" }}>
-            {lang === "en" ? "Lesson 01 · Windows architecture" : "Dars 01 · Windows arxitekturasi"}
+            {lang === "en" ? `L0${lessonNum} · ${t.en}` : `L0${lessonNum} · ${t.uz}`}
           </div>
         </div>
       </div>
@@ -203,9 +211,10 @@ function ModalHeader({ phase, onClose }) {
   );
 }
 
-function Intro({ onStart, loading }) {
+function Intro({ onStart, loading, lessonNum = 1 }) {
   const lang = useLang();
   const hasKey = !!(localStorage.getItem("wa_ai_provider") && localStorage.getItem("wa_ai_key"));
+  const t = LESSON_TITLES[lessonNum] || LESSON_TITLES[1];
   return (
     <div style={{ padding: "32px 0", textAlign: "center" }}>
       <div style={{
@@ -219,7 +228,7 @@ function Intro({ onStart, loading }) {
       </div>
 
       <h2 className="display" style={{ fontSize: 26, margin: "0 0 6px", letterSpacing: "-0.02em" }}>
-        {lang === "en" ? "Windows architecture mastery check" : "Windows arxitekturasi: bilim tekshiruvi"}
+        {lang === "en" ? `${t.en}: mastery check` : `${t.uz}: bilim tekshiruvi`}
       </h2>
       <p style={{ color: "var(--text-2)", margin: "0 0 24px", fontSize: 14 }}>
         {lang === "en"
@@ -422,7 +431,7 @@ function Grading() {
   );
 }
 
-function Result({ results, questions, answers, overall, passed, onContinue }) {
+function Result({ results, questions, answers, overall, passed, onContinue, lessonNum = 1 }) {
   const lang = useLang();
   const [now, setNow] = useQS(Date.now());
   useQE(() => {
@@ -467,11 +476,11 @@ function Result({ results, questions, answers, overall, passed, onContinue }) {
         <div style={{ fontSize: 14, color: "var(--text-2)", marginTop: 8 }}>
           {passed
             ? (lang === "en"
-                ? <><b style={{ color: "var(--accent)" }}>Excellent!</b> You've mastered the Windows architecture basics.</>
-                : <><b style={{ color: "var(--accent)" }}>Mukammal!</b> Siz Windows arxitekturasi asoslarini o'zlashtirdingiz.</>)
+                ? <><b style={{ color: "var(--accent)" }}>Excellent!</b> You've mastered <em>{(LESSON_TITLES[lessonNum] || LESSON_TITLES[1]).en}</em>.</>
+                : <><b style={{ color: "var(--accent)" }}>Mukammal!</b> Siz <em>{(LESSON_TITLES[lessonNum] || LESSON_TITLES[1]).uz}</em> mavzusini o'zlashtirdingiz.</>)
             : (lang === "en"
-                ? <><b style={{ color: "var(--c-attack)" }}>Not yet.</b> Review and come back.</>
-                : <><b style={{ color: "var(--c-attack)" }}>Hozircha o'ta olmadingiz.</b> O'rganib qaytib keling.</>)}
+                ? <><b style={{ color: "var(--c-attack)" }}>Not yet.</b> Review the lesson and come back.</>
+                : <><b style={{ color: "var(--c-attack)" }}>Hozircha o'ta olmadingiz.</b> Darsni qayta o'qib, qaytib keling.</>)}
         </div>
       </div>
 

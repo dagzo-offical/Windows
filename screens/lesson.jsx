@@ -78,7 +78,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
 
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
         <div className="page" style={{ padding: "32px 28px 80px" }}>
-          <LessonHero lesson={LESSON} />
+          <LessonHero lesson={LESSON} lessonNum={lessonNum} />
           {lessonNum === 1 ? <>
             <Section1Bigpicture />
             <Section2Theory />
@@ -185,9 +185,25 @@ function Row({ k, v }) {
   return <div style={{ display: "flex", justifyContent: "space-between" }}><span>{k}</span><span className="mono">{v}</span></div>;
 }
 
+const LESSON_META = {
+  1: { min: 36, diagrams: 9, labs: 3,
+       introUz: <>Windows tizimining to'liq arxitekturasi — hardware'dan boshlab, <em>user mode va kernel mode</em>, executive qatlam, microkernel, HAL, va bir sichqoncha bosishi shu qatlamlarning har biridan qanday o'tishini ko'ramiz.</>,
+       introEn: <>The complete Windows architecture from the silicon up — <em>user mode vs kernel mode</em>, the executive layer, microkernel, HAL, and how a single mouse click cascades through every one of them.</> },
+  2: { min: 28, diagrams: 6, labs: 1,
+       introUz: <><em>Kernel</em> — operatsion tizimning yuragi. Bu darsda <em>ntoskrnl.exe</em> ichida nima borligini, Executive va Microkernel farqini, HAL nima ekanini va drayverlar nima uchun xavfli ekanini o'rganasiz.</>,
+       introEn: <>The <em>kernel</em> is the heart of the OS. You'll learn what lives inside <em>ntoskrnl.exe</em>, the difference between the Executive and Microkernel, what the HAL does, and why drivers are a serious security risk.</> },
+  3: { min: 32, diagrams: 5, labs: 1,
+       introUz: <>CPU <em>privilege halqalari</em> nima, ring 3 va ring 0 farqi, bu chegara nima uchun mavjud, har bir rejimda xato qilsangiz nima bo'ladi — va kernel mode'ga qanday qonuniy o'tish mumkin.</>,
+       introEn: <>What CPU <em>privilege rings</em> are, the difference between ring 3 and ring 0, why this boundary exists, what happens when code crashes in each mode — and how to legally cross into kernel mode.</> },
+  4: { min: 36, diagrams: 8, labs: 2,
+       introUz: <>UEFI'dan login ekraniga qadar Windows qanday ishga tushishini har bir bosqichda ko'rasiz: POST, Secure Boot, <em>bootmgr → winload → ntoskrnl → LSASS</em> — va har bir bosqich xavfsizlik uchun nimani anglatadi.</>,
+       introEn: <>Walk through every step of the Windows boot — POST, Secure Boot, <em>bootmgr → winload → ntoskrnl → LSASS</em> — and understand what each stage means for security.</> },
+};
+
 // ─────────────────────────────────────────────────────────────
-function LessonHero({ lesson }) {
+function LessonHero({ lesson, lessonNum = 1 }) {
   const lang = useLang();
+  const meta = LESSON_META[lessonNum] || LESSON_META[1];
   return (
     <header style={{ marginBottom: 40 }}>
       <div className="eyebrow" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
@@ -201,9 +217,9 @@ function LessonHero({ lesson }) {
 
       <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 24, flexWrap: "wrap" }}>
         <div style={{ display: "flex", gap: 10 }}>
-          <span className="chip"><Icon name="clock" size={11} /> 36 min</span>
-          <span className="chip chip-blue"><Icon name="graph" size={11} /> {lang === "en" ? "9 diagrams" : "9 diagramma"}</span>
-          <span className="chip chip-purple"><Icon name="terminal" size={11} /> {lang === "en" ? "3 labs" : "3 lab"}</span>
+          <span className="chip"><Icon name="clock" size={11} /> {meta.min} min</span>
+          <span className="chip chip-blue"><Icon name="graph" size={11} /> {lang === "en" ? `${meta.diagrams} diagrams` : `${meta.diagrams} diagramma`}</span>
+          <span className="chip chip-purple"><Icon name="terminal" size={11} /> {lang === "en" ? `${meta.labs} lab${meta.labs > 1 ? "s" : ""}` : `${meta.labs} lab`}</span>
           <span className="chip chip-yellow"><Icon name="warning" size={11} /> {lang === "en" ? "foundational" : "asosiy"}</span>
         </div>
         <div style={{ flex: 1 }} />
@@ -219,9 +235,7 @@ function LessonHero({ lesson }) {
             {lang === "en" ? "What you'll learn in this lesson" : "Bu darsda nima o'rganasiz"}
           </div>
           <div style={{ fontSize: 13, color: "var(--text-1)", marginTop: 4, lineHeight: 1.55 }}>
-            {lang === "en"
-              ? <>The complete Windows architecture from the silicon up — <em>user mode vs kernel mode</em>, the executive layer, microkernel, HAL, and how a single mouse click cascades through every one of them. We'll end where every Windows security problem begins: <em>the user/kernel boundary</em>.</>
-              : <>Windows tizimining to'liq arxitekturasi — hardware'dan boshlab, <em>user mode va kernel mode</em>, executive qatlam, microkernel, HAL, va bir sichqoncha bosishi shu qatlamlarning har biridan qanday o'tishini ko'ramiz. Yakunda — har bir Windows xavfsizlik muammosi qaerdan boshlanishi: <em>user/kernel chegarasi</em>.</>}
+            {lang === "en" ? meta.introEn : meta.introUz}
           </div>
         </div>
       </div>
