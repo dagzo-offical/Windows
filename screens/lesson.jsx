@@ -298,6 +298,48 @@ function Section3Layered() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Boot step card component
+function BootStep({ n, icon, color, titleUz, titleEn, children }) {
+  const lang = useLang();
+  return (
+    <div style={{
+      display: "grid", gridTemplateColumns: "auto 1fr", gap: 0,
+      marginBottom: 4,
+    }}>
+      {/* Left: number + connector */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 52 }}>
+        <div style={{
+          width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+          background: `${color}18`, border: `2px solid ${color}`,
+          color, display: "grid", placeItems: "center",
+          fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)",
+          boxShadow: `0 0 14px ${color}44`,
+        }}>{n}</div>
+        <div style={{ width: 2, flex: 1, minHeight: 20, background: `${color}30`, marginTop: 4 }} />
+      </div>
+      {/* Right: content */}
+      <div style={{
+        background: `${color}08`, border: `1px solid ${color}22`,
+        borderRadius: 12, padding: "16px 20px", marginLeft: 12, marginBottom: 16,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8,
+            background: `${color}18`, border: `1px solid ${color}44`,
+            color, display: "grid", placeItems: "center",
+          }}><Icon name={icon} size={16} /></div>
+          <div style={{ fontWeight: 700, fontSize: 15, color }}>
+            {lang === "en" ? titleEn : titleUz}
+          </div>
+        </div>
+        <div style={{ fontSize: 13.5, lineHeight: 1.75, color: "var(--text-1)" }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Section4Boot() {
   const lang = useLang();
   const chart = `
@@ -325,8 +367,8 @@ flowchart TD
       <H2 num="04" uz="Boot jarayoni" en="The boot process" />
       <P>
         {lang === "en"
-          ? <>From the moment you press the power button to the login screen, Windows passes through a precisely choreographed sequence. Each stage hands off to the next and verifies the next, so a single compromised step can be detected.</>
-          : <>Quvvat tugmasini bosgan paytdan login ekranigacha, Windows aniq xoreografiyalashtirilgan ketma-ketlikdan o'tadi. Har bir bosqich keyingisiga estafetani uzatadi va uni tekshiradi, shuning uchun bitta buzilgan bosqichni aniqlash mumkin.</>}
+          ? <>From the moment you press the power button to the login screen, Windows passes through a precisely choreographed sequence. Each stage hands off to the next and verifies it — so a single compromised step can be detected.</>
+          : <>Quvvat tugmasini bosgan paytdan login ekranigacha, Windows aniq xoreografiyalashtirilgan ketma-ketlikdan o'tadi. Har bir bosqich keyingisiga estafetani uzatadi va uni tekshiradi — shuning uchun bitta buzilgan bosqichni aniqlash mumkin.</>}
       </P>
 
       <div style={{ marginTop: 22 }}>
@@ -337,14 +379,70 @@ flowchart TD
         />
       </div>
 
+      {/* Step-by-step breakdown */}
+      <div style={{ marginTop: 36, marginBottom: 8 }}>
+        <div className="eyebrow" style={{ marginBottom: 20 }}>
+          {lang === "en" ? "// STEP_BY_STEP — what happens at each stage" : "// BOSQICHMA_BOSQICH — har bir qadamda nima sodir bo'ladi"}
+        </div>
+
+        <BootStep n="1" icon="zap" color="var(--c-auth)"
+          titleUz="Power On — Elektr tokini yoqish"
+          titleEn="Power On — Electricity on">
+          {lang === "en"
+            ? <>When you press the power button, the <Em>Power Supply Unit (PSU)</Em> sends a stable signal to the motherboard: "Power is ready, you may start." Only after this signal does the CPU execute its very first instruction — always from the same fixed address in ROM.</>
+            : <>Siz tugmani bosganingizda, <Em>tok manbai (PSU)</Em> ona plataga signal yuboradi: «Elektr barqaror, ish boshlashimiz mumkin». Faqat shundan keyin CPU o'zining birinchi ko'rsatmasini bajaradi — har doim ROM'dagi qat'iy belgilangan manzildan.</>}
+        </BootStep>
+
+        <BootStep n="2" icon="shield" color="var(--c-warn)"
+          titleUz="UEFI / BIOS va POST — Qorovulning ertalabki tekshiruvi"
+          titleEn="UEFI / BIOS + POST — The morning inspection">
+          {lang === "en"
+            ? <><Em>POST (Power-On Self Test)</Em> is the first to run — hardware checks itself: is RAM present? Is the CPU working? Then <Em>UEFI</Em> (modern successor to BIOS) maps all components and checks the <Em>Secure Boot</Em> signature chain. If a bootkit tampered with the bootloader, UEFI refuses to hand off — this is exactly how <code>BlackLotus</code> was supposed to be stopped.</>
+            : <><Em>POST (Power-On Self Test)</Em> birinchi ishlaydi — hardware o'zini o'zi tekshiradi: RAM joyidami? CPU ishlayaptimi? Klaviatura ulanganmi? Keyin <Em>UEFI</Em> (zamonaviy BIOS o'rniga) barcha qismlarni xaritalaydi va <Em>Secure Boot</Em> imzo zanjirini tekshiradi. Agar bootkit bootloader'ni o'zgartirgan bo'lsa, UEFI estafetani uzatishdan bosh tortadi — <code>BlackLotus</code> aynan shunday to'xtatilishi kerak edi.</>}
+        </BootStep>
+
+        <BootStep n="3" icon="database" color="var(--c-system)"
+          titleUz="Boot Manager — bootmgr.efi (Zavod direktori)"
+          titleEn="Boot Manager — bootmgr.efi">
+          {lang === "en"
+            ? <>UEFI hands off to <code>bootmgr.efi</code> on the EFI System Partition. Its only job: read the <Em>BCD (Boot Configuration Data)</Em> store and decide which OS to load. If you dual-boot (Windows + Kali Linux), this is where the menu appears. Single OS? It jumps straight ahead.</>
+            : <>UEFI EFI System Partition'dagi <code>bootmgr.efi</code> fayliga estafetani uzatadi. Uning yagona vazifasi: <Em>BCD (Boot Configuration Data)</Em> ni o'qib, qaysi OT ni yuklashni hal qilish. Agar ikki OT o'rnatilgan bo'lsa (Windows + Kali Linux) — aynan shu yerda menyu paydo bo'ladi. Bitta OT bo'lsa — to'g'ri keyingisiga o'tadi.</>}
+        </BootStep>
+
+        <BootStep n="4" icon="cpu" color="var(--accent)"
+          titleUz="Windows Loader — winload.efi (Stolga kitoblar qo'yish)"
+          titleEn="Windows Loader — winload.efi">
+          {lang === "en"
+            ? <><code>winload.efi</code> reads the Windows kernel (<code>ntoskrnl.exe</code>), the Hardware Abstraction Layer (<code>hal.dll</code>), and the boot-start drivers from disk and maps them into RAM. Working from RAM is thousands of times faster than disk — this is why the step exists at all. Before handing off, it verifies every loaded file's digital signature.</>
+            : <><code>winload.efi</code> Windows yadrosi (<code>ntoskrnl.exe</code>), Apparat Abstraksiya Qatlami (<code>hal.dll</code>) va dastlabki drayverlarni diskdan o'qib, RAM ga ko'chiradi. RAM'dan ishlash diskga qaraganda minglab marta tezroq — aynan shuning uchun bu qadam mavjud. Boshqaruvni topshirishdan oldin har bir faylning raqamli imzosini tekshiradi.</>}
+        </BootStep>
+
+        <BootStep n="5" icon="layers" color="var(--c-user)"
+          titleUz="Kernel ishga tushishi — ntoskrnl.exe (Direktor ish boshlagani)"
+          titleEn="Kernel initialises — ntoskrnl.exe">
+          {lang === "en"
+            ? <>Control passes fully to the <Em>Kernel</Em>. It initialises the memory manager, object manager, I/O manager, and starts the process manager. Then it launches <code>smss.exe</code> (Session Manager) — the first real user-space process. Windows logo + spinning dots on screen = this exact moment.</>
+            : <>Boshqaruv to'liq <Em>Kernelga</Em> o'tadi. U xotira menejeri, ob'ekt menejeri, I/O menejeri va jarayon menejerini ishga tushiradi. So'ng <code>smss.exe</code> (Session Manager) ni — birinchi haqiqiy user-space jarayonini — yoqadi. Ekrandagi Windows logotipi va aylanayotgan nuqtalar — aynan mana shu lahza.</>}
+        </BootStep>
+
+        <BootStep n="6" icon="lock" color="var(--c-attack)"
+          titleUz="Winlogon va LSASS — Kirish eshigi va Ruxsatnoma xizmati"
+          titleEn="Winlogon + LSASS — Gate and credential guard">
+          {lang === "en"
+            ? <><code>wininit.exe</code> starts <code>services.exe</code> (all background services) and <code>lsass.exe</code>. <Em>LSASS (Local Security Authority Subsystem Service)</Em> is the heart of Windows authentication — it validates every password, PIN, and smart card. Then <code>winlogon.exe</code> brings up the lock screen. LSASS is also the prime target for <Em>credential dumping</Em> (Mimikatz extracts hashes from its memory).</>
+            : <><code>wininit.exe</code> — <code>services.exe</code> (barcha fon xizmatlar) va <code>lsass.exe</code> ni ishga tushiradi. <Em>LSASS (Local Security Authority Subsystem Service)</Em> — Windows autentifikatsiyasining yuragi: har bir parol, PIN va smart-karta aynan shu jarayon orqali tekshiriladi. So'ng <code>winlogon.exe</code> kirish ekranini ko'rsatadi. LSASS shu bilan birga <Em>credential dumping</Em> ning asosiy nishoni (Mimikatz uning xotirasidan hash'larni tortib oladi).</>}
+        </BootStep>
+      </div>
+
       <Callout color="var(--c-warn)" icon="warning" titleUz="Xavfsizlik nuqtai nazaridan" titleEn="Security note">
         {lang === "en"
-          ? <>Secure Boot enforces a cryptographic chain — UEFI verifies the bootloader, the bootloader verifies the kernel, the kernel verifies signed drivers. Breaking this chain is the dream of every bootkit (and how rootkits like <code>BlackLotus</code> made the news).</>
-          : <>Secure Boot kriptografik zanjirni ta'minlaydi — UEFI bootloader'ni tekshiradi, bootloader yadroni, yadro esa imzolangan drayverlarni. Bu zanjirni buzish har bir bootkit'ning orzusi (va <code>BlackLotus</code> kabi rootkit'lar shuning uchun yangiliklarda paydo bo'ldi).</>}
+          ? <>Secure Boot enforces a cryptographic chain — UEFI verifies the bootloader, the bootloader verifies the kernel, the kernel verifies signed drivers. Breaking this chain is the dream of every bootkit. <code>BlackLotus</code> (2023) was the first public UEFI bootkit to bypass Secure Boot on fully patched Windows 11 — it patched the Secure Boot revocation list in memory before the check ran.</>
+          : <>Secure Boot kriptografik zanjirni ta'minlaydi — UEFI bootloader'ni tekshiradi, bootloader yadroni, yadro esa imzolangan drayverlarni. Bu zanjirni buzish har bir bootkit'ning orzusi. <code>BlackLotus</code> (2023) — to'liq yangilangan Windows 11 da Secure Boot'ni chetlab o'tgan birinchi ommaviy UEFI bootkit: u tekshiruv ishlashidan oldin xotiradagi Secure Boot revokatsiya ro'yxatini o'zgartirdi.</>}
       </Callout>
     </section>
   );
 }
+
 
 // ─────────────────────────────────────────────────────────────
 function Section5Syscall() {
