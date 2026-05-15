@@ -11,7 +11,7 @@ function DashboardScreen({ setRoute, user }) {
         {/* HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32, gap: 24, flexWrap: "wrap" }}>
           <div>
-            <div className="eyebrow"><LiveDot /> &nbsp;OPERATOR_ID: {user?.name?.toUpperCase().replace(/\s/g,"_") || "DAGZO"} · LAST_LOGIN: just now</div>
+            <div className="eyebrow"><LiveDot /> &nbsp;OPERATOR_ID: {(user?.name || "DAGZO").toUpperCase().replace(/\s/g,"_")} · XP: {user?.xp || 0} · LVL: {user?.level || 1}</div>
             <h1 className="display" style={{ fontSize: 40, margin: "10px 0 6px", letterSpacing: "-0.02em" }}>
               {lang === "en" ? `Welcome back, ${user?.name || "Dagzo"}` : `Xush kelibsiz, ${user?.name || "Dagzo"}`}<span className="caret" />
             </h1>

@@ -27,7 +27,7 @@ const EXAM_QUESTIONS = [
   { uz: "Notepad'ni ishga tushirish bitta sichqoncha bosishidan login qilingan user uchun nima qiladi? Barcha qatlamlardan o'tish.", en: "What happens from a single click of Notepad? Trace through every layer.", topic: "Full trace", difficulty: "hard" },
 ];
 
-function FinalExamScreen({ setRoute, user }) {
+function FinalExamScreen({ setRoute, user, markLessonComplete }) {
   const lang = useLang();
   const [phase, setPhase] = useFS("brief");
   const [answers, setAnswers] = useFS(Array(20).fill(""));
@@ -37,6 +37,8 @@ function FinalExamScreen({ setRoute, user }) {
   const [tabSwitches, setTabSwitches] = useFS(0);
   const [warnings, setWarnings] = useFS([]);
   const [submitting, setSubmitting] = useFS(false);
+  const [gradingIdx, setGradingIdx] = useFS(0);
+  const [examResults, setExamResults] = useFS(null);
 
   useFE(() => {
     if (phase !== "taking") return;
@@ -75,9 +77,41 @@ function FinalExamScreen({ setRoute, user }) {
     const next = [...answers]; next[current] = val; setAnswers(next);
   };
 
-  const submit = () => {
+  const hasKey = !!(localStorage.getItem("wa_ai_provider") && localStorage.getItem("wa_ai_key"));
+
+  const submit = async () => {
     setSubmitting(true);
-    setTimeout(() => setPhase("submitted"), 800);
+    setPhase("grading");
+    const results = [];
+    for (let i = 0; i < EXAM_QUESTIONS.length; i++) {
+      setGradingIdx(i);
+      const q = EXAM_QUESTIONS[i];
+      const a = answers[i] || "";
+      try {
+        if (hasKey) {
+          const prompt = `You are a strict Windows internals exam grader.
+QUESTION: ${lang === "en" ? q.en : q.uz}
+STUDENT ANSWER: """${a || "(empty)"}"""
+Topic: ${q.topic} | Difficulty: ${q.difficulty}
+Grade 0-100. Empty=0-10. Surface-level=20-50. Correct technical terms (${q.topic})+depth=70+. Expert=90+.
+Return STRICT JSON only: {"score":<0-100>,"passed":<score>=70>,"key_points":["point"],"missing":["missing"],"feedback":"1-2 sentences in ${lang === "en" ? "English" : "Uzbek"}"}`;
+          const text = await gradeWithAI(prompt);
+          const cleaned = text.replace(/^```json[\s\S]*?\n|```\s*$/g, "").trim();
+          results.push(JSON.parse(cleaned));
+        } else {
+          const wc = a.trim().split(/\s+/).filter(Boolean).length;
+          const score = wc < 5 ? 8 : wc < 15 ? 28 : wc < 40 ? 52 : 74;
+          results.push({ score, passed: score >= 70, key_points: [], missing: ["AI kalit o'rnatilmagan"], feedback: "Tweaks → AI Tekshiruvchi bo'limida kalit o'rnating." });
+        }
+      } catch {
+        results.push({ score: 0, passed: false, key_points: [], missing: ["Baholashda xatolik"], feedback: "AI so'rovda xatolik yuz berdi." });
+      }
+    }
+    setExamResults(results);
+    const overall = Math.round(results.reduce((s, r) => s + r.score, 0) / results.length);
+    if (overall >= 85 && markLessonComplete) markLessonComplete("s01_final");
+    setPhase("submitted");
+    setSubmitting(false);
   };
 
   return (
@@ -100,7 +134,8 @@ function FinalExamScreen({ setRoute, user }) {
           onSubmit={submit} submitting={submitting}
         />
       )}
-      {phase === "submitted" && <ExamSubmitted setRoute={setRoute} answered={answered} />}
+      {phase === "grading" && <ExamGrading idx={gradingIdx} total={EXAM_QUESTIONS.length} />}
+      {phase === "submitted" && examResults && <ExamResults results={examResults} questions={EXAM_QUESTIONS} answers={answers} setRoute={setRoute} />}
     </div>
   );
 }
@@ -330,6 +365,104 @@ function SR({ k, v, c }) {
     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
       <span style={{ color: "var(--text-2)" }}>{k}</span>
       <span className="mono" style={{ color: c }}>{v}</span>
+    </div>
+  );
+}
+
+function ExamGrading({ idx, total }) {
+  const lang = useLang();
+  const pct = Math.round(((idx + 1) / total) * 100);
+  return (
+    <div style={{ maxWidth: 560, margin: "0 auto", padding: "100px 28px", textAlign: "center" }}>
+      <div style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--accent-soft)", color: "var(--accent)", display: "grid", placeItems: "center", margin: "0 auto 24px", boxShadow: "0 0 40px var(--accent-glow)", animation: "glow 2s ease-in-out infinite" }}>
+        <Icon name="spark" size={36} />
+      </div>
+      <h2 className="display" style={{ fontSize: 28, margin: "0 0 8px" }}>
+        {lang === "en" ? "AI grading your exam…" : "AI imtihonni tekshirmoqda…"}
+      </h2>
+      <p style={{ color: "var(--text-3)", margin: "0 0 28px", fontSize: 13, fontFamily: "var(--font-mono)" }}>
+        {lang === "en" ? `Question ${idx + 1} of ${total}` : `${idx + 1} / ${total} savol`}
+      </p>
+      <div style={{ background: "var(--bg-2)", borderRadius: 8, height: 8, overflow: "hidden", border: "1px solid var(--border)" }}>
+        <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, var(--accent), var(--c-auth))", transition: "width 400ms", boxShadow: "0 0 12px var(--accent-glow)" }} />
+      </div>
+      <div style={{ marginTop: 10, fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)" }}>{pct}%</div>
+    </div>
+  );
+}
+
+function ExamResults({ results, questions, answers, setRoute }) {
+  const lang = useLang();
+  const overall = Math.round(results.reduce((s, r) => s + r.score, 0) / results.length);
+  const passed = overall >= 85;
+  const [expanded, setExpanded] = React.useState(null);
+
+  return (
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 28px 80px" }}>
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: 36 }}>
+        <div style={{
+          width: 96, height: 96, borderRadius: "50%", margin: "0 auto 20px",
+          background: passed ? "var(--accent-soft)" : "rgba(255,58,94,0.12)",
+          color: passed ? "var(--accent)" : "var(--c-attack)",
+          display: "grid", placeItems: "center",
+          boxShadow: `0 0 40px ${passed ? "var(--accent-glow)" : "rgba(255,58,94,0.3)"}`,
+        }}>
+          <Icon name={passed ? "trophy" : "x"} size={44} />
+        </div>
+        <h1 className="display" style={{ fontSize: 40, margin: "0 0 6px" }}>
+          {passed ? (lang === "en" ? "Section Complete!" : "Bo'lim Yakunlandi!") : (lang === "en" ? "Not passed" : "O'tilmadi")}
+        </h1>
+        <div style={{ fontSize: 56, fontWeight: 900, fontFamily: "var(--font-mono)", color: passed ? "var(--accent)" : "var(--c-attack)", margin: "12px 0" }}>
+          {overall}<span style={{ fontSize: 24, opacity: 0.6 }}>/100</span>
+        </div>
+        <p style={{ color: "var(--text-2)", margin: 0 }}>
+          {lang === "en" ? `85% required · ${results.filter(r => r.score >= 70).length}/20 questions passed` : `85% talab qilinadi · ${results.filter(r => r.score >= 70).length}/20 ta savol o'tildi`}
+        </p>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 20 }}>
+          <button className="btn btn-primary" onClick={() => setRoute({ name: "section", section: 1 })}>
+            <Icon name="arrow-left" size={14} /> {lang === "en" ? "Back to Section" : "Bo'limga qaytish"}
+          </button>
+          {!passed && <button className="btn" onClick={() => window.location.reload()}>
+            <Icon name="play" size={14} /> {lang === "en" ? "Retry" : "Qayta urinish"}
+          </button>}
+        </div>
+      </div>
+
+      {/* Per-question results */}
+      <div className="eyebrow" style={{ marginBottom: 16 }}>{lang === "en" ? "// DETAILED_RESULTS" : "// BATAFSIL_NATIJALAR"}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {results.map((r, i) => {
+          const color = r.score >= 70 ? "var(--accent)" : r.score >= 50 ? "var(--c-warn)" : "var(--c-attack)";
+          const open = expanded === i;
+          return (
+            <div key={i} style={{ background: "var(--surface)", border: `1px solid ${open ? color + "44" : "var(--border)"}`, borderRadius: 10, overflow: "hidden", transition: "border 200ms" }}>
+              <div onClick={() => setExpanded(open ? null : i)} style={{ display: "grid", gridTemplateColumns: "36px 1fr auto auto", gap: 12, alignItems: "center", padding: "14px 16px", cursor: "pointer" }}>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-3)" }}>Q{i + 1}</div>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>{lang === "en" ? questions[i].en : questions[i].uz}</div>
+                <div style={{ fontFamily: "var(--font-mono)", fontWeight: 800, fontSize: 18, color, minWidth: 44, textAlign: "right" }}>{r.score}</div>
+                <Icon name={open ? "chevron-up" : "chevron-right"} size={14} style={{ color: "var(--text-3)" }} />
+              </div>
+              {open && (
+                <div style={{ padding: "0 16px 16px", borderTop: "1px solid var(--border)" }}>
+                  <div style={{ marginTop: 12, fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.6, background: "var(--bg-2)", padding: "10px 14px", borderRadius: 8, marginBottom: 10 }}>
+                    <b>{lang === "en" ? "Your answer: " : "Javobingiz: "}</b>{answers[i] || "(bo'sh)"}
+                  </div>
+                  {r.key_points?.length > 0 && <div style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, color: "var(--accent)", fontFamily: "var(--font-mono)", marginBottom: 4 }}>✓ {lang === "en" ? "KEY POINTS" : "TO'G'RI"}</div>
+                    {r.key_points.map((p, j) => <div key={j} style={{ fontSize: 12.5, color: "var(--text-1)", paddingLeft: 12 }}>• {p}</div>)}
+                  </div>}
+                  {r.missing?.length > 0 && <div style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, color: "var(--c-attack)", fontFamily: "var(--font-mono)", marginBottom: 4 }}>✗ {lang === "en" ? "MISSING" : "YETISHMAYDI"}</div>
+                    {r.missing.map((p, j) => <div key={j} style={{ fontSize: 12.5, color: "var(--text-1)", paddingLeft: 12 }}>• {p}</div>)}
+                  </div>}
+                  {r.feedback && <div style={{ fontSize: 12.5, color: "var(--text-2)", fontStyle: "italic", borderLeft: `2px solid ${color}`, paddingLeft: 10 }}>{r.feedback}</div>}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

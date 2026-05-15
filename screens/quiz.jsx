@@ -29,24 +29,55 @@ function QuizModal({ onClose, onPass, onFail }) {
   const [loading, setLoading] = useQS(false);
   const [err, setErr] = useQS(null);
 
+  const hasKey = () => !!(localStorage.getItem("wa_ai_provider") && localStorage.getItem("wa_ai_key"));
+
+  const gradeOne = async (q, answer) => {
+    const prompt = `You are a senior Windows internals instructor grading a student's written answer.
+
+QUESTION (Uzbek): ${q.uz}
+QUESTION (English): ${q.en}
+
+STUDENT ANSWER:
+"""
+${answer || "(empty)"}
+"""
+
+Grade STRICTLY on technical correctness (40%), Windows/OS terminology (20%), real understanding of internals (20%), explanation quality (20%).
+Empty/one-word answers get 0-20. Surface-level gets 30-50. Real depth with correct terms (ring 0/3, ntoskrnl, HAL, syscall, executive, LSASS, etc.) gets 70+. Expert security nuance gets 90+.
+
+Return STRICT JSON only, no markdown fences. Feedback in ${lang === "en" ? "English" : "Uzbek"}:
+{"score":<0-100>,"passed":<true if score>=70>,"strengths":["bullet","bullet"],"weaknesses":["bullet","bullet"],"feedback":"2-3 sentence feedback"}`;
+
+    if (hasKey()) {
+      const text = await gradeWithAI(prompt);
+      const cleaned = text.replace(/^```json\s*[\r\n]?|```\s*$/g, "").trim();
+      return JSON.parse(cleaned);
+    }
+    // fallback: word-count heuristic
+    const wc = (answer || "").trim().split(/\s+/).filter(Boolean).length;
+    const score = wc < 5 ? 10 : wc < 20 ? 30 : wc < 50 ? 55 : 72;
+    return {
+      score, passed: score >= 70,
+      strengths: wc >= 50 ? [lang === "en" ? "Detailed answer" : "Batafsil javob"] : [],
+      weaknesses: wc < 50 ? [lang === "en" ? "Too brief — AI key not set" : "Juda qisqa — AI kalit o'rnatilmagan"] : [],
+      feedback: lang === "en" ? "Set an AI key in Tweaks panel for real grading." : "Haqiqiy baholash uchun Tweaks panelida AI kalitini o'rnating.",
+    };
+  };
+
   const generate = async () => {
     setLoading(true); setErr(null);
     try {
-      const prompt = `Generate 3 advanced written questions about Windows architecture and operating system internals for a Windows security course.
-Requirements:
-- Each question requires a multi-sentence written explanation (not yes/no)
-- Cover: user mode vs kernel mode, executive/microkernel/HAL, processes & threads, boot process, syscall flow
-- Mix difficulty: 1 conceptual, 1 technical-deep, 1 security-implication scenario
-- Return STRICT JSON only, no markdown fences, like:
-{ "questions": [ { "uz": "...", "en": "..." }, { "uz": "...", "en": "..." }, { "uz": "...", "en": "..." } ] }
-- "uz" is the Uzbek version, "en" is the English version of the same question.`;
-      const text = await window.claude.complete(prompt);
-      const cleaned = text.replace(/^```json\s*|```\s*$/g, "").trim();
-      const json = JSON.parse(cleaned);
-      setQuestions(json.questions.slice(0, 3));
+      if (hasKey()) {
+        const prompt = `Generate 3 advanced written questions about Windows architecture and OS internals for a security course. Cover: user mode vs kernel mode, executive/HAL, boot process, syscall flow. Mix: 1 conceptual, 1 technical-deep, 1 security scenario. Return STRICT JSON only: {"questions":[{"uz":"...","en":"..."},{"uz":"...","en":"..."},{"uz":"...","en":"..."}]}`;
+        const text = await gradeWithAI(prompt);
+        const cleaned = text.replace(/^```json\s*[\r\n]?|```\s*$/g, "").trim();
+        setQuestions(JSON.parse(cleaned).questions.slice(0, 3));
+      } else {
+        setQuestions(FALLBACK_QUESTIONS);
+      }
       setPhase("answering");
     } catch (e) {
-      console.warn("AI question gen failed, using fallback:", e);
+      console.warn("Question gen failed, using fallback:", e);
       setQuestions(FALLBACK_QUESTIONS);
       setPhase("answering");
     } finally {
@@ -57,51 +88,7 @@ Requirements:
   const submit = async () => {
     setPhase("grading"); setLoading(true); setErr(null);
     try {
-      const evals = await Promise.all(questions.map(async (q, i) => {
-        const prompt = `You are a senior Windows internals instructor grading a student's written answer.
-
-QUESTION (Uzbek): ${q.uz}
-QUESTION (English): ${q.en}
-
-STUDENT ANSWER:
-"""
-${answers[i] || "(empty)"}
-"""
-
-Grade STRICTLY on:
-- Technical correctness (40%)
-- Windows / OS terminology usage (20%)
-- Real understanding of internals (20%)
-- Explanation quality (20%)
-
-Be tough but fair. Empty / one-word / unrelated answers get 0-20.
-Surface-level "Windows is an operating system" without specifics gets 30-50.
-Real technical depth with correct terms (ring 0/3, ntoskrnl, HAL, syscall, executive, etc.) gets 70+.
-Expert-level with security nuance gets 90+.
-
-Return STRICT JSON only, no markdown fences. Feedback should be in ${lang === "en" ? "English" : "Uzbek"}:
-{
-  "score": <0-100>,
-  "passed": <true if score >= 70>,
-  "strengths": ["short bullet", "short bullet"],
-  "weaknesses": ["short bullet", "short bullet"],
-  "feedback": "2-3 sentence overall feedback"
-}`;
-        try {
-          const text = await window.claude.complete(prompt);
-          const cleaned = text.replace(/^```json\s*|```\s*$/g, "").trim();
-          return JSON.parse(cleaned);
-        } catch (e) {
-          const a = (answers[i] || "").trim();
-          const score = a.length < 20 ? 10 : a.length < 80 ? 35 : a.length < 200 ? 55 : 75;
-          return {
-            score, passed: score >= 70,
-            strengths: a.length > 80 ? [lang === "en" ? "Answer is well-developed" : "Javob to'liq yozilgan"] : [],
-            weaknesses: a.length < 80 ? [lang === "en" ? "Answer too brief" : "Javob juda qisqa"] : [lang === "en" ? "Lacks technical depth" : "Texnik chuqurlik yetishmaydi"],
-            feedback: lang === "en" ? "Heuristic grading was applied — AI grader unavailable." : "AI tekshirib bo'lmadi — heuristik baholash qo'llanildi.",
-          };
-        }
-      }));
+      const evals = await Promise.all(questions.map((q, i) => gradeOne(q, answers[i])));
       setResults(evals);
       setPhase("result");
     } catch (e) {
@@ -197,6 +184,7 @@ function ModalHeader({ phase, onClose }) {
 
 function Intro({ onStart, loading }) {
   const lang = useLang();
+  const hasKey = !!(localStorage.getItem("wa_ai_provider") && localStorage.getItem("wa_ai_key"));
   return (
     <div style={{ padding: "32px 0", textAlign: "center" }}>
       <div style={{
@@ -231,6 +219,17 @@ function Intro({ onStart, loading }) {
         ))}
       </div>
 
+      {!hasKey && (
+        <div style={{ padding: 14, background: "rgba(255,145,0,0.07)", border: "1px solid rgba(255,145,0,0.3)", borderRadius: 10, textAlign: "left", marginBottom: 16, display: "flex", gap: 10, alignItems: "flex-start" }}>
+          <Icon name="warning" size={15} style={{ color: "var(--c-warn)", flexShrink: 0, marginTop: 2 }} />
+          <div style={{ fontSize: 12, color: "var(--text-1)", lineHeight: 1.55 }}>
+            <b style={{ color: "var(--c-warn)" }}>{lang === "en" ? "AI grader off:" : "AI tekshiruv o'chiq:"}</b>{" "}
+            {lang === "en"
+              ? "Open Tweaks panel (⚙) → AI Grader, choose provider and paste your API key for real AI grading."
+              : "Tweaks panel (⚙) → AI Tekshiruvchi bo'limiga kiring, provider tanlang va API kalitingizni kiriting."}
+          </div>
+        </div>
+      )}
       <div style={{ padding: 16, background: "rgba(255,58,94,0.06)", border: "1px solid rgba(255,58,94,0.25)", borderRadius: 10, textAlign: "left", marginBottom: 24, display: "flex", gap: 12, alignItems: "flex-start" }}>
         <Icon name="warning" size={16} style={{ color: "var(--c-attack)", flexShrink: 0, marginTop: 2 }} />
         <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.55 }}>

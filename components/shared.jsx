@@ -127,9 +127,7 @@ function TopNav({ route, setRoute, user, crumb }) {
       </div>
       <nav style={{ display: "flex", gap: 8 }}>
         <NavLink label={lang === "en" ? "Dashboard" : "Boshqaruv"} sub="Dashboard" active={route.name === "dashboard"} onClick={nav({ name: "dashboard" })} />
-        <NavLink label={lang === "en" ? "Courses" : "Kurslar"} sub="Courses" active={route.name === "section"} onClick={nav({ name: "section", section: 3 })} />
-        <NavLink label={lang === "en" ? "Labs" : "Laboratoriya"} sub="Labs" />
-        <NavLink label={lang === "en" ? "Leaderboard" : "Reyting"} sub="Leaderboard" />
+        <NavLink label={lang === "en" ? "Courses" : "Kurslar"} sub="Courses" active={route.name === "section"} onClick={nav({ name: "section", section: 1 })} />
       </nav>
       <div className="topnav-r">
         <LangToggle />
@@ -345,4 +343,136 @@ function LabStep({ n, title, titleEn, children, done }) {
 }
 
 // Expose
-Object.assign(window, { Bi, T, tt, useLang, useSetLang, LangContext, LangToggle, ParticleBg, TopNav, NavLink, Progress, Terminal, Code, NodeChip, LiveDot, SectionH, LabStep });
+Object.assign(window, { Bi, T, tt, useLang, useSetLang, LangContext, LangToggle, ParticleBg, TopNav, NavLink, Progress, Terminal, Code, NodeChip, LiveDot, SectionH, LabStep, AIKeyPanel, gradeWithAI });
+
+// ─────────────────────────────────────────────────────────────
+// Multi-provider AI grader
+// ─────────────────────────────────────────────────────────────
+async function gradeWithAI(prompt) {
+  const provider = localStorage.getItem("wa_ai_provider") || "";
+  const key      = localStorage.getItem("wa_ai_key") || "";
+  if (!provider || !key) throw new Error("no_key");
+
+  if (provider === "openai") {
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+      body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "user", content: prompt }], max_tokens: 600 }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || "OpenAI error");
+    return d.choices[0].message.content;
+  }
+
+  if (provider === "anthropic") {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 600, messages: [{ role: "user", content: prompt }] }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || "Anthropic error");
+    return d.content[0].text;
+  }
+
+  if (provider === "gemini") {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || "Gemini error");
+    return d.candidates[0].content.parts[0].text;
+  }
+
+  throw new Error("Noma'lum provider");
+}
+
+// ─────────────────────────────────────────────────────────────
+// AI Key settings panel (used in TweaksPanel)
+// ─────────────────────────────────────────────────────────────
+function AIKeyPanel() {
+  const { useState: useS } = React;
+  const [provider, setProvider] = useS(() => localStorage.getItem("wa_ai_provider") || "");
+  const [key, setKey]           = useS(() => localStorage.getItem("wa_ai_key") || "");
+  const [show, setShow]         = useS(false);
+  const [saved, setSaved]       = useS(false);
+
+  const save = () => {
+    localStorage.setItem("wa_ai_provider", provider);
+    localStorage.setItem("wa_ai_key", key);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const PROVIDERS = [
+    { id: "openai",    label: "OpenAI",    hint: "sk-..." },
+    { id: "anthropic", label: "Claude",    hint: "sk-ant-..." },
+    { id: "gemini",    label: "Gemini",    hint: "AIza..." },
+  ];
+
+  return (
+    <div style={{ marginTop: 4 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 6, flexWrap: "wrap" }}>
+        {PROVIDERS.map(p => (
+          <button key={p.id} onClick={() => setProvider(p.id)} style={{
+            appearance: "none", cursor: "pointer",
+            padding: "4px 10px", borderRadius: 6, fontSize: 10.5,
+            fontFamily: "var(--font-mono)", fontWeight: 600,
+            border: `1.5px solid ${provider === p.id ? "var(--accent)" : "rgba(255,255,255,0.1)"}`,
+            background: provider === p.id ? "var(--accent-soft)" : "rgba(0,0,0,0.05)",
+            color: provider === p.id ? "var(--accent)" : "var(--text-2)",
+            transition: "all 150ms",
+          }}>{p.label}</button>
+        ))}
+      </div>
+
+      {provider && (
+        <div style={{ position: "relative" }}>
+          <input
+            type={show ? "text" : "password"}
+            placeholder={PROVIDERS.find(p => p.id === provider)?.hint || "API Key"}
+            value={key}
+            onChange={e => setKey(e.target.value)}
+            style={{
+              width: "100%", boxSizing: "border-box",
+              background: "rgba(0,0,0,0.2)", border: "1px solid var(--border)",
+              borderRadius: 7, padding: "6px 36px 6px 9px",
+              fontSize: 10.5, fontFamily: "var(--font-mono)",
+              color: "var(--text-0)", outline: "none",
+            }}
+          />
+          <button onClick={() => setShow(s => !s)} style={{
+            position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
+            appearance: "none", background: "none", border: "none", cursor: "pointer",
+            color: "var(--text-3)", fontSize: 12, padding: 2,
+          }}>{show ? "🙈" : "👁"}</button>
+        </div>
+      )}
+
+      {provider && (
+        <button onClick={save} style={{
+          appearance: "none", cursor: "pointer", marginTop: 6,
+          width: "100%", padding: "5px 0", borderRadius: 6, fontSize: 10.5,
+          fontWeight: 700, fontFamily: "var(--font-mono)",
+          background: saved ? "rgba(0,255,136,0.15)" : "var(--accent-soft)",
+          border: `1px solid ${saved ? "var(--accent)" : "var(--accent-border)"}`,
+          color: saved ? "var(--accent)" : "var(--text-0)",
+          transition: "all 200ms",
+        }}>{saved ? "✓ Saqlandi" : "Saqlash"}</button>
+      )}
+
+      {!provider && (
+        <div style={{ fontSize: 10, color: "var(--text-3)", lineHeight: 1.5 }}>
+          AI tekshiruvi uchun provider tanlang va API kalitingizni kiriting.
+        </div>
+      )}
+    </div>
+  );
+}

@@ -144,6 +144,9 @@ function App() {
           options={["off", "low", "high"]}
           onChange={(v) => setTweak("motion", v)} />
 
+        <TweakSection label="AI Tekshiruvchi · Grader" />
+        <AIKeyPanel />
+
         <TweakSection label="Quick nav · Tezkor o'tish" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
           <NavBtn label="Landing" onClick={() => setRoute({ name: "landing" })} />
@@ -183,7 +186,7 @@ function RouteRender({ route, screenProps }) {
     case "section": return <SectionScreen {...screenProps} section={route.section || 1} />;
     case "lesson": return <LessonScreen {...screenProps} />;
     case "cooldown": return <CooldownScreen {...screenProps} />;
-    case "exam": return <FinalExamScreen {...screenProps} />;
+    case "exam": return <FinalExamScreen {...screenProps} markLessonComplete={screenProps.markLessonComplete} />;
     default: return <LandingScreen {...screenProps} />;
   }
 }
