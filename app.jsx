@@ -152,9 +152,10 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
   const [saved, setSaved]       = useAS(false);
 
   const PROVIDERS = [
-    { id: "openai",    label: "OpenAI",  hint: "sk-...",     url: "https://platform.openai.com/api-keys" },
-    { id: "anthropic", label: "Claude",  hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys" },
-    { id: "gemini",    label: "Gemini",  hint: "AIza...",    url: "https://aistudio.google.com/api-keys" },
+    { id: "groq",      label: "Groq",    hint: "gsk_...",    url: "https://console.groq.com/keys",               free: true },
+    { id: "openai",    label: "OpenAI",  hint: "sk-...",     url: "https://platform.openai.com/api-keys",        free: false },
+    { id: "anthropic", label: "Claude",  hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys", free: false },
+    { id: "gemini",    label: "Gemini",  hint: "AIza...",    url: "https://aistudio.google.com/api-keys",        free: false },
   ];
   const THEMES = ["green", "blue", "purple"];
 
@@ -240,16 +241,19 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
             <label style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
               {lang === "en" ? "// AI_GRADER · PROVIDER" : "// AI_TEKSHIRUVCHI · PROVIDER"}
             </label>
-            <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+            <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
               {PROVIDERS.map(p => (
                 <button key={p.id} onClick={() => setProvider(p.id)} style={{
-                  flex: 1, padding: "9px 0", borderRadius: 8, cursor: "pointer", appearance: "none",
+                  flex: "1 1 auto", padding: "9px 8px", borderRadius: 8, cursor: "pointer", appearance: "none",
                   border: `1.5px solid ${provider === p.id ? "var(--accent)" : "var(--border)"}`,
                   background: provider === p.id ? "var(--accent-soft)" : "var(--bg-2)",
                   color: provider === p.id ? "var(--accent)" : "var(--text-2)",
                   fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700,
-                  transition: "all 150ms",
-                }}>{p.label}</button>
+                  transition: "all 150ms", display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                }}>
+                  {p.label}
+                  {p.free && <span style={{ fontSize: 9, color: "var(--accent)", opacity: 0.8, fontWeight: 900 }}>BEPUL</span>}
+                </button>
               ))}
             </div>
             {provider && (() => {

@@ -387,8 +387,18 @@ async function gradeWithAI(prompt) {
     return d.content[0].text;
   }
 
+  if (provider === "groq") {
+    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+      body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], max_tokens: 600, temperature: 0.3 }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || `Groq error ${r.status}`);
+    return d.choices[0].message.content;
+  }
+
   if (provider === "gemini") {
-    // Try models in order until one works
     const models = ["gemini-2.0-flash-lite", "gemini-1.5-flash-latest", "gemini-1.5-flash-8b"];
     let lastErr = null;
     for (const model of models) {
@@ -396,10 +406,7 @@ async function gradeWithAI(prompt) {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${key}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 600, temperature: 0.3 },
-          }),
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 600, temperature: 0.3 } }),
         });
         const d = await r.json();
         if (!r.ok) { lastErr = new Error(d.error?.message || `Gemini ${model} error ${r.status}`); continue; }
