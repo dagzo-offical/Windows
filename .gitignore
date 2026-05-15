@@ -7,3 +7,5 @@ uploads/
 *.zip
 .env
 node_modules/
+# lib/ is included in git (local CDN fallback)
+
