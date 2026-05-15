@@ -1,6 +1,6 @@
 // app.jsx — main app: router, tweaks, theme + language orchestration
 
-const { useState: useAS, useEffect: useAE } = React;
+const { useState: useAS, useEffect: useAE, useCallback: useACB } = React;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "green",
@@ -9,13 +9,48 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "motion": "high"
 }/*EDITMODE-END*/;
 
-const USER = {
-  name: "Akmal K.",
-  initials: "AK",
-  level: 14,
-  xp: "4,820",
-};
+// ── Progress persistence ──────────────────────────────────────────────────────
+const PROGRESS_KEY = "wa_progress";
+const ROUTE_KEY    = "wa_route";
 
+function loadProgress() {
+  try {
+    const s = localStorage.getItem(PROGRESS_KEY);
+    if (s) return JSON.parse(s);
+  } catch {}
+  return { xp: 0, level: 1, completedLessons: [], name: "Foydalanuvchi", initials: "F" };
+}
+
+function saveProgress(p) {
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); } catch {}
+}
+
+function loadRoute() {
+  try {
+    const s = localStorage.getItem(ROUTE_KEY);
+    if (s) return JSON.parse(s);
+  } catch {}
+  return { name: "landing" };
+}
+
+function saveRoute(r) {
+  try { localStorage.setItem(ROUTE_KEY, JSON.stringify(r)); } catch {}
+}
+
+function clearAll() {
+  try {
+    localStorage.removeItem(PROGRESS_KEY);
+    localStorage.removeItem(ROUTE_KEY);
+    localStorage.removeItem("wa_cooldown_end");
+    localStorage.removeItem("wa_lang");
+  } catch {}
+}
+
+// XP thresholds per level (cumulative)
+const XP_PER_LESSON = 120;
+function xpToLevel(xp) { return Math.max(1, Math.floor(xp / 500) + 1); }
+
+// ─────────────────────────────────────────────────────────────────────────────
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [lang, _setLang] = useAS(() => {
@@ -25,19 +60,36 @@ function App() {
     _setLang(v);
     try { localStorage.setItem("wa_lang", v); } catch {}
   };
-  const [route, _setRoute] = useAS(() => {
-    try {
-      const stored = sessionStorage.getItem("wa_route");
-      if (stored) return JSON.parse(stored);
-    } catch {}
-    return { name: "landing" };
-  });
 
+  // Route stored in localStorage so it survives browser close
+  const [route, _setRoute] = useAS(loadRoute);
   const setRoute = (r) => {
     _setRoute(r);
-    try { sessionStorage.setItem("wa_route", JSON.stringify(r)); } catch {}
+    saveRoute(r);
     window.scrollTo({ top: 0, behavior: "instant" });
   };
+
+  // User progress stored in localStorage
+  const [progress, _setProgress] = useAS(loadProgress);
+  const updateProgress = useACB((patch) => {
+    _setProgress(prev => {
+      const next = { ...prev, ...patch };
+      saveProgress(next);
+      return next;
+    });
+  }, []);
+
+  const markLessonComplete = useACB((lessonKey) => {
+    _setProgress(prev => {
+      if (prev.completedLessons.includes(lessonKey)) return prev;
+      const completedLessons = [...prev.completedLessons, lessonKey];
+      const xp = prev.xp + XP_PER_LESSON;
+      const level = xpToLevel(xp);
+      const next = { ...prev, completedLessons, xp, level };
+      saveProgress(next);
+      return next;
+    });
+  }, []);
 
   // Apply tweaks + lang to document
   useAE(() => {
@@ -48,7 +100,25 @@ function App() {
     document.documentElement.lang = lang === "en" ? "en" : "uz";
   }, [t.theme, t.density, t.motion, lang]);
 
-  const screenProps = { setRoute, user: USER };
+  const user = {
+    name: progress.name || "Foydalanuvchi",
+    initials: progress.initials || "F",
+    level: progress.level || 1,
+    xp: progress.xp ? progress.xp.toLocaleString() : "0",
+    completedLessons: progress.completedLessons || [],
+  };
+
+  const screenProps = { setRoute, user, markLessonComplete };
+
+  const handleReset = () => {
+    if (!window.confirm(lang === "en"
+      ? "Reset all progress and start from zero?"
+      : "Barcha progressni o'chirib, 0dan boshlaysizmi?")) return;
+    clearAll();
+    _setProgress(loadProgress());
+    _setRoute({ name: "landing" });
+    saveRoute({ name: "landing" });
+  };
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>
@@ -82,11 +152,12 @@ function App() {
           <NavBtn label="Lesson 01" onClick={() => setRoute({ name: "lesson", section: 1, lesson: 1 })} />
           <NavBtn label="Cooldown" onClick={() => setRoute({ name: "cooldown" })} />
           <NavBtn label="Final exam" onClick={() => setRoute({ name: "exam" })} />
-          <NavBtn label="Reset" onClick={() => {
-            localStorage.removeItem("wa_cooldown_end");
-            sessionStorage.removeItem("wa_route");
-            setRoute({ name: "landing" });
-          }} />
+          <NavBtn label="⟳ 0dan boshlash" onClick={handleReset} />
+        </div>
+
+        <TweakSection label="Progress · Natija" />
+        <div style={{ fontSize: 11, opacity: 0.7, padding: "4px 0" }}>
+          XP: {user.xp} · Daraja: {user.level} · Darslar: {user.completedLessons.length}
         </div>
       </TweaksPanel>
     </LangContext.Provider>

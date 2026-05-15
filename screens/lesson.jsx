@@ -12,7 +12,7 @@ const LESSON = {
 };
 
 // ─────────────────────────────────────────────────────────────
-function LessonScreen({ setRoute, user }) {
+function LessonScreen({ setRoute, user, markLessonComplete }) {
   const lang = useLang();
   const [progress, setProgress] = useLS(0);
   const [quizOpen, setQuizOpen] = useLS(false);
@@ -65,7 +65,7 @@ function LessonScreen({ setRoute, user }) {
         </div>
       </div>
 
-      {quizOpen && <QuizModal onClose={() => setQuizOpen(false)} onPass={() => { setQuizOpen(false); setRoute({ name: "section", section: 1 }); }} onFail={() => { setQuizOpen(false); setRoute({ name: "cooldown" }); }} />}
+      {quizOpen && <QuizModal onClose={() => setQuizOpen(false)} onPass={() => { setQuizOpen(false); if (markLessonComplete) markLessonComplete("s01_l01"); setRoute({ name: "section", section: 1 }); }} onFail={() => { setQuizOpen(false); setRoute({ name: "cooldown" }); }} />}
     </div>
   );
 }
