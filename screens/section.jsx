@@ -38,7 +38,7 @@ const SECTION_DATA = {
   },
 };
 
-function SectionScreen({ setRoute, user, section = 1 }) {
+function SectionScreen({ setRoute, user, onOpenProfile, section = 1 }) {
   const lang = useLang();
   const data = SECTION_DATA[section] || SECTION_DATA[1];
   const completed = user?.completedLessons || [];
@@ -55,7 +55,7 @@ function SectionScreen({ setRoute, user, section = 1 }) {
 
   return (
     <div>
-      <TopNav route={{ name: "section" }} setRoute={setRoute} user={user}
+      <TopNav route={{ name: "section" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile}
         crumb={[
           { label: lang === "en" ? "Courses" : "Kurslar", onClick: () => setRoute({ name: "dashboard" }) },
           { label: `${lang === "en" ? "Section" : "Bo'lim"} ${data.num}: ${lang === "en" ? data.en : data.uz}` },

@@ -99,7 +99,7 @@ function ParticleBg({ count = 30, mode = "grid" }) {
 // ─────────────────────────────────────────────────────────────
 // Top Nav
 // ─────────────────────────────────────────────────────────────
-function TopNav({ route, setRoute, user, crumb }) {
+function TopNav({ route, setRoute, user, crumb, onOpenProfile }) {
   const lang = useLang();
   const nav = (r) => (e) => { e?.preventDefault(); setRoute(r); };
   return (
@@ -134,13 +134,20 @@ function TopNav({ route, setRoute, user, crumb }) {
         <button className="btn-ghost btn" style={{ padding: "8px 10px" }} aria-label="Search">
           <Icon name="search" size={15} />
         </button>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 12px 6px 6px", borderRadius: 999, background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, var(--accent), var(--accent-2))", display: "grid", placeItems: "center", color: "#04060d", fontWeight: 700, fontSize: 12, fontFamily: "var(--font-mono)" }}>
-            {user?.initials || "AK"}
+        <div onClick={onOpenProfile} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 12px 6px 6px", borderRadius: 999, background: "var(--surface)", border: "1px solid var(--border)", cursor: onOpenProfile ? "pointer" : "default", transition: "border-color 150ms" }}
+          onMouseEnter={e => { if (onOpenProfile) e.currentTarget.style.borderColor = "var(--accent-border)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}>
+          <div style={{ position: "relative" }}>
+            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#00ff88,#0af,#a855f7)", padding: 1.5, boxShadow: "0 0 8px rgba(0,255,136,0.3)" }}>
+              <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#04060d", display: "grid", placeItems: "center" }}>
+                <span style={{ background: "linear-gradient(135deg,#00ff88,#0af)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontSize: 10, fontWeight: 900, fontFamily: "var(--font-mono)" }}>{user?.initials || "DZ"}</span>
+              </div>
+            </div>
+            <div style={{ position: "absolute", bottom: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: "#00ff88", border: "1.5px solid #04060d" }} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
             <span style={{ fontSize: 12.5, fontWeight: 600 }}>{user?.name || "Dagzo"}</span>
-            <span className="mono" style={{ fontSize: 10, color: "var(--accent)" }}>LVL {user?.level || 14} · {user?.xp || "4,820"} XP</span>
+            <span className="mono" style={{ fontSize: 10, color: "var(--accent)" }}>LVL {user?.level || 1} · {user?.xp || "0"} XP</span>
           </div>
         </div>
       </div>

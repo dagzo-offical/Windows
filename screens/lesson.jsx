@@ -11,11 +11,20 @@ const LESSON = {
   subEn: "What's actually happening inside the operating system",
 };
 
+const LESSONS = {
+  1: { num: "L01", section: "01", uz: "Windows arxitekturasi", en: "Windows Architecture",
+       subUz: "Katta rasm, nazariy asos, qatlamli arxitektura", subEn: "Big picture, theory, layered architecture" },
+  2: { num: "L02", section: "01", uz: "Boot jarayoni va Syscall oqimi", en: "Boot Process & Syscall Flow",
+       subUz: "UEFI dan login gacha, tizim chaqiruvlari va xavfsizlik", subEn: "UEFI to login, syscalls and security" },
+};
+
 // ─────────────────────────────────────────────────────────────
-function LessonScreen({ setRoute, user, markLessonComplete }) {
+function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lessonNum = 1 }) {
   const lang = useLang();
   const [progress, setProgress] = useLS(0);
   const [quizOpen, setQuizOpen] = useLS(false);
+  const LESSON = LESSONS[lessonNum] || LESSONS[1];
+  const lessonKey = `s01_l0${lessonNum}`;
 
   useLE(() => {
     const onScroll = () => {
@@ -29,7 +38,7 @@ function LessonScreen({ setRoute, user, markLessonComplete }) {
 
   return (
     <div>
-      <TopNav route={{ name: "lesson" }} setRoute={setRoute} user={user}
+      <TopNav route={{ name: "lesson" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile}
         crumb={[
           { label: lang === "en" ? "Courses" : "Kurslar", onClick: () => setRoute({ name: "dashboard" }) },
           { label: lang === "en" ? "Sec 01" : "01-bo'lim", onClick: () => setRoute({ name: "section", section: 1 }) },
@@ -47,36 +56,49 @@ function LessonScreen({ setRoute, user, markLessonComplete }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", maxWidth: 1320, margin: "0 auto" }}>
-        <LessonTOC />
+        <LessonTOC lessonNum={lessonNum} />
 
         <div className="page" style={{ padding: "32px 28px 80px", maxWidth: "100%" }}>
-          <LessonHero />
-          <Section1Bigpicture />
-          <Section2Theory />
-          <Section3Layered />
-          <Section4Boot />
-          <Section5Syscall />
-          <Section6Security />
-          <Section7Lab />
-          <Section8Comparison />
-          <Section9Summary />
+          <LessonHero lesson={LESSON} />
+          {lessonNum === 1 ? <>
+            <Section1Bigpicture />
+            <Section2Theory />
+            <Section3Layered />
+          </> : <>
+            <Section4Boot />
+            <Section5Syscall />
+            <Section6Security />
+            <Section7Lab />
+            <Section8Comparison />
+            <Section9Summary />
+          </>}
 
-          <LessonNextNav setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />
+          <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />
         </div>
       </div>
 
-      {quizOpen && <QuizModal onClose={() => setQuizOpen(false)} onPass={() => { setQuizOpen(false); if (markLessonComplete) markLessonComplete("s01_l01"); setRoute({ name: "section", section: 1 }); }} onFail={() => { setQuizOpen(false); setRoute({ name: "cooldown" }); }} />}
+      {quizOpen && <QuizModal
+        lessonNum={lessonNum}
+        onClose={() => setQuizOpen(false)}
+        onPass={() => {
+          setQuizOpen(false);
+          if (markLessonComplete) markLessonComplete(lessonKey);
+          setRoute({ name: "section", section: 1 });
+        }}
+        onFail={() => { setQuizOpen(false); setRoute({ name: "cooldown" }); }}
+      />}
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────
-function LessonTOC() {
+function LessonTOC({ lessonNum = 1 }) {
   const lang = useLang();
-  const sections = [
+  const sections = lessonNum === 1 ? [
     { id: "big-picture", uz: "Katta rasm", en: "Big picture" },
     { id: "theory", uz: "Nazariy asos", en: "Theory" },
     { id: "layered", uz: "Qatlamli arxitektura", en: "Layered architecture" },
+  ] : [
     { id: "boot", uz: "Boot jarayoni", en: "Boot process" },
     { id: "syscall", uz: "Syscall oqimi", en: "Syscall flow" },
     { id: "security", uz: "Xavfsizlik nuqtai nazaridan", en: "Security view" },
@@ -142,18 +164,18 @@ function Row({ k, v }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-function LessonHero() {
+function LessonHero({ lesson }) {
   const lang = useLang();
   return (
     <header style={{ marginBottom: 40 }}>
       <div className="eyebrow" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
         <LiveDot />
-        <span>{lang === "en" ? `SECTION ${LESSON.section} · LESSON ${LESSON.num} · IN PROGRESS` : `${LESSON.section}-BO'LIM · DARS ${LESSON.num} · DAVOM ETMOQDA`}</span>
+        <span>{lang === "en" ? `SECTION ${lesson.section} · LESSON ${lesson.num} · IN PROGRESS` : `${lesson.section}-BO'LIM · DARS ${lesson.num} · DAVOM ETMOQDA`}</span>
       </div>
       <h1 className="display" style={{ fontSize: "clamp(36px, 4.4vw, 56px)", margin: 0, letterSpacing: "-0.025em", lineHeight: 1.05 }}>
-        {lang === "en" ? LESSON.en : LESSON.uz}
+        {lang === "en" ? lesson.en : lesson.uz}
       </h1>
-      <div style={{ color: "var(--text-2)", fontSize: 17, marginTop: 8 }}>{lang === "en" ? LESSON.subEn : LESSON.subUz}</div>
+      <div style={{ color: "var(--text-2)", fontSize: 17, marginTop: 8 }}>{lang === "en" ? lesson.subEn : lesson.subUz}</div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 24, flexWrap: "wrap" }}>
         <div style={{ display: "flex", gap: 10 }}>
@@ -961,7 +983,7 @@ function MindMap({ nodes }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-function LessonNextNav({ setRoute, onQuizStart }) {
+function LessonNextNav({ setRoute, onQuizStart, lessonNum }) {
   const lang = useLang();
   return (
     <div style={{ marginTop: 60, paddingTop: 32, borderTop: "1px solid var(--border)" }}>
@@ -969,14 +991,12 @@ function LessonNextNav({ setRoute, onQuizStart }) {
         <button className="btn" onClick={() => setRoute({ name: "section", section: 1 })} style={{ justifySelf: "start" }}>
           <Icon name="arrow-left" size={14} /> {lang === "en" ? "Section overview" : "Bo'limga qaytish"}
         </button>
-
         <div style={{ textAlign: "center" }}>
           <div className="eyebrow">// {lang === "en" ? "LESSON_COMPLETE" : "DARS_TUGADI"}</div>
           <div style={{ color: "var(--text-2)", fontSize: 12, marginTop: 4 }}>
             {lang === "en" ? "Pass the quiz to unlock the next lesson" : "Keyingi darsga o'tish uchun testni topshiring"}
           </div>
         </div>
-
         <button className="btn btn-primary" onClick={onQuizStart} style={{ justifySelf: "end" }}>
           <Icon name="target" size={14} /> {lang === "en" ? "Start the quiz" : "Testni boshlash"} <Icon name="arrow-right" size={14} />
         </button>

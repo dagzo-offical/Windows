@@ -1,13 +1,12 @@
-// app.jsx — main app: router, tweaks, theme + language orchestration
+// app.jsx — main app: router, theme, language, profile
 
 const { useState: useAS, useEffect: useAE, useCallback: useACB } = React;
 
-const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "theme": "green",
-  "background": "particles",
-  "density": "cozy",
-  "motion": "high"
-}/*EDITMODE-END*/;
+const THEME_KEY = "wa_theme";
+
+function loadTheme() {
+  try { return localStorage.getItem(THEME_KEY) || "green"; } catch { return "green"; }
+}
 
 // ── Progress persistence ──────────────────────────────────────────────────────
 const PROGRESS_KEY = "wa_progress";
@@ -43,16 +42,17 @@ function clearAll() {
     localStorage.removeItem(ROUTE_KEY);
     localStorage.removeItem("wa_cooldown_end");
     localStorage.removeItem("wa_lang");
+    localStorage.removeItem("wa_ai_provider");
+    localStorage.removeItem("wa_ai_key");
   } catch {}
 }
 
-// XP thresholds per level (cumulative)
 const XP_PER_LESSON = 120;
 function xpToLevel(xp) { return Math.max(1, Math.floor(xp / 500) + 1); }
 
 // ─────────────────────────────────────────────────────────────────────────────
 function App() {
-  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [theme, setThemeState] = useAS(loadTheme);
   const [lang, _setLang] = useAS(() => {
     try { return localStorage.getItem("wa_lang") || "uz"; } catch { return "uz"; }
   });
@@ -61,7 +61,11 @@ function App() {
     try { localStorage.setItem("wa_lang", v); } catch {}
   };
 
-  // Route stored in localStorage so it survives browser close
+  const setTheme = (v) => {
+    setThemeState(v);
+    try { localStorage.setItem(THEME_KEY, v); } catch {}
+  };
+
   const [route, _setRoute] = useAS(loadRoute);
   const setRoute = (r) => {
     _setRoute(r);
@@ -69,8 +73,8 @@ function App() {
     window.scrollTo({ top: 0, behavior: "instant" });
   };
 
-  // User progress stored in localStorage
   const [progress, _setProgress] = useAS(loadProgress);
+
   const updateProgress = useACB((patch) => {
     _setProgress(prev => {
       const next = { ...prev, ...patch };
@@ -91,103 +95,206 @@ function App() {
     });
   }, []);
 
-  // Apply tweaks + lang to document
+  const [profileOpen, setProfileOpen] = useAS(false);
+
   useAE(() => {
-    document.documentElement.dataset.theme = t.theme || "green";
-    document.documentElement.dataset.density = t.density || "cozy";
-    document.documentElement.dataset.motion = t.motion || "high";
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.density = "cozy";
+    document.documentElement.dataset.motion = "high";
     document.documentElement.dataset.lang = lang;
     document.documentElement.lang = lang === "en" ? "en" : "uz";
-  }, [t.theme, t.density, t.motion, lang]);
+  }, [theme, lang]);
 
   const user = {
     name: progress.name || "Dagzo",
-    initials: progress.initials || "DZ",
+    initials: (progress.name || "Dagzo").slice(0, 2).toUpperCase(),
     level: progress.level || 1,
     xp: progress.xp ? progress.xp.toLocaleString() : "0",
     completedLessons: progress.completedLessons || [],
   };
 
-  const screenProps = { setRoute, user, markLessonComplete };
-
-  const handleReset = () => {
-    if (!window.confirm(lang === "en"
-      ? "Reset all progress and start from zero?"
-      : "Barcha progressni o'chirib, 0dan boshlaysizmi?")) return;
-    clearAll();
-    _setProgress(loadProgress());
-    _setRoute({ name: "landing" });
-    saveRoute({ name: "landing" });
-  };
+  const screenProps = { setRoute, user, markLessonComplete, onOpenProfile: () => setProfileOpen(true) };
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>
-      <ParticleBg mode={t.background} count={t.motion === "off" ? 0 : t.motion === "low" ? 25 : 80} />
+      <ParticleBg mode="particles" count={80} />
       <RouteRender route={route} screenProps={screenProps} />
-
-      <TweaksPanel title="Tweaks">
-        <TweakSection label="Theme · Mavzu" />
-        <TweakRadio label="Accent" value={t.theme}
-          options={["green", "blue", "purple"]}
-          onChange={(v) => setTweak("theme", v)} />
-
-        <TweakSection label="Background · Fon" />
-        <TweakRadio label="Style" value={t.background}
-          options={["grid", "particles", "plain"]}
-          onChange={(v) => setTweak("background", v)} />
-
-        <TweakSection label="Layout · Tartibga solish" />
-        <TweakRadio label="Density" value={t.density}
-          options={["compact", "cozy", "comfy"]}
-          onChange={(v) => setTweak("density", v)} />
-        <TweakRadio label="Motion" value={t.motion}
-          options={["off", "low", "high"]}
-          onChange={(v) => setTweak("motion", v)} />
-
-        <TweakSection label="AI Tekshiruvchi · Grader" />
-        <AIKeyPanel />
-
-        <TweakSection label="Quick nav · Tezkor o'tish" />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
-          <NavBtn label="Landing" onClick={() => setRoute({ name: "landing" })} />
-          <NavBtn label="Dashboard" onClick={() => setRoute({ name: "dashboard" })} />
-          <NavBtn label="Section 01" onClick={() => setRoute({ name: "section", section: 1 })} />
-          <NavBtn label="Lesson 01" onClick={() => setRoute({ name: "lesson", section: 1, lesson: 1 })} />
-          <NavBtn label="Cooldown" onClick={() => setRoute({ name: "cooldown" })} />
-          <NavBtn label="Final exam" onClick={() => setRoute({ name: "exam" })} />
-          <NavBtn label="⟳ 0dan boshlash" onClick={handleReset} />
-        </div>
-
-        <TweakSection label="Progress · Natija" />
-        <div style={{ fontSize: 11, opacity: 0.7, padding: "4px 0" }}>
-          XP: {user.xp} · Daraja: {user.level} · Darslar: {user.completedLessons.length}
-        </div>
-      </TweaksPanel>
+      {profileOpen && (
+        <ProfileModal
+          user={user}
+          theme={theme}
+          setTheme={setTheme}
+          onSave={(patch) => { updateProgress(patch); setProfileOpen(false); }}
+          onReset={() => {
+            if (!window.confirm(lang === "en" ? "Reset all progress?" : "Barcha progressni o'chirasizmi?")) return;
+            clearAll();
+            _setProgress(loadProgress());
+            _setRoute({ name: "landing" });
+            saveRoute({ name: "landing" });
+            setProfileOpen(false);
+          }}
+          onClose={() => setProfileOpen(false)}
+        />
+      )}
     </LangContext.Provider>
   );
 }
 
-function NavBtn({ label, onClick }) {
+// ─────────────────────────────────────────────────────────────
+// Profile Modal
+// ─────────────────────────────────────────────────────────────
+function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
+  const lang = useLang();
+  const [name, setName] = useAS(user.name);
+  const [provider, setProvider] = useAS(() => localStorage.getItem("wa_ai_provider") || "");
+  const [apiKey, setApiKey]     = useAS(() => localStorage.getItem("wa_ai_key") || "");
+  const [showKey, setShowKey]   = useAS(false);
+  const [saved, setSaved]       = useAS(false);
+
+  const PROVIDERS = [
+    { id: "openai",    label: "OpenAI",  hint: "sk-..." },
+    { id: "anthropic", label: "Claude",  hint: "sk-ant-..." },
+    { id: "gemini",    label: "Gemini",  hint: "AIza..." },
+  ];
+  const THEMES = ["green", "blue", "purple"];
+
+  const handleSave = () => {
+    localStorage.setItem("wa_ai_provider", provider);
+    localStorage.setItem("wa_ai_key", apiKey);
+    onSave({ name: name.trim() || "Dagzo" });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1800);
+  };
+
+  const initials = (name.trim() || "Dagzo").slice(0, 2).toUpperCase();
+
   return (
-    <button onClick={onClick} style={{
-      appearance: "none", cursor: "pointer",
-      padding: "6px 8px",
-      background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.1)",
-      borderRadius: 6, fontSize: 10.5, color: "inherit",
-      fontFamily: "inherit", textAlign: "left",
-    }}>{label}</button>
+    <div style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(2,4,10,0.8)", backdropFilter: "blur(8px)", display: "grid", placeItems: "center", padding: 24 }}
+         onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div style={{ background: "rgba(8,12,24,0.97)", border: "1px solid var(--accent-border)", borderRadius: 20, width: "100%", maxWidth: 480, boxShadow: "0 30px 80px rgba(0,0,0,0.6), 0 0 40px var(--accent-soft)", overflow: "hidden" }}>
+
+        {/* Header */}
+        <div style={{ padding: "22px 28px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(180deg,rgba(0,255,136,0.04),transparent)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ position: "relative" }}>
+              <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#00ff88,#0af,#a855f7)", padding: 2, boxShadow: "0 0 16px rgba(0,255,136,0.4)" }}>
+                <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "radial-gradient(circle at 35% 35%,#0d1a12,#04060d)", display: "grid", placeItems: "center" }}>
+                  <span style={{ background: "linear-gradient(135deg,#00ff88,#0af)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontSize: 16, fontWeight: 900, fontFamily: "var(--font-mono)" }}>{initials}</span>
+                </div>
+              </div>
+              <div style={{ position: "absolute", bottom: 2, right: 2, width: 11, height: 11, borderRadius: "50%", background: "#00ff88", border: "2px solid #04060d", boxShadow: "0 0 6px #00ff88" }} />
+            </div>
+            <div>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700 }}>{lang === "en" ? "Profile" : "Profil"}</div>
+              <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>LVL {user.level} · {user.xp} XP · {user.completedLessons.length} {lang === "en" ? "lessons" : "dars"}</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ appearance: "none", background: "none", border: "none", cursor: "pointer", color: "var(--text-2)", padding: 8 }}>
+            <Icon name="x" size={18} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 22 }}>
+
+          {/* Name */}
+          <div>
+            <label style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+              {lang === "en" ? "// DISPLAY_NAME" : "// ISM"}
+            </label>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              maxLength={30}
+              style={{ width: "100%", boxSizing: "border-box", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", fontSize: 14, fontFamily: "var(--font-display)", fontWeight: 600, color: "var(--text-0)", outline: "none" }}
+              onFocus={e => e.target.style.borderColor = "var(--accent)"}
+              onBlur={e => e.target.style.borderColor = "var(--border)"}
+            />
+          </div>
+
+          {/* Theme */}
+          <div>
+            <label style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+              {lang === "en" ? "// ACCENT_THEME" : "// RANG_MAVZU"}
+            </label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {THEMES.map(t => {
+                const colors = { green: "#00ff88", blue: "#4d8bff", purple: "#a855f7" };
+                return (
+                  <button key={t} onClick={() => setTheme(t)} style={{
+                    flex: 1, padding: "10px 0", borderRadius: 10, cursor: "pointer", appearance: "none",
+                    border: `2px solid ${theme === t ? colors[t] : "var(--border)"}`,
+                    background: theme === t ? `${colors[t]}15` : "var(--bg-2)",
+                    color: theme === t ? colors[t] : "var(--text-2)",
+                    fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700,
+                    textTransform: "capitalize", transition: "all 150ms",
+                    boxShadow: theme === t ? `0 0 12px ${colors[t]}44` : "none",
+                  }}>{t}</button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* AI Provider */}
+          <div>
+            <label style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+              {lang === "en" ? "// AI_GRADER · PROVIDER" : "// AI_TEKSHIRUVCHI · PROVIDER"}
+            </label>
+            <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+              {PROVIDERS.map(p => (
+                <button key={p.id} onClick={() => setProvider(p.id)} style={{
+                  flex: 1, padding: "9px 0", borderRadius: 8, cursor: "pointer", appearance: "none",
+                  border: `1.5px solid ${provider === p.id ? "var(--accent)" : "var(--border)"}`,
+                  background: provider === p.id ? "var(--accent-soft)" : "var(--bg-2)",
+                  color: provider === p.id ? "var(--accent)" : "var(--text-2)",
+                  fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700,
+                  transition: "all 150ms",
+                }}>{p.label}</button>
+              ))}
+            </div>
+            {provider && (
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showKey ? "text" : "password"}
+                  placeholder={PROVIDERS.find(p => p.id === provider)?.hint}
+                  value={apiKey}
+                  onChange={e => setApiKey(e.target.value)}
+                  style={{ width: "100%", boxSizing: "border-box", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 40px 10px 14px", fontSize: 13, fontFamily: "var(--font-mono)", color: "var(--text-0)", outline: "none" }}
+                  onFocus={e => e.target.style.borderColor = "var(--accent)"}
+                  onBlur={e => e.target.style.borderColor = "var(--border)"}
+                />
+                <button onClick={() => setShowKey(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: 14, padding: 0 }}>
+                  {showKey ? "🙈" : "👁"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: "flex", gap: 10, paddingTop: 4 }}>
+            <button onClick={onReset} style={{ flex: "0 0 auto", padding: "10px 16px", borderRadius: 10, cursor: "pointer", appearance: "none", border: "1px solid rgba(255,58,94,0.3)", background: "rgba(255,58,94,0.06)", color: "var(--c-attack)", fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700 }}>
+              {lang === "en" ? "Reset progress" : "Progressni o'chir"}
+            </button>
+            <button onClick={handleSave} style={{ flex: 1, padding: "12px 0", borderRadius: 10, cursor: "pointer", appearance: "none", border: `1px solid ${saved ? "var(--accent)" : "var(--accent-border)"}`, background: saved ? "var(--accent-soft)" : "var(--accent)", color: saved ? "var(--accent)" : "#04060d", fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, transition: "all 200ms", boxShadow: "0 0 20px var(--accent-glow)" }}>
+              {saved ? (lang === "en" ? "✓ Saved!" : "✓ Saqlandi!") : (lang === "en" ? "Save changes" : "Saqlash")}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
+// ─────────────────────────────────────────────────────────────
 function RouteRender({ route, screenProps }) {
   switch (route.name) {
-    case "landing": return <LandingScreen {...screenProps} />;
+    case "landing":   return <LandingScreen {...screenProps} />;
     case "dashboard": return <DashboardScreen {...screenProps} />;
-    case "section": return <SectionScreen {...screenProps} section={route.section || 1} />;
-    case "lesson": return <LessonScreen {...screenProps} />;
-    case "cooldown": return <CooldownScreen {...screenProps} />;
-    case "exam": return <FinalExamScreen {...screenProps} markLessonComplete={screenProps.markLessonComplete} />;
-    default: return <LandingScreen {...screenProps} />;
+    case "section":   return <SectionScreen {...screenProps} section={route.section || 1} />;
+    case "lesson":    return <LessonScreen {...screenProps} lessonNum={route.lesson || 1} />;
+    case "cooldown":  return <CooldownScreen {...screenProps} />;
+    case "exam":      return <FinalExamScreen {...screenProps} />;
+    default:          return <LandingScreen {...screenProps} />;
   }
 }
 

@@ -1,10 +1,10 @@
 // dashboard.jsx — user dashboard (single-lang, points to Section 01 lesson 01)
 
-function DashboardScreen({ setRoute, user }) {
+function DashboardScreen({ setRoute, user, onOpenProfile }) {
   const lang = useLang();
   return (
     <div>
-      <TopNav route={{ name: "dashboard" }} setRoute={setRoute} user={user}
+      <TopNav route={{ name: "dashboard" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile}
         crumb={[{ label: lang === "en" ? "Dashboard" : "Boshqaruv" }]} />
 
       <div className="page" style={{ paddingTop: 24 }}>
