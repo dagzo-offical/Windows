@@ -5,18 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Windows Academy — Cyber Security Platform</title>
 
-<!-- Google Fonts with local fallback -->
+<!-- Google Fonts (falls back to system fonts if offline) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
 <link rel="stylesheet" href="styles.css" />
 
-<!-- Libraries served locally (no CDN dependency) -->
+<!-- All dependencies bundled locally — no CDN required -->
 <script src="lib/mermaid.js"></script>
 <script src="lib/react.js"></script>
 <script src="lib/react-dom.js"></script>
-<script src="lib/babel.js"></script>
+
+<!-- Pre-transpiled app bundle (JSX already compiled to plain JS) -->
+<script src="lib/bundle.js"></script>
 
 </head>
 <body>
@@ -26,24 +28,6 @@
 
 <!-- App mount -->
 <div id="app"></div>
-
-<!-- Components in dependency order -->
-<script type="text/babel" data-presets="react" src="components/icons.jsx"></script>
-<script type="text/babel" data-presets="react" src="components/shared.jsx"></script>
-<script type="text/babel" data-presets="react" src="components/mermaid-diagram.jsx"></script>
-<script type="text/babel" data-presets="react" src="components/windows-arch.jsx"></script>
-<script type="text/babel" data-presets="react" src="components/ad-topology.jsx"></script>
-
-<script type="text/babel" data-presets="react" src="screens/landing.jsx"></script>
-<script type="text/babel" data-presets="react" src="screens/dashboard.jsx"></script>
-<script type="text/babel" data-presets="react" src="screens/section.jsx"></script>
-<script type="text/babel" data-presets="react" src="screens/lesson.jsx"></script>
-<script type="text/babel" data-presets="react" src="screens/quiz.jsx"></script>
-<script type="text/babel" data-presets="react" src="screens/cooldown.jsx"></script>
-<script type="text/babel" data-presets="react" src="screens/final-exam.jsx"></script>
-
-<script type="text/babel" data-presets="react" src="tweaks-panel.jsx"></script>
-<script type="text/babel" data-presets="react" src="app.jsx"></script>
 
 </body>
 </html>

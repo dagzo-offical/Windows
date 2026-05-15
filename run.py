@@ -5,10 +5,12 @@ Usage:
     python run.py            # default port 8080
     python run.py 3000       # custom port
     python run.py --port 9000
+    python run.py --rebuild  # rebuild bundle.js then serve
 """
 
 import sys
 import os
+import subprocess
 import argparse
 import socket
 import webbrowser
@@ -48,12 +50,16 @@ class AcademyHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def log_message(self, fmt, *args):
-        # Quieter logs: skip 200/304 for assets, only show errors and page loads
-        code = args[1] if len(args) > 1 else ""
-        path = args[0].split()[1] if args else ""
-        skip_exts = (".css", ".png", ".jpg", ".ico", ".woff", ".woff2", ".ttf")
-        if code in ("200", "304") and any(path.endswith(e) for e in skip_exts):
-            return
+        try:
+            # log_request passes (requestline, code, size); log_error passes (code, msg)
+            first = args[0] if args else ""
+            path = first.split()[1] if isinstance(first, str) and " " in first else ""
+            code = str(args[1]) if len(args) > 1 else ""
+            skip_exts = (".css", ".png", ".jpg", ".ico", ".woff", ".woff2", ".ttf")
+            if code in ("200", "304") and any(path.endswith(e) for e in skip_exts):
+                return
+        except Exception:
+            pass
         super().log_message(fmt, *args)
 
 
@@ -79,6 +85,54 @@ def open_browser(url: str, delay: float = 0.8):
     threading.Thread(target=_open, daemon=True).start()
 
 
+def rebuild_bundle(root: Path):
+    """Pre-transpile all JSX → lib/bundle.js using Node.js + Babel."""
+    script = r"""
+const { transformSync } = require('./node_modules/@babel/core');
+const fs = require('fs');
+const path = require('path');
+const ROOT = process.cwd();
+const files = [
+  'components/icons.jsx','components/shared.jsx',
+  'components/mermaid-diagram.jsx','components/windows-arch.jsx',
+  'components/ad-topology.jsx',
+  'screens/landing.jsx','screens/dashboard.jsx','screens/section.jsx',
+  'screens/lesson.jsx','screens/quiz.jsx','screens/cooldown.jsx',
+  'screens/final-exam.jsx',
+  'tweaks-panel.jsx','app.jsx',
+];
+let bundle = '"use strict";\n// Windows Academy — pre-bundled\n';
+for (const file of files) {
+  const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
+  const res = transformSync(src, {
+    filename: file,
+    presets: [['./node_modules/@babel/preset-react', { runtime: 'classic' }]],
+    sourceMaps: false,
+  });
+  bundle += `\n// --- ${file} ---\n` + res.code + '\n';
+}
+fs.mkdirSync(path.join(ROOT, 'lib'), { recursive: true });
+fs.writeFileSync(path.join(ROOT, 'lib/bundle.js'), bundle);
+console.log('Bundle: ' + (bundle.length >> 10) + ' KB');
+"""
+    print("  Building bundle.js ...", end=" ", flush=True)
+    try:
+        result = subprocess.run(
+            ["node", "-e", script],
+            cwd=str(root), capture_output=True, text=True, timeout=60,
+        )
+        if result.returncode == 0:
+            print("OK")
+        else:
+            print("FAILED")
+            print(result.stderr[:800])
+            sys.exit(1)
+    except FileNotFoundError:
+        print("SKIPPED (node not found)")
+    except subprocess.TimeoutExpired:
+        print("TIMEOUT — skipping rebuild")
+
+
 def main():
     parser = argparse.ArgumentParser(description=f"Run {ACADEMY_NAME} locally")
     parser.add_argument("port", nargs="?", type=int, default=DEFAULT_PORT,
@@ -87,6 +141,8 @@ def main():
                         help="Port number (alternative flag)")
     parser.add_argument("--no-browser", action="store_true",
                         help="Don't open the browser automatically")
+    parser.add_argument("--rebuild", action="store_true",
+                        help="Rebuild lib/bundle.js before serving")
     args = parser.parse_args()
 
     port = args.port_flag if args.port_flag else args.port
@@ -99,6 +155,9 @@ def main():
     if not (root / "index.html").exists():
         print(f"[ERROR] index.html not found in {root}")
         sys.exit(1)
+
+    if args.rebuild:
+        rebuild_bundle(root)
 
     url = f"http://localhost:{port}"
 

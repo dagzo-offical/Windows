@@ -9,3 +9,6 @@ uploads/
 node_modules/
 # lib/ is included in git (local CDN fallback)
 
+package.json
+package-lock.json
+node_modules/
