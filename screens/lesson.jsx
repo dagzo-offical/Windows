@@ -45,7 +45,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
   const [quizOpen, setQuizOpen] = useLS(false);
   const LESSON = LESSONS[lessonNum] || { num: `L${String(lessonNum).padStart(2,"0")}`, section: "01", uz: "Dars", en: "Lesson", subUz: "Tez kunda", subEn: "Coming soon" };
   const lessonKey = `s01_l${String(lessonNum).padStart(2,"0")}`;
-  const hasContent = lessonNum <= 4;
+  const hasContent = true; // TEMP: all unlocked for review
 
   useLE(() => {
     const onScroll = () => {

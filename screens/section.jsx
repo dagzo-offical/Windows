@@ -49,7 +49,7 @@ function SectionScreen({ setRoute, user, onOpenProfile, section = 1 }) {
     // first unlocked lesson after all completed ones is "in-progress"
     const prevKey = i === 0 ? null : `s${String(section).padStart(2,"0")}_l${String(i).padStart(2,"0")}`;
     const prevDone = i === 0 || completed.includes(prevKey);
-    const status = isDone ? "done" : prevDone ? "in-progress" : "locked";
+    const status = isDone ? "done" : "in-progress"; // TEMP: all unlocked for review
     return { ...l, status };
   });
 
