@@ -86,25 +86,30 @@ function FinalExamScreen({ setRoute, user, markLessonComplete, onOpenProfile }) 
     for (let i = 0; i < EXAM_QUESTIONS.length; i++) {
       setGradingIdx(i);
       const q = EXAM_QUESTIONS[i];
-      const a = answers[i] || "";
+      const a = (answers[i] || "").trim();
+      // Skip AI call for empty answers — score 0 instantly
+      if (!a || a.length < 8) {
+        results.push({ score: 0, passed: false, key_points: [], missing: [lang === "en" ? "No answer provided" : "Javob berilmagan"], feedback: lang === "en" ? "Empty answer." : "Javob bo'sh." });
+        continue;
+      }
       try {
         if (hasKey) {
-          const prompt = `You are a strict Windows internals exam grader.
-QUESTION: ${lang === "en" ? q.en : q.uz}
-STUDENT ANSWER: """${a || "(empty)"}"""
+          const prompt = `Windows internals exam grader. Be strict.
+Q: ${lang === "en" ? q.en : q.uz}
+ANSWER: """${a}"""
 Topic: ${q.topic} | Difficulty: ${q.difficulty}
-Grade 0-100. Empty=0-10. Surface-level=20-50. Correct technical terms (${q.topic})+depth=70+. Expert=90+.
-Return STRICT JSON only: {"score":<0-100>,"passed":<score>=70>,"key_points":["point"],"missing":["missing"],"feedback":"1-2 sentences in ${lang === "en" ? "English" : "Uzbek"}"}`;
+Score 0-100. Surface=20-50. Correct terms+depth=70+. Expert=90+.
+JSON only: {"score":<0-100>,"passed":<score>=70>,"key_points":["point"],"missing":["gap"],"feedback":"1-2 sentences in ${lang === "en" ? "English" : "Uzbek"}"}`;
           const text = await gradeWithAI(prompt);
-          const cleaned = text.replace(/^```json[\s\S]*?\n|```\s*$/g, "").trim();
+          const cleaned = text.replace(/^```json\s*|```\s*$/g, "").trim();
           results.push(JSON.parse(cleaned));
         } else {
-          const wc = a.trim().split(/\s+/).filter(Boolean).length;
-          const score = wc < 5 ? 8 : wc < 15 ? 28 : wc < 40 ? 52 : 74;
-          results.push({ score, passed: score >= 70, key_points: [], missing: ["AI kalit o'rnatilmagan"], feedback: "Tweaks → AI Tekshiruvchi bo'limida kalit o'rnating." });
+          const wc = a.split(/\s+/).filter(Boolean).length;
+          const score = wc < 15 ? 28 : wc < 40 ? 52 : 74;
+          results.push({ score, passed: score >= 70, key_points: [], missing: [lang === "en" ? "Set AI key in Profile for real grading" : "Profilda AI kalitini o'rnating"], feedback: "" });
         }
-      } catch {
-        results.push({ score: 0, passed: false, key_points: [], missing: ["Baholashda xatolik"], feedback: "AI so'rovda xatolik yuz berdi." });
+      } catch (e) {
+        results.push({ score: 0, passed: false, key_points: [], missing: [String(e).slice(0, 80)], feedback: lang === "en" ? "Grading error — check AI key." : "Baholashda xatolik — AI kalitini tekshiring." });
       }
     }
     setExamResults(results);

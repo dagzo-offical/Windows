@@ -55,10 +55,8 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
         }} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", maxWidth: 1320, margin: "0 auto" }}>
-        <LessonTOC lessonNum={lessonNum} />
-
-        <div className="page" style={{ padding: "32px 28px 80px", maxWidth: "100%" }}>
+      <div style={{ maxWidth: 860, margin: "0 auto" }}>
+        <div className="page" style={{ padding: "32px 28px 80px" }}>
           <LessonHero lesson={LESSON} />
           {lessonNum === 1 ? <>
             <Section1Bigpicture />

@@ -27,7 +27,12 @@ function saveProgress(p) {
 function loadRoute() {
   try {
     const s = localStorage.getItem(ROUTE_KEY);
-    if (s) return JSON.parse(s);
+    if (s) {
+      const r = JSON.parse(s);
+      // Never restore mid-lesson — always open at dashboard
+      if (r.name === "lesson") return { name: "dashboard" };
+      return r;
+    }
   } catch {}
   return { name: "landing" };
 }
