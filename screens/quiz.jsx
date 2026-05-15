@@ -6,14 +6,24 @@ const { useState: useQS, useEffect: useQE, useRef: useQR } = React;
 // Static fallback questions per lesson
 const FALLBACK_QUESTIONS = {
   1: [
-    { uz: "User mode va Kernel mode farqini tushuntirib bering. Qaysi ring darajalari va nima uchun bu chegara xavfsizlik uchun muhim?", en: "Explain the difference between user mode and kernel mode. What CPU rings are used, and why is this boundary critical for security?" },
-    { uz: "Windows arxitekturasidagi Executive, Microkernel va HAL qatlamlarini tushuntiring. Ularning har biri qanday vazifani bajaradi?", en: "Explain the Executive, Microkernel and HAL layers in Windows architecture. What does each layer do?" },
-    { uz: "ntoskrnl.exe ichida qanday komponentlar mavjud va ular bir-biri bilan qanday o'zaro ishlaydi?", en: "What components exist inside ntoskrnl.exe and how do they interact with each other?" },
+    { uz: "Operatsion tizim nima va u qanday 4 ta asosiy vazifani bajaradi? Windows bu vazifalarni qanday amalga oshiradi?", en: "What is an operating system and what are its 4 main jobs? How does Windows carry these out?" },
+    { uz: "User mode (ring 3) va Kernel mode (ring 0) farqini tushuntiring. Nega bu ikki rejim mavjud va ular o'rtasidagi chegara nima uchun muhim?", en: "Explain the difference between user mode (ring 3) and kernel mode (ring 0). Why do these two modes exist and why is the boundary important?" },
+    { uz: "ntoskrnl.exe ichida Microkernel va Executive nima rol o'ynaydi? HAL (Hardware Abstraction Layer) nima uchun zarur?", en: "What roles do the Microkernel and Executive play inside ntoskrnl.exe? Why is the HAL (Hardware Abstraction Layer) needed?" },
   ],
   2: [
-    { uz: "Windows boot ketma-ketligini UEFI'dan login ekraniga qadar bosqichma-bosqich tushuntiring. Har bir bosqich keyingisini qanday tekshiradi?", en: "Walk through the Windows boot sequence step-by-step from UEFI to login. How does each stage verify the next?" },
-    { uz: "ReadFile() chaqiruvi user mode'dan kernel mode'gacha va orqaga qaytishida qaysi qatlamlardan o'tadi? ntdll va syscall buyrug'ining roli nima?", en: "Which layers does ReadFile() traverse from user mode to kernel and back? What is the role of ntdll and the syscall instruction?" },
-    { uz: "Secure Boot kriptografik zanjiri qanday ishlaydi va BlackLotus rootkiti uni qanday chetlab o'tdi?", en: "How does the Secure Boot cryptographic chain work and how did the BlackLotus rootkit bypass it?" },
+    { uz: "Kernel nima? U operatsion tizimda qanday asosiy vazifalarni bajaradi? Windows kerneli qaysi faylda joylashgan?", en: "What is a kernel? What are its main tasks in an operating system? Which file contains the Windows kernel?" },
+    { uz: "ntoskrnl.exe ichida qanday asosiy qismlar bor? Microkernel va Executive o'rtasidagi farqni tushuntiring.", en: "What are the main parts inside ntoskrnl.exe? Explain the difference between the Microkernel and the Executive." },
+    { uz: "Drayver nima va u nima uchun ring 0'da ishlaydi? Imzolanmagan drayver nima uchun xavfli?", en: "What is a driver and why does it run in ring 0? Why is an unsigned driver dangerous?" },
+  ],
+  3: [
+    { uz: "Ring 3 (User mode) va Ring 0 (Kernel mode) nima? Protsessor bu chegarani qanday qilib ta'minlaydi?", en: "What are Ring 3 (user mode) and Ring 0 (kernel mode)? How does the CPU enforce this boundary?" },
+    { uz: "User mode'da ishlayotgan dastur to'g'ridan-to'g'ri hardware'ga murojaat qila oladimi? Nima uchun? Kernel mode'da bunday murojaat mumkinmi?", en: "Can a user-mode program access hardware directly? Why or why not? Is this possible in kernel mode?" },
+    { uz: "User mode'dagi dastur xato (crash) qilsa nima bo'ladi? Kernel mode'dagi kod xato qilsa nima bo'ladi? Farqi nimada?", en: "What happens when a user-mode program crashes? What happens when kernel-mode code crashes? What is the difference?" },
+  ],
+  4: [
+    { uz: "Windows boot jarayonini UEFI'dan login ekraniga qadar 4-5 ta bosqichda tushuntiring. Har bir bosqichda nima sodir bo'ladi?", en: "Explain the Windows boot process from UEFI to the login screen in 4-5 steps. What happens at each stage?" },
+    { uz: "Secure Boot nima va u nima uchun zarur? U qanday ishlaydi?", en: "What is Secure Boot and why is it needed? How does it work?" },
+    { uz: "LSASS nima va u Windows'da qanday rol o'ynaydi? U nima uchun hujumchilar uchun qiziqarli?", en: "What is LSASS and what role does it play in Windows? Why is it a target for attackers?" },
   ],
 };
 
@@ -66,18 +76,19 @@ Return STRICT JSON only, no markdown fences. Feedback in ${lang === "en" ? "Engl
   };
 
   const TOPICS = {
-    1: "Windows architecture: user mode vs kernel mode (rings), Executive layer, Microkernel, HAL, ntoskrnl.exe components and how they interact",
-    2: "Windows boot sequence (UEFI/POST → bootmgr → winload → kernel → LSASS → login), syscall flow (ReadFile → kernel32 → ntdll → syscall gate → Executive), Secure Boot chain and bypass techniques like BlackLotus",
+    1: "Windows architecture basics (beginner-intermediate): what an OS does, user mode (ring 3) vs kernel mode (ring 0), Executive, Microkernel, HAL, ntoskrnl.exe. Ask clear conceptual questions a student can answer after reading the lesson.",
+    2: "What is the kernel (beginner level): kernel definition, ntoskrnl.exe main components (Executive, Microkernel, HAL), drivers in ring 0 and why unsigned drivers are dangerous. Keep questions foundational.",
+    3: "User mode vs kernel mode (beginner-intermediate): CPU privilege rings (ring 0 and ring 3), why the boundary exists, what each mode can/cannot do, crash impact differences. Practical and clear questions.",
+    4: "Windows boot process (beginner-intermediate): UEFI/POST, Secure Boot, bootmgr.efi, winload.efi, kernel load, smss.exe, LSASS, login screen. Ask about the sequence and purpose of each step.",
   };
 
   const generate = async () => {
     setLoading(true); setErr(null);
     try {
       if (hasKey()) {
-        const prompt = `Generate 3 advanced written questions for a Windows internals security course.
+        const prompt = `Generate 3 clear written questions for a Windows internals course.
 Topic focus: ${TOPICS[lessonNum] || TOPICS[1]}
-Requirements: each question needs multi-sentence written explanation (not yes/no). Mix: 1 conceptual, 1 technical-deep, 1 security-implication.
-Use a DIFFERENT angle than previous attempts — vary the specific concepts asked.
+Requirements: each question needs a multi-sentence written explanation (not yes/no). Mix: 1 definition/concept, 1 how-it-works, 1 why-it-matters. Questions should match what the lesson teaches — do NOT ask about topics not covered in the lesson. Vary the specific angle from previous attempts.
 Return STRICT JSON only, no markdown: {"questions":[{"uz":"...","en":"..."},{"uz":"...","en":"..."},{"uz":"...","en":"..."}]}`;
         const text = await gradeWithAI(prompt);
         const cleaned = text.replace(/^```json\s*[\r\n]?|```\s*$/g, "").trim();

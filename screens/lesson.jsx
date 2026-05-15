@@ -12,10 +12,30 @@ const LESSON = {
 };
 
 const LESSONS = {
-  1: { num: "L01", section: "01", uz: "Windows arxitekturasi", en: "Windows Architecture",
-       subUz: "Katta rasm, nazariy asos, qatlamli arxitektura", subEn: "Big picture, theory, layered architecture" },
-  2: { num: "L02", section: "01", uz: "Boot jarayoni va Syscall oqimi", en: "Boot Process & Syscall Flow",
-       subUz: "UEFI dan login gacha, tizim chaqiruvlari va xavfsizlik", subEn: "UEFI to login, syscalls and security" },
+  1:  { num: "L01", section: "01", uz: "Windows arxitekturasi",        en: "Windows Architecture",
+        subUz: "Katta rasm, nazariy asos, qatlamli arxitektura",           subEn: "Big picture, theory, layered architecture" },
+  2:  { num: "L02", section: "01", uz: "Kernel nima?",                  en: "What is the Kernel?",
+        subUz: "ntoskrnl.exe, Executive, Microkernel, HAL va drayverlar",   subEn: "ntoskrnl.exe, Executive, Microkernel, HAL and drivers" },
+  3:  { num: "L03", section: "01", uz: "User mode va Kernel mode",      en: "User Mode vs Kernel Mode",
+        subUz: "CPU privilege halqalari va chegara nima uchun muhim",        subEn: "CPU privilege rings and why the boundary matters" },
+  4:  { num: "L04", section: "01", uz: "Windows boot jarayoni",         en: "Windows Boot Process",
+        subUz: "UEFI'dan login ekraniga: har bir bosqich va xavfsizlik",     subEn: "UEFI to login: every step and its security implications" },
+  5:  { num: "L05", section: "01", uz: "BIOS vs UEFI",                  en: "BIOS vs UEFI",                subUz: "Tez kunda", subEn: "Coming soon" },
+  6:  { num: "L06", section: "01", uz: "Secure Boot",                   en: "Secure Boot",                 subUz: "Tez kunda", subEn: "Coming soon" },
+  7:  { num: "L07", section: "01", uz: "TPM",                           en: "TPM",                         subUz: "Tez kunda", subEn: "Coming soon" },
+  8:  { num: "L08", section: "01", uz: "Registry",                      en: "Windows Registry",            subUz: "Tez kunda", subEn: "Coming soon" },
+  9:  { num: "L09", section: "01", uz: "Fayl tizimlari",                en: "File Systems",                subUz: "Tez kunda", subEn: "Coming soon" },
+  10: { num: "L10", section: "01", uz: "NTFS",                          en: "NTFS",                        subUz: "Tez kunda", subEn: "Coming soon" },
+  11: { num: "L11", section: "01", uz: "FAT32",                         en: "FAT32",                       subUz: "Tez kunda", subEn: "Coming soon" },
+  12: { num: "L12", section: "01", uz: "Jarayonlar (Processes)",        en: "Processes",                   subUz: "Tez kunda", subEn: "Coming soon" },
+  13: { num: "L13", section: "01", uz: "Thread'lar",                    en: "Threads",                     subUz: "Tez kunda", subEn: "Coming soon" },
+  14: { num: "L14", section: "01", uz: "Handle'lar",                    en: "Handles",                     subUz: "Tez kunda", subEn: "Coming soon" },
+  15: { num: "L15", section: "01", uz: "Servislar",                     en: "Services",                    subUz: "Tez kunda", subEn: "Coming soon" },
+  16: { num: "L16", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "Tez kunda", subEn: "Coming soon" },
+  17: { num: "L17", section: "01", uz: "Windows API",                   en: "Windows API",                 subUz: "Tez kunda", subEn: "Coming soon" },
+  18: { num: "L18", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Tez kunda", subEn: "Coming soon" },
+  19: { num: "L19", section: "01", uz: "Task Scheduler",                en: "Task Scheduler",              subUz: "Tez kunda", subEn: "Coming soon" },
+  20: { num: "L20", section: "01", uz: "Windows log fayllari",          en: "Windows Logs",                subUz: "Tez kunda", subEn: "Coming soon" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -23,8 +43,9 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
   const lang = useLang();
   const [progress, setProgress] = useLS(0);
   const [quizOpen, setQuizOpen] = useLS(false);
-  const LESSON = LESSONS[lessonNum] || LESSONS[1];
-  const lessonKey = `s01_l0${lessonNum}`;
+  const LESSON = LESSONS[lessonNum] || { num: `L${String(lessonNum).padStart(2,"0")}`, section: "01", uz: "Dars", en: "Lesson", subUz: "Tez kunda", subEn: "Coming soon" };
+  const lessonKey = `s01_l${String(lessonNum).padStart(2,"0")}`;
+  const hasContent = lessonNum <= 4;
 
   useLE(() => {
     const onScroll = () => {
@@ -62,16 +83,19 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <Section1Bigpicture />
             <Section2Theory />
             <Section3Layered />
-          </> : <>
-            <Section4Boot />
-            <Section5Syscall />
-            <Section6Security />
-            <Section7Lab />
+          </> : lessonNum === 2 ? <>
+            <SectionKernelWhat />
+            <SectionKernelInside />
+            <SectionKernelDrivers />
+          </> : lessonNum === 3 ? <>
+            <SectionRings />
             <Section8Comparison />
-            <Section9Summary />
-          </>}
+            <SectionSyscallBrief />
+          </> : lessonNum === 4 ? <>
+            <Section4Boot />
+          </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
-          <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />
+          {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
         </div>
       </div>
 
@@ -997,6 +1021,337 @@ function LessonNextNav({ setRoute, onQuizStart, lessonNum }) {
         </div>
         <button className="btn btn-primary" onClick={onQuizStart} style={{ justifySelf: "end" }}>
           <Icon name="target" size={14} /> {lang === "en" ? "Start the quiz" : "Testni boshlash"} <Icon name="arrow-right" size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L02: Kernel nima?
+// ─────────────────────────────────────────────────────────────
+function SectionKernelWhat() {
+  const lang = useLang();
+  return (
+    <section id="kernel-what" style={{ scrollMarginTop: 80, marginBottom: 56 }}>
+      <H2 num="01" uz="Kernel nima?" en="What is the kernel?" />
+      <P>
+        {lang === "en"
+          ? <>The <Term>kernel</Term> is the core of the operating system — the one piece of software that has complete, unrestricted access to all hardware. While your browser and text editor live in the sandboxed <Em>user space</Em>, the kernel lives in a completely separate, privileged area called <Em>kernel space</Em>. It manages everything: memory, CPU time, files, network, and every piece of hardware connected to the machine.</>
+          : <>«<Term>Kernel</Term>» — operatsion tizimning asosi. Bu barcha hardware'ga to'liq, cheklovsiz kirishga ega bo'lgan yagona dastur. Brauzering va matn muharriringiz «sandbox»lashtirilgan <Em>user space</Em>'da yashasa, kernel butunlay boshqa, imtiyozli zonada — <Em>kernel space</Em>'da yashaydi. U hamma narsani boshqaradi: xotira, CPU vaqti, fayllar, tarmoq va mashinaga ulangan har bir hardware.</>}
+      </P>
+      <P>
+        {lang === "en"
+          ? <>In Windows, the kernel lives inside a single file: <code>ntoskrnl.exe</code> (NT OS Kernel Executable). This ~10 MB file bootstraps every component of the OS when Windows starts. Without it, the machine cannot function at all.</>
+          : <>Windows'da kernel bitta faylda joylashgan: <code>ntoskrnl.exe</code> (NT OS Kernel Executable). Bu ~10 MB li fayl Windows ishga tushganda OT'ning barcha komponentlarini ishga tushiradi. U bo'lmasa — mashina umuman ishlay olmaydi.</>}
+      </P>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginTop: 24 }}>
+        {[
+          { icon: "cpu", color: "var(--c-system)", uz: "CPU vaqtini boshqarish", en: "CPU scheduling", descUz: "Qaysi jarayon qachon protsessor vaqtini olishini kernel hal qiladi.", descEn: "The kernel decides which process gets CPU time and when." },
+          { icon: "database", color: "var(--accent)", uz: "Xotirani boshqarish", en: "Memory management", descUz: "Har bir jarayon o'z virtual manzil maydonini oladi. Kernel buni ta'minlaydi.", descEn: "Every process gets its own virtual address space. The kernel enforces this." },
+          { icon: "shield", color: "var(--c-auth)", uz: "Xavfsizlik siyosati", en: "Security policy", descUz: "Kernel har bir fayl, jarayon va qurilmaga kirish ruxsatini tekshiradi.", descEn: "The kernel checks every access permission for files, processes and devices." },
+        ].map((c, i) => (
+          <div key={i} className="glass" style={{ padding: 18 }}>
+            <div style={{ color: c.color, marginBottom: 10 }}><Icon name={c.icon} size={20} /></div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, marginBottom: 6 }}>{lang === "en" ? c.en : c.uz}</div>
+            <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.5 }}>{lang === "en" ? c.descEn : c.descUz}</div>
+          </div>
+        ))}
+      </div>
+
+      <Callout color="var(--accent)" icon="info" titleUz="ntoskrnl.exe — asosiy fayl" titleEn="ntoskrnl.exe — the central file">
+        {lang === "en"
+          ? <>You can find it at <code>C:\Windows\System32\ntoskrnl.exe</code>. It is signed by Microsoft and any modification means Windows refuses to boot. This file contains both the <strong>Microkernel</strong> and the <strong>Executive</strong> — two separate layers packed into one binary.</>
+          : <>Uni <code>C:\Windows\System32\ntoskrnl.exe</code> da topasiz. U Microsoft tomonidan imzolangan va har qanday o'zgartirishda Windows yuklashdan bosh tortadi. Bu fayl <strong>Microkernel</strong> va <strong>Executive</strong> ni — ikkita alohida qatlamni bitta faylda — o'z ichiga oladi.</>}
+      </Callout>
+    </section>
+  );
+}
+
+function SectionKernelInside() {
+  const lang = useLang();
+  return (
+    <section id="kernel-inside" style={{ scrollMarginTop: 80, marginBottom: 56 }}>
+      <H2 num="02" uz="ntoskrnl.exe ichida nima bor?" en="What's inside ntoskrnl.exe?" />
+      <P>
+        {lang === "en"
+          ? <>Despite being one file, <code>ntoskrnl.exe</code> contains two conceptually separate parts: the <Term>Microkernel</Term> (the low-level engine) and the <Term>Executive</Term> (the high-level policy layer). There's also one separate but closely related component: the <Term>HAL</Term>.</>
+          : <>Bitta fayl bo'lishiga qaramay, <code>ntoskrnl.exe</code> ikki kontseptual alohida qismni o'z ichiga oladi: <Term>Microkernel</Term> (past darajali dvigatel) va <Term>Executive</Term> (yuqori darajali siyosat qatlami). Shuningdek, alohida lekin chambarchas bog'liq komponent ham bor: <Term>HAL</Term>.</>}
+      </P>
+
+      <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ padding: "20px 24px", background: "rgba(77,139,255,0.06)", border: "1px solid rgba(77,139,255,0.25)", borderRadius: 14, borderLeft: "4px solid var(--c-system)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <Icon name="cpu" size={18} style={{ color: "var(--c-system)" }} />
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--c-system)" }}>Microkernel</div>
+          </div>
+          <P>{lang === "en"
+            ? <>The <Term>Microkernel</Term> is the innermost engine. It handles three things only: <Em>thread scheduling</Em> (deciding which thread runs next on which CPU), <Em>interrupt handling</Em> (reacting to hardware signals like keyboard presses), and <Em>CPU synchronization</Em> (keeping multiple cores in sync). It intentionally stays minimal — the fewer lines of code here, the smaller the attack surface.</>
+            : <><Term>Microkernel</Term> — eng ichki dvigatel. U faqat uchta ishni bajaradi: <Em>thread'larni rejalashtirish</Em> (qaysi thread qaysi CPU'da keyingi o'tadi), <Em>uzilishlarni boshqarish</Em> (klaviatura bosimi kabi hardware signallariga javob berish) va <Em>CPU sinxronizatsiyasi</Em> (bir nechta yadrolarni sinxronlash). U ataylab minimal qoladi — bu yerda kod qanchalik kam bo'lsa, hujum yuzasi shunchalik kichik.</>}</P>
+        </div>
+
+        <div style={{ padding: "20px 24px", background: "rgba(0,255,156,0.04)", border: "1px solid var(--accent-border)", borderRadius: 14, borderLeft: "4px solid var(--accent)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <Icon name="layers" size={18} style={{ color: "var(--accent)" }} />
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--accent)" }}>Executive</div>
+          </div>
+          <P>{lang === "en"
+            ? <>The <Term>Executive</Term> sits above the microkernel and implements all the high-level <Em>policies</Em>: what a process is, how memory is managed, how files work, and who can access what. It is split into managers:</>
+            : <><Term>Executive</Term> mikrokernelning ustida turadi va barcha yuqori darajali <Em>siyosatlarni</Em> amalga oshiradi: jarayon nima, xotira qanday boshqariladi, fayllar qanday ishlaydi va kim nimaga kirish huquqiga ega. U menejerlarga bo'linadi:</>}</P>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8, marginTop: 8 }}>
+            {(lang === "en" ? [
+              ["Process Manager", "Creates and destroys processes and threads"],
+              ["Memory Manager", "Manages virtual memory and page files"],
+              ["I/O Manager", "Routes requests to the right driver"],
+              ["Object Manager", "Tracks every kernel object (files, handles, tokens)"],
+              ["Security Reference Monitor", "Enforces access control (ACLs)"],
+              ["Cache Manager", "Caches file data in RAM for speed"],
+            ] : [
+              ["Jarayon menejeri", "Jarayonlar va thread'larni yaratib, yo'q qiladi"],
+              ["Xotira menejeri", "Virtual xotira va page fayllarini boshqaradi"],
+              ["I/O menejeri", "So'rovlarni to'g'ri drayverga yo'naltiradi"],
+              ["Ob'ekt menejeri", "Har bir kernel ob'ektini kuzatadi (fayllar, handle, token)"],
+              ["Xavfsizlik monitord", "Kirish nazoratini ta'minlaydi (ACL)"],
+              ["Kesh menejeri", "Tezlik uchun fayl ma'lumotlarini RAM'da saqlaydi"],
+            ]).map(([name, desc], i) => (
+              <div key={i} style={{ padding: "10px 14px", background: "var(--bg-2)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)", marginBottom: 4 }}>{name}</div>
+                <div style={{ fontSize: 12, color: "var(--text-1)", lineHeight: 1.45 }}>{desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ padding: "20px 24px", background: "rgba(184,140,255,0.05)", border: "1px solid rgba(184,140,255,0.2)", borderRadius: 14, borderLeft: "4px solid var(--c-auth)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <Icon name="shield" size={18} style={{ color: "var(--c-auth)" }} />
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 700, color: "var(--c-auth)" }}>HAL — Hardware Abstraction Layer</div>
+          </div>
+          <P>{lang === "en"
+            ? <>The <Term>HAL</Term> (<code>hal.dll</code>) is a thin layer between the kernel and the actual hardware. Without it, Windows would need different code for every motherboard chipset. HAL provides a <Em>standard interface</Em>: the kernel asks «write to this memory address» and HAL translates it to the right instruction for the actual hardware installed. This is why the same <code>ntoskrnl.exe</code> runs on thousands of different PC models.</>
+            : <><Term>HAL</Term> (<code>hal.dll</code>) — kernel va haqiqiy hardware o'rtasidagi yupqa qatlam. U bo'lmasa, Windows har bir ona plata chipset uchun alohida kod talab qilardi. HAL <Em>standart interfeys</Em> ta'minlaydi: kernel «bu xotira manziliga yoz» deb so'raydi, HAL esa buni o'rnatilgan haqiqiy hardware uchun to'g'ri buyruqqa tarjima qiladi. Shuning uchun bir xil <code>ntoskrnl.exe</code> minglab turli PC modellarida ishlaydi.</>}</P>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionKernelDrivers() {
+  const lang = useLang();
+  return (
+    <section id="kernel-drivers" style={{ scrollMarginTop: 80, marginBottom: 56 }}>
+      <H2 num="03" uz="Drayverlar — Ring 0'dagi kod" en="Drivers — code living in ring 0" />
+      <P>
+        {lang === "en"
+          ? <>A <Term>driver</Term> is a special program that tells the OS how to talk to a specific piece of hardware. Unlike regular apps, drivers run entirely in <Em>kernel mode (ring 0)</Em> — the same privilege level as the kernel itself. This means a buggy or malicious driver can take down the entire system, which is why Windows requires drivers to be digitally signed.</>
+          : <>«<Term>Drayver</Term>» — OS'ga ma'lum bir hardware bilan qanday gaplashishni aytadigan maxsus dastur. Oddiy ilovalardan farqli o'laroq, drayverlar to'liq <Em>kernel mode (ring 0)</Em>'da — kernelning o'zi bilan bir xil imtiyoz darajasida — ishlaydi. Bu degani, noto'g'ri yoki zararli drayver butun tizimni yiqitishi mumkin. Shuning uchun Windows drayverlardan raqamli imzo talab qiladi.</>}
+      </P>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 22 }}>
+        <div style={{ padding: "18px 20px", background: "rgba(0,255,156,0.04)", border: "1px solid var(--accent-border)", borderRadius: 12 }}>
+          <div style={{ color: "var(--accent)", marginBottom: 8 }}><Icon name="check" size={18} /></div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, marginBottom: 8 }}>
+            {lang === "en" ? "Signed driver" : "Imzolangan drayver"}
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "var(--text-1)", lineHeight: 1.7 }}>
+            {(lang === "en" ? [
+              "Certificate issued by Microsoft",
+              "Signature verified at boot time",
+              "Tampering detected → boot blocked",
+              "Extension: .sys",
+            ] : [
+              "Microsoft tomonidan sertifikat berilgan",
+              "Imzo boot vaqtida tekshiriladi",
+              "O'zgartirilsa → boot bloklanadi",
+              "Kengaytma: .sys",
+            ]).map((t, i) => <li key={i}>{t}</li>)}
+          </ul>
+        </div>
+        <div style={{ padding: "18px 20px", background: "rgba(255,58,94,0.05)", border: "1px solid rgba(255,58,94,0.25)", borderRadius: 12 }}>
+          <div style={{ color: "var(--c-attack)", marginBottom: 8 }}><Icon name="warning" size={18} /></div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, marginBottom: 8 }}>
+            {lang === "en" ? "Unsigned driver" : "Imzolanmagan drayver"}
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "var(--text-1)", lineHeight: 1.7 }}>
+            {(lang === "en" ? [
+              "No certificate — blocked by default",
+              "Windows shows a warning or refuses load",
+              "Common in BYOVD attacks",
+              "Red flag in incident response",
+            ] : [
+              "Sertifikat yo'q — odatda bloklanadi",
+              "Windows ogohlantirish ko'rsatadi yoki yuklamaydi",
+              "BYOVD hujumlarida keng tarqalgan",
+              "Hodisalarga javob berishda qizil bayroq",
+            ]).map((t, i) => <li key={i}>{t}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      <Callout color="var(--c-attack)" icon="warning" titleUz="BYOVD hujumi" titleEn="BYOVD attack">
+        {lang === "en"
+          ? <><strong>BYOVD (Bring Your Own Vulnerable Driver)</strong> is a technique where an attacker uses a <em>legitimate, signed but vulnerable</em> driver to gain ring 0 access. Because the driver is signed, Windows trusts it — but the attacker exploits a bug inside it to run their own code in the kernel. The defence: regularly check for vulnerable drivers with tools like <code>loldrivers.io</code>.</>
+          : <><strong>BYOVD (Bring Your Own Vulnerable Driver)</strong> — hujumchi <em>qonuniy, imzolangan, lekin zaif</em> drayverdan ring 0 kirishini olish uchun foydalanadi. Drayver imzolanganligi sababli Windows unga ishonadi — ammo hujumchi undagi xatolikni ekspluatatsiya qilib, kernelda o'z kodini ishga tushiradi. Himoya: <code>loldrivers.io</code> kabi vositalar bilan zaif drayverlarni muntazam tekshiring.</>}
+      </Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L03: User mode vs Kernel mode
+// ─────────────────────────────────────────────────────────────
+function SectionRings() {
+  const lang = useLang();
+  return (
+    <section id="rings" style={{ scrollMarginTop: 80, marginBottom: 56 }}>
+      <H2 num="01" uz="CPU Privilege Halqalari" en="CPU Privilege Rings" />
+      <P>
+        {lang === "en"
+          ? <>Modern processors don't just execute code — they enforce <Term>privilege levels</Term>. The x86/x64 CPU architecture defines 4 rings (0 through 3), where ring 0 is the most privileged and ring 3 is the least. Windows only uses two: <Em>ring 0 (kernel mode)</Em> and <Em>ring 3 (user mode)</Em>. Rings 1 and 2 were intended for device drivers in the original design but were never used in practice.</>
+          : <>Zamonaviy protsessorlar faqat kod bajarmasdan, <Term>imtiyoz darajalarini</Term> ham ta'minlaydi. x86/x64 CPU arxitekturasi 4 ta halqani (0 dan 3 gacha) belgilaydi: ring 0 — eng imtiyozli, ring 3 — eng kam imtiyozli. Windows faqat ikkitasidan foydalanadi: <Em>ring 0 (kernel mode)</Em> va <Em>ring 3 (user mode)</Em>. Ring 1 va 2 dastlabki dizaynda qurilma drayverlari uchun mo'ljallangan, lekin amalda hech qachon ishlatilmagan.</>}
+      </P>
+
+      {/* Visual ring diagram */}
+      <div style={{ margin: "28px auto", maxWidth: 380, position: "relative", textAlign: "center" }}>
+        <div style={{ position: "relative", display: "inline-block", width: 320, height: 320 }}>
+          {/* Ring 3 */}
+          <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "2px solid rgba(255,145,69,0.4)", background: "rgba(255,145,69,0.04)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ position: "absolute", top: 10, left: "50%", transform: "translateX(-50%)", fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--c-user)", letterSpacing: 0.1 }}>ring 3 · User mode</div>
+          </div>
+          {/* Ring 1-2 */}
+          <div style={{ position: "absolute", inset: 40, borderRadius: "50%", border: "1px dashed rgba(100,100,120,0.3)", background: "rgba(100,100,120,0.03)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)", fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--text-3)", letterSpacing: 0.1, whiteSpace: "nowrap" }}>ring 1 & 2 · unused</div>
+          </div>
+          {/* Ring 0 */}
+          <div style={{ position: "absolute", inset: 88, borderRadius: "50%", border: "2px solid rgba(77,139,255,0.6)", background: "rgba(77,139,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--c-system)", letterSpacing: 0.1 }}>ring 0</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--c-system)", marginTop: 2 }}>Kernel mode</div>
+              <div style={{ fontSize: 10, color: "var(--text-2)", marginTop: 2 }}>ntoskrnl.exe</div>
+            </div>
+          </div>
+          {/* Labels outside */}
+          <div style={{ position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)", fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--c-user)", whiteSpace: "nowrap" }}>
+            Chrome, Notepad, cmd.exe
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div style={{ padding: "16px 20px", background: "rgba(255,145,69,0.06)", border: "1px solid rgba(255,145,69,0.25)", borderRadius: 12 }}>
+          <div className="mono" style={{ fontSize: 10, color: "var(--c-user)", marginBottom: 8, letterSpacing: 0.1 }}>RING 3 · USER MODE</div>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "var(--text-1)", lineHeight: 1.7 }}>
+            {(lang === "en" ? [
+              "Cannot access hardware directly",
+              "Cannot read another process's memory",
+              "Cannot run privileged CPU instructions",
+              "App crash = only that app dies",
+              "Examples: Chrome, Notepad, Python scripts",
+            ] : [
+              "Hardware'ga to'g'ridan-to'g'ri kira olmaydi",
+              "Boshqa jarayonning xotirasini o'qiy olmaydi",
+              "Imtiyozli CPU buyruqlarini bajara olmaydi",
+              "Ilova xatosi = faqat o'sha ilova o'ladi",
+              "Misollar: Chrome, Notepad, Python skriptlar",
+            ]).map((t, i) => <li key={i}>{t}</li>)}
+          </ul>
+        </div>
+        <div style={{ padding: "16px 20px", background: "rgba(77,139,255,0.06)", border: "1px solid rgba(77,139,255,0.25)", borderRadius: 12 }}>
+          <div className="mono" style={{ fontSize: 10, color: "var(--c-system)", marginBottom: 8, letterSpacing: 0.1 }}>RING 0 · KERNEL MODE</div>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "var(--text-1)", lineHeight: 1.7 }}>
+            {(lang === "en" ? [
+              "Full access to all hardware",
+              "Can read/write any memory address",
+              "All CPU instructions available",
+              "Crash here = BSOD, entire machine halts",
+              "Examples: ntoskrnl.exe, drivers (.sys files)",
+            ] : [
+              "Barcha hardware'ga to'liq kirish",
+              "Istalgan xotira manziliga o'qish/yozish",
+              "Barcha CPU buyruqlari mavjud",
+              "Bu yerda xato = BSOD, butun mashina to'xtaydi",
+              "Misollar: ntoskrnl.exe, drayverlar (.sys fayllar)",
+            ]).map((t, i) => <li key={i}>{t}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      <Callout color="var(--c-warn)" icon="warning" titleUz="Nima uchun bu chegara zarur?" titleEn="Why does this boundary exist?">
+        {lang === "en"
+          ? <>Imagine if every app had full hardware access. A single buggy Chrome tab could corrupt RAM and crash everything. The ring boundary ensures that no matter how broken or malicious an app is, it <Em>cannot</Em> directly harm the kernel or other processes. The kernel stays in control — and that's the entire premise of OS security.</>
+          : <>Tasavvur qiling, har bir ilova to'liq hardware kirishiga ega bo'lsa. Bitta noto'g'ri Chrome yorlig'i RAM'ni buzib, hamma narsani yiqitishi mumkin edi. Halqa chegarasi shunday ta'minlaydiki, ilova qanchalik buzilgan yoki zararli bo'lmasin, u kernelga yoki boshqa jarayonlarga to'g'ridan-to'g'ri zarar yetkazolmaydi. Kernel nazoratni qo'lida ushlab turadi — bu OT xavfsizligining asosiy printsipi.</>}
+      </Callout>
+    </section>
+  );
+}
+
+function SectionSyscallBrief() {
+  const lang = useLang();
+  return (
+    <section id="syscall-brief" style={{ scrollMarginTop: 80, marginBottom: 56 }}>
+      <H2 num="03" uz="Chegarani qanday kesib o'tish mumkin?" en="How do you legally cross the boundary?" />
+      <P>
+        {lang === "en"
+          ? <>A user-mode app can never just jump into kernel mode directly — the CPU won't allow it. The <Em>only</Em> legal way to request a privileged service is through a <Term>system call</Term> (syscall). This is a special CPU instruction that: saves the user-mode context, switches the CPU to ring 0, runs the requested kernel function, then returns the CPU back to ring 3.</>
+          : <>User mode'dagi ilova kernel mode'ga to'g'ridan-to'g'ri sakray olmaydi — protsessor buni ruxsat bermaydi. Imtiyozli xizmat talab qilishning <Em>yagona</Em> qonuniy yo'li — <Term>tizim chaqiruvi</Term> (syscall). Bu maxsus CPU buyrug'i: user mode kontekstini saqlaydi, CPU'ni ring 0 ga o'tkazadi, so'ralgan kernel funksiyasini bajaradi va CPU'ni ring 3 ga qaytaradi.</>}
+      </P>
+
+      <div style={{ marginTop: 20, padding: "20px 24px", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 14 }}>
+        <div className="eyebrow" style={{ marginBottom: 14 }}>// {lang === "en" ? "SIMPLIFIED CALL PATH" : "SODDALASHTIRILGAN CHAQIRUV YO'LI"}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontSize: 13 }}>
+          {[
+            { label: "App code", color: "var(--c-user)" },
+            { label: "→", color: "var(--text-3)" },
+            { label: "kernel32.dll", color: "var(--c-user)" },
+            { label: "→", color: "var(--text-3)" },
+            { label: "ntdll.dll", color: "var(--c-user)" },
+            { label: "→ syscall →", color: "var(--c-warn)" },
+            { label: "Executive", color: "var(--c-system)" },
+            { label: "→", color: "var(--text-3)" },
+            { label: "Driver / Hardware", color: "var(--c-auth)" },
+          ].map((s, i) => (
+            <span key={i} style={{ fontFamily: s.label.includes("→") ? "var(--font-body)" : "var(--font-mono)", color: s.color, fontWeight: s.label.includes("→") ? 400 : 600 }}>{s.label}</span>
+          ))}
+        </div>
+        <div style={{ marginTop: 14, fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.6 }}>
+          {lang === "en"
+            ? <>Everything to the left of «syscall» is in ring 3. Everything to the right is in ring 0. The syscall instruction is the only legal crossing point — this is the fundamental design of every modern OS.</>
+            : <>«syscall»dan chap tomondagi hamma narsa ring 3'da. O'ng tomondagi hamma narsa ring 0'da. Syscall buyrug'i — yagona qonuniy kesishish nuqtasi. Bu har bir zamonaviy OT'ning asosiy dizayni.</>}
+        </div>
+      </div>
+
+      <Callout color="var(--c-attack)" icon="skull" titleUz="Xavfsizlik nuqtai nazaridan" titleEn="Security angle">
+        {lang === "en"
+          ? <>Security tools (EDRs, antivirus) place <Em>hooks</Em> inside <code>ntdll.dll</code> to monitor every syscall before it enters the kernel. Advanced malware bypasses this by calling the <code>syscall</code> instruction <Em>directly</Em> — skipping the hooked ntdll entirely. This technique is called <strong>direct syscalls</strong> and you'll study it in depth in the Windows API lesson.</>
+          : <>Xavfsizlik tizimlari (EDR, antivirus) har bir syscallni kernelga kirmasdan oldin kuzatish uchun <code>ntdll.dll</code> ichiga <Em>hook</Em> joylashtiradi. Rivojlangan malware buni chetlab o'tadi: <code>syscall</code> buyrug'ini <Em>to'g'ridan-to'g'ri</Em> chaqiradi — ushlangan ntdll'ni butunlay o'tkazib yuboradi. Bu texnika <strong>to'g'ridan-to'g'ri syscall</strong> deyiladi va uni Windows API darsida chuqur o'rganasiz.</>}
+      </Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Coming soon placeholder for L05-L20
+// ─────────────────────────────────────────────────────────────
+function ComingSoon({ lesson, lessonNum, setRoute }) {
+  const lang = useLang();
+  return (
+    <div style={{ textAlign: "center", padding: "80px 32px" }}>
+      <div style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--accent-soft)", border: "1px solid var(--accent-border)", margin: "0 auto 24px", display: "grid", placeItems: "center", color: "var(--accent)" }}>
+        <Icon name="clock" size={36} />
+      </div>
+      <div className="eyebrow" style={{ color: "var(--accent)", marginBottom: 12 }}>// {lang === "en" ? "IN_DEVELOPMENT" : "TAYYORLANMOQDA"}</div>
+      <h2 className="display" style={{ fontSize: 32, margin: "0 0 10px", letterSpacing: "-0.02em" }}>
+        {lang === "en" ? lesson.en : lesson.uz}
+      </h2>
+      <p style={{ color: "var(--text-2)", fontSize: 15, maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.65 }}>
+        {lang === "en"
+          ? "This lesson is currently being developed. Complete the earlier lessons and check back soon — it will appear here automatically when ready."
+          : "Bu dars hozirda tayyorlanmoqda. Oldingi darslarni tugating va tez orada qaytib keling — tayyor bo'lgach bu yerda avtomatik paydo bo'ladi."}
+      </p>
+      <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+        <button className="btn btn-primary" onClick={() => setRoute({ name: "section", section: 1 })}>
+          <Icon name="arrow-left" size={14} /> {lang === "en" ? "Back to section" : "Bo'limga qaytish"}
         </button>
       </div>
     </div>
