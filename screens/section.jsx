@@ -11,7 +11,7 @@ const SECTION_DATA = {
     duration: "~36 soat",
     durationEn: "~36 hrs",
     difficulty: "foundational",
-    instructorUz: "Aziz R. — Senior Red Team Operator",
+    instructorUz: "Dagzo — Senior Red Team Operator",
     instructorEn: "Former defender of a Fortune 500 enterprise · OSCP, CRTO, CRTP",
     lessons: [
       { n: "01", uz: "Windows arxitekturasi",        en: "Windows architecture",        duration: 36, status: "in-progress", icon: "cpu",      color: "var(--c-system)", labs: 3, diagrams: 9 },
@@ -119,12 +119,46 @@ function SectionScreen({ setRoute, user, section = 1 }) {
 
           <aside style={{ position: "sticky", top: 90, display: "flex", flexDirection: "column", gap: 16 }}>
             <div className="glass" style={{ padding: 20 }}>
-              <div className="eyebrow" style={{ marginBottom: 10 }}>// INSTRUCTOR</div>
-              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg, var(--c-attack), var(--c-warn))", color: "#04060d", fontWeight: 700, display: "grid", placeItems: "center", fontFamily: "var(--font-mono)", fontSize: 14 }}>AR</div>
+              <div className="eyebrow" style={{ marginBottom: 12 }}>// INSTRUCTOR</div>
+              <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+                {/* Dagzo avatar */}
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  <div style={{
+                    width: 52, height: 52, borderRadius: "50%",
+                    background: "linear-gradient(135deg, #00ff88 0%, #0af 50%, #a855f7 100%)",
+                    padding: 2,
+                    boxShadow: "0 0 16px rgba(0,255,136,0.35), 0 0 4px rgba(0,255,136,0.2)",
+                  }}>
+                    <div style={{
+                      width: "100%", height: "100%", borderRadius: "50%",
+                      background: "#04060d",
+                      display: "grid", placeItems: "center",
+                      fontFamily: "var(--font-mono)", fontWeight: 800,
+                      fontSize: 13, letterSpacing: "0.05em",
+                      background: "radial-gradient(circle at 35% 35%, #0d1a12, #04060d)",
+                      color: "transparent",
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                    }}>
+                      <span style={{
+                        background: "linear-gradient(135deg, #00ff88, #0af)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        fontSize: 15, fontWeight: 900, letterSpacing: "0.08em",
+                      }}>DZ</span>
+                    </div>
+                  </div>
+                  <div style={{
+                    position: "absolute", bottom: 1, right: 1,
+                    width: 11, height: 11, borderRadius: "50%",
+                    background: "#00ff88", border: "2px solid #04060d",
+                    boxShadow: "0 0 6px #00ff88",
+                  }} />
+                </div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>{lang === "en" ? "Aziz R." : data.instructorUz}</div>
-                  <div style={{ fontSize: 11, color: "var(--text-3)" }}>{data.instructorEn}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13.5, letterSpacing: "0.01em" }}>Dagzo</div>
+                  <div style={{ fontSize: 11, color: "var(--c-system)", fontWeight: 600, marginBottom: 2 }}>Senior Red Team Operator</div>
+                  <div style={{ fontSize: 10.5, color: "var(--text-3)", lineHeight: 1.4 }}>{data.instructorEn}</div>
                 </div>
               </div>
             </div>

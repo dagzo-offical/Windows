@@ -164,7 +164,7 @@ function LessonHero() {
         </div>
         <div style={{ flex: 1 }} />
         <div className="mono" style={{ fontSize: 11, color: "var(--text-2)" }}>
-          {lang === "en" ? "Updated" : "Yangilandi"} 2026.05.10 · Aziz R.
+          {lang === "en" ? "Updated" : "Yangilandi"} 2026.05.10 · Dagzo
         </div>
       </div>
 
