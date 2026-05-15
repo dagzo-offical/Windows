@@ -388,13 +388,16 @@ async function gradeWithAI(prompt) {
   }
 
   if (provider === "gemini") {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 600, temperature: 0.3 },
+      }),
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.error?.message || "Gemini error");
+    if (!r.ok) throw new Error(d.error?.message || `Gemini error ${r.status}`);
     return d.candidates[0].content.parts[0].text;
   }
 

@@ -152,9 +152,9 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
   const [saved, setSaved]       = useAS(false);
 
   const PROVIDERS = [
-    { id: "openai",    label: "OpenAI",  hint: "sk-..." },
-    { id: "anthropic", label: "Claude",  hint: "sk-ant-..." },
-    { id: "gemini",    label: "Gemini",  hint: "AIza..." },
+    { id: "openai",    label: "OpenAI",  hint: "sk-...",     url: "https://platform.openai.com/api-keys" },
+    { id: "anthropic", label: "Claude",  hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys" },
+    { id: "gemini",    label: "Gemini",  hint: "AIza...",    url: "https://aistudio.google.com/api-keys" },
   ];
   const THEMES = ["green", "blue", "purple"];
 
@@ -252,22 +252,32 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
                 }}>{p.label}</button>
               ))}
             </div>
-            {provider && (
-              <div style={{ position: "relative" }}>
-                <input
-                  type={showKey ? "text" : "password"}
-                  placeholder={PROVIDERS.find(p => p.id === provider)?.hint}
-                  value={apiKey}
-                  onChange={e => setApiKey(e.target.value)}
-                  style={{ width: "100%", boxSizing: "border-box", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 40px 10px 14px", fontSize: 13, fontFamily: "var(--font-mono)", color: "var(--text-0)", outline: "none" }}
-                  onFocus={e => e.target.style.borderColor = "var(--accent)"}
-                  onBlur={e => e.target.style.borderColor = "var(--border)"}
-                />
-                <button onClick={() => setShowKey(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: 14, padding: 0 }}>
-                  {showKey ? "🙈" : "👁"}
-                </button>
-              </div>
-            )}
+            {provider && (() => {
+              const prov = PROVIDERS.find(p => p.id === provider);
+              return (
+                <div>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type={showKey ? "text" : "password"}
+                      placeholder={prov?.hint}
+                      value={apiKey}
+                      onChange={e => setApiKey(e.target.value)}
+                      style={{ width: "100%", boxSizing: "border-box", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 40px 10px 14px", fontSize: 13, fontFamily: "var(--font-mono)", color: "var(--text-0)", outline: "none" }}
+                      onFocus={e => e.target.style.borderColor = "var(--accent)"}
+                      onBlur={e => e.target.style.borderColor = "var(--border)"}
+                    />
+                    <button onClick={() => setShowKey(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: 14, padding: 0 }}>
+                      {showKey ? "🙈" : "👁"}
+                    </button>
+                  </div>
+                  {prov?.url && (
+                    <a href={prov.url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", opacity: 0.8, textDecoration: "none" }}>
+                      <Icon name="arrow-right" size={10} /> {lang === "en" ? `Get ${prov.label} API key →` : `${prov.label} API kalitini olish →`}
+                    </a>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Actions */}
