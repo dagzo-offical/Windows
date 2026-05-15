@@ -7,9 +7,12 @@ function CooldownScreen({ setRoute, user, onOpenProfile }) {
   const COOLDOWN_KEY = "wa_cooldown_end";
   const DURATION = 30 * 60;
 
+  const lessonNum = (() => { try { const r = JSON.parse(localStorage.getItem("wa_route") || "{}"); return r.lesson || 1; } catch { return 1; } })();
+
   const [endsAt, setEndsAt] = useCS(() => {
     const stored = localStorage.getItem(COOLDOWN_KEY);
     if (stored && +stored > Date.now()) return +stored;
+    // Already handled by quiz — if no key set, create 30 min from now
     const e = Date.now() + DURATION * 1000;
     localStorage.setItem(COOLDOWN_KEY, String(e));
     return e;
@@ -31,7 +34,7 @@ function CooldownScreen({ setRoute, user, onOpenProfile }) {
 
   const reset = () => {
     localStorage.removeItem(COOLDOWN_KEY);
-    setRoute({ name: "lesson", section: 1, lesson: 1 });
+    setRoute({ name: "lesson", section: 1, lesson: lessonNum });
   };
   const skipForDemo = () => {
     localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
@@ -141,13 +144,13 @@ function CooldownScreen({ setRoute, user, onOpenProfile }) {
               <button className="btn btn-primary" onClick={reset}>
                 <Icon name="play" size={14} /> {lang === "en" ? "Retry with new questions" : "Yangi savollar bilan qayta urinish"}
               </button>
-              <button className="btn" onClick={() => setRoute({ name: "lesson", section: 1, lesson: 1 })}>
+              <button className="btn" onClick={() => setRoute({ name: "lesson", section: 1, lesson: lessonNum })}>
                 <Icon name="book" size={14} /> {lang === "en" ? "Review the lesson" : "Darsni qayta ko'rish"}
               </button>
             </>
           ) : (
             <>
-              <button className="btn" onClick={() => setRoute({ name: "lesson", section: 1, lesson: 1 })}>
+              <button className="btn" onClick={() => setRoute({ name: "lesson", section: 1, lesson: lessonNum })}>
                 <Icon name="book" size={14} /> {lang === "en" ? "Read the lesson meanwhile" : "Bu vaqtda darsni o'qing"}
               </button>
               <button className="btn btn-ghost" onClick={skipForDemo} title="Demo only: skip timer">

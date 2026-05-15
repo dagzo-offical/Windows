@@ -3,25 +3,26 @@
 
 const { useState: useQS, useEffect: useQE, useRef: useQR } = React;
 
-// Static fallback questions for the Windows architecture lesson
-const FALLBACK_QUESTIONS = [
-  {
-    uz: "User mode va Kernel mode farqini tushuntirib bering. Qaysi ring darajalari va nima uchun bu chegara xavfsizlik uchun muhim?",
-    en: "Explain the difference between user mode and kernel mode. What CPU rings are used, and why is this boundary critical for security?",
-  },
-  {
-    uz: "Windows boot ketma-ketligida UEFI'dan login ekraniga qadar bo'lgan asosiy bosqichlarni sanab bering. Har bir bosqich keyingisini qanday tekshiradi?",
-    en: "List the main stages of the Windows boot sequence from UEFI to the login screen. How does each stage verify the next one?",
-  },
-  {
-    uz: "Bir oddiy ReadFile() chaqiruvi user mode'dan kernel mode'gacha va orqaga qaytishida qaysi qatlamlardan o'tadi? ntdll va syscall buyrug'ining roli nima?",
-    en: "Which layers does a simple ReadFile() call traverse from user mode to kernel and back? What is the role of ntdll and the syscall instruction?",
-  },
-];
+// Static fallback questions per lesson
+const FALLBACK_QUESTIONS = {
+  1: [
+    { uz: "User mode va Kernel mode farqini tushuntirib bering. Qaysi ring darajalari va nima uchun bu chegara xavfsizlik uchun muhim?", en: "Explain the difference between user mode and kernel mode. What CPU rings are used, and why is this boundary critical for security?" },
+    { uz: "Windows arxitekturasidagi Executive, Microkernel va HAL qatlamlarini tushuntiring. Ularning har biri qanday vazifani bajaradi?", en: "Explain the Executive, Microkernel and HAL layers in Windows architecture. What does each layer do?" },
+    { uz: "ntoskrnl.exe ichida qanday komponentlar mavjud va ular bir-biri bilan qanday o'zaro ishlaydi?", en: "What components exist inside ntoskrnl.exe and how do they interact with each other?" },
+  ],
+  2: [
+    { uz: "Windows boot ketma-ketligini UEFI'dan login ekraniga qadar bosqichma-bosqich tushuntiring. Har bir bosqich keyingisini qanday tekshiradi?", en: "Walk through the Windows boot sequence step-by-step from UEFI to login. How does each stage verify the next?" },
+    { uz: "ReadFile() chaqiruvi user mode'dan kernel mode'gacha va orqaga qaytishida qaysi qatlamlardan o'tadi? ntdll va syscall buyrug'ining roli nima?", en: "Which layers does ReadFile() traverse from user mode to kernel and back? What is the role of ntdll and the syscall instruction?" },
+    { uz: "Secure Boot kriptografik zanjiri qanday ishlaydi va BlackLotus rootkiti uni qanday chetlab o'tdi?", en: "How does the Secure Boot cryptographic chain work and how did the BlackLotus rootkit bypass it?" },
+  ],
+};
 
-function QuizModal({ onClose, onPass, onFail }) {
+const COOLDOWN_KEY = "wa_cooldown_end";
+const COOLDOWN_DURATION = 30 * 60 * 1000; // 30 min in ms
+
+function QuizModal({ onClose, onPass, onFail, lessonNum = 1 }) {
   const lang = useLang();
-  const [phase, setPhase] = useQS("intro"); // intro | answering | grading | result
+  const [phase, setPhase] = useQS("intro");
   const [questions, setQuestions] = useQS(null);
   const [answers, setAnswers] = useQS(["", "", ""]);
   const [current, setCurrent] = useQS(0);
@@ -64,21 +65,30 @@ Return STRICT JSON only, no markdown fences. Feedback in ${lang === "en" ? "Engl
     };
   };
 
+  const TOPICS = {
+    1: "Windows architecture: user mode vs kernel mode (rings), Executive layer, Microkernel, HAL, ntoskrnl.exe components and how they interact",
+    2: "Windows boot sequence (UEFI/POST → bootmgr → winload → kernel → LSASS → login), syscall flow (ReadFile → kernel32 → ntdll → syscall gate → Executive), Secure Boot chain and bypass techniques like BlackLotus",
+  };
+
   const generate = async () => {
     setLoading(true); setErr(null);
     try {
       if (hasKey()) {
-        const prompt = `Generate 3 advanced written questions about Windows architecture and OS internals for a security course. Cover: user mode vs kernel mode, executive/HAL, boot process, syscall flow. Mix: 1 conceptual, 1 technical-deep, 1 security scenario. Return STRICT JSON only: {"questions":[{"uz":"...","en":"..."},{"uz":"...","en":"..."},{"uz":"...","en":"..."}]}`;
+        const prompt = `Generate 3 advanced written questions for a Windows internals security course.
+Topic focus: ${TOPICS[lessonNum] || TOPICS[1]}
+Requirements: each question needs multi-sentence written explanation (not yes/no). Mix: 1 conceptual, 1 technical-deep, 1 security-implication.
+Use a DIFFERENT angle than previous attempts — vary the specific concepts asked.
+Return STRICT JSON only, no markdown: {"questions":[{"uz":"...","en":"..."},{"uz":"...","en":"..."},{"uz":"...","en":"..."}]}`;
         const text = await gradeWithAI(prompt);
         const cleaned = text.replace(/^```json\s*[\r\n]?|```\s*$/g, "").trim();
         setQuestions(JSON.parse(cleaned).questions.slice(0, 3));
       } else {
-        setQuestions(FALLBACK_QUESTIONS);
+        setQuestions(FALLBACK_QUESTIONS[lessonNum] || FALLBACK_QUESTIONS[1]);
       }
       setPhase("answering");
     } catch (e) {
       console.warn("Question gen failed, using fallback:", e);
-      setQuestions(FALLBACK_QUESTIONS);
+      setQuestions(FALLBACK_QUESTIONS[lessonNum] || FALLBACK_QUESTIONS[1]);
       setPhase("answering");
     } finally {
       setLoading(false);
@@ -403,6 +413,29 @@ function Grading() {
 
 function Result({ results, questions, answers, overall, passed, onContinue }) {
   const lang = useLang();
+  const [now, setNow] = useQS(Date.now());
+  useQE(() => {
+    if (passed) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [passed]);
+
+  // Write cooldown start time when failed result first shown
+  useQE(() => {
+    if (!passed) {
+      const existing = localStorage.getItem(COOLDOWN_KEY);
+      if (!existing || +existing <= Date.now()) {
+        localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_DURATION));
+      }
+    }
+  }, [passed]);
+
+  const endsAt = !passed ? (+localStorage.getItem(COOLDOWN_KEY) || 0) : 0;
+  const remaining = Math.max(0, Math.floor((endsAt - now) / 1000));
+  const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
+  const ss = String(remaining % 60).padStart(2, "0");
+  const unlocked = !passed ? remaining === 0 : true;
+
   return (
     <div style={{ paddingTop: 20 }}>
       <div style={{ textAlign: "center", padding: "12px 0 24px" }}>
@@ -437,11 +470,36 @@ function Result({ results, questions, answers, overall, passed, onContinue }) {
         ))}
       </div>
 
-      <div style={{ marginTop: 24, textAlign: "center" }}>
-        <button className={`btn ${passed ? "btn-primary" : "btn-danger"}`} onClick={onContinue} style={{ padding: "12px 24px" }}>
+      {!passed && (
+        <div style={{ margin: "20px 0", padding: "18px 24px", background: "rgba(255,58,94,0.06)", border: "1px solid rgba(255,58,94,0.25)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+          <div>
+            <div className="mono" style={{ fontSize: 10, color: "var(--text-3)", letterSpacing: 0.18, marginBottom: 4 }}>
+              {unlocked ? (lang === "en" ? "READY TO RETRY" : "QAYTA URINISH MUMKIN") : (lang === "en" ? "NEXT ATTEMPT IN" : "KEYINGI URINISH")}
+            </div>
+            <div className="display" style={{ fontSize: 44, fontWeight: 700, letterSpacing: "-0.04em", color: unlocked ? "var(--accent)" : "var(--c-attack)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+              {unlocked ? "00:00" : `${mm}:${ss}`}
+            </div>
+          </div>
+          <div style={{ flex: 1, maxWidth: 180 }}>
+            <div style={{ height: 5, background: "var(--bg-2)", borderRadius: 4, overflow: "hidden" }}>
+              <div style={{ height: "100%", background: unlocked ? "var(--accent)" : "var(--c-attack)", borderRadius: 4, width: `${unlocked ? 100 : ((COOLDOWN_DURATION / 1000 - remaining) / (COOLDOWN_DURATION / 1000)) * 100}%`, transition: "width 1s linear" }} />
+            </div>
+            <div style={{ marginTop: 6, fontSize: 10, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>30:00 {lang === "en" ? "total" : "jami"}</div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ marginTop: 16, textAlign: "center" }}>
+        <button
+          className={`btn ${passed ? "btn-primary" : unlocked ? "btn-primary" : ""}`}
+          onClick={onContinue}
+          disabled={!passed && !unlocked}
+          style={{ padding: "12px 24px", opacity: (!passed && !unlocked) ? 0.45 : 1, cursor: (!passed && !unlocked) ? "not-allowed" : "pointer" }}>
           {passed
             ? <><Icon name="arrow-right" size={14} /> {lang === "en" ? "Continue to next lesson" : "Keyingi darsga o'tish"}</>
-            : <><Icon name="lock" size={14} /> {lang === "en" ? "Begin 30-minute cooldown" : "30 minut bloklashga o'tish"}</>}
+            : unlocked
+              ? <><Icon name="play" size={14} /> {lang === "en" ? "Retry with new questions" : "Yangi savollar bilan qayta urinish"}</>
+              : <><Icon name="lock" size={14} /> {lang === "en" ? `Locked — ${mm}:${ss} remaining` : `Bloklangan — ${mm}:${ss} qoldi`}</>}
         </button>
       </div>
     </div>
