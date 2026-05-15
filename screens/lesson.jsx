@@ -377,8 +377,8 @@ sequenceDiagram
       <H2 num="05" uz="Bitta syscall'ning hayoti" en="The life of a single syscall" />
       <P>
         {lang === "en"
-          ? <>Every privileged operation — opening a file, allocating memory, sending a network packet — follows the same path: Win32 API → ntdll → syscall instruction → executive. Knowing this path is non-negotiable for kernel debugging, malware analysis, and EDR work.</>
-          : <>Har qanday imtiyozli operatsiya — fayl ochish, xotira ajratish, tarmoq paketi yuborish — bir xil yo'ldan o'tadi: Win32 API → ntdll → syscall buyrug'i → executive. Bu yo'lni bilish — kernel debugging, malware tahlili va EDR ishi uchun shart.</>}
+          ? <>Every privileged operation — opening a file, allocating memory, sending a network packet — follows the exact same path: <Em>Win32 API → ntdll → syscall instruction → executive</Em>. The diagram below traces one single <Code2>ReadFile</Code2> call. Knowing this path by heart is non-negotiable for kernel debugging, malware analysis and EDR work.</>
+          : <>Har qanday imtiyozli operatsiya — fayl ochish, xotira ajratish, tarmoq paketi yuborish — aynan bir xil yo'ldan o'tadi: <Em>Win32 API → ntdll → syscall buyrug'i → executive</Em>. Quyidagi diagramma bitta <Code2>ReadFile</Code2> chaqiruvini kuzatadi. Bu yo'lni yoddan bilish — kernel debugging, malware tahlili va EDR ishi uchun shart.</>}
       </P>
 
       <div style={{ marginTop: 22 }}>
@@ -389,12 +389,175 @@ sequenceDiagram
         />
       </div>
 
-      <Callout color="var(--c-attack)" icon="skull" titleUz="Hujum nuqtasi" titleEn="Attack surface">
+      <SyscallAnalogy />
+
+      <Callout color="var(--c-attack)" icon="skull"
+        titleUz="Hujum nuqtasi — nega bu kiberxavfsizlik uchun muhim"
+        titleEn="Attack surface — why this matters for security">
         {lang === "en"
-          ? <>EDRs hook the user-mode side of this chain (ntdll). That's why advanced malware uses <em>direct syscalls</em> — skipping the hooked functions and invoking the syscall instruction itself.</>
-          : <>EDR'lar bu zanjirning user-mode tomonini ushlaydi (ntdll). Shuning uchun rivojlangan malware <em>to'g'ridan-to'g'ri syscall</em>'lardan foydalanadi — ushlangan funksiyalardan o'tib, syscall buyrug'ining o'zini chaqirib.</>}
+          ? <>Look at the <strong>"Attack surface"</strong> marker at the very bottom of the diagram. Most defensive tools and antivirus engines (<Em>EDRs</Em>) plant their "hook" right inside <Code2>ntdll.dll</Code2> — because it is the <Em>last stop in ring 3</Em>, the final place before the syscall instruction crosses into the kernel. They record every move the "waiter" makes. This is exactly why advanced malware uses <Em>direct syscalls</Em> — bypassing the hooked ntdll functions and invoking the <Code2>syscall</Code2> instruction itself, walking up to the kitchen window alone.</>
+          : <>Diagrammaning eng pastki qismidagi <strong>«Hujum nuqtasi»</strong> belgisiga e'tibor bering. Aksariyat himoya tizimlari va antiviruslar (<Em>EDR</Em>) jarayonni kuzatish uchun o'z «qarmog'ini» (hook) aynan <Code2>ntdll.dll</Code2> ichiga tashlaydi — chunki bu <Em>Ring 3'dagi oxirgi nuqta</Em>, syscall buyrug'i yadroga kirishidan oldingi so'nggi joy. Ular «ofitsiant»ning har bir qadamini yozib boradi. Aynan shuning uchun rivojlangan malware <Em>«to'g'ridan-to'g'ri syscall»</Em> (direct syscall) usulidan foydalanadi — ushlangan ntdll funksiyalarini chetlab o'tib, <Code2>syscall</Code2> buyrug'ining o'zini bevosita chaqiradi, ya'ni ofitsiantsiz o'zi oshxona darchasiga boradi.</>}
       </Callout>
     </section>
+  );
+}
+
+// ─── Restaurant analogy for the syscall flow ───────────────────
+const SYSCALL_ACTORS = [
+  { tech: "Application", roleUz: "Mijoz", roleEn: "The customer", icon: "user",
+    color: "var(--c-user)",
+    descUz: "Notepad — maxfiy.txt'ni ochmoqchi", descEn: "Notepad — wants to open maxfiy.txt" },
+  { tech: "kernel32 · ntdll", roleUz: "Ofitsiant", roleEn: "The waiter", icon: "code",
+    color: "var(--c-user)",
+    descUz: "Buyurtmani oshxona tiliga o'giradi", descEn: "Translates the order for the kitchen" },
+  { tech: "Syscall gate", roleUz: "Oshxona eshigi", roleEn: "The kitchen door", icon: "key",
+    color: "var(--c-warn)",
+    descUz: "Ring 3 → Ring 0 chegarasi", descEn: "The ring 3 → ring 0 boundary" },
+  { tech: "Executive / Kernel", roleUz: "Oshpaz + Qorovul", roleEn: "Chef + guard", icon: "shield-check",
+    color: "var(--c-system)",
+    descUz: "Ruxsatni tekshiradi, ishni bajaradi", descEn: "Checks the permission, does the work" },
+  { tech: "Hardware", roleUz: "Omborxona", roleEn: "The warehouse", icon: "database",
+    color: "#8390a8",
+    descUz: "SSD / HDD — baytlarni topadi", descEn: "SSD / HDD — fetches the raw bytes" },
+];
+
+function SyscallAnalogy() {
+  const lang = useLang();
+  return (
+    <div style={{ marginTop: 32 }}>
+      {/* Intro */}
+      <div style={{
+        padding: "18px 20px", borderRadius: 12,
+        background: "rgba(255,145,69,0.06)",
+        border: "1px solid rgba(255,145,69,0.28)",
+        display: "flex", gap: 14, alignItems: "flex-start",
+      }}>
+        <span style={{ color: "var(--c-user)", flexShrink: 0, marginTop: 2 }}><Icon name="users" size={20} /></span>
+        <div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 600, color: "var(--c-user)" }}>
+            {lang === "en" ? "Read it as a restaurant" : "Buni restoran misolida o'qing"}
+          </div>
+          <div style={{ fontSize: 13.5, color: "var(--text-1)", lineHeight: 1.6, marginTop: 4 }}>
+            {lang === "en"
+              ? <>This diagram shows how Windows connects a plain program (Notepad, or your Python script) to the computer's physical storage. The easiest way to understand it is a restaurant: you order, a waiter relays it, the kitchen cooks, the warehouse supplies — and your food travels back the same way.</>
+              : <>Bu diagramma Windows oddiy dasturni (Notepad yoki Python skriptingizni) kompyuterning jismoniy xotirasiga qanday bog'lashini ko'rsatadi. Buni eng oson tushunish yo'li — restoran: siz buyurtma berasiz, ofitsiant uni yetkazadi, oshxona tayyorlaydi, omborxona mahsulot beradi — taom esa o'sha yo'ldan orqaga qaytadi.</>}
+          </div>
+        </div>
+      </div>
+
+      {/* Actor mapping cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginTop: 16 }}>
+        {SYSCALL_ACTORS.map((a, i) => (
+          <div key={i} style={{
+            padding: "14px 12px", borderRadius: 10,
+            background: "var(--bg-2)",
+            border: `1px solid ${a.color}33`,
+            borderTop: `2px solid ${a.color}`,
+            display: "flex", flexDirection: "column", gap: 6,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ width: 30, height: 30, borderRadius: 7, background: a.color + "1a", border: `1px solid ${a.color}44`, color: a.color, display: "grid", placeItems: "center" }}>
+                <Icon name={a.icon} size={15} />
+              </div>
+              <span className="mono" style={{ fontSize: 9, color: "var(--text-3)", letterSpacing: 0.06 }}>0{i + 1}</span>
+            </div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 600, color: a.color }}>
+              {lang === "en" ? a.roleEn : a.roleUz}
+            </div>
+            <div className="mono" style={{ fontSize: 9.5, color: "var(--text-2)", letterSpacing: 0.04 }}>{a.tech}</div>
+            <div style={{ fontSize: 11, color: "var(--text-1)", lineHeight: 1.45 }}>
+              {lang === "en" ? a.descEn : a.descUz}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Step-by-step walkthrough */}
+      <div style={{ marginTop: 24 }}>
+        <div className="eyebrow" style={{ marginBottom: 4 }}>
+          // {lang === "en" ? "STEP_BY_STEP" : "QADAMMA_QADAM"}
+        </div>
+        <div>
+          <AnalogyStep n={1} zoneUz="Ring 3 · Buyurtma" zoneEn="Ring 3 · The order" color="var(--c-user)" dir="down"
+            titleUz="Mijoz buyurtma beradi" titleEn="The customer places an order">
+            {lang === "en"
+              ? <>You want to open <Code2>maxfiy.txt</Code2> in Notepad. Notepad tells the OS "read me this file" — in the diagram this is <Code2>ReadFile(handle, buffer)</Code2> (step&nbsp;1). The app only knows the file number (the <Term>handle</Term>) and an empty slot for the data (the <Term>buffer</Term>); it has no idea where the disk physically is.</>
+              : <>Siz Notepad'da <Code2>maxfiy.txt</Code2> faylini ochmoqchisiz. Notepad operatsion tizimga «menga shu faylni o'qib ber» deydi — diagrammada bu <Code2>ReadFile(handle, buffer)</Code2> (1-qadam). Dastur faqat fayl raqamini (<Term>handle</Term>) va ma'lumot joylashadigan bo'sh joyni (<Term>buffer</Term>) biladi; diskning fizik joyini umuman bilmaydi.</>}
+          </AnalogyStep>
+
+          <AnalogyStep n={2} zoneUz="Ring 3 · Ofitsiant" zoneEn="Ring 3 · The waiter" color="var(--c-user)" dir="down"
+            titleUz="Ofitsiant buyurtmani tarjima qiladi" titleEn="The waiter translates the order">
+            {lang === "en"
+              ? <>Programs are not allowed to talk to the hardware directly. Notepad calls a Windows library — <Code2>kernel32.dll</Code2> — which hands the order to <Code2>ntdll.dll</Code2>, translating it into the kitchen's language: <Code2>NtReadFile</Code2> (step&nbsp;2). All of this still happens in <Em>User Mode (Ring 3)</Em> — the restricted zone where security limits apply.</>
+              : <>Dasturlarga temir-tersak bilan to'g'ridan-to'g'ri gaplashishga ruxsat yo'q. Notepad maxsus Windows kutubxonasiga — <Code2>kernel32.dll</Code2> — murojaat qiladi, u esa buyurtmani <Code2>ntdll.dll</Code2> ga uzatib, oshxona tushunadigan tilga o'giradi: <Code2>NtReadFile</Code2> (2-qadam). Bularning bari hali <Em>User Mode (Ring 3)</Em> — xavfsizlik cheklovlari amal qiladigan hududda yuz beradi.</>}
+          </AnalogyStep>
+
+          <AnalogyStep n={3} zoneUz="Chegara · Syscall" zoneEn="Boundary · Syscall" color="var(--c-warn)" dir="down"
+            titleUz="Oshxona eshigi — syscall" titleEn="The kitchen door — the syscall">
+            {lang === "en"
+              ? <>The waiter has the order but cannot enter the kitchen (the kernel). So he passes it through the kitchen window with a special command: <Code2>syscall</Code2> (system call, step&nbsp;3). This is the hard boundary between the ordinary application world and the fully-privileged kernel world — ring&nbsp;3 stops, ring&nbsp;0 begins.</>
+              : <>Ofitsiant buyurtmani oldi, lekin oshxonaga (yadroga) kira olmaydi. Shuning uchun u oshxona darchasidan maxsus buyruq yuboradi: <Code2>syscall</Code2> (system call — tizim chaqiruvi, 3-qadam). Bu — oddiy dastur muhitidan to'liq huquqli yadro muhitiga o'tish chegarasi: ring&nbsp;3 tugaydi, ring&nbsp;0 boshlanadi.</>}
+          </AnalogyStep>
+
+          <AnalogyStep n={4} zoneUz="Ring 0 · Yadro" zoneEn="Ring 0 · Kernel" color="var(--c-system)" dir="down"
+            titleUz="Qorovul tekshiradi, oshpaz ishni bajaradi" titleEn="The guard checks, the chef cooks">
+            {lang === "en"
+              ? <>The order is now inside the "heart" of the computer (Ring&nbsp;0). The guard runs a <Em>security check</Em> first: do you actually have permission to read this file? If yes, the kernel (the chef) forwards the command straight to the hardware drivers (steps&nbsp;4–5).</>
+              : <>Buyurtma endi kompyuterning «yuragi» — Ring&nbsp;0 ichida. Avval Qorovul <Em>xavfsizlik tekshiruvini</Em> o'tkazadi: sizning bu faylni o'qishga huquqingiz bormi? Ruxsat bo'lsa, Kernel (oshpaz) buyruqni bevosita hardware drayverlariga uzatadi (4–5-qadamlar).</>}
+          </AnalogyStep>
+
+          <AnalogyStep n={5} zoneUz="Hardware · Omborxona" zoneEn="Hardware · Warehouse" color="#8390a8" dir="down"
+            titleUz="Omborxona baytlarni topadi" titleEn="The warehouse fetches the bytes">
+            {lang === "en"
+              ? <>Your disk (SSD / HDD) springs into action, locates the text bytes of <Code2>maxfiy.txt</Code2> at the requested address and sends them back up (step&nbsp;6). This is the only point where anything physical actually moves.</>
+              : <>Qattiq diskingiz (SSD / HDD) ishga tushadi, ko'rsatilgan manzildan <Code2>maxfiy.txt</Code2> ichidagi matn baytlarini topadi va yuqoriga qaytaradi (6-qadam). Bu — yagona nuqta, bu yerda haqiqatan fizik narsa harakatlanadi.</>}
+          </AnalogyStep>
+
+          <AnalogyStep n={6} zoneUz="Qaytish · Orqaga" zoneEn="Return · Back up" color="var(--accent)" dir="up" last
+            titleUz="Ma'lumot o'sha yo'ldan qaytadi" titleEn="The data travels back the same way">
+            {lang === "en"
+              ? <>The data retraces its path in reverse (steps&nbsp;7–9): kernel → <Code2>ntdll.dll</Code2> → <Code2>kernel32.dll</Code2> → Notepad. Finally the text appears on your screen. The entire round trip finishes in well under a millisecond.</>
+              : <>O'qilgan ma'lumot kelgan yo'lidan teskari qaytadi (7–9-qadamlar): yadro → <Code2>ntdll.dll</Code2> → <Code2>kernel32.dll</Code2> → Notepad. Nihoyat matn ekraningizda paydo bo'ladi. Butun bu sayohat bir millisekunddan ham kam vaqtda tugaydi.</>}
+          </AnalogyStep>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalogyStep({ n, zoneUz, zoneEn, color, dir = "down", last, titleUz, titleEn, children }) {
+  const lang = useLang();
+  return (
+    <div style={{ display: "flex", gap: 16, position: "relative" }}>
+      {/* Number + connector rail */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+        <div style={{
+          width: 36, height: 36, borderRadius: "50%",
+          background: color + "1a", color,
+          border: `1.5px solid ${color}`,
+          display: "grid", placeItems: "center",
+          fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: 14,
+          boxShadow: `0 0 14px ${color}44`,
+        }}>{n}</div>
+        {!last && (
+          <div style={{ flex: 1, width: 2, background: `linear-gradient(180deg, ${color}, var(--border))`, minHeight: 18, marginTop: 2 }} />
+        )}
+      </div>
+      {/* Body */}
+      <div style={{ paddingBottom: last ? 0 : 22, flex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <span className="mono" style={{ fontSize: 9.5, color, letterSpacing: 0.12, textTransform: "uppercase" }}>
+            {lang === "en" ? zoneEn : zoneUz}
+          </span>
+          <Icon name={dir === "up" ? "arrow-left" : "arrow-right"} size={11}
+            style={{ color, transform: dir === "up" ? "rotate(-90deg)" : "rotate(90deg)" }} />
+        </div>
+        <h4 style={{ margin: "0 0 4px", fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--text-0)" }}>
+          {lang === "en" ? titleEn : titleUz}
+        </h4>
+        <div style={{ fontSize: 13.5, color: "var(--text-1)", lineHeight: 1.65 }}>{children}</div>
+      </div>
+    </div>
   );
 }
 

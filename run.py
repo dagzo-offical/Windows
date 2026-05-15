@@ -115,6 +115,19 @@ fs.mkdirSync(path.join(ROOT, 'lib'), { recursive: true });
 fs.writeFileSync(path.join(ROOT, 'lib/bundle.js'), bundle);
 console.log('Bundle: ' + (bundle.length >> 10) + ' KB');
 """
+    bundle_exists = (root / "lib" / "bundle.js").exists()
+
+    def _fallback(reason: str):
+        # A pre-built bundle.js ships with the repo, so a failed rebuild is
+        # non-fatal — serve the existing one and explain how to enable rebuilds.
+        print(reason)
+        if bundle_exists:
+            print("  -> serving the pre-built lib/bundle.js instead.")
+        else:
+            print("  [ERROR] lib/bundle.js is missing and cannot be built.")
+            print("          Run: npm install   (installs @babel/* for --rebuild)")
+            sys.exit(1)
+
     print("  Building bundle.js ...", end=" ", flush=True)
     try:
         result = subprocess.run(
@@ -124,13 +137,17 @@ console.log('Bundle: ' + (bundle.length >> 10) + ' KB');
         if result.returncode == 0:
             print("OK")
         else:
-            print("FAILED")
-            print(result.stderr[:800])
-            sys.exit(1)
+            err = (result.stderr or "").strip()
+            if "Cannot find module" in err:
+                _fallback("SKIPPED (run `npm install` first)")
+            else:
+                print("FAILED")
+                print(err[:800])
+                _fallback("")
     except FileNotFoundError:
-        print("SKIPPED (node not found)")
+        _fallback("SKIPPED (Node.js not found)")
     except subprocess.TimeoutExpired:
-        print("TIMEOUT — skipping rebuild")
+        _fallback("TIMEOUT")
 
 
 def main():
