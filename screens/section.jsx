@@ -41,10 +41,17 @@ const SECTION_DATA = {
 function SectionScreen({ setRoute, user, section = 1 }) {
   const lang = useLang();
   const data = SECTION_DATA[section] || SECTION_DATA[1];
-  const lessons = data.lessons.map((l, i) => ({
-    ...l,
-    status: i === 0 ? "in-progress" : "locked",
-  }));
+  const completed = user?.completedLessons || [];
+
+  const lessons = data.lessons.map((l, i) => {
+    const key = `s${String(section).padStart(2,"0")}_l${String(i+1).padStart(2,"0")}`;
+    const isDone = completed.includes(key);
+    // first unlocked lesson after all completed ones is "in-progress"
+    const prevKey = i === 0 ? null : `s${String(section).padStart(2,"0")}_l${String(i).padStart(2,"0")}`;
+    const prevDone = i === 0 || completed.includes(prevKey);
+    const status = isDone ? "done" : prevDone ? "in-progress" : "locked";
+    return { ...l, status };
+  });
 
   return (
     <div>
@@ -94,7 +101,7 @@ function SectionScreen({ setRoute, user, section = 1 }) {
           </div>
 
           <div style={{ position: "relative", marginTop: 28, paddingTop: 20, borderTop: `1px solid ${data.color}22` }}>
-            <Progress value={1} max={20} label={lang === "en" ? "Section progress" : "Bo'lim taraqqiyoti"} color={data.color} />
+            <Progress value={completed.filter(k => k.startsWith(`s${String(section).padStart(2,"0")}_`)).length} max={data.lessons.length} label={lang === "en" ? "Section progress" : "Bo'lim taraqqiyoti"} color={data.color} />
           </div>
         </div>
 

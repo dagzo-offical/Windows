@@ -141,7 +141,7 @@ function TopNav({ route, setRoute, user, crumb }) {
             {user?.initials || "AK"}
           </div>
           <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
-            <span style={{ fontSize: 12.5, fontWeight: 600 }}>{user?.name || "Akmal K."}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 600 }}>{user?.name || "Dagzo"}</span>
             <span className="mono" style={{ fontSize: 10, color: "var(--accent)" }}>LVL {user?.level || 14} · {user?.xp || "4,820"} XP</span>
           </div>
         </div>

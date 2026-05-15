@@ -11,14 +11,14 @@ function DashboardScreen({ setRoute, user }) {
         {/* HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32, gap: 24, flexWrap: "wrap" }}>
           <div>
-            <div className="eyebrow"><LiveDot /> &nbsp;OPERATOR_ID: AK-4820 · LAST_LOGIN: 14m ago</div>
+            <div className="eyebrow"><LiveDot /> &nbsp;OPERATOR_ID: {user?.name?.toUpperCase().replace(/\s/g,"_") || "DAGZO"} · LAST_LOGIN: just now</div>
             <h1 className="display" style={{ fontSize: 40, margin: "10px 0 6px", letterSpacing: "-0.02em" }}>
-              {lang === "en" ? "Welcome back, Akmal" : "Xush kelibsiz, Akmal"}<span className="caret" />
+              {lang === "en" ? `Welcome back, ${user?.name || "Dagzo"}` : `Xush kelibsiz, ${user?.name || "Dagzo"}`}<span className="caret" />
             </h1>
             <p style={{ color: "var(--text-2)", margin: 0 }}>
               {lang === "en"
-                ? "14-day streak · 4,820 XP · Section 01 · Lesson 1 of 20 in progress"
-                : "14 kunlik seriya · 4,820 XP · 01-bo'lim · 20 darsdan 1-darsi davom etmoqda"}
+                ? `Level ${user?.level || 1} · ${user?.xp || 0} XP · ${user?.completedLessons?.length || 0} lessons completed`
+                : `${user?.level || 1}-daraja · ${user?.xp || 0} XP · ${user?.completedLessons?.length || 0} ta dars tugatildi`}
             </p>
           </div>
           <button className="btn btn-primary" onClick={() => setRoute({ name: "lesson", section: 1, lesson: 1 })}>
@@ -28,10 +28,10 @@ function DashboardScreen({ setRoute, user }) {
 
         {/* STAT ROW */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
-          <StatCard icon="flame" color="var(--c-attack)" n="14" suffix={lang === "en" ? "day" : "kun"} uz="Seriya" en="Study streak" />
-          <StatCard icon="zap" color="var(--accent)" n="4,820" uz="Tajriba" en="Total XP" />
-          <StatCard icon="trophy" color="var(--c-warn)" n="12" suffix="/ 36" uz="Yutuqlar" en="Achievements" />
-          <StatCard icon="target" color="var(--c-auth)" n="92" suffix="%" uz="O'rtacha test" en="Avg quiz score" />
+          <StatCard icon="flame" color="var(--c-attack)" n={user?.level || 1} suffix={lang === "en" ? "lvl" : "lvl"} uz="Daraja" en="Level" />
+          <StatCard icon="zap" color="var(--accent)" n={user?.xp || "0"} uz="Tajriba" en="Total XP" />
+          <StatCard icon="trophy" color="var(--c-warn)" n={user?.completedLessons?.length || 0} suffix="/ 20" uz="Darslar" en="Lessons done" />
+          <StatCard icon="target" color="var(--c-auth)" n="—" uz="O'rtacha test" en="Avg quiz score" />
         </div>
 
         {/* MAIN GRID */}
