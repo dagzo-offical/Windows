@@ -25,6 +25,11 @@ const FALLBACK_QUESTIONS = {
     { uz: "Secure Boot nima va u nima uchun zarur? U qanday ishlaydi?", en: "What is Secure Boot and why is it needed? How does it work?" },
     { uz: "LSASS nima va u Windows'da qanday rol o'ynaydi? U nima uchun hujumchilar uchun qiziqarli?", en: "What is LSASS and what role does it play in Windows? Why is it a target for attackers?" },
   ],
+  5: [
+    { uz: "BIOS va UEFI nima? Ularning asosiy arxitektura farqlari nimada — rejim, xotira, disk chegaralari?", en: "What are BIOS and UEFI? What are their main architectural differences — mode, memory, disk limits?" },
+    { uz: "MBR va GPT bo'lim jadvallari nima? Ular bir-biridan qanday farq qiladi va qaysi firmware bilan ishlaydi?", en: "What are MBR and GPT partition tables? How do they differ and which firmware works with each?" },
+    { uz: "Nima uchun BIOS davridagi tizimlar MBR bootkit hujumlariga zaif edi? UEFI Secure Boot bu muammoni qanday hal qiladi?", en: "Why were BIOS-era systems vulnerable to MBR bootkit attacks? How does UEFI Secure Boot address this?" },
+  ],
 };
 
 const COOLDOWN_KEY = "wa_cooldown_end";
@@ -80,6 +85,7 @@ Return STRICT JSON only, no markdown fences. Feedback in ${lang === "en" ? "Engl
     2: "What is the kernel (beginner level): kernel definition, ntoskrnl.exe main components (Executive, Microkernel, HAL), drivers in ring 0 and why unsigned drivers are dangerous. Keep questions foundational.",
     3: "User mode vs kernel mode (beginner-intermediate): CPU privilege rings (ring 0 and ring 3), why the boundary exists, what each mode can/cannot do, crash impact differences. Practical and clear questions.",
     4: "Windows boot process (beginner-intermediate): UEFI/POST, Secure Boot, bootmgr.efi, winload.efi, kernel load, smss.exe, LSASS, login screen. Ask about the sequence and purpose of each step.",
+    5: "BIOS vs UEFI (beginner-intermediate): BIOS 16-bit real mode vs UEFI 64-bit, MBR vs GPT partition tables, Secure Boot chain of trust, why BIOS was vulnerable to MBR bootkits, CSM/Legacy mode risks. Practical and conceptual questions.",
   };
 
   const generate = async () => {
@@ -177,6 +183,7 @@ const LESSON_TITLES = {
   2: { uz: "Kernel nima?",            en: "What is the Kernel?" },
   3: { uz: "User mode va Kernel mode", en: "User Mode vs Kernel Mode" },
   4: { uz: "Windows boot jarayoni",   en: "Windows Boot Process" },
+  5: { uz: "BIOS va UEFI",            en: "BIOS vs UEFI" },
 };
 
 function ModalHeader({ phase, onClose, lessonNum = 1 }) {

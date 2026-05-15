@@ -93,6 +93,8 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <SectionSyscallBrief />
           </> : lessonNum === 4 ? <>
             <Section4Boot />
+          </> : lessonNum === 5 ? <>
+            <SectionBiosUefi />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -198,6 +200,9 @@ const LESSON_META = {
   4: { min: 36, diagrams: 8, labs: 2,
        introUz: <>UEFI'dan login ekraniga qadar Windows qanday ishga tushishini har bir bosqichda ko'rasiz: POST, Secure Boot, <em>bootmgr → winload → ntoskrnl → LSASS</em> — va har bir bosqich xavfsizlik uchun nimani anglatadi.</>,
        introEn: <>Walk through every step of the Windows boot — POST, Secure Boot, <em>bootmgr → winload → ntoskrnl → LSASS</em> — and understand what each stage means for security.</> },
+  5: { min: 32, diagrams: 7, labs: 2,
+       introUz: <><em>BIOS</em> va <em>UEFI</em> — kompyuter yoqilganda birinchi ishga tushadigan dasturiy ta'minot. Bu darsda ikkalasining arxitekturasini, MBR va GPT farqini, Secure Boot qanday ishlashini va firmwarelar qanday qilib hujum yuzasiga aylanishini ko'rasiz.</>,
+       introEn: <><em>BIOS</em> and <em>UEFI</em> are the first software that runs when you power on. This lesson covers both architectures, MBR vs GPT, how Secure Boot works, and how firmware became a critical attack surface.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -904,49 +909,231 @@ flowchart TD
         <div>{"  "}<span style={{ color: "var(--c-system)" }}>bootdebug</span>{"     "}<span style={{ color: "var(--c-attack)" }}>No</span><span style={{ color: "var(--text-3)" }}>{"   "}{lang === "en" ? "← enable for kernel debugging" : "← kernel debug uchun yoqish"}</span></div>
       </div>
 
-      <h3 style={subhead}>{lang === "en" ? "4.3 — SMSS.exe and session creation" : "4.3 — SMSS.exe va sessiya yaratish"}</h3>
+      <h3 style={subhead}>{lang === "en" ? "4.3 — Every critical process explained" : "4.3 — Har bir muhim jarayon batafsil"}</h3>
       <P>
         {lang === "en"
-          ? <>After the kernel finishes its own initialisation, the very first user-space process it launches is <Term>smss.exe (Session Manager Subsystem)</Term>. SMSS is special: it runs in <Em>Session 0</Em>, the isolated session reserved for system services. It creates two types of sessions: <Em>Session 0</Em> for background services (services.exe, lsass.exe, svchost.exe) and <Em>Session 1+</Em> for each interactive user that logs in. This separation was introduced in Windows Vista as a security improvement — malware running as a service in Session 0 can no longer interact with the user's desktop in Session 1 (the <Em>Session 0 Isolation</Em> feature).</>
-          : <>Kernel o'z ishga tushirishini tugatgandan so'ng, u ishga tushiradigan birinchi user-space jarayon <Term>smss.exe (Session Manager Subsystem)</Term> dir. SMSS maxsus: u tizim xizmatlari uchun ajratilgan izolyatsiyalangan sessiyada — <Em>Sessiya 0</Em> da ishlaydi. U ikkita turdagi sessiyalarni yaratadi: fon xizmatlari uchun <Em>Sessiya 0</Em> (services.exe, lsass.exe, svchost.exe) va kiruvchi har bir interaktiv foydalanuvchi uchun <Em>Sessiya 1+</Em>. Bu ajratish xavfsizlikni yaxshilash maqsadida Windows Vista'da kiritildi — Sessiya 0 da xizmat sifatida ishlaydigan zararli dastur endi Sessiya 1 dagi foydalanuvchi ish stolida ko'rina olmaydi (<Em>Sessiya 0 Izolyatsiyasi</Em> xususiyati).</>}
+          ? <>After the kernel starts, it launches a chain of critical processes. Each one has a precise role — knowing them means knowing the skeleton of every Windows machine. Forensic analysts, pentesters, and malware authors all study this same list to understand what normal looks like versus what is suspicious.</>
+          : <>Kernel ishga tushgach, u muhim jarayonlar zanjirini ishga tushiradi. Har birining aniq roli bor — ularni bilish har bir Windows mashinasining skeletini bilishni anglatadi. Kriminalistlar, pentest mutaxassislari va zararli dastur muallif hammalari normal va shubhali ko'rinishni tushunish uchun bir xil ro'yxatni o'rganadi.</>}
       </P>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12, marginBottom: 8 }}>
+      {/* ── Session 0 processes ── */}
+      <div className="eyebrow" style={{ margin: "20px 0 10px" }}>// SESSION 0 — {lang === "en" ? "SYSTEM PROCESSES (no UI, isolated)" : "TIZIM JARAYONLARI (UI yo'q, izolyatsiyalangan)"}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          {
+            exe: "smss.exe",
+            title: lang === "en" ? "Session Manager Subsystem" : "Sessiya Menejeri Quyi Tizimi",
+            color: "var(--c-system)",
+            props: lang === "en" ? "PID: ~316–450 · Parent: ntoskrnl · User: SYSTEM · Session 0" : "PID: ~316–450 · Ota: ntoskrnl · Foydalanuvchi: SYSTEM · Sessiya 0",
+            path: "C:\\Windows\\System32\\smss.exe",
+            body: lang === "en"
+              ? <>The very first user-space process, spawned directly by the kernel (ntoskrnl.exe). SMSS is responsible for the entire session infrastructure. Its startup tasks: initialise the pagefile (<code>pagefile.sys</code>), load the known DLLs into shared memory (<code>HKLM\SYSTEM\KnownDLLs</code>), and then fork itself into two separate instances — one instance becomes <strong>Session 0</strong> (spawns wininit.exe for system services) and another becomes <strong>Session 1</strong> (spawns winlogon.exe for the first user's login). For each additional user (RDP sessions), SMSS forks again to create Sessions 2, 3, etc. <br /><br /><em>Forensic red flag:</em> if you see smss.exe running with a parent other than ntoskrnl (PID 4), or multiple smss.exe instances when no RDP sessions are active, it is suspicious — malware sometimes uses the name "smss.exe" as camouflage.</>
+              : <>Kernelin (ntoskrnl.exe) to'g'ridan-to'g'ri yaratgan birinchi user-space jarayon. SMSS butun sessiya infratuzilmasi uchun mas'ul. Uning ishga tushiruv vazifalari: pagefile'ni (<code>pagefile.sys</code>) ishga tushirish, ma'lum DLL'larni umumiy xotiraga yuklash (<code>HKLM\SYSTEM\KnownDLLs</code>), so'ngra o'zini ikki alohida nusxaga ajratish — bir nusxa <strong>Sessiya 0</strong> bo'ladi (tizim xizmatlari uchun wininit.exe ni yaratadi) va boshqasi <strong>Sessiya 1</strong> bo'ladi (birinchi foydalanuvchi kirishi uchun winlogon.exe ni yaratadi). Har bir qo'shimcha foydalanuvchi (RDP sessiyalari) uchun SMSS yana ajralib, Sessiya 2, 3 va h.k. yaratadi.<br /><br /><em>Kriminalistik qizil bayroq:</em> agar smss.exe ni ntoskrnl (PID 4) dan boshqa ota bilan ishlayotgan yoki faol RDP sessiyalari bo'lmaganda bir nechta smss.exe nusxasini ko'rsangiz — bu shubhali: zararli dasturlar ba'zan "smss.exe" nomidan niqob sifatida foydalanadi.</>,
+          },
+          {
+            exe: "wininit.exe",
+            title: lang === "en" ? "Windows Initialization (Session 0 init)" : "Windows Ishga Tushirish (Sessiya 0 initsializatsiyasi)",
+            color: "var(--c-system)",
+            props: lang === "en" ? "PID: ~500–600 · Parent: smss.exe · User: SYSTEM · Session 0" : "PID: ~500–600 · Ota: smss.exe · Foydalanuvchi: SYSTEM · Sessiya 0",
+            path: "C:\\Windows\\System32\\wininit.exe",
+            body: lang === "en"
+              ? <>wininit.exe is the Session 0 initialiser — its sole job is to start the three core system services that everything else depends on: <strong>services.exe</strong> (the Service Control Manager), <strong>lsass.exe</strong> (authentication), and <strong>lsm.exe</strong> (Local Session Manager, which tracks session state). After spawning these three, wininit.exe stays alive doing nothing — it is the parent that keeps them anchored to Session 0. <br /><br /><em>Forensic note:</em> there is always exactly one wininit.exe on a running system. Its parent is smss.exe, and its three children are services.exe, lsass.exe, and lsm.exe. Any deviation from this parent-child pattern indicates tampering.</>
+              : <>wininit.exe — Sessiya 0 initsializatori: uning yagona vazifasi boshqa hamma narsa bog'liq bo'lgan uchta asosiy tizim xizmatini ishga tushirish: <strong>services.exe</strong> (Xizmat Boshqaruv Menejeri), <strong>lsass.exe</strong> (autentifikatsiya) va <strong>lsm.exe</strong> (Mahalliy Sessiya Menejeri, sessiya holatini kuzatadi). Bu uchtalikni yaratgandan so'ng, wininit.exe ularni Sessiya 0 ga bog'lab turuvchi ota sifatida hayotda qoladi.<br /><br /><em>Kriminalistik eslatma:</em> ishlaydigan tizimda har doim aynan bitta wininit.exe bo'ladi. Uning otasi smss.exe, uchta farzandi esa services.exe, lsass.exe va lsm.exe. Ota-farzand naqshidan har qanday og'ish — buzilishni ko'rsatadi.</>,
+          },
+          {
+            exe: "services.exe",
+            title: lang === "en" ? "Service Control Manager (SCM)" : "Xizmat Boshqaruv Menejeri (SCM)",
+            color: "var(--c-system)",
+            props: lang === "en" ? "PID: ~650–800 · Parent: wininit.exe · User: SYSTEM · Session 0" : "PID: ~650–800 · Ota: wininit.exe · Foydalanuvchi: SYSTEM · Sessiya 0",
+            path: "C:\\Windows\\System32\\services.exe",
+            body: lang === "en"
+              ? <>services.exe is the Service Control Manager — it owns the lifecycle of every Windows service. On startup it reads <code>HKLM\SYSTEM\CurrentControlSet\Services</code> in the registry and starts every service with <code>Start=2</code> (auto-start). It manages three types of services: <strong>Win32 services</strong> (hosted in svchost.exe as DLLs), <strong>standalone EXE services</strong> (processes in their own right), and <strong>kernel-mode drivers</strong> (loaded via I/O Manager). services.exe exposes the SCM API — used by tools like <code>sc.exe</code>, <code>PowerShell New-Service</code>, and Task Manager. <br /><br /><em>Security angle:</em> attackers create persistence by registering a new service via <code>sc create</code> or directly writing to the Services registry key. services.exe is also the parent of all svchost.exe instances — if you see svchost.exe with a parent other than services.exe, it is immediately suspicious.</>
+              : <>services.exe — Xizmat Boshqaruv Menejeri: u har bir Windows xizmatining hayot tsikliga egalik qiladi. Ishga tushirishda <code>HKLM\SYSTEM\CurrentControlSet\Services</code> registrini o'qiydi va <code>Start=2</code> (avtomatik ishga tushirish) bilan har bir xizmatni ishga tushiradi. U uch turdagi xizmatlarni boshqaradi: <strong>Win32 xizmatlar</strong> (svchost.exe da DLL sifatida joylashgan), <strong>mustaqil EXE xizmatlar</strong> (o'z jarayonlari) va <strong>kernel-mode drayverlar</strong> (I/O Manager orqali yuklangan). services.exe SCM API ni taqdim etadi — <code>sc.exe</code>, <code>PowerShell New-Service</code> va Vazifa Menejeri kabi vositalar tomonidan ishlatiladi.<br /><br /><em>Xavfsizlik tomoni:</em> hujumchilar <code>sc create</code> yoki Services registr kalitiga to'g'ridan-to'g'ri yozish orqali yangi xizmat ro'yxatga olib, barqarorlikni ta'minlaydi. services.exe barcha svchost.exe nusxalarining ham otasi — agar svchost.exe ni services.exe dan boshqa ota bilan ko'rsangiz, bu darhol shubhali.</>,
+          },
+          {
+            exe: "svchost.exe",
+            title: lang === "en" ? "Service Host — generic DLL service container" : "Xizmat Mezbon — umumiy DLL xizmat konteyneri",
+            color: "var(--c-system)",
+            props: lang === "en" ? "PID: many · Parent: services.exe · User: varies · Session 0" : "PID: ko'p · Ota: services.exe · Foydalanuvchi: turli xil · Sessiya 0",
+            path: "C:\\Windows\\System32\\svchost.exe -k <ServiceGroupName>",
+            body: lang === "en"
+              ? <>svchost.exe (Service Host) is a generic container process that hosts Windows services implemented as DLLs. Instead of each service running as its own EXE, many are bundled into DLLs and loaded inside a shared svchost.exe for efficiency. The <code>-k</code> flag determines which service group runs in that instance: <code>-k netsvcs</code> (network services), <code>-k LocalService</code> (limited-privilege services), <code>-k DcomLaunch</code> (COM server activator). A healthy Windows 11 system has 15–20+ svchost.exe instances simultaneously. <br /><br /><strong>Important hosted services:</strong> Windows Update (<code>wuauserv</code>), DHCP Client (<code>Dhcp</code>), DNS Client (<code>Dnscache</code>), Print Spooler (<code>Spooler</code>), Task Scheduler (<code>Schedule</code>), Windows Defender (<code>WdNisSvc</code>), Remote Desktop (<code>TermService</code>). <br /><br /><em>Attacker abuse:</em> "svchost process injection" — malware injects shellcode into a legitimate svchost.exe to hide inside a trusted process. Detection: check parent (must be services.exe), command line (must have -k flag), and loaded modules for unexpected DLLs.</>
+              : <>svchost.exe — DLL sifatida amalga oshirilgan Windows xizmatlarini joylashtiruvchi umumiy konteyner jarayon. Har bir xizmat o'z EXE'si sifatida ishlash o'rniga, ko'plari DLL sifatida to'plangan va samaradorlik uchun umumiy svchost.exe ichida yuklanadi. <code>-k</code> bayrog'i o'sha nusxada qaysi xizmat guruhi ishlashini belgilaydi: <code>-k netsvcs</code> (tarmoq xizmatlari), <code>-k LocalService</code> (cheklangan imtiyozli xizmatlar), <code>-k DcomLaunch</code> (COM server aktivatori). Sog'lom Windows 11 tizimida 15–20 dan ortiq svchost.exe nusxasi bir vaqtda ishlaydi.<br /><br /><strong>Muhim joylashtirilgan xizmatlar:</strong> Windows Update (<code>wuauserv</code>), DHCP Mijozi (<code>Dhcp</code>), DNS Mijozi (<code>Dnscache</code>), Print Spooler (<code>Spooler</code>), Vazifa Rejalashtiruvchi (<code>Schedule</code>), Windows Defender (<code>WdNisSvc</code>), Remote Desktop (<code>TermService</code>).<br /><br /><em>Hujumchi suiiste'moli:</em> "svchost jarayon kiritish" — zararli dastur ishonchli jarayon ichiga yashirinish uchun qonuniy svchost.exe ga shellcode kiritadi. Aniqlash: ota (services.exe bo'lishi kerak), buyruq satrini (−k bayroq bo'lishi kerak) va kutilmagan DLL lar uchun yuklangan modullarni tekshiring.</>,
+          },
+        ].map((proc, i) => (
+          <div key={i} style={{ borderRadius: 12, border: `1px solid ${proc.color}30`, overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", background: `${proc.color}10`, borderBottom: `1px solid ${proc.color}20` }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 15, fontWeight: 700, color: proc.color }}>{proc.exe}</div>
+              <div style={{ fontSize: 13, color: "var(--text-2)", flex: 1 }}>{proc.title}</div>
+            </div>
+            <div style={{ padding: "12px 16px", background: `${proc.color}04` }}>
+              <div className="mono" style={{ fontSize: 10.5, color: "var(--text-3)", marginBottom: 4 }}>{proc.props}</div>
+              <div className="mono" style={{ fontSize: 10.5, color: proc.color, marginBottom: 10 }}>{proc.path}</div>
+              <div style={{ fontSize: 13, lineHeight: 1.75, color: "var(--text-1)" }}>{proc.body}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Session 1+ processes ── */}
+      <div className="eyebrow" style={{ margin: "24px 0 10px" }}>// SESSION 1+ — {lang === "en" ? "USER PROCESSES (interactive, has desktop)" : "FOYDALANUVCHI JARAYONLARI (interaktiv, ish stoli bor)"}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          {
+            exe: "winlogon.exe",
+            title: lang === "en" ? "Windows Logon Application" : "Windows Kirish Ilovasi",
+            color: "var(--c-user)",
+            props: lang === "en" ? "PID: ~700–900 · Parent: smss.exe · User: SYSTEM · Session 1+" : "PID: ~700–900 · Ota: smss.exe · Foydalanuvchi: SYSTEM · Sessiya 1+",
+            path: "C:\\Windows\\System32\\winlogon.exe",
+            body: lang === "en"
+              ? <>winlogon.exe manages the interactive logon experience. It handles the <strong>Secure Attention Sequence (SAS)</strong> — the Ctrl+Alt+Del keystroke — which is handled at hardware level and cannot be faked by any user-mode application (this is why Ctrl+Alt+Del is used as a "trusted path" before entering passwords). winlogon loads the <strong>credential providers</strong> (the login UI — password box, PIN, Windows Hello face recognition) via <code>LogonUI.exe</code>. After successful authentication by lsass.exe, winlogon loads the user's profile (<code>NTUSER.DAT</code>) and registry hive, then launches <code>userinit.exe</code> which in turn starts <code>explorer.exe</code>. <br /><br /><em>Security note:</em> the "Winlogon Notification Packages" registry key (<code>HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon</code>) is a classic persistence mechanism — malware registers a DLL here to be loaded by winlogon on every login. Microsoft restricts this in modern Windows, but it remains a checked location during incident response.</>
+              : <>winlogon.exe interaktiv kirish tajribasini boshqaradi. U <strong>Xavfsiz Diqqat Ketma-ketligi (SAS)</strong> — Ctrl+Alt+Del tugmalar birikmasini — boshqaradi, bu hardware darajasida ko'rib chiqiladi va hech qanday user-mode ilova tomonidan soxtalashtirib bo'lmaydi (shuning uchun Ctrl+Alt+Del parollarni kiritishdan oldin "ishonchli yo'l" sifatida ishlatiladi). winlogon <strong>hisob ma'lumotlari provayderlarini</strong> (kirish UI — parol qutisi, PIN, Windows Hello yuz tanish) <code>LogonUI.exe</code> orqali yuklaydi. lsass.exe tomonidan muvaffaqiyatli autentifikatsiyadan so'ng, winlogon foydalanuvchining profilini (<code>NTUSER.DAT</code>) va registr uyasini yuklaydi, so'ngra o'z navbatida <code>explorer.exe</code> ni ishga tushiradigan <code>userinit.exe</code> ni ishga tushiradi.<br /><br /><em>Xavfsizlik eslatmasi:</em> "Winlogon Notification Packages" registr kaliti (<code>HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon</code>) — klassik barqarorlik mexanizmi: zararli dastur har bir kirishda winlogon tomonidan yuklanadigan DLL ni shu yerga ro'yxatdan o'tkazadi. Microsoft buni zamonaviy Windows da cheklaydi, lekin u hodisalarga munosabat paytida tekshiriladigan joy bo'lib qoladi.</>,
+          },
+          {
+            exe: "explorer.exe",
+            title: lang === "en" ? "Windows Shell / Desktop" : "Windows Shell / Ish Stoli",
+            color: "var(--c-user)",
+            props: lang === "en" ? "PID: varies · Parent: userinit.exe → orphaned · User: current user · Session 1+" : "PID: turli xil · Ota: userinit.exe → etim · Foydalanuvchi: joriy foydalanuvchi · Sessiya 1+",
+            path: "C:\\Windows\\explorer.exe",
+            body: lang === "en"
+              ? <>explorer.exe is the Windows shell — it renders the desktop, taskbar, Start menu, system tray, and all File Explorer windows. It is the first process that runs under the <strong>user's own security token</strong> (not SYSTEM), meaning it has exactly the permissions the logged-in user has — no more. explorer.exe becomes the parent of most user-launched processes: when you double-click an EXE, explorer.exe spawns it. <br /><br /><em>Technical detail:</em> when userinit.exe finishes its work (running login scripts, mounting network drives), it exits — leaving explorer.exe as an orphan. That's why explorer.exe's parent PID in Task Manager points to a non-existent process. This is normal behaviour, not an anomaly. <br /><br /><em>Security angle:</em> "explorer process injection" is common malware technique. Also, "explorer.exe replacement" — replacing it with a trojan of the same name. Detection: verify the file path is exactly <code>C:\Windows\explorer.exe</code> (not <code>C:\Windows\System32\</code> or any other directory), check file hash, and verify digital signature.</>
+              : <>explorer.exe — Windows shell: u ish stoli, vazifalar paneli, Start menyusi, tizim tepsi va barcha Fayl Explorer oynalarini ko'rsatadi. Bu <strong>foydalanuvchining o'z xavfsizlik tokeni</strong> ostida ishlaydigan birinchi jarayon (SYSTEM emas), ya'ni kirgan foydalanuvchi ega bo'lgan imtiyozlarga ega — na ko'proq, na kamroq. explorer.exe ko'plab foydalanuvchi tomonidan ishga tushirilgan jarayonlarning otasiga aylanadi: EXE ni ikki marta bosganingizda, explorer.exe uni yaratadi.<br /><br /><em>Texnik tafsilot:</em> userinit.exe o'z ishini (kirish skriptlarini ishga tushirish, tarmoq disklarini o'rnatish) tugatgach, chiqib ketadi — explorer.exe ni etim holda qoldiradi. Shuning uchun Vazifa Menejeridagi explorer.exe ning ota PID'i mavjud bo'lmagan jarayonga ishora qiladi. Bu normal xatti-harakat, anomaliya emas.<br /><br /><em>Xavfsizlik tomoni:</em> "explorer jarayon kiritish" — keng tarqalgan zararli dastur texnikasi. Shuningdek, "explorer.exe almashtirish" — uni xuddi shu nomdagi troyan bilan almashtirish. Aniqlash: fayl yo'li aynan <code>C:\Windows\explorer.exe</code> ekanligini tekshiring (<code>C:\Windows\System32\</code> yoki boshqa katalog emas), fayl xeshini va raqamli imzoni tekshiring.</>,
+          },
+        ].map((proc, i) => (
+          <div key={i} style={{ borderRadius: 12, border: `1px solid ${proc.color}30`, overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", background: `${proc.color}10`, borderBottom: `1px solid ${proc.color}20` }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 15, fontWeight: 700, color: proc.color }}>{proc.exe}</div>
+              <div style={{ fontSize: 13, color: "var(--text-2)", flex: 1 }}>{proc.title}</div>
+            </div>
+            <div style={{ padding: "12px 16px", background: `${proc.color}04` }}>
+              <div className="mono" style={{ fontSize: 10.5, color: "var(--text-3)", marginBottom: 4 }}>{proc.props}</div>
+              <div className="mono" style={{ fontSize: 10.5, color: proc.color, marginBottom: 10 }}>{proc.path}</div>
+              <div style={{ fontSize: 13, lineHeight: 1.75, color: "var(--text-1)" }}>{proc.body}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h3 style={subhead}>{lang === "en" ? "4.4 — LSASS: full deep-dive" : "4.4 — LSASS: to'liq chuqur tahlil"}</h3>
+      <P>
+        {lang === "en"
+          ? <><Term>LSASS (Local Security Authority Subsystem Service)</Term> is the most security-critical process on any Windows machine. It is the sole arbiter of who is authenticated and what they are allowed to do. Every logon, token issuance, and password change flows through it. And for exactly that reason, it is the single most targeted process by attackers in post-exploitation.</>
+          : <><Term>LSASS (Local Security Authority Subsystem Service)</Term> — har qanday Windows mashinasidagi xavfsizlik jihatidan eng muhim jarayon. U kim autentifikatsiya qilinishi va nima qilishga ruxsat berilishi haqida yagona hakam. Har bir kirish, token berish va parol o'zgartirish undan o'tadi. Va aynan shu sababdan, u post-ekspluatatsiyada hujumchilar tomonidan eng ko'p nishonlanadigan yagona jarayon.</>}
+      </P>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
         <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(0,212,255,0.06)", border: "1px solid rgba(0,212,255,0.22)" }}>
           <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "var(--c-system)", marginBottom: 10 }}>
-            {lang === "en" ? "Session 0 — system services" : "Sessiya 0 — tizim xizmatlari"}
+            {lang === "en" ? "What LSASS does:" : "LSASS nima qiladi:"}
           </div>
-          {["smss.exe (Session Manager)", "wininit.exe (Session 0 initialiser)", "services.exe (Service Control Manager)", "lsass.exe (Security authority)", "svchost.exe × many (hosted services)"].map((p, i) => (
-            <div key={i} className="mono" style={{ fontSize: 11.5, color: "var(--text-1)", marginBottom: 3, paddingLeft: 8, borderLeft: "2px solid var(--c-system)" }}>{p}</div>
+          {(lang === "en" ? [
+            "Validates every logon: local password, PIN, Windows Hello, smart card, Kerberos ticket, NTLM challenge-response",
+            "Issues access tokens: after auth, creates the token that carries SID, group memberships, and privileges",
+            "Maintains LSA secrets: stores service account passwords, cached domain credentials in HKLM\\SECURITY (readable only as SYSTEM)",
+            "Manages security packages: loads MSV1_0 (NTLM), Kerberos, NTLM, TSpkg, WDigest, LiveSSP as DLLs",
+            "Caches domain credentials: stores salted+hashed credential for offline logon (HKLM\\SECURITY\\Cache)",
+            "Handles password changes: coordinates with domain controllers on domain password policy",
+            "Issues Kerberos tickets (TGT/TGS) received from the KDC and caches them for SSO",
+          ] : [
+            "Har bir kirishni tekshiradi: mahalliy parol, PIN, Windows Hello, smart karta, Kerberos chiptas, NTLM muammoga javob",
+            "Kirish tokenlarini beradi: autentifikatsiyadan so'ng SID, guruh a'zoliklari va imtiyozlarni olib yuruvchi tokenni yaratadi",
+            "LSA sirlarini saqlaydi: xizmat hisobi parollarini, HKLM\\SECURITY da keshli domen hisob ma'lumotlarini saqlaydi (faqat SYSTEM sifatida o'qiladi)",
+            "Xavfsizlik paketlarini boshqaradi: MSV1_0 (NTLM), Kerberos, NTLM, TSpkg, WDigest, LiveSSP ni DLL sifatida yuklaydi",
+            "Domen hisob ma'lumotlarini keshlaydi: oflayn kirish uchun tuzlangan+xeshlangan hisob ma'lumotlarini saqlaydi (HKLM\\SECURITY\\Cache)",
+            "Parol o'zgarishlarini boshqaradi: domen parol siyosatida domen kontrollerlari bilan muvofiqlashadi",
+            "KDC dan olingan Kerberos chiptalari (TGT/TGS) ni beradi va SSO uchun keshlaydi",
+          ]).map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.5 }}>
+              <span style={{ color: "var(--c-system)", flexShrink: 0, marginTop: 1 }}>▸</span>{item}
+            </div>
           ))}
-          <div style={{ marginTop: 8, fontSize: 12, color: "var(--text-2)", lineHeight: 1.5 }}>
-            {lang === "en" ? "No UI. Cannot interact with user desktop. Isolated from Session 1+." : "UI yo'q. Foydalanuvchi ish stolida o'zaro aloqa qila olmaydi. Sessiya 1+ dan izolyatsiyalangan."}
-          </div>
         </div>
-        <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,145,69,0.06)", border: "1px solid rgba(255,145,69,0.22)" }}>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "var(--c-user)", marginBottom: 10 }}>
-            {lang === "en" ? "Session 1+ — user sessions" : "Sessiya 1+ — foydalanuvchi sessiyalari"}
+        <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,58,94,0.06)", border: "1px solid rgba(255,58,94,0.28)" }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "var(--c-attack)", marginBottom: 10 }}>
+            {lang === "en" ? "What LSASS memory contains (= why attackers want it):" : "LSASS xotirasi nima o'z ichiga oladi (= nima uchun hujumchilar xohlaydi):"}
           </div>
-          {["winlogon.exe (logon manager)", "explorer.exe (shell / desktop)", "All user-launched apps (chrome, notepad…)", "Additional sessions for each RDP login"].map((p, i) => (
-            <div key={i} className="mono" style={{ fontSize: 11.5, color: "var(--text-1)", marginBottom: 3, paddingLeft: 8, borderLeft: "2px solid var(--c-user)" }}>{p}</div>
+          {(lang === "en" ? [
+            "NTLM hashes — used for Pass-the-Hash attacks without knowing the cleartext password",
+            "Kerberos TGT and TGS tickets — used for Pass-the-Ticket and Golden/Silver Ticket attacks",
+            "Cleartext passwords — if WDigest is enabled (default ON on pre-2012 systems) or via forced re-enable on modern systems",
+            "DPAPI master keys — decrypt all data encrypted by the Data Protection API (browser passwords, WiFi keys, Credential Manager)",
+            "Cached domain credentials — offline copies of the last 10 domain logons (configurable), useful when the DC is unreachable",
+          ] : [
+            "NTLM xeshlari — ochiq matn parolini bilmasdan Pass-the-Hash hujumlari uchun ishlatiladi",
+            "Kerberos TGT va TGS chiptalari — Pass-the-Ticket va Golden/Silver Ticket hujumlari uchun ishlatiladi",
+            "Ochiq matn parollar — agar WDigest yoqilgan bo'lsa (2012 gacha tizimlarda sukut bo'yicha YOQIQ) yoki zamonaviy tizimlarda majburan qayta yoqilsa",
+            "DPAPI master kalitlari — Data Protection API tomonidan shifrlangan barcha ma'lumotlarni (brauzer parollari, WiFi kalitlari, Hisob Ma'lumotlari Menejeri) shifrini ochadi",
+            "Keshli domen hisob ma'lumotlari — so'nggi 10 ta domen kirishining oflayn nusxalari (sozlanadi), DC uchishib qolganida foydali",
+          ]).map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.5 }}>
+              <span style={{ color: "var(--c-attack)", flexShrink: 0, marginTop: 1 }}>✗</span>{item}
+            </div>
           ))}
-          <div style={{ marginTop: 8, fontSize: 12, color: "var(--text-2)", lineHeight: 1.5 }}>
-            {lang === "en" ? "Has desktop, input, UI. Each RDP user gets its own session number." : "Ish stoli, kiritish, UI bor. Har bir RDP foydalanuvchi o'z sessiya raqamini oladi."}
-          </div>
         </div>
       </div>
 
-      <h3 style={subhead}>{lang === "en" ? "4.4 — LSASS: authentication heart and prime attack target" : "4.4 — LSASS: autentifikatsiya yuragi va asosiy hujum nishoni"}</h3>
+      <h3 style={subhead} id="lsass-attack">{lang === "en" ? "4.4.1 — How Mimikatz dumps LSASS" : "4.4.1 — Mimikatz LSASS ni qanday dump qiladi"}</h3>
       <P>
         {lang === "en"
-          ? <><Term>LSASS (Local Security Authority Subsystem Service)</Term> is the process that owns all authentication in Windows. Every logon — local password, PIN, Windows Hello, smart card, or network Kerberos ticket — passes through LSASS. It validates credentials, issues access tokens, maintains the local security policy, and manages the LSA secrets database (<code>HKLM\SECURITY\Policy\Secrets</code>). LSASS runs in <Em>Session 0</Em> and is protected by Windows Defender Credential Guard (virtualisation-based isolation on modern systems).</>
-          : <><Term>LSASS (Local Security Authority Subsystem Service)</Term> — Windows dagi barcha autentifikatsiyaga egalik qiladigan jarayon. Har bir kirish — mahalliy parol, PIN, Windows Hello, smart karta yoki tarmoq Kerberos chiptasi — LSASS orqali o'tadi. U hisob ma'lumotlarini tekshiradi, kirish tokenlarini beradi, mahalliy xavfsizlik siyosatini boshqaradi va LSA secrets ma'lumotlar bazasini (<code>HKLM\SECURITY\Policy\Secrets</code>) saqlaydi. LSASS <Em>Sessiya 0</Em> da ishlaydi va zamonaviy tizimlarda Windows Defender Credential Guard (virtuallashtirish asosidagi izolyatsiya) tomonidan himoyalangan.</>}
+          ? <><Em>Mimikatz</Em> (written by Benjamin Delpy, 2011) is the most famous credential harvesting tool in existence. It reads credentials directly from the LSASS process memory. The technique works in three steps:</>
+          : <><Em>Mimikatz</Em> (Benjamin Delpy tomonidan yozilgan, 2011) — mavjud eng mashhur hisob ma'lumotlarini yig'ish vositasi. U hisob ma'lumotlarini to'g'ridan-to'g'ri LSASS jarayon xotirasidan o'qiydi. Texnika uch bosqichda ishlaydi:</>}
       </P>
-      <P>
-        {lang === "en"
-          ? <>LSASS is the most targeted process in post-exploitation. The tool <Em>Mimikatz</Em> (and its many clones) reads NTLM password hashes and Kerberos tickets directly from LSASS process memory. Defenders respond with: <code>PPL (Protected Process Light)</code> — LSASS gets a signed, protected process flag that prevents even administrator-level processes from opening its memory; <Em>Credential Guard</Em> — moves credentials into a virtualisation-based security (VBS) enclave that even a compromised kernel cannot access; and <Em>LSA auditing</Em> (Event ID 4656, 4662) which logs every handle opened against LSASS.</>
-          : <>LSASS — post-ekspluatatsiyada eng ko'p nishonlanadigan jarayon. <Em>Mimikatz</Em> (va uning ko'plab klonlari) qurvosi LSASS jarayon xotirasidan NTLM parol xeshlarini va Kerberos chiptalari to'g'ridan-to'g'ri o'qiydi. Himoyachilar shunday choralar bilan javob beradi: <code>PPL (Protected Process Light)</code> — LSASS imzolangan, himoyalangan jarayon bayrog'ini oladi, bu administrator darajasidagi jarayonlarga ham uning xotirasini ochishga to'sqinlik qiladi; <Em>Credential Guard</Em> — hisob ma'lumotlarini hatto buzilgan kernel ham kira olmaydigan virtuallashtirish asosidagi xavfsizlik (VBS) enklavisiga ko'chiradi; va <Em>LSA tekshiruvi</Em> (Event ID 4656, 4662) — LSASS ga ochilgan har bir handle'ni qayd etadi.</>}
-      </P>
+
+      <div style={{ margin: "14px 0", padding: "16px 20px", borderRadius: 12, background: "var(--bg-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.9 }}>
+        <div className="eyebrow" style={{ marginBottom: 10 }}>// MIMIKATZ — step-by-step credential dump</div>
+        <div>
+          <div style={{ color: "var(--text-3)" }}>{lang === "en" ? "Step 1: request SeDebugPrivilege (needed to open LSASS)" : "1-qadam: SeDebugPrivilege so'rash (LSASS ni ochish uchun kerak)"}</div>
+          <div style={{ color: "var(--accent)" }}>mimikatz # <span style={{ color: "var(--text-1)" }}>privilege::debug</span></div>
+          <div style={{ color: "var(--c-user)", fontSize: 11 }}>{"  → "}Privilege '20' OK  {lang === "en" ? "(enables reading any process memory as admin)" : "(admin sifatida har qanday jarayon xotirasini o'qish imkonini beradi)"}</div>
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <div style={{ color: "var(--text-3)" }}>{lang === "en" ? "Step 2: open LSASS with OpenProcess(PROCESS_VM_READ), read memory regions where lsasrv.dll stores credential structures" : "2-qadam: OpenProcess(PROCESS_VM_READ) bilan LSASS ni ochish, lsasrv.dll hisob ma'lumotlari tuzilmalarini saqlaydigan xotira mintaqalarini o'qish"}</div>
+          <div style={{ color: "var(--accent)" }}>mimikatz # <span style={{ color: "var(--text-1)" }}>sekurlsa::logonpasswords</span></div>
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <div style={{ color: "var(--text-3)" }}>{lang === "en" ? "Step 3: output — decrypted credentials from memory" : "3-qadam: natija — xotiradan shifrlangan hisob ma'lumotlari"}</div>
+          <div style={{ color: "var(--c-attack)" }}>Authentication Id : 0 ; 123456</div>
+          <div style={{ color: "var(--text-1)" }}>{"  "}Username : Administrator</div>
+          <div style={{ color: "var(--text-1)" }}>{"  "}Domain   : CORP</div>
+          <div style={{ color: "var(--c-user)" }}>{"  "}NTLM     : <span style={{ color: "var(--c-attack)" }}>aad3b435b51404eeaad3b435b51404ee</span>  <span style={{ color: "var(--text-3)", fontSize: 10 }}>{lang === "en" ? "← usable for PtH without password" : "← parolsiz PtH uchun ishlatish mumkin"}</span></div>
+          <div style={{ color: "var(--c-user)" }}>{"  "}Password : <span style={{ color: "var(--c-attack)" }}>P@ssw0rd123</span>  <span style={{ color: "var(--text-3)", fontSize: 10 }}>{lang === "en" ? "← cleartext if WDigest enabled" : "← WDigest yoqilgan bo'lsa ochiq matn"}</span></div>
+        </div>
+      </div>
+
+      <h3 style={subhead}>{lang === "en" ? "4.4.2 — LSASS defences" : "4.4.2 — LSASS himoyasi"}</h3>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
+        {[
+          {
+            name: "PPL — Protected Process Light",
+            color: "var(--c-system)",
+            bodyUz: <>LSASS ni imzolangan himoyalangan jarayon sifatida belgilaydi. PPL bilan LSASS ga <code>OpenProcess(PROCESS_VM_READ)</code> chaqiruvi <code>ERROR_ACCESS_DENIED</code> bilan muvaffaqiyatsiz tugaydi — administrator sifatida ham. PPL ni yoqish uchun: <code>HKLM\SYSTEM\CurrentControlSet\Control\Lsa → RunAsPPL = 1</code>. Muhim: PPL ni chetlab o'tishning ma'lum usullari mavjud (masalan, zaif drayver orqali kernel kodini kiritish).</>,
+            bodyEn: <>Marks LSASS as a signed, protected process. With PPL enabled, <code>OpenProcess(PROCESS_VM_READ)</code> to LSASS fails with <code>ERROR_ACCESS_DENIED</code> — even as administrator. To enable: <code>HKLM\SYSTEM\CurrentControlSet\Control\Lsa → RunAsPPL = 1</code>. Important: known bypass techniques exist (e.g. injecting kernel code via a vulnerable driver).</>,
+          },
+          {
+            name: "Credential Guard (VBS Enclave)",
+            color: "#b48cff",
+            bodyUz: <>Hisob ma'lumotlarini (NTLM hash'lari, Kerberos chiptalari) <em>Virtuallashtirish Asosidagi Xavfsizlik (VBS)</em> enklavisiga — Hyper-V ga asoslangan izolyatsiyalangan muhitga ko'chiradi. Hatto to'liq buzilgan kernel (ring 0) ham ushbu enklavdagi hisob ma'lumotlariga kira olmaydi. Bunga erishish uchun maxsus CPU qo'llab-quvvatlash talab etiladi (VT-x/AMD-V + SLAT). Windows 11 da Enterprise uchun sukut bo'yicha yoqilgan.</>,
+            bodyEn: <>Moves credentials (NTLM hashes, Kerberos tickets) into a <em>Virtualisation-Based Security (VBS)</em> enclave — a Hyper-V-based isolated environment. Even a fully-compromised kernel (ring 0) cannot access the credentials inside this enclave. Requires specific CPU support (VT-x/AMD-V + SLAT). Enabled by default on Windows 11 for Enterprise.</>,
+          },
+          {
+            name: "WDigest off (default post-KB2871997)",
+            color: "var(--c-warn)",
+            bodyUz: <>WDigest — IIS HTTP Digest autentifikatsiyasi uchun mo'ljallangan eski protokol, lekin u hisob ma'lumotlarini xotirada ochiq matn sifatida saqlashni talab qiladi. Windows 8.1/Server 2012 R2 dan boshlab, Microsoft sukut bo'yicha WDigest ni o'chirdi. Eski tizimlarda: <code>HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest → UseLogonCredential = 0</code>. Hujumchilar ba'zan bu registr qiymatini 1 ga o'zgartiradi va ochiq matn parollarini dump qilishdan oldin foydalanuvchini qayta kirish uchun majbur qiladi.</>,
+            bodyEn: <>WDigest is a legacy protocol designed for IIS HTTP Digest auth, but it requires storing credentials in cleartext in memory. From Windows 8.1/Server 2012 R2, Microsoft disabled WDigest by default. On older systems: <code>HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest → UseLogonCredential = 0</code>. Attackers sometimes change this registry value to 1 and force the user to re-login before dumping cleartext passwords.</>,
+          },
+          {
+            name: "Detection — Sysmon Event ID 10",
+            color: "var(--c-attack)",
+            bodyUz: <>Sysmon (System Monitor) Event ID 10 — <em>ProcessAccess</em> — LSASS ga <code>PROCESS_VM_READ</code> yoki <code>PROCESS_VM_OPERATION</code> huquqlari bilan <code>OpenProcess</code> chaqiruvi amalga oshirilganda qayd etiladi. Bu Mimikatz va uning klonlarini aniqlashning standart usuli. SIEM korrelyatsiya qoidasi: "TargetImage = lsass.exe AND GrantedAccess ∈ {0x1010, 0x1410, 0x143A} → HIGH PRIORITY ALERT".</>,
+            bodyEn: <>Sysmon (System Monitor) Event ID 10 — <em>ProcessAccess</em> — fires whenever <code>OpenProcess</code> is called on LSASS with <code>PROCESS_VM_READ</code> or <code>PROCESS_VM_OPERATION</code> rights. This is the standard detection for Mimikatz and its clones. SIEM correlation rule: "TargetImage = lsass.exe AND GrantedAccess ∈ {0x1010, 0x1410, 0x143A} → HIGH PRIORITY ALERT".</>,
+          },
+        ].map((def, i) => (
+          <div key={i} style={{ padding: "12px 16px", borderRadius: 10, background: `${def.color}08`, border: `1px solid ${def.color}28`, borderLeft: `3px solid ${def.color}` }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 13.5, fontWeight: 700, color: def.color, marginBottom: 6 }}>{def.name}</div>
+            <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.7 }}>{lang === "en" ? def.bodyEn : def.bodyUz}</div>
+          </div>
+        ))}
+      </div>
 
       <h3 style={subhead}>{lang === "en" ? "4.5 — PatchGuard and Driver Signature Enforcement" : "4.5 — PatchGuard va Drayver Imzo Tekshiruvi"}</h3>
       <P>
@@ -2081,7 +2268,253 @@ function SectionSyscallBrief() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Coming soon placeholder for L05-L20
+// L05: BIOS vs UEFI
+// ─────────────────────────────────────────────────────────────
+function SectionBiosUefi() {
+  const lang = useLang();
+
+  const compRows = [
+    {
+      aspect: lang === "en" ? "Architecture" : "Arxitektura",
+      bios: lang === "en" ? "16-bit x86 real mode. Runs from ROM chip. Max 1 MB addressable memory." : "16-bit x86 real mode. ROM chipidan ishlaydi. Maksimal 1 MB manzillanuvchi xotira.",
+      uefi: lang === "en" ? "32/64-bit protected/long mode. Runs from SPI flash. Full memory access, own C-based drivers (DXE)." : "32/64-bit himoyalangan/uzun rejim. SPI flashdan ishlaydi. To'liq xotiraga kirish, o'z C-asosidagi drayverlar (DXE).",
+    },
+    {
+      aspect: lang === "en" ? "Boot target" : "Yuklash maqsadi",
+      bios: lang === "en" ? "MBR (Master Boot Record) — first 512 bytes of disk. 446 bytes bootloader + 64 bytes partition table + 0x55AA signature." : "MBR (Master Boot Record) — diskning birinchi 512 bayt. 446 bayt bootloader + 64 bayt bo'limlar jadvali + 0x55AA imzo.",
+      uefi: lang === "en" ? "EFI System Partition (ESP) — FAT32 partition with .efi files. Bootloader is a full EFI application (e.g. bootmgr.efi, grubx64.efi)." : "EFI System Partition (ESP) — .efi fayllari bilan FAT32 bo'limi. Bootloader to'liq EFI ilovasi (masalan, bootmgr.efi, grubx64.efi).",
+    },
+    {
+      aspect: lang === "en" ? "Partition table" : "Bo'lim jadvali",
+      bios: lang === "en" ? "MBR: max 4 primary partitions, max 2 TB disk, 32-bit LBA addressing." : "MBR: maksimal 4 ta asosiy bo'lim, maksimal 2 TB disk, 32-bit LBA manzillash.",
+      uefi: lang === "en" ? "GPT (GUID Partition Table): 128 partitions, up to 9.4 ZB disk, 64-bit LBA. Each partition has a unique GUID." : "GPT (GUID Partition Table): 128 bo'lim, 9.4 ZB gacha disk, 64-bit LBA. Har bir bo'limning o'ziga xos GUID'i bor.",
+    },
+    {
+      aspect: lang === "en" ? "Initialisation speed" : "Ishga tushirish tezligi",
+      bios: lang === "en" ? "Sequential: devices init one by one. Slower POST." : "Ketma-ket: qurilmalar birma-bir ishga tushiriladi. Sekinroq POST.",
+      uefi: lang === "en" ? "Parallel: devices init simultaneously. Fast Boot skips some checks entirely. Boots 2–3× faster than BIOS." : "Parallel: qurilmalar bir vaqtda ishga tushiriladi. Fast Boot ba'zi tekshiruvlarni butunlay o'tkazib yuboradi. BIOS dan 2–3× tezroq yuklaydi.",
+    },
+    {
+      aspect: lang === "en" ? "Secure Boot" : "Xavfsiz Yuklash",
+      bios: lang === "en" ? "Not supported. No cryptographic verification of bootloader — any code on the first sector runs unchecked." : "Qo'llab-quvvatlanmaydi. Bootloader'ning kriptografik tekshiruvi yo'q — birinchi sektordagi har qanday kod tekshirilmasdan ishlaydi.",
+      uefi: lang === "en" ? "Built-in. db/dbx certificate databases. RSA-2048 + SHA-256 chain from firmware → bootloader → kernel → drivers." : "Ichki. db/dbx sertifikat ma'lumotlar bazalari. Firmware → bootloader → kernel → drayverlargacha RSA-2048 + SHA-256 zanjiri.",
+    },
+    {
+      aspect: lang === "en" ? "UI / Shell" : "UI / Shell",
+      bios: lang === "en" ? "Text-only. No mouse. Navigated with keyboard only. No networking, no scripting." : "Faqat matn. Sichqoncha yo'q. Faqat klaviatura bilan boshqariladi. Tarmoq yo'q, skript yo'q.",
+      uefi: lang === "en" ? "Optional GUI with mouse support. UEFI Shell (full CLI with scripting). Network boot (PXE) and HTTPS boot built in." : "Sichqoncha qo'llab-quvvatlash bilan ixtiyoriy GUI. UEFI Shell (skript bilan to'liq CLI). Tarmoqdan yuklash (PXE) va HTTPS yuklash ichida.",
+    },
+    {
+      aspect: lang === "en" ? "OS disk size limit" : "OS disk hajmi chegarasi",
+      bios: lang === "en" ? "2 TB (MBR 32-bit LBA). Disks larger than 2 TB require GPT regardless of firmware." : "2 TB (MBR 32-bit LBA). 2 TB dan katta disklar firmware'dan qat'i nazar GPT talab qiladi.",
+      uefi: lang === "en" ? "9.4 ZB (GPT 64-bit LBA). Effectively unlimited for any foreseeable hardware." : "9.4 ZB (GPT 64-bit LBA). Ko'zga ko'rinadigan har qanday hardware uchun amalda cheksiz.",
+    },
+    {
+      aspect: lang === "en" ? "Security model" : "Xavfsizlik modeli",
+      bios: lang === "en" ? "None. Any code loaded from MBR runs with full CPU privilege. No attestation, no signing." : "Yo'q. MBR dan yuklangan har qanday kod to'liq CPU imtiyozi bilan ishlaydi. Tasdiqlov yo'q, imzolash yo'q.",
+      uefi: lang === "en" ? "Measured Boot (TPM records hashes), Secure Boot (signature chain), firmware update authentication, runtime DXE services for privileged operations." : "Measured Boot (TPM xeshlarni qayd etadi), Secure Boot (imzo zanjiri), firmware yangilash autentifikatsiyasi, imtiyozli amallar uchun runtime DXE xizmatlar.",
+    },
+  ];
+
+  const biosChart = `
+flowchart TD
+    A([Power on]) --> B[CPU jumps to\\nROM 0xFFFFFFF0]
+    B --> C[BIOS POST\\nhardware check]
+    C --> D[Read MBR\\nfirst 512 bytes of disk]
+    D --> E{0x55AA\\nsignature?}
+    E -->|Yes| F[Execute 446-byte\\nbootloader code]
+    E -->|No| G([Boot error])
+    F --> H[Load OS\\nno verification]
+
+    style A fill:#1a2342,stroke:#4d8bff,color:#fff
+    style G fill:#3a0a1a,stroke:#ff3a5e,color:#fff
+    style H fill:#1a2342,stroke:#4d8bff,color:#fff
+  `;
+
+  const uefiChart = `
+flowchart TD
+    A([Power on]) --> B[SEC phase\\nCPU cache-as-RAM]
+    B --> C[PEI phase\\nRAM init + platform init]
+    C --> D[DXE phase\\nload EFI drivers]
+    D --> E[BDS phase\\nboot device selection]
+    E --> F{Secure Boot\\ncheck ESP .efi}
+    F -->|Signed OK| G[bootmgr.efi\\nloads OS loader]
+    F -->|Fail| H([Boot blocked])
+    G --> I[OS loader\\nwith full UEFI services]
+
+    style A fill:#1a2342,stroke:#4d8bff,color:#fff
+    style H fill:#3a0a1a,stroke:#ff3a5e,color:#fff
+    style I fill:#0a3a1f,stroke:#00ff9c,color:#fff
+    style F fill:#2a1f3a,stroke:#b88cff,color:#fff
+  `;
+
+  return (
+    <section id="bios-uefi" style={{ scrollMarginTop: 80, marginBottom: 56 }}>
+      <H2 num="01" uz="BIOS va UEFI nima?" en="What are BIOS and UEFI?" />
+      <P>
+        {lang === "en"
+          ? <>Before the operating system can load, something must wake up the CPU, test the hardware, and hand control to the bootloader. That something is the <Term>firmware</Term> — software permanently stored in a chip on the motherboard. For 30 years it was <Em>BIOS</Em>; since ~2007 it has been replaced by <Em>UEFI</Em>. Understanding the difference matters for security because the firmware runs before any OS protection — a compromised firmware bypasses Secure Boot, TPM, and BitLocker entirely.</>
+          : <>Operatsion tizim yuklanishidan oldin, biror narsa CPU ni uyg'otishi, hardware ni sinab ko'rishi va boshqaruvni bootloader'ga topshirishi kerak. Bu narsa — <Term>firmware</Term>: ona platadagi chipda doimiy saqlanadigan dasturiy ta'minot. 30 yil davomida bu <Em>BIOS</Em> edi; ~2007 yildan boshlab u <Em>UEFI</Em> bilan almashtirildi. Farqni tushunish xavfsizlik uchun muhim, chunki firmware har qanday OS himoyasidan oldin ishlaydi — buzilgan firmware Secure Boot, TPM va BitLocker'ni butunlay chetlab o'tadi.</>}
+      </P>
+
+      {/* ── BIOS ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.1 — BIOS: the legacy firmware (1975–present)" : "1.1 — BIOS: eski avlod firmware (1975-hozir)"}</h3>
+      <P>
+        {lang === "en"
+          ? <><Term>BIOS (Basic Input/Output System)</Term> was created for the original IBM PC in 1975 and has remained fundamentally unchanged since. It lives in a small ROM (Read-Only Memory) chip on the motherboard and is the first code the CPU executes after power-on. The CPU always starts at a fixed address — <code>0xFFFFFFF0</code> (the top of the 4 GB address space, reset vector) — and the ROM chip is mapped there. BIOS runs in <Em>16-bit x86 real mode</Em>, which means it can only address 1 MB of memory (20-bit address bus), cannot use protected-mode features, and runs as if it were a DOS-era program — no virtual memory, no privilege rings, no memory protection.</>
+          : <><Term>BIOS (Basic Input/Output System)</Term> 1975 yilda asl IBM PC uchun yaratilgan va o'shandan beri asosan o'zgarmagan. U ona platadagi kichik ROM (Read-Only Memory) chipida yashaydi va CPU quvvat yoqilgandan keyin bajariladigan birinchi kod. CPU har doim qat'iy manzildan boshlanadi — <code>0xFFFFFFF0</code> (4 GB manzil maydonining yuqori qismi, reset vektori) — va ROM chipi u yerga xaritalangan. BIOS <Em>16-bit x86 real rejimida</Em> ishlaydi, ya'ni faqat 1 MB xotirani (20-bit manzil avtobusi) manzillashi mumkin, himoyalangan rejim xususiyatlaridan foydalana olmaydi va DOS davrida dastur kabi ishlaydi — virtual xotira yo'q, imtiyoz halqalari yo'q, xotira himoyasi yo'q.</>}
+      </P>
+      <P>
+        {lang === "en"
+          ? <><Em>POST (Power-On Self Test)</Em> runs first — BIOS checks that RAM is present and working, CPU and FPU are functioning, keyboard controller is responding, and all configured peripherals are reachable. Then BIOS reads the <Em>MBR (Master Boot Record)</Em> from the first 512 bytes of the boot disk. The MBR layout is fixed: the first 446 bytes contain the <Em>bootstrap code</Em> (the tiny bootloader), bytes 446–509 contain the <Em>partition table</Em> (up to 4 primary partition entries of 16 bytes each), and the last 2 bytes must be <code>0x55AA</code> — the boot signature. If the signature matches, BIOS jumps to the bootstrap code and executes it — <Em>with no verification whatsoever</Em>.</>
+          : <><Em>POST (Power-On Self Test)</Em> birinchi ishlaydi — BIOS RAM mavjud va ishlayotganini, CPU va FPU ishlayotganini, klaviatura kontrolleri javob berayotganini va barcha sozlangan qurilmalarga erishish mumkinligini tekshiradi. Keyin BIOS yuklash diskining birinchi 512 baytidan <Em>MBR (Master Boot Record)</Em> ni o'qiydi. MBR joylashuvi qat'iy: birinchi 446 bayt <Em>bootstrap kod</Em> (kichik bootloader) ni o'z ichiga oladi, 446-509-baytlar <Em>bo'limlar jadvalini</Em> (har biri 16 baytdan 4 tagacha asosiy bo'lim yozuvi), va oxirgi 2 bayt <code>0x55AA</code> bo'lishi kerak — yuklash imzosi. Imzo mos kelsa, BIOS bootstrap kodga sakraydi va uni bajaradi — <Em>hech qanday tekshiruvsiz</Em>.</>}
+      </P>
+
+      <div style={{ margin: "18px 0", padding: "14px 18px", borderRadius: 10, background: "var(--bg-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.8 }}>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>// MBR LAYOUT — 512 bytes total (disk sector 0)</div>
+        {[
+          { range: "0x000–0x1BD", size: "446 bytes", label: "Bootstrap code", color: "var(--accent)", desc: lang === "en" ? "Tiny x86 machine code, loads the real bootloader" : "Kichik x86 mashina kodi, haqiqiy bootloaderni yuklaydi" },
+          { range: "0x1BE–0x1FD", size: "64 bytes", label: "Partition table", color: "var(--c-system)", desc: lang === "en" ? "4 × 16-byte entries: type, LBA start, LBA size" : "4 × 16 baytli yozuv: tur, LBA boshi, LBA hajmi" },
+          { range: "0x1FE–0x1FF", size: "2 bytes", label: "Boot signature", color: "var(--c-warn)", desc: lang === "en" ? "Must be 0x55AA — if not, BIOS halts" : "0x55AA bo'lishi kerak — aks holda BIOS to'xtaydi" },
+        ].map((row, i) => (
+          <div key={i} style={{ display: "flex", gap: 12, padding: "4px 0", borderBottom: i < 2 ? "1px solid var(--border)" : "none" }}>
+            <span style={{ color: row.color, minWidth: 120 }}>{row.range}</span>
+            <span style={{ color: "var(--text-3)", minWidth: 70 }}>{row.size}</span>
+            <span style={{ color: "var(--text-1)", minWidth: 120 }}>{row.label}</span>
+            <span style={{ color: "var(--text-2)", fontSize: 11 }}>{row.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <Callout color="var(--c-attack)" icon="skull" titleUz="BIOS bootkit — MBR ga yozish" titleEn="BIOS bootkit — overwriting the MBR">
+        {lang === "en"
+          ? <>Because BIOS performs zero verification on the MBR bootstrap code, overwriting those 446 bytes is enough to control the entire boot sequence — before the OS, before any AV, before any security tool. Classic MBR bootkits: <strong>Mebroot/Sinowal</strong> (2007, first in-the-wild MBR rootkit), <strong>TDL4/Alureon</strong> (2010, survived OS reinstalls), <strong>Petya</strong> (2016, encrypted the MBR and held it for ransom). The fix was UEFI Secure Boot — but it only helps if Secure Boot is actually enabled and CSM/Legacy mode is disabled.</>
+          : <>BIOS MBR bootstrap kodida nol tekshiruv amalga oshirgani uchun, o'sha 446 baytni yozib o'chirish — OS dan oldin, har qanday AV dan oldin, har qanday xavfsizlik vositasidan oldin — butun yuklash ketma-ketligini nazorat qilish uchun yetarli. Klassik MBR bootkit'lar: <strong>Mebroot/Sinowal</strong> (2007, birinchi real MBR rootkiti), <strong>TDL4/Alureon</strong> (2010, OS qayta o'rnatishlaridan omon qoldi), <strong>Petya</strong> (2016, MBR ni shifrladi va to'lov so'radi). Yechim UEFI Secure Boot edi — lekin faqat Secure Boot haqiqatan yoqilgan va CSM/Legacy rejim o'chirilgan bo'lsa ishlaydi.</>}
+      </Callout>
+
+      <div style={{ marginTop: 22 }}>
+        <MermaidDiagram chart={biosChart}
+          caption="1-rasm. BIOS yuklash ketma-ketligi: ROM → POST → MBR → bootloader (tekshiruvsiz)."
+          captionEn="Fig 1. BIOS boot sequence: ROM → POST → MBR → bootloader (no verification)." />
+      </div>
+
+      {/* ── UEFI ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.2 — UEFI: modern firmware architecture" : "1.2 — UEFI: zamonaviy firmware arxitekturasi"}</h3>
+      <P>
+        {lang === "en"
+          ? <><Term>UEFI (Unified Extensible Firmware Interface)</Term> was developed by Intel starting in 1998 (as EFI, then standardised as UEFI in 2007 by the UEFI Forum). Unlike BIOS, UEFI runs in <Em>32 or 64-bit protected/long mode</Em> from the start, giving it access to all RAM, the ability to load proper DXE (Driver eXecution Environment) drivers, and support for a real file system. UEFI firmware has four distinct phases:</>
+          : <><Term>UEFI (Unified Extensible Firmware Interface)</Term> 1998 yildan boshlab Intel tomonidan (EFI sifatida, keyin 2007 yilda UEFI Forum tomonidan UEFI sifatida standartlashtirilgan) ishlab chiqilgan. BIOS dan farqli o'laroq, UEFI boshidanoq <Em>32 yoki 64-bit himoyalangan/uzun rejimda</Em> ishlaydi, bu unga barcha RAM ga kirish, to'g'ri DXE (Driver eXecution Environment) drayverlarini yuklash va haqiqiy fayl tizimini qo'llab-quvvatlash imkoniyatini beradi. UEFI firmwarening to'rtta alohida fazasi mavjud:</>}
+      </P>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "16px 0" }}>
+        {[
+          { phase: "SEC", full: "Security Phase", color: "var(--c-auth)",
+            bodyUz: "CPU ni xavfsiz holatga o'tkazadi, \"Cache-as-RAM\" (CAR) texnikasidan foydalangan holda L1/L2 keshini vaqtinchalik RAM sifatida ishlatadi (RAM hali ishga tushmagan), asosiy CPU ishga tushirishni amalga oshiradi.",
+            bodyEn: "Puts CPU into a known-safe state, uses \"Cache-as-RAM\" (CAR) — treating L1/L2 cache as temporary RAM (since RAM isn't initialised yet), performs basic CPU initialisation." },
+          { phase: "PEI", full: "Pre-EFI Initialisation", color: "var(--c-warn)",
+            bodyUz: "RAM ni ishga tushiradi (DDR SPD ma'lumotlarini o'qib), platform qismlarini (PCH, DRAM kontrolleri) sozlaydi, barcha bosqichlar uchun platformaga xos ishga tushirishni amalga oshiradi.",
+            bodyEn: "Initialises RAM (reads DDR SPD data), configures platform components (PCH, DRAM controller), performs platform-specific initialisation that all subsequent phases depend on." },
+          { phase: "DXE", full: "Driver eXecution Environment", color: "var(--c-system)",
+            bodyUz: "UEFI drayverlarini yuklaydi (EFI Protocol Interface orqali), to'liq xotiraga kirish bilan 64-bit muhitda ishlaydi, disk kontrollerlari, tarmoq kartalari, displey drayverlarini yuklaydi.",
+            bodyEn: "Loads UEFI drivers (via EFI Protocol Interface), runs in full 64-bit environment with complete memory access, loads disk controllers, network cards, display drivers." },
+          { phase: "BDS", full: "Boot Device Selection", color: "var(--accent)",
+            bodyUz: "Yuklash qurilmalarini NVRAM roʻyxatidan o'qiydi (UEFI Boot#### o'zgaruvchilari), Secure Boot ni amalga oshiradi — ESP dagi .efi faylini imzoni db/dbx bilan tekshirib yuklaydi.",
+            bodyEn: "Reads boot devices from NVRAM list (UEFI Boot#### variables), enforces Secure Boot — loads the .efi file from ESP after verifying its signature against db/dbx." },
+        ].map((p, i) => (
+          <div key={i} style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 0, borderRadius: 10, overflow: "hidden", border: `1px solid ${p.color}30` }}>
+            <div style={{ background: `${p.color}18`, borderRight: `2px solid ${p.color}50`, padding: "12px 14px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minWidth: 64 }}>
+              <div className="mono" style={{ fontSize: 13, fontWeight: 700, color: p.color }}>{p.phase}</div>
+              <div className="mono" style={{ fontSize: 9, color: "var(--text-3)", textAlign: "center", marginTop: 2 }}>{p.full}</div>
+            </div>
+            <div style={{ padding: "12px 16px", background: `${p.color}05`, fontSize: 13, lineHeight: 1.7, color: "var(--text-1)" }}>
+              {lang === "en" ? p.bodyEn : p.bodyUz}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <P>
+        {lang === "en"
+          ? <>UEFI stores boot configuration in <Em>NVRAM (Non-Volatile RAM)</Em> — small flash memory on the motherboard. The boot order and each OS's bootloader path are stored as NVRAM variables (e.g. <code>Boot0001 = \EFI\Microsoft\Boot\bootmgfw.efi</code>). You can read and write these variables from the OS with the <code>bcdedit /set {"{fwbootmgr}"} displayorder</code> command or from Linux with <code>efibootmgr</code>.</>
+          : <>UEFI yuklash konfiguratsiyasini <Em>NVRAM (Xotirada saqlanadigan o'zgaruvchan RAM)</Em> da saqlaydi — ona platadagi kichik flesh xotira. Yuklash tartibi va har bir OS ning bootloader yo'li NVRAM o'zgaruvchilari sifatida saqlanadi (masalan, <code>Boot0001 = \EFI\Microsoft\Boot\bootmgfw.efi</code>). Bu o'zgaruvchilarni OS dan <code>bcdedit /set {"{fwbootmgr}"} displayorder</code> buyrug'i yoki Linux da <code>efibootmgr</code> bilan o'qib va yozish mumkin.</>}
+      </P>
+
+      <div style={{ marginTop: 22 }}>
+        <MermaidDiagram chart={uefiChart}
+          caption="2-rasm. UEFI yuklash fazalari: SEC → PEI → DXE → BDS → Secure Boot tekshiruvi → bootmgr.efi."
+          captionEn="Fig 2. UEFI boot phases: SEC → PEI → DXE → BDS → Secure Boot check → bootmgr.efi." />
+      </div>
+
+      {/* ── Comparison table ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.3 — BIOS vs UEFI: full comparison" : "1.3 — BIOS va UEFI: to'liq taqqoslash"}</h3>
+      <div style={{ borderRadius: 12, border: "1px solid var(--border)", overflow: "hidden", marginTop: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", background: "var(--bg-2)", borderBottom: "1px solid var(--border)" }}>
+          <div style={{ padding: "10px 14px", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 12, color: "var(--text-2)" }}>{lang === "en" ? "Aspect" : "Jihat"}</div>
+          <div style={{ padding: "10px 14px", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 12, color: "var(--c-warn)", borderLeft: "1px solid var(--border)" }}>BIOS</div>
+          <div style={{ padding: "10px 14px", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 12, color: "var(--c-system)", borderLeft: "1px solid var(--border)" }}>UEFI</div>
+        </div>
+        {compRows.map((row, i) => (
+          <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", borderBottom: i < compRows.length - 1 ? "1px solid var(--border)" : "none", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.015)" }}>
+            <div style={{ padding: "10px 14px", fontSize: 12.5, fontWeight: 600, color: "var(--text-1)" }}>{row.aspect}</div>
+            <div style={{ padding: "10px 14px", fontSize: 12, color: "var(--text-2)", borderLeft: "1px solid var(--border)", lineHeight: 1.6 }}>{row.bios}</div>
+            <div style={{ padding: "10px 14px", fontSize: 12, color: "var(--text-1)", borderLeft: "1px solid var(--border)", lineHeight: 1.6 }}>{row.uefi}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Security ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.4 — Firmware as an attack surface" : "1.4 — Firmware hujum yuzasi sifatida"}</h3>
+      <P>
+        {lang === "en"
+          ? <>Firmware-level attacks are the most persistent and hardest to detect category of malware. Unlike a rootkit that lives in the OS, a firmware implant survives: OS reinstallation, disk replacement, and even BitLocker wipes — because the firmware lives on a separate SPI flash chip, not on the main drive. This is why nation-state actors and APT groups invest heavily in firmware research.</>
+          : <>Firmware darajasidagi hujumlar — zararli dasturlarning eng barqaror va aniqlanishi qiyinroq toifasi. OS da yashovchi rootkit dan farqli o'laroq, firmware implant omon qoladi: OS qayta o'rnatish, disk almashtirish va hatto BitLocker o'chirishdan — chunki firmware asosiy diskda emas, alohida SPI flesh chipida yashaydi. Shuning uchun davlat darajasidagi hujumchilar va APT guruhlari firmware tadqiqotlariga katta sarmoya kiritadi.</>}
+      </P>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
+        {[
+          {
+            name: "MBR bootkits (BIOS era)", color: "var(--c-attack)",
+            bodyUz: "BIOS ning tekshiruvlarsiz MBR ni bajarishini ekspluatatsiya qiladi. MBR dagi 446 baytni yozib o'chirish OS dan oldin nazoratni beradi. Klassik misollar: Mebroot (2007), TDL4 (2010), Petya (2016). Himoya: BIOS ni UEFI + Secure Boot bilan almashtirish.",
+            bodyEn: "Exploits BIOS's execution of MBR without verification. Overwriting 446 bytes in the MBR gives control before the OS. Classic examples: Mebroot (2007), TDL4 (2010), Petya (2016). Fix: replace BIOS with UEFI + Secure Boot.",
+          },
+          {
+            name: "UEFI firmware implants", color: "var(--c-attack)",
+            bodyUz: "Firmware manbasini to'g'ridan-to'g'ri o'zgartiradigan implantlar — SPI flesh chipiga yoziladi. Mashhur misollar: CosmicStrand (2022, ASUS/Gigabyte), MosaicRegressor (2020, Kaspersky tomonidan kashf etilgan). Bunday implant UEFI ni qayta yangilash orqali ham olib tashlanmaydi (chunki implant yangilanish kodining o'zini o'zgartiradi).",
+            bodyEn: "Implants that directly modify the firmware source — written to the SPI flash chip. Notable examples: CosmicStrand (2022, ASUS/Gigabyte), MosaicRegressor (2020, discovered by Kaspersky). Such an implant survives even UEFI re-flashing (because the implant modifies the update code itself).",
+          },
+          {
+            name: "ESPecter — EFI System Partition bootkit", color: "var(--c-warn)",
+            bodyUz: "Firmware chipiga yozmasdan, ESP dagi .efi fayllarni modifikatsiya qiladi. Secure Boot o'chirilgan yoki CSM/Legacy rejimi yoqilgan tizimlarda ishlaydi. ESPecter (2021) Windows Boot Manager (bootmgfw.efi) ni yamab, kernel yuklanishidan oldin drayverini kiritardi. Himoya: Secure Boot yoqilishi va ESP'ga yozish monitoringi.",
+            bodyEn: "Modifies .efi files on the ESP without writing to the firmware chip. Works on systems with Secure Boot disabled or CSM/Legacy mode enabled. ESPecter (2021) patched the Windows Boot Manager (bootmgfw.efi) to inject its driver before the kernel loaded. Fix: Secure Boot enabled + ESP write monitoring.",
+          },
+          {
+            name: "CSM / Legacy mode — Secure Boot killer", color: "var(--c-warn)",
+            bodyUz: "Aksariyat UEFI dasturiy ta'minotlari CSM (Compatibility Support Module) yoki \"Legacy mode\" ni taqdim etadi — eski BIOS-only OS'larni (Windows XP, Linux no-EFI) qo'llab-quvvatlash uchun. CSM yoqilganda, Secure Boot avtomatik ravishda butunlay o'chiriladi. Bu xavfsizlik jihati ko'plab korporativ tizimlar tomonidan e'tibordan chetda qoldiriladi. Tekshirish: <code>msinfo32</code> → BIOS Mode → \"UEFI\" bo'lishi kerak (\"Legacy\" emas).",
+            bodyEn: "Most UEFI firmware offers CSM (Compatibility Support Module) or \"Legacy mode\" — to support old BIOS-only OSes (Windows XP, non-EFI Linux). When CSM is enabled, Secure Boot is automatically disabled entirely. This security implication is overlooked by many enterprise systems. Check: <code>msinfo32</code> → BIOS Mode → should say \"UEFI\" (not \"Legacy\").",
+          },
+          {
+            name: "Measured Boot + TPM — attestation chain", color: "var(--c-system)",
+            bodyUz: "UEFI'dagi Measured Boot har bir yuklash bosqichini (firmware, bootloader, kernel, drayverlar) SHA-256 xeshini TPM PCR (Platform Configuration Register) ga yozadi. Bu xeshlar o'zgartirilishi mumkin emas — TPM ularni biriktirib, oxirgi «o'lcham» ni yaratadi. Masofaviy attestatsiya orqali server tizimning haqiqiy yuklash konfiguratsiyasini tekshirishi mumkin — biron bir komponent modifikatsiya qilinganligini aniqlash uchun.",
+            bodyEn: "Measured Boot in UEFI records the SHA-256 hash of each boot stage (firmware, bootloader, kernel, drivers) into TPM PCR (Platform Configuration Register). These hashes cannot be altered — the TPM chains them, creating a final \"measurement\". Via remote attestation, a server can verify a machine's exact boot configuration — detecting if any component was modified.",
+          },
+        ].map((item, i) => (
+          <div key={i} style={{ padding: "12px 16px", borderRadius: 10, background: `${item.color}07`, border: `1px solid ${item.color}28`, borderLeft: `3px solid ${item.color}` }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 13.5, fontWeight: 700, color: item.color, marginBottom: 6 }}>{item.name}</div>
+            <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.72 }}>{lang === "en" ? item.bodyEn : item.bodyUz}</div>
+          </div>
+        ))}
+      </div>
+
+      <Callout color="var(--c-system)" icon="shield" titleUz="Amaliy tekshiruv — tizimingiz UEFI yoki BIOS?" titleEn="Practical check — is your system UEFI or BIOS?">
+        {lang === "en"
+          ? <>Run <code>msinfo32</code> (Win+R → msinfo32 → Enter). Look at <strong>BIOS Mode</strong>: if it says <em>UEFI</em>, your system boots in UEFI mode. If it says <em>Legacy</em>, CSM is active and Secure Boot is disabled — a security risk. To check Secure Boot status: <code>msinfo32</code> → <strong>Secure Boot State</strong> → should say <em>On</em>. From PowerShell (admin): <code>Confirm-SecureBootUEFI</code> → returns <em>True</em> if Secure Boot is active.</>
+          : <>Ishga tushiring <code>msinfo32</code> (Win+R → msinfo32 → Enter). <strong>BIOS Mode</strong> ga qarang: agar <em>UEFI</em> desa, tizimingiz UEFI rejimida yuklanadi. Agar <em>Legacy</em> desa, CSM faol va Secure Boot o'chirilgan — xavfsizlik xavfi. Secure Boot holatini tekshirish uchun: <code>msinfo32</code> → <strong>Secure Boot State</strong> → <em>On</em> bo'lishi kerak. PowerShell dan (admin): <code>Confirm-SecureBootUEFI</code> → Secure Boot faol bo'lsa <em>True</em> qaytaradi.</>}
+      </Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Coming soon placeholder for L06-L20
 // ─────────────────────────────────────────────────────────────
 function ComingSoon({ lesson, lessonNum, setRoute }) {
   const lang = useLang();
