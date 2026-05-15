@@ -125,14 +125,19 @@ html, body {
   position: absolute;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 12px var(--accent-glow);
-  opacity: 0.35;
+  box-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow);
+  opacity: 0;
   animation: drift linear infinite;
 }
+.particle-star {
+  background: radial-gradient(circle, #fff 10%, var(--accent) 60%, transparent 100%);
+  box-shadow: 0 0 16px var(--accent-glow), 0 0 32px var(--accent-glow), 0 0 4px #fff;
+}
 @keyframes drift {
-  0%   { transform: translate(0,0) scale(1); opacity: 0; }
-  20%  { opacity: 0.6; }
-  100% { transform: translate(var(--dx), var(--dy)) scale(0.4); opacity: 0; }
+  0%   { transform: translate(0,0) scale(1);   opacity: 0; }
+  8%   { opacity: 0.75; }
+  85%  { opacity: 0.55; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
 }
 
 /* Scanline subtle CRT vibe */

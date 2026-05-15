@@ -4,7 +4,7 @@ const { useState: useAS, useEffect: useAE, useCallback: useACB } = React;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "green",
-  "background": "grid",
+  "background": "particles",
   "density": "cozy",
   "motion": "high"
 }/*EDITMODE-END*/;
@@ -122,7 +122,7 @@ function App() {
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>
-      <ParticleBg mode={t.background} count={t.motion === "off" ? 0 : t.motion === "low" ? 10 : 30} />
+      <ParticleBg mode={t.background} count={t.motion === "off" ? 0 : t.motion === "low" ? 25 : 80} />
       <RouteRender route={route} screenProps={screenProps} />
 
       <TweaksPanel title="Tweaks">

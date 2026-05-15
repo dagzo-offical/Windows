@@ -144,8 +144,8 @@ function SectionScreen({ setRoute, user, section = 1 }) {
                         background: "linear-gradient(135deg, #00ff88, #0af)",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
-                        fontSize: 15, fontWeight: 900, letterSpacing: "0.08em",
-                      }}>DZ</span>
+                        fontSize: 11, fontWeight: 900, letterSpacing: "0.06em",
+                      }}>DAGZO</span>
                     </div>
                   </div>
                   <div style={{

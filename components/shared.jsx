@@ -75,15 +75,20 @@ function ParticleBg({ count = 30, mode = "grid" }) {
     if (mode === "particles" || mode === "grid") {
       for (let i = 0; i < count; i++) {
         const p = document.createElement("div");
-        p.className = "particle";
-        const s = 1 + Math.random() * 2.5;
+        // every 5th particle is a bigger "star" glow
+        const isStar = i % 5 === 0;
+        p.className = "particle" + (isStar ? " particle-star" : "");
+        const s = isStar ? 3 + Math.random() * 3 : 1 + Math.random() * 2;
         p.style.width = p.style.height = `${s}px`;
         p.style.left = `${Math.random() * 100}%`;
         p.style.top = `${Math.random() * 100}%`;
-        p.style.setProperty("--dx", `${(Math.random() - 0.5) * 200}px`);
-        p.style.setProperty("--dy", `${-100 - Math.random() * 200}px`);
-        p.style.animationDuration = `${15 + Math.random() * 25}s`;
-        p.style.animationDelay = `${-Math.random() * 30}s`;
+        // drift in all directions, not just up
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 120 + Math.random() * 220;
+        p.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
+        p.style.setProperty("--dy", `${Math.sin(angle) * dist - 80}px`);
+        p.style.animationDuration = `${isStar ? 20 : 12 + Math.random() * 20}s`;
+        p.style.animationDelay = `${-Math.random() * 35}s`;
         el.appendChild(p);
       }
     }
