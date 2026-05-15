@@ -18,7 +18,7 @@ function loadProgress() {
     const s = localStorage.getItem(PROGRESS_KEY);
     if (s) return JSON.parse(s);
   } catch {}
-  return { xp: 0, level: 1, completedLessons: [], name: "Foydalanuvchi", initials: "F" };
+  return { xp: 0, level: 1, completedLessons: [], name: "Dagzo", initials: "DZ" };
 }
 
 function saveProgress(p) {
@@ -101,8 +101,8 @@ function App() {
   }, [t.theme, t.density, t.motion, lang]);
 
   const user = {
-    name: progress.name || "Foydalanuvchi",
-    initials: progress.initials || "F",
+    name: progress.name || "Dagzo",
+    initials: progress.initials || "DZ",
     level: progress.level || 1,
     xp: progress.xp ? progress.xp.toLocaleString() : "0",
     completedLessons: progress.completedLessons || [],
