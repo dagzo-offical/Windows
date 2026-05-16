@@ -31,8 +31,8 @@ const LESSONS = {
   13: { num: "L13", section: "01", uz: "Thread'lar",                    en: "Threads",                     subUz: "ETHREAD, rejalashtiruvchi, prioritetlar, sinxronizatsiya va thread in'ektsiya", subEn: "ETHREAD, scheduler, priorities, synchronization, and thread injection" },
   14: { num: "L14", section: "01", uz: "Handle'lar",                    en: "Handles",                     subUz: "Ob'ekt menejeri, handle jadvali, turlari, takrorlash, xavfsizlik va handle hujumlari", subEn: "Object Manager, handle table, types, duplication, security, and handle-based attacks" },
   15: { num: "L15", section: "01", uz: "Servislar",                     en: "Services",                    subUz: "SCM, servis turlari, xizmat akkauntlari, svchost guruhlari va servis persistenslik texnikalari", subEn: "SCM, service types, service accounts, svchost groups, and service-based persistence techniques" },
-  16: { num: "L16", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "Tez kunda", subEn: "Coming soon" },
-  17: { num: "L17", section: "01", uz: "Windows API",                   en: "Windows API",                 subUz: "Tez kunda", subEn: "Coming soon" },
+  16: { num: "L16", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "PE tuzilmasi, DLL yuklash, qidiruv tartibi, in'ektsiya va DLL hijacking texnikalari", subEn: "PE structure, DLL loading, search order, injection, and DLL hijacking techniques" },
+  17: { num: "L17", section: "01", uz: "Windows API",                   en: "Windows API",                 subUz: "Win32 qatlami, ntdll syscall ko'prigi, API hooking va monitoring texnikalari", subEn: "Win32 layer, ntdll syscall bridge, API hooking, and monitoring techniques" },
   18: { num: "L18", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Tez kunda", subEn: "Coming soon" },
   19: { num: "L19", section: "01", uz: "Task Scheduler",                en: "Task Scheduler",              subUz: "Tez kunda", subEn: "Coming soon" },
   20: { num: "L20", section: "01", uz: "Windows log fayllari",          en: "Windows Logs",                subUz: "Tez kunda", subEn: "Coming soon" },
@@ -115,6 +115,10 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <SectionHandles />
           </> : lessonNum === 15 ? <>
             <SectionServices />
+          </> : lessonNum === 16 ? <>
+            <SectionDLL />
+          </> : lessonNum === 17 ? <>
+            <SectionWindowsAPI />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -253,6 +257,12 @@ const LESSON_META = {
   15: { min: 36, diagrams: 6, labs: 2,
        introUz: <><em>Windows Service</em> — fon rejimida ishlaydigan, foydalanuvchi tizimga kirmagan vaqtda ham faol bo'lgan jarayon. Bu darsda <em>Service Control Manager (SCM)</em>, servis turlari va holatlari, servis akkauntlari (LocalSystem, LocalService, NetworkService), svchost.exe −k guruhlari, servis DACL lari va tajovuzkorlar foydalanadigan servis persistenslik va imtiyozlarni ko'tarish texnikalarini o'rganasiz.</>,
        introEn: <><em>A Windows Service</em> is a process that runs in the background even when no user is logged in. This lesson covers the <em>Service Control Manager (SCM)</em>, service types and states, service accounts (LocalSystem, LocalService, NetworkService), svchost.exe -k groups, service DACLs, and the service persistence and privilege-escalation techniques attackers rely on.</> },
+  16: { min: 36, diagrams: 7, labs: 3,
+       introUz: <><em>DLL (Dynamic Link Library)</em> — bir nechta jarayonlar baham ko'ra oladigan umumiy kod va resurslar kutubxonasi. Bu darsda <em>PE formati</em>, DLL yuklash mexanizmi (LoadLibrary, implicit linking), Windows DLL qidiruv tartibi, <em>KnownDlls</em>, DllMain hayot tsikli, DLL in'ektsiya texnikalari (klassik, reflektiv, AppInit) va DLL hijacking hujumlarini o'rganasiz.</>,
+       introEn: <><em>A DLL (Dynamic Link Library)</em> is a shared library of code and resources that multiple processes can map into their address space simultaneously. This lesson covers the <em>PE format</em>, DLL loading mechanics (LoadLibrary, implicit linking), Windows DLL search order, <em>KnownDlls</em>, DllMain lifecycle, DLL injection techniques (classic, reflective, AppInit), and DLL hijacking attacks.</> },
+  17: { min: 38, diagrams: 6, labs: 2,
+       introUz: <><em>Windows API</em> — dasturlar operatsion tizim xizmatlariga murojaat qilish uchun foydalanadigan funksiyalar to'plami. Bu darsda <em>Win32 → ntdll → syscall</em> zanjiri, asosiy DLL lar (kernel32, ntdll, advapi32, user32), chaqiruv konventsiyalari (x64 fastcall), <em>API hooking</em> texnikalari (IAT, inline, SSDT), WOW64 qatlami va API monitoringi usullarini o'rganasiz.</>,
+       introEn: <><em>The Windows API</em> is the set of functions applications call to access OS services. This lesson covers the <em>Win32 → ntdll → syscall</em> chain, key DLLs (kernel32, ntdll, advapi32, user32), calling conventions (x64 fastcall), <em>API hooking</em> techniques (IAT, inline, SSDT), the WOW64 layer, and API monitoring methods.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -4986,6 +4996,640 @@ sc delete TestSvc
 
 # Yangi servis yaratish tekshiruvi (Event ID 7045)
 Get-WinEvent -LogName System | Where {$_.Id -eq 7045} | Select -First 10 | Format-List`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionDLL() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="DLL — Dynamic Link Library" uz="" />
+      <P>A <Term>DLL (Dynamic Link Library)</Term> is a PE (Portable Executable) file that contains compiled code, data, and resources that can be loaded into a process's virtual address space and shared simultaneously by many processes. Unlike static linking (where library code is copied into each EXE at compile time), DLLs are mapped once into physical memory and each process sees its own virtual mapping — the code pages are physically shared. This saves RAM, enables code updates without recompiling dependents, and is the foundation of the entire Windows component model.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — PE Format and DLL Structure</h3>
+      <P>A DLL is a PE file with the <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>IMAGE_FILE_DLL</code> flag set in the COFF header. Key PE sections relevant to DLLs:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Section / Directory","Purpose","Security Relevance"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            [".text","Executable code","Must be RX (read+execute); W+X = shellcode staging"],
+            [".data / .rdata",".data = writable globals; .rdata = read-only constants, string literals","Shellcode sometimes hides in .rdata gaps"],
+            ["Export Directory (IMAGE_EXPORT_DIRECTORY)","Lists exported function names, ordinals, and RVAs","DLL hijack target: attacker DLL must re-export all originals"],
+            ["Import Directory (IMAGE_IMPORT_DESCRIPTOR)","Lists DLLs and functions this DLL depends on","IAT hooking overwrites entries here after loading"],
+            ["Relocation Table (.reloc)","Address fixup table for ASLR rebasing","Missing .reloc = DLL can't be ASLR'd → predictable address"],
+            ["TLS Directory","Thread Local Storage callbacks — run before entry point","Malware hides code in TLS callbacks to run before main()"],
+            ["Digital Signature (WIN_CERT)","Authenticode signature","Unsigned DLL loaded by signed process = classic attack vector"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — DLL Loading: Implicit vs Explicit</h3>
+      <P>There are two ways to use a DLL — the loader handles both, but at different times:</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:12}}>
+        <div style={{padding:"14px 16px",borderRadius:10,background:"rgba(0,212,255,0.06)",border:"1px solid rgba(0,212,255,0.25)"}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"var(--c-system)",marginBottom:10}}>IMPLICIT LINKING</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>
+            <p style={{margin:"0 0 8px"}}>Linker records the dependency in the PE import table. The Windows loader (<code>ntdll!LdrLoadDll</code>) maps all imported DLLs automatically before <code>main()</code> runs.</p>
+            <p style={{margin:"0 0 8px"}}>Example: <code>#include &lt;windows.h&gt;</code> + linking against <code>kernel32.lib</code> → <code>kernel32.dll</code> auto-loaded.</p>
+            <p style={{margin:0,color:"var(--text-2)",fontSize:12}}>Dependency visible in PE Import Directory. If DLL not found → process fails to start.</p>
+          </div>
+        </div>
+        <div style={{padding:"14px 16px",borderRadius:10,background:"rgba(180,100,255,0.06)",border:"1px solid rgba(180,100,255,0.25)"}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"#b48cff",marginBottom:10}}>EXPLICIT LINKING</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>
+            <p style={{margin:"0 0 8px"}}>Code calls <code>LoadLibrary("name.dll")</code> at runtime to get an <code>HMODULE</code>, then uses <code>GetProcAddress(hMod, "FuncName")</code> to get a function pointer.</p>
+            <p style={{margin:"0 0 8px"}}>Load is on-demand; failure is handleable. Used for plugins, optional features, COM servers.</p>
+            <p style={{margin:0,color:"var(--text-2)",fontSize:12}}>Not visible in static PE imports — forensic tools must detect runtime loads via API hooking or ETW.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — DLL Search Order</h3>
+      <P>When <code>LoadLibrary("foo.dll")</code> is called without a full path, Windows searches locations in this exact order (assuming <em>SafeDllSearchMode</em> is enabled, which it is by default since XP SP2):</P>
+      <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:12}}>
+        {[
+          {n:"1",loc:"KnownDlls (\\KnownDlls object directory)","note":"ntdll.dll, kernel32.dll, etc. — pre-loaded at boot, immune to hijacking"},
+          {n:"2",loc:"Application directory","note":"Directory where the EXE lives — most common hijack target"},
+          {n:"3",loc:"System directory (System32)",note:"%SystemRoot%\\System32 — e.g., C:\\Windows\\System32"},
+          {n:"4",loc:"Windows directory",note:"%SystemRoot% — e.g., C:\\Windows"},
+          {n:"5",loc:"Current working directory","note":"Dangerous if CWD is user-writable (e.g., Desktop, Downloads)"},
+          {n:"6",loc:"PATH environment variable","note":"Each directory in %PATH%, left to right"},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"8px 12px",borderRadius:6,background:i<1?"rgba(0,212,255,0.04)":"rgba(255,255,255,0.02)",border:`1px solid ${i<1?"rgba(0,212,255,0.25)":"var(--border)"}`}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:13,color:"var(--accent)",minWidth:24,flexShrink:0,fontWeight:700}}>#{item.n}</span>
+            <div>
+              <div style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--c-warn)",marginBottom:2}}>{item.loc}</div>
+              <div style={{fontSize:12,color:"var(--text-2)"}}>{item.note}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-warn)" icon="warning" titleEn="DLL hijacking exploits search order steps 2, 5, and 6" titleUz="">
+        If a privileged process loads <code>wlbsctrl.dll</code> (IKEEXT service) by name and that DLL doesn't exist in System32, the loader falls through to step 2 (app dir) or step 5 (CWD). If an attacker controls those directories, their malicious DLL is loaded with the service's LocalSystem privileges. Tools: <code>Process Monitor</code> filter on <code>NAME NOT FOUND</code> + <code>CreateFile</code> path — every missing DLL is a potential hijack.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — DllMain and Lifecycle</h3>
+      <P>When a DLL is loaded or unloaded, Windows calls its <Term>DllMain</Term> entry point with a reason code:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
+  switch (fdwReason) {
+    case DLL_PROCESS_ATTACH:
+      // DLL loaded into process — initialize globals, start threads
+      // WARNING: loader lock held — NO LoadLibrary, CreateThread here
+      break;
+    case DLL_PROCESS_DETACH:
+      // DLL being unloaded — free resources
+      break;
+    case DLL_THREAD_ATTACH:
+      // New thread created in this process — allocate TLS
+      break;
+    case DLL_THREAD_DETACH:
+      // Thread exiting — free TLS
+      break;
+  }
+  return TRUE; // FALSE = refuse to load (DLL_PROCESS_ATTACH only)
+}`}</code></pre>
+      <Callout color="var(--c-err)" icon="warning" titleEn="Loader lock deadlock — DllMain restrictions are critical" titleUz="">
+        DllMain is called while the <em>loader lock</em> is held. Any attempt to call <code>LoadLibrary</code>, <code>FreeLibrary</code>, or <code>CreateThread</code> from inside DllMain risks a deadlock. This is a common source of hanging processes during DLL injection — the injected DLL calls <code>LoadLibrary</code> from its DllMain, deadlocking against the loader lock held by the injecting thread.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — KnownDlls and ASLR</h3>
+      <P><Term>KnownDlls</Term> is a list of critical system DLLs (ntdll.dll, kernel32.dll, kernelbase.dll, msvcrt.dll, etc.) that are mapped once at boot into a shared section object. Every process that needs them gets the same physical pages — saving memory and preventing search-order hijacking for these DLLs. They are listed under <code>HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs</code>.</P>
+      <P><Term>ASLR (Address Space Layout Randomization)</Term> randomizes the load address of each DLL at boot (system-wide) and at load time (per-process for <code>LoadLibrary</code>). ASLR requires the DLL to have a relocation table (<code>.reloc</code> section). A DLL compiled without <code>/DYNAMICBASE</code> always loads at its preferred base address — a predictable gadget source for ROP chains. Check with: <code>dumpbin /headers foo.dll | findstr DLL_CHARACTERISTICS</code>.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — DLL Injection Techniques</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Classic DLL Injection (LoadLibrary + CreateRemoteThread)",color:"var(--c-attack)",body:<>The most common technique: (1) <code>OpenProcess(PROCESS_VM_WRITE|PROCESS_CREATE_THREAD, …, targetPid)</code>, (2) <code>VirtualAllocEx</code> in target to write DLL path string, (3) <code>CreateRemoteThread(target, LoadLibraryA, dllPathAddr)</code>. The target process's thread calls <code>LoadLibraryA</code> with the attacker's DLL path. Detected by Sysmon Event 8 (CreateRemoteThread) and Event 7 (ImageLoad with non-system path).</>},
+          {title:"Reflective DLL Injection",color:"var(--c-err)",body:<>No DLL path written to disk — the entire DLL is written as a blob into target memory, then a custom loader function within the blob resolves imports and relocations in-memory. Used by Metasploit's <code>meterpreter</code>. Detection: memory regions with RWX permissions containing a PE header at unexpected offsets; no corresponding module entry in the process PEB module list (<code>PEB.Ldr</code>). Tools: Process Hacker "Find DLLs" shows unlisted PE headers in memory.</>},
+          {title:"AppInit_DLLs",color:"var(--c-warn)",body:<>Registry key <code>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows\AppInit_DLLs</code> lists DLLs that <code>user32.dll</code> loads into every process that imports user32. Disabled by Secure Boot (requires signature). Classic malware persistence — e.g., old banking trojans. Detection: Autoruns "AppInit" tab; Event ID 11 (Registry modification to AppInit_DLLs path).</>},
+          {title:"COM Hijacking via DLL",color:"var(--c-system)",body:<>COM objects resolved via CLSID registry keys. <code>HKCU\Software\Classes\CLSID\{"{…}"}\InprocServer32</code> takes precedence over HKLM. A user-writable CLSID registration pointing to an attacker DLL causes it to load into any process that instantiates that COM object. Used by APTs for user-level persistence without admin rights. Detection: Autoruns "COM" tab; SysinternalsSuite's <code>sigcheck -a</code> on registered COM DLLs.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Export Forwarding and Proxy DLLs</h3>
+      <P>A DLL can <em>forward</em> an export to another DLL. In the export directory, instead of an RVA to code, the entry contains a string like <code>"NTDLL.RtlAllocateHeap"</code> — the loader redirects the call. This is used legitimately (kernel32 forwards many functions to kernelbase), and maliciously: a <Term>proxy DLL</Term> exports all the same functions as the legitimate DLL (forwarding to the real one), plus runs attacker code in DllMain or in wrapped functions. Creating one requires matching the export table exactly — tools: <code>AheadLib</code>, <code>SharpDllProxy</code>.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# View DLL exports
+dumpbin /exports C:\\Windows\\System32\\kernel32.dll
+# View DLL imports (dependencies)
+dumpbin /imports myapp.exe
+
+# Check ASLR / DEP flags
+dumpbin /headers foo.dll | findstr /i "dll characteristics"
+# 0x0040 = ASLR, 0x0100 = NX (DEP), 0x4000 = CFG
+
+# List DLLs loaded in a running process
+listdlls.exe -v notepad.exe     # Sysinternals
+Get-Process notepad | Select -ExpandProperty Modules | Select FileName
+
+# Find hijackable DLL loads (Process Monitor)
+# Filter: Operation = CreateFile, Result = NAME NOT FOUND, Path ends in .dll
+
+# Verify DLL signatures
+sigcheck.exe -a C:\\Windows\\System32\\kernel32.dll
+
+# WinDbg — list loaded modules
+lm                    # all modules with addresses
+!lmi kernel32         # detailed module info
+x kernel32!*Create*   # exports matching pattern`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="DLL — Dinamik Bog'lanadigan Kutubxona" en="" />
+      <P><Term>DLL (Dynamic Link Library)</Term> — virtual manzil fazosiga yuklanishi va bir vaqtda ko'p jarayonlar tomonidan baham ko'rilishi mumkin bo'lgan compiled kod, ma'lumotlar va resurslarni o'z ichiga olgan PE fayl. Statik bog'lashdan farqli (kutubxona kodi kompilyatsiya vaqtida har bir EXE ga ko'chiriladi), DLL lar jismoniy xotiraga bir marta mapplanadi va har bir jarayon o'zining virtual mappingini ko'radi — kod sahifalari jismoniy jihatdan umumiy bo'ladi. Bu RAM ni tejaydi, dependentlarni qayta kompilyatsiya qilmasdan kod yangilashni ta'minlaydi va butun Windows komponent modelining asosini tashkil etadi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — PE Formati va DLL Tuzilishi</h3>
+      <P>DLL — COFF sarlavhasida <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>IMAGE_FILE_DLL</code> bayroği o'rnatilgan PE fayl. DLL lar uchun muhim PE bo'limlari:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Bo'lim / Katalog","Maqsad","Xavfsizlik Ahamiyati"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            [".text","Bajariladigan kod","RX (o'qish+bajarish) bo'lishi kerak; W+X = shellcode joylashtirish"],
+            [".data / .rdata",".data = yoziladigan globallar; .rdata = faqat o'qiladigan konstantalar","Shellcode ba'zan .rdata bo'shliqlarida yashirinadi"],
+            ["Export Katalogi (IMAGE_EXPORT_DIRECTORY)","Eksport qilingan funksiya nomlari, ordinallar va RVA larni ro'yxatga oladi","DLL hijack maqsadi: hujumchi DLL barcha originallarni qayta eksport qilishi kerak"],
+            ["Import Katalogi (IMAGE_IMPORT_DESCRIPTOR)","Ushbu DLL bog'liq bo'lgan DLL lar va funksiyalarni ro'yxatga oladi","IAT hooking yuklanganidan keyin bu yerda yozuvlarni qayta yozadi"],
+            ["Relokatsiya Jadvali (.reloc)","ASLR qayta bazalash uchun manzil tuzatish jadvali","Yo'q .reloc = DLL ASLR bo'lolmaydi → taxmin qilinadigan manzil"],
+            ["TLS Katalogi","Thread Local Storage callbacklari — kirish nuqtasidan oldin ishlaydi","Zararli dasturlar main() dan oldin kodni ishlatish uchun TLS callbacklarida yashirinadi"],
+            ["Raqamli Imzo (WIN_CERT)","Authenticode imzosi","Imzosiz DLL → imzolangan jarayon tomonidan yuklanadi = klassik hujum vektori"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — DLL Yuklash: Implicit va Explicit</h3>
+      <P>DLL dan foydalanishning ikki yo'li bor — loader ikkalasini ham, lekin turli vaqtlarda boshqaradi:</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:12}}>
+        <div style={{padding:"14px 16px",borderRadius:10,background:"rgba(0,212,255,0.06)",border:"1px solid rgba(0,212,255,0.25)"}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"var(--c-system)",marginBottom:10}}>IMPLICIT BOG'LASH</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>
+            <p style={{margin:"0 0 8px"}}>Linker bog'liqlikni PE import jadvalida qayd etadi. Windows loader (<code>ntdll!LdrLoadDll</code>) barcha import qilingan DLL larni <code>main()</code> ishga tushishidan oldin avtomatik mapplaydi.</p>
+            <p style={{margin:"0 0 8px"}}>Misol: <code>#include &lt;windows.h&gt;</code> + <code>kernel32.lib</code> ga bog'lash → <code>kernel32.dll</code> avtomatik yuklanadi.</p>
+            <p style={{margin:0,color:"var(--text-2)",fontSize:12}}>PE Import Katalogida ko'rinadi. DLL topilmasa → jarayon ishga tushishdan muvaffaqiyatsiz bo'ladi.</p>
+          </div>
+        </div>
+        <div style={{padding:"14px 16px",borderRadius:10,background:"rgba(180,100,255,0.06)",border:"1px solid rgba(180,100,255,0.25)"}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"#b48cff",marginBottom:10}}>EXPLICIT BOG'LASH</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>
+            <p style={{margin:"0 0 8px"}}>Kod ishga tushish vaqtida <code>HMODULE</code> olish uchun <code>LoadLibrary("name.dll")</code> ni chaqiradi, keyin funksiya ko'rsatkichini olish uchun <code>GetProcAddress(hMod, "FuncName")</code> ishlatadi.</p>
+            <p style={{margin:"0 0 8px"}}>Yuklash talab bo'yicha; muvaffaqiyatsizlik qayta ishlanishi mumkin. Plaginlar, ixtiyoriy xususiyatlar, COM serverlar uchun ishlatiladi.</p>
+            <p style={{margin:0,color:"var(--text-2)",fontSize:12}}>Statik PE importlarida ko'rinmaydi — sudyalik vositalari API hooking yoki ETW orqali ish vaqtidagi yuklashni aniqlashi kerak.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — DLL Qidiruv Tartibi</h3>
+      <P>To'liq yo'lsiz <code>LoadLibrary("foo.dll")</code> chaqirilganda Windows quyidagi tartibda (<em>SafeDllSearchMode</em> yoqilgan holda, bu XP SP2 dan beri standart) joylashuvlarni qidiradi:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:12}}>
+        {[
+          {n:"1",loc:"KnownDlls (\\KnownDlls ob'ekt katalogi)","note":"ntdll.dll, kernel32.dll va h.k. — yuklash vaqtida oldindan yuklanadi, hijackingdan himoyalangan"},
+          {n:"2",loc:"Ilova katalogi","note":"EXE turgan katalog — eng keng tarqalgan hijack maqsadi"},
+          {n:"3",loc:"Tizim katalogi (System32)","note":"%SystemRoot%\\System32 — masalan, C:\\Windows\\System32"},
+          {n:"4",loc:"Windows katalogi","note":"%SystemRoot% — masalan, C:\\Windows"},
+          {n:"5",loc:"Joriy ishchi katalog","note":"CWD foydalanuvchi yoziladigan bo'lsa xavfli (masalan, Desktop, Downloads)"},
+          {n:"6",loc:"PATH muhit o'zgaruvchisi","note":"%PATH% dagi har bir katalog, chapdan o'ngga"},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"8px 12px",borderRadius:6,background:i<1?"rgba(0,212,255,0.04)":"rgba(255,255,255,0.02)",border:`1px solid ${i<1?"rgba(0,212,255,0.25)":"var(--border)"}`}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:13,color:"var(--accent)",minWidth:24,flexShrink:0,fontWeight:700}}>#{item.n}</span>
+            <div>
+              <div style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--c-warn)",marginBottom:2}}>{item.loc}</div>
+              <div style={{fontSize:12,color:"var(--text-2)"}}>{item.note}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-warn)" icon="warning" titleUz="DLL hijacking qidiruv tartibi 2, 5 va 6 bosqichlarini ekspluatatsiya qiladi" titleEn="">
+        Imtiyozli jarayon <code>wlbsctrl.dll</code> ni (IKEEXT servisi) nom bo'yicha yuklasa va bu DLL System32 da mavjud bo'lmasa, loader 2-bosqichga (ilova katalogi) yoki 5-bosqichga (CWD) tushadi. Hujumchi bu kataloglarni nazorat qilsa, uning zararli DLL i servisning LocalSystem imtiyozlari bilan yuklanadi. Vositalar: <code>Process Monitor</code> — <code>NAME NOT FOUND</code> + <code>CreateFile</code> yo'li filtri — har bir yo'q DLL potensial hijack.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — DllMain va Hayot Tsikli</h3>
+      <P>DLL yuklanganida yoki tushurilganda Windows uning <Term>DllMain</Term> kirish nuqtasini sabab kodi bilan chaqiradi:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
+  switch (fdwReason) {
+    case DLL_PROCESS_ATTACH:
+      // DLL jarayonga yuklandi — globallarni ishga tushirish, threadlar boshlash
+      // OGOHLANTIRISH: loader lock ushlab turilgan — bu yerda LoadLibrary, CreateThread YO'Q
+      break;
+    case DLL_PROCESS_DETACH:
+      // DLL tushirilmoqda — resurslarni bo'shatish
+      break;
+    case DLL_THREAD_ATTACH:
+      // Bu jarayonda yangi thread yaratildi — TLS ajratish
+      break;
+    case DLL_THREAD_DETACH:
+      // Thread chiqmoqda — TLS ni bo'shatish
+      break;
+  }
+  return TRUE; // FALSE = yuklashni rad etish (faqat DLL_PROCESS_ATTACH)
+}`}</code></pre>
+      <Callout color="var(--c-err)" icon="warning" titleUz="Loader lock deadlock — DllMain cheklovlari muhim" titleEn="">
+        DllMain <em>loader lock</em> ushlab turilganda chaqiriladi. DllMain ichidan <code>LoadLibrary</code>, <code>FreeLibrary</code> yoki <code>CreateThread</code> chaqirishga har qanday urinish deadlock xavfini tug'diradi. Bu DLL in'ektsiyasi paytida jarayonning osilib qolishining keng tarqalgan sababi — in'ektsiya qilingan DLL o'zining DllMain dan <code>LoadLibrary</code> chaqiradi, in'ektsiyalovchi thread ushlab turgan loader lock ga qarshi deadlock hosil qiladi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — KnownDlls va ASLR</h3>
+      <P><Term>KnownDlls</Term> — har yuklash vaqtida umumiy section ob'ektiga bir marta mapplanadigan muhim tizim DLL lari ro'yxati (ntdll.dll, kernel32.dll, kernelbase.dll, msvcrt.dll va h.k.). Ularni talab qiladigan har bir jarayon bir xil jismoniy sahifalarni oladi — xotirani tejaydi va bu DLL lar uchun qidiruv tartibi hijackingini oldini oladi. Ular <code>HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs</code> ostida ro'yxatga olingan.</P>
+      <P><Term>ASLR (Manzil Fazosi Tartibini Tasodifiylash)</Term> yuklash vaqtida har bir DLL ning yuklash manzilini tasodifiylashtiradi. ASLR DLL ning relokatsiya jadvaliga (<code>.reloc</code> bo'limi) ega bo'lishini talab qiladi. <code>/DYNAMICBASE</code> siz kompilyatsiya qilingan DLL har doim o'zining afzal ko'rilgan asosiy manzilida yuklanadi — ROP zanjirlari uchun taxmin qilinadigan gadget manbai.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — DLL In'ektsiya Texnikalari</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Klassik DLL In'ektsiya (LoadLibrary + CreateRemoteThread)",color:"var(--c-attack)",body:<>Eng keng tarqalgan texnika: (1) <code>OpenProcess(PROCESS_VM_WRITE|PROCESS_CREATE_THREAD, …, maqsadPid)</code>, (2) DLL yo'l satrini yozish uchun maqsadda <code>VirtualAllocEx</code>, (3) <code>CreateRemoteThread(maqsad, LoadLibraryA, dllYoliManzili)</code>. Maqsad jarayonning threadi hujumchi DLL yo'li bilan <code>LoadLibraryA</code> ni chaqiradi. Sysmon Event 8 (CreateRemoteThread) va Event 7 (tizim bo'lmagan yo'l bilan ImageLoad) tomonidan aniqlanadi.</>},
+          {title:"Reflektiv DLL In'ektsiya",color:"var(--c-err)",body:<>Diskka DLL yo'li yozilmaydi — butun DLL maqsad xotiraga blob sifatida yoziladi, keyin blob ichidagi maxsus loader funksiyasi importlarni va relokatsiyalarni xotirada hal qiladi. Metasploit ning <code>meterpreter</code> i tomonidan qo'llaniladi. Aniqlash: kutilmagan offsetlarda PE sarlavhasini o'z ichiga olgan RWX ruxsatlari bo'lgan xotira mintaqalari; jarayon PEB modul ro'yxatida (<code>PEB.Ldr</code>) mos modul yozuvi yo'q.</>},
+          {title:"AppInit_DLLs",color:"var(--c-warn)",body:<>Registry kaliti <code>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows\AppInit_DLLs</code> — <code>user32.dll</code> user32 import qiladigan har bir jarayonga yuklaydigan DLL lar ro'yxati. Secure Boot tomonidan o'chirilgan (imzo talab qiladi). Klassik zararli dastur persistenslik. Aniqlash: Autoruns "AppInit" yorlig'i.</>},
+          {title:"COM Hijacking DLL orqali",color:"var(--c-system)",body:<>COM ob'ektlari CLSID registry kalitlari orqali hal qilinadi. <code>HKCU\Software\Classes\CLSID\{"{…}"}\InprocServer32</code> HKLM dan ustun turadi. Hujumchi DLL ga ishora qiluvchi foydalanuvchi yoziladigan CLSID ro'yxatdan o'tkazish, ushbu COM ob'ektini yaratadigan har qanday jarayonga yuklanishiga sabab bo'ladi. APT lar tomonidan admin huquqlarisiz foydalanuvchi darajasidagi persistenslik uchun qo'llaniladi.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Eksport Yo'naltirish va Proksi DLL lar</h3>
+      <P>DLL eksportni boshqa DLL ga <em>yo'naltirishi</em> mumkin. Eksport katalogida, kod uchun RVA o'rniga, yozuv <code>"NTDLL.RtlAllocateHeap"</code> kabi satrni o'z ichiga oladi — loader chaqiruvni yo'naltiradi. Bu qonuniy holda ishlatiladi (kernel32 ko'p funksiyalarni kernelbase ga yo'naltiradi) va zararli holda: <Term>proksi DLL</Term> qonuniy DLL bilan bir xil barcha funksiyalarni eksport qiladi (haqiqiysiga yo'naltirib), va DllMain da yoki o'ralgan funksiyalarda hujumchi kodini ishlatadi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# DLL eksportlarini ko'rish
+dumpbin /exports C:\\Windows\\System32\\kernel32.dll
+# DLL importlarini ko'rish (bog'liqliklar)
+dumpbin /imports myapp.exe
+
+# ASLR / DEP bayroqlarini tekshirish
+dumpbin /headers foo.dll | findstr /i "dll characteristics"
+# 0x0040 = ASLR, 0x0100 = NX (DEP), 0x4000 = CFG
+
+# Ishlaydigan jarayonda yuklangan DLL larni ro'yxatga olish
+listdlls.exe -v notepad.exe     # Sysinternals
+Get-Process notepad | Select -ExpandProperty Modules | Select FileName
+
+# Hijack qilinadigan DLL yuklashlarini topish (Process Monitor)
+# Filtr: Operation = CreateFile, Result = NAME NOT FOUND, Path .dll bilan tugaydi
+
+# DLL imzolarini tekshirish
+sigcheck.exe -a C:\\Windows\\System32\\kernel32.dll
+
+# WinDbg — yuklangan modullarni ro'yxatga olish
+lm                    # manzillar bilan barcha modullar
+!lmi kernel32         # batafsil modul ma'lumoti
+x kernel32!*Create*   # naqshga mos eksportlar`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionWindowsAPI() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows API — The Interface to the OS" uz="" />
+      <P>The <Term>Windows API</Term> (also called Win32 API) is the set of C-callable functions that give user-mode applications access to OS services: creating processes, reading files, managing memory, drawing to the screen, accessing the network. It is organized into a layered stack — each layer adds abstraction and security checks on top of the one below. Understanding this stack is fundamental to both offensive and defensive security, because every attack technique and every detection method ultimately operates at one of these layers.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — The API Layered Stack</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:0,marginTop:14}}>
+        {[
+          {label:"Application",sub:"Your code: WriteFile(), CreateProcess(), RegOpenKeyEx()",color:"#b48cff",mode:"User mode"},
+          {label:"Win32 Subsystem DLLs",sub:"kernel32.dll, advapi32.dll, user32.dll, gdi32.dll — thin wrappers, parameter validation, error translation",color:"#00d4ff",mode:"User mode"},
+          {label:"Windows Subsystem DLL",sub:"kernelbase.dll — bulk of Win32 implementation since Win7",color:"#00d4ff",mode:"User mode"},
+          {label:"Native API (ntdll.dll)",sub:"NtCreateFile, NtOpenProcess, NtAllocateVirtualMemory — undocumented Nt/Zw functions; contains the syscall stub",color:"#ff9145",mode:"User mode"},
+          {label:"SYSCALL instruction",sub:"Transitions CPU from Ring 3 → Ring 0; kernel validates call number (SSN) and dispatches",color:"#ff3a5e",mode:"RING 0 BOUNDARY"},
+          {label:"System Service Dispatch (SSDT)",sub:"nt!KiSystemCall64 → SSDT lookup → actual kernel function (NtCreateFile in ntoskrnl)",color:"#ff9145",mode:"Kernel mode"},
+          {label:"Executive + HAL",sub:"I/O Manager, Memory Manager, Object Manager, Security Reference Monitor, HAL",color:"#b48cff",mode:"Kernel mode"},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"stretch",gap:0}}>
+            <div style={{width:3,flexShrink:0,background:item.color,opacity:0.6}}/>
+            <div style={{flex:1,padding:"10px 14px",borderBottom:"1px solid var(--border)",background:i===4?"rgba(255,58,94,0.07)":"transparent"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:8}}>
+                <span style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color}}>{item.label}</span>
+                <span style={{fontFamily:"var(--font-mono)",fontSize:10,color:i<4?"var(--c-system)":"var(--c-err)",flexShrink:0}}>{item.mode}</span>
+              </div>
+              <div style={{fontSize:12,color:"var(--text-2)",marginTop:3}}>{item.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Key DLLs and Their Responsibilities</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["DLL","Key Functions","Notes"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["ntdll.dll","NtCreateFile, NtOpenProcess, NtAllocateVirtualMemory, LdrLoadDll, RtlAllocateHeap","The only DLL loaded by the kernel directly; contains syscall stubs and heap manager; every process has it"],
+            ["kernel32.dll","CreateFile, CreateProcess, VirtualAlloc, ReadFile, GetProcAddress, LoadLibrary","Core Win32 API; most functions forward to kernelbase.dll since Win7"],
+            ["kernelbase.dll","Actual implementation of most kernel32 functions since Windows 7","Separating kernel32/kernelbase allows MinWin (minimal install) subsystems"],
+            ["advapi32.dll","RegOpenKeyEx, OpenProcessToken, AdjustTokenPrivileges, CreateService, LookupPrivilegeValue","Security/registry API; forwards many functions to sechost.dll"],
+            ["user32.dll","CreateWindow, SendMessage, GetMessage, SetWindowsHookEx","GUI subsystem; loads win32k.sys (kernel-mode GUI driver) on first call"],
+            ["gdi32.dll","CreateCompatibleDC, BitBlt, TextOut, CreatePen","Graphics Device Interface; calls win32kbase.sys in kernel"],
+            ["ws2_32.dll","socket, connect, send, recv, WSAStartup","Winsock 2 API; actual implementation in mswsock.dll"],
+            ["sechost.dll","OpenSCManager, CreateService, StartService, QueryServiceStatus","Service Control API; formerly in advapi32"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Syscall Mechanics (x64)</h3>
+      <P>On x64 Windows, every Win32 API call that needs kernel services eventually hits the <Term>syscall stub</Term> in ntdll. The stub assigns a <Em>System Service Number (SSN)</Em> and executes the <code>SYSCALL</code> instruction:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`; ntdll!NtCreateFile syscall stub (Windows 11 x64)
+NtCreateFile:
+    mov  r10, rcx          ; save rcx (1st param) in r10 per ABI
+    mov  eax, 55h          ; SSN = 0x55 for NtCreateFile on this build
+    test byte ptr [SharedUserData+0x308], 1  ; check for Syscall Filtering (KPTI)
+    jnz  short KiFastSystemCall2
+    syscall                ; SYSCALL: save RIP→RCX, RSP→R11, load LSTAR into RIP
+    ret                    ; return to caller
+
+; In the kernel (ring 0):
+; nt!KiSystemCall64 → reads eax (SSN) → looks up SSDT[SSN] → calls actual function`}</code></pre>
+      <P>The <Term>SSDT (System Service Descriptor Table)</Term> is a kernel array where each index maps an SSN to the corresponding kernel function. EDR kernel drivers hook the SSDT (or use callbacks) to intercept and inspect syscalls. Direct syscall attacks (bypassing ntdll stubs entirely) execute the <code>SYSCALL</code> instruction from user-mode shellcode with the hardcoded SSN to avoid userland hooks.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Calling Convention (x64 fastcall)</h3>
+      <P>All Windows x64 API functions use the <Term>Microsoft x64 calling convention</Term>:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Register / Area","Role"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["RCX","1st integer/pointer argument"],
+            ["RDX","2nd integer/pointer argument"],
+            ["R8","3rd integer/pointer argument"],
+            ["R9","4th integer/pointer argument"],
+            ["Stack (RSP+0x20 and above)","5th+ arguments AND 32-byte 'shadow space' reserved for callee to spill RCX–R9"],
+            ["RAX","Return value (integer/pointer)"],
+            ["XMM0–XMM3","Floating-point arguments (1st–4th)"],
+            ["RBX, RBP, RDI, RSI, R12–R15","Non-volatile — callee must preserve across call"],
+            ["RAX, RCX, RDX, R8–R11, XMM0–5","Volatile — callee may destroy"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — API Hooking Techniques</h3>
+      <P><Term>API hooking</Term> means intercepting a function call to inspect or modify arguments, return values, or behavior. Used legitimately by EDRs (to detect malicious calls) and maliciously (to hide, steal, or redirect):</P>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"IAT Hooking (Import Address Table)",color:"var(--c-system)",body:<>The IAT holds pointers to imported functions. After DLL loading, these point to the real functions. IAT hooking overwrites an entry (e.g., <code>CreateProcess</code>) with a pointer to the hook function. Easy to implement (writable memory), easy to detect (compare IAT entries against actual DLL addresses). Used by old-school antivirus and simple sandbox detectors.</>},
+          {title:"Inline Hooking (Trampoline)",color:"var(--c-warn)",body:<>Overwrite the first 5–14 bytes of the target function with a <code>JMP hook_function</code> instruction. The hook saves original bytes, executes them in a "trampoline" buffer, then returns to the function body. Used by modern EDRs (CrowdStrike, Defender ATP) to hook ntdll functions. Bypassed by: (1) re-reading the hook and patching it back, (2) syscall direct execution bypassing ntdll entirely, (3) loading a fresh ntdll copy from disk (ntdll unhooking via <code>NtCreateSection</code> + <code>NtMapViewOfSection</code>).</>},
+          {title:"SSDT Hooking (Kernel-mode)",color:"var(--c-attack)",body:<>Early AV/HIPS patched SSDT entries to redirect kernel functions to their own inspection code. Microsoft blocked this in x64 Windows with <em>Kernel Patch Protection (PatchGuard)</em> — BSOD on SSDT modification. Modern kernel EDRs instead use documented kernel callbacks (<code>PsSetCreateProcessNotifyRoutine</code>, <code>ObRegisterCallbacks</code>, minifilter drivers) which are officially supported and PatchGuard-compatible.</>},
+          {title:"Direct Syscall / Syscall Stomping (Evasion)",color:"var(--c-err)",body:<>Instead of calling ntdll stubs (which EDR hooks intercept), attackers execute the <code>SYSCALL</code> instruction directly from shellcode with the hardcoded SSN (e.g., SysWhispers2/3 tooling). <em>Syscall stomping</em> goes further: overwrite a legitimate ntdll stub's SSN field with the desired SSN, then call the stub — the syscall executes from ntdll's legitimate address range, evading stack-origin checks.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — WOW64 (32-bit on 64-bit Windows)</h3>
+      <P><Term>WOW64 (Windows-on-Windows 64)</Term> is the compatibility layer that allows 32-bit PE executables to run on a 64-bit Windows installation. It consists of three DLLs loaded into every 32-bit process: <code>wow64.dll</code> (thunk layer), <code>wow64win.dll</code> (GUI thunks), and <code>wow64cpu.dll</code> (CPU mode switch). When a 32-bit process makes a syscall:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          "32-bit code calls Int 2E or Sysenter (x86 syscall method)",
+          "wow64cpu.dll catches the transition and switches the CPU to 64-bit mode (heaven's gate — CS selector 0x33)",
+          "wow64.dll reformats 32-bit arguments to 64-bit and calls the 64-bit ntdll syscall stub",
+          "64-bit syscall executes normally in the kernel",
+          "Return path: wow64.dll translates 64-bit results back to 32-bit and restores x86 mode",
+        ].map((step,i)=>(
+          <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",minWidth:20,flexShrink:0}}>{i+1}.</span>
+            <span style={{fontSize:13,color:"var(--text-1)"}}>{step}</span>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-warn)" icon="info" titleEn="Security implication: WOW64 as a detection gap" titleUz="">
+        Some EDR userland hooks only cover the 64-bit ntdll. A 32-bit process using "Heaven's Gate" (manually switching to 64-bit mode and calling the 64-bit syscall stub directly) can bypass 32-bit hooks. This is why kernel callbacks are more reliable for detection — they fire regardless of WOW64.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — API Monitoring and Detection</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Tool / Method","Layer","What It Captures"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["API Monitor (Rohitab)","User-mode (IAT/inline hooks)","Every Win32 call with arguments, return values, call stacks"],
+            ["Frida","User-mode (dynamic instrumentation)","Scriptable hooks on any function; cross-platform; used for EDR testing"],
+            ["Process Monitor (Procmon)","Kernel callbacks + minifilter","File, registry, network, process/thread events with call stacks"],
+            ["ETW (Event Tracing for Windows)","Kernel providers","Microsoft-Windows-Kernel-Process, -File, -Registry, -Network providers at low overhead"],
+            ["Sysmon (Event IDs 1,7,8,10,11,12,13,17,18…)","Kernel callbacks + ETW","Process creation, image load, remote thread, file create, registry, pipe events"],
+            ["WinDbg breakpoints","Any layer","Precise — break on any function, inspect any argument; requires attaching to process"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Find SSN for any Nt function (ntdll offset method)
+# Each Nt stub starts: mov r10, rcx; mov eax, <SSN>
+python3 -c "
+import ctypes, struct
+ntdll = ctypes.WinDLL('ntdll')
+fn = ctypes.cast(getattr(ntdll, 'NtCreateFile'), ctypes.c_void_p).value
+buf = (ctypes.c_ubyte * 8).from_address(fn)
+print('SSN:', hex(struct.unpack_from('<H', bytes(buf), 4)[0]))
+"
+
+# Check if ntdll is hooked (compare byte 0 of Nt stubs to expected 4C 8B D1)
+# If byte 0 = 0xE9 (JMP) = hook present (EDR inline hook)
+Get-NtdllHooks.ps1   # PSReflect-based tool
+
+# Monitor all API calls in a process (WinDbg)
+sxe ld:ntdll        # break on ntdll load
+bp ntdll!NtCreateFile "du @rcx; g"   # log file paths
+
+# ETW syscall tracing (Admin, requires patching or TPM disabled)
+xperf -on PROC_THREAD+LOADER+DPC -stackwalk Profile -buffersize 2048
+# Then analyze .etl with Windows Performance Analyzer`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows API — OS ga Interfeys" en="" />
+      <P><Term>Windows API</Term> (Win32 API ham deyiladi) — foydalanuvchi rejimi dasturlariga OS xizmatlariga kirish imkonini beruvchi C chaqiriladigan funksiyalar to'plami: jarayonlar yaratish, fayllarni o'qish, xotirani boshqarish, ekranga chizish, tarmoqqa kirish. U qatlamli stek sifatida tashkil etilgan — har bir qatlam uning ostidagisiga qo'shimcha abstraktsiya va xavfsizlik tekshiruvlarini qo'shadi. Bu stekni tushunish hujumkor va himoyaviy xavfsizlik uchun ham asosiy hisoblanadi, chunki har bir hujum texnikasi va har bir aniqlash usuli oxir-oqibat bu qatlamlardan birida ishlaydi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — API Qatlamli Steki</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:0,marginTop:14}}>
+        {[
+          {label:"Dastur",sub:"Sizning kodingiz: WriteFile(), CreateProcess(), RegOpenKeyEx()",color:"#b48cff",mode:"Foydalanuvchi rejimi"},
+          {label:"Win32 Quyi Tizim DLL lari",sub:"kernel32.dll, advapi32.dll, user32.dll, gdi32.dll — yupqa o'ramlar, parametrlarni tekshirish, xato tarjimasi",color:"#00d4ff",mode:"Foydalanuvchi rejimi"},
+          {label:"Windows Quyi Tizim DLL",sub:"kernelbase.dll — Win7 dan beri Win32 implementatsiyasining asosiy qismi",color:"#00d4ff",mode:"Foydalanuvchi rejimi"},
+          {label:"Native API (ntdll.dll)",sub:"NtCreateFile, NtOpenProcess, NtAllocateVirtualMemory — hujjatlanmagan Nt/Zw funksiyalari; syscall stubini o'z ichiga oladi",color:"#ff9145",mode:"Foydalanuvchi rejimi"},
+          {label:"SYSCALL ko'rsatmasi",sub:"CPU ni Ring 3 dan Ring 0 ga o'tkazadi; kernel chaqiruv raqamini (SSN) tekshiradi va yo'naltiradi",color:"#ff3a5e",mode:"RING 0 CHEGARASI"},
+          {label:"Tizim Xizmati Dispetcheri (SSDT)",sub:"nt!KiSystemCall64 → SSDT qidirish → haqiqiy kernel funksiyasi (ntoskrnl da NtCreateFile)",color:"#ff9145",mode:"Kernel rejimi"},
+          {label:"Executive + HAL",sub:"I/O Menejeri, Xotira Menejeri, Ob'ekt Menejeri, Xavfsizlik Havolasi Monitoru, HAL",color:"#b48cff",mode:"Kernel rejimi"},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"stretch",gap:0}}>
+            <div style={{width:3,flexShrink:0,background:item.color,opacity:0.6}}/>
+            <div style={{flex:1,padding:"10px 14px",borderBottom:"1px solid var(--border)",background:i===4?"rgba(255,58,94,0.07)":"transparent"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:8}}>
+                <span style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color}}>{item.label}</span>
+                <span style={{fontFamily:"var(--font-mono)",fontSize:10,color:i<4?"var(--c-system)":"var(--c-err)",flexShrink:0}}>{item.mode}</span>
+              </div>
+              <div style={{fontSize:12,color:"var(--text-2)",marginTop:3}}>{item.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Asosiy DLL lar va Ularning Vazifalari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["DLL","Asosiy Funksiyalar","Eslatmalar"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["ntdll.dll","NtCreateFile, NtOpenProcess, NtAllocateVirtualMemory, LdrLoadDll, RtlAllocateHeap","Kernel tomonidan to'g'ridan-to'g'ri yuklanadigan yagona DLL; syscall stublarini va heap menejerni o'z ichiga oladi; har bir jarayonda mavjud"],
+            ["kernel32.dll","CreateFile, CreateProcess, VirtualAlloc, ReadFile, GetProcAddress, LoadLibrary","Asosiy Win32 API; ko'p funksiyalar Win7 dan beri kernelbase.dll ga yo'naltiradi"],
+            ["kernelbase.dll","Windows 7 dan beri ko'p kernel32 funksiyalarining haqiqiy implementatsiyasi","kernel32/kernelbase ajratish MinWin quyi tizimlariga imkon beradi"],
+            ["advapi32.dll","RegOpenKeyEx, OpenProcessToken, AdjustTokenPrivileges, CreateService, LookupPrivilegeValue","Xavfsizlik/registry API; ko'p funksiyalarni sechost.dll ga yo'naltiradi"],
+            ["user32.dll","CreateWindow, SendMessage, GetMessage, SetWindowsHookEx","GUI quyi tizimi; birinchi chaqiruvda win32k.sys (kernel-rejim GUI drayveri) yuklanadi"],
+            ["gdi32.dll","CreateCompatibleDC, BitBlt, TextOut, CreatePen","Grafik Qurilma Interfeysi; kernelda win32kbase.sys ni chaqiradi"],
+            ["ws2_32.dll","socket, connect, send, recv, WSAStartup","Winsock 2 API; haqiqiy implementatsiya mswsock.dll da"],
+            ["sechost.dll","OpenSCManager, CreateService, StartService, QueryServiceStatus","Servis Nazorati API; avval advapi32 da edi"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Syscall Mexanikasi (x64)</h3>
+      <P>x64 Windows da kernel xizmatlarini talab qiladigan har bir Win32 API chaqiruvi oxir-oqibat ntdll dagi <Term>syscall stubiga</Term> etadi. Stub <Em>Tizim Xizmati Raqami (SSN)</Em> tayinlaydi va <code>SYSCALL</code> ko'rsatmasini bajaradi:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`; ntdll!NtCreateFile syscall stub (Windows 11 x64)
+NtCreateFile:
+    mov  r10, rcx          ; rcx ni (1-parametr) r10 da saqlash (ABI talabi)
+    mov  eax, 55h          ; SSN = 0x55 bu qurilmada NtCreateFile uchun
+    test byte ptr [SharedUserData+0x308], 1  ; Syscall Filtrlash tekshiruvi
+    jnz  short KiFastSystemCall2
+    syscall                ; SYSCALL: RIP→RCX, RSP→R11 saqlash, LSTAR dan RIP yuklash
+    ret                    ; chaqiruvchiga qaytish
+
+; Kernelda (ring 0):
+; nt!KiSystemCall64 → eax (SSN) o'qiydi → SSDT[SSN] qidiradi → haqiqiy funksiyani chaqiradi`}</code></pre>
+      <P><Term>SSDT (Tizim Xizmati Tavsif Jadvali)</Term> — har bir indeks SSN ni mos kernel funksiyasiga moslashtiruvchi kernel massivi. EDR kernel drayverlari syscallarni to'xtatib tekshirish uchun SSDT ni hooklaydi (yoki callbacklar ishlatadi). To'g'ridan-to'g'ri syscall hujumlari (ntdll stublarini butunlay chetlab o'tib) foydalanuvchi makonidagi hooklerni chetlab o'tish uchun hardcoded SSN bilan foydalanuvchi rejimi shellcodedan <code>SYSCALL</code> ko'rsatmasini bajaradi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Chaqiruv Konventsiyasi (x64 fastcall)</h3>
+      <P>Barcha Windows x64 API funksiyalari <Term>Microsoft x64 chaqiruv konventsiyasidan</Term> foydalanadi:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Registr / Maydon","Rol"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["RCX","1-son/ko'rsatgich argument"],
+            ["RDX","2-son/ko'rsatgich argument"],
+            ["R8","3-son/ko'rsatgich argument"],
+            ["R9","4-son/ko'rsatgich argument"],
+            ["Stek (RSP+0x20 va undan yuqori)","5+ argumentlar VA chaqiriluvchi uchun RCX–R9 ni to'kish uchun 32-baytli 'soya maydoni'"],
+            ["RAX","Qaytish qiymati (son/ko'rsatgich)"],
+            ["XMM0–XMM3","Suzuvchi nuqta argumentlari (1–4-si)"],
+            ["RBX, RBP, RDI, RSI, R12–R15","Notinch emas — chaqiriluvchi chaqiruv bo'yicha saqlashi kerak"],
+            ["RAX, RCX, RDX, R8–R11, XMM0–5","Tinch — chaqiriluvchi yo'q qilishi mumkin"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — API Hooking Texnikalari</h3>
+      <P><Term>API hooking</Term> — funksiya chaqiruvini argumentlarni, qaytish qiymatlarini yoki xatti-harakatni tekshirish yoki o'zgartirish uchun to'xtatish. EDR lar tomonidan qonuniy ravishda (zararli chaqiruvlarni aniqlash uchun) va zararli holda (yashirish, o'g'irlash yoki yo'naltirish uchun) qo'llaniladi:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"IAT Hooking (Import Manzil Jadvali)",color:"var(--c-system)",body:<>IAT import qilingan funksiyalarga ko'rsatkichlarni saqlaydi. DLL yuklanganidan keyin, bular haqiqiy funksiyalarga ishora qiladi. IAT hooking yozuvni (masalan, <code>CreateProcess</code>) hook funksiyasiga ko'rsatkich bilan qayta yozadi. Amalga oshirish oson (yoziladigan xotira), aniqlash oson (IAT yozuvlarini haqiqiy DLL manzillari bilan solishtirish). Eski maktab antivirus va oddiy sandbox aniqlovchilari tomonidan ishlatiladi.</>},
+          {title:"Inline Hooking (Trampolin)",color:"var(--c-warn)",body:<>Maqsad funksiyaning dastlabki 5–14 baytini <code>JMP hook_function</code> ko'rsatmasi bilan qayta yozish. Hook asl baytlarni saqlaydi, ularni "trampolin" buferida bajaradi, keyin funksiya tanasiga qaytadi. Zamonaviy EDR lar (CrowdStrike, Defender ATP) tomonidan ntdll funksiyalarini hooklash uchun qo'llaniladi. Chetlab o'tish: (1) hookni qayta o'qib tuzatish, (2) ntdll ni butunlay chetlab o'tib to'g'ridan-to'g'ri syscall bajarish, (3) diskdan yangi ntdll nusxasini yuklash (ntdll unhooking).</>},
+          {title:"SSDT Hooking (Kernel rejimi)",color:"var(--c-attack)",body:<>Erta AV/HIPS SSDT yozuvlarini o'z tekshiruv kodlariga yo'naltirish uchun yamoqlar qo'lladi. Microsoft buni x64 Windows da <em>Kernel Patch Protection (PatchGuard)</em> bilan to'sdi — SSDT o'zgartirishda BSOD. Zamonaviy kernel EDR lar buning o'rniga hujjatlanmagan kernel callbacklaridan (<code>PsSetCreateProcessNotifyRoutine</code>, <code>ObRegisterCallbacks</code>, minifilter drayverlari) foydalanadi.</>},
+          {title:"To'g'ridan-to'g'ri Syscall / Syscall Stomping (Chetlab O'tish)",color:"var(--c-err)",body:<>ntdll stublarini (EDR hooklar to'xtatadigan) chaqirish o'rniga, hujumchilar hardcoded SSN bilan shellcodedan to'g'ridan-to'g'ri <code>SYSCALL</code> ko'rsatmasini bajaradi (SysWhispers2/3 vositalari). <em>Syscall stomping</em> yanada ilgarilab ketadi: kerakli SSN bilan qonuniy ntdll stubining SSN maydonini qayta yozadi, keyin stubni chaqiradi — syscall ntdll ning qonuniy manzil diapazonidan bajariladi, stek-kelib chiqish tekshiruvlarini chetlab o'tadi.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — WOW64 (64-bit Windows da 32-bit)</h3>
+      <P><Term>WOW64 (Windows-on-Windows 64)</Term> — 32-bit PE bajariladigan fayllarning 64-bit Windows o'rnatmasida ishlashiga imkon beruvchi muvofiqlastirish qatlami. Har bir 32-bit jarayonga yuklanadigan uchta DLL dan iborat: <code>wow64.dll</code> (thunk qatlami), <code>wow64win.dll</code> (GUI thunklar) va <code>wow64cpu.dll</code> (CPU rejimi almashtirish).</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          "32-bit kod Int 2E yoki Sysenter ni chaqiradi (x86 syscall usuli)",
+          "wow64cpu.dll o'tishni ushlab qoladi va CPUni 64-bit rejimiga o'tkazadi (heaven's gate — CS selektori 0x33)",
+          "wow64.dll 32-bit argumentlarni 64-bit ga qayta formatlaydi va 64-bit ntdll syscall stubini chaqiradi",
+          "64-bit syscall kernelda odatiy bajariladi",
+          "Qaytish yo'li: wow64.dll 64-bit natijalarini 32-bit ga tarjima qiladi va x86 rejimini tiklaydi",
+        ].map((step,i)=>(
+          <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",minWidth:20,flexShrink:0}}>{i+1}.</span>
+            <span style={{fontSize:13,color:"var(--text-1)"}}>{step}</span>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-warn)" icon="info" titleUz="Xavfsizlik oqibati: WOW64 aniqlash bo'shlig'i sifatida" titleEn="">
+        Ba'zi EDR foydalanuvchi makon hooklari faqat 64-bit ntdll ni qamrab oladi. "Heaven's Gate" ishlatuvchi 32-bit jarayon (qo'lda 64-bit rejimiga o'tib, 64-bit syscall stubni to'g'ridan-to'g'ri chaqirib) 32-bit hooklerni chetlab o'ta oladi. Shuning uchun kernel callbacklari aniqlash uchun ishonchliroq — ular WOW64 dan qat'iy nazar ishga tushadi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — API Monitoringi va Aniqlash</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Vosita / Usul","Qatlam","Nima Qayd Etadi"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["API Monitor (Rohitab)","Foydalanuvchi rejimi (IAT/inline hooklar)","Argumentlar, qaytish qiymatlari, chaqiruv stekilari bilan har bir Win32 chaqiruvi"],
+            ["Frida","Foydalanuvchi rejimi (dinamik asboblash)","Har qanday funksiyada skript hooklar; platformalararo; EDR testlash uchun ishlatiladi"],
+            ["Process Monitor (Procmon)","Kernel callbacklar + minifiltr","Chaqiruv stekilari bilan fayl, registry, tarmoq, jarayon/thread hodisalari"],
+            ["ETW (Windows Hodisa Kuzatish)","Kernel provayderlari","Past yuklamada Microsoft-Windows-Kernel-Process, -File, -Registry, -Network provayderlari"],
+            ["Sysmon (ID 1,7,8,10,11,12,13,17,18…)","Kernel callbacklar + ETW","Jarayon yaratish, tasvir yuklash, uzoq thread, fayl yaratish, registry, quvur hodisalari"],
+            ["WinDbg nuqta to'xtatish","Har qanday qatlam","Aniq — har qanday funksiyada to'xtatish, har qanday argumentni tekshirish; jarayonga ulanish talab qiladi"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Har qanday Nt funksiyasi uchun SSN topish (ntdll offset usuli)
+# Har bir Nt stub boshlanadi: mov r10, rcx; mov eax, <SSN>
+python3 -c "
+import ctypes, struct
+ntdll = ctypes.WinDLL('ntdll')
+fn = ctypes.cast(getattr(ntdll, 'NtCreateFile'), ctypes.c_void_p).value
+buf = (ctypes.c_ubyte * 8).from_address(fn)
+print('SSN:', hex(struct.unpack_from('<H', bytes(buf), 4)[0]))
+"
+
+# ntdll hooklanganligini tekshirish (Nt stub ning 0-bayti kutilgan 4C 8B D1 bilan solishtirish)
+# 0-bayt = 0xE9 (JMP) bo'lsa = hook mavjud (EDR inline hook)
+
+# Jarayondagi barcha API chaqiruvlarini kuzatish (WinDbg)
+sxe ld:ntdll
+bp ntdll!NtCreateFile "du @rcx; g"   # fayl yo'llarini log qilish
+
+# ETW syscall kuzatish (Admin)
+xperf -on PROC_THREAD+LOADER+DPC -stackwalk Profile -buffersize 2048`}</code></pre>
     </section>
   );
 }

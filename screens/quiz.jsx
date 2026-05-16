@@ -80,6 +80,16 @@ const FALLBACK_QUESTIONS = {
     { uz: "Servis akkauntlarini solishtiring: LocalSystem, LocalService, NetworkService va Virtual Servis Akkaunti. Har birining imtiyozlari va tarmoq identifikatori nimadan iborat va qaysi biri eng xavfli va nima uchun?", en: "Compare service accounts: LocalSystem, LocalService, NetworkService, and Virtual Service Account. What are the privileges and network identity of each, and which is most dangerous and why?" },
     { uz: "Servis persistenslik va imtiyoz ko'tarish uchun ishlatiladigan kamida 3 ta texnikani tushuntiring — masalan, yangi servis yaratish, qo'shtirnoqsiz servis yo'li va DLL qidiruv tartibi o'g'irlash. Har biri qanday ishlaydi va qanday aniqlanadi?", en: "Explain at least 3 techniques attackers use for service-based persistence and privilege escalation — such as creating a new service, unquoted service path, and DLL search order hijacking. How does each work and how is it detected?" },
   ],
+  16: [
+    { uz: "DLL nima va u EXE dan qanday farq qiladi? Implicit va explicit DLL bog'lash o'rtasidagi farqni tushuntiring — loader ularni qachon va qanday qayta ishlaydi?", en: "What is a DLL and how does it differ from an EXE? Explain the difference between implicit and explicit DLL linking — when and how does the loader process each?" },
+    { uz: "Windows DLL qidiruv tartibi nima? Hujumchilar DLL hijacking uchun qaysi bosqichlarni ekspluatatsiya qiladi va bu hujumni Process Monitor yordamida qanday aniqlash mumkin?", en: "What is the Windows DLL search order? Which steps do attackers exploit for DLL hijacking and how can this attack be detected using Process Monitor?" },
+    { uz: "Klassik DLL in'ektsiya, reflektiv DLL in'ektsiya va COM hijacking texnikalarini solishtiring. Har biri qanday ishlaydi, qanday aniqlash mumkin va DllMain da nima uchun LoadLibrary ni chaqirmaslik kerak?", en: "Compare classic DLL injection, reflective DLL injection, and COM hijacking techniques. How does each work, how is it detected, and why must you never call LoadLibrary from inside DllMain?" },
+  ],
+  17: [
+    { uz: "Windows API qatlamli stekini tushuntiring: dasturdan ntdll gacha, va ntdll dan kernel SSDT gacha. Har bir qatlamning vazifasi nima va syscall ko'rsatmasi qanday CPU rejimini almashtiradi?", en: "Explain the Windows API layered stack: from the application to ntdll, and from ntdll to the kernel SSDT. What is the role of each layer, and how does the SYSCALL instruction switch CPU modes?" },
+    { uz: "IAT hooking, inline hooking (trampolin) va SSDT hookingni solishtiring. Har biri qanday ishlaydi, qaysi biri zamonaviy EDR lar tomonidan qo'llaniladi va hujumchilar foydalanuvchi makon hooklerini qanday chetlab o'tadi (to'g'ridan-to'g'ri syscall, ntdll unhooking)?", en: "Compare IAT hooking, inline hooking (trampoline), and SSDT hooking. How does each work, which is used by modern EDRs, and how do attackers bypass userland hooks (direct syscall, ntdll unhooking)?" },
+    { uz: "WOW64 nima va u 32-bit jarayon 64-bit Windows da syscall bajarganida qanday ishlaydi? 'Heaven's Gate' nima va u nima uchun xavfsizlik aniqlash bo'shlig'ini yaratadi?", en: "What is WOW64 and how does it work when a 32-bit process makes a syscall on 64-bit Windows? What is 'Heaven's Gate' and why does it create a security detection gap?" },
+  ],
 };
 
 const COOLDOWN_KEY = "wa_cooldown_end";
