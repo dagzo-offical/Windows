@@ -29,11 +29,13 @@ const SECTION_DATA = {
       { n: "13", uz: "Thread'lar",                   en: "Threads",                     duration: 28, status: "locked", icon: "spark",    color: "var(--c-user)",   labs: 2, diagrams: 6 },
       { n: "14", uz: "Handle'lar",                   en: "Handles",                     duration: 24, status: "locked", icon: "key",      color: "var(--c-user)",   labs: 1, diagrams: 5 },
       { n: "15", uz: "Servislar",                    en: "Services",                    duration: 30, status: "locked", icon: "settings", color: "var(--c-user)",   labs: 2, diagrams: 6 },
-      { n: "16", uz: "DLL (Dynamic Link Library)",   en: "DLL",                         duration: 32, status: "locked", icon: "code",     color: "var(--c-user)",   labs: 2, diagrams: 6 },
-      { n: "17", uz: "Windows API",                  en: "Windows API",                 duration: 30, status: "locked", icon: "code",     color: "var(--c-user)",   labs: 2, diagrams: 5 },
-      { n: "18", uz: "Event Viewer",                 en: "Event Viewer",                duration: 24, status: "locked", icon: "eye",      color: "var(--accent)",   labs: 2, diagrams: 4 },
-      { n: "19", uz: "Task Scheduler",               en: "Task Scheduler",              duration: 22, status: "locked", icon: "clock",    color: "var(--accent)",   labs: 1, diagrams: 4 },
-      { n: "20", uz: "Windows log fayllari",         en: "Windows logs",                duration: 28, status: "locked", icon: "graph",    color: "var(--accent)",   labs: 2, diagrams: 5 },
+      { n: "16", uz: "Foydalanuvchi hisoblari",      en: "User Accounts",               duration: 30, status: "locked", icon: "user",     color: "var(--c-auth)",   labs: 2, diagrams: 5 },
+      { n: "17", uz: "UAC",                           en: "User Account Control",        duration: 28, status: "locked", icon: "shield",   color: "var(--c-auth)",   labs: 2, diagrams: 5 },
+      { n: "18", uz: "DLL (Dynamic Link Library)",   en: "DLL",                         duration: 32, status: "locked", icon: "code",     color: "var(--c-user)",   labs: 2, diagrams: 6 },
+      { n: "19", uz: "Windows API",                  en: "Windows API",                 duration: 30, status: "locked", icon: "code",     color: "var(--c-user)",   labs: 2, diagrams: 5 },
+      { n: "20", uz: "Event Viewer",                 en: "Event Viewer",                duration: 24, status: "locked", icon: "eye",      color: "var(--accent)",   labs: 2, diagrams: 4 },
+      { n: "21", uz: "Task Scheduler",               en: "Task Scheduler",              duration: 22, status: "locked", icon: "clock",    color: "var(--accent)",   labs: 1, diagrams: 4 },
+      { n: "22", uz: "Windows log fayllari",         en: "Windows logs",                duration: 28, status: "locked", icon: "graph",    color: "var(--accent)",   labs: 2, diagrams: 5 },
     ],
   },
 };
@@ -93,7 +95,7 @@ function SectionScreen({ setRoute, user, onOpenProfile, section = 1 }) {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <MiniStat labelUz="Darslar" labelEn="Lessons" value="20" sub={lang === "en" ? "1/20 in progress" : "1/20 davom etmoqda"} color={data.color} icon="book" />
+              <MiniStat labelUz="Darslar" labelEn="Lessons" value="22" sub={lang === "en" ? "1/22 in progress" : "1/22 davom etmoqda"} color={data.color} icon="book" />
               <MiniStat labelUz="Laboratoriya" labelEn="Hands-on labs" value="36" sub={lang === "en" ? "0 done" : "0 yakunlangan"} color="var(--c-user)" icon="terminal" />
               <MiniStat labelUz="Diagrammalar" labelEn="Diagrams" value="118" sub="interactive" color="var(--c-system)" icon="graph" />
               <MiniStat labelUz="Final imtihon" labelEn="Final exam" value="20Q" sub={lang === "en" ? "2hr · 85% pass" : "2 soat · 85% o'tish"} color="var(--c-warn)" icon="target" />

