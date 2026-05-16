@@ -29,8 +29,8 @@ const LESSONS = {
   11: { num: "L11", section: "01", uz: "FAT32",                         en: "FAT32",                       subUz: "FAT jadvali, klaster ajratish, cheklovlar va ESP", subEn: "FAT table, cluster allocation, limitations and the EFI System Partition" },
   12: { num: "L12", section: "01", uz: "Jarayonlar (Processes)",        en: "Processes",                   subUz: "EPROCESS, virtual manzil fazosi, kirish tokeni va jarayon in'ektsiya texnikalari", subEn: "EPROCESS, virtual address space, access token, and process injection techniques" },
   13: { num: "L13", section: "01", uz: "Thread'lar",                    en: "Threads",                     subUz: "ETHREAD, rejalashtiruvchi, prioritetlar, sinxronizatsiya va thread in'ektsiya", subEn: "ETHREAD, scheduler, priorities, synchronization, and thread injection" },
-  14: { num: "L14", section: "01", uz: "Handle'lar",                    en: "Handles",                     subUz: "Tez kunda", subEn: "Coming soon" },
-  15: { num: "L15", section: "01", uz: "Servislar",                     en: "Services",                    subUz: "Tez kunda", subEn: "Coming soon" },
+  14: { num: "L14", section: "01", uz: "Handle'lar",                    en: "Handles",                     subUz: "Ob'ekt menejeri, handle jadvali, turlari, takrorlash, xavfsizlik va handle hujumlari", subEn: "Object Manager, handle table, types, duplication, security, and handle-based attacks" },
+  15: { num: "L15", section: "01", uz: "Servislar",                     en: "Services",                    subUz: "SCM, servis turlari, xizmat akkauntlari, svchost guruhlari va servis persistenslik texnikalari", subEn: "SCM, service types, service accounts, svchost groups, and service-based persistence techniques" },
   16: { num: "L16", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "Tez kunda", subEn: "Coming soon" },
   17: { num: "L17", section: "01", uz: "Windows API",                   en: "Windows API",                 subUz: "Tez kunda", subEn: "Coming soon" },
   18: { num: "L18", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Tez kunda", subEn: "Coming soon" },
@@ -111,6 +111,10 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <SectionProcesses />
           </> : lessonNum === 13 ? <>
             <SectionThreads />
+          </> : lessonNum === 14 ? <>
+            <SectionHandles />
+          </> : lessonNum === 15 ? <>
+            <SectionServices />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -243,6 +247,12 @@ const LESSON_META = {
   13: { min: 34, diagrams: 6, labs: 2,
        introUz: <><em>Thread</em> — jarayon ichidagi bajariladigan oqim. Bu darsda <em>ETHREAD</em> va TEB tuzilmalari, Windows rejalashtiruvchisi (0–31 prioritet, kvant, prioritet ko'tarish), thread holatlari, sinxronizatsiya primitivlari (mutex, event, critical section, SRWLock), thread in'ektsiya texnikalari (CreateRemoteThread, APC) va ularni kuzatishni o'rganasiz.</>,
        introEn: <><em>A thread</em> is the unit of execution inside a process. This lesson covers the <em>ETHREAD</em> and TEB structures, the Windows scheduler (0–31 priorities, quanta, priority boost), thread states, synchronization primitives (mutex, event, critical section, SRWLock), thread injection techniques (CreateRemoteThread, APC), and how to monitor for them.</> },
+  14: { min: 32, diagrams: 5, labs: 2,
+       introUz: <><em>Handle</em> — jarayon kernel ob'ektiga (fayl, jarayon, thread, token, event, mutex) murojaat qilish uchun ishlatiladigan abstrakt raqam. Bu darsda <em>Object Manager</em>, handle jadvalining tuzilishi, handle turlari, DuplicateHandle API, handle merosxo'rligi, handle sizishi va tajovuzkorlar foydalanadigan handle o'g'irlash texnikalarini o'rganasiz.</>,
+       introEn: <><em>A handle</em> is the abstract number a process uses to reference a kernel object — file, process, thread, token, event, mutex. This lesson covers the <em>Object Manager</em>, handle table structure, handle types, DuplicateHandle API, handle inheritance, handle leaks, and the handle-theft techniques attackers use to escalate privileges.</> },
+  15: { min: 36, diagrams: 6, labs: 2,
+       introUz: <><em>Windows Service</em> — fon rejimida ishlaydigan, foydalanuvchi tizimga kirmagan vaqtda ham faol bo'lgan jarayon. Bu darsda <em>Service Control Manager (SCM)</em>, servis turlari va holatlari, servis akkauntlari (LocalSystem, LocalService, NetworkService), svchost.exe −k guruhlari, servis DACL lari va tajovuzkorlar foydalanadigan servis persistenslik va imtiyozlarni ko'tarish texnikalarini o'rganasiz.</>,
+       introEn: <><em>A Windows Service</em> is a process that runs in the background even when no user is logged in. This lesson covers the <em>Service Control Manager (SCM)</em>, service types and states, service accounts (LocalSystem, LocalService, NetworkService), svchost.exe -k groups, service DACLs, and the service persistence and privilege-escalation techniques attackers rely on.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -3611,92 +3621,64 @@ function SectionFAT32() {
       <P>FAT directories are a linear array of 32-byte directory entries, each holding the 8.3 filename (uppercase, space-padded), attributes byte, timestamps, first cluster number, and file size. The original FAT allowed only 8.3 names. Windows 95 added LFN support using a hack: LFN entries use attribute byte 0x0F (ReadOnly+Hidden+System+VolumeLabel), which old software ignores. Each LFN entry stores 13 UTF-16 characters. Maximum LFN: 255 UTF-16 characters.</P>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — FAT12, FAT16, FAT32 and exFAT — Full Comparison</h3>
-      <P>Think of each generation as a card — the most important numbers at a glance:</P>
+      <P>Four generations of FAT — the most important numbers at a glance:</P>
 
-      {/* 4 cards */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:14,marginTop:16}}>
         {[
           {
             title:"FAT12", year:"1977", color:"#6b7280",
-            file:"= Volume size (max ~256 MB)",
-            disk:"Max ~16 MB (4 KB clusters)\nMax ~256 MB (64 KB clusters)",
+            file:"Same as volume\n(no separate file size limit)",
+            disk:"Max ~16 MB (proven on floppies)\nAbsolute max ~256 MB",
             perm:"NONE — no ACLs whatsoever",
             use:"Floppy disks, tiny embedded devices",
-            note:"Cluster count: 2¹² = 4,084",
           },
           {
             title:"FAT16", year:"1984", color:"var(--c-warn)",
-            file:"= Volume size (max ~4 GB)",
-            disk:"Max ~256 MB (4 KB clusters)\nMax ~4 GB (64 KB clusters)",
+            file:"Same as volume\n(no separate file size limit)",
+            disk:"Max ~2 GB (Windows 9x)\nAbsolute max ~4 GB",
             perm:"NONE — no ACLs whatsoever",
             use:"Old USB drives, DOS-era systems",
-            note:"Cluster count: 2¹⁶ = 65,524",
           },
           {
             title:"FAT32", year:"1996", color:"var(--accent)",
-            file:"4 GB − 1 byte (HARD LIMIT)\n32-bit size field: 2³²−1 = 4,294,967,295 B",
-            disk:"Max 2 TB (spec)\nMax 32 GB (Windows format.exe policy only)",
+            file:"4 GB − 1 byte  ← HARD LIMIT\n(32-bit size field, cannot be bypassed)",
+            disk:"Max 2 TB (proven, Linux/Rufus format)\nMax 32 GB (Windows format.exe policy)",
             perm:"NONE — no ACLs whatsoever",
-            use:"USB drives, SD cards, EFI System Partition (ESP)",
-            note:"Cluster count: 2²⁸ = 268,435,445",
+            use:"USB drives, SD cards, EFI System Partition",
           },
           {
             title:"exFAT", year:"2006", color:"var(--c-ok)",
-            file:"128 PB (64-bit size field: 2⁶⁴−1 B)",
-            disk:"Max 128 PB (practical)\nMax 512 EB (theoretical)",
-            perm:"NONE — only attribute bits (ReadOnly/Hidden)\nNo NTFS-style ACLs",
-            use:"Modern USB, SD (>32 GB), cameras",
-            note:"Mandated by SD Assoc. for SDXC cards",
+            file:"128 PB (practically: same as disk)\n(64-bit size field)",
+            disk:"Max 128 TB (tested in practice)\nMandated for SDXC cards >32 GB",
+            perm:"NONE — only Read-Only/Hidden bits\n(no NTFS-style user ACLs)",
+            use:"Modern USB, SD >32 GB, cameras",
           },
         ].map(c=>(
           <div key={c.title} style={{padding:"16px",background:`${c.color}08`,border:`1px solid ${c.color}30`,borderTop:`3px solid ${c.color}`,borderRadius:8}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:12}}>
               <span style={{fontFamily:"var(--font-mono)",fontSize:18,fontWeight:800,color:c.color}}>{c.title}</span>
               <span style={{fontSize:11,color:"var(--text-2)"}}>{c.year}</span>
             </div>
-            <div style={{fontSize:11,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginBottom:10}}>{c.note}</div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
                 <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>MAX FILE</div>
-                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.file}</div>
+                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.55,whiteSpace:"pre-line"}}>{c.file}</div>
               </div>
               <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
                 <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>MAX DISK</div>
-                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.disk}</div>
+                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.55,whiteSpace:"pre-line"}}>{c.disk}</div>
               </div>
-              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
-                <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>PERMISSIONS</div>
-                <div style={{fontSize:12,color:"var(--c-err)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.perm}</div>
+              <div style={{background:"rgba(255,30,30,0.08)",border:"1px solid rgba(255,30,30,0.18)",borderRadius:6,padding:"8px 10px"}}>
+                <div style={{fontSize:10,fontWeight:700,color:"var(--c-err)",letterSpacing:1,marginBottom:3}}>PERMISSIONS</div>
+                <div style={{fontSize:12,color:"var(--c-err)",lineHeight:1.55,whiteSpace:"pre-line"}}>{c.perm}</div>
               </div>
-              <div style={{fontSize:11,color:"var(--text-2)",lineHeight:1.4,marginTop:2}}>{c.use}</div>
+              <div style={{fontSize:11,color:"var(--text-2)",lineHeight:1.4}}>{c.use}</div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Detailed numbers table */}
-      <P style={{marginTop:24}}>Max disk size by cluster size (MB / GB / TB):</P>
-      <div style={{overflowX:"auto",marginTop:8}}>
-        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
-          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
-            {["Cluster size","FAT12","FAT16","FAT32","exFAT"].map(h=><th key={h} style={{textAlign:"left",padding:"7px 10px",color:"var(--text-2)",fontWeight:600,fontSize:12}}>{h}</th>)}
-          </tr></thead>
-          <tbody>{[
-            ["512 B","4,084 × 512 B = 2 MB","65,524 × 512 B = 32 MB","268M × 512 B = 128 GB","—"],
-            ["4 KB","4,084 × 4 KB = 16 MB","65,524 × 4 KB = 256 MB","268M × 4 KB = 1 TB","268M × 4 KB = 1 TB"],
-            ["32 KB","4,084 × 32 KB = 128 MB","65,524 × 32 KB = 2 GB","268M × 32 KB = 8 TB","268M × 32 KB = 8 TB"],
-            ["64 KB","4,084 × 64 KB = 256 MB","65,524 × 64 KB = 4 GB","268M × 64 KB = 16 TB","268M × 64 KB = 16 TB"],
-            ["Max file size","= Volume","= Volume","4 GB − 1 byte (2³²−1 B)","128 PB (2⁶⁴−1 B)"],
-            ["Permissions (ACL)","NONE","NONE","NONE","NONE"],
-            ["Journaling","NONE","NONE","NONE","NONE"],
-          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
-            {r.map((c,j)=><td key={j} style={{padding:"6px 10px",color:j===0?"var(--text-0)":i>=4&&j>0?"var(--c-err)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12,fontWeight:i>=4&&j>0?600:400}}>{c}</td>)}
-          </tr>)}
-          </tbody>
-        </table>
-      </div>
-      <Callout color="var(--c-err)" icon="warning" titleEn="All four FAT variants share the same fatal flaw: no permissions" titleUz="">
-        FAT12, FAT16, FAT32, exFAT — all four have zero access control. Anyone who can mount the volume (root on Linux, Administrator on Windows) can read and modify every file. When an NTFS disk is rebooted into Linux and mounted as root, the "protections" disappear entirely. <strong>BitLocker-style encryption is the only correct solution for protecting data against physical access on FAT volumes.</strong>
+      <Callout color="var(--c-err)" icon="warning" titleEn="All four FAT types: no user permissions" titleUz="">
+        FAT12, FAT16, FAT32, exFAT — zero access control on all four. Anyone who can mount the volume (root on Linux, Administrator on Windows) reads and modifies every file. NTFS ACLs are irrelevant here. <strong>For physical access protection: only BitLocker-style full-disk encryption works.</strong>
       </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Critical Limitations</h3>
@@ -3748,92 +3730,64 @@ Get-Volume -DriveLetter D | Select-Object FileSystem, Size, SizeRemaining`}</cod
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — FAT12, FAT16, FAT32 va exFAT — To'liq Taqqoslash</h3>
-      <P>To'rtta FAT avlodining eng muhim ko'rsatkichlarini eslab qolish uchun — har birini bir karta sifatida tasavvur qiling:</P>
+      <P>To'rtta FAT avlodi — eng muhim ko'rsatkichlar bir nazar bilan:</P>
 
-      {/* 4 cards */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:14,marginTop:16}}>
         {[
           {
             title:"FAT12", year:"1977", color:"#6b7280",
-            file:"= Hajm (max ~256 MB)",
-            disk:"Max ~16 MB (4KB klaster)\nMax ~256 MB (64KB klaster)",
+            file:"= Disk hajmi kabi\n(alohida fayl chegarasi yo'q)",
+            disk:"Maks ~16 MB (disketalarda isbotlangan)\nMutlaq maks ~256 MB",
             perm:"YO'Q — hech qanday ACL yo'q",
             use:"Disketalar, kichik o'rnatilgan qurilmalar",
-            note:"Klaster soni: 2¹² = 4,084",
           },
           {
             title:"FAT16", year:"1984", color:"var(--c-warn)",
-            file:"= Hajm (max ~4 GB)",
-            disk:"Max ~256 MB (4KB klaster)\nMax ~4 GB (64KB klaster)",
+            file:"= Disk hajmi kabi\n(alohida fayl chegarasi yo'q)",
+            disk:"Maks ~2 GB (Windows 9x da isbotlangan)\nMutlaq maks ~4 GB",
             perm:"YO'Q — hech qanday ACL yo'q",
             use:"Eski USB disklar, DOS tizimlari",
-            note:"Klaster soni: 2¹⁶ = 65,524",
           },
           {
             title:"FAT32", year:"1996", color:"var(--accent)",
-            file:"4 GB − 1 bayt (QATTIQ CHEGARA)\n32-bitli hajm maydoni: 2³²−1 = 4,294,967,295 B",
-            disk:"Max 2 TB (spesifikatsiya)\nMax 32 GB (Windows format.exe siyosati)",
+            file:"4 GB − 1 bayt  ← QATTIQ CHEGARA\n(32-bitli hajm maydoni, chetlab o'tib bo'lmaydi)",
+            disk:"Maks 2 TB (Linux/Rufus da isbotlangan)\nMaks 32 GB (Windows format.exe siyosati)",
             perm:"YO'Q — hech qanday ACL yo'q",
-            use:"USB, SD kartalar, EFI System Partition (ESP)",
-            note:"Klaster soni: 2²⁸ = 268,435,445",
+            use:"USB, SD kartalar, EFI System Partition",
           },
           {
             title:"exFAT", year:"2006", color:"var(--c-ok)",
-            file:"128 PB (64-bitli hajm maydoni: 2⁶⁴−1 B)",
-            disk:"Max 128 PB (amaliy)\nMax 512 EB (nazariy)",
-            perm:"YO'Q — faqat atribut bitlari (ReadOnly/Hidden)\nNTFS kabi ACL yo'q",
-            use:"Zamonaviy USB, SD (>32 GB), kameralar",
-            note:"SD Assotsiatsiyasi: SDXC uchun majburiy",
+            file:"128 PB (amalda = disk hajmi kabi)\n(64-bitli hajm maydoni)",
+            disk:"Maks 128 TB (amalda sinab ko'rilgan)\n32 GB dan katta SDXC uchun majburiy",
+            perm:"YO'Q — faqat ReadOnly/Hidden bitlari\n(NTFS kabi foydalanuvchi ACL yo'q)",
+            use:"Zamonaviy USB, SD >32 GB, kameralar",
           },
         ].map(c=>(
           <div key={c.title} style={{padding:"16px",background:`${c.color}08`,border:`1px solid ${c.color}30`,borderTop:`3px solid ${c.color}`,borderRadius:8}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:12}}>
               <span style={{fontFamily:"var(--font-mono)",fontSize:18,fontWeight:800,color:c.color}}>{c.title}</span>
               <span style={{fontSize:11,color:"var(--text-2)"}}>{c.year}</span>
             </div>
-            <div style={{fontSize:11,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginBottom:10}}>{c.note}</div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
                 <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>MAKS FAYL</div>
-                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.file}</div>
+                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.55,whiteSpace:"pre-line"}}>{c.file}</div>
               </div>
               <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
                 <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>MAKS DISK</div>
-                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.disk}</div>
+                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.55,whiteSpace:"pre-line"}}>{c.disk}</div>
               </div>
-              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
-                <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>RUXSATLAR</div>
-                <div style={{fontSize:12,color:"var(--c-err)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.perm}</div>
+              <div style={{background:"rgba(255,30,30,0.08)",border:"1px solid rgba(255,30,30,0.18)",borderRadius:6,padding:"8px 10px"}}>
+                <div style={{fontSize:10,fontWeight:700,color:"var(--c-err)",letterSpacing:1,marginBottom:3}}>RUXSATLAR</div>
+                <div style={{fontSize:12,color:"var(--c-err)",lineHeight:1.55,whiteSpace:"pre-line"}}>{c.perm}</div>
               </div>
-              <div style={{fontSize:11,color:"var(--text-2)",lineHeight:1.4,marginTop:2}}>{c.use}</div>
+              <div style={{fontSize:11,color:"var(--text-2)",lineHeight:1.4}}>{c.use}</div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Detailed numbers table */}
-      <P style={{marginTop:24}}>Klaster hajmiga qarab maks disk hajmi (MB / GB / TB):</P>
-      <div style={{overflowX:"auto",marginTop:8}}>
-        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
-          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
-            {["Klaster hajmi","FAT12","FAT16","FAT32","exFAT"].map(h=><th key={h} style={{textAlign:"left",padding:"7px 10px",color:"var(--text-2)",fontWeight:600,fontSize:12}}>{h}</th>)}
-          </tr></thead>
-          <tbody>{[
-            ["512 B","4,084 × 512 B = 2 MB","65,524 × 512 B = 32 MB","268M × 512 B = 128 GB","—"],
-            ["4 KB","4,084 × 4 KB = 16 MB","65,524 × 4 KB = 256 MB","268M × 4 KB = 1 TB","268M × 4 KB = 1 TB"],
-            ["32 KB","4,084 × 32 KB = 128 MB","65,524 × 32 KB = 2 GB","268M × 32 KB = 8 TB","268M × 32 KB = 8 TB"],
-            ["64 KB","4,084 × 64 KB = 256 MB","65,524 × 64 KB = 4 GB","268M × 64 KB = 16 TB","268M × 64 KB = 16 TB"],
-            ["Maks fayl hajmi","= Hajm","= Hajm","4 GB − 1 bayt (2³²−1 B)","128 PB (2⁶⁴−1 B)"],
-            ["Ruxsatlar (ACL)","YO'Q","YO'Q","YO'Q","YO'Q"],
-            ["Jurnalling","YO'Q","YO'Q","YO'Q","YO'Q"],
-          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
-            {r.map((c,j)=><td key={j} style={{padding:"6px 10px",color:j===0?"var(--text-0)":i===4&&j>0?"var(--c-err)":i===5&&j>0?"var(--c-err)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12,fontWeight:i>=4&&j>0?600:400}}>{c}</td>)}
-          </tr>)}
-          </tbody>
-        </table>
-      </div>
-      <Callout color="var(--c-err)" icon="warning" titleUz="Hamma FAT turlari uchun umumiy: ruxsatlar yo'q" titleEn="">
-        FAT12, FAT16, FAT32, exFAT — to'rtovida ham NTFS ACL yo'q. Diskni o'rnatishi mumkin bo'lgan har kim (root yoki Administrator) barcha fayllarni o'qib va o'zgartira oladi. Linux da mount qilinganda Windows "himoyasi" butunlay e'tiborsiz qoladi. <strong>Jismoniy kirishdan himoya qilish uchun faqat BitLocker kabi shifrlash to'g'ri yechim.</strong>
+      <Callout color="var(--c-err)" icon="warning" titleUz="To'rtta FAT turi uchun umumiy: foydalanuvchi ruxsatlari yo'q" titleEn="">
+        FAT12, FAT16, FAT32, exFAT — to'rtovida ham kirish nazorati nol. Diskni o'rnatishi mumkin bo'lgan har kim (Linux da root, Windows da Administrator) barcha fayllarni o'qib va o'zgartira oladi. NTFS ACLlar bu yerda mutlaqo ahamiyatsiz. <strong>Jismoniy kirishdan himoya: faqat BitLocker kabi to'liq disk shifrlash ishlaydi.</strong>
       </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Asosiy Cheklovlar</h3>
@@ -4376,6 +4330,662 @@ Get-Process -Name "notepad" | Select-Object -ExpandProperty Threads |
 # <CreateRemoteThread onmatch="include">
 #   <TargetImage condition="is">lsass.exe</TargetImage>
 # </CreateRemoteThread>`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionHandles() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Handles — Kernel Object References" uz="" />
+      <P>A <Term>handle</Term> is an opaque 32-bit integer that represents a reference to a kernel object. When your code calls <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>CreateFile()</code>, the kernel creates an internal <em>file object</em>, puts it in the process's <em>handle table</em>, and returns a small integer (4, 8, 12, …) back to user mode. You never touch the kernel object directly — you pass the handle to subsequent API calls (<code>ReadFile</code>, <code>CloseHandle</code>, etc.) and the kernel maps it back to the object internally. This indirection provides isolation (processes can't address each other's objects directly), reference counting (the object lives until all handles are closed), and security checking (access rights are verified when the handle is opened, not on every use).</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Object Manager and OBJECT_HEADER</h3>
+      <P>Every kernel object is preceded in kernel memory by an <Term>OBJECT_HEADER</Term> structure. The Object Manager (<code>ObXxx</code> routines in ntoskrnl.exe) manages creation, reference counting, and destruction of these objects.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`typedef struct _OBJECT_HEADER {
+  LONG_PTR     PointerCount;   // Total kernel references (including handles)
+  LONG_PTR     HandleCount;    // Number of open handles (across all processes)
+  POBJECT_TYPE Type;           // Points to FILE, PROCESS, THREAD, TOKEN, EVENT… type
+  UCHAR        NameInfoOffset; // Optional: optional header with object name
+  UCHAR        HandleInfoOffset;
+  UCHAR        QuotaInfoOffset;
+  UCHAR        Flags;
+  // Immediately followed by the actual object body (e.g., _FILE_OBJECT)
+} OBJECT_HEADER;`}</code></pre>
+      <P>The Object Manager lives in the kernel's <em>Object Namespace</em> — a directory tree rooted at <code>\</code>. You can browse it with WinObj (Sysinternals) or <code>!object \</code> in WinDbg. Common directories:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Namespace Path","Contents"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["\\Device","Physical and virtual device objects (e.g., \\Device\\HarddiskVolume3)"],
+            ["\\BaseNamedObjects","Named events, mutexes, semaphores, sections (user-accessible)"],
+            ["\\Sessions\\1\\BaseNamedObjects","Per-session named objects (prevent session isolation bypass)"],
+            ["\\KnownDlls","Pre-loaded DLL section objects — speed optimization & security"],
+            ["\\ObjectTypes","One entry per object type (File, Process, Thread, Token…)"],
+            ["\\Windows","Window stations and desktops"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Handle Table Structure</h3>
+      <P>Each process has a private <Term>handle table</Term> — a kernel-managed array where each entry contains a pointer to the kernel object plus access rights granted when the handle was opened. The table is pageable kernel memory; entries are allocated in multiples of 4 (handles are always divisible by 4 because the low 2 bits carry flags).</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Handle Entry Field","Size","Description"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["ObjectPointerBits","60 bits","Pointer to kernel object >> 4 (low bits reused)"],
+            ["GrantedAccessBits","25 bits","Access mask granted at OpenProcess / CreateFile time"],
+            ["Attributes","3 bits","Inherit, ProtectFromClose, Audit-on-close flags"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleEn="Access rights are baked in at open time" titleUz="">
+        If you open a file with <code>GENERIC_READ</code>, the handle entry stores exactly that mask. Later calls to <code>ReadFile(handle)</code> use the stored mask — no re-checking against the file's ACL every time. This is why privilege escalation often focuses on stealing a handle opened with broad rights rather than bypassing the ACL directly.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Common Handle Types</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {type:"File / Directory",api:"CreateFile, NtCreateFile",flags:"GENERIC_READ, GENERIC_WRITE, DELETE, FILE_READ_ATTRIBUTES",note:"Most common type; includes pipes, consoles, devices"},
+          {type:"Process",api:"OpenProcess",flags:"PROCESS_VM_READ, PROCESS_VM_WRITE, PROCESS_CREATE_THREAD, PROCESS_ALL_ACCESS",note:"Having PROCESS_VM_READ on LSASS = instant credential dump"},
+          {type:"Thread",api:"OpenThread",flags:"THREAD_SUSPEND_RESUME, THREAD_SET_CONTEXT, THREAD_GET_CONTEXT",note:"Used for thread injection (SetThreadContext)"},
+          {type:"Token",api:"OpenProcessToken",flags:"TOKEN_QUERY, TOKEN_IMPERSONATE, TOKEN_DUPLICATE, TOKEN_ADJUST_PRIVILEGES",note:"Duplicating a SYSTEM token → impersonation attack"},
+          {type:"Event / Mutex / Semaphore",api:"CreateEvent, CreateMutex",flags:"EVENT_MODIFY_STATE, MUTEX_ALL_ACCESS, SEMAPHORE_MODIFY_STATE",note:"Named objects visible across processes; malware uses mutexes as 'already-running' checks"},
+          {type:"Registry Key",api:"RegOpenKeyEx, NtOpenKey",flags:"KEY_READ, KEY_WRITE, KEY_ALL_ACCESS",note:"Open key handle survives key deletion until closed"},
+          {type:"Section (Memory Map)",api:"CreateFileMapping",flags:"SECTION_MAP_READ, SECTION_MAP_WRITE, SECTION_MAP_EXECUTE",note:"Foundation of shared memory; DLL loading; reflective DLL injection"},
+          {type:"Job Object",api:"CreateJobObject",flags:"JOB_OBJECT_ALL_ACCESS",note:"Contains and limits a group of processes — escaping a job is a sandbox bypass"},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"12px 14px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",fontWeight:700,marginBottom:4}}>{item.type}</div>
+            <div style={{fontSize:11,color:"var(--c-warn)",fontFamily:"var(--font-mono)",marginBottom:6}}>API: {item.api}</div>
+            <div style={{fontSize:11,color:"var(--text-2)",marginBottom:4}}>Flags: {item.flags}</div>
+            <div style={{fontSize:12,color:"var(--text-1)"}}>{item.note}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Handle Duplication and Inheritance</h3>
+      <P><Term>DuplicateHandle</Term> copies a handle from one process's table to another process's table. The duplicated handle refers to the same underlying kernel object; the object's <code>HandleCount</code> increments. The caller needs <code>PROCESS_DUP_HANDLE</code> on both source and target processes.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// Steal a handle from another process (requires PROCESS_DUP_HANDLE on victim)
+HANDLE hVictim = OpenProcess(PROCESS_DUP_HANDLE, FALSE, victimPid);
+HANDLE hStolen;
+DuplicateHandle(
+    hVictim,         // source process
+    0x40,            // handle value inside victim (e.g., their LSASS handle)
+    GetCurrentProcess(),  // target process (us)
+    &hStolen,        // new handle value in our table
+    0, FALSE,
+    DUPLICATE_SAME_ACCESS   // copy whatever access victim had
+);
+// hStolen now has the same rights as victim's handle`}</code></pre>
+      <P><Term>Inheritable handles</Term>: when a process is created with <code>CreateProcess</code> and <code>bInheritHandles=TRUE</code>, all handles marked <code>HANDLE_FLAG_INHERIT</code> are duplicated into the child's table with the same access rights. This is how stdin/stdout/stderr pipes work — the parent creates pipe handles, marks them inheritable, and passes their values in <code>STARTUPINFO</code>.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Handle Leaks</h3>
+      <P>A <Term>handle leak</Term> occurs when code opens a handle and never calls <code>CloseHandle</code>. Each unclosed handle consumes an entry in the handle table and increments the object's <code>HandleCount</code>, preventing the object from being destroyed. Long-running services with handle leaks eventually exhaust the handle table (default limit: 16 million handles per process, but each entry costs kernel memory). Tools to detect leaks:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Tool","How to Use","What It Shows"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Process Hacker / Task Manager","Handles column in process list","Total handle count — growing count = leak"],
+            ["WinDbg !handle","!handle 0 0xf in PID context","All handles, type, object address, access mask"],
+            ["App Verifier","Enable 'Handles' check","Breaks into debugger on CloseHandle(invalid)"],
+            ["ETW (Event Tracing)","Microsoft-Windows-Kernel-Object provider","Logs handle open/close with stack trace (needs symbols)"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Handle-Based Attacks</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Handle Theft / Handle Duplication Attack",color:"var(--c-attack)",body:<>The attacker opens a privileged process (e.g., <code>lsass.exe</code>) with <code>PROCESS_DUP_HANDLE</code>, then iterates handles inside that process (using <code>NtQuerySystemInformation(SystemHandleInformation)</code>) looking for a handle with <code>PROCESS_ALL_ACCESS</code> or <code>PROCESS_VM_READ</code>. It duplicates that handle into its own process and reads LSASS memory — all without ever calling <code>OpenProcess(PROCESS_VM_READ, …, lsassPid)</code> which EDR hooks. Used by Mimikatz's <code>sekurlsa::minidump</code> variant and Nanodump.</>},
+          {title:"Privileged File Handle Stealing",color:"var(--c-warn)",body:<>Services often hold open file handles with <code>DELETE</code> or <code>WRITE_DAC</code> access on sensitive files (e.g., SAM hive, certificate stores). An attacker who can duplicate that handle gains the same access without needing the ACL permissions themselves.</>},
+          {title:"Token Impersonation via Stolen Handle",color:"var(--c-err)",body:<>Windows allows impersonating a token obtained via <code>OpenProcessToken</code> + <code>DuplicateTokenEx</code>. If a low-privilege process can steal a SYSTEM token handle (from a privileged service that left it open), it can call <code>ImpersonateLoggedOnUser</code> or <code>SetThreadToken</code> to assume SYSTEM context — a classic local privilege escalation.</>},
+          {title:"Named Object Squatting",color:"var(--c-system)",body:<>Named kernel objects (mutexes, events, sections) in <code>\\BaseNamedObjects</code> are first-come-first-served. If a low-privileged process creates a named mutex before a privileged process does, the privileged process receives the low-privilege object — breaking its security invariants. This is why elevated services use per-session directories (<code>\\Sessions\\N\\BaseNamedObjects</code>) and integrity-level-filtered ACLs on named objects.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all handles for a process (Process Hacker CLI / NtQuerySystemInformation)
+handle.exe -p lsass.exe          # Sysinternals handle.exe
+handle64.exe -a -p notepad.exe   # all handle types
+
+# WinDbg — inspect handle table
+!process 0 0 lsass.exe   # get EPROCESS
+.process /r /p <eprocess>
+!handle 0 0xf             # all handles: 0 = all, 0xf = full info
+
+# PowerShell — count handles (cheap leak monitor)
+Get-Process | Select-Object Name, HandleCount | Sort-Object HandleCount -Descending | Select -First 20
+
+# ETW handle tracking (requires Admin)
+logman start HandleTrace -p "Microsoft-Windows-Kernel-Object" 0xFFFF 5 -ets
+# ... reproduce leak ...
+logman stop HandleTrace -ets
+tracerpt HandleTrace.etl -o handles.xml`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Handle'lar — Kernel Ob'ektlariga Murojaat" en="" />
+      <P>A <Term>handle</Term> — jarayon kernel ob'ektiga murojaat qilish uchun foydalanadigan noaniq 32-bitli son. Kod <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>CreateFile()</code> chaqirganda, kernel ichki <em>fayl ob'ekti</em> yaratadi, uni jarayonning <em>handle jadvaliga</em> joylashtiradi va foydalanuvchi rejimiga kichik son (4, 8, 12, …) qaytaradi. Siz kernel ob'ektiga to'g'ridan-to'g'ri tegmaysiz — handleni keyingi API chaqiruvlarga (<code>ReadFile</code>, <code>CloseHandle</code> va h.k.) uzatasiz va kernel uni ichkarida ob'ektga moslashtiradi. Bu bilvosita murojaat izolyatsiyani ta'minlaydi (jarayonlar bir-birining ob'ektlariga to'g'ridan-to'g'ri murojaat qila olmaydi), havolalarni sanashni ta'minlaydi (ob'ekt barcha handlelar yopilgunga qadar yashaydi) va xavfsizlikni tekshirishni ta'minlaydi (kirish huquqlari handle ochilganda tekshiriladi, har bir foydalanishda emas).</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Ob'ekt Menejeri va OBJECT_HEADER</h3>
+      <P>Har bir kernel ob'ekti kernel xotirasida <Term>OBJECT_HEADER</Term> tuzilmasi bilan boshlanadi. Ob'ekt Menejeri (ntoskrnl.exe dagi <code>ObXxx</code> routinelari) bu ob'ektlarning yaratilishi, havolalarni sanash va yo'q qilinishini boshqaradi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`typedef struct _OBJECT_HEADER {
+  LONG_PTR     PointerCount;   // Jami kernel havolalari (handlelar bilan birga)
+  LONG_PTR     HandleCount;    // Ochiq handlelar soni (barcha jarayonlarda)
+  POBJECT_TYPE Type;           // FILE, PROCESS, THREAD, TOKEN, EVENT… turiga ko'rsatadi
+  UCHAR        NameInfoOffset; // Ixtiyoriy: ob'ekt nomi bilan ixtiyoriy sarlavha
+  UCHAR        HandleInfoOffset;
+  UCHAR        QuotaInfoOffset;
+  UCHAR        Flags;
+  // Darhol haqiqiy ob'ekt tanasi bilan davom etadi (masalan, _FILE_OBJECT)
+} OBJECT_HEADER;`}</code></pre>
+      <P>Ob'ekt Menejeri kernelning <em>Ob'ekt Nomlar Fazosida</em> yashaydi — <code>\</code> dan boshlanadigan katalog daraxti. Uni WinObj (Sysinternals) yoki WinDbg da <code>!object \</code> bilan ko'rishingiz mumkin. Keng tarqalgan kataloglar:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Nomlar Fazosi Yo'li","Tarkib"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["\\Device","Jismoniy va virtual qurilma ob'ektlari (masalan, \\Device\\HarddiskVolume3)"],
+            ["\\BaseNamedObjects","Nomlangan event, mutex, semafor, section (foydalanuvchi kirishiga ochiq)"],
+            ["\\Sessions\\1\\BaseNamedObjects","Har bir seans uchun nomlangan ob'ektlar (seans izolyatsiyasini chetlab o'tishning oldini olish)"],
+            ["\\KnownDlls","Oldindan yuklangan DLL section ob'ektlari — tezlashtirish va xavfsizlik"],
+            ["\\ObjectTypes","Har bir ob'ekt turi uchun bitta yozuv (File, Process, Thread, Token…)"],
+            ["\\Windows","Oyna stantsiyalari va ish stoillari"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Handle Jadvalining Tuzilishi</h3>
+      <P>Har bir jarayonda shaxsiy <Term>handle jadvali</Term> mavjud — kernel boshqaradigan massiv, har bir yozuvda kernel ob'ektiga ko'rsatgich va handle ochilganda berilgan kirish huquqlari saqlanadi. Jadval pageable kernel xotirasida; yozuvlar 4 ga karrali taqsimlanadi (handlelar har doim 4 ga bo'linadi, chunki quyi 2 bit bayroqlar uchun ishlatiladi).</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Handle Yozuv Maydoni","Hajmi","Tavsif"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["ObjectPointerBits","60 bit","Kernel ob'ektiga ko'rsatgich >> 4 (quyi bitlar qayta ishlatiladi)"],
+            ["GrantedAccessBits","25 bit","OpenProcess / CreateFile vaqtida berilgan kirish niqobi"],
+            ["Attributes","3 bit","Meros, ProtectFromClose, yopishda audit bayroqlari"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleUz="Kirish huquqlari ochilish vaqtida belgilanadi" titleEn="">
+        Agar faylni <code>GENERIC_READ</code> bilan ochsangiz, handle yozuvi aynan shu niqobni saqlaydi. Keyingi <code>ReadFile(handle)</code> chaqiruvlari saqlangan niqobdan foydalanadi — har safar faylning ACL ini qayta tekshirmaydi. Shuning uchun imtiyozlarni ko'tarish ko'pincha keng huquqlar bilan ochilgan handleni o'g'irlashga qaratilgan, ACL ni chetlab o'tish o'rniga.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Handle Turlari</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {type:"Fayl / Katalog",api:"CreateFile, NtCreateFile",flags:"GENERIC_READ, GENERIC_WRITE, DELETE, FILE_READ_ATTRIBUTES",note:"Eng keng tarqalgan tur; quvurlar, konsollar, qurilmalarni o'z ichiga oladi"},
+          {type:"Jarayon",api:"OpenProcess",flags:"PROCESS_VM_READ, PROCESS_VM_WRITE, PROCESS_CREATE_THREAD, PROCESS_ALL_ACCESS",note:"LSASS da PROCESS_VM_READ = zudlik bilan hisob ma'lumotlarini dumplash"},
+          {type:"Thread",api:"OpenThread",flags:"THREAD_SUSPEND_RESUME, THREAD_SET_CONTEXT, THREAD_GET_CONTEXT",note:"Thread in'ektsiyasi uchun ishlatiladi (SetThreadContext)"},
+          {type:"Token",api:"OpenProcessToken",flags:"TOKEN_QUERY, TOKEN_IMPERSONATE, TOKEN_DUPLICATE, TOKEN_ADJUST_PRIVILEGES",note:"SYSTEM tokenini takrorlash → taqlid hujumi"},
+          {type:"Event / Mutex / Semafor",api:"CreateEvent, CreateMutex",flags:"EVENT_MODIFY_STATE, MUTEX_ALL_ACCESS, SEMAPHORE_MODIFY_STATE",note:"Jarayonlar bo'yicha ko'rinadigan nomlangan ob'ektlar; zararli dasturlar mutexlarni 'allaqachon ishlamoqda' tekshiruvi sifatida ishlatadi"},
+          {type:"Registry Kaliti",api:"RegOpenKeyEx, NtOpenKey",flags:"KEY_READ, KEY_WRITE, KEY_ALL_ACCESS",note:"Ochiq kalit handlesi kalit o'chirilgandan keyin ham yopilgunga qadar yashaydi"},
+          {type:"Section (Xotira Xaritasi)",api:"CreateFileMapping",flags:"SECTION_MAP_READ, SECTION_MAP_WRITE, SECTION_MAP_EXECUTE",note:"Umumiy xotira asosi; DLL yuklash; reflektiv DLL in'ektsiya"},
+          {type:"Job Ob'ekti",api:"CreateJobObject",flags:"JOB_OBJECT_ALL_ACCESS",note:"Jarayonlar guruhini o'z ichiga oladi va cheklaydi — jobdan qochish sandbox chetlab o'tish"},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"12px 14px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",fontWeight:700,marginBottom:4}}>{item.type}</div>
+            <div style={{fontSize:11,color:"var(--c-warn)",fontFamily:"var(--font-mono)",marginBottom:6}}>API: {item.api}</div>
+            <div style={{fontSize:11,color:"var(--text-2)",marginBottom:4}}>Bayroqlar: {item.flags}</div>
+            <div style={{fontSize:12,color:"var(--text-1)"}}>{item.note}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Handle Takrorlash va Meros</h3>
+      <P><Term>DuplicateHandle</Term> handleni bir jarayon jadvalidan boshqa jarayon jadvaliga ko'chiradi. Takrorlangan handle bir xil kernel ob'ektiga ishora qiladi; ob'ektning <code>HandleCount</code> i ortadi. Chaqiruvchi manba va maqsad jarayonlarda <code>PROCESS_DUP_HANDLE</code> ga muhtoj.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// Boshqa jarayondan handleni o'g'irlash (jabrlanuvchida PROCESS_DUP_HANDLE kerak)
+HANDLE hJabrlanuvchi = OpenProcess(PROCESS_DUP_HANDLE, FALSE, jabrlanuvchiPid);
+HANDLE hO_girlangan;
+DuplicateHandle(
+    hJabrlanuvchi,       // manba jarayon
+    0x40,                // jabrlanuvchi ichidagi handle qiymati (masalan, ularning LSASS handlesi)
+    GetCurrentProcess(), // maqsad jarayon (biz)
+    &hO_girlangan,       // bizning jadvalidagi yangi handle qiymati
+    0, FALSE,
+    DUPLICATE_SAME_ACCESS   // jabrlanuvchi qanday kirish huquqiga ega bo'lsa shuni ko'chirish
+);
+// hO_girlangan endi jabrlanuvchi handlesi bilan bir xil huquqlarga ega`}</code></pre>
+      <P><Term>Merosiy handlelar</Term>: jarayon <code>CreateProcess</code> va <code>bInheritHandles=TRUE</code> bilan yaratilganda, <code>HANDLE_FLAG_INHERIT</code> bilan belgilangan barcha handlelar bir xil kirish huquqlari bilan bolaning jadvaliga takrorlanadi. stdin/stdout/stderr quvurlari shunday ishlaydi — ota endi quvur handlelarini yaratadi, ularni merosiy deb belgilaydi va qiymatlarini <code>STARTUPINFO</code> da uzatadi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Handle Sizishi</h3>
+      <P><Term>Handle sizishi</Term> kod handle ochsa va hech qachon <code>CloseHandle</code> chaqirmasa yuzaga keladi. Har bir yopilmagan handle jadvalda yozuv iste'mol qiladi va ob'ektning <code>HandleCount</code> ini oshiradi, ob'ektning yo'q qilinishiga to'sqinlik qiladi. Handle sizishlari bo'lgan uzoq muddatli xizmatlar oxir-oqibat handle jadvalini tugataveradi (jarayon uchun standart chegara: 16 million handle, lekin har bir yozuv kernel xotirasini talab qiladi).</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Handle Asosidagi Hujumlar</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Handle O'g'irlash / Handle Takrorlash Hujumi",color:"var(--c-attack)",body:<>Hujumchi imtiyozli jarayonni (masalan, <code>lsass.exe</code>) <code>PROCESS_DUP_HANDLE</code> bilan ochadi, keyin <code>NtQuerySystemInformation(SystemHandleInformation)</code> yordamida o'sha jarayon ichidagi handlelarni ko'rib chiqadi va <code>PROCESS_ALL_ACCESS</code> yoki <code>PROCESS_VM_READ</code> bilan handleni qidiradi. U shu handleni o'z jarayoniga ko'chiradi va LSASS xotirasini o'qiydi — hech qachon <code>OpenProcess(PROCESS_VM_READ, …, lsassPid)</code> chaqirmasdan, buni EDR ushlab qolishi mumkin edi. Mimikatz ning <code>sekurlsa::minidump</code> varianti va Nanodump tomonidan qo'llaniladi.</>},
+          {title:"Imtiyozli Fayl Handleini O'g'irlash",color:"var(--c-warn)",body:<>Xizmatlar ko'pincha maxfiy fayllarda (masalan, SAM hive, sertifikat do'konlari) <code>DELETE</code> yoki <code>WRITE_DAC</code> kirish huquqlari bilan ochiq fayl handlelarini ushlab turadi. Shu handleni takrorlashga muvaffaq bo'lgan hujumchi o'zi ACL ruxsatlarisiz bir xil kirishga ega bo'ladi.</>},
+          {title:"Token Taqlidi Yordamida O'g'irlangan Handle",color:"var(--c-err)",body:<><code>OpenProcessToken</code> + <code>DuplicateTokenEx</code> orqali olingan tokenni taqlid qilish mumkin. Agar past imtiyozli jarayon SYSTEM token handleini o'g'irlay olsa (uni ochiq qoldirgan imtiyozli xizmatdan), u SYSTEM kontekstini o'zlashtirish uchun <code>ImpersonateLoggedOnUser</code> yoki <code>SetThreadToken</code> ni chaqira oladi — bu klassik mahalliy imtiyozlarni ko'tarish.</>},
+          {title:"Nomlangan Ob'ektni Egallab Olish",color:"var(--c-system)",body:<><code>\\BaseNamedObjects</code> dagi nomlangan kernel ob'ektlari (mutex, event, section) birinchi kelgan birinchi oladi tartibida ishlaydi. Agar past imtiyozli jarayon nomlangan mutexni imtiyozli jarayondan oldin yaratsam, imtiyozli jarayon past imtiyozli ob'ektni oladi — bu uning xavfsizlik invariantlarini buzadi. Shuning uchun yuqori darajali xizmatlar seans bo'yicha kataloglar va nomlangan ob'ektlardagi yaxlitlik darajasi bilan filtrlangan ACL lardan foydalanadi.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Jarayon uchun barcha handlelarni ro'yxatga olish
+handle.exe -p lsass.exe          # Sysinternals handle.exe
+handle64.exe -a -p notepad.exe   # barcha handle turlari
+
+# WinDbg — handle jadvalini tekshirish
+!process 0 0 lsass.exe   # EPROCESS topish
+.process /r /p <eprocess>
+!handle 0 0xf             # barcha handlelar: 0 = hammasi, 0xf = to'liq ma'lumot
+
+# PowerShell — handlelarni hisoblash (sizish monitori)
+Get-Process | Select-Object Name, HandleCount | Sort-Object HandleCount -Descending | Select -First 20
+
+# ETW orqali handle kuzatish (Admin kerak)
+logman start HandleTrace -p "Microsoft-Windows-Kernel-Object" 0xFFFF 5 -ets
+# ... sizishni takrorlash ...
+logman stop HandleTrace -ets
+tracerpt HandleTrace.etl -o handles.xml`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionServices() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows Services — Background Execution" uz="" />
+      <P>A <Term>Windows service</Term> is a long-running executable that operates in the background, started automatically at boot or on demand, without requiring an interactive user session. Services enable core OS functionality — networking, printing, Windows Update, Defender — to run before any user logs in and continue running after they log out. They differ from regular processes in one key way: their lifecycle is managed by the <Em>Service Control Manager (SCM)</Em>, which handles start, stop, pause, and resume operations through a defined protocol.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Service Control Manager (SCM)</h3>
+      <P>The <Term>SCM</Term> runs as <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>services.exe</code> — a Windows-protected process started by <code>wininit.exe</code> during Phase 1 boot. It reads service configuration from <code>HKLM\SYSTEM\CurrentControlSet\Services</code> and starts services in dependency order. Its responsibilities:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["SCM Function","Details"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Service database","Reads/writes HKLM\\SYSTEM\\CurrentControlSet\\Services for all service config"],
+            ["Lifecycle management","Start, stop, pause, resume, restart on failure"],
+            ["Dependency resolution","Ensures service A starts before service B if B depends on A"],
+            ["Failure actions","Can restart service, run a program, or reboot on crash (configured per service)"],
+            ["Security descriptor","The SCM object itself has a DACL controlling who can start/stop/query services"],
+            ["Service accounts","Launches services under specified accounts with appropriate privileges"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Service Types</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {type:"WIN32_OWN_PROCESS (0x10)",desc:"Service runs as its own dedicated process (e.g., spoolsv.exe for Print Spooler). Crash isolation: one service crash doesn't affect others."},
+          {type:"WIN32_SHARE_PROCESS (0x20)",desc:"Service runs as a DLL inside svchost.exe, sharing a process with other services of the same -k group. More efficient but less isolated."},
+          {type:"KERNEL_DRIVER (0x01)",desc:"Kernel-mode driver loaded by SCM at boot (Start=0 or 1). Runs in ring 0. Examples: tcpip.sys, ntfs.sys, Defender's WdFilter.sys."},
+          {type:"FILE_SYSTEM_DRIVER (0x02)",desc:"Kernel-mode file system driver (NTFS, FAT32 drivers, filter drivers like antivirus). Also ring 0."},
+          {type:"INTERACTIVE_PROCESS (0x100)",desc:"Legacy flag (deprecated in Vista+) for services that could display UI on the interactive desktop. Disabled by default — Session 0 isolation prevents it."},
+          {type:"USER_OWN_PROCESS (0x50)",desc:"Service runs as a user-mode process under a user account template. New in Windows 10 — lower privilege, per-user isolation."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"12px 14px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:700,marginBottom:6}}>{item.type}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Service Start Types</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Start Type","Value","When Started","Examples"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Boot","0","Before kernel init completes (loaded by boot loader)","ntfs.sys, disk.sys, partmgr.sys"],
+            ["System","1","During kernel initialization (Phase 0)","tcpip.sys, WdFilter.sys (Defender)"],
+            ["Automatic","2","After kernel init, during SCM startup (Phase 1+)","Spooler, wuauserv, EventLog"],
+            ["Automatic (Delayed)","2 + DelayedAutoStart","After all Automatic services start (~2 min post-login)","Windows Update, Defender (scan)"],
+            ["Manual","3","Only when explicitly started by SCM, user, or another service","Bluetooth, Remote Registry"],
+            ["Disabled","4","Never started — SCM rejects start requests","Telnet, RemoteAccess (usually)"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Service States</h3>
+      <P>A service transitions through defined states managed by the SCM. The service reports its state via <code>SetServiceStatus()</code>:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {state:"STOPPED (1)",color:"#ff3a5e",desc:"Service is not running. SCM can start it if Start type allows."},
+          {state:"START_PENDING (2)",color:"#ff9145",desc:"Service process started but hasn't called SetServiceStatus(RUNNING) yet."},
+          {state:"STOP_PENDING (3)",color:"#ff9145",desc:"Service received SERVICE_CONTROL_STOP but hasn't stopped yet."},
+          {state:"RUNNING (4)",color:"#00d4ff",desc:"Service is fully operational — can accept control codes."},
+          {state:"CONTINUE_PENDING (5)",color:"#ff9145",desc:"Service received CONTINUE after PAUSE but isn't running yet."},
+          {state:"PAUSE_PENDING (6)",color:"#ff9145",desc:"Service received PAUSE but hasn't paused yet."},
+          {state:"PAUSED (7)",color:"#b48cff",desc:"Service is paused — still loaded but not processing requests."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:11,color:item.color,minWidth:180,flexShrink:0}}>{item.state}</span>
+            <span style={{fontSize:12,color:"var(--text-1)"}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Service Accounts</h3>
+      <P>Services run under accounts that determine their privileges and network identity. Choosing the wrong account is a classic source of privilege escalation:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Account","Local Privileges","Network Identity","Risk"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["LocalSystem","SYSTEM — highest possible, owns entire machine","Authenticates as the machine account (DOMAIN\\COMPUTERNAME$)","Highest — compromise = full machine"],
+            ["LocalService","Limited subset of User privileges","Authenticates as Anonymous (no network access)","Lower — limited blast radius"],
+            ["NetworkService","Limited subset of User privileges","Authenticates as machine account (like LocalSystem)","Medium — can access network resources"],
+            ["Virtual Service Account (NT SERVICE\\name)","Minimal — only what service needs","Authenticates as machine account","Recommended — principle of least privilege"],
+            ["Managed Service Account (MSA)","Custom-configured","Machine account with automatic password rotation","Best — no password management burden"],
+            ["Custom domain account","Configured by admin","Full domain user","Depends on config — often over-privileged"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===3?"var(--c-err)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-err)" icon="warning" titleEn="LocalSystem is the most dangerous service account" titleUz="">
+        A service running as LocalSystem has SeDebugPrivilege, SeTcbPrivilege, and can access any object on the machine. If an attacker can execute code in a LocalSystem service (via a bug or misconfiguration), they have full machine compromise. Prefer virtual service accounts or NetworkService.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — svchost.exe and -k Groups</h3>
+      <P>Many Windows services are implemented as DLLs and hosted inside <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>svchost.exe</code> (Service Host). The <code>-k</code> parameter specifies which <em>service group</em> that svchost instance hosts. Groups are defined under <code>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Svchost</code>. A healthy Windows 11 system has 15–25+ svchost.exe instances simultaneously.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["-k Group","Services Hosted","Account"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["-k netsvcs","wuauserv (Windows Update), Themes, Schedule (Task Scheduler), Winmgmt (WMI), BITS","LocalSystem"],
+            ["-k LocalService","EventLog, nsi (Network Store Interface), Wcmsvc (WLAN)","LocalService"],
+            ["-k LocalServiceNoNetwork","FirewallAPI, BFE (Base Filtering Engine)","LocalService (no network)"],
+            ["-k NetworkService","Dnscache (DNS Client), NlaSvc (Network Location Awareness)","NetworkService"],
+            ["-k DcomLaunch","PlugPlay, Power, LSM (Local Session Manager) — starts COM servers","LocalSystem"],
+            ["-k rpcss","RpcSs (RPC Endpoint Mapper), DcomLaunch (variant)","NetworkService"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Service Registry Configuration</h3>
+      <P>Each service has a subkey under <code>HKLM\SYSTEM\CurrentControlSet\Services\{"{ServiceName}"}</code>:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`HKLM\\SYSTEM\\CurrentControlSet\\Services\\Spooler
+  ImagePath    REG_EXPAND_SZ  %SystemRoot%\\System32\\spoolsv.exe
+  DisplayName  REG_SZ         Print Spooler
+  Description  REG_SZ         ...
+  ObjectName   REG_SZ         LocalSystem        ← service account
+  Start        REG_DWORD      0x2                ← Automatic
+  Type         REG_DWORD      0x110              ← WIN32_OWN + INTERACTIVE
+  ErrorControl REG_DWORD      0x1                ← Normal (log but continue boot)
+  DependOnService REG_MULTI_SZ RPCSS\\0SPOOLER\\0  ← must start after these
+
+  Parameters\\
+    ServiceDll  REG_EXPAND_SZ  %SystemRoot%\\system32\\spoolsv.exe
+    ← for svchost-hosted services: this points to the DLL`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Service-Based Attack Techniques</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Service Persistence (New Service)",color:"var(--c-attack)",body:<>An attacker with admin rights creates a new service pointing to their malware: <code>sc create EvilSvc binPath="C:\\evil.exe" start=auto</code>. The service auto-starts on reboot. Detection: new service creation logs Event ID 7045 (System log) and Sysmon Event ID 1. Autoruns highlights unsigned or unusual services.</>},
+          {title:"Service Binary Replacement",color:"var(--c-warn)",body:<>If a service's <code>ImagePath</code> points to a writable binary (weak ACL — e.g., <code>Everyone: Write</code> on the EXE), an attacker replaces the binary with their payload. Next service start runs the attacker's code under the service account (often LocalSystem). Detection: file integrity monitoring on service binaries; sc.exe query to compare expected vs actual ImagePath.</>},
+          {title:"Unquoted Service Path",color:"var(--c-warn)",body:<>If <code>ImagePath</code> has spaces but isn't quoted (e.g., <code>C:\\Program Files\\My Service\\app.exe</code>), Windows tries <code>C:\\Program.exe</code>, then <code>C:\\Program Files\\My.exe</code> before finding the real binary. If an attacker can write <code>C:\\Program.exe</code>, it runs as the service account. Detection: <code>wmic service get name,pathname</code> — look for unquoted paths with spaces. Seatbelt and PowerSploit's <code>Get-ServiceUnquoted</code> automate this.</>},
+          {title:"DLL Search Order Hijacking in Service",color:"var(--c-system)",body:<>Many services load DLLs by name without full path. Windows searches: (1) application directory, (2) system32, (3) system, (4) Windows dir, (5) current directory, (6) PATH directories. If an attacker places a malicious DLL before the legitimate one in the search path, the service loads it. Classic example: services that load <code>wlbsctrl.dll</code> (IKEEXT service) from a user-writable path.</>},
+          {title:"Service DACL Manipulation",color:"var(--c-err)",body:<>Each service has a security descriptor (DACL) controlling who can start, stop, query, and modify it. Attackers with write access (<code>SERVICE_CHANGE_CONFIG</code>) can change the <code>ImagePath</code> or <code>ObjectName</code> to redirect the service to a malicious binary or a lower-privilege account. <code>sc sdset ServiceName D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)...</code> modifies the DACL. Accesschk.exe (Sysinternals) audits service DACLs.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.9 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all services and their states
+sc query type= all state= all
+Get-Service | Select-Object Name, DisplayName, Status, StartType | Sort-Object Status
+
+# Service details (ImagePath, account, dependencies)
+sc qc Spooler                          # classic sc.exe
+Get-WmiObject Win32_Service | Where {$_.Name -eq "Spooler"} | Format-List *
+
+# Check for unquoted service paths (privesc check)
+wmic service get name,pathname | findstr /i /v "c:\\windows\\"
+
+# Service DACL audit
+accesschk.exe -uwcqv "Everyone" *      # services writable by Everyone
+accesschk.exe -c Spooler              # specific service DACL
+
+# Create / delete a service (Admin required)
+sc create TestSvc binPath="C:\\test.exe" start=auto obj=LocalSystem
+sc delete TestSvc
+
+# New service creation audit (Event ID 7045)
+Get-WinEvent -LogName System | Where {$_.Id -eq 7045} | Select -First 10 | Format-List`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows Servislar — Fon Rejimida Bajarish" en="" />
+      <P>A <Term>Windows servis</Term> — fon rejimida uzoq muddatli ishlaydigan bajariladigan fayl, interaktiv foydalanuvchi seansi talab qilmasdan, yuklash vaqtida yoki talab bo'yicha boshlanadigan. Servislar asosiy OS funksionalligini ta'minlaydi — tarmoq, chop etish, Windows Update, Defender — hech bir foydalanuvchi kirmagan vaqtda ham ishlashi va ular chiqqanidan keyin ham davom etishi uchun. Ular odatiy jarayonlardan bitta asosiy jihatda farq qiladi: ularning hayot tsikli <Em>Service Control Manager (SCM)</Em> tomonidan boshqariladi, u belgilangan protokol orqali ishga tushirish, to'xtatish, to'xtatib turish va davom ettirish operatsiyalarini amalga oshiradi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Service Control Manager (SCM)</h3>
+      <P><Term>SCM</Term> <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>services.exe</code> sifatida ishlaydi — 1-fazali yuklash paytida <code>wininit.exe</code> tomonidan boshlangan Windows-himoyalangan jarayon. U <code>HKLM\SYSTEM\CurrentControlSet\Services</code> dan servis konfiguratsiyasini o'qiydi va servislarni bog'liqlik tartibida ishga tushiradi.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["SCM Funksiyasi","Tafsilotlar"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Servis ma'lumotlar bazasi","Barcha servis konfiguratsiyasi uchun HKLM\\SYSTEM\\CurrentControlSet\\Services ni o'qiydi/yozadi"],
+            ["Hayot tsikli boshqaruvi","Ishga tushirish, to'xtatish, to'xtatib turish, davom ettirish, muvaffaqiyatsizlikda qayta ishga tushirish"],
+            ["Bog'liqlikni hal qilish","Agar B A ga bog'liq bo'lsa, A servis B dan oldin ishga tushishini ta'minlaydi"],
+            ["Muvaffaqiyatsizlik harakatlari","Crash da xizmatni qayta ishga tushirish, dastur ishga tushirish yoki qayta yuklab olish mumkin (har bir servis uchun konfiguratsiya qilinadi)"],
+            ["Xavfsizlik tavsifi","SCM ob'ektining o'zi kim servislarni ishga tushirishi/to'xtatishi/so'rashi mumkinligini nazorat qiluvchi DACL ga ega"],
+            ["Servis akkauntlari","Servislarni tegishli imtiyozlar bilan belgilangan akkauntlar ostida ishga tushiradi"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Servis Turlari</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {type:"WIN32_OWN_PROCESS (0x10)",desc:"Servis o'z alohida jarayoni sifatida ishlaydi (masalan, Print Spooler uchun spoolsv.exe). Crash izolyatsiyasi: bir servis crashi boshqalarga ta'sir qilmaydi."},
+          {type:"WIN32_SHARE_PROCESS (0x20)",desc:"Servis svchost.exe ichida DLL sifatida ishlaydi, bir xil -k guruhdagi boshqa servislar bilan jarayon baham ko'radi. Samaraliroq, lekin kamroq izolyatsiyalangan."},
+          {type:"KERNEL_DRIVER (0x01)",desc:"Yuklash vaqtida SCM tomonidan yuklangan kernel-rejim drayveri (Start=0 yoki 1). Ring 0 da ishlaydi. Misollar: tcpip.sys, ntfs.sys, Defender ning WdFilter.sys."},
+          {type:"FILE_SYSTEM_DRIVER (0x02)",desc:"Kernel-rejim fayl tizimi drayveri (NTFS, FAT32 drayverlari, antivirus kabi filtr drayverlari). Ham ring 0."},
+          {type:"INTERACTIVE_PROCESS (0x100)",desc:"Eski bayroq (Vista+ da eskirgan) interaktiv ish stolida UI ko'rsatishi mumkin bo'lgan xizmatlar uchun. Standart sifatida o'chirilgan — Seans 0 izolyatsiyasi uni to'xtatadi."},
+          {type:"USER_OWN_PROCESS (0x50)",desc:"Servis foydalanuvchi akkaunti shabloni ostida foydalanuvchi-rejim jarayoni sifatida ishlaydi. Windows 10 da yangi — past imtiyoz, foydalanuvchi izolyatsiyasi."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"12px 14px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:700,marginBottom:6}}>{item.type}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Servis Ishga Tushirish Turlari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Ishga Tushirish Turi","Qiymati","Qachon Boshlanadi","Misollar"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Boot","0","Kernel init tugashidan oldin (yuklash yuklovchisi tomonidan yuklanadi)","ntfs.sys, disk.sys, partmgr.sys"],
+            ["System","1","Kernel initializatsiyasi paytida (0-fazada)","tcpip.sys, WdFilter.sys (Defender)"],
+            ["Automatic","2","Kernel init dan keyin, SCM ishga tushishi paytida (1+ fazada)","Spooler, wuauserv, EventLog"],
+            ["Automatic (Kechiktirilgan)","2 + DelayedAutoStart","Barcha Automatic servislar ishga tushgandan keyin (~login dan 2 daqiqa keyin)","Windows Update, Defender (skan)"],
+            ["Manual","3","Faqat SCM, foydalanuvchi yoki boshqa servis tomonidan aniq boshlanganda","Bluetooth, Remote Registry"],
+            ["Disabled","4","Hech qachon boshlanmaydi — SCM ishga tushirish so'rovlarini rad etadi","Telnet, RemoteAccess (odatda)"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Servis Holatlari</h3>
+      <P>Servis SCM tomonidan boshqariladigan belgilangan holatlar orqali o'tadi. Servis holatini <code>SetServiceStatus()</code> orqali bildiradi:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {state:"STOPPED (1)",color:"#ff3a5e",desc:"Servis ishlamayapti. SCM Start turi ruxsat bersa uni ishga tushira oladi."},
+          {state:"START_PENDING (2)",color:"#ff9145",desc:"Servis jarayoni boshlandi, lekin hali SetServiceStatus(RUNNING) chaqirmagan."},
+          {state:"STOP_PENDING (3)",color:"#ff9145",desc:"Servis SERVICE_CONTROL_STOP oldi, lekin hali to'xtamadi."},
+          {state:"RUNNING (4)",color:"#00d4ff",desc:"Servis to'liq ishlayapti — boshqaruv kodlarini qabul qila oladi."},
+          {state:"CONTINUE_PENDING (5)",color:"#ff9145",desc:"Servis PAUSE dan keyin CONTINUE oldi, lekin hali ishlamayapti."},
+          {state:"PAUSE_PENDING (6)",color:"#ff9145",desc:"Servis PAUSE oldi, lekin hali to'xtatilmagan."},
+          {state:"PAUSED (7)",color:"#b48cff",desc:"Servis to'xtatilgan — hali yuklangan, lekin so'rovlarni qayta ishlamayapti."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:11,color:item.color,minWidth:200,flexShrink:0}}>{item.state}</span>
+            <span style={{fontSize:12,color:"var(--text-1)"}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Servis Akkauntlari</h3>
+      <P>Servislar imtiyozlari va tarmoq identifikatorini belgilaydigan akkauntlar ostida ishlaydi. Noto'g'ri akkount tanlash imtiyozlarni ko'tarishning klassik manbai:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Akkount","Mahalliy Imtiyozlar","Tarmoq Identifikatori","Xavf"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["LocalSystem","SYSTEM — eng yuqori, butun mashina egasi","Mashina akkaunti sifatida autentifikatsiya qiladi (DOMAIN\\COMPUTERNAME$)","Eng yuqori — buzilish = to'liq mashina"],
+            ["LocalService","Foydalanuvchi imtiyozlarining cheklangan to'plami","Anonim sifatida autentifikatsiya qiladi (tarmoq kirishi yo'q)","Past — cheklangan ta'sir radiusi"],
+            ["NetworkService","Foydalanuvchi imtiyozlarining cheklangan to'plami","Mashina akkaunti sifatida autentifikatsiya qiladi (LocalSystem kabi)","O'rtacha — tarmoq resurslariga kirish mumkin"],
+            ["Virtual Servis Akkaunti (NT SERVICE\\name)","Minimal — faqat servisga keraklisi","Mashina akkaunti sifatida autentifikatsiya qiladi","Tavsiya etiladi — minimal imtiyoz prinsipi"],
+            ["Boshqariladigan Servis Akkaunti (MSA)","Admin tomonidan sozlangan","Avtomatik parol rotatsiyasi bilan mashina akkaunti","Eng yaxshi — parol boshqaruvi yukisiz"],
+            ["Maxsus domen akkaunti","Admin tomonidan sozlangan","To'liq domen foydalanuvchisi","Konfiguratsiyaga bog'liq — ko'pincha haddan ortiq imtiyozli"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===3?"var(--c-err)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-err)" icon="warning" titleUz="LocalSystem eng xavfli servis akkauntidir" titleEn="">
+        LocalSystem ostida ishlaydigan servisda SeDebugPrivilege, SeTcbPrivilege bor va mashina dagi har qanday ob'ektga kira oladi. Agar hujumchi LocalSystem servisda kod bajarsa (xato yoki noto'g'ri konfiguratsiya orqali), butun mashina buzilgan hisoblanadi. Virtual servis akkauntlari yoki NetworkService ni afzal ko'ring.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — svchost.exe va -k Guruhlar</h3>
+      <P>Ko'plab Windows servislar DLL sifatida amalga oshirilgan va <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>svchost.exe</code> (Servis Host) ichida joylashtirilgan. <code>-k</code> parametri svchost nusxasi qaysi <em>servis guruhini</em> joylashtirishini belgilaydi. Guruhlar <code>HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Svchost</code> ostida belgilanadi. Sog'lom Windows 11 tizimida bir vaqtda 15–25+ svchost.exe nusxasi bo'ladi.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["-k Guruhi","Joylashtirilgan Servislar","Akkount"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["-k netsvcs","wuauserv (Windows Update), Themes, Schedule (Vazifa Rejalashtiruvchi), Winmgmt (WMI), BITS","LocalSystem"],
+            ["-k LocalService","EventLog, nsi (Tarmoq Do'koni Interfeysi), Wcmsvc (WLAN)","LocalService"],
+            ["-k LocalServiceNoNetwork","FirewallAPI, BFE (Asosiy Filtr Mexanizmi)","LocalService (tarmoqsiz)"],
+            ["-k NetworkService","Dnscache (DNS Mijozi), NlaSvc (Tarmoq Joylashuvi Hushyorligi)","NetworkService"],
+            ["-k DcomLaunch","PlugPlay, Power, LSM (Mahalliy Seans Menejeri) — COM serverlarini ishga tushiradi","LocalSystem"],
+            ["-k rpcss","RpcSs (RPC Endpoint Mapper), DcomLaunch (varianti)","NetworkService"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Servis Registry Konfiguratsiyasi</h3>
+      <P>Har bir servisda <code>HKLM\SYSTEM\CurrentControlSet\Services\{"{ServisNomi}"}</code> ostida pastki kalit mavjud:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`HKLM\\SYSTEM\\CurrentControlSet\\Services\\Spooler
+  ImagePath    REG_EXPAND_SZ  %SystemRoot%\\System32\\spoolsv.exe
+  DisplayName  REG_SZ         Print Spooler
+  Description  REG_SZ         ...
+  ObjectName   REG_SZ         LocalSystem        ← servis akkaunti
+  Start        REG_DWORD      0x2                ← Automatic
+  Type         REG_DWORD      0x110              ← WIN32_OWN + INTERACTIVE
+  ErrorControl REG_DWORD      0x1                ← Normal (log, lekin yuklashni davom ettir)
+  DependOnService REG_MULTI_SZ RPCSS\\0SPOOLER\\0  ← bular ishga tushgandan keyin boshlanishi kerak
+
+  Parameters\\
+    ServiceDll  REG_EXPAND_SZ  %SystemRoot%\\system32\\spoolsv.exe
+    ← svchost da joylashtirilgan servislar uchun: bu DLL ga ko'rsatadi`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Servis Asosidagi Hujum Texnikalari</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Servis Persistenslik (Yangi Servis)",color:"var(--c-attack)",body:<>Admin huquqlariga ega hujumchi o'z zararli dasturiga ishora qiluvchi yangi servis yaratadi: <code>sc create EvilSvc binPath="C:\\evil.exe" start=auto</code>. Servis qayta yuklashda avtomatik boshlanadi. Aniqlash: yangi servis yaratish loglari Event ID 7045 (System log) va Sysmon Event ID 1. Autoruns imzosiz yoki g'ayrioddiy servislarni ajratib ko'rsatadi.</>},
+          {title:"Servis Ikkilik Faylini Almashtirish",color:"var(--c-warn)",body:<>Agar servisning <code>ImagePath</code> i yoziladigan ikkilik faylga (zaif ACL — masalan, EXE da <code>Everyone: Write</code>) ishora qilsa, hujumchi ikkilik faylni o'z yuklamasi bilan almashtiradi. Keyingi servis ishga tushishi hujumchi kodini servis akkaunti ostida bajaradi (ko'pincha LocalSystem). Aniqlash: servis ikkilik fayllarida fayl yaxlitlik monitoringi; kutilgan va haqiqiy ImagePath ni taqqoslash uchun sc.exe query.</>},
+          {title:"Qo'shtirnoqsiz Servis Yo'li",color:"var(--c-warn)",body:<>Agar <code>ImagePath</code> da bo'shliqlar bo'lsa, lekin qo'shtirnoq yo'q bo'lsa (masalan, <code>C:\\Program Files\\My Service\\app.exe</code>), Windows haqiqiy ikkilik faylni topishdan oldin <code>C:\\Program.exe</code>, keyin <code>C:\\Program Files\\My.exe</code> ni sinab ko'radi. Hujumchi <code>C:\\Program.exe</code> yoza olsa, u servis akkounti sifatida ishlaydi. Aniqlash: <code>wmic service get name,pathname</code> — bo'shliqlar bilan qo'shtirnoqsiz yo'llarni qidiring.</>},
+          {title:"Servis DLL Qidiruv Tartibi O'g'irlash",color:"var(--c-system)",body:<>Ko'plab servislar DLL larni to'liq yo'lsiz nom bo'yicha yuklaydi. Windows qidiradi: (1) ilova katalogi, (2) system32, (3) system, (4) Windows kataloği, (5) joriy katalog, (6) PATH kataloglari. Hujumchi qidiruv yo'lida qonuniy DLL dan oldin zararli DLL joylashtirsa, servis uni yuklaydi. Klassik misol: foydalanuvchi yoziladigan yo'ldan <code>wlbsctrl.dll</code> (IKEEXT servisi) yuklaydigan servislar.</>},
+          {title:"Servis DACL Manipulyatsiyasi",color:"var(--c-err)",body:<>Har bir servisda uni kim ishga tushirishi, to'xtatishi, so'rashi va o'zgartirishi mumkinligini nazorat qiluvchi xavfsizlik tavsifi (DACL) mavjud. Yozish kirishiga (<code>SERVICE_CHANGE_CONFIG</code>) ega hujumchilar servisni zararli ikkilik faylga yo'naltirish uchun <code>ImagePath</code> yoki <code>ObjectName</code> ni o'zgartira oladi. Accesschk.exe (Sysinternals) servis DACL larini tekshiradi.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.9 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Barcha servislar va ularning holatlarini ro'yxatga olish
+sc query type= all state= all
+Get-Service | Select-Object Name, DisplayName, Status, StartType | Sort-Object Status
+
+# Servis tafsilotlari (ImagePath, akkount, bog'liqliklar)
+sc qc Spooler
+Get-WmiObject Win32_Service | Where {$_.Name -eq "Spooler"} | Format-List *
+
+# Qo'shtirnoqsiz servis yo'llarini tekshirish (imtiyoz ko'tarish tekshiruvi)
+wmic service get name,pathname | findstr /i /v "c:\\windows\\"
+
+# Servis DACL tekshiruvi
+accesschk.exe -uwcqv "Everyone" *    # Hammaga yoziladigan servislar
+accesschk.exe -c Spooler             # Muayyan servis DACL
+
+# Servis yaratish / o'chirish (Admin kerak)
+sc create TestSvc binPath="C:\\test.exe" start=auto obj=LocalSystem
+sc delete TestSvc
+
+# Yangi servis yaratish tekshiruvi (Event ID 7045)
+Get-WinEvent -LogName System | Where {$_.Id -eq 7045} | Select -First 10 | Format-List`}</code></pre>
     </section>
   );
 }

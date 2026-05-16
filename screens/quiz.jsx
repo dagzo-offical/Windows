@@ -70,6 +70,16 @@ const FALLBACK_QUESTIONS = {
     { uz: "Windows rejalashtiruvchisi qanday ishlaydi? 0-31 prioritet darajalari, kvant va prioritet ko'tarish mexanizmini tushuntiring.", en: "How does the Windows scheduler work? Explain the 0-31 priority levels, thread quantum, and the priority boost mechanism." },
     { uz: "Thread in'ektsiya texnikalarini solishtiring: CreateRemoteThread, QueueUserAPC va Thread Hijacking. Har biri qanday ishlaydi va Sysmon qaysi hodisalarni yozib oladi?", en: "Compare thread injection techniques: CreateRemoteThread, QueueUserAPC, and Thread Hijacking. How does each work and which Sysmon events capture them?" },
   ],
+  14: [
+    { uz: "Windows da handle nima? Handle javalining tuzilishi (ObjectPointerBits, GrantedAccessBits, Attributes) qanday va kirish huquqlari nima uchun ochilish vaqtida belgilanadi, har bir foydalanishda emas?", en: "What is a handle in Windows? How is a handle table entry structured (ObjectPointerBits, GrantedAccessBits, Attributes), and why are access rights baked in at open time rather than checked on every use?" },
+    { uz: "DuplicateHandle API qanday ishlaydi va u nima uchun xavfsizlik xavfini tug'diradi? Handle o'g'irlash texnikasini tushuntiring — hujumchi qanday EDR hookini chetlab o'tib LSASS xotirasini o'qiy oladi?", en: "How does DuplicateHandle work and why does it create a security risk? Explain the handle theft technique — how can an attacker read LSASS memory while bypassing EDR hooks on OpenProcess?" },
+    { uz: "Handle sizishi nima va u uzoq muddatli xizmat uchun nima uchun muammo? Handle sizishini qanday aniqlash va kuzatish mumkin? OBJECT_HEADER da HandleCount va PointerCount ning farqi nima?", en: "What is a handle leak and why is it a problem for a long-running service? How can you detect and track handle leaks? What is the difference between HandleCount and PointerCount in OBJECT_HEADER?" },
+  ],
+  15: [
+    { uz: "Windows Service Control Manager (SCM) nima va u services.exe da qanday ishlaydi? Servislarning hayot tsiklini boshqarish uchun SCM qanday mexanizmlardan foydalanadi (bog'liqlik hal qilish, muvaffaqiyatsizlik harakatlari, DACL)?", en: "What is the Windows Service Control Manager (SCM) and how does it run inside services.exe? What mechanisms does the SCM use to manage service lifecycles — dependency resolution, failure actions, and DACLs?" },
+    { uz: "Servis akkauntlarini solishtiring: LocalSystem, LocalService, NetworkService va Virtual Servis Akkaunti. Har birining imtiyozlari va tarmoq identifikatori nimadan iborat va qaysi biri eng xavfli va nima uchun?", en: "Compare service accounts: LocalSystem, LocalService, NetworkService, and Virtual Service Account. What are the privileges and network identity of each, and which is most dangerous and why?" },
+    { uz: "Servis persistenslik va imtiyoz ko'tarish uchun ishlatiladigan kamida 3 ta texnikani tushuntiring — masalan, yangi servis yaratish, qo'shtirnoqsiz servis yo'li va DLL qidiruv tartibi o'g'irlash. Har biri qanday ishlaydi va qanday aniqlanadi?", en: "Explain at least 3 techniques attackers use for service-based persistence and privilege escalation — such as creating a new service, unquoted service path, and DLL search order hijacking. How does each work and how is it detected?" },
+  ],
 };
 
 const COOLDOWN_KEY = "wa_cooldown_end";
