@@ -60,6 +60,16 @@ const FALLBACK_QUESTIONS = {
     { uz: "FAT32 ning asosiy cheklovlari nimalar — xususan 4 GB fayl hajmi chegarasi nima uchun mavjud va u qanday muammolarga olib keladi? 32 GB hajm chegarasi qanday chetlab o'tiladi?", en: "What are FAT32's main limitations — specifically why does the 4 GB file size limit exist and what problems does it cause? How is the 32 GB volume limit bypassed?" },
     { uz: "Nima uchun EFI Tizim Bo'limi (ESP) FAT32 sifatida formatlanishi shart? Bu xavfsizlik nuqtai nazaridan qanday muammolar tug'diradi?", en: "Why must the EFI System Partition (ESP) be formatted as FAT32? What security implications does this create?" },
   ],
+  12: [
+    { uz: "Windows'da jarayon nima? EPROCESS tuzilmasida qanday asosiy maydonlar bor va ular birgalikda jarayon izolyatsiyasini qanday ta'minlaydi?", en: "What is a process in Windows? What are the key fields in the EPROCESS structure and how do they together provide process isolation?" },
+    { uz: "Kirish tokeni nima va u jarayon xavfsizlik kontekstini qanday belgilaydi? Yaxlitlik darajalari (Integrity Levels) nima va UAC qanday ishlaydi?", en: "What is an access token and how does it define a process's security context? What are Integrity Levels and how does UAC work?" },
+    { uz: "DLL in'ektsiya va jarayon bo'shatish (process hollowing) texnikalarini tushuntiring. Ular qanday ishlaydi va qanday aniqlanadi?", en: "Explain the DLL injection and process hollowing techniques. How does each one work and how are they detected?" },
+  ],
+  13: [
+    { uz: "Thread nima va u jarayondan qanday farq qiladi? ETHREAD va TEB tuzilmalari qanday asosiy ma'lumotlarni saqlaydi?", en: "What is a thread and how does it differ from a process? What key information do the ETHREAD and TEB structures contain?" },
+    { uz: "Windows rejalashtiruvchisi qanday ishlaydi? 0-31 prioritet darajalari, kvant va prioritet ko'tarish mexanizmini tushuntiring.", en: "How does the Windows scheduler work? Explain the 0-31 priority levels, thread quantum, and the priority boost mechanism." },
+    { uz: "Thread in'ektsiya texnikalarini solishtiring: CreateRemoteThread, QueueUserAPC va Thread Hijacking. Har biri qanday ishlaydi va Sysmon qaysi hodisalarni yozib oladi?", en: "Compare thread injection techniques: CreateRemoteThread, QueueUserAPC, and Thread Hijacking. How does each work and which Sysmon events capture them?" },
+  ],
 };
 
 const COOLDOWN_KEY = "wa_cooldown_end";
@@ -122,6 +132,8 @@ Return STRICT JSON only, no markdown fences. Feedback in ${lang === "en" ? "Engl
     9: "Windows File Systems (beginner-intermediate): I/O Manager and IRP model, filter driver stack and altitude numbers, FAT32 vs NTFS vs exFAT comparison (file size limits, permissions, journaling, ADS), file system drivers (ntfs.sys, fastfat.sys, exfat.sys), security implications of file system choice. Ask about the IRP stack and FAT vs NTFS differences.",
     10: "NTFS file system (intermediate-advanced): MFT structure (resident vs non-resident data, first 16 system records), NTFS attributes ($STANDARD_INFORMATION, $FILE_NAME, $DATA, $REPARSE_POINT), Alternate Data Streams (ADS) and malware abuse, NTFS permissions vs share permissions (effective access = NTFS ∩ Share), journaling ($LogFile write-ahead journal, $UsnJrnl change journal), hard links/junctions/symbolic links security, EFS encryption (FEK, AES-256, RSA). Ask about MFT, ADS, and permissions.",
     11: "FAT32 file system (beginner-intermediate): FAT table structure (FAT12/16/32 entry sizes), cluster chain as singly-linked list, 3 volume regions (Reserved/FAT/Data), directory entries (32-byte structure, 8.3 filename, LFN via 0x0F attribute), critical limitations (4GB file limit from 32-bit size field, 32GB Windows-only volume limit), why still used (USB cross-platform, ESP must be FAT32), data recovery (0xE5 deleted marker). Ask about the 4GB limit and ESP usage.",
+    12: "Windows Processes (intermediate): EPROCESS structure (ActiveProcessLinks, VadRoot, ObjectTable, Token, ProtectionLevel), CreateProcess flow (kernel32→ntdll→NtCreateUserProcess→kernel), virtual address space layout (ASLR, VAD tree, PEB), access token fields (User SID, group SIDs, privileges, integrity level), Integrity Levels and UAC (Medium→High elevation), Protected Process Light (PPL) for LSASS, process injection techniques (DLL injection via CreateRemoteThread, process hollowing, reflective DLL, APC injection), PPID spoofing, Sysmon Event 1. Ask about EPROCESS fields, token, injection techniques.",
+    13: "Windows Threads (intermediate): ETHREAD structure, TEB fields and GS segment register (GS:[0x30]=TEB, GS:[0x60]=PEB, TlsSlots), thread states (Running/Ready/Waiting/Transition/Terminated), Windows scheduler (32 priority levels 0-31, priority classes, quantum ~31ms client/~187ms server, priority boost after waits), synchronization primitives (CRITICAL_SECTION fast-path spin, Mutex cross-process/recursive, Event auto-reset vs manual-reset, Semaphore counting, SRWLock reader-writer, interlocked atomics), TLS and TLS callback anti-debug, thread injection (CreateRemoteThread/Sysmon Event 8, QueueUserAPC alertable wait, SetThreadContext hijacking, NtCreateThreadEx), thread pool. Ask about scheduler, sync primitives, and thread injection.",
   };
 
   const generate = async () => {
@@ -226,6 +238,8 @@ const LESSON_TITLES = {
   9:  { uz: "Fayl tizimlari",          en: "File Systems" },
   10: { uz: "NTFS",                    en: "NTFS" },
   11: { uz: "FAT32",                   en: "FAT32" },
+  12: { uz: "Jarayonlar (Processes)", en: "Processes" },
+  13: { uz: "Thread'lar",             en: "Threads" },
 };
 
 function ModalHeader({ phase, onClose, lessonNum = 1 }) {

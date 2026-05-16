@@ -27,8 +27,8 @@ const LESSONS = {
   9:  { num: "L09", section: "01", uz: "Fayl tizimlari",                en: "File Systems",                subUz: "VFS, FAT/NTFS/exFAT arxitekturasi va Windows I/O menejeri", subEn: "VFS, FAT/NTFS/exFAT architecture and the Windows I/O Manager" },
   10: { num: "L10", section: "01", uz: "NTFS",                          en: "NTFS",                        subUz: "MFT, atributlar, ADS, ruxsatlar, jurnalling va EFS", subEn: "MFT, attributes, ADS, permissions, journaling and EFS" },
   11: { num: "L11", section: "01", uz: "FAT32",                         en: "FAT32",                       subUz: "FAT jadvali, klaster ajratish, cheklovlar va ESP", subEn: "FAT table, cluster allocation, limitations and the EFI System Partition" },
-  12: { num: "L12", section: "01", uz: "Jarayonlar (Processes)",        en: "Processes",                   subUz: "Tez kunda", subEn: "Coming soon" },
-  13: { num: "L13", section: "01", uz: "Thread'lar",                    en: "Threads",                     subUz: "Tez kunda", subEn: "Coming soon" },
+  12: { num: "L12", section: "01", uz: "Jarayonlar (Processes)",        en: "Processes",                   subUz: "EPROCESS, virtual manzil fazosi, kirish tokeni va jarayon in'ektsiya texnikalari", subEn: "EPROCESS, virtual address space, access token, and process injection techniques" },
+  13: { num: "L13", section: "01", uz: "Thread'lar",                    en: "Threads",                     subUz: "ETHREAD, rejalashtiruvchi, prioritetlar, sinxronizatsiya va thread in'ektsiya", subEn: "ETHREAD, scheduler, priorities, synchronization, and thread injection" },
   14: { num: "L14", section: "01", uz: "Handle'lar",                    en: "Handles",                     subUz: "Tez kunda", subEn: "Coming soon" },
   15: { num: "L15", section: "01", uz: "Servislar",                     en: "Services",                    subUz: "Tez kunda", subEn: "Coming soon" },
   16: { num: "L16", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "Tez kunda", subEn: "Coming soon" },
@@ -107,6 +107,10 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <SectionNTFS />
           </> : lessonNum === 11 ? <>
             <SectionFAT32 />
+          </> : lessonNum === 12 ? <>
+            <SectionProcesses />
+          </> : lessonNum === 13 ? <>
+            <SectionThreads />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -233,6 +237,12 @@ const LESSON_META = {
   11: { min: 26, diagrams: 4, labs: 1,
        introUz: <><em>FAT32</em> — eng oddiy va keng tarqalgan fayl tizimlaridan biri. Bu darsda FAT jadvalining tuzilishi, klaster ajratish, FAT12/16/32 farqlari, asosiy cheklovlar (4GB fayl, 32GB hajm), nima uchun hali ham USB disklar va EFI System Partition (ESP) uchun ishlatilishini va qoplash usullarini o'rganasiz.</>,
        introEn: <><em>FAT32</em> is one of the simplest and most widely deployed file systems. This lesson covers the FAT table structure, cluster allocation, FAT12/16/32 differences, key limitations (4GB file size, 32GB volume), why it's still used for USB drives and the EFI System Partition, and data recovery considerations.</> },
+  12: { min: 38, diagrams: 7, labs: 3,
+       introUz: <><em>Jarayon (Process)</em> — Windows'da bajariladigan dasturning asosiy konteyneri: virtual manzil fazosi, handle jadvali, kirish tokeni va mavzular to'plami. Bu darsda <em>EPROCESS</em> tuzilmasi, CreateProcess oqimi, manzil fazosi tartibi, yaxlitlik darajalari va tajovuzkorlar foydalanadigan DLL in'ektsiya, jarayon bo'shatish kabi texnikalarni o'rganasiz.</>,
+       introEn: <><em>A process</em> is Windows' primary container for executing code: a virtual address space, handle table, access token, and a set of threads. This lesson covers the <em>EPROCESS</em> structure, the CreateProcess flow, address space layout, integrity levels, and the techniques attackers use — DLL injection, process hollowing, and more.</> },
+  13: { min: 34, diagrams: 6, labs: 2,
+       introUz: <><em>Thread</em> — jarayon ichidagi bajariladigan oqim. Bu darsda <em>ETHREAD</em> va TEB tuzilmalari, Windows rejalashtiruvchisi (0–31 prioritet, kvant, prioritet ko'tarish), thread holatlari, sinxronizatsiya primitivlari (mutex, event, critical section, SRWLock), thread in'ektsiya texnikalari (CreateRemoteThread, APC) va ularni kuzatishni o'rganasiz.</>,
+       introEn: <><em>A thread</em> is the unit of execution inside a process. This lesson covers the <em>ETHREAD</em> and TEB structures, the Windows scheduler (0–31 priorities, quanta, priority boost), thread states, synchronization primitives (mutex, event, critical section, SRWLock), thread injection techniques (CreateRemoteThread, APC), and how to monitor for them.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -3717,6 +3727,518 @@ convert D: /FS:NTFS
 
 # Hajm turini tekshirish
 Get-Volume -DriveLetter D | Select-Object FileSystem, Size, SizeRemaining`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L12 — Processes
+// ─────────────────────────────────────────────────────────────
+function SectionProcesses() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Processes — The Execution Container" uz="" />
+      <P>A <Term>process</Term> is Windows' fundamental unit of isolation. It is not code that runs — threads run. A process is the <Em>container</Em> that wraps an executing program: its own virtual address space (so one process cannot read another's memory), its own handle table (references to kernel objects like files and mutexes), an access token (what the process is allowed to do), and at least one thread. When you double-click notepad.exe, Windows creates a process object in the kernel, allocates a 128 TB virtual address space, maps the executable into it, and creates the first thread to start executing at the entry point.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — EPROCESS: The Kernel Structure</h3>
+      <P>Every process is represented in the kernel as an <Term>EPROCESS</Term> structure — a large, partially opaque block of memory allocated from the non-paged pool. It contains everything the kernel needs to manage the process. Key fields (x64 Windows 11):</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// Simplified EPROCESS layout (selected fields, offsets vary by build)
+typedef struct _EPROCESS {
+  KPROCESS         Pcb;              // Dispatcher header + scheduler state
+  EX_PUSH_LOCK     ProcessLock;
+  LARGE_INTEGER    CreateTime;
+  LARGE_INTEGER    ExitTime;
+  RTL_AVL_TREE     VadRoot;          // Virtual Address Descriptor tree (VAD)
+                                     //   — describes every mapped region
+  HANDLE_TABLE*    ObjectTable;      // Handle table (files, mutexes, events, ...)
+  EX_FAST_REF      Token;            // Access token → who is this process?
+  ULONG_PTR        UniqueProcessId;  // PID
+  LIST_ENTRY       ActiveProcessLinks; // Doubly-linked list of all EPROCESS nodes
+  ULONG            ImagePathHash;
+  UNICODE_STRING   ImageFileName;    // Short name (up to 15 chars)
+  SECTION_OBJECT*  SectionObject;    // Mapped executable
+  ULONG            ProtectionLevel;  // PPL: Protected Process Light level
+  ULONG            Flags2;           // IsBeingDebugged, IsSubsystemProcess, ...
+} EPROCESS;`}</code></pre>
+      <P>The <Em>ActiveProcessLinks</Em> doubly-linked list connects every live EPROCESS. Task Manager and Process Explorer walk this list to enumerate processes. DKOM (Direct Kernel Object Manipulation) rootkits unlink an EPROCESS from this list to hide a process from user-space tools — but forensic tools can scan the pool for EPROCESS signatures to find unlinked processes.</P>
+      <Callout color="var(--c-warn)" icon="warning" titleEn="VAD tree — the real memory map" titleUz="">
+        The <strong>Virtual Address Descriptor (VAD)</strong> tree is the authoritative map of a process's virtual address space. Every VirtualAlloc, MapViewOfFile, and LoadLibrary creates a VAD node. Malware analysis tools (VadInfo in WinDbg, malfind in Volatility) walk the VAD tree to find injected regions — memory that is executable, writable, and not backed by a file on disk is a strong indicator of shellcode injection.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Process Creation: CreateProcess Flow</h3>
+      <P>When you call <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>CreateProcess()</code>, the following chain executes:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Step","Layer","What happens"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["1","kernel32.dll","CreateProcessW() validates parameters, resolves the executable path, reads the file to check if it is a .exe, .bat, .cmd, or needs a shim"],
+            ["2","kernel32.dll","Opens the image file, creates a section object (maps the PE into memory), reads the PE headers to find the entry point and required DLLs"],
+            ["3","ntdll.dll","NtCreateUserProcess() — single system call that atomically creates the EPROCESS, ETHREAD, address space, and copies the PEB/TEB"],
+            ["4","Kernel (ntoskrnl)","Allocates EPROCESS from non-paged pool, initializes handle table, VAD tree, token (inherited from parent), and links into ActiveProcessLinks"],
+            ["5","Kernel","Creates the initial ETHREAD, allocates its stack, sets the start address to ntdll!LdrInitializeThunk"],
+            ["6","ntdll.dll (new process)","LdrInitializeThunk runs in the new process: loads all import DLLs (LoadLibrary), resolves imports, runs DLL_PROCESS_ATTACH callbacks, then jumps to WinMain/main"],
+            ["7","CSRSS","The new process registers itself with CSRSS (Client-Server Runtime Subsystem) for Win32 subsystem services"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":j===1?"var(--accent)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Virtual Address Space Layout</h3>
+      <P>On 64-bit Windows, each process gets a 128 TB user-mode virtual address space (addresses 0x0000000000000000 – 0x00007FFFFFFFFFFF) and the kernel occupies the upper 128 TB (0xFFFF800000000000 – 0xFFFFFFFFFFFFFFFF). The layout of the user-mode space for a typical process:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Region","Typical address (ASLR-randomized)","Contents"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Null page","0x0000000000000000","64KB unmapped — catches NULL pointer dereferences"],
+            ["Executable image","~0x140000000 (ASLR)","The main .exe mapped from disk (code, data, read-only data)"],
+            ["Loaded DLLs","Scattered, ASLR","ntdll.dll, kernel32.dll, ucrtbase.dll, app DLLs, etc."],
+            ["Heaps","Dynamic","Default process heap + additional heaps from HeapCreate()"],
+            ["Thread stacks","Dynamic (ASLR)","Each thread gets 1MB stack by default (committed on demand)"],
+            ["PEB","~0x7FF... (ASLR)","Process Environment Block: image base, command line, env vars, loader data, heap list"],
+            ["User-mode limit","0x00007FFFFFFFFFFF","Top of user address space — kernel starts above"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <P><Term>ASLR (Address Space Layout Randomization)</Term> randomizes the base addresses of the executable, DLLs, stack, and heap on each launch. Without ASLR, an attacker who knows a buffer overflow target can hardcode the return address. With ASLR, they need an info-leak vulnerability first to discover the randomized address before they can exploit the overflow. Windows implements ASLR for both the kernel (KASLR) and user mode.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Access Token: The Security Context</h3>
+      <P>Every process has an <Term>access token</Term> attached to it (field <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>EPROCESS.Token</code>). The token is a kernel object that answers the question: "Who is this process, and what is it allowed to do?" It contains:</P>
+      <ul style={{paddingLeft:24,lineHeight:2,fontSize:14,color:"var(--text-1)"}}>
+        <li><strong>User SID</strong> — e.g., S-1-5-21-...-1001. Identifies the owner of the process.</li>
+        <li><strong>Group SIDs</strong> — list of groups the user belongs to (Administrators, Users, Everyone, INTERACTIVE, etc.)</li>
+        <li><strong>Privileges</strong> — individual rights not tied to objects: SeDebugPrivilege (debug any process), SeLoadDriverPrivilege (load kernel drivers), SeTcbPrivilege (act as OS), SeImpersonatePrivilege (impersonate any token). Each privilege can be Disabled, Enabled, or Enabled by default.</li>
+        <li><strong>Integrity Level (IL)</strong> — Untrusted (0), Low (1), Medium (2), High (3), System (4). Mandatory Integrity Control (MIC) enforces no-write-up: a Medium process cannot write to High objects.</li>
+        <li><strong>Primary token vs impersonation token</strong> — A thread can temporarily impersonate a different security context (e.g., a service impersonating a client) by attaching an impersonation token to itself.</li>
+      </ul>
+      <Callout color="var(--c-err)" icon="warning" titleEn="Token theft — privilege escalation via stolen token" titleUz="">
+        If an attacker has SeDebugPrivilege (or is already SYSTEM), they can open a SYSTEM-level process (e.g., lsass.exe), call <code>OpenProcessToken()</code>, duplicate the token with <code>DuplicateTokenEx()</code>, and inject it into their own process with <code>ImpersonateLoggedOnUser()</code>. Their process now runs as SYSTEM. This is why SeDebugPrivilege is called "a gift of god to attackers" — any process with it can effectively become SYSTEM. Mimikatz uses this technique routinely.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Integrity Levels and UAC</h3>
+      <P>Windows Vista introduced <Term>Mandatory Integrity Control (MIC)</Term>. Every object (file, registry key, process) has an integrity label. The MIC policy enforces: <strong>no write-up</strong> (a lower-integrity process cannot write to a higher-integrity object), <strong>no read-up</strong> (for some object types), <strong>no execute-up</strong>. The practical levels:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Level","SID","Who runs at this level","Typical access"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Untrusted","S-1-16-0","Anonymous, AppContainer (sandboxed UWP)","Almost nothing — can't write anywhere meaningful"],
+            ["Low","S-1-16-4096","IE/Edge in Protected Mode, downloaded files initially","Temp folder, specific registry keys only"],
+            ["Medium","S-1-16-8192","Normal user processes (standard user or unelevated admin)","User profile, HKCU, no HKLM writes, no system dir writes"],
+            ["High","S-1-16-12288","Elevated processes (UAC elevation, RunAs)","HKLM, Program Files, system dirs, kernel driver load"],
+            ["System","S-1-16-16384","Windows services (SYSTEM account), LSASS, kernel drivers","Full access to everything in user mode"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-warn)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <P><Term>UAC (User Account Control)</Term> is the mechanism that elevates processes from Medium to High integrity. When an executable requests elevation (via a UAC manifest or via RunAs), Windows creates a second, elevated token with the Administrator SID active and IL=High, and presents the "Do you want to allow this app to make changes?" dialog. The unelevated and elevated processes are separate — even for the same user — which is why a Medium notepad.exe cannot read the memory of a High cmd.exe.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Protected Processes and PPL</h3>
+      <P>Windows Vista introduced <Term>Protected Processes</Term> for DRM (media playback). Windows 8.1 extended this with <Term>Protected Process Light (PPL)</Term> for security-critical processes. A protected process has a ProtectionLevel set in EPROCESS. The rules:</P>
+      <ul style={{paddingLeft:24,lineHeight:2,fontSize:14,color:"var(--text-1)"}}>
+        <li>A non-protected process (even SYSTEM) cannot open a protected process with PROCESS_VM_READ, PROCESS_VM_WRITE, or PROCESS_INJECT_THREAD access.</li>
+        <li>Only a process with equal or higher protection level can open a protected process.</li>
+        <li>LSASS runs as PPL (PsProtectedSignerLsa-Light) on Windows 10+ when Credential Guard is configured. This blocks Mimikatz's OpenProcess approach to dumping LSASS.</li>
+        <li>Antivirus products must have their drivers signed with a special "Early Launch Anti-Malware (ELAM)" certificate to run as protected processes.</li>
+      </ul>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Process Injection Techniques</h3>
+      <P>Process injection is the act of executing attacker code in the address space of another process — to evade detection, inherit its privileges, or hide activity behind a legitimate process name. The main techniques:</P>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,marginTop:12}}>
+        {[
+          {title:"Classic DLL Injection",color:"var(--c-warn)",body:'VirtualAllocEx() → WriteProcessMemory() → CreateRemoteThread(LoadLibraryA). Attacker allocates space in the target, writes the DLL path string, then creates a remote thread starting at LoadLibraryA. Detected by: Sysmon Event 8 (CreateRemoteThread), DLL load events, memory scanning.'},
+          {title:"Process Hollowing",color:"var(--c-err)",body:'CreateProcess(SUSPENDED) → NtUnmapViewOfSection() → VirtualAllocEx() → WriteProcessMemory() → SetThreadContext() → ResumeThread(). The attacker creates a legitimate process suspended, unmaps its image, writes malicious code, and redirects the entry point. The process appears as legitimate in Task Manager.'},
+          {title:"APC Injection",color:"var(--accent)",body:'VirtualAllocEx() + WriteProcessMemory() → QueueUserAPC(shellcode, thread). Asynchronous Procedure Calls are functions queued to execute in a thread context when it enters an alertable wait state (SleepEx, WaitForSingleObjectEx). Used in process doppelgänging and early-bird injection.'},
+          {title:"Reflective DLL Injection",color:"var(--c-system)",body:"The DLL contains its own loader — no LoadLibrary call. The attacker writes the DLL bytes into target memory and calls an exported ReflectiveLoader() function that maps the DLL without touching the Windows loader. Used by Metasploit Meterpreter and Cobalt Strike."},
+        ].map(c=><div key={c.title} style={{padding:"14px 16px",background:`${c.color}08`,border:`1px solid ${c.color}25`,borderLeft:`3px solid ${c.color}`,borderRadius:8}}>
+          <div style={{fontWeight:700,fontSize:13,color:c.color,marginBottom:6}}>{c.title}</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{c.body}</div>
+        </div>)}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Process Parent-Child Relationships</h3>
+      <P>Every EPROCESS stores its <Term>parent PID (PPID)</Term>. When Explorer launches notepad.exe, notepad's PPID is Explorer's PID. However, the parent-child relationship in Windows is <Em>not enforced</Em> after creation — a process can specify any PID as its parent via PROC_THREAD_ATTRIBUTE_PARENT_PROCESS attribute in CreateProcess. Malware uses PPID spoofing to make malicious processes appear as children of explorer.exe or svchost.exe rather than the actual launching process. Detecting PPID spoofing: compare the PPID in EPROCESS with the actual handle inheritance chain using WMI or ETW events.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all processes with PID and PPID (PowerShell)
+Get-CimInstance Win32_Process | Select-Object ProcessId, ParentProcessId, Name, CommandLine |
+  Sort-Object ProcessId | Format-Table -AutoSize
+
+# Find anomalous parent-child relationships
+# Expected: svchost.exe PPID = services.exe
+# Suspicious: svchost.exe PPID = cmd.exe or powershell.exe
+
+# Sysmon Event ID 1 — Process Create
+# Logs: Image, CommandLine, ParentImage, ParentCommandLine, Hashes, IntegrityLevel
+# Essential for detecting PPID spoofing and living-off-the-land attacks
+
+# Check process token integrity level
+Get-Process -Name notepad | ForEach-Object {
+  $p = $_
+  $token = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+  $token.Groups | Where-Object { $_.Value -like "S-1-16-*" }
+}`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Jarayonlar — Bajarilish Konteyneri" en="" />
+      <P><Term>Jarayon (Process)</Term> — Windows'ning izolyatsiyaning asosiy birligi. Kod emas, thread lar ishlaydi. Jarayon — bajariladigan dasturni o'rab turgan <Em>konteyner</Em>: o'zining virtual manzil fazosi (bir jarayon boshqasining xotirasini o'qiy olmaydi), o'zining handle jadvali (fayl, mutex kabi yadro ob'ektlariga havolalar), kirish tokeni (jarayonga nima ruxsat berilgan) va kamida bitta thread. Notepad.exe ni ikki marta bosganingizda, Windows yadrada jarayon ob'ektini yaratadi, 128 TB virtual manzil fazosini ajratadi, bajariladigan faylni unga moslashtiradi va birinchi thread ni yaratadi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — EPROCESS: Yadro Tuzilmasi</h3>
+      <P>Har bir jarayon yadrada <Term>EPROCESS</Term> tuzilmasi sifatida ifodalanadi — paged bo'lmagan pooldan ajratilgan katta, qisman noaniq xotira bloki. U yadroning jarayonni boshqarishi uchun kerak bo'lgan hamma narsani o'z ichiga oladi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// Soddalashtirilgan EPROCESS (tanlangan maydonlar)
+typedef struct _EPROCESS {
+  KPROCESS         Pcb;              // Dispatcher sarlavhasi + rejalashtiruvchi holati
+  LARGE_INTEGER    CreateTime;       // Yaratilish vaqti
+  RTL_AVL_TREE     VadRoot;          // Virtual Manzil Tavsiflovchi daraxti (VAD)
+  HANDLE_TABLE*    ObjectTable;      // Handle jadvali (fayllar, mutex, event, ...)
+  EX_FAST_REF      Token;            // Kirish tokeni → bu jarayon kim?
+  ULONG_PTR        UniqueProcessId;  // PID
+  LIST_ENTRY       ActiveProcessLinks; // Barcha EPROCESS larning ikki tomonlama ro'yxati
+  UNICODE_STRING   ImageFileName;    // Qisqa nom (15 belgigacha)
+  ULONG            ProtectionLevel;  // PPL: Himoyalangan Jarayon Yengil darajasi
+} EPROCESS;`}</code></pre>
+      <P><Em>ActiveProcessLinks</Em> ikki tomonlama ro'yxati barcha tirik EPROCESS larni birlashtiradi. Task Manager va Process Explorer jarayonlarni sanash uchun bu ro'yxatni aylanib chiqadi. DKOM rootkit lar jarayonni user-space vositalaridan yashirish uchun EPROCESS ni bu ro'yxatdan olib tashlaydi — lekin kriminalistik vositalar ulangan bo'lmagan jarayonlarni topish uchun pool ni EPROCESS imzolari uchun skanerlashi mumkin.</P>
+      <Callout color="var(--c-warn)" icon="warning" titleUz="VAD daraxti — haqiqiy xotira xaritasi" titleEn="">
+        <strong>Virtual Manzil Tavsiflovchi (VAD)</strong> daraxti jarayonning virtual manzil fazosining vakolatli xaritasi. Har bir VirtualAlloc, MapViewOfFile va LoadLibrary VAD tugunini yaratadi. Zararli dastur tahlil vositalari (Volatility'da malfind) VAD daraxtini aylanib chiqib in'ektlangan hududlarni topadi — bajariladigan, yozish mumkin va diskdagi faylga asoslanmagan xotira shellcode in'ektsiyasining kuchli ko'rsatkichi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Jarayon Yaratish: CreateProcess Oqimi</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Qadam","Qatlam","Nima sodir bo'ladi"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["1","kernel32.dll","CreateProcessW() parametrlarni tekshiradi, bajariladigan fayl yo'lini hal qiladi, fayl turini tekshiradi"],
+            ["2","kernel32.dll","Rasm faylini ochadi, bo'lim ob'ektini yaratadi (PE ni xotiraga moslashtiradi)"],
+            ["3","ntdll.dll","NtCreateUserProcess() — EPROCESS, ETHREAD, manzil fazosi va PEB/TEB ni atomik yaratuvchi bitta tizim chaqiruvi"],
+            ["4","Yadro","EPROCESS ni ajratadi, handle jadvalini, VAD daraxtini, tokenini (ota-onadan meros) ishga tushiradi"],
+            ["5","Yadro","Dastlabki ETHREAD ni yaratadi, stekini ajratadi, boshlash manzilini ntdll!LdrInitializeThunk ga o'rnatadi"],
+            ["6","ntdll.dll (yangi jarayon)","LdrInitializeThunk ishga tushadi: barcha import DLL larni yuklaydi, importlarni hal qiladi, DLL_PROCESS_ATTACH ni chaqiradi, WinMain ga sakraydi"],
+            ["7","CSRSS","Yangi jarayon Win32 pastki tizim xizmatlari uchun CSRSS bilan ro'yxatdan o'tadi"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":j===1?"var(--accent)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Virtual Manzil Fazosi Tartibı</h3>
+      <P>64-bitli Windows'da har bir jarayon 128 TB user-mode virtual manzil fazosiga ega (0x0000... – 0x00007FFF...) va yadro yuqori 128 TB ni egallaydi (0xFFFF8000...). <Term>ASLR (Manzil Fazosi Tartibini Tasodifiylashtirish)</Term> bajariladigan fayl, DLL, stek va heap ning asosiy manzillarini har bir yuklashda tasodifiylashtiradi. ASLR siz tajovuzkor buffer overflow maqsadli qaytish manzilini qattiq kodlashi mumkin edi. ASLR bilan tajovuzkorga avval overflow dan foydalanish uchun tasodifiy manzilni aniqlash uchun ma'lumot sizib chiqish zaifligi kerak.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Kirish Tokeni: Xavfsizlik Konteksti</h3>
+      <P>Har bir jarayonda <Term>kirish tokeni</Term> biriktirilgan (<code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>EPROCESS.Token</code> maydoni). Token — "Bu jarayon kim va nima qilishga ruxsati bor?" degan savolga javob beradigan yadro ob'ekti:</P>
+      <ul style={{paddingLeft:24,lineHeight:2,fontSize:14,color:"var(--text-1)"}}>
+        <li><strong>Foydalanuvchi SID</strong> — masalan S-1-5-21-...-1001. Jarayon egasini aniqlaydi.</li>
+        <li><strong>Guruh SID lari</strong> — Administrators, Users, Everyone, INTERACTIVE va boshqalar.</li>
+        <li><strong>Imtiyozlar</strong> — ob'ektlarga bog'liq bo'lmagan individual huquqlar: SeDebugPrivilege (istalgan jarayonni nosozliklashi), SeLoadDriverPrivilege (yadro drayveri yuklash), SeTcbPrivilege (OT sifatida harakat qilish). Har bir imtiyoz O'chirilgan, Yoqilgan yoki Standart yoqilgan bo'lishi mumkin.</li>
+        <li><strong>Yaxlitlik Darajasi (IL)</strong> — Ishonilmagan (0), Past (1), O'rta (2), Yuqori (3), Tizim (4). Majburiy Yaxlitlik Nazorati (MIC) yozishni yuqoriga bloklaydi: O'rta jarayon Yuqori ob'ektlarga yoza olmaydi.</li>
+      </ul>
+      <Callout color="var(--c-err)" icon="warning" titleUz="Token o'g'irlash — o'g'irlangan token orqali imtiyozlarni oshirish" titleEn="">
+        Agar tajovuzkor SeDebugPrivilege ga ega bo'lsa yoki allaqachon SYSTEM bo'lsa, u SYSTEM darajadagi jarayonni (lsass.exe) ochib, tokenini nusxalab va o'z jarayoniga in'ektsiya qilishi mumkin. Jarayoni endi SYSTEM sifatida ishlaydi. Mimikatz bu texnikadan muntazam foydalanadi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Jarayon In'ektsiya Texnikalari</h3>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,marginTop:12}}>
+        {[
+          {title:"Klassik DLL In'ektsiya",color:"var(--c-warn)",body:"VirtualAllocEx() → WriteProcessMemory() → CreateRemoteThread(LoadLibraryA). Tajovuzkor maqsadda joy ajratadi, DLL yo'l satrini yozadi, keyin LoadLibraryA dan boshlanadigan masofaviy thread yaratadi. Sysmon Event 8 (CreateRemoteThread) bilan aniqlanadi."},
+          {title:"Jarayon Bo'shatish (Hollowing)",color:"var(--c-err)",body:"CreateProcess(SUSPENDED) → NtUnmapViewOfSection() → WriteProcessMemory() → ResumeThread(). Tajovuzkor qonuniy jarayonni to'xtatilgan holda yaratadi, uning rasmini olib tashlaydi, zararli kod yozadi va kirish nuqtasini qayta yo'naltiradi. Jarayon Task Manager da qonuniy ko'rinadi."},
+          {title:"APC In'ektsiya",color:"var(--accent)",body:"VirtualAllocEx() + WriteProcessMemory() → QueueUserAPC(shellcode, thread). Asenkron Protsedura Chaqiruvlar — thread uyg'ot holatiga (SleepEx) kirganida bajarilish uchun navbatga qo'yilgan funksiyalar. Early-bird in'ektsiyada ishlatiladi."},
+          {title:"Reflektiv DLL In'ektsiya",color:"var(--c-system)",body:"DLL o'z yuklovchisini o'z ichiga oladi — LoadLibrary chaqiruvi yo'q. Tajovuzkor DLL baytlarini maqsad xotirasiga yozadi va Windows yuklovchisiga tegmasdan DLL ni moslashtiruvchi ReflectiveLoader() ni chaqiradi. Metasploit Meterpreter va Cobalt Strike ishlatadi."},
+        ].map(c=><div key={c.title} style={{padding:"14px 16px",background:`${c.color}08`,border:`1px solid ${c.color}25`,borderLeft:`3px solid ${c.color}`,borderRadius:8}}>
+          <div style={{fontWeight:700,fontSize:13,color:c.color,marginBottom:6}}>{c.title}</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{c.body}</div>
+        </div>)}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Jarayon Ota-Bola Munosabatlari va PPID Soxtalashtirish</h3>
+      <P>Har bir EPROCESS o'zining <Term>ota-ona PID (PPID)</Term> ini saqlaydi. Lekin Windows'da ota-bola munosabati yaratilgandan keyin <Em>ta'minlanmaydi</Em> — jarayon CreateProcess da PROC_THREAD_ATTRIBUTE_PARENT_PROCESS atributi orqali istalgan PIDni ota-ona sifatida ko'rsatishi mumkin. Zararli dasturlar PPID soxtalashtirish orqali zararli jarayonlarni haqiqiy ishga tushiruvchi jarayon o'rniga explorer.exe yoki svchost.exe ning bolasi ko'rinishida ko'rsatadi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# PID va PPID bilan barcha jarayonlar ro'yxati (PowerShell)
+Get-CimInstance Win32_Process |
+  Select-Object ProcessId, ParentProcessId, Name, CommandLine |
+  Sort-Object ProcessId | Format-Table -AutoSize
+
+# Anomal ota-bola munosabatlarini topish
+# Kutilgan: svchost.exe PPID = services.exe
+# Shubhali: svchost.exe PPID = cmd.exe yoki powershell.exe
+
+# Sysmon Event ID 1 — Jarayon Yaratish
+# Yozadi: Image, CommandLine, ParentImage, Hashes, IntegrityLevel`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L13 — Threads
+// ─────────────────────────────────────────────────────────────
+function SectionThreads() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Threads — The Unit of Execution" uz="" />
+      <P>A <Term>thread</Term> is the entity the CPU scheduler actually runs. While a process is an isolation container, a thread is the instruction pointer + register state + stack that moves through the code. A process must have at least one thread; it can have thousands. All threads within a process share the same virtual address space, the same handle table, and the same access token — but each thread has its own <Em>stack</Em>, its own <Em>CPU registers</Em> (saved as a CONTEXT structure during context switches), and its own <Em>Thread Environment Block (TEB)</Em>. This shared-but-separate model is why multi-threading is powerful and why thread synchronization bugs (race conditions, deadlocks) are so hard to debug.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — ETHREAD and TEB</h3>
+      <P>Every thread is represented in the kernel as an <Term>ETHREAD</Term> structure. Key fields:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`typedef struct _ETHREAD {
+  KTHREAD        Tcb;             // Kernel thread control block
+                                  //   — scheduler state, priority, quantum, APC queues
+  LARGE_INTEGER  CreateTime;
+  LARGE_INTEGER  ExitTime;
+  ULONG          ThreadId;        // TID
+  PEPROCESS      ThreadsProcess;  // Back-pointer to owning EPROCESS
+  PVOID          StartAddress;    // Original start address (CreateThread parameter)
+  PVOID          Win32StartAddress; // User-mode start address (for debugging)
+  CLIENT_ID      Cid;             // { UniqueProcess, UniqueThread }
+  ULONG          SameThreadApcFlags;
+  // ... impersonation token, I/O pending flag, ...
+} ETHREAD;`}</code></pre>
+      <P>The <Term>TEB (Thread Environment Block)</Term> lives in user-mode memory and is accessible to the thread itself via the <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>GS</code> segment register on x64 (<code>FS</code> on x86). Key TEB fields:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["TEB Field","Offset (x64)","Contents"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["NtTib.StackBase","0x08","Top of the thread's user-mode stack"],
+            ["NtTib.StackLimit","0x10","Bottom of committed stack (guard page below)"],
+            ["NtTib.Self","0x30","Pointer to TEB itself — GS:[0x30] = &TEB"],
+            ["ProcessEnvironmentBlock","0x60","Pointer to the process PEB — GS:[0x60] = &PEB"],
+            ["LastErrorValue","0x68","Result of GetLastError() — per-thread Win32 error code"],
+            ["ThreadId","0x48","TID — GS:[0x48]"],
+            ["TlsSlots[0..63]","0x1480","Thread Local Storage slots 0-63 inline"],
+            ["TlsExpansionSlots","0x1788","Pointer to extended TLS slots 64-1088"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-warn)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleEn="Why attackers read the TEB" titleUz="">
+        Shellcode frequently uses GS:[0x60] to find the PEB, then walks PEB.Ldr (the loader data list) to find loaded DLLs without calling any Windows API — a technique called "PEB walking." This avoids triggering import-address-table hooks placed by antivirus software. Every hand-written shellcode in the wild does this: <code>mov rax, gs:[0x60] // PEB</code>.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Thread States</h3>
+      <P>The Windows scheduler tracks each thread through a state machine:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["State","Meaning"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Running","Executing on a CPU right now. At most one thread per logical CPU core can be Running."],
+            ["Ready","Eligible to run, waiting for a CPU to become free. Held in per-priority ready queues."],
+            ["Waiting (Blocked)","Blocked on a kernel object: WaitForSingleObject(), Sleep(), I/O completion, page fault. Not consuming CPU."],
+            ["Transition","Ready to run but its kernel stack was paged out — waiting for the stack to be paged back in."],
+            ["Terminated","ExitThread() called or the owning process exited. ETHREAD object still exists until the last handle closes."],
+            ["Initialized","Thread object created but not yet ready to run (between NtCreateThread and the first scheduler tick)."],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — The Windows Scheduler: Priorities and Quanta</h3>
+      <P>Windows uses a <Term>preemptive, priority-based scheduler</Term>. There are 32 priority levels (0–31). The scheduler always picks the highest-priority Ready thread. If a thread of equal or higher priority becomes Ready while another is Running, the running thread is preempted immediately.</P>
+      <P><strong>Priority classes and base priorities:</strong></P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Priority class","Base priority range","Win32 constant"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Idle","1 (base 1)","IDLE_PRIORITY_CLASS"],
+            ["Below Normal","4–6 (base 6)","BELOW_NORMAL_PRIORITY_CLASS"],
+            ["Normal","4–9 (base 8 for foreground, 6 for background)","NORMAL_PRIORITY_CLASS"],
+            ["Above Normal","6–11 (base 10)","ABOVE_NORMAL_PRIORITY_CLASS"],
+            ["High","11–15 (base 13)","HIGH_PRIORITY_CLASS"],
+            ["Realtime","16–31 (base 24)","REALTIME_PRIORITY_CLASS — bypass normal scheduler"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":j===2?"var(--accent)":"var(--text-1)",fontFamily:j!==0&&j!==2?"inherit":"var(--font-mono)",fontSize:j===2?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <P>Within a priority class, each thread has a <Em>relative thread priority</Em> offset (THREAD_PRIORITY_LOWEST = −2 through THREAD_PRIORITY_HIGHEST = +2, plus THREAD_PRIORITY_TIME_CRITICAL = 15 and THREAD_PRIORITY_IDLE = 1). The actual scheduling priority = priority class base + relative offset.</P>
+      <P><strong>Quantum:</strong> The time slice a Running thread is allowed before being preempted. On client Windows (workstation), a quantum is 2 clock intervals (~15.6ms each) = ~31ms. On Windows Server, quanta are longer (12 intervals = ~187ms) to reduce context-switch overhead for long-running services. The scheduler measures quanta in <Em>quantum units</Em> (1 unit ≈ 1/3 of a clock interval), and reduces the count on each clock tick.</P>
+      <P><strong>Priority boost:</strong> The scheduler automatically boosts a thread's dynamic priority above its base priority after certain events: completing a wait (e.g., receiving a keyboard/mouse event → UI thread gets +2 boost), completing I/O, being starved at low priority. The boost decays by 1 unit per quantum until it returns to base. This prevents low-priority threads from starving completely while still letting high-priority threads dominate.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Thread Synchronization Primitives</h3>
+      <P>Threads within a process share the same memory. Without synchronization, two threads modifying the same variable simultaneously produce unpredictable results (race condition). Windows provides:</P>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))",gap:14,marginTop:12}}>
+        {[
+          {title:"Critical Section (CRITICAL_SECTION)",color:"var(--accent)",body:"User-mode spin lock + kernel event. Fast path: if the CS is free, a single interlocked operation acquires it without entering the kernel. Slow path: if contended, falls back to a kernel Event object to wait. Fastest synchronization for same-process threads. Non-recursive-safe by default."},
+          {title:"Mutex (HANDLE)",color:"var(--c-system)",body:"Kernel object. Named mutexes work cross-process (unlike CRITICAL_SECTION). Supports waiting with timeout (WaitForSingleObject). The owning thread can re-acquire without deadlocking (recursive). Abandoned mutex (owning process died) returns WAIT_ABANDONED — the state is unknown."},
+          {title:"Event (HANDLE)",color:"var(--c-ok)",body:"Kernel object with two states: signaled / non-signaled. Auto-reset: automatically resets to non-signaled after releasing one waiter. Manual-reset: stays signaled until explicitly reset with ResetEvent() — all waiters released simultaneously. Used for one-thread-signals-many patterns."},
+          {title:"Semaphore (HANDLE)",color:"var(--c-warn)",body:"Kernel object with a count. Allows up to N threads to enter simultaneously (N set at creation). ReleaseSemaphore() increments the count; WaitForSingleObject() decrements it (blocking when count = 0). Classic for limiting concurrent access to a resource pool."},
+          {title:"SRWLock (SRWLOCK)",color:"var(--accent)",body:"Slim Reader-Writer Lock. User-mode only (no kernel involvement). Multiple readers can hold simultaneously; a writer gets exclusive access. Significantly lower overhead than a kernel mutex. Used throughout ntdll.dll and the CRT. Does NOT support recursive acquisition."},
+          {title:"Interlocked functions",color:"var(--c-system)",body:"InterlockedIncrement(), InterlockedCompareExchange(), etc. — CPU-level atomic operations (LOCK XADD, CMPXCHG). Zero kernel overhead. Used for lock-free data structures and reference counting. The foundation of all other synchronization."},
+        ].map(c=><div key={c.title} style={{padding:"14px 16px",background:`${c.color}08`,border:`1px solid ${c.color}25`,borderLeft:`3px solid ${c.color}`,borderRadius:8}}>
+          <div style={{fontWeight:700,fontSize:13,color:c.color,marginBottom:6}}>{c.title}</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{c.body}</div>
+        </div>)}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Thread Local Storage (TLS)</h3>
+      <P><Term>Thread Local Storage (TLS)</Term> provides per-thread global variables — a variable declared <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>__declspec(thread)</code> or <code>thread_local</code> gets its own copy in each thread. In the PE format, a <code>.tls</code> section holds the TLS template; the loader copies it for each new thread and stores a pointer in the TEB's TlsSlots array. Applications can use dynamic TLS via <code>TlsAlloc()</code> / <code>TlsSetValue()</code> / <code>TlsGetValue()</code> for runtime-determined per-thread data.</P>
+      <P><strong>Security relevance:</strong> TLS callbacks are functions stored in the PE's <code>.tls</code> directory that Windows calls <Em>before</Em> the executable's entry point, even before the debugger breaks. Malware uses TLS callbacks for anti-debug tricks and early initialization of obfuscation code that runs before any analysis tool can intercept the main entry point.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Thread Injection Techniques</h3>
+      <P>Thread injection allows an attacker to execute code in another process by hijacking or creating threads:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Technique","API used","Detection"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["CreateRemoteThread","CreateRemoteThread(hProcess, NULL, 0, shellcode, param, 0, &tid)","Sysmon Event 8 (CreateRemoteThread) — logs source/target process, start address, start module"],
+            ["QueueUserAPC / NtQueueApcThread","QueueUserAPC(shellcode, hThread, param) — code runs when thread calls alertable wait","Sysmon Event 8 variant; harder to detect because no new thread is created"],
+            ["Thread Hijacking (SetThreadContext)","SuspendThread() → GetThreadContext() → patch RIP/EIP in CONTEXT → SetThreadContext() → ResumeThread()","No new thread created; suspicious: thread suspended by external process, followed by SetThreadContext"],
+            ["NtCreateThreadEx","Undocumented native API bypassing some CreateRemoteThread monitoring","Memory/handle-based detection; direct syscall bypasses user-mode hooks"],
+            ["Fiber hijacking","ConvertThreadToFiber() + CreateFiber() + SwitchToFiber() — user-mode cooperative scheduling","No scheduler visibility; only detectable by memory scanning for fiber stacks"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-err)" icon="warning" titleEn="Sysmon Event 8 — your primary thread injection detector" titleUz="">
+        Sysmon's CreateRemoteThread event (ID 8) logs: SourceImage, TargetImage, StartAddress, StartModule, and StartFunction. Legitimate inter-process thread creation is rare. Alert on: any process creating a remote thread in another process where StartModule is empty or unknown (shellcode has no associated module name), or where TargetImage is a sensitive process (lsass.exe, csrss.exe, svchost.exe).
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Thread Pool and Worker Threads</h3>
+      <P>Creating a new thread for every small unit of work is expensive (stack allocation, kernel object creation, context switch overhead). Windows provides a built-in <Term>Thread Pool</Term> API (TP_*: CreateThreadpool, SubmitThreadpoolWork, CreateThreadpoolTimer, etc.) that manages a pool of worker threads reused across work items. The thread pool dynamically scales the thread count based on CPU utilization and work queue depth.</P>
+      <P>The CLR (.NET runtime), the I/O Completion Port (IOCP) model, and the Win32 thread pool all use this mechanism. From a security perspective, thread pools make attribution harder — malicious work items can be submitted to the system thread pool (via <code>QueueUserWorkItem</code>) so that the executing thread belongs to a system-managed pool thread rather than a thread explicitly created by the malware.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all threads in a process (PowerShell)
+Get-Process -Name "notepad" | Select-Object -ExpandProperty Threads |
+  Select-Object Id, StartAddress, ThreadState, WaitReason | Format-Table
+
+# WinDbg — list threads in live session
+!process 0 0 notepad.exe  # find EPROCESS
+.process /r /p <eprocess_addr>
+~*          # show all threads
+~0 kb       # stack of thread 0
+
+# Sysmon Event ID 8 — CreateRemoteThread
+# Configure in sysmonconfig.xml:
+# <RuleGroup name="" groupRelation="or">
+#   <CreateRemoteThread onmatch="include">
+#     <TargetImage condition="is">lsass.exe</TargetImage>
+#   </CreateRemoteThread>
+# </RuleGroup>
+
+# Process Hacker: right-click process → Properties → Threads tab
+# Shows all threads, start address, start module, CPU usage per thread`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Thread'lar — Bajarilish Birligi" en="" />
+      <P><Term>Thread</Term> — CPU rejalashtiruvchisi haqiqatda ishlatadigan birlik. Jarayon izolyatsiya konteyneri bo'lsa, thread — kod bo'ylab harakat qiladigan ko'rsatma ko'rsatkichi + registrlar holati + stek. Jarayonda kamida bitta thread bo'lishi kerak, lekin minglab bo'lishi mumkin. Jarayon ichidagi barcha thread lar bir xil virtual manzil fazosi, bir xil handle jadvali va bir xil kirish tokenini baham ko'radi — lekin har bir thread ning o'z <Em>steki</Em>, o'z <Em>CPU registrlari</Em> (kontekst almashish paytida CONTEXT sifatida saqlanadi) va o'z <Em>Thread Muhit Bloki (TEB)</Em> bor.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — ETHREAD va TEB</h3>
+      <P>Har bir thread yadrada <Term>ETHREAD</Term> tuzilmasi sifatida ifodalanadi. <Term>TEB (Thread Muhit Bloki)</Term> user-mode xotirasida joylashgan va x64 da <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>GS</code> segment registri orqali thread ning o'ziga kirish mumkin. Shellcode ko'pincha GS:[0x60] dan PEB topib, yuklangan DLL larni Windows API chaqiruvisiz topadi ("PEB yurishi") — bu antivirus tomonidan joylashtirilgan IAT hook larini ishga tushirmaslik uchun.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// TEB asosiy maydonlari (x64 offsetlar)
+GS:[0x00]  = NtTib.ExceptionList  // SEH zanjiri
+GS:[0x08]  = NtTib.StackBase      // Stek yuqori qismi
+GS:[0x10]  = NtTib.StackLimit     // Stek pastki qismi (majburiy)
+GS:[0x30]  = NtTib.Self           // TEB ga ko'rsatgich
+GS:[0x48]  = ClientId.UniqueThread // TID
+GS:[0x60]  = ProcessEnvironmentBlock // PEB ga ko'rsatgich
+GS:[0x68]  = LastErrorValue        // GetLastError() natijasi (thread bo'yicha)
+GS:[0x1480] = TlsSlots[0..63]     // Thread Mahalliy Saqlash slotlari
+
+// Shellcode klassik PEB yurishi:
+// mov rax, gs:[0x60]  // PEB
+// mov rax, [rax+0x18] // PEB.Ldr
+// mov rax, [rax+0x20] // InMemoryOrderModuleList
+// -- modullarni aylanib chiqib DLLlarni topadi --`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Thread Holatlari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Holat","Ma'nosi"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Running","Hozir CPU da ishlayapti. Har bir mantiqiy CPU yadrosida ko'pi bilan bitta Running thread bo'lishi mumkin."],
+            ["Ready","Ishlashga tayyor, CPUni kutmoqda. Prioritet bo'yicha tayyor navbatlarda saqlanadi."],
+            ["Waiting (Bloklangan)","Yadro ob'ektida bloklangan: WaitForSingleObject(), Sleep(), I/O tugashi, sahifa xatosi. CPU sarflamaydi."],
+            ["Transition","Ishlashga tayyor lekin yadro steki disk ga ko'chirilgan — stekni qaytarishni kutmoqda."],
+            ["Terminated","ExitThread() chaqirildi yoki egalik qiluvchi jarayon chiqib ketdi."],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Windows Rejalashtiruvchisi: Prioritetlar va Kvantlar</h3>
+      <P>Windows <Term>oldini olib, prioritetga asoslangan rejalashtiruvchi</Term> ishlatadi. 32 ta prioritet darajasi (0–31) mavjud. Rejalashtiruvchi doimo eng yuqori prioritetli Ready thread ni tanlaydi. Agar teng yoki yuqori prioritetli thread Running holda turganida Ready bo'lsa, ishlaydigan thread darhol to'xtatiladi.</P>
+      <P><strong>Kvant</strong> — Running thread ning to'xtatilishidan oldin unga ruxsat etilgan vaqt. Client Windows da kvant ~31ms (2 soat intervali × 15.6ms). Windows Server da uzunroq (~187ms) — uzoq muddatli servislar uchun kontekst almashish qo'shimcha yukini kamaytirish uchun.</P>
+      <P><strong>Prioritet ko'tarish:</strong> Rejalashtiruvchi kutish tugaganidan keyin (masalan, klaviatura/sichqoncha hodisasini olish → UI thread +2 ko'tarish oladi) thread ning dinamik prioritetini avtomatik ko'taradi. Ko'tarish asosiy prioritetga qaytguncha har kvantda 1 birlik kamayadi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Sinxronizatsiya Primitivlari</h3>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(270px,1fr))",gap:14,marginTop:12}}>
+        {[
+          {title:"Critical Section",color:"var(--accent)",body:"User-mode spin lock + yadro hodisasi. Tez yo'l: agar CS bo'sh bo'lsa, yagona interlocked amal kernelga kirmasdan oladi. Sekin yo'l: tortishilganda kutish uchun yadro Event ob'ektiga qaytadi. Bir jarayon ichidagi thread lar uchun eng tez sinxronizatsiya."},
+          {title:"Mutex",color:"var(--c-system)",body:"Yadro ob'ekti. Nomlangan mutex lar jarayonlararo ishlaydi (CRITICAL_SECTION dan farqli). Timeout bilan kutishni qo'llab-quvvatlaydi. Egalik qiluvchi thread deadlock siz qayta olishi mumkin. Tark etilgan mutex (jarayon o'lgan) WAIT_ABANDONED qaytaradi."},
+          {title:"Event",color:"var(--c-ok)",body:"Yadro ob'ekti ikki holat bilan: signal berilgan / berilmagan. Avtomatik tiklash: bitta kutuvchini qo'yib bergandan keyin avtomatik tiklaydi. Qo'lda tiklash: barcha kutuvchilar bir vaqtda qo'yib beriladi, ResetEvent() gacha signal berilgan qoladi."},
+          {title:"SRWLock",color:"var(--c-warn)",body:"Ozg'in O'quvchi-Yozuvchi Qulfi. Faqat user-mode (yadro ishtirokisiz). Bir nechta o'quvchilar bir vaqtda ushlab turishi mumkin; yozuvchi eksklyuziv kirish oladi. Yadro mutex dan sezilarli darajada past qo'shimcha yuk. Rekursiv olishni qo'llab-quvvatlamaydi."},
+        ].map(c=><div key={c.title} style={{padding:"14px 16px",background:`${c.color}08`,border:`1px solid ${c.color}25`,borderLeft:`3px solid ${c.color}`,borderRadius:8}}>
+          <div style={{fontWeight:700,fontSize:13,color:c.color,marginBottom:6}}>{c.title}</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{c.body}</div>
+        </div>)}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Thread In'ektsiya Texnikalari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Texnika","Ishlatilgan API","Aniqlash"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["CreateRemoteThread","CreateRemoteThread(hJarayon, NULL, 0, shellcode, param, 0, &tid)","Sysmon Event 8 — manba/maqsad jarayon, boshlash manzili, modul yozadi"],
+            ["QueueUserAPC","QueueUserAPC(shellcode, hThread, param) — uyg'ot kutishda ishlaydi","Yangi thread yaratilmaydi; aniqlash qiyinroq"],
+            ["Thread Hijacking","SuspendThread() → GetThreadContext() → RIP ni o'zgartirish → SetThreadContext() → ResumeThread()","Yangi thread yo'q; shubhali: tashqi jarayon tomonidan to'xtatilgan thread"],
+            ["TLS Callback","PE .tls bo'limidagi kirish nuqtasidan oldin chaqiriluvchi funksiya","Kirish nuqtasida bo'linuvchi nuqta o'rniga TLS bo'limini tekshiring"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-err)" icon="warning" titleUz="Sysmon Event 8 — asosiy thread in'ektsiya aniqlovchingiz" titleEn="">
+        CreateRemoteThread hodisasi (ID 8) yozadi: SourceImage, TargetImage, StartAddress, StartModule, StartFunction. Jarayonlararo thread yaratish kamdan-kam qonuniy. Ogohlantirish: StartModule bo'sh yoki noma'lum (shellcode bog'liq modulga ega emas), yoki TargetImage muhim jarayon (lsass.exe, csrss.exe, svchost.exe) bo'lganda.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Jarayondagi barcha thread larni ro'yxatga olish (PowerShell)
+Get-Process -Name "notepad" | Select-Object -ExpandProperty Threads |
+  Select-Object Id, StartAddress, ThreadState, WaitReason | Format-Table
+
+# WinDbg — barcha thread larni ko'rish
+!process 0 0 notepad.exe   # EPROCESS topish
+.process /r /p <eprocess>  # joriy jarayon o'zgartirish
+~*                          # barcha thread lar
+~0 kb                       # 0-thread steki
+
+# Sysmon CreateRemoteThread (Event 8) kuzatish
+# sysmonconfig.xml da:
+# <CreateRemoteThread onmatch="include">
+#   <TargetImage condition="is">lsass.exe</TargetImage>
+# </CreateRemoteThread>`}</code></pre>
     </section>
   );
 }
