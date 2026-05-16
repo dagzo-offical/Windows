@@ -20,13 +20,13 @@ const LESSONS = {
         subUz: "CPU privilege halqalari va chegara nima uchun muhim",        subEn: "CPU privilege rings and why the boundary matters" },
   4:  { num: "L04", section: "01", uz: "Windows boot jarayoni",         en: "Windows Boot Process",
         subUz: "UEFI'dan login ekraniga: har bir bosqich va xavfsizlik",     subEn: "UEFI to login: every step and its security implications" },
-  5:  { num: "L05", section: "01", uz: "BIOS vs UEFI",                  en: "BIOS vs UEFI",                subUz: "Tez kunda", subEn: "Coming soon" },
-  6:  { num: "L06", section: "01", uz: "Secure Boot",                   en: "Secure Boot",                 subUz: "Tez kunda", subEn: "Coming soon" },
-  7:  { num: "L07", section: "01", uz: "TPM",                           en: "TPM",                         subUz: "Tez kunda", subEn: "Coming soon" },
-  8:  { num: "L08", section: "01", uz: "Registry",                      en: "Windows Registry",            subUz: "Tez kunda", subEn: "Coming soon" },
-  9:  { num: "L09", section: "01", uz: "Fayl tizimlari",                en: "File Systems",                subUz: "Tez kunda", subEn: "Coming soon" },
-  10: { num: "L10", section: "01", uz: "NTFS",                          en: "NTFS",                        subUz: "Tez kunda", subEn: "Coming soon" },
-  11: { num: "L11", section: "01", uz: "FAT32",                         en: "FAT32",                       subUz: "Tez kunda", subEn: "Coming soon" },
+  5:  { num: "L05", section: "01", uz: "BIOS vs UEFI",                  en: "BIOS vs UEFI",                subUz: "16-bit BIOS, MBR, UEFI fazalari, Secure Boot asoslari", subEn: "16-bit BIOS, MBR, UEFI phases, Secure Boot fundamentals" },
+  6:  { num: "L06", section: "01", uz: "Secure Boot",                   en: "Secure Boot",                 subUz: "PK/KEK/db/dbx ierarxiyasi, imzo zanjiri va chetlab o'tish texnikalari", subEn: "PK/KEK/db/dbx hierarchy, signature chain and bypass techniques" },
+  7:  { num: "L07", section: "01", uz: "TPM",                           en: "TPM",                         subUz: "PCR banklari, kalitlarni muhrlab qo'yish, BitLocker va attestatsiya", subEn: "PCR banks, key sealing, BitLocker integration and attestation" },
+  8:  { num: "L08", section: "01", uz: "Registry",                      en: "Windows Registry",            subUz: "Ierarxik ma'lumotlar bazasi, hive fayllar va persistenslik joylari", subEn: "Hierarchical database, hive files, and persistence locations" },
+  9:  { num: "L09", section: "01", uz: "Fayl tizimlari",                en: "File Systems",                subUz: "VFS, FAT/NTFS/exFAT arxitekturasi va Windows I/O menejeri", subEn: "VFS, FAT/NTFS/exFAT architecture and the Windows I/O Manager" },
+  10: { num: "L10", section: "01", uz: "NTFS",                          en: "NTFS",                        subUz: "MFT, atributlar, ADS, ruxsatlar, jurnalling va EFS", subEn: "MFT, attributes, ADS, permissions, journaling and EFS" },
+  11: { num: "L11", section: "01", uz: "FAT32",                         en: "FAT32",                       subUz: "FAT jadvali, klaster ajratish, cheklovlar va ESP", subEn: "FAT table, cluster allocation, limitations and the EFI System Partition" },
   12: { num: "L12", section: "01", uz: "Jarayonlar (Processes)",        en: "Processes",                   subUz: "Tez kunda", subEn: "Coming soon" },
   13: { num: "L13", section: "01", uz: "Thread'lar",                    en: "Threads",                     subUz: "Tez kunda", subEn: "Coming soon" },
   14: { num: "L14", section: "01", uz: "Handle'lar",                    en: "Handles",                     subUz: "Tez kunda", subEn: "Coming soon" },
@@ -95,6 +95,18 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <Section4Boot />
           </> : lessonNum === 5 ? <>
             <SectionBiosUefi />
+          </> : lessonNum === 6 ? <>
+            <SectionSecureBoot />
+          </> : lessonNum === 7 ? <>
+            <SectionTPM />
+          </> : lessonNum === 8 ? <>
+            <SectionRegistry />
+          </> : lessonNum === 9 ? <>
+            <SectionFileSystems />
+          </> : lessonNum === 10 ? <>
+            <SectionNTFS />
+          </> : lessonNum === 11 ? <>
+            <SectionFAT32 />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -203,6 +215,24 @@ const LESSON_META = {
   5: { min: 32, diagrams: 7, labs: 2,
        introUz: <><em>BIOS</em> va <em>UEFI</em> — kompyuter yoqilganda birinchi ishga tushadigan dasturiy ta'minot. Bu darsda ikkalasining arxitekturasini, MBR va GPT farqini, Secure Boot qanday ishlashini va firmwarelar qanday qilib hujum yuzasiga aylanishini ko'rasiz.</>,
        introEn: <><em>BIOS</em> and <em>UEFI</em> are the first software that runs when you power on. This lesson covers both architectures, MBR vs GPT, how Secure Boot works, and how firmware became a critical attack surface.</> },
+  6: { min: 34, diagrams: 6, labs: 2,
+       introUz: <><em>Secure Boot</em> — yuklash jarayonini kriptografik zanjir orqali himoya qiladigan UEFI mexanizmi. Bu darsda <em>PK → KEK → db/dbx</em> kalit ierarxiyasi, imzo tekshiruvi oqimi, BlackLotus va BootHole kabi real chetlab o'tish texnikalarini va Linux'da Secure Boot qanday ishlashini o'rganasiz.</>,
+       introEn: <><em>Secure Boot</em> is the UEFI mechanism that protects the boot process with a cryptographic chain. This lesson covers the <em>PK → KEK → db/dbx</em> key hierarchy, signature verification flow, real bypass techniques like BlackLotus and BootHole, and how Secure Boot works on Linux.</> },
+  7: { min: 30, diagrams: 5, labs: 2,
+       introUz: <><em>TPM (Trusted Platform Module)</em> — apparat xavfsizlik chipi bo'lib, kriptografik kalitlarni saqlaydi, tizim holatini o'lchaydi va BitLocker, Windows Hello, Credential Guard kabi texnologiyalarga asos bo'ladi. Bu darsda PCR banklari, kalit muhrlash, attestatsiya va real hujum vektorlarini o'rganasiz.</>,
+       introEn: <><em>TPM (Trusted Platform Module)</em> is a hardware security chip that stores cryptographic keys, measures system state, and underpins BitLocker, Windows Hello, and Credential Guard. This lesson covers PCR banks, key sealing, attestation, and real attack vectors against TPM.</> },
+  8: { min: 32, diagrams: 5, labs: 2,
+       introUz: <><em>Windows Registry</em> — barcha tizim sozlamalari, dasturlar konfiguratsiyasi va xavfsizlik siyosatlari saqlanadigan markaziy ierarxik ma'lumotlar bazasi. Bu darsda 5 ta asosiy kalit, hive fayllar, ma'lumot turlari va zararli dasturlar persistenslik uchun foydalanadigan joylarni o'rganasiz.</>,
+       introEn: <><em>Windows Registry</em> is the central hierarchical database where all system settings, application config, and security policies are stored. This lesson covers the 5 root keys, hive files on disk, data types, and the registry locations malware uses for persistence.</> },
+  9: { min: 28, diagrams: 6, labs: 1,
+       introUz: <><em>Fayl tizimi</em> — fizik saqlash qurilmasi ustida mantiqiy ma'lumotlar tashkilotchisi. Bu darsda Windows I/O menejeri va VFS qatlami, FAT/NTFS/exFAT arxitekturasi, Windows fayl tizimi drayverlari va filtr drayverlari qanday ishlashini o'rganasiz.</>,
+       introEn: <><em>File systems</em> are the logical organizers of data on top of physical storage. This lesson covers the Windows I/O Manager and VFS layer, FAT/NTFS/exFAT architectures, Windows file system drivers, and how filter drivers intercept I/O for antivirus and encryption.</> },
+  10: { min: 36, diagrams: 7, labs: 3,
+       introUz: <><em>NTFS</em> — Windows'ning asosiy fayl tizimi. Bu darsda <em>Master File Table (MFT)</em>, NTFS atributlari, Alternate Data Streams (ADS) va ularning yashirin ma'lumot saqlash uchun ishlatilishi, NTFS ruxsatlari, jurnalling ($LogFile/$UsnJrnl), EFS shifrlash, hard link/junction/symlink farqlari va xavfsizlik oqibatlarini o'rganasiz.</>,
+       introEn: <><em>NTFS</em> is Windows' primary file system. This lesson covers the <em>Master File Table (MFT)</em>, NTFS attributes, Alternate Data Streams (ADS) and their use for hiding data, NTFS permissions, journaling ($LogFile/$UsnJrnl), EFS encryption, hard links/junctions/symlinks, and security implications.</> },
+  11: { min: 26, diagrams: 4, labs: 1,
+       introUz: <><em>FAT32</em> — eng oddiy va keng tarqalgan fayl tizimlaridan biri. Bu darsda FAT jadvalining tuzilishi, klaster ajratish, FAT12/16/32 farqlari, asosiy cheklovlar (4GB fayl, 32GB hajm), nima uchun hali ham USB disklar va EFI System Partition (ESP) uchun ishlatilishini va qoplash usullarini o'rganasiz.</>,
+       introEn: <><em>FAT32</em> is one of the simplest and most widely deployed file systems. This lesson covers the FAT table structure, cluster allocation, FAT12/16/32 differences, key limitations (4GB file size, 32GB volume), why it's still used for USB drives and the EFI System Partition, and data recovery considerations.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -2514,7 +2544,1183 @@ flowchart TD
 }
 
 // ─────────────────────────────────────────────────────────────
-// Coming soon placeholder for L06-L20
+// L06: Secure Boot
+// ─────────────────────────────────────────────────────────────
+function SectionSecureBoot() {
+  const lang = useLang();
+
+  const verifyChart = `
+flowchart TD
+    A([UEFI BDS phase\\nboot device selected]) --> B[Load .efi from ESP]
+    B --> C{Hash in dbx?\\nrevoked?}
+    C -->|YES| X([BOOT BLOCKED\\nrevoked binary])
+    C -->|NO| D{Certificate chain\\ntraces to db?}
+    D -->|NO| Y([BOOT BLOCKED\\nunsigned / unknown])
+    D -->|YES| E[Execute bootloader\\nbootmgr.efi]
+    E --> F{Bootloader verifies\\nOS loader signature}
+    F -->|FAIL| Z([BOOT BLOCKED])
+    F -->|OK| G[Load winload.efi]
+    G --> H{winload verifies\\nntoskrnl + HAL}
+    H -->|OK| I([Kernel starts\\nring 0])
+
+    style X fill:#3a0a1a,stroke:#ff3a5e,color:#fff
+    style Y fill:#3a0a1a,stroke:#ff3a5e,color:#fff
+    style Z fill:#3a0a1a,stroke:#ff3a5e,color:#fff
+    style I fill:#0a3a1f,stroke:#00ff9c,color:#fff
+    style C fill:#2a1f3a,stroke:#b88cff,color:#fff
+    style D fill:#2a1f3a,stroke:#b88cff,color:#fff
+  `;
+
+  const keyHierarchy = [
+    {
+      key: "PK", full: lang === "en" ? "Platform Key" : "Platforma Kaliti",
+      color: "#ff6b35", owner: lang === "en" ? "OEM (ASUS, Dell, HP, Lenovo…)" : "OEM (ASUS, Dell, HP, Lenovo…)",
+      bodyUz: <>Zanjirning eng yuqori qismi — «root» sertifikat. Faqat bitta PK bo'lishi mumkin. PK KEK yangilanishlarini imzolaydi. PK o'chirilsa — tizim «Setup Mode»ga kiradi (barcha tekshiruvlar o'chiriladi, xavfli!). Odatda OEM ishlab chiqarish zavodida yozadi — oddiy foydalanuvchilar PK ni almashtirishga ehtiyoj sezmaydi, lekin bu imkoniyat mavjud (masalan, maxsus Secure Boot konfiguratsiyasi uchun).</>,
+      bodyEn: <>The top of the chain — the "root" certificate. Only one PK can exist at a time. PK signs KEK updates. Deleting the PK puts the system into "Setup Mode" (all checks disabled — dangerous!). Typically written by the OEM at the factory — normal users never need to replace it, but the option exists (e.g., for custom Secure Boot configurations).</>,
+    },
+    {
+      key: "KEK", full: lang === "en" ? "Key Exchange Key" : "Kalit Almashuv Kaliti",
+      color: "#f5a623", owner: lang === "en" ? "OEM + Microsoft (both enrolled)" : "OEM + Microsoft (ikkalasi ham yozilgan)",
+      bodyUz: <>db va dbx ma'lumotlar bazalarini yangilash huquqi. Bir nechta KEK bo'lishi mumkin. Barcha Windows-sertifikatlangan mashinalarda Microsoft o'zining KEK ni o'rnatgan — bu Microsoft ga dbx (revokatsiya ro'yxati) ni Windows Update orqali yangilash imkonini beradi. Agar KEK bo'lmasa, Microsoft imzolangan bootloader'lar uchun dbx yangilanishlarini yubora olmaydi.</>,
+      bodyEn: <>Grants the right to update the db and dbx databases. Multiple KEKs can exist. Microsoft installs its own KEK on all Windows-certified machines — this allows Microsoft to push dbx (revocation list) updates via Windows Update. Without the Microsoft KEK, dbx updates for Microsoft-signed bootloaders cannot be delivered.</>,
+    },
+    {
+      key: "db", full: lang === "en" ? "Signature Database (allowed)" : "Imzo Ma'lumotlar Bazasi (ruxsat etilgan)",
+      color: "var(--c-system)", owner: lang === "en" ? "Microsoft UEFI CA + OEM certificates" : "Microsoft UEFI CA + OEM sertifikatlari",
+      bodyUz: <>Yuklashga ruxsat etilgan imzolar va hashlar ro'yxati. db da ikkita asosiy Microsoft sertifikati bor: <strong>Microsoft Windows Production PCA 2011</strong> (Windows'ning o'z bootloader'lari: bootmgr.efi) va <strong>Microsoft Corporation UEFI CA 2011</strong> (uchinchi tomon EFI ilovalar: Linux shim, ba'zi OEM vositalari). Agar .efi faylining sertifikat zanjiri db dagi birorta sertifikatga borib taqalmasa — yuklash rad etiladi.</>,
+      bodyEn: <>The allowlist of signatures and hashes permitted to run at boot. db contains two primary Microsoft certificates: <strong>Microsoft Windows Production PCA 2011</strong> (Windows's own bootloaders: bootmgr.efi) and <strong>Microsoft Corporation UEFI CA 2011</strong> (third-party EFI apps: Linux shim, some OEM tools). If a .efi file's certificate chain cannot be traced to any certificate in db — boot is rejected.</>,
+    },
+    {
+      key: "dbx", full: lang === "en" ? "Forbidden Signature Database (revoked)" : "Taqiqlangan Imzo Ma'lumotlar Bazasi (bekor qilingan)",
+      color: "var(--c-attack)", owner: lang === "en" ? "Microsoft (updated via Windows Update)" : "Microsoft (Windows Update orqali yangilanadi)",
+      bodyUz: <>Bekor qilingan imzolar va hashlar qora ro'yxati. db ga ruxsat etilgan bo'lsa ham, dbx da keltirilgan fayl yuklashdan bloklanadi. dbx ning asosiy tarkibi: zaif bootloader'lar (eski GRUB2 versiyalari, BootHole CVE-2020-10713 dan ta'sirlangan), zararli bootkit'lar tomonidan ishlatilgan fayl hashlari, sertifikat bekor qilish. Muhim: BlackLotus (CVE-2022-21894) dbx tekshiruvini <em>xotirada</em> chetlab o'tdi — dbx ni o'zgartirishsiz.</>,
+      bodyEn: <>The blocklist of revoked signatures and hashes. Even if a file is allowed by db, if it appears in dbx — it is blocked from booting. dbx primarily contains: vulnerable bootloaders (old GRUB2 versions affected by BootHole CVE-2020-10713), file hashes used by known bootkits, certificate revocations. Key: BlackLotus (CVE-2022-21894) bypassed the dbx check <em>in memory</em> — without modifying dbx itself.</>,
+    },
+  ];
+
+  const bypasses = [
+    {
+      name: "BlackLotus — CVE-2022-21894 «baton drop»",
+      year: "2023", severity: lang === "en" ? "Critical" : "Kritik",
+      color: "var(--c-attack)",
+      bodyUz: <>To'liq yamoqlangan Windows 11 da Secure Boot'ni chetlab o'tgan birinchi ommaviy UEFI bootkit. Zaiflik: yuklash jarayonidagi «baton drop» holatida, winload.efi eski (zaif) versiyasi yuklanganda, Secure Boot tekshiruvi qayta bajarilar edi — lekin bu safar kechroq, ba'zi xotira mintaqalari allaqachon yozib bo'linganidan keyin. BlackLotus bu oraliqda dbx tekshiruvi uchun mas'ul kodni xotirada yamadi. <br /><br /><strong>Hujum ketma-ketligi:</strong> (1) zaif winload'ni ESP ga yozish, (2) xotiradagi dbx tekshiruvini patch qilish, (3) shim loader orqali imzosiz drayver yuklash, (4) DSE (Driver Signature Enforcement) o'chirish, (5) ring 0 da doimiy implant o'rnatish. Patch: KB5025885 (2023 may) — lekin faqat dbx yangilanishi o'rnatilgan va yangi revokatsiya siyosati yoqilgan bo'lsa.</>,
+      bodyEn: <>The first publicly documented UEFI bootkit to bypass Secure Boot on fully-patched Windows 11. Vulnerability: in a "baton drop" condition during boot, when an older (vulnerable) winload.efi was loaded, the Secure Boot check re-ran — but this time later, after some memory regions had already been written. BlackLotus used this window to patch the dbx verification code in memory. <br /><br /><strong>Attack chain:</strong> (1) write vulnerable winload to ESP, (2) patch dbx check in memory, (3) load unsigned driver via shim loader, (4) disable DSE (Driver Signature Enforcement), (5) install persistent ring 0 implant. Patch: KB5025885 (May 2023) — but only effective if dbx update is installed and new revocation policy enabled.</>,
+    },
+    {
+      name: "BootHole — CVE-2020-10713",
+      year: "2020", severity: lang === "en" ? "High" : "Yuqori",
+      color: "#f5a623",
+      bodyUz: <>GRUB2 (GNU GRand Unified Bootloader) da buffer overflow. GRUB2 ning <code>grub.cfg</code> konfiguratsiya faylini tahlil qilishida xato: konfiguratsiya faylidagi juda uzun qiymat GRUB ning o'z kod segmentiga yozilardi. GRUB2 Microsoft UEFI CA tomonidan imzolangan (db da) — ya'ni Secure Boot uni ishga tushirishga ruxsat berardi. Ekspluatatsiya: imzolangan GRUB2 ni yuklab, <code>grub.cfg</code> ni (imzosiz, oddiy fayl) modifikatsiya qilib, har qanday kodni bajarish. Microsoft majbur bo'lib GRUB2 ning yuzlab zaif versiyasini dbx ga qo'shdi. Linux tarqatmalari shim va GRUB2 ni yangilashi kerak bo'ldi.</>,
+      bodyEn: <>Buffer overflow in GRUB2 (GNU GRand Unified Bootloader). The vulnerability was in GRUB2's parsing of its <code>grub.cfg</code> config file: an overly long value in the config would overflow into GRUB's own code segment. GRUB2 is signed by the Microsoft UEFI CA (trusted in db) — so Secure Boot allowed it to run. Exploit: load the signed GRUB2, modify <code>grub.cfg</code> (unsigned, plain file), execute arbitrary code. Microsoft was forced to add hundreds of vulnerable GRUB2 versions to dbx. Linux distributions had to update shim and GRUB2.</>,
+    },
+    {
+      name: lang === "en" ? "Signed-but-vulnerable bootloader reuse" : "Imzolangan lekin zaif bootloader qayta ishlatish",
+      year: lang === "en" ? "Ongoing" : "Doimiy",
+      severity: lang === "en" ? "Medium–High" : "O'rta–Yuqori",
+      color: "var(--c-warn)",
+      bodyUz: <>Secure Boot faqat imzoni tekshiradi — zaiflikni emas. Agar qonuniy imzolangan bootloader zaif bo'lsa (eski .efi fayl), hujumchi uni ESP ga ko'chirib, zaifligini ekspluatatsiya qiladi. dbx bu hashn qora ro'yxatga kiritib qo'ygan bo'lsa — bloklanadi. Lekin dbx ro'yxati Microsoft tomonidan yangilanganligi va tizimda o'rnatilganligi kerak. Ko'plab ishlab chiqarish tizimlari dbx ni yillarca yangilamaydi — shuning uchun «eski imzolangan bootloader» arsenali katta bo'lib qoladi.</>,
+      bodyEn: <>Secure Boot only checks the signature — not the vulnerability status. If a legitimately signed bootloader contains a vulnerability (an old .efi file), an attacker can copy it to the ESP and exploit the vulnerability. If dbx has blocklisted this hash — it's blocked. But dbx must have been updated by Microsoft AND installed on the system. Many production systems go years without dbx updates — meaning the "old signed bootloader" arsenal remains large.</>,
+    },
+    {
+      name: lang === "en" ? "Physical attack: BIOS setup / CMOS clear" : "Jismoniy hujum: BIOS sozlamalari / CMOS tozalash",
+      year: lang === "en" ? "Always" : "Doim",
+      severity: lang === "en" ? "Physical access required" : "Jismoniy kirish kerak",
+      color: "var(--text-2)",
+      bodyUz: <>Agar hujumchi mashinaga jismoniy kirishi bo'lsa: (1) BIOS Setup ga kirish (Del / F2 / F12) → Secure Boot ni o'chirish. (2) CMOS batareyasini olib qo'yish yoki CLRTC jumper → barcha BIOS sozlamalarini, jumladan Secure Boot ni nolga qaytarish. (3) SPI flesh programmer (masalan, CH341A) → ona platadagi SPI chip'dan firmware ni to'g'ridan-to'g'ri o'qish va yozish. Himoya: BIOS Setup parol, TPM PCR o'lchovlari (Measured Boot), diskni jismoniy himoyalash.</>,
+      bodyEn: <>If an attacker has physical machine access: (1) Enter BIOS Setup (Del / F2 / F12) → disable Secure Boot. (2) Remove CMOS battery or use CLRTC jumper → reset all BIOS settings including Secure Boot to defaults. (3) SPI flash programmer (e.g., CH341A) → directly read and write firmware from the SPI chip on the motherboard. Defences: BIOS Setup password, TPM PCR measurements (Measured Boot), physical disk protection.</>,
+    },
+    {
+      name: lang === "en" ? "Microsoft \"Golden Key\" leak (2016)" : "Microsoft «Oltin Kalit» sizib chiqishi (2016)",
+      year: "2016", severity: lang === "en" ? "Critical (patched)" : "Kritik (yamoqlangan)",
+      color: "var(--c-attack)",
+      bodyUz: <>2016 yilda Microsoft xodimi sinov maqsadida «Secure Boot debug siyosati» ni — Secure Boot ni o'chirib qo'yadigan maxsus imzolangan fayl — tasodifan chiqarib yubordi. Bu fayl Microsoft Production CA tomonidan imzolangan (db da ruxsat etilgan), shuning uchun Secure Boot uni to'siqsiz yuklardi. Keyin esa Secure Boot'ni o'chirib, har qanday imzosiz kodni yuklash mumkin bo'lardi. Bu fayl «oltin kalit» deb nomlandi — Microsoft uchun uyalib ketarli hodisa. Patch: dbx ga bu faylning heshini qo'shish, lekin patch'ning o'zi ham muammoli bo'lib, birta patch yana bir yangi zaiflikni ochib qo'ydi.</>,
+      bodyEn: <>In 2016, a Microsoft employee accidentally leaked a "Secure Boot debug policy" — a specially signed file that disables Secure Boot. This file was signed by the Microsoft Production CA (permitted in db), so Secure Boot would load it without question. Then with Secure Boot disabled, any unsigned code could run. The file was dubbed the "golden key" — a deeply embarrassing incident for Microsoft. Fix: add the file's hash to dbx — but the patch itself was problematic, with one patch opening another vulnerability.</>,
+    },
+  ];
+
+  return (
+    <section id="secure-boot" style={{ scrollMarginTop: 80, marginBottom: 56 }}>
+      <H2 num="01" uz="Secure Boot nima va nima uchun kerak?" en="What is Secure Boot and why does it exist?" />
+      <P>
+        {lang === "en"
+          ? <><Term>Secure Boot</Term> is a UEFI security feature that ensures every piece of software loaded during the boot process has been cryptographically signed by a trusted authority. It was designed to solve a fundamental problem of the BIOS era: the bootloader ran with <Em>zero verification</Em> — any code in the MBR would execute unconditionally. This allowed <Em>bootkits</Em> — malware that lived below the OS — to persist through OS reinstalls, AV scans, and disk formats, because they never touched the OS partition.</>
+          : <><Term>Secure Boot</Term> — yuklash jarayonida yuklanadigan har bir dasturiy ta'minot ishonchli organ tomonidan kriptografik imzolanganligi kafolatlaydigan UEFI xavfsizlik xususiyati. U BIOS davrining asosiy muammosini hal qilish uchun yaratildi: bootloader <Em>nol tekshiruv</Em> bilan ishlardi — MBR dagi har qanday kod so'zsiz bajarilardi. Bu OS qayta o'rnatish, antivirus skanerlash va disk formatlash jarayonlarini boshdan o'tkazib yashaydigan zararli dasturlarni — <Em>bootkit</Em>larni — imkon berdi, chunki ular OS bo'limiga hech qachon tegmasdi.</>}
+      </P>
+      <P>
+        {lang === "en"
+          ? <>Secure Boot was introduced with UEFI and became mandatory for Windows 8 OEM certification in 2012 (Microsoft required all Windows 8–certified hardware to ship with Secure Boot enabled). The core idea is a <Em>chain of trust</Em>: each layer of the boot process cryptographically verifies the next, so that if any single link is tampered with, the entire chain breaks and boot is halted. The chain is anchored in the firmware itself — hardware that users generally cannot modify without physical access.</>
+          : <>Secure Boot UEFI bilan birga kiritildi va 2012 yilda Windows 8 OEM sertifikatlash uchun majburiy bo'ldi (Microsoft barcha Windows 8-sertifikatlangan qurilmalar Secure Boot yoqilgan holda yetkazib berilishini talab qildi). Asosiy g'oya — <Em>ishonch zanjiri</Em>: yuklash jarayonining har bir qatlami keyingisini kriptografik tekshiradi, shuning uchun biron bir bo'g'in buzilsa, butun zanjir sinadi va yuklash to'xtatiladi. Zanjir firmware'ning o'zida — foydalanuvchilar odatda jismoniy kirishsiz o'zgartira olmaydigan hardware'da — o'rnatilgan.</>}
+      </P>
+
+      {/* ── Key hierarchy ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.1 — The 4-key hierarchy: PK → KEK → db → dbx" : "1.1 — 4 kalit ierarxiyasi: PK → KEK → db → dbx"}</h3>
+      <P>
+        {lang === "en"
+          ? <>Secure Boot uses four databases stored in UEFI NVRAM, arranged in a strict trust hierarchy. The top key can update the one below it, but not vice versa. Understanding this hierarchy explains both how Secure Boot works and why it sometimes fails to stop advanced attacks.</>
+          : <>Secure Boot UEFI NVRAM da saqlangan to'rtta ma'lumotlar bazasidan foydalanadi, ular qat'iy ishonch ierarxiyasida joylashtirilgan. Yuqori kalit pastdagini yangilay oladi, lekin aksincha emas. Bu ierarxiyani tushunish Secure Boot qanday ishlashini ham, nima uchun ba'zan kuchli hujumlarni to'xtata olmasligi sababini ham tushuntiradi.</>}
+      </P>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
+        {keyHierarchy.map((k, i) => (
+          <div key={i} style={{ borderRadius: 12, border: `1px solid ${k.color}30`, overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 16px", background: `${k.color}12`, borderBottom: `1px solid ${k.color}20` }}>
+              <div className="mono" style={{ fontSize: 17, fontWeight: 800, color: k.color, minWidth: 44 }}>{k.key}</div>
+              <div>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: 13.5, fontWeight: 700, color: k.color }}>{k.full}</div>
+                <div className="mono" style={{ fontSize: 10.5, color: "var(--text-3)", marginTop: 1 }}>{lang === "en" ? "Owner:" : "Egasi:"} {k.owner}</div>
+              </div>
+              {i < keyHierarchy.length - 1 && (
+                <div className="mono" style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-3)" }}>→ {lang === "en" ? "signs updates to" : "yangilanishlarini imzolaydi"} {keyHierarchy[i+1].key}</div>
+              )}
+            </div>
+            <div style={{ padding: "12px 16px", fontSize: 13, lineHeight: 1.75, color: "var(--text-1)" }}>
+              {lang === "en" ? k.bodyEn : k.bodyUz}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ margin: "18px 0", padding: "14px 18px", borderRadius: 10, background: "var(--bg-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.9 }}>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>// PowerShell — read all Secure Boot NVRAM variables (Admin required)</div>
+        <div><span style={{ color: "var(--c-system)" }}>Get-SecureBootUEFI</span> <span style={{ color: "var(--accent)" }}>-Name</span> <span style={{ color: "var(--c-user)" }}>PK</span>    <span style={{ color: "var(--text-3)" }}># Platform Key (1 entry)</span></div>
+        <div><span style={{ color: "var(--c-system)" }}>Get-SecureBootUEFI</span> <span style={{ color: "var(--accent)" }}>-Name</span> <span style={{ color: "var(--c-user)" }}>KEK</span>   <span style={{ color: "var(--text-3)" }}># Key Exchange Keys</span></div>
+        <div><span style={{ color: "var(--c-system)" }}>Get-SecureBootUEFI</span> <span style={{ color: "var(--accent)" }}>-Name</span> <span style={{ color: "var(--c-user)" }}>db</span>    <span style={{ color: "var(--text-3)" }}># Allowed signatures (Microsoft CAs)</span></div>
+        <div><span style={{ color: "var(--c-system)" }}>Get-SecureBootUEFI</span> <span style={{ color: "var(--accent)" }}>-Name</span> <span style={{ color: "var(--c-user)" }}>dbx</span>   <span style={{ color: "var(--text-3)" }}># Revocation list (blocked hashes)</span></div>
+        <div style={{ marginTop: 8 }}><span style={{ color: "var(--c-system)" }}>Confirm-SecureBootUEFI</span>                   <span style={{ color: "var(--text-3)" }}># True = Secure Boot active</span></div>
+        <div><span style={{ color: "var(--c-system)" }}>[System.Text.Encoding]::ASCII.GetString(</span></div>
+        <div>{"  "}<span style={{ color: "var(--c-system)" }}>(Get-SecureBootUEFI</span> <span style={{ color: "var(--accent)" }}>-Name</span> dbx<span style={{ color: "var(--c-system)" }}>).bytes)</span> <span style={{ color: "var(--text-3)" }}># dump dbx content</span></div>
+      </div>
+
+      {/* ── Verification flow ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.2 — Verification flow: how each boot stage is checked" : "1.2 — Tekshiruv oqimi: har bir yuklash bosqichi qanday tekshiriladi"}</h3>
+      <P>
+        {lang === "en"
+          ? <>At each boot stage, UEFI (and then the bootloader, and then the kernel) performs a two-step check: first against dbx (is this binary revoked?), then against db (is this binary trusted?). Both checks must pass. Only if a binary is <Em>not in dbx</Em> AND <Em>is trusted by db</Em> does boot continue.</>
+          : <>Har bir yuklash bosqichida UEFI (keyin bootloader va kernel) ikki bosqichli tekshiruv o'tkazadi: avval dbx ga qarshi (bu binary bekor qilinganmi?), keyin db ga qarshi (bu binary ishonchli?). Ikkalasi ham o'tishi kerak. Binary <Em>dbx da yo'q</Em> VA <Em>db tomonidan ishonchli</Em> bo'lsagina yuklash davom etadi.</>}
+      </P>
+      <div style={{ marginTop: 16 }}>
+        <MermaidDiagram chart={verifyChart}
+          caption="1-rasm. Secure Boot tekshiruv oqimi: dbx → db → bootloader → OS loader → kernel."
+          captionEn="Fig 1. Secure Boot verification flow: dbx → db → bootloader → OS loader → kernel." />
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 14 }}>
+        {[
+          { icon: "shield", color: "var(--c-system)", titleUz: "dbx tekshiruvi — birinchi", titleEn: "dbx check — first",
+            bodyUz: "Binary heshi dbx qora ro'yxatida bormi? Agar ha — darhol bloklash. Bu qadam imzolangan lekin zaif yoki yomon ma'lum bo'lgan kodni to'xtatadi.",
+            bodyEn: "Is the binary's hash in the dbx blocklist? If yes — block immediately. This step stops code that is signed but known-vulnerable or known-malicious." },
+          { icon: "key", color: "var(--c-warn)", titleUz: "db tekshiruvi — ikkinchi", titleEn: "db check — second",
+            bodyUz: "Binary'ning sertifikat zanjiri db dagi birorta sertifikatga borib taqaladimi? Aks holda — bloklash. Bu imzosiz yoki noto'g'ri imzolangan kodni to'xtatadi.",
+            bodyEn: "Does the binary's certificate chain trace to any certificate in db? If not — block. This stops code that is unsigned or signed by an untrusted key." },
+          { icon: "check", color: "var(--c-user)", titleUz: "Muvaffaqiyat → bajarish", titleEn: "Pass → execute",
+            bodyUz: "Ikkalasi ham o'tdi: dbx da yo'q, db ga ishonchli. UEFI kodni bajarishga ruxsat beradi. Boshqaruv bootloader'ga o'tadi — u o'z navbatida OS loader uchun xuddi shu tekshiruvni o'tkazadi.",
+            bodyEn: "Both passed: not in dbx, trusted by db. UEFI permits execution. Control passes to the bootloader — which in turn runs the same check for the OS loader." },
+        ].map((c, i) => (
+          <div key={i} style={{ padding: "14px 16px", borderRadius: 10, background: `${c.color}08`, border: `1px solid ${c.color}30` }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+              <span style={{ color: c.color }}><Icon name={c.icon} size={16} /></span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: 13, fontWeight: 700, color: c.color }}>{lang === "en" ? c.titleEn : c.titleUz}</span>
+            </div>
+            <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.65 }}>{lang === "en" ? c.bodyEn : c.bodyUz}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Modes ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.3 — Secure Boot modes" : "1.3 — Secure Boot rejimlari"}</h3>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
+        {[
+          { name: "Setup Mode", color: "#f5a623",
+            bodyUz: "PK yo'q (o'chirilgan yoki hech qachon o'rnatilmagan). Barcha tekshiruvlar o'chirilgan — har qanday .efi yuklanishi mumkin. db/dbx/KEK imzosiz yangilanishi mumkin. Yangi qurilmalarda va custom Secure Boot konfiguratsiyasida ishlatiladi. JUDA XAVFLI — hech qachon ishlab chiqarish tizimida qoldirmang.",
+            bodyEn: "No PK (deleted or never enrolled). All verification is disabled — any .efi can load. db/dbx/KEK can be updated without signing. Used on new machines and for custom Secure Boot configurations. VERY DANGEROUS — never leave a production system in this state." },
+          { name: "User Mode", color: "var(--c-system)",
+            bodyUz: "PK o'rnatilgan, normal operatsiya. Barcha tekshiruvlar faol. db/dbx/KEK yangilanishlari KEK bilan imzolanishi kerak. Windows tizimlarida standart holat. msinfo32 da «Secure Boot State: On» ko'rinadi.",
+            bodyEn: "PK is enrolled, normal operation. All verification is active. db/dbx/KEK updates must be signed with KEK. Default state on Windows systems. Shows as \"Secure Boot State: On\" in msinfo32." },
+          { name: "Audit Mode", color: "var(--c-warn)",
+            bodyUz: "Secure Boot tekshiruvlari bajariladi — lekin muvaffaqiyatsizlikda to'xtamaydi, balki logga yozadi. Muhandislar yangi imzo siyosatlarini test qilish uchun ishlatadi. Foydalanuvchi tizimlarida uchramaydi.",
+            bodyEn: "Secure Boot checks run — but on failure they log instead of blocking. Used by engineers to test new signature policies. Not encountered on end-user systems." },
+          { name: "Deployed Mode (Windows 11)", color: "var(--accent)",
+            bodyUz: "Eng qat'iy rejim. Setup Mode ga kirishdan oldin tizim reset talab qilinadi. Microsoft Windows 11 uchun bu rejimni tavsiya qiladi. Secure Boot konfiguratsiyasini OS tomonidan o'zgartirishga to'sqinlik qiladi — faqat UEFI Setup dan o'zgartirish mumkin.",
+            bodyEn: "Most restrictive mode. Switching to Setup Mode requires a system reset first. Microsoft recommends this for Windows 11. Prevents OS-level modification of Secure Boot configuration — changes only possible from UEFI Setup." },
+        ].map((m, i) => (
+          <div key={i} style={{ padding: "14px 16px", borderRadius: 10, background: `${m.color}08`, border: `1px solid ${m.color}28`, borderLeft: `3px solid ${m.color}` }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: m.color, marginBottom: 6 }}>{m.name}</div>
+            <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.68 }}>{lang === "en" ? m.bodyEn : m.bodyUz}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Bypass techniques ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.4 — Bypass techniques: how attackers defeat Secure Boot" : "1.4 — Chetlab o'tish texnikalari: hujumchilar Secure Boot ni qanday yengadi"}</h3>
+      <P>
+        {lang === "en"
+          ? <>Secure Boot is not unbreakable. Understanding how it has been bypassed is essential for defenders — each bypass technique points to a specific weakness in the trust model that must be understood and mitigated.</>
+          : <>Secure Boot sindirilib bo'lmaydi degani emas. U qanday chetlab o'tilganini tushunish himoyachilar uchun muhim — har bir chetlab o'tish texnikasi ishonch modelidagi ma'lum bir zaiflikka ishora qiladi, uni tushunish va yumshatish kerak.</>}
+      </P>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
+        {bypasses.map((b, i) => (
+          <div key={i} style={{ borderRadius: 12, border: `1px solid ${b.color}30`, overflow: "hidden" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: `${b.color}10`, borderBottom: `1px solid ${b.color}20`, flexWrap: "wrap" }}>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 13.5, fontWeight: 700, color: b.color, flex: 1 }}>{b.name}</div>
+              <div className="mono" style={{ fontSize: 10, color: "var(--text-3)" }}>{b.year}</div>
+              <div style={{ fontSize: 11, color: b.color, background: `${b.color}18`, padding: "2px 8px", borderRadius: 4 }}>{b.severity}</div>
+            </div>
+            <div style={{ padding: "12px 16px", fontSize: 13, lineHeight: 1.78, color: "var(--text-1)" }}>
+              {lang === "en" ? b.bodyEn : b.bodyUz}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Linux shim + MOK ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.5 — Secure Boot on Linux: shim and MOK" : "1.5 — Linux'da Secure Boot: shim va MOK"}</h3>
+      <P>
+        {lang === "en"
+          ? <>Linux distributions face a challenge: Microsoft controls what's in db (the allowed signature list), and Linux bootloaders aren't signed by Microsoft's certificate. The solution is a tiny intermediary called <Term>shim</Term>.</>
+          : <>Linux tarqatmalari bir muammo bilan duch keladi: Microsoft db ni (ruxsat etilgan imzo ro'yxati) nazorat qiladi, va Linux bootloader'lari Microsoft sertifikati bilan imzolanmagan. Yechim — <Term>shim</Term> deb ataladigan kichik vositachi.</>}
+      </P>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, margin: "14px 0", padding: "16px 18px", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 12 }}>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>// LINUX SECURE BOOT CHAIN</div>
+        {[
+          { from: "UEFI firmware (db)", arrow: "verifies →", to: "shim.efi", note: lang === "en" ? "shim is signed by Microsoft UEFI CA (in db on all Windows-certified machines)" : "shim Microsoft UEFI CA tomonidan imzolangan (barcha Windows-sertifikatlangan mashinalarda db da)" },
+          { from: "shim.efi", arrow: "verifies →", to: "grubx64.efi", note: lang === "en" ? "shim verifies GRUB using its own embedded certificate (distro-specific, e.g. Red Hat, Canonical)" : "shim GRUB ni o'z ichida joylashgan sertifikat yordamida tekshiradi (tarqatmaga xos, masalan Red Hat, Canonical)" },
+          { from: "grubx64.efi", arrow: "verifies →", to: "Linux kernel", note: lang === "en" ? "GRUB verifies the kernel image using the same shim-trusted certificate" : "GRUB yadro tasvirini xuddi shu shim-ishonchli sertifikat yordamida tekshiradi" },
+          { from: "Linux kernel", arrow: "verifies →", to: "kernel modules", note: lang === "en" ? "kernel enforces module signature checking when Secure Boot is active (no unsigned .ko files)" : "Secure Boot faol bo'lganda kernel modul imzo tekshiruvini ta'minlaydi (imzosiz .ko faylar yo'q)" },
+        ].map((row, i) => (
+          <div key={i} style={{ display: "flex", gap: 10, fontSize: 12.5, alignItems: "flex-start", padding: "6px 0", borderBottom: i < 3 ? "1px solid var(--border)" : "none" }}>
+            <span className="mono" style={{ color: "var(--c-user)", flexShrink: 0, minWidth: 130 }}>{row.from}</span>
+            <span className="mono" style={{ color: "var(--text-3)", flexShrink: 0 }}>{row.arrow}</span>
+            <span className="mono" style={{ color: "var(--accent)", flexShrink: 0, minWidth: 110 }}>{row.to}</span>
+            <span style={{ color: "var(--text-2)", fontSize: 11.5, lineHeight: 1.5 }}>{row.note}</span>
+          </div>
+        ))}
+      </div>
+      <P>
+        {lang === "en"
+          ? <><Term>MOK (Machine Owner Key)</Term> is shim's mechanism for adding user-defined keys. When you build a custom Linux kernel module (e.g., a proprietary GPU driver like NVIDIA), you can sign it with your own key and register that key with shim via <code>mokutil --import my.cer</code>. On next boot, shim shows a MOK enrollment screen — you confirm the fingerprint, and shim adds your key to its trusted database. From then on, your self-signed module loads under Secure Boot without disabling it.</>
+          : <><Term>MOK (Machine Owner Key)</Term> — shim ning foydalanuvchi tomonidan belgilangan kalitlarni qo'shish mexanizmi. Maxsus Linux yadro modulini (masalan, NVIDIA kabi mulkiy GPU drayveri) qurishda, uni o'z kalitingiz bilan imzolab, <code>mokutil --import my.cer</code> orqali bu kalitni shim bilan ro'yxatdan o'tkazishingiz mumkin. Keyingi yuklanishda shim MOK ro'yxatga olish ekranini ko'rsatadi — barmoq izini tasdiqlaysiz va shim kalitingizni o'zining ishonchli ma'lumotlar bazasiga qo'shadi. Bundan keyin, o'z-o'zini imzolagan modulingiz Secure Boot ni o'chirmasdan yuklanadi.</>}
+      </P>
+
+      {/* ── Practical ── */}
+      <h3 style={subhead}>{lang === "en" ? "1.6 — Practical: verify, enable and harden Secure Boot" : "1.6 — Amaliy: Secure Boot ni tekshirish, yoqish va mustahkamlash"}</h3>
+      <div style={{ margin: "12px 0", padding: "16px 18px", borderRadius: 12, background: "var(--bg-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 2 }}>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>// SECURE BOOT — practical commands</div>
+        <div style={{ color: "var(--text-3)" }}># {lang === "en" ? "1. Check Secure Boot status (PowerShell, run as Admin)" : "1. Secure Boot holatini tekshirish (PowerShell, Admin sifatida)"}</div>
+        <div><span style={{ color: "var(--c-system)" }}>Confirm-SecureBootUEFI</span>        <span style={{ color: "var(--text-3)" }}>{lang === "en" ? "# True / False" : "# True / False"}</span></div>
+        <div style={{ marginTop: 6, color: "var(--text-3)" }}># {lang === "en" ? "2. Check BIOS Mode (msinfo32 or PowerShell)" : "2. BIOS rejimini tekshirish (msinfo32 yoki PowerShell)"}</div>
+        <div><span style={{ color: "var(--c-user)" }}>(Get-WmiObject</span> Win32_OperatingSystem<span style={{ color: "var(--c-user)" }}>)</span>.OSArchitecture</div>
+        <div><span style={{ color: "var(--c-system)" }}>msinfo32</span>   <span style={{ color: "var(--text-3)" }}>{lang === "en" ? "# → BIOS Mode: UEFI (not Legacy)" : "# → BIOS Mode: UEFI (Legacy emas)"}</span></div>
+        <div style={{ marginTop: 6, color: "var(--text-3)" }}># {lang === "en" ? "3. Check dbx version (how up-to-date is your revocation list?)" : "3. dbx versiyasini tekshirish (revokatsiya ro'yxati qanchalik yangilangan?)"}</div>
+        <div><span style={{ color: "var(--c-system)" }}>Get-SecureBootUEFI</span> <span style={{ color: "var(--accent)" }}>-Name</span> <span style={{ color: "var(--c-user)" }}>dbx</span> | <span style={{ color: "var(--c-system)" }}>Select-Object</span> Name, Guid, Attributes</div>
+        <div style={{ marginTop: 6, color: "var(--text-3)" }}># {lang === "en" ? "4. Force dbx update (requires KB5025885 installed)" : "4. dbx yangilanishini majburlash (KB5025885 o'rnatilgan bo'lishi kerak)"}</div>
+        <div><span style={{ color: "var(--c-user)" }}>wusa.exe</span> /update /kb:5025885</div>
+        <div style={{ marginTop: 6, color: "var(--text-3)" }}># {lang === "en" ? "5. Check if CSM/Legacy is off (must be for full Secure Boot)" : "5. CSM/Legacy o'chirilganligini tekshirish (to'liq Secure Boot uchun kerak)"}</div>
+        <div><span style={{ color: "var(--text-3)" }}>{lang === "en" ? "# → in UEFI Setup: Boot → CSM → Disabled" : "# → UEFI Setupda: Boot → CSM → Disabled"}</span></div>
+      </div>
+
+      <Callout color="var(--c-attack)" icon="skull" titleUz="Asosiy xavf: CSM yoqilgan + eskirgan dbx = Secure Boot bekor" titleEn="Critical risk: CSM enabled + outdated dbx = Secure Boot nullified">
+        {lang === "en"
+          ? <>Two conditions together make a "Secure Boot" system completely insecure: (1) <strong>CSM / Legacy mode enabled</strong> — this silently disables Secure Boot entirely. Many corporate systems enable CSM for compatibility with older tools without realising it kills Secure Boot. (2) <strong>Outdated dbx</strong> — if the revocation list hasn't been updated in years, dozens of known-vulnerable signed bootloaders can still run freely, including many BYOVD candidates. Check both on every system you assess: <code>msinfo32</code> → BIOS Mode should say UEFI (not Legacy), and dbx should be updated via KB5025885 or later.</>
+          : <>Ikki shart birgalikda «Secure Boot» tizimini to'liq xavfli qiladi: (1) <strong>CSM / Legacy rejimi yoqilgan</strong> — bu Secure Boot ni to'liq o'chirib qo'yadi. Ko'plab korporativ tizimlar eski vositalar bilan moslik uchun CSM ni yoqadi — bu Secure Boot ni o'ldirishini tushunmasdan. (2) <strong>Eskirgan dbx</strong> — agar revokatsiya ro'yxati yillar davomida yangilanmagan bo'lsa, o'nlab ma'lum zaif imzolangan bootloader'lar hali ham erkin ishlashi mumkin, jumladan ko'plab BYOVD nomzodlari. Baholayotgan har bir tizimda ikkalasini tekshiring: <code>msinfo32</code> → BIOS Mode UEFI bo'lishi kerak (Legacy emas) va dbx KB5025885 yoki keyingi yamoq orqali yangilanishi kerak.</>}
+      </Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// L07 — TPM
+// ─────────────────────────────────────────────────────────────
+function SectionTPM() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="TPM — Trusted Platform Module" uz="" />
+      <P>A <Term>Trusted Platform Module (TPM)</Term> is a dedicated hardware security chip — either soldered on the motherboard or implemented as firmware (fTPM inside the CPU). Its job is to perform cryptographic operations in a tamper-resistant environment that the operating system and software cannot directly read or manipulate. Every modern PC sold after 2016 ships with TPM 2.0, and Windows 11 made it a hard requirement. The chip exposes a small but extremely powerful set of primitives: random number generation, asymmetric key generation, HMAC, hashing, and — most importantly — <Term>key sealing</Term> and <Term>platform measurement</Term>.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — TPM 1.2 vs TPM 2.0</h3>
+      <P>TPM 1.2 (2003) was designed around a single algorithm suite — SHA-1 for hashing and RSA-2048 for asymmetric operations. It used a single PCR bank of 24 registers. TPM 2.0 (2014) is a complete redesign: algorithm-agnostic (SHA-1, SHA-256, SHA-384, ECC P-256, ECC P-384, AES-128/256 are all supported simultaneously), multiple PCR banks (one per hash algorithm), hierarchies instead of a single owner model, and enhanced key management. Windows 11 dropped TPM 1.2 support entirely because SHA-1 is broken and the old owner model created deployment nightmares for enterprises.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Feature","TPM 1.2","TPM 2.0"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Standard","TCG 2003","TCG 2014"],
+            ["Hash algorithms","SHA-1 only","SHA-1, SHA-256, SHA-384"],
+            ["Asymmetric crypto","RSA-2048 only","RSA, ECC P-256/P-384"],
+            ["Symmetric crypto","None","AES-128/256"],
+            ["PCR banks","1 bank × 24 registers","Multiple banks (one per alg)"],
+            ["Key hierarchy","Single owner","3 hierarchies: Platform/Owner/Endorsement"],
+            ["Windows 11 support","No (dropped)","Yes (required)"],
+            ["Implementation","Discrete chip or integrated","Discrete chip, fTPM (CPU firmware), or vTPM"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — PCR Banks (Platform Configuration Registers)</h3>
+      <P>PCRs are the heart of TPM's measurement capability. Each register is 20 bytes (SHA-1) or 32 bytes (SHA-256) and follows one rule: it can only be <Em>extended</Em>, never written directly. Extending PCR[n] means: <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>PCR[n] = Hash(PCR[n] || new_measurement)</code>. This creates a tamper-evident log — you cannot forge a PCR value without re-running every measurement in the correct order from boot time.</P>
+      <P>During boot, firmware measures each component before executing it and extends the result into specific PCRs. The UEFI firmware spec (TCG EFI Platform Specification) assigns PCRs as follows:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["PCR","What is measured"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["PCR[0]","UEFI firmware code (BIOS ROM)"],
+            ["PCR[1]","UEFI firmware configuration (NVRAM settings)"],
+            ["PCR[2]","UEFI Option ROMs (expansion card firmware)"],
+            ["PCR[3]","UEFI Option ROM configuration"],
+            ["PCR[4]","Boot Manager (bootmgr.efi) and boot attempts"],
+            ["PCR[5]","Boot Manager configuration (BCD store)"],
+            ["PCR[6]","Resume from S4/S5 wake events"],
+            ["PCR[7]","Secure Boot state and policy"],
+            ["PCR[8-9]","Windows Boot Loader (winload.efi)"],
+            ["PCR[11]","BitLocker access control (BitLocker-specific)"],
+            ["PCR[12-15]","OS-defined — Windows uses for Kernel, ELAM, policies"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleEn="Why PCR chaining matters for BitLocker" titleUz="">
+        BitLocker seals its Volume Master Key (VMK) against PCR[0,2,4,7,11] by default. If anyone replaces the bootloader, alters UEFI firmware, or changes the Secure Boot policy, those PCRs change — the TPM refuses to unseal the key, and the drive stays encrypted even if the attacker yanked the disk out and plugged it into another machine.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — TPM Operations: Key Gen, Sealing, Unsealing, Attestation</h3>
+      <P><strong>Key Generation:</strong> The TPM contains a permanent Endorsement Key (EK) burned in at manufacture — a 2048-bit RSA key pair. The private half never leaves the chip. From this root, the TPM can derive an unlimited number of child keys (Storage Root Key → application keys). Keys can be set as <Em>non-migratable</Em> so they physically cannot be exported even with the owner's password.</P>
+      <P><strong>Key Sealing:</strong> This is the unique killer feature. The TPM can encrypt ("seal") an arbitrary secret blob and record the current PCR values at sealing time. Unsealing requires the TPM, the same machine (same PCR values), and optionally a PIN. If the PCRs differ at unseal time — because someone swapped the bootloader or changed firmware — the TPM refuses. This makes sealed keys useless on a different machine or after system tampering.</P>
+      <P><strong>Remote Attestation:</strong> A remote server can ask: "Prove to me what software is running on your machine." The TPM signs the current PCR values with its EK (or an Attestation Identity Key derived from it). The server checks the signature against the manufacturer's certificate, verifies the PCR values match a known-good policy, and only then trusts the client. This is how Azure Attestation, TPM-based device health, and Zero Trust deployments work.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — TPM in Windows</h3>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:14,marginTop:12}}>
+        {[
+          {title:"BitLocker",color:"var(--c-ok)",body:"Seals the Volume Master Key against PCR[0,2,4,7,11]. On every boot the TPM checks those PCRs — if the system is unmodified, the key is automatically released (transparent unlock). If they mismatch, BitLocker demands the 48-digit recovery key."},
+          {title:"Windows Hello",color:"var(--c-system)",body:"Your PIN or biometric template unlocks a TPM-protected RSA private key. The key never leaves the chip — Windows Hello private keys are non-exportable by design. Remote attackers who steal your NTUSER.DAT get nothing useful."},
+          {title:"Credential Guard",color:"var(--accent)",body:"Uses VBS (Virtualization-Based Security) + a TPM-sealed key to protect NTLM hashes and Kerberos tickets inside an isolated VM (VSM). Even if the OS kernel is compromised, Mimikatz cannot extract credentials because they live in a VM the kernel can't access."},
+          {title:"vTPM (Virtual TPM)",color:"var(--c-warn)",body:"Hyper-V guests get a software-emulated TPM 2.0 backed by the host's physical TPM. This allows BitLocker, Windows Hello, and Credential Guard inside VMs. In Azure, the vTPM root is the hardware TPM of the physical server."},
+        ].map(c=><div key={c.title} style={{padding:"14px 16px",background:`${c.color}08`,border:`1px solid ${c.color}25`,borderLeft:`3px solid ${c.color}`,borderRadius:8}}>
+          <div style={{fontWeight:700,fontSize:14,color:c.color,marginBottom:6}}>{c.title}</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{c.body}</div>
+        </div>)}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — TPM Attack Vectors</h3>
+      <P><strong>Evil Maid Attack:</strong> Physical access to an unattended laptop. If BitLocker is in "TPM-only" mode (no PIN), the disk unlocks automatically on boot — so an attacker who cold-boots the machine gets a fully unlocked Windows session. Mitigation: enable BitLocker pre-boot PIN (TPM+PIN mode) so the TPM alone is insufficient.</P>
+      <P><strong>TPM Bus Sniffing:</strong> Discrete TPM chips communicate over an LPC or SPI bus on the motherboard. An attacker with physical access and a logic analyzer can intercept the plaintext VMK as it travels from the TPM chip to the CPU. Intel PTT (fTPM) and AMD fTPM mitigate this — the TPM lives inside the CPU, no external bus. CVE-2021-1782 demonstrated bus sniffing against discrete TPMs to extract BitLocker keys from Surface Pro 3.</P>
+      <P><strong>TPM-Fail (CVE-2019-11090 / CVE-2019-16863):</strong> Side-channel timing attack against some STMicroelectronics (ST33) and Infineon TPM chips during ECDSA signature operations. By measuring response time differences down to nanoseconds, an attacker can recover the private ECC key after ~1,000 operations. Microsoft patched via firmware update — this is why keeping TPM firmware updated matters.</P>
+      <P><strong>TPM Reset Attack / S3 Sleep:</strong> Some old systems allowed the TPM to be reset via S3 resume state without verifying PCRs, allowing an attacker to replace the bootloader and then resume from S3 with the TPM already unsealed. Modern UEFI with PCR[6] measurement and Windows BitLocker's sleep protection (hibernate instead of S3) mitigates this.</P>
+      <Callout color="var(--c-err)" icon="warning" titleEn="fTPM vs discrete TPM — which is safer?" titleUz="">
+        Intel PTT (fTPM) runs in the Management Engine (ME), AMD PSP runs in the Platform Security Processor. Both eliminate the bus sniffing attack but introduce a new trust dependency: the ME/PSP firmware. CVE-2017-5705 (Intel ME critical vulnerability) showed the entire fTPM chain could be compromised if ME is exploited. Discrete TPMs are physically isolated — they just have the bus exposure problem. Neither is universally "safer."
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check TPM status in PowerShell (run as Administrator)
+Get-Tpm
+
+# Output shows:
+# TpmPresent     : True
+# TpmReady       : True
+# TpmEnabled     : True
+# TpmActivated   : True
+# ManagedAuthLevel: Full
+
+# Get TPM spec version
+Get-Tpm | Select-Object -ExpandProperty ManufacturerVersion
+
+# Check TPM in Device Manager → Security Devices → Trusted Platform Module 2.0
+
+# tpm.msc — MMC snap-in: shows manufacturer, version, PCR status
+# Start → Run → tpm.msc
+
+# Check BitLocker PCR binding
+manage-bde -protectors -get C:
+# Look for "TPM And PIN" or "TPM" under Key Protectors`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="TPM — Ishonchli Platforma Moduli" en="" />
+      <P><Term>Trusted Platform Module (TPM)</Term> — maxsus apparat xavfsizlik chipi bo'lib, u anakartga lehimlanadi yoki protsessor ichida dasturiy ta'minot (fTPM) sifatida amalga oshiriladi. Uning vazifasi — operatsion tizim va dasturiy ta'minot bevosita o'qiy yoki o'zgartira olmaydigan buzilishga chidamli muhitda kriptografik amallarni bajarish. 2016 yildan keyin sotilgan har bir zamonaviy kompyuter TPM 2.0 bilan keladi va Windows 11 uni majburiy talab qildi. Chip kichik, lekin juda kuchli ibtidoiylar to'plamini taqdim etadi: tasodifiy sonlar generatsiyasi, assimetrik kalit yaratish, HMAC, xeshlash va — eng muhimi — <Term>kalitlarni muhrlab qo'yish</Term> va <Term>platforma o'lchovi</Term>.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — TPM 1.2 vs TPM 2.0</h3>
+      <P>TPM 1.2 (2003) bitta algoritmlar to'plami atrofida loyihalangan — xeshlash uchun SHA-1 va assimetrik amallar uchun RSA-2048. U 24 registrli bitta PCR bankidan foydalangan. TPM 2.0 (2014) to'liq qayta loyihalash: algoritm-agnostik (SHA-1, SHA-256, SHA-384, ECC P-256, ECC P-384, AES-128/256 bir vaqtda qo'llab-quvvatlanadi), bir nechta PCR banklari (har bir xesh algoritmi uchun bittadan), yagona egasi modeli o'rniga ierarxiyalar va takomillashtirilgan kalit boshqaruvi. Windows 11 TPM 1.2 qo'llab-quvvatlashini butunlay olib tashladi, chunki SHA-1 buzilgan.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Xususiyat","TPM 1.2","TPM 2.0"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Standart","TCG 2003","TCG 2014"],
+            ["Xesh algoritmlari","Faqat SHA-1","SHA-1, SHA-256, SHA-384"],
+            ["Assimetrik kriptografiya","Faqat RSA-2048","RSA, ECC P-256/P-384"],
+            ["Simmetrik kriptografiya","Yo'q","AES-128/256"],
+            ["PCR banklari","1 bank × 24 registr","Bir nechta bank (har alg uchun)"],
+            ["Kalit ierarxiyasi","Yagona egasi","3 ierarxiya: Platforma/Egasi/Tasdiqlash"],
+            ["Windows 11 qo'llab-quvvatlashi","Yo'q (olib tashlangan)","Ha (talab qilinadi)"],
+            ["Amalga oshirish","Diskret chip yoki integratsiyalangan","Diskret chip, fTPM (CPU), yoki vTPM"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — PCR Banklari (Platforma Konfiguratsiya Registrlari)</h3>
+      <P>PCRlar TPM o'lchov imkoniyatining yuragini tashkil etadi. Har bir registr 20 bayt (SHA-1) yoki 32 bayt (SHA-256) va bitta qoidaga amal qiladi: u faqat <Em>kengaytirilishi</Em> mumkin, to'g'ridan-to'g'ri yozib bo'lmaydi. PCR[n] ni kengaytirish: <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>PCR[n] = Hash(PCR[n] || yangi_o'lchov)</code>. Bu buzilishga chidamli jurnal yaratadi — to'g'ri tartibda har bir o'lchovni qayta ishlatmasdan PCR qiymatini soxtalashtirish mumkin emas.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["PCR","Nima o'lchanadi"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["PCR[0]","UEFI proshivka kodi (BIOS ROM)"],
+            ["PCR[1]","UEFI proshivka konfiguratsiyasi (NVRAM sozlamalari)"],
+            ["PCR[2]","UEFI Option ROMlari (kengaytirish kartasi proshivkasi)"],
+            ["PCR[3]","UEFI Option ROM konfiguratsiyasi"],
+            ["PCR[4]","Boot menejer (bootmgr.efi) va yuklash urinishlari"],
+            ["PCR[5]","Boot menejer konfiguratsiyasi (BCD do'koni)"],
+            ["PCR[6]","S4/S5 uyqu holatidan tiklash hodisalari"],
+            ["PCR[7]","Secure Boot holati va siyosati"],
+            ["PCR[8-9]","Windows Boot Loader (winload.efi)"],
+            ["PCR[11]","BitLocker kirish nazorati (BitLocker-spetsifik)"],
+            ["PCR[12-15]","OT tomonidan belgilangan — Windows Kernel, ELAM, siyosatlar uchun"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleUz="Nima uchun PCR zanjirlash BitLocker uchun muhim" titleEn="">
+        BitLocker standart bo'yicha PCR[0,2,4,7,11] ga nisbatan Volume Master Key (VMK) ni muhrlab qo'yadi. Har bir yuklashda TPM bu PCRlarni tekshiradi — agar tizim o'zgartirilmagan bo'lsa, kalit avtomatik ravishda chiqariladi (shaffof qulfdan chiqarish). Agar ular mos kelmasa, BitLocker 48 raqamli tiklanish kalitini talab qiladi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — TPM Amallari: Kalit Yaratish, Muhrlab Qo'yish, Attestatsiya</h3>
+      <P><strong>Kalit Yaratish:</strong> TPM ishlab chiqarish paytida yoqilgan doimiy Tasdiqlash Kalitini (EK) o'z ichiga oladi — 2048-bitli RSA kalit jufti. Maxfiy yarmi chipni hech qachon tark etmaydi. Bu ildizdan TPM cheksiz miqdordagi bolalar kalitlarini chiqarishi mumkin (Saqlash Ildiz Kaliti → ilova kalitlari). Kalitlar <Em>ko'chirmaydigan</Em> sifatida belgilanishi mumkin, shuning uchun ular egasining paroli bilan ham jismonan eksport qilinishi mumkin emas.</P>
+      <P><strong>Kalitlarni Muhrlab Qo'yish:</strong> Bu noyob o'ldiruvchi xususiyat. TPM ixtiyoriy maxfiy blobni shifrlashi ("muhrlab qo'yishi") va muhrlab qo'yish paytidagi joriy PCR qiymatlarini yozib olishi mumkin. Muhrni ochish uchun TPM, xuddi shu mashina (xuddi shu PCR qiymatlari) va ixtiyoriy ravishda PIN talab qilinadi. Agar PCRlar muhrni ochish vaqtida farq qilsa — kimdir bootloaderni almashtirgan yoki proshivkani o'zgartirgan bo'lsa — TPM rad etadi. Bu muhrlangan kalitlarni boshqa mashinada yoki tizim buzilgandan so'ng foydasiz qiladi.</P>
+      <P><strong>Masofaviy Attestatsiya:</strong> Masofaviy server so'rashi mumkin: "Menga mashiningizda qaysi dasturiy ta'minot ishlayotganini isbotlang." TPM joriy PCR qiymatlarini EK bilan (yoki undan olingan Attestatsiya Identifikatsiya Kaliti bilan) imzolaydi. Server imzoni ishlab chiqaruvchining sertifikatiga nisbatan tekshiradi, PCR qiymatlarining ma'lum yaxshi siyosatga mos kelishini tekshiradi va faqat shundan so'ng mijozga ishonadi. Azure Attestation, TPM-asosli qurilma salomatligi va Zero Trust joylashtirishlar shunday ishlaydi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Windows'da TPM</h3>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:14,marginTop:12}}>
+        {[
+          {title:"BitLocker",color:"var(--c-ok)",body:"Volume Master Key (VMK) ni PCR[0,2,4,7,11] ga nisbatan muhrlab qo'yadi. Har bir yuklashda TPM bu PCRlarni tekshiradi — tizim o'zgartirilmagan bo'lsa, kalit avtomatik chiqariladi. Agar mos kelmasa, BitLocker 48 raqamli tiklanish kalitini talab qiladi."},
+          {title:"Windows Hello",color:"var(--c-system)",body:"PIN yoki biometrik shabloningiz TPM tomonidan himoyalangan RSA maxfiy kalitini ochadi. Kalit chipni hech qachon tark etmaydi — Windows Hello maxfiy kalitlari dizayn bo'yicha eksport qilinmaydigan. NTUSER.DAT ni o'g'irlagan masofaviy tajovuzkorlar foydali narsa ololmaydi."},
+          {title:"Credential Guard",color:"var(--accent)",body:"VBS (Virtualizatsiyaga Asoslangan Xavfsizlik) + TPM tomonidan muhrlangan kalit yordamida NTLM xeshlari va Kerberos chiptalari izolyatsiya qilingan VM (VSM) ichida himoya qilinadi. OS yadro buzilgan bo'lsa ham, Mimikatz hisob ma'lumotlarini chiqara olmaydi."},
+          {title:"vTPM (Virtual TPM)",color:"var(--c-warn)",body:"Hyper-V mehmonlari xostning jismoniy TPM tomonidan qo'llab-quvvatlanadigan dasturiy ta'minot-emulatsiya qilingan TPM 2.0 ni oladi. Bu VMlar ichida BitLocker, Windows Hello va Credential Guard'ga imkon beradi."},
+        ].map(c=><div key={c.title} style={{padding:"14px 16px",background:`${c.color}08`,border:`1px solid ${c.color}25`,borderLeft:`3px solid ${c.color}`,borderRadius:8}}>
+          <div style={{fontWeight:700,fontSize:14,color:c.color,marginBottom:6}}>{c.title}</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{c.body}</div>
+        </div>)}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — TPM Hujum Vektorlari</h3>
+      <P><strong>Evil Maid Hujumi:</strong> Qarovsiz qoldirilgan noutbukka jismoniy kirish. Agar BitLocker "faqat TPM" rejimida bo'lsa (PIN yo'q), disk yuklashda avtomatik qulfdan chiqariladi — shuning uchun sovuq-yuklash qiladigan tajovuzkor to'liq qulfdan chiqarilgan Windows sessiyasini oladi. Yengillashtirish: BitLocker yuklashdan oldingi PINni yoqish (TPM+PIN rejimi).</P>
+      <P><strong>TPM Avtobusini Tinglash:</strong> Diskret TPM chiplari anakartdagi LPC yoki SPI avtobusi orqali muloqot qiladi. Jismoniy kirish va mantiq analizatoriga ega tajovuzkor VMK ning TPM chipidan CPUga sayohat qilayotganini ushlashi mumkin. Intel PTT (fTPM) va AMD fTPM buni yumshatadi — TPM CPU ichida joylashgan, tashqi avtobus yo'q.</P>
+      <P><strong>TPM-Fail (CVE-2019-11090 / CVE-2019-16863):</strong> Ba'zi TPM chiplarida ECDSA imzolash amallari davomida yon kanal vaqt hujumi. Nanosaniyagacha javob vaqti farqlarini o'lchash orqali tajovuzkor ~1,000 amaldan so'ng ECC maxfiy kalitini qayta tiklashi mumkin. Microsoft proshivka yangilanishi orqali yamoqladi.</P>
+      <P><strong>TPM Reset Hujumi / S3 Uyqusi:</strong> Ba'zi eski tizimlarda PCRlarni tekshirmasdan S3 tiklash holati orqali TPMni tiklashga ruxsat berildi, bu tajovuzkorga bootloaderni almashtirish va keyin TPM allaqachon muhri ochilgan holda S3 dan davom etish imkonini berdi.</P>
+      <Callout color="var(--c-err)" icon="warning" titleUz="fTPM vs diskret TPM — qaysi birisi xavfsizroq?" titleEn="">
+        Intel PTT (fTPM) Management Engine (ME) ichida ishlaydi, AMD PSP Platform Security Processor da ishlaydi. Ikkalasi ham avtobus tinglash hujumini yo'q qiladi, lekin yangi ishonch bog'liqligini kiritadi: ME/PSP proshivka. CVE-2017-5705 (Intel ME kritik zaiflik) butun fTPM zanjiriga zarar etkazishi mumkinligini ko'rsatdi. Diskret TPMlar jismonan izolyatsiya qilingan — ularda shunchaki avtobus ta'sir muammosi bor.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# PowerShell'da TPM holatini tekshirish (Administrator sifatida)
+Get-Tpm
+
+# Natijada:
+# TpmPresent     : True
+# TpmReady       : True
+# TpmEnabled     : True
+# TpmActivated   : True
+
+# TPM spec versiyasini olish
+Get-Tpm | Select-Object -ExpandProperty ManufacturerVersion
+
+# tpm.msc — MMC snap-in: ishlab chiqaruvchi, versiya, PCR holatini ko'rsatadi
+# Boshlash → Ishga tushirish → tpm.msc
+
+# BitLocker PCR bog'liqligini tekshirish
+manage-bde -protectors -get C:`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L08 — Windows Registry
+// ─────────────────────────────────────────────────────────────
+function SectionRegistry() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows Registry" uz="" />
+      <P>The <Term>Windows Registry</Term> is the central hierarchical database where Windows stores virtually all configuration: hardware settings, driver parameters, user preferences, installed software, security policies, and COM object registrations. It is not a single file — the registry is a collection of binary files called <Term>hives</Term>, loaded into memory by the kernel at boot time and kept in sync on disk. From an attacker's perspective, the registry is one of the most valuable real estate in the OS: dozens of well-known locations are checked automatically at login, at service start, and on DLL load — making it the #1 persistence mechanism for malware.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Five Root Keys</h3>
+      <P>The registry tree has five root keys, each serving a distinct purpose:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Root Key","Abbreviation","Purpose"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["HKEY_LOCAL_MACHINE","HKLM","Machine-wide settings: hardware, drivers, services, installed software, security policy. Changes require admin rights."],
+            ["HKEY_CURRENT_USER","HKCU","Settings for the currently logged-in user. Mapped from HKU\\<SID>. Each user has their own subtree."],
+            ["HKEY_CLASSES_ROOT","HKCR","File type associations and COM/OLE object registrations. Merged view of HKLM\\Software\\Classes and HKCU\\Software\\Classes."],
+            ["HKEY_USERS","HKU","All loaded user profiles. HKCU is a symbolic link into here. Includes .DEFAULT (used before login) and S-1-5-18 (LocalSystem)."],
+            ["HKEY_CURRENT_CONFIG","HKCC","Hardware profile for the current boot. A symbolic link to HKLM\\SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current."],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleEn="HKLM vs HKCU — the permission model" titleUz="">
+        HKLM requires Administrator or SYSTEM to write. HKCU is writable by the current user with no elevation. This split is intentional — malware that runs as a low-privileged user can still persist via HKCU Run keys without triggering UAC prompts.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Data Types</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Type","ID","Description","Example use"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["REG_SZ","1","Plain Unicode string","InstallPath, service descriptions"],
+            ["REG_EXPAND_SZ","2","String with environment variable references like %SystemRoot%","ImagePath for services"],
+            ["REG_BINARY","3","Raw binary data","Hardware info, encryption blobs"],
+            ["REG_DWORD","4","32-bit integer (little-endian)","Flags, timeout values, feature toggles"],
+            ["REG_QWORD","11","64-bit integer","Large counts, timestamps"],
+            ["REG_MULTI_SZ","7","Array of strings, each null-terminated, double-null at end","DependOnService, ContentIndex"],
+            ["REG_LINK","6","Symbolic link to another registry key","HKCU → HKU\\<SID>"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-warn)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Hive Files on Disk</h3>
+      <P>The registry lives on disk as a set of binary files called hives. Each hive has a primary file, a transaction log (.LOG1/.LOG2), and optionally a backup (.SAV). Windows uses a write-ahead log — changes are journaled before being committed to the primary file, so a crash mid-write doesn't corrupt the hive.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Hive name","Disk path","Contents"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["SYSTEM","C:\\Windows\\System32\\config\\SYSTEM","Boot config, driver load order, CurrentControlSet"],
+            ["SOFTWARE","C:\\Windows\\System32\\config\\SOFTWARE","Installed programs, Windows components, policies"],
+            ["SAM","C:\\Windows\\System32\\config\\SAM","Local user accounts and password hashes (locked while Windows runs)"],
+            ["SECURITY","C:\\Windows\\System32\\config\\SECURITY","Security policy, LSA secrets, cached domain credentials"],
+            ["DEFAULT","C:\\Windows\\System32\\config\\DEFAULT","Default user profile (used before any user logs in)"],
+            ["NTUSER.DAT","C:\\Users\\<username>\\NTUSER.DAT","Per-user settings → becomes HKCU when user logs in"],
+            ["UsrClass.dat","C:\\Users\\<username>\\AppData\\Local\\Microsoft\\Windows\\UsrClass.dat","User-specific class registrations and shell settings"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-err)" icon="warning" titleEn="SAM and SECURITY are locked" titleUz="">
+        Windows locks SAM and SECURITY with an exclusive kernel handle while running — you cannot simply copy them. Attackers use Volume Shadow Copies (<code>vssadmin list shadows</code>), registry export via reg.exe SAVE, or tools like <code>secretsdump.py</code> to extract offline copies. SAM contains NTLM hashes that can be pass-the-hash attacked without cracking.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Registry and Boot: How Keys Are Loaded</h3>
+      <P>The boot sequence depends heavily on the registry. The SYSTEM hive is the only hive the kernel loads itself — every other hive is loaded later. The kernel reads <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\BootExecute</code> to find programs that must run before the session manager starts (e.g., <code>autocheck autochk *</code> — the disk checker). Then <code>smss.exe</code> loads all other hives, starts subsystems, and creates sessions.</P>
+      <P>The "CurrentControlSet" you see in the registry is actually a symbolic link to either ControlSet001 or ControlSet002. Windows rotates between these on each successful boot so that if a bad driver was added, you can boot into the Last Known Good Configuration (ControlSet002), which was the last successfully booted set.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Persistence Locations (Attacker's Registry)</h3>
+      <P>Malware almost universally uses the registry for persistence. The most commonly abused keys — checked automatically by Windows on every login or service start:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Auto-run at every user login (low-priv — HKCU)
+HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
+HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce
+
+# Auto-run at every login (needs admin — HKLM)
+HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
+HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce
+
+# Service definitions (needs admin)
+HKLM\\SYSTEM\\CurrentControlSet\\Services\\<ServiceName>
+  → ImagePath = path to executable or driver
+  → Start     = 0x00 (Boot) | 0x01 (System) | 0x02 (Auto) | 0x03 (Manual)
+
+# DLL injection into EVERY process — highly dangerous
+HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs
+  → LoadAppInit_DLLs = 1 to enable (disabled by default on Windows 8+)
+
+# Winlogon notification packages (rare but used by bootkits)
+HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify
+
+# COM object hijacking (no admin needed for HKCU)
+HKCU\\Software\\Classes\\CLSID\\{<GUID>}\\InprocServer32
+  → Override a system COM object with your own DLL`}</code></pre>
+      <Callout color="var(--c-err)" icon="warning" titleEn="AppInit_DLLs — the nuclear persistence option" titleUz="">
+        Any DLL listed under AppInit_DLLs is injected into every process that loads user32.dll — which is almost every GUI application. Malware like Carberp, Zeus, and Flame abused this. Windows 8+ requires the DLL to be signed when Secure Boot is active, but many legacy systems still have this vector open.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Monitoring the Registry</h3>
+      <P><strong>Sysmon Event ID 13 (RegistryValueSet):</strong> Logs registry value write operations. Configure Sysmon to monitor the Run/RunOnce keys, Services ImagePath, AppInit_DLLs — any write to these is immediately suspicious. Pair with Event ID 12 (key creation) and 14 (key rename — a trick to evade simple value monitors).</P>
+      <P><strong>Process Monitor (Sysinternals):</strong> Real-time registry monitoring with full stack traces. Filter by path (e.g., "Path contains Run") and see exactly which process, which thread, and what stack called the write. Essential for malware analysis and incident response.</P>
+      <P><strong>Autoruns (Sysinternals):</strong> The definitive tool for finding persistence. Scans 100+ autostart locations in the registry (and filesystem), shows the signed/unsigned status of each binary, highlights entries with VirusTotal hits. Run as Administrator and check "Hide Microsoft entries" to focus on third-party items.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Export registry hive offline (needs admin)
+reg export HKLM\\SOFTWARE C:\\backup\\software.reg
+
+# Save binary hive (for offline analysis with tools like regedit /L)
+reg save HKLM\\SAM C:\\backup\\sam.bak
+
+# Query a specific value
+reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
+
+# PowerShell: find all Run key entries across all users
+Get-Item "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+Get-Item "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+
+# Check if AppInit_DLLs is enabled
+Get-ItemProperty "HKLM:\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" |
+  Select-Object AppInit_DLLs, LoadAppInit_DLLs`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows Registry" en="" />
+      <P><Term>Windows Registry</Term> — Windows deyarli barcha konfiguratsiyani saqlaydigan markaziy ierarxik ma'lumotlar bazasi: apparat sozlamalari, drayver parametrlari, foydalanuvchi afzalliklari, o'rnatilgan dasturiy ta'minot, xavfsizlik siyosatlari va COM ob'ekt ro'yxatga olinishi. Bu bitta fayl emas — registry yadro tomonidan yuklash vaqtida xotiraga yuklanadigan <Term>hive</Term> deb ataladigan ikkilik fayllar to'plami. Tajovuzkor nuqtai nazaridan, registry OTdagi eng qimmatli ko'chmas mulklardan biri: o'nlab ma'lum joylar har bir loginда, servis boshlanishida va DLL yuklanishida avtomatik tekshiriladi — bu zararli dasturlar uchun №1 persistenslik mexanizmi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Beshta Asosiy Kalit</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Asosiy kalit","Qisqartma","Maqsad"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["HKEY_LOCAL_MACHINE","HKLM","Mashina-keng sozlamalar: apparat, drayverlar, servislar, o'rnatilgan dasturiy ta'minot, xavfsizlik siyosati. O'zgartirish admin huquqlarini talab qiladi."],
+            ["HKEY_CURRENT_USER","HKCU","Hozirda tizimga kirgan foydalanuvchi uchun sozlamalar. HKU\\<SID> dan ko'rsatilgan. Har bir foydalanuvchining o'z pastki daraxti bor."],
+            ["HKEY_CLASSES_ROOT","HKCR","Fayl turi bog'liqliklari va COM/OLE ob'ekt ro'yxatga olinishi. HKLM\\Software\\Classes va HKCU\\Software\\Classes ning birlashtirilgan ko'rinishi."],
+            ["HKEY_USERS","HKU","Barcha yuklangan foydalanuvchi profillari. HKCU bu yerga simvolik havola. .DEFAULT (logindan oldin) va S-1-5-18 (LocalSystem) ni o'z ichiga oladi."],
+            ["HKEY_CURRENT_CONFIG","HKCC","Joriy yuklash uchun apparat profili. HKLM\\SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current ga simvolik havola."],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleUz="HKLM vs HKCU — ruxsat modeli" titleEn="">
+        HKLM ga yozish uchun Administrator yoki SYSTEM talab qilinadi. HKCU hozirgi foydalanuvchi tomonidan ko'tarilmasdan yozilishi mumkin. Bu bo'linish ataylab — past imtiyozli foydalanuvchi sifatida ishlaydigan zararli dastur HKCU Run kalitlari orqali UAC so'rovlarini ishga tushirmasdan persistenslikni saqlay oladi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Ma'lumot Turlari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Tur","ID","Tavsif","Misol foydalanish"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["REG_SZ","1","Oddiy Unicode satr","InstallPath, servis tavsiflari"],
+            ["REG_EXPAND_SZ","2","%SystemRoot% kabi muhit o'zgaruvchi havolalari bo'lgan satr","Servislar uchun ImagePath"],
+            ["REG_BINARY","3","Xom ikkilik ma'lumot","Apparat ma'lumoti, shifrlash bloblari"],
+            ["REG_DWORD","4","32-bitli butun son (little-endian)","Bayroqlar, kutish muddatlari, xususiyat kalitlari"],
+            ["REG_QWORD","11","64-bitli butun son","Katta sonlar, vaqt tamg'alari"],
+            ["REG_MULTI_SZ","7","Satrlar massivi, har biri null bilan tugaydi","DependOnService, ContentIndex"],
+            ["REG_LINK","6","Boshqa registry kalitiga simvolik havola","HKCU → HKU\\<SID>"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-warn)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Diskdagi Hive Fayllar</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Hive nomi","Disk yo'li","Tarkib"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["SYSTEM","C:\\Windows\\System32\\config\\SYSTEM","Boot konfiguratsiya, drayver yuklash tartibi, CurrentControlSet"],
+            ["SOFTWARE","C:\\Windows\\System32\\config\\SOFTWARE","O'rnatilgan dasturlar, Windows komponentlari, siyosatlar"],
+            ["SAM","C:\\Windows\\System32\\config\\SAM","Mahalliy foydalanuvchi hisoblari va parol xeshlari (Windows ishlayotganda qulflangan)"],
+            ["SECURITY","C:\\Windows\\System32\\config\\SECURITY","Xavfsizlik siyosati, LSA sirlari, keshlanган domen hisob ma'lumotlari"],
+            ["DEFAULT","C:\\Windows\\System32\\config\\DEFAULT","Standart foydalanuvchi profili (hech kim kirmagan holda ishlatiladi)"],
+            ["NTUSER.DAT","C:\\Users\\<foydalanuvchi>\\NTUSER.DAT","Foydalanuvchiga xos sozlamalar → login paytida HKCU bo'ladi"],
+            ["UsrClass.dat","C:\\Users\\<foydalanuvchi>\\AppData\\Local\\Microsoft\\Windows\\UsrClass.dat","Foydalanuvchiga xos sinf ro'yxatga olinishi va shell sozlamalari"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-err)" icon="warning" titleUz="SAM va SECURITY qulflangan" titleEn="">
+        Windows SAM va SECURITY ni ishlatayotganda eksklyuziv yadro tutqichi bilan qulflaydi — ularni oddiy nusxalab bo'lmaydi. Tajovuzkorlar Volume Shadow Nusxalaridan, reg.exe SAVE dan yoki secretsdump.py kabi vositalardan foydalanadi. SAM buzmasdan pass-the-hash hujum qilish mumkin bo'lgan NTLM xeshlarini o'z ichiga oladi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Registry va Yuklash: Kalitlar Qanday Yuklanadi</h3>
+      <P>Yuklash ketma-ketligi registryga kuchli bog'liq. SYSTEM hive — yadro o'zi yuklaydigan yagona hive. Yadro <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\BootExecute</code> ni o'qib, sessiya menejeri boshlashidan oldin ishga tushishi kerak bo'lgan dasturlarni topadi (masalan, disk tekshiruvchi). Keyin <code>smss.exe</code> barcha boshqa hivelarni yuklaydi.</P>
+      <P>"CurrentControlSet" aslida ControlSet001 yoki ControlSet002 ga simvolik havola. Windows har muvaffaqiyatli yuklashda ular o'rtasida almashadi — yomon drayver qo'shilgan bo'lsa, oxirgi Yaxshi Ma'lum Konfiguratsiyaga (ControlSet002) yuklanish mumkin.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Persistenslik Joylari (Tajovuzkorning Registry'si)</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Har bir foydalanuvchi loginida avtomatik ishga tushish (past-imtiyoz — HKCU)
+HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
+HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce
+
+# Har bir loginда avtomatik ishga tushish (admin kerak — HKLM)
+HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
+HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce
+
+# Servis ta'riflari (admin kerak)
+HKLM\\SYSTEM\\CurrentControlSet\\Services\\<ServisNomi>
+  → ImagePath = bajariladigan fayl yoki drayvер yo'li
+  → Start     = 0x00 (Boot) | 0x01 (System) | 0x02 (Auto) | 0x03 (Manual)
+
+# HAR BIR jarayonga DLL in'ektsiya — juda xavfli
+HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs
+  → LoadAppInit_DLLs = 1 yoqish uchun (Windows 8+ da standart o'chirilgan)
+
+# COM ob'ektni o'g'irlash (HKCU uchun admin kerak emas)
+HKCU\\Software\\Classes\\CLSID\\{<GUID>}\\InprocServer32
+  → Tizim COM ob'ektini o'z DLL ingiz bilan almashiring`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Registry'ni Monitoring Qilish</h3>
+      <P><strong>Sysmon Event ID 13 (RegistryValueSet):</strong> Registry qiymat yozish amallarini jurnaliga oladi. Sysmon'ni Run/RunOnce kalitlari, Services ImagePath, AppInit_DLLs ni kuzatish uchun sozlang — bularga har qanday yozish darhol shubhali. Event ID 12 (kalit yaratish) va 14 (kalit nomini o'zgartirish) bilan juftlang.</P>
+      <P><strong>Process Monitor (Sysinternals):</strong> To'liq stek izlari bilan real vaqt registry monitoringi. Yo'l bo'yicha filterlang (masalan, "Yo'l Run ni o'z ichiga oladi") va qaysi jarayon, qaysi ip va qaysi stek yozishni chaqirganini ko'ring. Zararli dastur tahlili va hodisaga javob berish uchun muhim.</P>
+      <P><strong>Autoruns (Sysinternals):</strong> Persistenslik topish uchun yetakchi vosita. Registry da 100+ dan ortiq autostart joylarini skanerlaydi, har bir ikkilikni imzolangan/imzolanmagan holati bilan ko'rsatadi, VirusTotal xitlari bo'lgan yozuvlarni ajratib ko'rsatadi. Administrator sifatida ishga tushiring.</P>
+    </section>
+  );
+}
+// ─────────────────────────────────────────────────────────────
+// L09 — File Systems
+// ─────────────────────────────────────────────────────────────
+function SectionFileSystems() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="File Systems — Organizing Data on Storage" uz="" />
+      <P>A <Term>file system</Term> is the layer between raw storage (sectors on a disk, flash cells on an SSD) and the logical view that applications see: files with names, sizes, timestamps, permissions, and directory trees. Without a file system, a disk is just an undifferentiated ocean of bytes — you'd have to track every byte's physical address yourself. The file system solves: how to allocate space for new files, how to find a file by name, how to record metadata (who owns it, when was it last modified), how to handle partial writes on power failure, and how to enforce access control.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — The Windows I/O Manager and VFS Layer</h3>
+      <P>Windows does not let applications talk directly to file system drivers. Instead, the <Term>I/O Manager</Term> (part of ntoskrnl.exe) provides a unified abstraction called the <Term>I/O Request Packet (IRP)</Term> model. When an application calls <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>ReadFile()</code>, the Win32 layer converts it to an IRP_MJ_READ and passes it down a driver stack. The stack may have:</P>
+      <ul style={{paddingLeft:24,lineHeight:2,fontSize:14,color:"var(--text-1)"}}>
+        <li><strong>Filter drivers</strong> (top) — antivirus, encryption (EFS), auditing, reparse-point handlers</li>
+        <li><strong>File system driver</strong> (middle) — ntfs.sys, fastfat.sys, exfat.sys</li>
+        <li><strong>Volume manager</strong> — dmio.sys / StorAhci — handles LVM, RAID, disk partitioning</li>
+        <li><strong>Miniport driver</strong> (bottom) — talks to physical hardware: NVMe, SATA, USB</li>
+      </ul>
+      <P>This layered IRP stack means an antivirus filter driver can intercept every file read/write without the file system driver knowing. Windows can support multiple file systems simultaneously — NTFS on C:, FAT32 on a USB, exFAT on an SD card — through the same I/O Manager interface.</P>
+      <Callout color="var(--c-system)" icon="info" titleEn="Why this matters for security" titleUz="">
+        Ransomware typically opens files via normal Win32 APIs, generating IRPs that flow through all filter drivers. This is how endpoint protection products intercept ransomware: a filter driver at the top of the stack catches the write IRP, checks the write pattern (is this encrypting a .docx?), and can block the IRP before data is overwritten.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — FAT vs NTFS vs exFAT Comparison</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Feature","FAT32","NTFS","exFAT"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Introduced","1996","1993 (Windows NT 3.1)","2006 (Windows CE 6)"],
+            ["Max file size","4 GB − 1 byte","16 EB (theoretical)","16 EB (theoretical)"],
+            ["Max volume size","2 TB (8 TB with 64KB clusters)","256 TB (practical)","128 PB (theoretical)"],
+            ["Journaling","None","Yes ($LogFile, $UsnJrnl)","None"],
+            ["Permissions / ACLs","None","Full NTFS ACLs (SID-based)","None"],
+            ["Encryption","None","EFS (per-file, kernel-level)","None"],
+            ["Alternate Data Streams","None","Yes ($DATA attribute)","No"],
+            ["Unicode filenames","No (8.3 + LFN extension)","Yes (UTF-16)","Yes (UTF-16)"],
+            ["Typical use","USB drives, SD cards, ESP","Windows system drives","Flash drives, SD, cross-platform"],
+            ["Linux support","Native","ntfs3 (kernel 5.15+)","exfatprogs"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":"var(--text-1)",fontSize:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Windows File System Drivers</h3>
+      <P><strong>ntfs.sys</strong> — The NTFS driver. Loaded at boot. Handles all operations on NTFS volumes: file open/read/write/delete, directory enumeration, ACL enforcement, journaling, EFS, sparse files, ADS, reparse points (symlinks, junctions, mount points). Roughly 500,000 lines of code.</P>
+      <P><strong>fastfat.sys</strong> — FAT12/16/32 driver. Loaded on demand when a FAT volume is mounted. Much simpler than ntfs.sys — no ACLs, no journaling.</P>
+      <P><strong>exfat.sys</strong> — exFAT driver, introduced in Windows Vista SP1. Common on SD cards (the SD Association mandates exFAT for SDXC cards larger than 32 GB).</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Filter Drivers: The Invisible Middleware</h3>
+      <P>Filter drivers sit above the file system driver in the IRP stack and can intercept, modify, or block any I/O request. Windows uses a structured filter model called the <Term>Filter Manager</Term> (fltmgr.sys) introduced in Windows XP SP2, which provides registration, altitude ordering, and callback APIs.</P>
+      <P><strong>Altitude numbers</strong> determine the order filters run. Microsoft assigns altitude ranges by purpose: 420000–429999 = antivirus (highest priority), 140000–149999 = encryption, 80000–89999 = HSM (backup). A filter at 420000 sees every I/O before the filter at 140000.</P>
+      <P><strong>Security-relevant filter drivers:</strong> Windows Defender's real-time protection (WdFilter.sys), BitLocker volume encryption (fveefsx.sys), EFS (srmv2.sys). Rootkits that load as filter drivers can intercept file reads to hide malicious files — this was how TDL4's file hiding worked before PatchGuard restrictions tightened.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Security Implications of File System Choice</h3>
+      <P>Using FAT32 or exFAT means <strong>no access control</strong>. Anyone who can mount the volume can read and modify any file. NTFS ACLs are only enforced by ntfs.sys inside the Windows kernel — if you take an NTFS disk, boot Linux, and mount it as root, Linux reads NTFS structures via ntfs3 and ignores Windows ACLs entirely. <strong>BitLocker encryption is the correct layer for protecting data at rest against physical access</strong> — not NTFS permissions.</P>
+      <P>Alternate Data Streams (ADS) on NTFS allow hiding data inside legitimate files with no visible size change in Explorer. Many malware families have used ADS to store payloads and configuration. Tools like <code>dir /r</code> and Streams.exe (Sysinternals) reveal them.</P>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Fayl Tizimlari — Saqlashni Tashkil Etish" en="" />
+      <P><Term>Fayl tizimi</Term> — xom saqlash va dasturlar ko'radigan mantiqiy ko'rinish o'rtasidagi qatlam: nomlar, o'lchamlar, vaqt tamg'alari, ruxsatlar va katalog daraxtlari bilan fayllar. Fayl tizimisiz disk shunchaki baytlarning farqlanmagan dengizi. Fayl tizimi quyidagilarni hal qiladi: yangi fayllar uchun joy qanday ajratilsin, fayl nomiga ko'ra qanday topilsin, metadata qanday yozilsin, quvvat uzilishida qisman yozishlarda nima qilinsin va kirish nazorati qanday ta'minlansin.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Windows I/O Menejeri va VFS Qatlami</h3>
+      <P>Windows dasturlarga to'g'ridan-to'g'ri fayl tizimi drayverlari bilan muloqot qilishga ruxsat bermaydi. <Term>I/O Menejeri</Term> (ntoskrnl.exe ning bir qismi) <Term>IRP</Term> modeli deb ataladigan yagona abstraktsiya taqdim etadi. Dastur <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>ReadFile()</code> ni chaqirganda, u IRP_MJ_READ ga aylantiriladi va drayver stek bo'ylab uzatiladi:</P>
+      <ul style={{paddingLeft:24,lineHeight:2,fontSize:14,color:"var(--text-1)"}}>
+        <li><strong>Filtr drayverlari</strong> (yuqori) — antivirus, shifrlash (EFS), audit</li>
+        <li><strong>Fayl tizimi drayveri</strong> (o'rta) — ntfs.sys, fastfat.sys, exfat.sys</li>
+        <li><strong>Hajm menejeri</strong> — LVM, RAID, disk bo'limlashni boshqaradi</li>
+        <li><strong>Miniport drayveri</strong> (quyi) — jismoniy apparat bilan muloqot</li>
+      </ul>
+      <Callout color="var(--c-system)" icon="info" titleUz="Xavfsizlik uchun nima uchun muhim" titleEn="">
+        To'lov dasturlari odatda oddiy Win32 API orqali fayllarni ochadi, bu barcha filtr drayverlari orqali o'tadigan IRPlar yaratadi. Endpoint himoya mahsulotlari to'lov dasturlarini shu tarzda ushlaydिlar: stekdagi filtr drayveri yozish IRPni ushlaydн, yozish naqshini tekshiradн va IRP ni bloklaydн.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — FAT vs NTFS vs exFAT Taqqoslash</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Xususiyat","FAT32","NTFS","exFAT"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Kiritilgan","1996","1993","2006"],
+            ["Maks fayl hajmi","4 GB − 1 bayt","16 EB","16 EB"],
+            ["Maks hajm","2 TB","256 TB","128 PB"],
+            ["Jurnalling","Yo'q","Ha ($LogFile, $UsnJrnl)","Yo'q"],
+            ["Ruxsatlar / ACLlar","Yo'q","To'liq NTFS ACLlar","Yo'q"],
+            ["Shifrlash","Yo'q","EFS (fayl bo'yicha)","Yo'q"],
+            ["Muqobil Ma'lumot Oqimlari","Yo'q","Ha ($DATA)","Yo'q"],
+            ["Odatdagi foydalanish","USB, SD, ESP","Windows tizim disklari","Flash, SD, platformalararo"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":"var(--text-1)",fontSize:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Xavfsizlik Oqibatlari</h3>
+      <P>FAT32 yoki exFAT ishlatish <strong>kirish nazorati yo'q</strong> degan ma'noni anglatadi. NTFS ACLlar faqat Windows yadro ichidagi ntfs.sys tomonidan ta'minlanadi — NTFS diskni olsangiz va Linux da root sifatida o'rnatsangiz, Linux Windows ACLlarni butunlay e'tiborsiz qoldiradi. <strong>Jismoniy kirishdan ma'lumotni himoya qilish uchun to'g'ri qatlam BitLocker</strong> — NTFS ruxsatlar emas.</P>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L10 — NTFS
+// ─────────────────────────────────────────────────────────────
+function SectionNTFS() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="NTFS — New Technology File System" uz="" />
+      <P><Term>NTFS</Term> has been Windows' primary file system since NT 3.1 in 1993. It was designed to replace FAT with journaling, fine-grained access control, large file support, and a flexible metadata model. Every aspect of an NTFS volume is ultimately a file — including the file system's own metadata. This design makes NTFS extremely powerful but also creates unique attack surfaces that every security professional must understand.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — The Master File Table (MFT)</h3>
+      <P>The <Term>Master File Table ($MFT)</Term> is the heart of NTFS. Every file and directory on an NTFS volume has exactly one record in the MFT. Each MFT record is 1024 bytes (default) and contains all metadata for one file — name, timestamps, permissions, and for small files, even the file data itself (resident data). Files larger than ~700 bytes have a runlist — a list of (LCN, length) pairs pointing to actual clusters on disk.</P>
+      <P>NTFS reserves the first 16 MFT records for system metadata files:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Record #","System File","Purpose"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["0","$MFT","The MFT itself — self-referential first record"],
+            ["1","$MFTMirr","MFT mirror — backup of first 4 MFT records for recovery"],
+            ["2","$LogFile","NTFS journal — records metadata changes for crash recovery"],
+            ["3","$Volume","Volume name, NTFS version, dirty flag"],
+            ["4","$AttrDef","Attribute type definitions for this volume"],
+            ["5",".(root)","Root directory — the '\\' you navigate from"],
+            ["6","$Bitmap","Cluster allocation bitmap — 1 bit per cluster"],
+            ["7","$Boot","Boot sector and bootstrap code"],
+            ["8","$BadClus","List of bad clusters to avoid"],
+            ["9","$Secure","Security descriptor database (ACLs stored here)"],
+            ["10","$UpCase","Uppercase table for case-insensitive filename comparison"],
+            ["11","$Extend","Extension directory: $UsnJrnl, $Quota, $Reparse"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":j===1?"var(--accent)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — NTFS Attributes</h3>
+      <P>Everything in an NTFS MFT record is an <Term>attribute</Term>. A typical file has at minimum:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Attribute","Type","Contents / Security Notes"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["$STANDARD_INFORMATION","0x10","Creation, modification, MFT-modified, access timestamps; file attributes (hidden, read-only, system). This is what Explorer shows — and what malware modifies to fake timestamps (timestomping)."],
+            ["$FILE_NAME","0x30","Filename(s) in Unicode. Contains its OWN copy of timestamps — harder to stomp because most tools don't touch $FILE_NAME timestamps."],
+            ["$DATA","0x80","File content. Can be resident (in record) or non-resident (runlist). Can have multiple named instances — those are Alternate Data Streams."],
+            ["$INDEX_ROOT","0x90","B-tree index root for directories. Small directories fit entirely in the MFT record."],
+            ["$INDEX_ALLOCATION","0xA0","Extension of the B-tree for large directories."],
+            ["$REPARSE_POINT","0xC0","Reparse tag and data. Used for symbolic links, junctions, mount points, and OneDrive placeholder files."],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===1?"var(--c-warn)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Alternate Data Streams (ADS)</h3>
+      <P>An <Term>Alternate Data Stream</Term> is a named $DATA attribute. The default stream has no name (the "main" file data). NTFS allows any number of additional named streams on any file or directory. Syntax: <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>filename.txt:streamname:$DATA</code>. The alternate stream's size does NOT appear in <code>dir</code> output, Explorer, or most backup tools — only the main stream size is shown.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Create a hidden ADS
+echo "malicious payload" > innocent.txt:hidden_data
+
+# Read it back
+more < innocent.txt:hidden_data
+
+# List ADS streams (built-in, Windows 7+)
+dir /r innocent.txt
+# Shows:
+#    123 innocent.txt
+#     25 innocent.txt:hidden_data:$DATA
+
+# PowerShell
+Get-Item -Stream * C:\\path\\innocent.txt
+
+# Zone.Identifier — legitimate ADS Windows uses for downloaded files
+# Every file downloaded from the internet gets:
+# file.exe:Zone.Identifier:$DATA  →  [ZoneTransfer]\nZoneId=3
+# SmartScreen reads this to know the file came from the internet`}</code></pre>
+      <Callout color="var(--c-err)" icon="warning" titleEn="ADS abuse by malware" titleUz="">
+        Malware families including Poweliks, Ursnif, and APT tools have used ADS to hide payloads inside legitimate system files. A dropper can write a PowerShell payload into an ADS then create a scheduled task that reads and executes it: <code>wscript.exe "C:\Windows\explorer.exe:payload.vbs"</code>.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — NTFS Permissions vs Share Permissions</h3>
+      <P><strong>NTFS Permissions:</strong> Applied by ntfs.sys at the file system level. Stored as a Security Descriptor with a DACL containing ACEs. Each ACE specifies a SID and access rights: Read Data, Write Data, Execute, Delete, Change Permissions, Take Ownership. Apply whether access is local or over the network.</P>
+      <P><strong>Share Permissions:</strong> Applied by the Server service (srv2.sys) at the SMB level. Coarser: Full Control, Change, or Read. Only apply to network access — irrelevant for local console access.</P>
+      <P><strong>Effective rule:</strong> <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>Effective = NTFS ∩ Share</code> — the more restrictive wins. Best practice: set Share Permissions to "Everyone — Full Control" and control access entirely through NTFS ACLs.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Journaling: $LogFile and $UsnJrnl</h3>
+      <P><strong>$LogFile</strong> is NTFS's <Term>write-ahead journal</Term>. Before any metadata change, NTFS writes the intended change to $LogFile first. If the system crashes mid-operation, on next boot NTFS replays or rolls back incomplete transactions. Typically 64MB, circular, on every NTFS volume.</P>
+      <P><strong>$UsnJrnl</strong> (Change Journal) records every change to every file/directory: creation, deletion, rename, modification, security change. From a forensics perspective, $UsnJrnl is a goldmine — it shows the history of all file changes, even after files are deleted, until the circular journal wraps around.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check $UsnJrnl status
+fsutil usn queryjournal C:
+
+# Read recent USN journal entries (forensics)
+fsutil usn readjournal C: csv | findstr /i "delete"
+
+# $LogFile details
+fsutil logfile query C:`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Hard Links, Junctions, and Symbolic Links</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Type","Scope","Security note"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Hard link","Same volume only","Deleting the 'original' doesn't delete data — the MFT record stays until all hard links are removed. A 'deleted' file may still be accessible via its hard link."],
+            ["Junction","Local volumes only","Used for backwards compatibility (C:\\Documents and Settings → C:\\Users). Malware uses junctions for privilege escalation: write to a junction target that a privileged service reads."],
+            ["Symbolic link","Cross-volume, cross-host","TOCTOU attacks: create a symlink pointing to a privileged file right after a privileged process checks the path but before it opens it."],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontSize:j===0?12:13,fontFamily:j===0?"var(--font-mono)":"inherit"}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — EFS (Encrypting File System)</h3>
+      <P><Term>EFS</Term> is NTFS's per-file transparent encryption, introduced in Windows 2000. When you encrypt a file: (1) A random <Em>File Encryption Key (FEK)</Em> is generated. (2) File content is encrypted with the FEK using AES-256. (3) The FEK is encrypted with the user's EFS public key (RSA) and stored in the file's <code>$DATA:$EFS</code> attribute. (4) When the user opens the file, LSA decrypts the FEK using the user's private key — all transparently.</P>
+      <P><strong>EFS limitations:</strong> Keys are tied to the user's profile — if the profile is deleted without a Data Recovery Agent (DRA), files become unrecoverable. EFS does NOT protect against a logged-in attacker running as the same user (EFS transparently decrypts), in-memory data (decrypted pages live in RAM), or backup files (VSS copies may store decrypted data).</P>
+      <Callout color="var(--c-warn)" icon="warning" titleEn="Ransomware and EFS abuse" titleUz="">
+        Ransomware groups have used EFS as an encryption engine — calling the Windows EFS API to encrypt victim files with the ransomware's certificate, then deleting the victim's EFS key material. This sidesteps behavioral detection that looks for the ransomware's own crypto code. Microsoft added Windows Defender mitigations in 2020 to detect EFS abuse.
+      </Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="NTFS — Yangi Texnologiya Fayl Tizimi" en="" />
+      <P><Term>NTFS</Term> 1993 yildan beri Windows ning asosiy fayl tizimi. U jurnalling, nozik kirish nazorati, katta fayl qo'llab-quvvatlash va moslashuvchan metadata modeli bilan FAT ni almashtirish uchun noldan loyihalandi. NTFS hajmining har bir aspekti oxir-oqibat fayl — shu jumladan fayl tizimining o'z metadata si ham.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Master Fayl Jadvali (MFT)</h3>
+      <P><Term>Master Fayl Jadvali ($MFT)</Term> NTFS ning yuragi. Har bir fayl va katalog MFT da aynan bitta yozuvga ega. Har bir MFT yozuvi 1024 bayt va bitta fayl uchun barcha metadata ni o'z ichiga oladi. Kichik fayllar uchun ma'lumotlar to'g'ridan-to'g'ri MFT yozuvi ichida saqlanadi (rezident). Katta fayllar uchun runlist — diskdagi haqiqiy klasterlarga ko'rsatuvchi (LCN, uzunlik) juftliklari ro'yxati.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Yozuv #","Tizim fayli","Maqsad"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["0","$MFT","MFT ning o'zi — o'z-o'ziga havola"],
+            ["1","$MFTMirr","Birinchi 4 MFT yozuvining zaxirasi"],
+            ["2","$LogFile","NTFS jurnali — xato tiklanishi uchun"],
+            ["3","$Volume","Hajm nomi, NTFS versiyasi"],
+            ["5",".(ildiz)","Ildiz katalogi '\\'"],
+            ["6","$Bitmap","Klaster ajratish bitmap"],
+            ["7","$Boot","Boot sektori va bootstrap kodi"],
+            ["9","$Secure","Xavfsizlik tavsiflovchi ma'lumotlar bazasi (ACLlar)"],
+            ["11","$Extend","$UsnJrnl, $Quota, $Reparse uchun kengaytma"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":j===1?"var(--accent)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?12:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Muqobil Ma'lumot Oqimlari (ADS)</h3>
+      <P>Nomlangan $DATA atributi. Sintaksis: <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>fayl.txt:oqim_nomi:$DATA</code>. Muqobil oqimning hajmi <code>dir</code>, Explorer yoki aksariyat zaxira vositalarida ko'rinmaydi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Yashirin ADS yaratish
+echo "yashirin ma'lumot" > oddiy.txt:yashirin
+
+# Ro'yxatga olish
+dir /r oddiy.txt
+
+# PowerShell
+Get-Item -Stream * C:\\yo'l\\oddiy.txt
+
+# Zone.Identifier — internetdan yuklab olingan fayllar uchun
+# fayl.exe:Zone.Identifier:$DATA → [ZoneTransfer]\nZoneId=3`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — NTFS Ruxsatlari vs Ulashish Ruxsatlari</h3>
+      <P><strong>NTFS Ruxsatlari:</strong> ntfs.sys tomonidan ta'minlanadi. DACL va ACElardan iborat Xavfsizlik Tavsiflovchisi sifatida saqlanadi. Mahalliy yoki tarmoq kirishida amal qiladi.</P>
+      <P><strong>Ulashish Ruxsatlari:</strong> SMB darajasida qo'llaniladi. Faqat tarmoq kirishiga tegishli. <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>Samarali = NTFS ∩ Ulashish</code> — qattiqroq g'alaba qozonadi. Eng yaxshi amaliyot: Ulashish Ruxsatlarini "Hamma — To'liq" ga o'rnating va kirishni to'liq NTFS ACLlar orqali boshqaring.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Jurnalling: $LogFile va $UsnJrnl</h3>
+      <P><strong>$LogFile</strong> — oldindan yozish jurnali. Har qanday metadata o'zgarishidan oldin NTFS o'zgarishni avval $LogFile ga yozadi. Tizim o'rta yo'lda ishdan chiqsa, keyingi yuklashda tugallanmagan tranzaktsiyalar qayta ishlanadi yoki ortga qaytariladi.</P>
+      <P><strong>$UsnJrnl</strong> — har bir fayl va katalogdagi har bir o'zgarishni yozadi: yaratish, o'chirish, nomni o'zgartirish, o'zgartirish. Kriminalistika uchun oltin kon — fayllar o'chirilgandan keyin ham tarixni ko'rsatadi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — EFS (Fayllarni Shifrlash Tizimi)</h3>
+      <P>NTFS ning fayl bo'yicha shaffof shifrlash, Windows 2000 da kiritilgan. (1) Tasodifiy FEK yaratiladi. (2) Fayl AES-256 bilan shifrlanadi. (3) FEK foydalanuvchining RSA ochiq kaliti bilan shifrlanadi va <code>$DATA:$EFS</code> atributida saqlanadi. (4) Fayl ochilganda, LSA FEK ni maxfiy kalit bilan hal qiladi — barchasi shaffof.</P>
+      <P><strong>Cheklovlar:</strong> Kalitlar foydalanuvchi profiliga bog'liq. Agar profil o'chirilsa va DRA konfiguratsiya qilinmagan bo'lsa, fayllar tiklanmaydi. EFS xuddi shu foydalanuvchi sifatida ishlayotgan tajovuzkordan, xotiradagi ma'lumotlardan yoki VSS zaxira nusxalaridan himoya qilmaydi.</P>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L11 — FAT32
+// ─────────────────────────────────────────────────────────────
+function SectionFAT32() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="FAT32 — File Allocation Table" uz="" />
+      <P><Term>FAT32</Term> is the third generation of Microsoft's File Allocation Table file system, introduced in 1996. Despite being over 25 years old, FAT32 is still ubiquitous: virtually every USB flash drive ships formatted as FAT32 or exFAT, the EFI System Partition (ESP) must be FAT32, and billions of embedded devices use FAT for its simplicity. Understanding FAT32's architecture and critical limitations — especially the 4 GB file size limit — is essential for any Windows professional.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — The FAT Structure</h3>
+      <P>A FAT volume is divided into three regions:</P>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12,marginTop:12}}>
+        {[
+          {title:"Reserved Region",color:"var(--c-system)",body:"Contains the Boot Sector (512 bytes) at offset 0, holding the BPB (BIOS Parameter Block): cluster size, total sectors, FAT count, root directory cluster (FAT32). Also contains the FSInfo sector caching the free cluster count."},
+          {title:"FAT Region",color:"var(--accent)",body:"One or two copies of the File Allocation Table. Each entry is 32 bits representing one cluster: 0x00000000 = free, 0x0FFFFFF7 = bad, 0x0FFFFFF8–0x0FFFFFFF = end of chain, or the next cluster number in the file's chain."},
+          {title:"Data Region",color:"var(--c-ok)",body:"Actual file and directory data in clusters. Cluster size is configurable at format time: 512B, 1KB, 2KB, 4KB, 8KB, 16KB, 32KB, 64KB. Larger clusters = less FAT entries but more wasted slack for small files."},
+        ].map(c=><div key={c.title} style={{padding:"14px 16px",background:`${c.color}08`,border:`1px solid ${c.color}25`,borderLeft:`3px solid ${c.color}`,borderRadius:8}}>
+          <div style={{fontWeight:700,fontSize:13,color:c.color,marginBottom:6}}>{c.title}</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{c.body}</div>
+        </div>)}
+      </div>
+      <P style={{marginTop:16}}>The FAT is a <Em>singly-linked list</Em> encoded as an array. To read a file: start at the first cluster stored in the directory entry → look up that cluster's FAT entry to find the next cluster → follow the chain until you hit an end-of-chain marker. This is why fragmented FAT32 volumes perform poorly — each fragment requires a separate FAT lookup.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Directory Structure and Long File Names</h3>
+      <P>FAT directories are a linear array of 32-byte directory entries, each holding the 8.3 filename (uppercase, space-padded), attributes byte, timestamps, first cluster number, and file size. The original FAT allowed only 8.3 names. Windows 95 added LFN support using a hack: LFN entries use attribute byte 0x0F (ReadOnly+Hidden+System+VolumeLabel), which old software ignores. Each LFN entry stores 13 UTF-16 characters. Maximum LFN: 255 UTF-16 characters.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — FAT12, FAT16, FAT32 Comparison</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Feature","FAT12","FAT16","FAT32"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["FAT entry size","12 bits","16 bits","28 bits (in 32-bit field)"],
+            ["Max clusters","4,084","65,524","268,435,445"],
+            ["Max volume (4KB clusters)","~16 MB","~256 MB","~2 TB"],
+            ["Max file size","Same as volume","Same as volume","4 GB − 1 byte"],
+            ["Root directory","Fixed, 224 entries","Fixed, 512 entries","Dynamic (in data region, no limit)"],
+            ["Year introduced","1977","1984","1996"],
+            ["Typical use","Floppy disks","Old USB drives","Modern USB, SD, ESP"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":"var(--text-1)",fontSize:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Critical Limitations</h3>
+      <P><strong>4 GB file size limit:</strong> The directory entry's file size field is a 32-bit unsigned integer. 2³² − 1 = 4,294,967,295 bytes = exactly 4 GB − 1 byte. No FAT32 file can be 4 GB or larger. You cannot store a 4.7 GB DVD ISO, a Windows installation ISO (typically 5–6 GB), or a large database file. The error: "The file is too large for the destination file system."</P>
+      <P><strong>32 GB volume limit (Windows only):</strong> Windows' format.exe refuses to format volumes larger than 32 GB as FAT32. This is an arbitrary Microsoft policy — FAT32 supports up to 2 TB. Third-party tools (Rufus, fat32format) bypass this restriction.</P>
+      <P><strong>No permissions or journaling:</strong> Every file is accessible to every user. A power failure during a write can leave FAT and directory entries inconsistent — CHKDSK /F required to repair. This is why FAT32 is inappropriate for system drives.</P>
+      <P><strong>Timestamps with 2-second resolution:</strong> FAT stores modified time with 2-second resolution (5-bit seconds field → values 0, 2, 4, ..., 58, 60). This matters for forensics: timestamp analysis on FAT has lower precision than NTFS (100-nanosecond resolution).</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Why FAT32 Is Still Used: USB, SD, and the ESP</h3>
+      <P><strong>USB and SD Cards:</strong> FAT32 has universal read/write support across every OS: Windows, macOS, Linux, Android, iOS, game consoles, cameras, TVs, car stereos. exFAT is FAT32's modern replacement for removable media — supports files larger than 4 GB and volumes larger than 32 GB while maintaining near-universal OS support.</P>
+      <P><strong>EFI System Partition (ESP):</strong> The UEFI specification mandates the ESP must be formatted as FAT32. The ESP holds bootloaders (bootmgfw.efi, grubx64.efi), UEFI driver modules, firmware update capsules, and the Windows Boot Manager. Typically 100–550 MB. Because it must be readable by UEFI firmware with no OS drivers loaded, FAT32 was chosen for its simplicity and universal support.</P>
+      <Callout color="var(--c-warn)" icon="warning" titleEn="Protecting the ESP" titleUz="">
+        The ESP is a FAT32 volume with no NTFS ACLs, accessible to any process running as Administrator. Bootkits and persistent malware target the ESP because files written there survive OS reinstallation. Secure Boot's signature verification is the primary defense — UEFI firmware refuses to execute unsigned EFI binaries from the ESP.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — FAT32 Data Recovery</h3>
+      <P>FAT32 is easier to recover data from than NTFS. When you delete a file, FAT32 only marks the first character of the directory entry with 0xE5 (deleted marker) and frees the FAT chain. The actual file data on disk is untouched until overwritten. Recovery tools (TestDisk, Recuva, PhotoRec) scan for 0xE5-marked entries and rebuild the cluster chain. FAT32 has no journal, so deletion leaves fewer forensic traces than NTFS (where $UsnJrnl records deletion events).</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check FAT32 volume details
+fsutil fsinfo volumeinfo D:
+
+# Check for filesystem errors (read-only)
+chkdsk D:
+
+# Fix errors (requires unmount or restart)
+chkdsk D: /F
+
+# Convert FAT32 to NTFS (non-destructive, one-way)
+convert D: /FS:NTFS
+# Warning: cannot convert back to FAT32 without formatting
+
+# Check volume type via PowerShell
+Get-Volume -DriveLetter D | Select-Object FileSystem, Size, SizeRemaining`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="FAT32 — Fayl Ajratish Jadvali" en="" />
+      <P><Term>FAT32</Term> — Microsoft ning Fayl Ajratish Jadvali fayl tizimining uchinchi avlodi, 1996 yilda kiritilgan. 25 yildan oshiq bo'lishiga qaramay hali ham hamma joyda: deyarli har bir USB flesh disk FAT32 yoki exFAT sifatida keladi, EFI Tizim Bo'limi (ESP) FAT32 bo'lishi shart, va milliardlab o'rnatilgan qurilmalar FAT ishlatadi. 4 GB fayl hajmi cheklovini va nima uchun FAT32 hali ham ishlatilishini tushunish har bir Windows mutaxassisi uchun muhim.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — FAT Tuzilmasi</h3>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12,marginTop:12}}>
+        {[
+          {title:"Zahiralangan Soha",color:"var(--c-system)",body:"BPB (BIOS Parametrlari Bloki) saqlanadigan Boot Sektorini o'z ichiga oladi: klaster hajmi, jami sektorlar, FAT soni, ildiz katalog klasteri. FSInfo sektori bepul klaster sonini keshlaydi."},
+          {title:"FAT Soha",color:"var(--accent)",body:"Fayl Ajratish Jadvalining nusxasi. Har bir yozuv 32 bit: 0 = bepul, 0x0FFFFFF7 = yomon, 0x0FFFFFF8-0x0FFFFFFF = zanjir oxiri, yoki KEYINGI klaster raqami."},
+          {title:"Ma'lumotlar Soha",color:"var(--c-ok)",body:"Klasterlardagi haqiqiy fayl va katalog ma'lumotlari. Klaster hajmi format vaqtida sozlanadi: 512B dan 64KB gacha."},
+        ].map(c=><div key={c.title} style={{padding:"14px 16px",background:`${c.color}08`,border:`1px solid ${c.color}25`,borderLeft:`3px solid ${c.color}`,borderRadius:8}}>
+          <div style={{fontWeight:700,fontSize:13,color:c.color,marginBottom:6}}>{c.title}</div>
+          <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{c.body}</div>
+        </div>)}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — FAT12, FAT16, FAT32 Taqqoslash</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Xususiyat","FAT12","FAT16","FAT32"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["FAT yozuv hajmi","12 bit","16 bit","28 bit (32-bitli maydon)"],
+            ["Maks hajm (4KB)","~16 MB","~256 MB","~2 TB"],
+            ["Maks fayl hajmi","Hajm kabi","Hajm kabi","4 GB − 1 bayt"],
+            ["Ildiz katalog","224 yozuv (qat'iy)","512 yozuv (qat'iy)","Dinamik (chegarasiz)"],
+            ["Kiritilgan","1977","1984","1996"],
+            ["Odatdagi foydalanish","Disketalar","Eski USB","Zamonaviy USB, SD, ESP"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":"var(--text-1)",fontSize:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Asosiy Cheklovlar</h3>
+      <P><strong>4 GB fayl hajmi chegarasi:</strong> Katalog yozuvidagi fayl hajmi maydoni 32-bitli belgisiz butun son. 2³² − 1 = 4 GB − 1 bayt. FAT32 diskida hech qanday fayl 4 GB yoki undan katta bo'la olmaydi. 4.7 GB DVD ISO, Windows o'rnatish ISO (5–6 GB), yoki katta ma'lumotlar bazasi fayli siqmaydi. Xato: "Fayl maqsad fayl tizimi uchun juda katta."</P>
+      <P><strong>32 GB hajm chegarasi (faqat Windows):</strong> Windows ning format.exe si 32 GB dan katta hajmni FAT32 sifatida formatlashdan bosh tortadi. Lekin bu ixtiyoriy Microsoft siyosati — FAT32 spetsifikatsiyasi 2 TB qo'llab-quvvatlaydi. Uchinchi tomon vositalari (Rufus) bu cheklovni chetlab o'tadi.</P>
+      <P><strong>Ruxsatlar va jurnalling yo'q:</strong> Har bir faylga har kim kirishi mumkin. Quvvat uzilishi ma'lumotlarni buzishi mumkin — CHKDSK /F tuzatish uchun talab qilinadi. Shuning uchun FAT32 tizim disklari uchun yaroqsiz.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Nima uchun FAT32 Hali Ham Ishlatiladi</h3>
+      <P><strong>USB va SD Kartalar:</strong> FAT32 har bir OT da universal qo'llab-quvvatlashga ega: Windows, macOS, Linux, Android, iOS, o'yin konsollari, kameralar. exFAT FAT32 ning zamonaviy o'rnini bosuvchisi — 4 GB dan katta fayllar va 32 GB dan katta hajmlarni qo'llab-quvvatlaydi.</P>
+      <P><strong>EFI Tizim Bo'limi (ESP):</strong> UEFI spetsifikatsiyasi ESP FAT32 sifatida formatlanishi shart deb belgilaydi. ESP bootloaderlar, UEFI drayver modullari va Windows Boot Manager ni o'z ichiga oladi. Odatda 100–550 MB. OT drayverlari yuklanmagan holda UEFI tomonidan o'qilishi kerak bo'lgani uchun FAT32 tanlandi.</P>
+      <Callout color="var(--c-warn)" icon="warning" titleUz="ESP ni himoya qilish" titleEn="">
+        ESP — NTFS ACL siz FAT32 hajmi, Administrator sifatida ishlayotgan har qanday jarayon uchun ochiq. Bootkit va doimiy zararli dasturlar ESP ni nishonga oladilar — u yerda yozilgan fayllar OT qayta o'rnatishdan omon qoladi. Asosiy himoya: Secure Boot ning imzo tekshiruvi — UEFI imzolanmagan EFI fayllarni bajarishdan bosh tortadi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — FAT32 Ma'lumotlarni Tiklash</h3>
+      <P>FAT32 dan ma'lumotlarni tiklash NTFS dan osonroq. Faylni o'chirganda, FAT32 faqat katalog yozuvining birinchi belgisini 0xE5 bilan belgilaydi va FAT zanjiriga ozod qiladi. Diskdagi haqiqiy ma'lumotlar ustiga yozilgunga qadar tegılmagan. Tiklash vositalari (TestDisk, Recuva) 0xE5 yozuvlarini topadi va zanjirni qayta tiklaydi. FAT32 da jurnal yo'q — bu NTFS dan ko'ra kamroq kriminalistik iz qoldiradi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# FAT32 hajm tafsilotlari
+fsutil fsinfo volumeinfo D:
+
+# Xatolarni tekshirish
+chkdsk D:
+
+# Xatolarni tuzatish
+chkdsk D: /F
+
+# FAT32 dan NTFS ga o'tkazish (bir tomonlama, yo'qotishsiz)
+convert D: /FS:NTFS
+
+# Hajm turini tekshirish
+Get-Volume -DriveLetter D | Select-Object FileSystem, Size, SizeRemaining`}</code></pre>
+    </section>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────
 function ComingSoon({ lesson, lessonNum, setRoute }) {
   const lang = useLang();

@@ -30,6 +30,36 @@ const FALLBACK_QUESTIONS = {
     { uz: "MBR va GPT bo'lim jadvallari nima? Ular bir-biridan qanday farq qiladi va qaysi firmware bilan ishlaydi?", en: "What are MBR and GPT partition tables? How do they differ and which firmware works with each?" },
     { uz: "Nima uchun BIOS davridagi tizimlar MBR bootkit hujumlariga zaif edi? UEFI Secure Boot bu muammoni qanday hal qiladi?", en: "Why were BIOS-era systems vulnerable to MBR bootkit attacks? How does UEFI Secure Boot address this?" },
   ],
+  6: [
+    { uz: "Secure Boot nima va u nima uchun yaratilgan? PK, KEK, db va dbx kalitlari qanday ierarxiya hosil qiladi va har birining roli nima?", en: "What is Secure Boot and why was it created? How do the PK, KEK, db, and dbx keys form a hierarchy and what is each one's role?" },
+    { uz: "Secure Boot tekshiruvi qanday ishlaydi — UEFI firmware bootloaderni yuklashdan oldin qanday tekshiradi? Tekshiruv muvaffaqiyatsiz bo'lsa nima bo'ladi?", en: "How does Secure Boot verification work — how does UEFI firmware verify a bootloader before running it? What happens if verification fails?" },
+    { uz: "BlackLotus (CVE-2022-21894) yoki BootHole (CVE-2020-10713) kabi haqiqiy Secure Boot chetlab o'tish texnikasini tushuntiring. Bu hujum qanday ishladi va Microsoft qanday javob berdi?", en: "Explain a real Secure Boot bypass technique such as BlackLotus (CVE-2022-21894) or BootHole (CVE-2020-10713). How did the attack work and how did Microsoft respond?" },
+  ],
+  7: [
+    { uz: "TPM (Trusted Platform Module) nima va u qanday asosiy kriptografik funksiyalarni ta'minlaydi? fTPM va diskret TPM o'rtasidagi farq nima?", en: "What is a TPM (Trusted Platform Module) and what core cryptographic functions does it provide? What is the difference between fTPM and a discrete TPM?" },
+    { uz: "PCR (Platform Configuration Register) nima va u qanday ishlaydi? BitLocker PCR larni qanday ishlatadi va nima uchun bu muhim?", en: "What is a PCR (Platform Configuration Register) and how does it work? How does BitLocker use PCRs and why does this matter?" },
+    { uz: "TPM ga qarshi haqiqiy hujum vektorini tushuntiring — masalan, Evil Maid hujumi yoki TPM avtobus tinglash. Bu hujum qanday ishlaydi va qanday kamaytiriladi?", en: "Explain a real attack vector against TPM — for example, the Evil Maid attack or TPM bus sniffing. How does the attack work and how is it mitigated?" },
+  ],
+  8: [
+    { uz: "Windows Registry nima? Uning 5 ta asosiy kaliti (HKLM, HKCU, HKCR, HKU, HKCC) nima uchun ishlatiladi va ular qaysi disk fayllariga mos keladi?", en: "What is the Windows Registry? What are its 5 root keys (HKLM, HKCU, HKCR, HKU, HKCC) used for and which disk files do they map to?" },
+    { uz: "Zararli dasturlar registry'ni persistenslik uchun qanday ishlatadi? Kamida 3 ta keng tarqalgan persistenslik joyini va ular nima uchun xavfli ekanini tushuntiring.", en: "How do malware programs use the registry for persistence? Name at least 3 commonly abused persistence locations and explain why each is dangerous." },
+    { uz: "Registry monitoring uchun qanday vositalar ishlatiladi? Sysmon Event ID 13, Process Monitor va Autoruns ning har biri nima qiladi?", en: "What tools are used for registry monitoring? What does each of Sysmon Event ID 13, Process Monitor, and Autoruns do?" },
+  ],
+  9: [
+    { uz: "Windows I/O Menejeri va IRP modeli nima? Dastur ReadFile() chaqirganda, so'rov qanday drayver stekidan o'tadi?", en: "What is the Windows I/O Manager and IRP model? When an application calls ReadFile(), how does the request pass through the driver stack?" },
+    { uz: "FAT32, NTFS va exFAT o'rtasidagi asosiy farqlarni solishtiring — maks fayl hajmi, ruxsatlar, jurnalling va xavfsizlik nuqtai nazaridan.", en: "Compare the main differences between FAT32, NTFS, and exFAT — in terms of max file size, permissions, journaling, and security." },
+    { uz: "Filtr drayverlari nima va ular Windows fayl tizimi xavfsizligi uchun nima uchun muhim? Bir nechta filtr drayveri misolini keltiring.", en: "What are filter drivers and why are they important for Windows file system security? Give several examples of filter drivers." },
+  ],
+  10: [
+    { uz: "NTFS Master Fayl Jadvali (MFT) nima? Rezident va norezident ma'lumotlar o'rtasidagi farq nima va bu forensics uchun nima anglatadi?", en: "What is the NTFS Master File Table (MFT)? What is the difference between resident and non-resident data and what does this mean for forensics?" },
+    { uz: "NTFS Muqobil Ma'lumot Oqimlari (ADS) nima? Zararli dasturlar ularni qanday ishlatadi va ADS ni qanday aniqlash mumkin?", en: "What are NTFS Alternate Data Streams (ADS)? How do malware programs use them and how can ADS be detected?" },
+    { uz: "NTFS ruxsatlari va ulashish ruxsatlari o'rtasidagi farq nima? Tarmoq orqali faylga kirishda ular qanday birgalikda ishlaydi? $UsnJrnl nima va forensics uchun nima uchun muhim?", en: "What is the difference between NTFS permissions and share permissions? How do they work together when accessing a file over the network? What is $UsnJrnl and why is it important for forensics?" },
+  ],
+  11: [
+    { uz: "FAT32 da fayl ma'lumotlari diskda qanday saqlanadi? FAT jadvali, klaster zanjiri va katalog yozuvlari bir-biri bilan qanday bog'liq?", en: "How is file data stored on disk in FAT32? How do the FAT table, cluster chain, and directory entries relate to each other?" },
+    { uz: "FAT32 ning asosiy cheklovlari nimalar — xususan 4 GB fayl hajmi chegarasi nima uchun mavjud va u qanday muammolarga olib keladi? 32 GB hajm chegarasi qanday chetlab o'tiladi?", en: "What are FAT32's main limitations — specifically why does the 4 GB file size limit exist and what problems does it cause? How is the 32 GB volume limit bypassed?" },
+    { uz: "Nima uchun EFI Tizim Bo'limi (ESP) FAT32 sifatida formatlanishi shart? Bu xavfsizlik nuqtai nazaridan qanday muammolar tug'diradi?", en: "Why must the EFI System Partition (ESP) be formatted as FAT32? What security implications does this create?" },
+  ],
 };
 
 const COOLDOWN_KEY = "wa_cooldown_end";
@@ -86,6 +116,12 @@ Return STRICT JSON only, no markdown fences. Feedback in ${lang === "en" ? "Engl
     3: "User mode vs kernel mode (beginner-intermediate): CPU privilege rings (ring 0 and ring 3), why the boundary exists, what each mode can/cannot do, crash impact differences. Practical and clear questions.",
     4: "Windows boot process (beginner-intermediate): UEFI/POST, Secure Boot, bootmgr.efi, winload.efi, kernel load, smss.exe, LSASS, login screen. Ask about the sequence and purpose of each step.",
     5: "BIOS vs UEFI (beginner-intermediate): BIOS 16-bit real mode vs UEFI 64-bit, MBR vs GPT partition tables, Secure Boot chain of trust, why BIOS was vulnerable to MBR bootkits, CSM/Legacy mode risks. Practical and conceptual questions.",
+    6: "Secure Boot (intermediate): PK/KEK/db/dbx key hierarchy, signature verification flow, Secure Boot modes (Setup/User/Audit/Deployed), real bypass techniques (BlackLotus CVE-2022-21894, BootHole CVE-2020-10713, signed vulnerable bootloaders, physical attack), Linux shim+MOK. Ask about the chain of trust and bypass techniques.",
+    7: "TPM — Trusted Platform Module (intermediate): TPM 1.2 vs 2.0, PCR banks (Platform Configuration Registers), PCR extension formula, TPM operations (key generation, key sealing, attestation), Windows TPM uses (BitLocker, Windows Hello, Credential Guard, vTPM), attack vectors (evil maid, TPM bus sniffing, TPM-Fail). Ask about PCR chaining and BitLocker integration.",
+    8: "Windows Registry (beginner-intermediate): 5 root keys (HKLM/HKCU/HKCR/HKU/HKCC), hive files on disk (SYSTEM, SOFTWARE, SAM, SECURITY, NTUSER.DAT), data types (REG_SZ/REG_DWORD/REG_BINARY), persistence locations (Run/RunOnce/Services/AppInit_DLLs/COM hijacking), monitoring (Sysmon Event 13, Process Monitor, Autoruns). Ask about persistence techniques.",
+    9: "Windows File Systems (beginner-intermediate): I/O Manager and IRP model, filter driver stack and altitude numbers, FAT32 vs NTFS vs exFAT comparison (file size limits, permissions, journaling, ADS), file system drivers (ntfs.sys, fastfat.sys, exfat.sys), security implications of file system choice. Ask about the IRP stack and FAT vs NTFS differences.",
+    10: "NTFS file system (intermediate-advanced): MFT structure (resident vs non-resident data, first 16 system records), NTFS attributes ($STANDARD_INFORMATION, $FILE_NAME, $DATA, $REPARSE_POINT), Alternate Data Streams (ADS) and malware abuse, NTFS permissions vs share permissions (effective access = NTFS ∩ Share), journaling ($LogFile write-ahead journal, $UsnJrnl change journal), hard links/junctions/symbolic links security, EFS encryption (FEK, AES-256, RSA). Ask about MFT, ADS, and permissions.",
+    11: "FAT32 file system (beginner-intermediate): FAT table structure (FAT12/16/32 entry sizes), cluster chain as singly-linked list, 3 volume regions (Reserved/FAT/Data), directory entries (32-byte structure, 8.3 filename, LFN via 0x0F attribute), critical limitations (4GB file limit from 32-bit size field, 32GB Windows-only volume limit), why still used (USB cross-platform, ESP must be FAT32), data recovery (0xE5 deleted marker). Ask about the 4GB limit and ESP usage.",
   };
 
   const generate = async () => {
@@ -179,11 +215,17 @@ const modalStyle = {
 };
 
 const LESSON_TITLES = {
-  1: { uz: "Windows arxitekturasi",   en: "Windows Architecture" },
-  2: { uz: "Kernel nima?",            en: "What is the Kernel?" },
-  3: { uz: "User mode va Kernel mode", en: "User Mode vs Kernel Mode" },
-  4: { uz: "Windows boot jarayoni",   en: "Windows Boot Process" },
-  5: { uz: "BIOS va UEFI",            en: "BIOS vs UEFI" },
+  1:  { uz: "Windows arxitekturasi",   en: "Windows Architecture" },
+  2:  { uz: "Kernel nima?",            en: "What is the Kernel?" },
+  3:  { uz: "User mode va Kernel mode", en: "User Mode vs Kernel Mode" },
+  4:  { uz: "Windows boot jarayoni",   en: "Windows Boot Process" },
+  5:  { uz: "BIOS va UEFI",            en: "BIOS vs UEFI" },
+  6:  { uz: "Secure Boot",             en: "Secure Boot" },
+  7:  { uz: "TPM",                     en: "TPM" },
+  8:  { uz: "Windows Registry",        en: "Windows Registry" },
+  9:  { uz: "Fayl tizimlari",          en: "File Systems" },
+  10: { uz: "NTFS",                    en: "NTFS" },
+  11: { uz: "FAT32",                   en: "FAT32" },
 };
 
 function ModalHeader({ phase, onClose, lessonNum = 1 }) {
