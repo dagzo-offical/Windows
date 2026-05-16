@@ -38,6 +38,10 @@ const LESSONS = {
   20: { num: "L20", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Windows event log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensics", subEn: "Windows event log architecture, key Event IDs, ETW, Sysmon, and forensic analysis" },
   21: { num: "L21", section: "01", uz: "Task Scheduler",                en: "Task Scheduler",              subUz: "Vazifa arxitekturasi, triggerlar, harakatlar, imtiyozlar va persistenslik texnikalari", subEn: "Task architecture, triggers, actions, privileges, and scheduler-based persistence techniques" },
   22: { num: "L22", section: "01", uz: "Windows log fayllari",          en: "Windows Logs",                subUz: "EVTX format, log yo'llari, log o'chirish aniqlash va forensic tekshiruv", subEn: "EVTX format, log paths, log clearing detection, and forensic log analysis" },
+  23: { num: "L23", section: "01", uz: "Settings va Control Panel",     en: "Settings & Control Panel",    subUz: "Settings URI sxemasi, Control Panel appletlari, xavfsizlik sozlamalari va GPO", subEn: "Settings URI scheme, Control Panel applets, security settings and Group Policy" },
+  24: { num: "L24", section: "01", uz: "System Configuration",          en: "System Configuration",        subUz: "msconfig.exe — ishga tushish turlari, xavfsiz yuklash, xizmatlar va vositalar", subEn: "msconfig.exe — startup types, safe boot modes, services tab and tools shortcuts" },
+  25: { num: "L25", section: "01", uz: "Kengaytirilgan Tizim Sozlamalari", en: "Advanced System Settings", subUz: "sysdm.cpl — DEP, virtual xotira, tizimni tiklash, drayver imzolash va RDP", subEn: "sysdm.cpl — DEP, virtual memory, system restore, driver signing and RDP" },
+  26: { num: "L26", section: "01", uz: "Kompyuter Boshqaruvi",          en: "Computer Management",         subUz: "compmgmt.msc — ulashimlar, foydalanuvchilar, disk, xizmatlar va WMI persistenslik", subEn: "compmgmt.msc — shares, users, disk management, services and WMI persistence" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -131,6 +135,14 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <SectionTaskScheduler />
           </> : lessonNum === 22 ? <>
             <SectionWindowsLogs />
+          </> : lessonNum === 23 ? <>
+            <SectionSettings />
+          </> : lessonNum === 24 ? <>
+            <SectionMsconfig />
+          </> : lessonNum === 25 ? <>
+            <SectionAdvancedSystem />
+          </> : lessonNum === 26 ? <>
+            <SectionComputerMgmt />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -290,6 +302,18 @@ const LESSON_META = {
   22: { min: 30, diagrams: 4, labs: 2,
        introUz: <><em>Windows log fayllari</em> — tizim faoliyatining doimiy yozuvi. Bu darsda <em>EVTX ikkilik formati</em>, asosiy log fayllari va ularning yo'llari, PowerShell/WMI/ETW yordamida log so'rov qilish, log o'chirish va tahrif qilish aniqlash usullari va real forensics tekshiruvida qanday izlarni qidirish kerakligini o'rganasiz.</>,
        introEn: <><em>Windows log files</em> are the persistent record of system activity. This lesson covers the <em>EVTX binary format</em>, key log files and their paths, querying logs with PowerShell/WMI/ETW, detecting log clearing and tampering, and what traces to look for in a real forensic investigation.</> },
+  23: { min: 28, diagrams: 5, labs: 2,
+       introUz: <><em>Settings va Control Panel</em> — Windows konfiguratsiyasining ikki interfeysi. Bu darsda zamonaviy <em>Settings ilovasi</em> (ms-settings: URI sxemasi, WinRT/UWP), eski <em>Control Panel</em> appletlari, xavfsizlikka oid muhim sozlamalar va ularning registry bilan bog'liqligini o'rganasiz.</>,
+       introEn: <><em>Settings and Control Panel</em> are Windows' two configuration interfaces. This lesson covers the modern <em>Settings app</em> (ms-settings: URI scheme, WinRT/UWP), legacy <em>Control Panel</em> applets, security-relevant settings, and how they map to the underlying registry.</> },
+  24: { min: 26, diagrams: 4, labs: 2,
+       introUz: <><em>msconfig.exe (System Configuration)</em> — Windows ishga tushish harakatini boshqarish uchun klassik vosita. Bu darsda 5 ta tab (Umumiy, Yuklash, Xizmatlar, Ishga tushish, Vositalar), <em>Xavfsiz Yuklash</em> rejimlari, BCD sozlamalari va xavfsizlik oqibatlarini o'rganasiz.</>,
+       introEn: <><em>msconfig.exe (System Configuration)</em> is the classic tool for managing Windows startup behavior. This lesson covers all 5 tabs (General, Boot, Services, Startup, Tools), <em>Safe Boot</em> modes, BCD settings, and security implications of startup configuration.</> },
+  25: { min: 32, diagrams: 5, labs: 2,
+       introUz: <><em>sysdm.cpl (Tizim Xususiyatlari)</em> — asosiy tizim konfiguratsiyasi markazi. Bu darsda 5 ta tab: Kompyuter nomi (domen qo'shilish), Apparat (<em>DSE drayver imzolash</em>), Kengaytirilgan (<em>DEP, virtual xotira, BSOD dump turlari</em>), Tizim himoyasi (VSS/shadow copies) va Masofadan (RDP hujum vektorlari) orqali o'tamiz.</>,
+       introEn: <><em>sysdm.cpl (System Properties)</em> is the core system configuration hub. This lesson walks through all 5 tabs: Computer Name (domain join), Hardware (<em>DSE driver signing enforcement</em>), Advanced (<em>DEP, virtual memory, BSOD dump types</em>), System Protection (VSS/shadow copies), and Remote (RDP attack vectors).</> },
+  26: { min: 34, diagrams: 6, labs: 2,
+       introUz: <><em>Kompyuter Boshqaruvi (compmgmt.msc)</em> — eng muhim Windows boshqaruv vositalarini jamlagan MMC konsolı. Bu darsda Ulashilgan papkalar (yashirin admin ulashimlari C$, ADMIN$, IPC$), Mahalliy foydalanuvchilar va guruhlar, Ishlash monitori, <em>WMI persistenslik va aniqlash</em>, Disk boshqaruvi va masofaviy boshqaruv imkoniyatlarini o'rganasiz.</>,
+       introEn: <><em>Computer Management (compmgmt.msc)</em> is the MMC console aggregating Windows' most essential admin tools. This lesson covers Shared Folders (hidden admin shares C$, ADMIN$, IPC$), Local Users and Groups, Performance Monitor, <em>WMI persistence and detection</em>, Disk Management, and remote computer management.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -7196,6 +7220,829 @@ function ComingSoon({ lesson, lessonNum, setRoute }) {
     </div>
   );
 }
+
+
+// ─────────────────────────────────────────────────────────────
+// L23 – Settings & Control Panel
+// ─────────────────────────────────────────────────────────────
+function SectionSettings() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Settings App vs Control Panel" uz="" />
+      <P>Windows offers two parallel configuration interfaces: the modern <Term>Settings app</Term> (WinRT/UWP, redesigned in Windows 11) and the legacy <Term>Control Panel</Term> (Win32, available since Windows 1.0). Microsoft is gradually migrating Control Panel features into Settings, but many enterprise and security-critical tools remain in Control Panel.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,margin:"18px 0"}}>
+        <div style={{padding:16,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>SETTINGS APP (Modern)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>ms-settings: URI scheme<br/>WinRT/UWP + XAML UI<br/>Per-user &amp; system scope<br/>Touch-friendly design<br/>Syncs with Microsoft Account<br/><span style={{color:"var(--accent)"}}>→ Win10/11 default</span></div>
+        </div>
+        <div style={{padding:16,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>CONTROL PANEL (Legacy)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>control.exe + .cpl applets<br/>Win32/MFC UI<br/>Admin-focused features<br/>No Microsoft account sync<br/><span style={{color:"var(--c-auth)"}}>→ Enterprise standard</span></div>
+        </div>
+      </div>
+      <H2 num="§2" en="Settings App — URI Deep Links" uz="" />
+      <P>The Settings app (<code>SystemSettings.exe</code>) uses the <Term>ms-settings:</Term> URI scheme for deep-linking to any page. Settings are stored in <code>HKCU</code> (per-user) or <code>HKLM</code> (machine-wide).</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`ms-settings:                     → Settings home
+ms-settings:windowsdefender     → Windows Security
+ms-settings:accounts             → Accounts
+ms-settings:signinoptions        → Sign-in options
+ms-settings:privacy-general      → Privacy settings
+ms-settings:windowsupdate        → Windows Update
+ms-settings:appsfeatures         → Apps & features
+ms-settings:network-wifi         → Wi-Fi
+
+# Open from Run (Win+R) or PowerShell:
+start ms-settings:windowsdefender
+start ms-settings:signinoptions`}</code></pre>
+      <H2 num="§3" en="Control Panel — Key Applets" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Security applets:
+  wf.msc              → Windows Firewall (Advanced Security)
+  secpol.msc          → Local Security Policy
+  lusrmgr.msc         → Local Users and Groups
+  control userpasswords2 / netplwiz → User Accounts (advanced)
+  control /name Microsoft.BitLockerDriveEncryption
+
+Hardware:
+  devmgmt.msc         → Device Manager
+  ncpa.cpl            → Network Connections
+  hdwwiz.cpl          → Add Hardware
+
+Programs:
+  appwiz.cpl          → Programs and Features (uninstall)
+  optionalfeatures    → Windows Features toggle
+
+Admin tools:
+  perfmon.msc   eventvwr.msc   compmgmt.msc   services.msc`}</code></pre>
+      <H2 num="§4" en="Security-Relevant Settings" uz="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Windows Security",c:"var(--accent)",items:["Virus & threat protection (Defender)","Firewall & network protection","App & browser control (SmartScreen)","Device security (TPM, Secure Boot)","Core isolation / Memory integrity (HVCI)"]},
+          {t:"Sign-in Options",c:"var(--c-auth)",items:["Windows Hello (PIN / fingerprint / face)","Security key (FIDO2)","Dynamic lock","Require Windows Hello on wakeup","Password-less sign-in toggle"]},
+          {t:"Privacy & Diagnostics",c:"var(--c-warn)",items:["Diagnostic data level (Basic / Full)","Activity history (Timeline)","App permissions (Camera / Mic / Location)","Advertising ID","Find My Device"]},
+          {t:"Group Policy overrides (gpedit.msc)",c:"var(--c-attack)",items:["Overrides many Settings options","AppLocker / SRP rules","PowerShell execution policy","Windows Update deferral","Software installation restrictions"]},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:8}}>{card.t}</div>
+            <ul style={{margin:0,paddingLeft:16,fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>{card.items.map((item,j)=><li key={j}>{item}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+      <H2 num="§5" en="Practical Commands" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Windows Defender status
+Get-MpComputerStatus | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, BehaviorMonitorEnabled
+
+# List startup apps (Apps → Startup in Settings)
+Get-CimInstance Win32_StartupCommand | Select-Object Name, Command, Location
+
+# Check telemetry level
+reg query "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry
+
+# List installed UWP apps
+Get-AppxPackage | Select-Object Name, Version | Sort-Object Name
+
+# Persistence locations (Run keys)
+reg query "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"
+reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Settings ilovasi va Control Panel" en="" />
+      <P>Windows ikkita parallel sozlamalar interfeysini taklif etadi: zamonaviy <Term>Settings ilovasi</Term> (WinRT/UWP, Windows 11 da to'liq qayta ishlab chiqilgan) va eski <Term>Control Panel</Term> (Win32, Windows 1.0 dan beri mavjud). Microsoft asta-sekin Control Panel funksionalligini Settings ga ko'chirmoqda, lekin ko'plab korporativ va xavfsizlik-kritik vositalar Control Panel da qolmoqda.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,margin:"18px 0"}}>
+        <div style={{padding:16,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>SETTINGS ILOVASI (Zamonaviy)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>ms-settings: URI sxemasi<br/>WinRT/UWP + XAML interfeys<br/>Foydalanuvchi va tizim doirasi<br/>Sensorli ekranga optimallashgan<br/>Microsoft hisobi bilan sinxron<br/><span style={{color:"var(--accent)"}}>→ Win10/11 standart</span></div>
+        </div>
+        <div style={{padding:16,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>CONTROL PANEL (Eski)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>control.exe + .cpl plaginlari<br/>Win32/MFC interfeys<br/>Admin uchun mo'ljallangan<br/>Hisob sinxronizatsiyasi yo'q<br/><span style={{color:"var(--c-auth)"}}>→ Korporativ standart</span></div>
+        </div>
+      </div>
+      <H2 num="§2" uz="Settings Ilovasi — URI Havolalari" en="" />
+      <P>Settings ilovasi (<code>SystemSettings.exe</code>) har qanday sahifaga chuqur havola uchun <Term>ms-settings:</Term> URI sxemasidan foydalanadi. Sozlamalar <code>HKCU</code> (foydalanuvchi uchun) yoki <code>HKLM</code> (mashina uchun) da saqlanadi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`ms-settings:                     → Bosh sahifa
+ms-settings:windowsdefender     → Windows xavfsizligi
+ms-settings:accounts             → Hisoblar
+ms-settings:signinoptions        → Kirish parametrlari
+ms-settings:privacy-general      → Maxfiylik sozlamalari
+ms-settings:windowsupdate        → Windows Update
+ms-settings:appsfeatures         → Ilovalar va xususiyatlar
+ms-settings:network-wifi         → Wi-Fi
+
+# Run (Win+R) yoki PowerShell orqali ochish:
+start ms-settings:windowsdefender
+start ms-settings:signinoptions`}</code></pre>
+      <H2 num="§3" uz="Control Panel — Asosiy Appletlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Xavfsizlik appletlari:
+  wf.msc              → Windows Xavfsizlik devori (Kengaytirilgan)
+  secpol.msc          → Mahalliy xavfsizlik siyosati
+  lusrmgr.msc         → Mahalliy foydalanuvchilar va guruhlar
+  control userpasswords2 / netplwiz → Foydalanuvchi hisoblari
+  control /name Microsoft.BitLockerDriveEncryption
+
+Apparat:
+  devmgmt.msc         → Qurilma menejeri
+  ncpa.cpl            → Tarmoq ulanishlari
+
+Dasturlar:
+  appwiz.cpl          → Dasturlar va xususiyatlar (o'chirish)
+  optionalfeatures    → Windows xususiyatlarini yoqish/o'chirish
+
+Boshqaruv vositalari:
+  perfmon.msc   eventvwr.msc   compmgmt.msc   services.msc`}</code></pre>
+      <H2 num="§4" uz="Xavfsizlikka Oid Sozlamalar" en="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Windows Xavfsizligi",c:"var(--accent)",items:["Virus va tahdid himoyasi (Defender)","Xavfsizlik devori va tarmoq himoyasi","Ilova va brauzer nazorati (SmartScreen)","Qurilma xavfsizligi (TPM, Secure Boot)","Core isolation / Xotira yaxlitligi (HVCI)"]},
+          {t:"Kirish Parametrlari",c:"var(--c-auth)",items:["Windows Hello (PIN / barmoq izi / yuz)","Xavfsizlik kaliti (FIDO2)","Dinamik qulf","Uyg'onishda Windows Hello talab qilish","Parolsiz kirish rejimi"]},
+          {t:"Maxfiylik va Diagnostika",c:"var(--c-warn)",items:["Diagnostika ma'lumotlari darajasi","Faoliyat tarixi (Timeline)","Ilova ruxsatlari (Kamera/Mikrofon/Joylashuv)","Reklama ID","Qurilmamni top"]},
+          {t:"Guruh siyosati (gpedit.msc)",c:"var(--c-attack)",items:["Ko'plab Settings variantlarini bekor qiladi","AppLocker / SRP qoidalari","PowerShell bajarish siyosati","Windows Update kechiktirish","Dastur o'rnatish cheklovlari"]},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:8}}>{card.t}</div>
+            <ul style={{margin:0,paddingLeft:16,fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>{card.items.map((item,j)=><li key={j}>{item}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+      <H2 num="§5" uz="Amaliy Buyruqlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Windows Defender holati
+Get-MpComputerStatus | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, BehaviorMonitorEnabled
+
+# Ishga tushish dasturlari ro'yxati
+Get-CimInstance Win32_StartupCommand | Select-Object Name, Command, Location
+
+# Telemetriya darajasini tekshirish
+reg query "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry
+
+# O'rnatilgan UWP ilovalar ro'yxati
+Get-AppxPackage | Select-Object Name, Version | Sort-Object Name
+
+# Persistenslik joylari (Run kalitlari)
+reg query "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"
+reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L24 – System Configuration (msconfig)
+// ─────────────────────────────────────────────────────────────
+function SectionMsconfig() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="System Configuration — msconfig.exe" uz="" />
+      <P><Term>msconfig.exe</Term> sets flags and preferences that take effect on next boot. It does not configure a running system. Use it for startup troubleshooting, diagnosing driver conflicts, and enabling Safe Boot.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`msconfig.exe — 5 Tabs:
+┌─────────────────────────────────────────────────────────────┐
+│  [General]  [Boot]  [Services]  [Startup]  [Tools]         │
+└─────────────────────────────────────────────────────────────┘
+      │          │         │           │           │
+      ▼          ▼         ▼           ▼           ▼
+  Startup     OS list  Enable/     Task Mgr    Shortcuts
+   type       SafeBoot disable     redirect    to tools
+  (Normal/    options  non-MS      (Win10+)    (regedit,
+  Diagnostic/          services                 perfmon...)
+  Selective)`}</code></pre>
+      <H2 num="§2" en="General Tab — Startup Types" uz="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Normal Startup",c:"var(--accent)",d:"Loads all drivers and services. All registry Run keys processed. Default mode."},
+          {t:"Diagnostic Startup",c:"var(--c-warn)",d:"Loads only basic devices and services. Similar to Safe Mode but via normal boot path. Good for isolating conflicts."},
+          {t:"Selective Startup",c:"var(--c-auth)",d:"Choose what to load: system services, startup items, original boot config. Most flexible — combine with Services tab."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:8}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+      <H2 num="§3" en="Boot Tab — Safe Boot Modes" uz="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Safe Boot Mode","What Loads","Use Case"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["Minimal","Critical drivers + Explorer shell","Remove malware, fix boot issues"],
+              ["Alternate Shell","Critical drivers + CMD (no Explorer)","When Explorer itself is corrupted"],
+              ["Network","Minimal + TCP/IP stack","Remote malware removal, online tools"],
+              ["Active Directory Repair","AD repair mode — DC only","Fix Active Directory database"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontSize:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:14}}><code>{`Other Boot Tab options:
+  No GUI boot   → skip Windows logo animation
+  Boot log      → write to %SystemRoot%\\ntbtlog.txt
+  Base video    → force VGA 640x480 (fix display driver crash)
+  OS boot info  → show driver names as they load (verbose)
+
+BCD equivalents (bcdedit):
+  bcdedit /set safeboot minimal      → Safe Boot Minimal
+  bcdedit /set safeboot network      → Safe Boot Network
+  bcdedit /deletevalue safeboot      → exit Safe Boot
+  bcdedit /set bootlog yes           → enable boot log`}</code></pre>
+      <H2 num="§4" en="Services Tab" uz="" />
+      <P>Shows all registered Windows services. "Hide all Microsoft services" focuses view on third-party software. Changes write directly to <code>HKLM\SYSTEM\CurrentControlSet\Services\[Name]\Start</code> — value 4 = disabled.</P>
+      <Callout color="var(--c-attack)" icon="warning" titleEn="Attack Relevance" titleUz="">
+        Attackers disable security services here or via <code>sc config</code> to blind defenses. Investigate any security service (Defender, Sysmon, EventLog) found unexpectedly disabled. Event ID 7036 = service state change.
+      </Callout>
+      <H2 num="§5" en="Tools Tab — Utility Shortcuts" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Tools Tab shortcuts (run directly without msconfig):
+  msinfo32.exe         → System Information
+  eventvwr.msc         → Event Viewer
+  compmgmt.msc         → Computer Management
+  sysdm.cpl            → System Properties
+  perfmon.exe          → Performance Monitor
+  resmon.exe           → Resource Monitor
+  taskmgr.exe          → Task Manager
+  regedit.exe          → Registry Editor
+  cmd.exe              → Command Prompt
+  rstrui.exe           → System Restore
+  wmimgmt.msc          → WMI Control
+  UserAccountControlSettings.exe  → UAC level slider`}</code></pre>
+      <H2 num="§6" en="Practical Commands" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Open System Configuration
+msconfig
+
+# View current BCD boot entries
+bcdedit /enum all
+
+# Read boot log (after enabling in Boot tab + reboot)
+type %SystemRoot%\\ntbtlog.txt | findstr "DID NOT LOAD"
+
+# Check/change service start type
+sc query [ServiceName]
+sc config [ServiceName] start= disabled
+sc config [ServiceName] start= auto
+
+# Find unexpected disabled security services
+Get-Service | Where-Object {($_.Name -like "*Defender*" -or $_.Name -like "*Sysmon*") -and $_.Status -ne "Running"}
+
+# Last boot time
+(Get-CimInstance Win32_OperatingSystem).LastBootUpTime`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Tizim Konfiguratsiyasi — msconfig.exe" en="" />
+      <P><Term>msconfig.exe</Term> keyingi yuklashda kuchga kiradigan bayroqlar va afzalliklarni o'rnatadi. Ishlaydigan tizimni konfiguratsiya qilmaydi. Ishga tushish muammolarini bartaraf etish, drayver nizolarini tashxis qilish va Xavfsiz Yuklashni yoqish uchun ishlatiladi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`msconfig.exe — 5 Tab:
+┌──────────────────────────────────────────────────────────────┐
+│  [Umumiy]  [Yuklash]  [Xizmatlar]  [Ishga tushish]  [Vositalar] │
+└──────────────────────────────────────────────────────────────┘
+       │          │           │              │               │
+       ▼          ▼           ▼              ▼               ▼
+   Ishga      OT ro'y-    Yoqish/       Vazifa          Vositalar
+   tushish    xati        o'chirish     menejeriga      yorliqlari
+   turi       SafeBoot    MS bo'l-      yo'nalish       (regedit,
+  (Normal/    param.      magan xizm.   (Win10+)        perfmon...)`}</code></pre>
+      <H2 num="§2" uz="Umumiy Tab — Ishga Tushish Turlari" en="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Normal ishga tushish",c:"var(--accent)",d:"Barcha drayverlar va xizmatlar yuklanadi. Barcha Run kalitlari qayta ishlanadi. Standart rejim."},
+          {t:"Tashxisli ishga tushish",c:"var(--c-warn)",d:"Faqat asosiy qurilmalar va xizmatlar yuklanadi. Xavfsiz rejimga o'xshash, oddiy yo'l orqali. Nizo topishga qulaj."},
+          {t:"Tanlovli ishga tushish",c:"var(--c-auth)",d:"Nima yuklanishini tanlash: tizim xizmatlari, ishga tushish elementlari, asl konfiguratsiya. Xizmatlar tab bilan birga eng moslashuvchan."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:8}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+      <H2 num="§3" uz="Yuklash Tab — Xavfsiz Yuklash Rejimlari" en="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Xavfsiz Yuklash Rejimi","Nima Yuklanadi","Qo'llanish"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["Minimal","Kritik drayverlar + Explorer qobig'i","Zararli dasturni o'chirish, yuklash muammolari"],
+              ["Muqobil qobiq","Kritik drayverlar + CMD (Explorer'siz)","Explorer o'zi buzilganda"],
+              ["Tarmoq","Minimal + TCP/IP steki","Masofaviy zararli dasturni o'chirish"],
+              ["Active Directory Ta'mirlash","Faqat domen kontrollerlar","Active Directory bazasini tuzatish"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontSize:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:14}}><code>{`Boshqa Yuklash Tab parametrlari:
+  GUI bo'lmasiz   → Windows logotipini o'tkazib yuborish
+  Yuklash jurnali → %SystemRoot%\\ntbtlog.txt ga yozish
+  Asosiy video    → VGA 640x480 ga majburlay
+
+BCD ekvivalentlari:
+  bcdedit /set safeboot minimal   → Xavfsiz Yuklash Minimal
+  bcdedit /set safeboot network   → Xavfsiz Yuklash Tarmoq
+  bcdedit /deletevalue safeboot   → Xavfsiz Yuklashdan chiqish
+  bcdedit /set bootlog yes        → Yuklash jurnalini yoqish`}</code></pre>
+      <H2 num="§4" uz="Xizmatlar Tab" en="" />
+      <P>Barcha ro'yxatdan o'tgan Windows xizmatlarini ko'rsatadi. "Microsoft xizmatlarini yashirish" uchinchi tomon dasturlarini ajratadi. O'zgartirishlar to'g'ridan-to'g'ri <code>HKLM\SYSTEM\CurrentControlSet\Services\[Name]\Start</code> ga yoziladi — 4 qiymati = o'chirilgan.</P>
+      <Callout color="var(--c-attack)" icon="warning" titleUz="Hujum bog'liqligi" titleEn="">
+        Hujumchilar himoyani ko'r qilish uchun xavfsizlik xizmatlarini bu yerda yoki <code>sc config</code> orqali o'chiradi. Kutilmaganda o'chirilgan Defender, Sysmon, EventLog xizmatlarini tekshiring. Event ID 7036 = xizmat holati o'zgarishi.
+      </Callout>
+      <H2 num="§5" uz="Vositalar Tab — Yorliqlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Vositalar Tab yorliqlari (msconfig'siz to'g'ridan-to'g'ri ishlatish):
+  msinfo32.exe         → Tizim ma'lumotlari
+  eventvwr.msc         → Hodisa ko'ruvchi
+  compmgmt.msc         → Kompyuter boshqaruvi
+  sysdm.cpl            → Tizim xususiyatlari
+  perfmon.exe          → Ishlash monitori
+  resmon.exe           → Resurs monitori
+  taskmgr.exe          → Vazifa menejeri
+  regedit.exe          → Registry muharriri
+  rstrui.exe           → Tizimni tiklash
+  UserAccountControlSettings.exe  → UAC darajasi`}</code></pre>
+      <H2 num="§6" uz="Amaliy Buyruqlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Tizim konfiguratsiyasini ochish
+msconfig
+
+# Joriy BCD yuklash yozuvlarini ko'rish
+bcdedit /enum all
+
+# Yuklash jurnalini o'qish (tab da yoqib, qayta yuklangandan so'ng)
+type %SystemRoot%\\ntbtlog.txt | findstr "DID NOT LOAD"
+
+# Xizmat ishga tushish turini tekshirish/o'zgartirish
+sc query [ServiceName]
+sc config [ServiceName] start= disabled
+sc config [ServiceName] start= auto
+
+# Kutilmaganda o'chirilgan xavfsizlik xizmatlarini topish
+Get-Service | Where-Object {($_.Name -like "*Defender*" -or $_.Name -like "*Sysmon*") -and $_.Status -ne "Running"}
+
+# Oxirgi yuklash vaqti
+(Get-CimInstance Win32_OperatingSystem).LastBootUpTime`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L25 – Advanced System Settings
+// ─────────────────────────────────────────────────────────────
+function SectionAdvancedSystem() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Advanced System Settings — sysdm.cpl" uz="" />
+      <P><Term>sysdm.cpl</Term> (System Properties) is the central panel for core system configuration. Access via <code>Win+Pause</code>, right-click This PC → Properties, or <code>sysdm.cpl</code> from Run. Five tabs: Computer Name, Hardware, Advanced, System Protection, Remote.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`sysdm.cpl — System Properties:
+┌──────────────────────────────────────────────────────────────────────┐
+│  [Computer Name]  [Hardware]  [Advanced]  [Sys Protection]  [Remote] │
+└──────────────────────────────────────────────────────────────────────┘
+        │               │           │              │               │
+        ▼               ▼           ▼              ▼               ▼
+   Hostname,       Device      Performance    System         Remote
+   domain/WG      Manager,    User Profiles  Restore,       Desktop,
+   join, DNS      driver      Startup &      Shadow         Remote
+   suffix         signing     Recovery       Copies         Assistance
+
+Direct launch shortcuts:
+  SystemPropertiesAdvanced.exe      → Advanced tab
+  SystemPropertiesProtection.exe    → System Protection tab
+  SystemPropertiesRemote.exe        → Remote tab
+  SystemPropertiesHardware.exe      → Hardware tab
+  SystemPropertiesComputerName.exe  → Computer Name tab`}</code></pre>
+      <H2 num="§2" en="Computer Name / Domain Tab" uz="" />
+      <P>Sets the machine's <Term>hostname</Term> (NetBIOS ≤15 chars) and <Term>workgroup</Term> or <Term>domain</Term> membership. Joining a domain installs a machine certificate, creates a computer object in AD, and enables Group Policy application.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Registry locations:
+  HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName
+  HKLM\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Domain
+
+PowerShell:
+  (Get-CimInstance Win32_ComputerSystem).Name       # hostname
+  (Get-CimInstance Win32_ComputerSystem).Domain     # domain
+  Rename-Computer -NewName "NEW-NAME" -Restart
+  Add-Computer -DomainName "corp.contoso.com" -Restart`}</code></pre>
+      <H2 num="§3" en="Advanced Tab — Performance, Profiles, Recovery" uz="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Virtual Memory (Paging File — pagefile.sys)",c:"var(--c-auth)",d:"Acts as RAM overflow stored on disk. SECURITY: pagefile.sys can contain passwords, encryption keys, and process memory — forensic tools extract credentials from it. hiberfil.sys (hibernate file) = full RAM snapshot on disk. Both are deleted/recreated at shutdown by policy."},
+          {t:"DEP — Data Execution Prevention",c:"var(--c-warn)",d:"Marks memory pages as non-executable (NX/XD CPU bit) to prevent shellcode. Two modes: Essential Windows programs only, or All programs. Modern 64-bit Windows enforces DEP + ASLR + CFG + CET together. bcdedit /set {default} nx AlwaysOn forces hardware DEP."},
+          {t:"User Profiles",c:"var(--accent)",d:"Shows all profiles with size, type (Local / Roaming / Mandatory), and last-use date. Roaming profiles sync to a network share in domain environments. Security: orphaned profiles of deleted accounts may still hold sensitive data in AppData (browser credentials, DPAPI-encrypted files)."},
+          {t:"Startup and Recovery (BSOD settings)",c:"var(--c-attack)",d:"Controls crash dump type: None / Small (minidump 64KB) / Kernel (kernel memory) / Complete (all RAM) / Automatic. Complete dump is largest — critical for malware forensics. 'Automatically restart' — uncheck to freeze on BSOD for crash analysis. Event ID 6008 = unexpected shutdown."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+      <H2 num="§4" en="Hardware Tab — Driver Signing (DSE)" uz="" />
+      <P>64-bit Windows enforces <Term>Driver Signature Enforcement (DSE)</Term> — unsigned kernel drivers cannot load. Bypass requires either: disabling DSE at boot (F8 menu / bcdedit), or exploiting a vulnerable but signed driver (BYOVD — Bring Your Own Vulnerable Driver). Device Manager shows all drivers with signing status.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check driver signing enforcement state
+bcdedit /enum | findstr "nointegritychecks"
+# If "Yes" → DSE disabled — SERIOUS RED FLAG
+
+# List all kernel drivers (look for unsigned ones)
+Get-WinEvent -LogName System | Where-Object {$_.Id -eq 7045}  # new driver installed
+
+# Find unsigned drivers
+driverquery /SI | findstr "False"     # False = not signed
+
+# BYOVD examples (real incidents):
+#   RTCore64.sys (MSI AfterBurner)    → used by BlackByte, Lazarus
+#   DBUtil_2_3.sys (Dell)             → used by FinFisher
+#   gdrv.sys (GIGABYTE)               → used by various ransomware`}</code></pre>
+      <H2 num="§5" en="System Protection Tab — VSS & Shadow Copies" uz="" />
+      <P><Term>System Restore</Term> uses <Term>Volume Shadow Copy Service (VSS)</Term> to snapshot system files and registry. Restore points are stored in <code>C:\System Volume Information\</code>. Ransomware almost always deletes shadow copies immediately after encryption.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List shadow copies
+vssadmin list shadows
+Get-ComputerRestorePoint
+
+# Create restore point (PowerShell as Admin)
+Checkpoint-Computer -Description "Before pentest" -RestorePointType APPLICATION_INSTALL
+
+# Mount a shadow copy for forensic access
+mklink /d C:\\VSS "\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\"
+
+# RANSOMWARE shadow deletion (detect these commands):
+vssadmin delete shadows /all /quiet   # Event ID 8222
+wmic shadowcopy delete
+bcdedit /set {default} recoveryenabled No
+powershell.exe -c "(gwmi Win32_ShadowCopy).Delete()"  `}</code></pre>
+      <H2 num="§6" en="Remote Tab — RDP" uz="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>Remote Desktop (RDP)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.65}}>Default port: <b>TCP 3389</b><br/>Requires: Remote Desktop Users group<br/>NLA: credentials checked before session<br/><code>fDenyTSConnections = 0</code> → RDP on<br/><code>fDenyTSConnections = 1</code> → RDP off<br/>Reg: <code>HKLM\SYSTEM\CCS\Control\Terminal Server</code></div>
+        </div>
+        <div style={{padding:14,background:"rgba(255,58,94,0.06)",border:"1px solid rgba(255,58,94,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-attack)",marginBottom:8}}>Attack Vectors</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.65}}>BlueKeep (CVE-2019-0708) pre-auth RCE<br/>DejaBlue (CVE-2019-1181/1182)<br/>Brute-force (common with exposed 3389)<br/>Pass-the-Hash with Restricted Admin mode<br/>Credential caching in RDP sessions<br/>SharpRDP — lateral movement tool</div>
+        </div>
+      </div>
+      <H2 num="§7" en="Practical Commands" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check DEP status
+bcdedit /enum | findstr " nx "
+Get-CimInstance Win32_OperatingSystem | Select-Object DataExecutionPrevention_Available
+
+# Paging file info
+Get-CimInstance Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize, CurrentUsage
+
+# List user profiles with sizes
+Get-CimInstance Win32_UserProfile | Select-Object LocalPath, LastUseTime, Special
+
+# Check RDP status
+reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections
+
+# Enable RDP
+reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+netsh advfirewall firewall set rule group="remote desktop" new enable=yes`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Kengaytirilgan Tizim Sozlamalari — sysdm.cpl" en="" />
+      <P><Term>sysdm.cpl</Term> (Tizim Xususiyatlari) — asosiy tizim konfiguratsiyasining markaziy paneli. <code>Win+Pause</code>, "Bu kompyuter"ga o'ng tugma → Xususiyatlar, yoki Run dan <code>sysdm.cpl</code> orqali kirish. Besh tab: Kompyuter nomi, Apparat, Kengaytirilgan, Tizim himoyasi, Masofadan.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`sysdm.cpl — Tizim Xususiyatlari:
+┌──────────────────────────────────────────────────────────────────────────┐
+│  [Kompyuter nomi]  [Apparat]  [Kengaytirilgan]  [Tizim himoyasi]  [Masofadan] │
+└──────────────────────────────────────────────────────────────────────────┘
+        │                │            │                  │               │
+        ▼                ▼            ▼                  ▼               ▼
+   Hostname,         Qurilma      Ishlash           Tizimni          Masofaviy
+   domen/WG         menejeri,    Foydalanuvchi     tiklash,         ish stoli,
+   qo'shilish,      drayver      profillari        Soya             Masofaviy
+   DNS qo'shimcha   imzolash     Ishga tushish     nusxalar         yordam
+
+To'g'ridan-to'g'ri yorliqlar:
+  SystemPropertiesAdvanced.exe     → Kengaytirilgan tab
+  SystemPropertiesProtection.exe   → Tizim himoyasi tab
+  SystemPropertiesRemote.exe       → Masofadan tab`}</code></pre>
+      <H2 num="§2" uz="Kompyuter Nomi / Domen Tab" en="" />
+      <P>Mashinaning <Term>hostname</Term> (NetBIOS ≤15 belgi) va <Term>ishchi guruh</Term> yoki <Term>domen</Term> a'zoligini o'rnatadi. Domenge qo'shilish mashina sertifikatini o'rnatadi, AD da kompyuter ob'ektini yaratadi va Guruh siyosatini qo'llash imkonini beradi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Registry joylari:
+  HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName
+  HKLM\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Domain
+
+PowerShell:
+  (Get-CimInstance Win32_ComputerSystem).Name       # hostname
+  (Get-CimInstance Win32_ComputerSystem).Domain     # domen
+  Rename-Computer -NewName "YANGI-NOM" -Restart
+  Add-Computer -DomainName "corp.contoso.com" -Restart`}</code></pre>
+      <H2 num="§3" uz="Kengaytirilgan Tab — Ishlash, Profiller, Tiklanish" en="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Virtual Xotira (Almashtirish fayli — pagefile.sys)",c:"var(--c-auth)",d:"Diskdagi RAM qo'shimchasi. XAVFSIZLIK: pagefile.sys parollar, shifrlash kalitlari va jarayon xotirasini o'z ichiga olishi mumkin — forensics vositalar undan hisob ma'lumotlarini chiqaradi. hiberfil.sys (qish uyqusi fayli) = diskdagi to'liq RAM snapshoti."},
+          {t:"DEP — Ma'lumotlarni Bajarilishdan Himoya Qilish",c:"var(--c-warn)",d:"Xotira sahifalarini bajarib bo'lmaydigan deb belgilaydi (NX/XD CPU biti) va shellcode bajarilishini oldini oladi. Ikkita rejim: faqat Windows dasturlari yoki barcha dasturlar. Zamonaviy 64-bitli Windows DEP + ASLR + CFG + CET birgalikda amalga oshiradi."},
+          {t:"Foydalanuvchi Profillari",c:"var(--accent)",d:"Barcha profillar hajmi, turi (Mahalliy / Aylanuvchi / Majburiy) va oxirgi ishlatilgan sanasi bilan ko'rsatiladi. Aylanuvchi profillar domenda tarmoq ulashmasiga sinxronlanadi. Xavfsizlik: o'chirilgan hisoblarning eskirgan profillari AppData da maxfiy ma'lumotlarni saqlashi mumkin."},
+          {t:"Ishga tushish va tiklanish (BSOD sozlamalari)",c:"var(--c-attack)",d:"Crash dump turi: Yo'q / Kichik (64KB minidump) / Kernel xotirasi / To'liq (barcha RAM) / Avtomatik. To'liq dump zararli dastur forensics uchun muhim. 'Avtomatik qayta ishga tushirish' — o'chirilsa BSOD da muzlatib qoladi — crash tahlili uchun foydali. Event ID 6008 = kutilmagan o'chirish."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+      <H2 num="§4" uz="Apparat Tab — Drayver Imzolash (DSE)" en="" />
+      <P>64-bitli Windows <Term>Drayver Imzo Tekshiruvi (DSE)</Term> ni amalga oshiradi — imzosiz kernel drayverlar yuklanmaydi. Chetlab o'tish: yuklashda DSE ni o'chirish (F8 / bcdedit) yoki zaif, lekin imzolangan drayverni ekspluatatsiya qilish (BYOVD). Qurilma menejeri barcha drayverlarni imzolash holati bilan ko'rsatadi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# DSE holati
+bcdedit /enum | findstr "nointegritychecks"
+# "Yes" bo'lsa → DSE o'chirilgan — JIDDIY QIZIL BAYROQ
+
+# Imzosiz drayverlarni topish
+driverquery /SI | findstr "False"     # False = imzosiz
+
+# Yangi drayver o'rnatilgan (Event ID 7045)
+Get-WinEvent -LogName System | Where-Object {$_.Id -eq 7045}
+
+# BYOVD real misollar:
+#   RTCore64.sys (MSI AfterBurner)    → BlackByte, Lazarus
+#   DBUtil_2_3.sys (Dell)             → FinFisher
+#   gdrv.sys (GIGABYTE)               → turli ransomware`}</code></pre>
+      <H2 num="§5" uz="Tizim Himoyasi Tab — VSS va Soya Nusxalar" en="" />
+      <P><Term>Tizimni Tiklash</Term> tizim fayllarini va registry ni snapshot qilish uchun <Term>VSS (Volume Shadow Copy Service)</Term> dan foydalanadi. Tiklash nuqtalari <code>C:\System Volume Information\</code> da saqlanadi. Ransomware shifrlashdan so'ng deyarli har doim soya nusxalarni o'chiradi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Soya nusxalarni ko'rish
+vssadmin list shadows
+Get-ComputerRestorePoint
+
+# Tiklash nuqtasini yaratish
+Checkpoint-Computer -Description "Pentest oldidan" -RestorePointType APPLICATION_INSTALL
+
+# Forensics uchun soya nusxani ulash
+mklink /d C:\\VSS "\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\"
+
+# RANSOMWARE soya nusxani o'chirish (bu buyruqlarni aniqlang):
+vssadmin delete shadows /all /quiet
+wmic shadowcopy delete
+bcdedit /set {default} recoveryenabled No`}</code></pre>
+      <H2 num="§6" uz="Masofadan Tab — RDP" en="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>Masofaviy Ish Stoli (RDP)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.65}}>Standart port: <b>TCP 3389</b><br/>Talab: Masofaviy Ish Stoli Foydalanuvchilari guruhi<br/>NLA: sessiyadan oldin hisob ma'lumotlari tekshiriladi<br/><code>fDenyTSConnections = 0</code> → RDP yoqilgan<br/><code>fDenyTSConnections = 1</code> → RDP o'chirilgan</div>
+        </div>
+        <div style={{padding:14,background:"rgba(255,58,94,0.06)",border:"1px solid rgba(255,58,94,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-attack)",marginBottom:8}}>Hujum Vektorlari</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.65}}>BlueKeep (CVE-2019-0708) pre-auth RCE<br/>DejaBlue (CVE-2019-1181/1182)<br/>Brute-force (ochiq 3389 port bilan keng tarqalgan)<br/>Cheklangan Admin rejimi bilan PtH<br/>RDP sessiyalarida hisob ma'lumotlari kesh<br/>SharpRDP — lateral harakatlar vositasi</div>
+        </div>
+      </div>
+      <H2 num="§7" uz="Amaliy Buyruqlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# DEP holatini tekshirish
+bcdedit /enum | findstr " nx "
+
+# Almashtirish fayli ma'lumotlari
+Get-CimInstance Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize, CurrentUsage
+
+# Foydalanuvchi profillarini ko'rish
+Get-CimInstance Win32_UserProfile | Select-Object LocalPath, LastUseTime, Special
+
+# RDP holatini tekshirish
+reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections
+# 0 = yoqilgan, 1 = o'chirilgan
+
+# RDP ni yoqish
+reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+netsh advfirewall firewall set rule group="remote desktop" new enable=yes`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L26 – Computer Management
+// ─────────────────────────────────────────────────────────────
+function SectionComputerMgmt() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Computer Management — compmgmt.msc" uz="" />
+      <P><Term>Computer Management</Term> (compmgmt.msc) is an MMC snap-in that aggregates the most essential Windows administrative tools. Access via right-click Start → Computer Management, or <code>compmgmt.msc</code> from Run. Supports connecting to remote machines via Action → Connect to another computer.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Computer Management Tree (compmgmt.msc):
+📁 Computer Management (Local)
+ ├─📁 System Tools
+ │   ├─📋 Task Scheduler        → scheduled tasks tree + library
+ │   ├─📰 Event Viewer          → Windows Logs, App & Services Logs
+ │   ├─📂 Shared Folders
+ │   │    ├─ Shares             → all network shares incl. C$, ADMIN$, IPC$
+ │   │    ├─ Sessions           → connected network users (live)
+ │   │    └─ Open Files         → files locked by network users
+ │   ├─👥 Local Users & Groups
+ │   │    ├─ Users              → all local accounts
+ │   │    └─ Groups             → Administrators, Users, RDP Users...
+ │   ├─📈 Performance
+ │   │    ├─ Performance Monitor → real-time counter graphs
+ │   │    └─ Data Collector Sets → scheduled performance logging
+ │   └─⚙  Device Manager        → hardware tree by category
+ ├─💾 Storage
+ │   └─ Disk Management          → graphical partition editor
+ └─⚙  Services and Applications
+      ├─ Services                 → full service management GUI
+      └─ WMI Control              → WMI namespace permissions`}</code></pre>
+      <H2 num="§2" en="Shared Folders — Hidden Admin Shares" uz="" />
+      <P>The <Term>Shared Folders</Term> node is critical for security auditing. It exposes every network share — including <Term>administrative shares</Term> hidden from browse lists but always present on domain machines.</P>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Share","Path","Security Risk"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["C$, D$","Root of each drive","Admin-only; used by PsExec, Impacket, SMB lateral movement"],
+              ["ADMIN$","%SystemRoot% (C:\\Windows)","Admin-only; used for remote binary deployment"],
+              ["IPC$","Named pipes","NULL session enumeration; pipe-based lateral movement"],
+              ["SYSVOL","C:\\Windows\\SYSVOL","DC only; GPO scripts; historically leaked GPP passwords (MS14-025)"],
+              ["NETLOGON","SYSVOL\\domain\\scripts","Logon scripts; writable by Domain Admins; NTLM relay target"],
+              ["Custom shares","User-defined","Misconfigured ACLs (Everyone: Full Control) = lateral movement path"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <H2 num="§3" en="Local Users and Groups" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Key Built-in Groups (Local):
+  Administrators        → full control; S-1-5-32-544
+  Users                 → standard users; S-1-5-32-545
+  Guests                → very limited; S-1-5-32-546
+  Remote Desktop Users  → RDP access; S-1-5-32-555
+  Remote Mgmt Users     → WinRM / PSRemoting; S-1-5-32-580
+  Backup Operators      → bypass file ACLs for backup — dangerous if abused
+  Event Log Readers     → read logs without admin rights
+
+Security checks:
+  # Unexpected members in Administrators
+  Get-LocalGroupMember -Group "Administrators"
+
+  # Accounts with no password required
+  Get-LocalUser | Where-Object {$_.PasswordRequired -eq $false}
+
+  # Disabled built-in accounts (Guest, Administrator)
+  Get-LocalUser | Where-Object {$_.Enabled -eq $false}`}</code></pre>
+      <H2 num="§4" en="Performance Monitor — Security Use" uz="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>Key Performance Counters</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}><code>\Processor(_Total)\% Processor Time</code><br/><code>\Memory\Available MBytes</code><br/><code>\Memory\Pages/sec</code> (paging pressure)<br/><code>\Process(*)\Working Set</code> (per-process RAM)<br/><code>\Process(*)\% Processor Time</code><br/><code>\Network Interface(*)\Bytes Total/sec</code></div>
+        </div>
+        <div style={{padding:14,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>Security Detection Uses</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Sustained 100% CPU → cryptominer<br/>Unusual outbound bytes → data exfil<br/>Sudden RSS spike → memory injection<br/>High Pages/sec → malware swapping<br/>Baseline deviations trigger alerts<br/>Data Collector Sets → scheduled capture</div>
+        </div>
+      </div>
+      <H2 num="§5" en="WMI Control — Persistence Detection" uz="" />
+      <P><Term>WMI Control</Term> (wmimgmt.msc) manages WMI namespace permissions. Attackers abuse WMI for fileless <Term>persistence</Term> via event subscriptions: <code>__EventFilter</code> + <code>__EventConsumer</code> + <code>__FilterToConsumerBinding</code>. These survive reboots and are stored in the WMI repository (<code>C:\Windows\System32\wbem\Repository</code>).</P>
+      <Callout color="var(--c-attack)" icon="warning" titleEn="WMI Persistence Detection" titleUz="">
+        Any WMI subscription you didn't create is suspicious. Autoruns.exe (Sysinternals WMI tab) reveals them. Removal: <code>Get-WMIObject -Namespace root\subscription -Class __EventFilter | Remove-WmiObject</code>. Monitor with Sysmon Event ID 19, 20, 21.
+      </Callout>
+      <H2 num="§6" en="Disk Management — Key Concepts" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Partition Types (GPT):
+  EFI System Partition (ESP) → FAT32, ~100-550 MB, hidden mount
+  Microsoft Reserved (MSR)   → 16 MB, no drive letter, GPT metadata
+  Basic Data Partition        → NTFS / exFAT / FAT32 data volumes
+  Windows Recovery (WinRE)   → ~500 MB-1 GB, no drive letter
+
+Disk States:
+  Online       → healthy and accessible
+  Offline      → explicitly disconnected or SAN policy
+  Missing      → dynamic disk with lost connectivity
+  Failed redund→ RAID volume degraded
+
+PowerShell alternatives to Disk Management GUI:
+  Get-Disk          # list physical disks
+  Get-Partition     # list all partitions
+  Get-Volume        # list all volumes / drive letters
+  diskpart          # interactive command-line partition tool`}</code></pre>
+      <H2 num="§7" en="Practical Commands" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Open individual snap-ins
+compmgmt.msc   lusrmgr.msc   diskmgmt.msc   services.msc
+perfmon.msc    wmimgmt.msc   eventvwr.msc   taskschd.msc
+
+# List all network shares
+Get-SmbShare | Select-Object Name, Path, Description
+net share
+
+# Active SMB sessions
+Get-SmbSession | Select-Object ClientComputerName, ClientUserName, NumOpens
+net session
+
+# Open files on shares
+Get-SmbOpenFile | Select-Object SessionId, ClientUserName, Path
+
+# WMI persistence detection
+Get-WMIObject -Namespace "root\\subscription" -Class "__EventFilter"
+Get-WMIObject -Namespace "root\\subscription" -Class "__EventConsumer"
+Get-WMIObject -Namespace "root\\subscription" -Class "__FilterToConsumerBinding"
+
+# Connect to remote computer management
+$s = New-PSSession -ComputerName REMOTE-PC; Enter-PSSession $s
+
+# Disk info
+Get-Disk; Get-Partition; Get-Volume`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Kompyuter Boshqaruvi — compmgmt.msc" en="" />
+      <P><Term>Kompyuter Boshqaruvi</Term> (compmgmt.msc) — eng muhim Windows boshqaruv vositalarini jamlagan MMC snap-in. Boshlash → o'ng tugma → Kompyuter Boshqaruvi, yoki Run dan <code>compmgmt.msc</code> orqali kirish. Masofaviy mashinalarga Action → Connect to another computer orqali ulanishni qo'llab-quvvatlaydi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Kompyuter Boshqaruvi Daraxti (compmgmt.msc):
+📁 Kompyuter Boshqaruvi (Mahalliy)
+ ├─📁 Tizim Vositalari
+ │   ├─📋 Vazifa Rejalashtiruvchi  → rejalashtirilgan vazifalar daraxti
+ │   ├─📰 Hodisa Ko'ruvchi         → Windows Jurnallari, Ilova Jurnallari
+ │   ├─📂 Ulashilgan Papkalar
+ │   │    ├─ Ulashimlar            → C$, ADMIN$, IPC$ bilan barcha ulashimlar
+ │   │    ├─ Sessiyalar            → ulangan tarmoq foydalanuvchilari (jonli)
+ │   │    └─ Ochiq Fayllar         → tarmoq foydalanuvchilari qulflagan fayllar
+ │   ├─👥 Mahalliy Foydalanuvchilar va Guruhlar
+ │   │    ├─ Foydalanuvchilar      → barcha mahalliy hisoblar
+ │   │    └─ Guruhlar              → Administratorlar, Foydalanuvchilar...
+ │   ├─📈 Ishlash
+ │   │    ├─ Ishlash Monitori      → real vaqt hisoblagich grafiklari
+ │   │    └─ Ma'lumot Yig'uvchi    → rejalashtirilgan ishlash jurnali
+ │   └─⚙  Qurilma Menejeri         → apparat daraxti kategoriyalar bo'yicha
+ ├─💾 Saqlash
+ │   └─ Disk Boshqaruvi            → grafik bo'lim muharriri
+ └─⚙  Xizmatlar va Ilovalar
+      ├─ Xizmatlar                  → to'liq xizmat boshqaruvi GUI
+      └─ WMI Nazorati               → WMI nom maydoni ruxsatlari`}</code></pre>
+      <H2 num="§2" uz="Ulashilgan Papkalar — Yashirin Admin Ulashimlari" en="" />
+      <P><Term>Ulashilgan Papkalar</Term> tuguni xavfsizlik auditi uchun kritik. U ko'rib chiqish ro'yxatlaridan yashirilgan, lekin domen mashinalarida har doim mavjud bo'lgan <Term>administrator ulashimlari</Term> bilan barcha tarmoq ulashimlarini ko'rsatadi.</P>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Ulashim","Yo'l","Xavfsizlik xavfi"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["C$, D$","Har bir disk ildizi","Faqat admin; PsExec, Impacket, SMB lateral harakatlar"],
+              ["ADMIN$","%SystemRoot% (C:\\Windows)","Masofaviy ikkilik fayl joylashtirish uchun"],
+              ["IPC$","Nomlangan quvurlar","NULL sessiya ro'yxat; quvur asosidagi lateral harakat"],
+              ["SYSVOL","C:\\Windows\\SYSVOL","Faqat DC; GPO skriptlari; GPP parollar (MS14-025)"],
+              ["NETLOGON","SYSVOL\\domain\\scripts","Kirish skriptlari; NTLM relay nishoni"],
+              ["Maxsus ulashimlar","Foydalanuvchi belgilagan","Noto'g'ri ACL (Everyone: Full Control) = lateral harakat"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <H2 num="§3" uz="Mahalliy Foydalanuvchilar va Guruhlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Asosiy O'rnatilgan Guruhlar (Mahalliy):
+  Administratorlar       → to'liq nazorat; S-1-5-32-544
+  Foydalanuvchilar       → standart foydalanuvchilar; S-1-5-32-545
+  Mehmonlar              → juda cheklangan; S-1-5-32-546
+  Masofaviy Ish Stoli    → RDP kirish; S-1-5-32-555
+  Masofaviy Boshqaruv    → WinRM / PSRemoting; S-1-5-32-580
+  Backup Operators       → fayl ACL ni chetlab o'tish — suiiste'molda XAVFLI
+  Event Log Readers      → admin huquqsiz jurnallarni o'qish
+
+Xavfsizlik tekshiruvlari:
+  # Kutilmagan Administrators a'zolari
+  Get-LocalGroupMember -Group "Administrators"
+
+  # Parol talab qilinmaydigan hisoblar
+  Get-LocalUser | Where-Object {$_.PasswordRequired -eq $false}
+
+  # O'chirilgan o'rnatilgan hisoblar
+  Get-LocalUser | Where-Object {$_.Enabled -eq $false}`}</code></pre>
+      <H2 num="§4" uz="Ishlash Monitori — Xavfsizlik Qo'llanilishi" en="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>Asosiy Ishlash Hisoblagichlari</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}><code>\Processor(_Total)\% Processor Time</code><br/><code>\Memory\Available MBytes</code><br/><code>\Memory\Pages/sec</code> (almashtirish bosimi)<br/><code>\Process(*)\Working Set</code> (jarayon RAM)<br/><code>\Network Interface(*)\Bytes Total/sec</code></div>
+        </div>
+        <div style={{padding:14,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>Xavfsizlik Aniqlash Qo'llanilishi</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Doimiy 100% CPU → kriptomayner<br/>G'ayrioddiy chiquvchi baytlar → ma'lumot chiqarish<br/>RSS keskin o'sishi → xotira in'ektsiyasi<br/>Yuqori Pages/sec → zararli dastur almashishi<br/>Asosiy holat og'ishlari ogohlantirishlarni ishga tushiradi</div>
+        </div>
+      </div>
+      <H2 num="§5" uz="WMI Nazorati — Persistenslikni Aniqlash" en="" />
+      <P><Term>WMI Nazorati</Term> (wmimgmt.msc) WMI nom maydoni ruxsatlarini boshqaradi. Hujumchilar faylsiz <Term>persistenslik</Term> uchun WMI dan foydalanadi: <code>__EventFilter</code> + <code>__EventConsumer</code> + <code>__FilterToConsumerBinding</code>. Ular qayta yoqishdan omon qoladi va WMI repositoryda saqlanadi (<code>C:\Windows\System32\wbem\Repository</code>).</P>
+      <Callout color="var(--c-attack)" icon="warning" titleUz="WMI Persistenslikni Aniqlash" titleEn="">
+        Siz yaratmagan har qanday WMI obunasi shubhali. Autoruns.exe (Sysinternals WMI tab) ularni ko'rsatadi. O'chirish: <code>Get-WMIObject -Namespace root\subscription -Class __EventFilter | Remove-WmiObject</code>. Sysmon Event ID 19, 20, 21 bilan kuzating.
+      </Callout>
+      <H2 num="§6" uz="Amaliy Buyruqlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Alohida snap-inlarni ochish
+compmgmt.msc   lusrmgr.msc   diskmgmt.msc   services.msc
+perfmon.msc    wmimgmt.msc   eventvwr.msc   taskschd.msc
+
+# Barcha tarmoq ulashimlarini ko'rish
+Get-SmbShare | Select-Object Name, Path, Description
+net share
+
+# Faol SMB sessiyalari
+Get-SmbSession | Select-Object ClientComputerName, ClientUserName, NumOpens
+net session
+
+# Ulashimlardagi ochiq fayllar
+Get-SmbOpenFile | Select-Object SessionId, ClientUserName, Path
+
+# WMI persistenslikni aniqlash
+Get-WMIObject -Namespace "root\\subscription" -Class "__EventFilter"
+Get-WMIObject -Namespace "root\\subscription" -Class "__EventConsumer"
+Get-WMIObject -Namespace "root\\subscription" -Class "__FilterToConsumerBinding"
+
+# Disk ma'lumotlari
+Get-Disk; Get-Partition; Get-Volume`}</code></pre>
+    </section>
+  );
+}
+
 
 // ─────────────────────────────────────────────────────────────
 // Text helpers
