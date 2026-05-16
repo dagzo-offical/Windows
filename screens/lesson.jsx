@@ -3610,30 +3610,94 @@ function SectionFAT32() {
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Directory Structure and Long File Names</h3>
       <P>FAT directories are a linear array of 32-byte directory entries, each holding the 8.3 filename (uppercase, space-padded), attributes byte, timestamps, first cluster number, and file size. The original FAT allowed only 8.3 names. Windows 95 added LFN support using a hack: LFN entries use attribute byte 0x0F (ReadOnly+Hidden+System+VolumeLabel), which old software ignores. Each LFN entry stores 13 UTF-16 characters. Maximum LFN: 255 UTF-16 characters.</P>
 
-      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — FAT12, FAT16, FAT32 Comparison</h3>
-      <div style={{overflowX:"auto",marginTop:12}}>
-        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — FAT12, FAT16, FAT32 and exFAT — Full Comparison</h3>
+      <P>Think of each generation as a card — the most important numbers at a glance:</P>
+
+      {/* 4 cards */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:14,marginTop:16}}>
+        {[
+          {
+            title:"FAT12", year:"1977", color:"#6b7280",
+            file:"= Volume size (max ~256 MB)",
+            disk:"Max ~16 MB (4 KB clusters)\nMax ~256 MB (64 KB clusters)",
+            perm:"NONE — no ACLs whatsoever",
+            use:"Floppy disks, tiny embedded devices",
+            note:"Cluster count: 2¹² = 4,084",
+          },
+          {
+            title:"FAT16", year:"1984", color:"var(--c-warn)",
+            file:"= Volume size (max ~4 GB)",
+            disk:"Max ~256 MB (4 KB clusters)\nMax ~4 GB (64 KB clusters)",
+            perm:"NONE — no ACLs whatsoever",
+            use:"Old USB drives, DOS-era systems",
+            note:"Cluster count: 2¹⁶ = 65,524",
+          },
+          {
+            title:"FAT32", year:"1996", color:"var(--accent)",
+            file:"4 GB − 1 byte (HARD LIMIT)\n32-bit size field: 2³²−1 = 4,294,967,295 B",
+            disk:"Max 2 TB (spec)\nMax 32 GB (Windows format.exe policy only)",
+            perm:"NONE — no ACLs whatsoever",
+            use:"USB drives, SD cards, EFI System Partition (ESP)",
+            note:"Cluster count: 2²⁸ = 268,435,445",
+          },
+          {
+            title:"exFAT", year:"2006", color:"var(--c-ok)",
+            file:"128 PB (64-bit size field: 2⁶⁴−1 B)",
+            disk:"Max 128 PB (practical)\nMax 512 EB (theoretical)",
+            perm:"NONE — only attribute bits (ReadOnly/Hidden)\nNo NTFS-style ACLs",
+            use:"Modern USB, SD (>32 GB), cameras",
+            note:"Mandated by SD Assoc. for SDXC cards",
+          },
+        ].map(c=>(
+          <div key={c.title} style={{padding:"16px",background:`${c.color}08`,border:`1px solid ${c.color}30`,borderTop:`3px solid ${c.color}`,borderRadius:8}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10}}>
+              <span style={{fontFamily:"var(--font-mono)",fontSize:18,fontWeight:800,color:c.color}}>{c.title}</span>
+              <span style={{fontSize:11,color:"var(--text-2)"}}>{c.year}</span>
+            </div>
+            <div style={{fontSize:11,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginBottom:10}}>{c.note}</div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
+                <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>MAX FILE</div>
+                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.file}</div>
+              </div>
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
+                <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>MAX DISK</div>
+                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.disk}</div>
+              </div>
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
+                <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>PERMISSIONS</div>
+                <div style={{fontSize:12,color:"var(--c-err)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.perm}</div>
+              </div>
+              <div style={{fontSize:11,color:"var(--text-2)",lineHeight:1.4,marginTop:2}}>{c.use}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Detailed numbers table */}
+      <P style={{marginTop:24}}>Max disk size by cluster size (MB / GB / TB):</P>
+      <div style={{overflowX:"auto",marginTop:8}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
           <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
-            {["Feature","FAT12","FAT16","FAT32"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+            {["Cluster size","FAT12","FAT16","FAT32","exFAT"].map(h=><th key={h} style={{textAlign:"left",padding:"7px 10px",color:"var(--text-2)",fontWeight:600,fontSize:12}}>{h}</th>)}
           </tr></thead>
           <tbody>{[
-            ["FAT entry size","12 bits","16 bits","28 bits (in 32-bit field)"],
-            ["Max cluster count","2¹² − 12 = 4,084","2¹⁶ − 12 = 65,524","2²⁸ − 11 = 268,435,445"],
-            ["Max volume — 512 B clusters","4,084 × 512 B = 2 MB","65,524 × 512 B = 32 MB","268,435,445 × 512 B = 128 GB"],
-            ["Max volume — 4 KB clusters","4,084 × 4 KB = 16 MB","65,524 × 4 KB = 256 MB","268,435,445 × 4 KB = 1,024 GB (1 TB)"],
-            ["Max volume — 32 KB clusters","4,084 × 32 KB = 128 MB","65,524 × 32 KB = 2,048 MB (2 GB)","268,435,445 × 32 KB = 8,192 GB (8 TB)"],
-            ["Max volume — 64 KB clusters","4,084 × 64 KB = 256 MB","65,524 × 64 KB = 4,096 MB (4 GB)","268,435,445 × 64 KB = 16,384 GB (16 TB)"],
-            ["Max file size","Same as volume","Same as volume","2³² − 1 bytes = 4,294,967,295 B = 4 GB − 1 byte"],
-            ["Windows format.exe limit","—","—","32 GB (arbitrary policy, not spec)"],
-            ["Root directory","Fixed, 224 entries","Fixed, 512 entries","Dynamic (in data region, no limit)"],
-            ["Year introduced","1977","1984","1996"],
-            ["Typical use","Floppy disks","Old USB drives","Modern USB, SD, ESP"],
+            ["512 B","4,084 × 512 B = 2 MB","65,524 × 512 B = 32 MB","268M × 512 B = 128 GB","—"],
+            ["4 KB","4,084 × 4 KB = 16 MB","65,524 × 4 KB = 256 MB","268M × 4 KB = 1 TB","268M × 4 KB = 1 TB"],
+            ["32 KB","4,084 × 32 KB = 128 MB","65,524 × 32 KB = 2 GB","268M × 32 KB = 8 TB","268M × 32 KB = 8 TB"],
+            ["64 KB","4,084 × 64 KB = 256 MB","65,524 × 64 KB = 4 GB","268M × 64 KB = 16 TB","268M × 64 KB = 16 TB"],
+            ["Max file size","= Volume","= Volume","4 GB − 1 byte (2³²−1 B)","128 PB (2⁶⁴−1 B)"],
+            ["Permissions (ACL)","NONE","NONE","NONE","NONE"],
+            ["Journaling","NONE","NONE","NONE","NONE"],
           ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
-            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":"var(--text-1)",fontSize:13}}>{c}</td>)}
+            {r.map((c,j)=><td key={j} style={{padding:"6px 10px",color:j===0?"var(--text-0)":i>=4&&j>0?"var(--c-err)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12,fontWeight:i>=4&&j>0?600:400}}>{c}</td>)}
           </tr>)}
           </tbody>
         </table>
       </div>
+      <Callout color="var(--c-err)" icon="warning" titleEn="All four FAT variants share the same fatal flaw: no permissions" titleUz="">
+        FAT12, FAT16, FAT32, exFAT — all four have zero access control. Anyone who can mount the volume (root on Linux, Administrator on Windows) can read and modify every file. When an NTFS disk is rebooted into Linux and mounted as root, the "protections" disappear entirely. <strong>BitLocker-style encryption is the only correct solution for protecting data against physical access on FAT volumes.</strong>
+      </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Critical Limitations</h3>
       <P><strong>4 GB file size limit:</strong> The directory entry's file size field is a 32-bit unsigned integer. 2³² − 1 = 4,294,967,295 bytes = exactly 4 GB − 1 byte. No FAT32 file can be 4 GB or larger. You cannot store a 4.7 GB DVD ISO, a Windows installation ISO (typically 5–6 GB), or a large database file. The error: "The file is too large for the destination file system."</P>
@@ -3683,32 +3747,96 @@ Get-Volume -DriveLetter D | Select-Object FileSystem, Size, SizeRemaining`}</cod
         </div>)}
       </div>
 
-      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — FAT12, FAT16, FAT32 Taqqoslash</h3>
-      <div style={{overflowX:"auto",marginTop:12}}>
-        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — FAT12, FAT16, FAT32 va exFAT — To'liq Taqqoslash</h3>
+      <P>To'rtta FAT avlodining eng muhim ko'rsatkichlarini eslab qolish uchun — har birini bir karta sifatida tasavvur qiling:</P>
+
+      {/* 4 cards */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:14,marginTop:16}}>
+        {[
+          {
+            title:"FAT12", year:"1977", color:"#6b7280",
+            file:"= Hajm (max ~256 MB)",
+            disk:"Max ~16 MB (4KB klaster)\nMax ~256 MB (64KB klaster)",
+            perm:"YO'Q — hech qanday ACL yo'q",
+            use:"Disketalar, kichik o'rnatilgan qurilmalar",
+            note:"Klaster soni: 2¹² = 4,084",
+          },
+          {
+            title:"FAT16", year:"1984", color:"var(--c-warn)",
+            file:"= Hajm (max ~4 GB)",
+            disk:"Max ~256 MB (4KB klaster)\nMax ~4 GB (64KB klaster)",
+            perm:"YO'Q — hech qanday ACL yo'q",
+            use:"Eski USB disklar, DOS tizimlari",
+            note:"Klaster soni: 2¹⁶ = 65,524",
+          },
+          {
+            title:"FAT32", year:"1996", color:"var(--accent)",
+            file:"4 GB − 1 bayt (QATTIQ CHEGARA)\n32-bitli hajm maydoni: 2³²−1 = 4,294,967,295 B",
+            disk:"Max 2 TB (spesifikatsiya)\nMax 32 GB (Windows format.exe siyosati)",
+            perm:"YO'Q — hech qanday ACL yo'q",
+            use:"USB, SD kartalar, EFI System Partition (ESP)",
+            note:"Klaster soni: 2²⁸ = 268,435,445",
+          },
+          {
+            title:"exFAT", year:"2006", color:"var(--c-ok)",
+            file:"128 PB (64-bitli hajm maydoni: 2⁶⁴−1 B)",
+            disk:"Max 128 PB (amaliy)\nMax 512 EB (nazariy)",
+            perm:"YO'Q — faqat atribut bitlari (ReadOnly/Hidden)\nNTFS kabi ACL yo'q",
+            use:"Zamonaviy USB, SD (>32 GB), kameralar",
+            note:"SD Assotsiatsiyasi: SDXC uchun majburiy",
+          },
+        ].map(c=>(
+          <div key={c.title} style={{padding:"16px",background:`${c.color}08`,border:`1px solid ${c.color}30`,borderTop:`3px solid ${c.color}`,borderRadius:8}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10}}>
+              <span style={{fontFamily:"var(--font-mono)",fontSize:18,fontWeight:800,color:c.color}}>{c.title}</span>
+              <span style={{fontSize:11,color:"var(--text-2)"}}>{c.year}</span>
+            </div>
+            <div style={{fontSize:11,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginBottom:10}}>{c.note}</div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
+                <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>MAKS FAYL</div>
+                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.file}</div>
+              </div>
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
+                <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>MAKS DISK</div>
+                <div style={{fontSize:12,color:"var(--text-0)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.disk}</div>
+              </div>
+              <div style={{background:"rgba(0,0,0,0.2)",borderRadius:6,padding:"8px 10px"}}>
+                <div style={{fontSize:10,fontWeight:700,color:c.color,letterSpacing:1,marginBottom:3}}>RUXSATLAR</div>
+                <div style={{fontSize:12,color:"var(--c-err)",lineHeight:1.5,whiteSpace:"pre-line"}}>{c.perm}</div>
+              </div>
+              <div style={{fontSize:11,color:"var(--text-2)",lineHeight:1.4,marginTop:2}}>{c.use}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Detailed numbers table */}
+      <P style={{marginTop:24}}>Klaster hajmiga qarab maks disk hajmi (MB / GB / TB):</P>
+      <div style={{overflowX:"auto",marginTop:8}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
           <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
-            {["Xususiyat","FAT12","FAT16","FAT32"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+            {["Klaster hajmi","FAT12","FAT16","FAT32","exFAT"].map(h=><th key={h} style={{textAlign:"left",padding:"7px 10px",color:"var(--text-2)",fontWeight:600,fontSize:12}}>{h}</th>)}
           </tr></thead>
           <tbody>{[
-            ["FAT yozuv hajmi","12 bit","16 bit","28 bit (32-bitli maydon)"],
-            ["Maks klaster soni","2¹² − 12 = 4,084","2¹⁶ − 12 = 65,524","2²⁸ − 11 = 268,435,445"],
-            ["Maks hajm — 512 B klaster","4,084 × 512 B = 2 MB","65,524 × 512 B = 32 MB","268,435,445 × 512 B = 128 GB"],
-            ["Maks hajm — 4 KB klaster","4,084 × 4 KB = 16 MB","65,524 × 4 KB = 256 MB","268,435,445 × 4 KB = 1,024 GB (1 TB)"],
-            ["Maks hajm — 32 KB klaster","4,084 × 32 KB = 128 MB","65,524 × 32 KB = 2,048 MB (2 GB)","268,435,445 × 32 KB = 8,192 GB (8 TB)"],
-            ["Maks hajm — 64 KB klaster","4,084 × 64 KB = 256 MB","65,524 × 64 KB = 4,096 MB (4 GB)","268,435,445 × 64 KB = 16,384 GB (16 TB)"],
-            ["Maks fayl hajmi","Hajm kabi","Hajm kabi","2³² − 1 bayt = 4,294,967,295 B = 4 GB − 1 bayt"],
-            ["Windows format.exe chegarasi","—","—","32 GB (ixtiyoriy siyosat, spesifikatsiya emas)"],
-            ["Ildiz katalog","224 yozuv (qat'iy)","512 yozuv (qat'iy)","Dinamik (chegarasiz)"],
-            ["Kiritilgan","1977","1984","1996"],
-            ["Odatdagi foydalanish","Disketalar","Eski USB","Zamonaviy USB, SD, ESP"],
+            ["512 B","4,084 × 512 B = 2 MB","65,524 × 512 B = 32 MB","268M × 512 B = 128 GB","—"],
+            ["4 KB","4,084 × 4 KB = 16 MB","65,524 × 4 KB = 256 MB","268M × 4 KB = 1 TB","268M × 4 KB = 1 TB"],
+            ["32 KB","4,084 × 32 KB = 128 MB","65,524 × 32 KB = 2 GB","268M × 32 KB = 8 TB","268M × 32 KB = 8 TB"],
+            ["64 KB","4,084 × 64 KB = 256 MB","65,524 × 64 KB = 4 GB","268M × 64 KB = 16 TB","268M × 64 KB = 16 TB"],
+            ["Maks fayl hajmi","= Hajm","= Hajm","4 GB − 1 bayt (2³²−1 B)","128 PB (2⁶⁴−1 B)"],
+            ["Ruxsatlar (ACL)","YO'Q","YO'Q","YO'Q","YO'Q"],
+            ["Jurnalling","YO'Q","YO'Q","YO'Q","YO'Q"],
           ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
-            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-0)":"var(--text-1)",fontSize:13}}>{c}</td>)}
+            {r.map((c,j)=><td key={j} style={{padding:"6px 10px",color:j===0?"var(--text-0)":i===4&&j>0?"var(--c-err)":i===5&&j>0?"var(--c-err)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12,fontWeight:i>=4&&j>0?600:400}}>{c}</td>)}
           </tr>)}
           </tbody>
         </table>
       </div>
+      <Callout color="var(--c-err)" icon="warning" titleUz="Hamma FAT turlari uchun umumiy: ruxsatlar yo'q" titleEn="">
+        FAT12, FAT16, FAT32, exFAT — to'rtovida ham NTFS ACL yo'q. Diskni o'rnatishi mumkin bo'lgan har kim (root yoki Administrator) barcha fayllarni o'qib va o'zgartira oladi. Linux da mount qilinganda Windows "himoyasi" butunlay e'tiborsiz qoladi. <strong>Jismoniy kirishdan himoya qilish uchun faqat BitLocker kabi shifrlash to'g'ri yechim.</strong>
+      </Callout>
 
-      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Asosiy Cheklovlar</h3>
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Asosiy Cheklovlar</h3>
       <P><strong>4 GB fayl hajmi chegarasi:</strong> Katalog yozuvidagi fayl hajmi maydoni 32-bitli belgisiz butun son. 2³² − 1 = 4 GB − 1 bayt. FAT32 diskida hech qanday fayl 4 GB yoki undan katta bo'la olmaydi. 4.7 GB DVD ISO, Windows o'rnatish ISO (5–6 GB), yoki katta ma'lumotlar bazasi fayli siqmaydi. Xato: "Fayl maqsad fayl tizimi uchun juda katta."</P>
       <P><strong>32 GB hajm chegarasi (faqat Windows):</strong> Windows ning format.exe si 32 GB dan katta hajmni FAT32 sifatida formatlashdan bosh tortadi. Lekin bu ixtiyoriy Microsoft siyosati — FAT32 spetsifikatsiyasi 2 TB qo'llab-quvvatlaydi. Uchinchi tomon vositalari (Rufus) bu cheklovni chetlab o'tadi.</P>
       <P><strong>Ruxsatlar va jurnalling yo'q:</strong> Har bir faylga har kim kirishi mumkin. Quvvat uzilishi ma'lumotlarni buzishi mumkin — CHKDSK /F tuzatish uchun talab qilinadi. Shuning uchun FAT32 tizim disklari uchun yaroqsiz.</P>
