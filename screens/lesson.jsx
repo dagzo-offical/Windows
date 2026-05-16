@@ -33,9 +33,9 @@ const LESSONS = {
   15: { num: "L15", section: "01", uz: "Servislar",                     en: "Services",                    subUz: "SCM, servis turlari, xizmat akkauntlari, svchost guruhlari va servis persistenslik texnikalari", subEn: "SCM, service types, service accounts, svchost groups, and service-based persistence techniques" },
   16: { num: "L16", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "PE tuzilmasi, DLL yuklash, qidiruv tartibi, in'ektsiya va DLL hijacking texnikalari", subEn: "PE structure, DLL loading, search order, injection, and DLL hijacking techniques" },
   17: { num: "L17", section: "01", uz: "Windows API",                   en: "Windows API",                 subUz: "Win32 qatlami, ntdll syscall ko'prigi, API hooking va monitoring texnikalari", subEn: "Win32 layer, ntdll syscall bridge, API hooking, and monitoring techniques" },
-  18: { num: "L18", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Tez kunda", subEn: "Coming soon" },
-  19: { num: "L19", section: "01", uz: "Task Scheduler",                en: "Task Scheduler",              subUz: "Tez kunda", subEn: "Coming soon" },
-  20: { num: "L20", section: "01", uz: "Windows log fayllari",          en: "Windows Logs",                subUz: "Tez kunda", subEn: "Coming soon" },
+  18: { num: "L18", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Windows event log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensics", subEn: "Windows event log architecture, key Event IDs, ETW, Sysmon, and forensic analysis" },
+  19: { num: "L19", section: "01", uz: "Task Scheduler",                en: "Task Scheduler",              subUz: "Vazifa arxitekturasi, triggerlar, harakatlar, imtiyozlar va persistenslik texnikalari", subEn: "Task architecture, triggers, actions, privileges, and scheduler-based persistence techniques" },
+  20: { num: "L20", section: "01", uz: "Windows log fayllari",          en: "Windows Logs",                subUz: "EVTX format, log yo'llari, log o'chirish aniqlash va forensic tekshiruv", subEn: "EVTX format, log paths, log clearing detection, and forensic log analysis" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -119,6 +119,12 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <SectionDLL />
           </> : lessonNum === 17 ? <>
             <SectionWindowsAPI />
+          </> : lessonNum === 18 ? <>
+            <SectionEventViewer />
+          </> : lessonNum === 19 ? <>
+            <SectionTaskScheduler />
+          </> : lessonNum === 20 ? <>
+            <SectionWindowsLogs />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -263,6 +269,15 @@ const LESSON_META = {
   17: { min: 38, diagrams: 6, labs: 2,
        introUz: <><em>Windows API</em> — dasturlar operatsion tizim xizmatlariga murojaat qilish uchun foydalanadigan funksiyalar to'plami. Bu darsda <em>Win32 → ntdll → syscall</em> zanjiri, asosiy DLL lar (kernel32, ntdll, advapi32, user32), chaqiruv konventsiyalari (x64 fastcall), <em>API hooking</em> texnikalari (IAT, inline, SSDT), WOW64 qatlami va API monitoringi usullarini o'rganasiz.</>,
        introEn: <><em>The Windows API</em> is the set of functions applications call to access OS services. This lesson covers the <em>Win32 → ntdll → syscall</em> chain, key DLLs (kernel32, ntdll, advapi32, user32), calling conventions (x64 fastcall), <em>API hooking</em> techniques (IAT, inline, SSDT), the WOW64 layer, and API monitoring methods.</> },
+  18: { min: 34, diagrams: 5, labs: 2,
+       introUz: <><em>Windows Event Log</em> — tizim, xavfsizlik va dastur hodisalarini yozib oladigan markaziy jurnal tizimi. Bu darsda <em>ETW (Event Tracing for Windows)</em> arxitekturasi, EVTX format, xavfsizlik auditi uchun muhim Event ID lar (4624, 4625, 4688, 4698, 7045…), Sysmon integratsiyasi va hujumchilar log larni qanday o'chirish yoki chetlab o'tishga urinishlarini o'rganasiz.</>,
+       introEn: <><em>Windows Event Log</em> is the central journaling system that records system, security, and application events. This lesson covers the <em>ETW (Event Tracing for Windows)</em> architecture, EVTX format, critical Event IDs for security auditing (4624, 4625, 4688, 4698, 7045…), Sysmon integration, and how attackers attempt to clear or bypass logging.</> },
+  19: { min: 32, diagrams: 5, labs: 2,
+       introUz: <><em>Windows Task Scheduler</em> — vaqt yoki tizim hodisalariga asosida vazifalarni avtomatik bajaradigan tizim. Bu darsda vazifa XML tuzilmasi, trigger turlari (vaqt, hodisa, yuklash, kirish), harakatlar, imtiyozlar, <em>COM-asosli bajarish</em> mexanizmi va hujumchilar Task Scheduler dan persistenslik, lateral movement va UAC bypass uchun qanday foydalanishini o'rganasiz.</>,
+       introEn: <><em>Windows Task Scheduler</em> is the system that automatically runs tasks based on time or system events. This lesson covers task XML structure, trigger types (time, event, boot, logon), actions, privilege settings, the <em>COM-based execution</em> mechanism, and how attackers use the Task Scheduler for persistence, lateral movement, and UAC bypass.</> },
+  20: { min: 30, diagrams: 4, labs: 2,
+       introUz: <><em>Windows log fayllari</em> — tizim faoliyatining doimiy yozuvi. Bu darsda <em>EVTX ikkilik formati</em>, asosiy log fayllari va ularning yo'llari, PowerShell/WMI/ETW yordamida log so'rov qilish, log o'chirish va tahrif qilish aniqlash usullari va real forensics tekshiruvida qanday izlarni qidirish kerakligini o'rganasiz.</>,
+       introEn: <><em>Windows log files</em> are the persistent record of system activity. This lesson covers the <em>EVTX binary format</em>, key log files and their paths, querying logs with PowerShell/WMI/ETW, detecting log clearing and tampering, and what traces to look for in a real forensic investigation.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -5630,6 +5645,892 @@ bp ntdll!NtCreateFile "du @rcx; g"   # fayl yo'llarini log qilish
 
 # ETW syscall kuzatish (Admin)
 xperf -on PROC_THREAD+LOADER+DPC -stackwalk Profile -buffersize 2048`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionEventViewer() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Event Viewer — Windows Logging System" uz="" />
+      <P>Windows records system activity in structured logs called <Term>event logs</Term>. These are the primary data source for incident response, forensics, and detection engineering. Every meaningful OS action — user logon, process creation, service installation, privilege use — generates an event that persists in a binary <code>.evtx</code> file. Understanding which events fire, what fields they carry, and how to query them is foundational to blue-team work.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — ETW Architecture</h3>
+      <P>The underlying engine is <Term>ETW (Event Tracing for Windows)</Term> — a kernel-level pub/sub system built into Windows since XP. It has three components:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {role:"Provider",color:"var(--c-system)",desc:"Any kernel or user-mode component that emits events. Identified by a GUID. Examples: Microsoft-Windows-Security-Auditing (GUID 54849625-…), Microsoft-Windows-Kernel-Process, Sysmon (5770385F-…). Providers declare their events in a manifest (XML schema) that describes every event ID, fields, and levels."},
+          {role:"Session / Controller",color:"var(--c-warn)",desc:"A logging session subscribes to one or more providers and routes events to a consumer. The Windows Event Log service (svchost -k LocalServiceNoNetworkFirewall hosting EventLog) manages the persistent log sessions. You can create custom ETW sessions with logman or xperf."},
+          {role:"Consumer",color:"#b48cff",desc:"Reads events from a session buffer (real-time) or from an .etl/.evtx file (offline). Event Viewer, Get-WinEvent, wevtutil, and custom SIEM agents are consumers."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:12,padding:"10px 14px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}25`}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:item.color,minWidth:90,flexShrink:0,fontWeight:700,paddingTop:1}}>{item.role}</span>
+            <span style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Log Channels</h3>
+      <P>Events are routed into named <Term>channels</Term>. The four classic channels plus the modern Applications and Services Logs hierarchy:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Channel","File Path","Contains","Max Size (default)"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Security","System32\\winevt\\Logs\\Security.evtx","Logon/logoff, privilege use, object access, policy change, account management — audit policy controls what fires","128 MB (wraps)"],
+            ["System","System32\\winevt\\Logs\\System.evtx","Driver load/unload, service install, hardware errors, boot events, SCM activity","20 MB"],
+            ["Application","System32\\winevt\\Logs\\Application.evtx","Application-defined events (MSSQL, IIS, .NET runtime errors)","20 MB"],
+            ["Setup","System32\\winevt\\Logs\\Setup.evtx","Windows Update, component installation, servicing","20 MB"],
+            ["Microsoft-Windows-Sysmon/Operational","System32\\winevt\\Logs\\Microsoft-Windows-Sysmon%4Operational.evtx","Sysmon events (process, network, file, registry…) — requires Sysmon install","Configurable"],
+            ["Microsoft-Windows-PowerShell/Operational","…\\Microsoft-Windows-PowerShell%4Operational.evtx","PS script block logging (Event 4104), module logging (4103)","15 MB"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Critical Security Event IDs</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Event ID","Channel","Name","Key Fields / Why It Matters"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["4624","Security","Logon Success","LogonType (2=interactive,3=network,10=remote interactive), SubjectUserName, TargetUserName, IpAddress — baseline for lateral movement detection"],
+            ["4625","Security","Logon Failure","Same fields + FailureReason. Burst of 4625 → brute force. Single 4625 then 4624 → credential stuffing success."],
+            ["4648","Security","Logon with Explicit Credentials","SubjectUserName used runas/network logon with different credentials — pass-the-hash indicator"],
+            ["4688","Security","Process Creation","NewProcessName, CommandLine (requires audit policy), ParentProcessName, SubjectUserName — gold for detecting LOLBins"],
+            ["4698","Security","Scheduled Task Created","TaskName, TaskContent (full XML) — attacker persistence via Task Scheduler"],
+            ["4702","Security","Scheduled Task Updated","Same as 4698 — modified task; check for new actions or changed RunAs account"],
+            ["4720 / 4728","Security","User/Group Created","NewTargetUserName — new accounts, new group members"],
+            ["4732","Security","Member Added to Security-Enabled Local Group","MemberName, GroupName — watch for additions to Administrators, Remote Desktop Users"],
+            ["4768 / 4769","Security","Kerberos TGT/Service Ticket","Kerberoasting: 4769 with EncryptionType=0x17 (RC4) for service accounts → ticket offline crack"],
+            ["4776","Security","NTLM Auth Attempt","WorkstationName, TargetUserName — all NTLM authentications, including pass-the-hash"],
+            ["7045","System","Service Installed","ServiceName, ImagePath, ServiceType, StartType — new service = common persistence"],
+            ["1102","Security","Audit Log Cleared","SubjectUserName — attacker cleanup, highly suspicious"],
+            ["4104","PS/Operational","Script Block Logged","ScriptBlockText — full deobfuscated PowerShell code"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Sysmon Events</h3>
+      <P><Term>Sysmon (System Monitor)</Term> is a Sysinternals driver + service that adds high-fidelity telemetry beyond what native Windows audit policy provides. Configured via XML, deployed via GPO or SCCM. Key events:</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {id:"ID 1",name:"Process Create",fields:"CommandLine, Hashes (MD5/SHA256/IMPHASH), ParentImage, ParentCommandLine, User",note:"Full command line + hash — no way to hide from this without tampering the driver"},
+          {id:"ID 3",name:"Network Connect",fields:"SourceIp:Port, DestIp:Port, Protocol, ProcessId, Image",note:"Maps process to network connection — pivotal for C2 detection"},
+          {id:"ID 7",name:"Image Loaded",fields:"ImageLoaded, Hashes, Signed, Signature, SignatureStatus",note:"Every DLL load — detect unsigned DLL injection, LOLBin side-loading"},
+          {id:"ID 8",name:"CreateRemoteThread",fields:"SourceImage, TargetImage, StartAddress, StartModule, StartFunction",note:"Cross-process thread creation — primary injection indicator"},
+          {id:"ID 10",name:"ProcessAccess",fields:"SourceImage, TargetImage, GrantedAccess, CallTrace",note:"PROCESS_VM_READ on lsass.exe = credential dump — most critical alert"},
+          {id:"ID 11",name:"File Created",fields:"TargetFilename, CreationUtcTime, ProcessId",note:"Ransomware detection: mass file creation in short window"},
+          {id:"ID 12/13/14",name:"Registry Events",fields:"EventType (Create/Set/Delete), TargetObject, Details",note:"Persistence: autorun key modifications"},
+          {id:"ID 17/18",name:"Pipe Events",fields:"PipeName, Image",note:"Named pipe creation/connection — lateral movement via SMB named pipes, Cobalt Strike default pipes"},
+          {id:"ID 22",name:"DNS Query",fields:"QueryName, QueryResults, Image",note:"C2 detection: beaconing to DGAs, unusual query patterns"},
+          {id:"ID 25",name:"Process Tampering",fields:"Image, Type (ImageFileDeleted/HostileCodeShellcode/Other)",note:"Process hollowing, process doppelgänging detection"},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+              <span style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-warn)",fontWeight:700}}>{item.id}</span>
+              <span style={{fontFamily:"var(--font-display)",fontSize:13,fontWeight:600,color:"var(--accent)"}}>{item.name}</span>
+            </div>
+            <div style={{fontSize:11,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginBottom:4}}>{item.fields}</div>
+            <div style={{fontSize:12,color:"var(--text-1)"}}>{item.note}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Audit Policy Configuration</h3>
+      <P>By default, Windows logs very little. Security Event IDs only fire if the corresponding <Term>audit policy</Term> subcategory is enabled. Critical subcategories to enable:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Enable process creation auditing with command line (requires KB3004375 on Win7/2008)
+auditpol /set /subcategory:"Process Creation" /success:enable
+auditpol /set /subcategory:"Process Termination" /success:enable
+
+# Enable detailed logon events
+auditpol /set /subcategory:"Logon" /success:enable /failure:enable
+auditpol /set /subcategory:"Special Logon" /success:enable
+
+# Enable privilege use
+auditpol /set /subcategory:"Sensitive Privilege Use" /success:enable /failure:enable
+
+# View current policy
+auditpol /get /category:*
+
+# Via Group Policy: Computer Config → Windows Settings → Security Settings
+#   → Advanced Audit Policy Configuration → Audit Policies → ...
+
+# Enable Process Creation command line (registry method)
+reg add "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Audit" \
+  /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Log Tampering and Evasion</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Log Clearing (Event ID 1102 / 104)",color:"var(--c-attack)",body:<>Attackers run <code>wevtutil cl Security</code> or <code>Clear-EventLog -LogName Security</code> to wipe the Security log. This itself generates Event ID 1102 (Security log cleared) or 104 (System log cleared) — but only if the Security log isn't also cleared first. Detection: forward logs in real time to a SIEM; once a log is cleared the SIEM copy survives even if local copy is gone.</>},
+          {title:"ETW Provider Disabling (Patching)",color:"var(--c-err)",body:<>Advanced attackers patch the ETW provider inside a process to stop it from generating events. Technique: locate the EtwEventWrite function in ntdll, overwrite with a RET instruction (<code>0xC3</code>). This silences all ETW events from that process — including PowerShell script block logging. Detection: kernel-mode ETW consumers (e.g., Microsoft-Windows-Threat-Intelligence provider accessible only to PPL processes) are immune to this. CrowdStrike/Defender Sense uses this provider.</>},
+          {title:"Sysmon Driver Unloading",color:"var(--c-warn)",body:<>Sysmon runs as a kernel driver. An admin can stop/delete the Sysmon service: <code>sc stop Sysmon64</code>. Detection: absence of Sysmon events in SIEM pipeline (gap detection); alert on Event 4 (Sysmon service state changed); monitor for deletion of Sysmon service registry key.</>},
+          {title:"Volume Shadow Copy Deletion",color:"var(--c-warn)",body:<>Attackers delete VSS snapshots to destroy backup copies of logs: <code>vssadmin delete shadows /all /quiet</code> or <code>wmic shadowcopy delete</code>. This is now a ransomware behavioral indicator — generate a high-priority alert on any process deleting shadow copies.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Querying Event Logs</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# PowerShell — query Security log for all failed logons (4625)
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} |
+  Select TimeCreated, @{n='User';e={$_.Properties[5].Value}},
+         @{n='IP';e={$_.Properties[19].Value}} | Format-Table
+
+# Get all process creations in last 1 hour (Event 4688)
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4688;
+  StartTime=(Get-Date).AddHours(-1)} |
+  Select TimeCreated, @{n='Process';e={$_.Properties[5].Value}},
+         @{n='Cmdline';e={$_.Properties[8].Value}} | Format-List
+
+# wevtutil — export Security log to XML
+wevtutil epl Security C:\\out\\security.evtx
+wevtutil qe Security /q:"*[System[EventID=4624]]" /f:text /c:20
+
+# Query Sysmon for lsass access (Event 10)
+Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" |
+  Where {$_.Id -eq 10 -and $_.Message -match "lsass"} | Format-List
+
+# Real-time ETW session (low-level)
+logman start MySession -p "Microsoft-Windows-Security-Auditing" 0xFFFF 0 -ets -o C:\\trace.etl`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Event Viewer — Windows Jurnallash Tizimi" en="" />
+      <P>Windows tizim faoliyatini <Term>hodisa jurnallari</Term> deb ataladigan tuzilgan jurnaллarda qayd etadi. Bular hodisalarga javob berish, forensics va aniqlash muhandisligi uchun asosiy ma'lumot manbai. Har bir muhim OS harakati — foydalanuvchi kirishi, jarayon yaratish, servis o'rnatish, imtiyozdan foydalanish — ikkilik <code>.evtx</code> faylida saqlanadigan hodisa hosil qiladi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — ETW Arxitekturasi</h3>
+      <P>Asosiy dvigatel — <Term>ETW (Windows Hodisa Kuzatish)</Term> — XP dan beri Windows ga o'rnatilgan kernel darajasidagi pub/sub tizimi. Uch komponentdan iborat:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {role:"Provayder",color:"var(--c-system)",desc:"Hodisalar chiqaradigan har qanday kernel yoki foydalanuvchi rejimi komponenti. GUID bilan aniqlanadi. Misollar: Microsoft-Windows-Security-Auditing (GUID 54849625-…), Microsoft-Windows-Kernel-Process, Sysmon (5770385F-…). Provayderlar har bir hodisa ID, maydon va darajani tavsiflovchi manifest (XML sxema) da hodisalarini e'lon qiladi."},
+          {role:"Seans / Boshqaruvchi",color:"var(--c-warn)",desc:"Jurnallash seansi bir yoki bir nechta provayderlarga obuna bo'ladi va hodisalarni iste'molchiga yo'naltiradi. Windows Hodisa Jurnali xizmati (EventLog ni joylashtiradigan svchost) doimiy jurnal seanslarini boshqaradi. logman yoki xperf bilan maxsus ETW seanslarini yaratishingiz mumkin."},
+          {role:"Iste'molchi",color:"#b48cff",desc:"Seans buferidan (real vaqt) yoki .etl/.evtx faylidan (oflayn) hodisalarni o'qiydi. Event Viewer, Get-WinEvent, wevtutil va maxsus SIEM agentlari iste'molchilardir."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:12,padding:"10px 14px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}25`}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:item.color,minWidth:110,flexShrink:0,fontWeight:700,paddingTop:1}}>{item.role}</span>
+            <span style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Log Kanallari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Kanal","Fayl Yo'li","Tarkib","Maks Hajm (standart)"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Security","System32\\winevt\\Logs\\Security.evtx","Kirish/chiqish, imtiyoz ishlatish, ob'ektga kirish, siyosat o'zgarishi, akkount boshqaruvi — audit siyosati nima yonishini nazorat qiladi","128 MB (aylanib yoziladi)"],
+            ["System","System32\\winevt\\Logs\\System.evtx","Drayver yuklash/tushirish, servis o'rnatish, apparat xatolari, yuklash hodisalari, SCM faoliyati","20 MB"],
+            ["Application","System32\\winevt\\Logs\\Application.evtx","Dastur tomonidan belgilangan hodisalar (MSSQL, IIS, .NET runtime xatolari)","20 MB"],
+            ["Setup","System32\\winevt\\Logs\\Setup.evtx","Windows Update, komponent o'rnatish, xizmat ko'rsatish","20 MB"],
+            ["Microsoft-Windows-Sysmon/Operational","System32\\winevt\\Logs\\Microsoft-Windows-Sysmon%4Operational.evtx","Sysmon hodisalari (jarayon, tarmoq, fayl, registry…) — Sysmon o'rnatishni talab qiladi","Sozlanadi"],
+            ["Microsoft-Windows-PowerShell/Operational","…\\Microsoft-Windows-PowerShell%4Operational.evtx","PS skript blok jurnallash (Event 4104), modul jurnallash (4103)","15 MB"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Muhim Xavfsizlik Event ID lari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Event ID","Kanal","Nomi","Asosiy Maydonlar / Nima Uchun Muhim"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["4624","Security","Kirish Muvaffaqiyatli","LogonType (2=interaktiv,3=tarmoq,10=uzoq interaktiv), SubjectUserName, TargetUserName, IpAddress — lateral movement aniqlash uchun asosiy"],
+            ["4625","Security","Kirish Muvaffaqiyatsiz","Bir xil maydonlar + FailureReason. 4625 ning portlashi → brute force. Bitta 4625 keyin 4624 → credential stuffing muvaffaqiyati."],
+            ["4648","Security","Aniq Hisob Ma'lumotlari bilan Kirish","SubjectUserName turli hisob ma'lumotlari bilan runas/tarmoq kirishini ishlatdi — pass-the-hash ko'rsatkichi"],
+            ["4688","Security","Jarayon Yaratildi","NewProcessName, CommandLine (audit siyosati talab qiladi), ParentProcessName, SubjectUserName — LOLBin aniqlash uchun oltin"],
+            ["4698","Security","Rejalashtirilgan Vazifa Yaratildi","TaskName, TaskContent (to'liq XML) — Task Scheduler orqali hujumchi persistenslik"],
+            ["4702","Security","Rejalashtirilgan Vazifa Yangilandi","4698 bilan bir xil — o'zgartirilgan vazifa; yangi harakatlar yoki o'zgartirilgan RunAs akkountini tekshiring"],
+            ["4720 / 4728","Security","Foydalanuvchi/Guruh Yaratildi","NewTargetUserName — yangi akkauntlar, yangi guruh a'zolari"],
+            ["4732","Security","Xavfsizlik Guruhiga A'zo Qo'shildi","MemberName, GroupName — Administratorlar, Remote Desktop Users ga qo'shimchalarni kuzatish"],
+            ["4768 / 4769","Security","Kerberos TGT/Servis Chiptasi","Kerberoasting: servis akkauntlari uchun EncryptionType=0x17 (RC4) bilan 4769 → chiptani oflayn crack qilish"],
+            ["4776","Security","NTLM Autentifikatsiya Urinishi","WorkstationName, TargetUserName — pass-the-hash kiradi, barcha NTLM autentifikatsiyalar"],
+            ["7045","System","Servis O'rnatildi","ServiceName, ImagePath, ServiceType, StartType — yangi servis = keng tarqalgan persistenslik"],
+            ["1102","Security","Audit Jurnali Tozalandi","SubjectUserName — hujumchi tozalash, juda shubhali"],
+            ["4104","PS/Operational","Skript Blok Jurnallandi","ScriptBlockText — to'liq deobfuskatsiya qilingan PowerShell kodi"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--c-warn)":j===1?"var(--c-system)":"var(--text-1)",fontFamily:j<2?"var(--font-mono)":"inherit",fontSize:j<2?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Sysmon Hodisalari</h3>
+      <P><Term>Sysmon (Tizim Monitoru)</Term> — mahalliy Windows audit siyosati ta'minlaydiganidan tashqari yuqori aniqlikdagi telemetriya qo'shadigan Sysinternals drayveri + xizmati. XML orqali sozlanadi, GPO yoki SCCM orqali joylashtiriladi.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {id:"ID 1",name:"Jarayon Yaratildi",fields:"CommandLine, Hashes (MD5/SHA256/IMPHASH), ParentImage, ParentCommandLine, User",note:"To'liq buyruq satri + hash — drayverni buzmasdan bundan yashib bo'lmaydi"},
+          {id:"ID 3",name:"Tarmoq Ulanish",fields:"ManbaIp:Port, MaqsadIp:Port, Protokol, ProcessId, Image",note:"Jarayonni tarmoq ulanishiga moslashtiradi — C2 aniqlash uchun muhim"},
+          {id:"ID 7",name:"Tasvir Yuklandi",fields:"ImageLoaded, Hashes, Signed, Signature, SignatureStatus",note:"Har bir DLL yuklash — imzosiz DLL in'ektsiya, LOLBin side-loading aniqlash"},
+          {id:"ID 8",name:"CreateRemoteThread",fields:"SourceImage, TargetImage, StartAddress, StartModule, StartFunction",note:"Jarayonlararo thread yaratish — asosiy in'ektsiya ko'rsatkichi"},
+          {id:"ID 10",name:"JarayonKirish",fields:"SourceImage, TargetImage, GrantedAccess, CallTrace",note:"lsass.exe da PROCESS_VM_READ = hisob ma'lumotlarini dumplash — eng muhim ogohlantirish"},
+          {id:"ID 11",name:"Fayl Yaratildi",fields:"TargetFilename, CreationUtcTime, ProcessId",note:"Ransomware aniqlash: qisqa vaqt oralig'ida ommaviy fayl yaratish"},
+          {id:"ID 12/13/14",name:"Registry Hodisalari",fields:"EventType (Create/Set/Delete), TargetObject, Details",note:"Persistenslik: autorun kalit o'zgarishlari"},
+          {id:"ID 17/18",name:"Quvur Hodisalari",fields:"PipeName, Image",note:"Nomlangan quvur yaratish/ulanish — SMB quvurlari orqali lateral movement, Cobalt Strike standart quvurlari"},
+          {id:"ID 22",name:"DNS So'rovi",fields:"QueryName, QueryResults, Image",note:"C2 aniqlash: DGA larga mayoq urish, g'ayritabiiy so'rov naqshlari"},
+          {id:"ID 25",name:"Jarayon Buzish",fields:"Image, Type (ImageFileDeleted/HostileCodeShellcode/Other)",note:"Jarayon bo'shatish, jarayon doppelgänging aniqlash"},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+              <span style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-warn)",fontWeight:700}}>{item.id}</span>
+              <span style={{fontFamily:"var(--font-display)",fontSize:13,fontWeight:600,color:"var(--accent)"}}>{item.name}</span>
+            </div>
+            <div style={{fontSize:11,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginBottom:4}}>{item.fields}</div>
+            <div style={{fontSize:12,color:"var(--text-1)"}}>{item.note}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Audit Siyosatini Sozlash</h3>
+      <P>Standart bo'yicha Windows juda oz narsani jurnallaydi. Xavfsizlik Event ID lari faqat mos <Term>audit siyosati</Term> quyi toifasi yoqilgan bo'lsa ishga tushadi. Yoqish kerak bo'lgan muhim quyi toifalar:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Buyruq satri bilan jarayon yaratish auditini yoqish
+auditpol /set /subcategory:"Process Creation" /success:enable
+auditpol /set /subcategory:"Process Termination" /success:enable
+
+# Batafsil kirish hodisalarini yoqish
+auditpol /set /subcategory:"Logon" /success:enable /failure:enable
+auditpol /set /subcategory:"Special Logon" /success:enable
+
+# Joriy siyosatni ko'rish
+auditpol /get /category:*
+
+# Process Creation buyruq satrini yoqish (registry usuli)
+reg add "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Audit" \
+  /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Log Buzish va Chetlab O'tish</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Log Tozalash (Event ID 1102 / 104)",color:"var(--c-attack)",body:<>Hujumchilar Security jurnalini o'chirish uchun <code>wevtutil cl Security</code> yoki <code>Clear-EventLog -LogName Security</code> ni ishlatadi. Bu o'zi Event ID 1102 (Security jurnali tozalandi) yoki 104 (System jurnali tozalandi) ni hosil qiladi — lekin faqat Security jurnali avval tozalanmagan bo'lsa. Aniqlash: hodisalarni real vaqtda SIEM ga yo'naltirish; jurnal tozalanganda SIEM nusxasi mahalliy nusxa yo'q bo'lsa ham saqlanib qoladi.</>},
+          {title:"ETW Provayderini O'chirish (Yamash)",color:"var(--c-err)",body:<>Ilg'or hujumchilar jarayon ichidagi ETW provayderini hodisalar yaratishni to'xtatish uchun yamaqlaydi. Texnika: ntdll da EtwEventWrite funksiyasini topish, RET ko'rsatmasi (<code>0xC3</code>) bilan qayta yozish. Bu jarayondan barcha ETW hodisalarini — PowerShell skript blok jurnallashni ham kiritib — o'chiradi. Aniqlash: faqat PPL jarayonlariga kirish mumkin bo'lgan kernel-rejim ETW iste'molchilari (masalan, Microsoft-Windows-Threat-Intelligence provayderi) bunga immundir.</>},
+          {title:"Sysmon Drayverini Tushirish",color:"var(--c-warn)",body:<>Sysmon kernel drayveri sifatida ishlaydi. Admin Sysmon xizmatini to'xtatishi/o'chirishi mumkin: <code>sc stop Sysmon64</code>. Aniqlash: SIEM konveyerida Sysmon hodisalarining yo'qligi (bo'shliq aniqlash); Event 4 (Sysmon xizmat holati o'zgardi) da ogohlantirish; Sysmon xizmat registry kalitining o'chirilishini kuzatish.</>},
+          {title:"Volume Shadow Copy O'chirish",color:"var(--c-warn)",body:<>Hujumchilar jurnal zaxira nusxalarini yo'q qilish uchun VSS snapshotlarini o'chiradi: <code>vssadmin delete shadows /all /quiet</code> yoki <code>wmic shadowcopy delete</code>. Bu endi ransomware xulq-atvor ko'rsatkichi — soya nusxalarini o'chiradigan har qanday jarayonda yuqori ustuvorlikdagi ogohlantirish hosil qiling.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Event Log So'rov Qilish</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# PowerShell — barcha muvaffaqiyatsiz kirish (4625) uchun Security jurnalini so'rash
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} |
+  Select TimeCreated, @{n='User';e={$_.Properties[5].Value}},
+         @{n='IP';e={$_.Properties[19].Value}} | Format-Table
+
+# So'nggi 1 soatdagi barcha jarayon yaratishlarni olish (Event 4688)
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4688;
+  StartTime=(Get-Date).AddHours(-1)} |
+  Select TimeCreated, @{n='Process';e={$_.Properties[5].Value}},
+         @{n='Cmdline';e={$_.Properties[8].Value}} | Format-List
+
+# wevtutil — Security jurnalini XML ga eksport qilish
+wevtutil epl Security C:\\out\\security.evtx
+wevtutil qe Security /q:"*[System[EventID=4624]]" /f:text /c:20
+
+# lsass kirishini Sysmon da so'rash (Event 10)
+Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" |
+  Where {$_.Id -eq 10 -and $_.Message -match "lsass"} | Format-List`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionTaskScheduler() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Task Scheduler — Automated Execution" uz="" />
+      <P>The <Term>Windows Task Scheduler</Term> service (<code>svchost -k netsvcs</code> hosting the <code>Schedule</code> service) allows tasks to be executed automatically based on time schedules or system events. Tasks are stored as XML files under <code>C:\Windows\System32\Tasks\</code> and registered in the registry. The scheduler is deeply integrated with the OS — it is both a powerful administration tool and one of the most-abused persistence mechanisms by attackers.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Task XML Structure</h3>
+      <P>Every scheduled task is defined as an XML document conforming to the Task Scheduler schema. Key sections:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>Windows Defender Scheduled Scan</Description>
+    <Author>Microsoft Corporation</Author>
+  </RegistrationInfo>
+
+  <Triggers>                          <!-- WHEN to run -->
+    <CalendarTrigger>
+      <StartBoundary>2024-01-01T03:00:00</StartBoundary>
+      <ScheduleByDay><DaysInterval>1</DaysInterval></ScheduleByDay>
+    </CalendarTrigger>
+  </Triggers>
+
+  <Principals>                        <!-- WHO runs it / what privilege -->
+    <Principal id="Author">
+      <UserId>S-1-5-18</UserId>       <!-- LocalSystem SID -->
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <Hidden>false</Hidden>            <!-- attackers set to true -->
+  </Settings>
+
+  <Actions Context="Author">         <!-- WHAT to run -->
+    <Exec>
+      <Command>%SystemRoot%\\System32\\MpCmdRun.exe</Command>
+      <Arguments>-ScanType 1</Arguments>
+    </Exec>
+  </Actions>
+</Task>`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Trigger Types</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {type:"Time (CalendarTrigger)",desc:"Run once, daily, weekly, or monthly at a specific time. Most common for maintenance tasks and attacker persistence (e.g., every 5 minutes for C2 check-in)."},
+          {type:"Event (EventTrigger)",desc:"Fire when a specific Windows event occurs. Example: trigger on Event 4625 (failed logon) to auto-lock account, or on system startup event to launch a payload."},
+          {type:"Boot (BootTrigger)",desc:"Runs after the OS boots, before any user logs in. Equivalent to a service in terms of persistence — survives logoff."},
+          {type:"Logon (LogonTrigger)",desc:"Runs when a user (specified or any) logs in. Can be scoped to a specific SID. Classic attacker persistence: run malware whenever admin logs in."},
+          {type:"Idle (IdleTrigger)",desc:"Fires when the machine has been idle for a defined period. Used by Windows Update and Defrag — attackers use it to run noisy operations when the machine appears unattended."},
+          {type:"Session (SessionStateChangeTrigger)",desc:"Remote connect/disconnect, console connect/disconnect, session lock/unlock. Useful for attack tools that activate when a user RDPs in."},
+          {type:"Registration (RegistrationTrigger)",desc:"Runs once immediately when the task is registered. Used by installers — and by attackers to immediately execute a payload upon registration."},
+          {type:"WNF (WindowsNotificationFacility)",desc:"Modern internal trigger based on WNF state changes — used by Windows components, not configurable via normal task XML."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:700,marginBottom:5}}>{item.type}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Actions</h3>
+      <P>A task can have multiple actions that run sequentially. Three action types:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
+        {[
+          {type:"Exec",color:"var(--c-system)",desc:<>Run an executable. <code>&lt;Command&gt;</code> = full path or env-variable path; <code>&lt;Arguments&gt;</code> = command line. Most common — attackers use <code>powershell.exe -enc &lt;b64&gt;</code>, <code>wscript.exe payload.vbs</code>, <code>mshta.exe http://…</code>.</>},
+          {type:"ComHandler",color:"var(--c-warn)",desc:<>Instantiate a COM object and call its <code>ITaskHandler::Start()</code> method. The COM server is a DLL loaded in-process by the Task Scheduler service. Used by Windows Update (CLSID {"{…}"} in registry) — and by attackers for fileless persistence via COM hijacking.</>},
+          {type:"SendEmail / ShowMessage",color:"#b48cff",desc:"Deprecated in Windows 8+. Send email or show a dialog. Rarely used in modern tasks."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:12,padding:"10px 14px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}25`}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:item.color,minWidth:110,flexShrink:0,fontWeight:700,paddingTop:1}}>{item.type}</span>
+            <span style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Privilege Model</h3>
+      <P>Tasks run under a specified user account determined by the <code>&lt;Principal&gt;</code> element. Key options:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Principal Configuration","Privilege Level","Notes"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["UserId=S-1-5-18 (LocalSystem)","SYSTEM","Highest possible — task runs as LocalSystem. Used by Windows components."],
+            ["UserId=S-1-5-19 (LocalService)","Limited","Low-privilege local account, no network."],
+            ["UserId=S-1-5-20 (NetworkService)","Limited + network","Low-privilege but can access network as machine account."],
+            ["UserId=DOMAIN\\User + password","That user's privileges","Stored credentials in credential vault — requires password."],
+            ["RunLevel=HighestAvailable","Admin (with UAC)","If the RunAs user is admin, runs elevated (bypasses UAC prompt silently)."],
+            ["LogonType=InteractiveTokenOrPassword","Interactive session","Task runs in the user's interactive session (can show UI)."],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — COM-Based Task Execution (How it actually works)</h3>
+      <P>The Task Scheduler is not just a cron-style timer. Internally it uses COM:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          "Task Scheduler service (Schedule) exposes ITaskService COM interface — clients register/modify tasks via COM calls",
+          "The schtasks.exe and PowerShell Register-ScheduledTask cmdlets are thin wrappers around this COM API",
+          "COM object CLSID {0F87369F-A4E5-4CFC-BD3E-73E6154572DD} = Task Scheduler 2.0 — accessible to any user",
+          "Privilege escalation risk: any user can register a task; privilege of execution depends only on the Principal element and whether the user can provide credentials",
+          "ComHandler actions load a DLL inside the Schedule service process — a DLL registered as a COM server runs as SYSTEM if the task's Principal is LocalSystem",
+        ].map((step,i)=>(
+          <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 12px",borderRadius:6,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",minWidth:20,flexShrink:0}}>{i+1}.</span>
+            <span style={{fontSize:13,color:"var(--text-1)"}}>{step}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Attacker Techniques</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Scheduled Task Persistence",color:"var(--c-attack)",body:<>Register a task that runs the payload on boot, logon, or on a short time interval: <code>schtasks /create /tn "WindowsUpdate" /tr "C:\\evil.exe" /sc onlogon /ru SYSTEM /f</code>. The <code>/f</code> flag forces creation even if a task with that name exists. Generates Event 4698. Detection: Autoruns "Scheduled Tasks" tab; Get-ScheduledTask | Where {`{$_.Actions.Execute -notmatch "Windows"}`}; Task XML files in <code>C:\Windows\System32\Tasks\</code>.</>},
+          {title:"UAC Bypass via Task Scheduler",color:"var(--c-err)",body:<>Many legitimate Windows tasks (e.g., <code>\Microsoft\Windows\DiskCleanup\SilentCleanup</code>) run as the calling user with <code>RunLevel=HighestAvailable</code> and inherit the user's token without UAC prompt. By modifying the <code>%windir%</code> environment variable to a user-writable path and triggering SilentCleanup, an attacker executes arbitrary code at high integrity without a UAC prompt. This is UACME technique #41 and many variants.</>},
+          {title:"Fileless Task (ComHandler)",color:"var(--c-warn)",body:<>Register a COM server (DLL) under a user-controlled CLSID in HKCU, then create a task with a ComHandler action pointing to that CLSID. When the task fires, Task Scheduler loads the DLL into its own process. The DLL runs in the Schedule service's process space — which runs as SYSTEM. No EXE on disk, no Exec action — bypasses many detection rules that look for command-line patterns.</>},
+          {title:"Task XML Modification (Living off the Land)",color:"var(--c-system)",body:<>Modify an existing legitimate task's XML file directly (<code>C:\Windows\System32\Tasks\Microsoft\Windows\SomeTask</code>) to add an additional action or change the executable path. Requires admin rights but avoids creating a new task (which is more suspicious). The task definition in the file must match the registry copy — inconsistencies can be a forensic indicator of tampering.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all scheduled tasks
+schtasks /query /fo LIST /v | more
+Get-ScheduledTask | Select TaskPath, TaskName, State | Format-Table
+
+# Export task XML
+schtasks /query /tn "\\Microsoft\\Windows\\Defrag\\ScheduledDefrag" /xml
+
+# Show task details including RunAs and actions
+Get-ScheduledTask -TaskName "ScheduledDefrag" | Get-ScheduledTaskInfo
+(Get-ScheduledTask -TaskName "ScheduledDefrag").Actions
+(Get-ScheduledTask -TaskName "ScheduledDefrag").Principal
+
+# Find suspicious tasks (non-Microsoft, running as SYSTEM, unusual paths)
+Get-ScheduledTask | Where {
+  $_.Principal.UserId -match "SYSTEM|S-1-5-18" -and
+  $_.Actions.Execute -notmatch "(?i)system32|program files|syswow64"
+} | Select TaskName, @{n='Exec';e={$_.Actions.Execute}}
+
+# Create / delete task
+schtasks /create /tn "Test" /tr "calc.exe" /sc daily /st 12:00 /ru SYSTEM
+schtasks /delete /tn "Test" /f
+
+# Event log audit
+Get-WinEvent -FilterHashtable @{LogName='Security';Id=4698,4699,4700,4702} |
+  Select TimeCreated, @{n='Task';e={$_.Properties[4].Value}} | Format-Table`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Task Scheduler — Avtomatik Bajarish" en="" />
+      <P><Term>Windows Task Scheduler</Term> xizmati (<code>Schedule</code> xizmatini joylashtiradigan <code>svchost -k netsvcs</code>) vaqt jadvallari yoki tizim hodisalariga asosida vazifalarni avtomatik bajarishga imkon beradi. Vazifalar <code>C:\Windows\System32\Tasks\</code> ostida XML fayllari sifatida saqlanadi va registry da ro'yxatga olinadi. Rejalashtiruvchi OS ga chuqur integratsiya qilingan — bu ham kuchli ma'murlik vositasi, ham hujumchilar tomonidan eng ko'p ishlatiladigan persistenslik mexanizmlaridan biri.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Vazifa XML Tuzilishi</h3>
+      <P>Har bir rejalashtirilgan vazifa Task Scheduler sxemasiga mos XML hujjat sifatida belgilanadi:</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>Windows Defender Scheduled Scan</Description>
+    <Author>Microsoft Corporation</Author>
+  </RegistrationInfo>
+
+  <Triggers>                          <!-- QACHON ishga tushirish -->
+    <CalendarTrigger>
+      <StartBoundary>2024-01-01T03:00:00</StartBoundary>
+      <ScheduleByDay><DaysInterval>1</DaysInterval></ScheduleByDay>
+    </CalendarTrigger>
+  </Triggers>
+
+  <Principals>                        <!-- KIM ishga tushiradi / qanday imtiyoz -->
+    <Principal id="Author">
+      <UserId>S-1-5-18</UserId>       <!-- LocalSystem SID -->
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <Hidden>false</Hidden>            <!-- hujumchilar true ga o'rnatadi -->
+  </Settings>
+
+  <Actions Context="Author">         <!-- NIMA ishga tushirish -->
+    <Exec>
+      <Command>%SystemRoot%\\System32\\MpCmdRun.exe</Command>
+      <Arguments>-ScanType 1</Arguments>
+    </Exec>
+  </Actions>
+</Task>`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Trigger Turlari</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {type:"Vaqt (CalendarTrigger)",desc:"Muayyan vaqtda bir marta, kunlik, haftalik yoki oylik ishga tushirish. Texnik xizmat vazifalari va hujumchi persistenslik uchun eng keng tarqalgan (masalan, C2 tekshirish uchun har 5 daqiqada)."},
+          {type:"Hodisa (EventTrigger)",desc:"Muayyan Windows hodisasi yuzaga kelganida ishga tushirish. Misol: Event 4625 (muvaffaqiyatsiz kirish) da trigger qo'yish, yoki tizim yuklash hodisasida yuklamani ishga tushirish."},
+          {type:"Yuklash (BootTrigger)",desc:"Hech bir foydalanuvchi kirmasdan oldin OS yuklanganidan keyin ishlaydi. Persistenslik nuqtai nazaridan xizmatga ekvivalent — chiqishdan keyin ham saqlanadi."},
+          {type:"Kirish (LogonTrigger)",desc:"Foydalanuvchi (belgilangan yoki istalgan) kirganida ishlaydi. Muayyan SID ga miqyoslash mumkin. Klassik hujumchi persistenslik: admin kirganida zararli dasturni ishga tushirish."},
+          {type:"Dam Olish (IdleTrigger)",desc:"Mashina belgilangan muddatga dam olganda ishga tushiradi. Windows Update va Defrag tomonidan ishlatiladi — hujumchilar mashina qarovsiz ko'ringanda shovqinli operatsiyalarni bajarish uchun foydalanadi."},
+          {type:"Seans (SessionStateChangeTrigger)",desc:"Uzoqdan ulanish/uzilish, konsol ulanish/uzilish, seans bloklash/ochish. Foydalanuvchi RDP orqali ulanganda faollashadigan hujum vositalari uchun foydali."},
+          {type:"Ro'yxatga olish (RegistrationTrigger)",desc:"Vazifa ro'yxatga olinganida zudlik bilan bir marta ishlaydi. O'rnatuvchilar tomonidan ishlatiladi — va hujumchilar tomonidan ro'yxatga olinishi bilan zudlik bilan yuklamani bajarish uchun."},
+          {type:"WNF (WindowsNotificationFacility)",desc:"WNF holat o'zgarishlariga asosida zamonaviy ichki trigger — Windows komponentlari tomonidan ishlatiladi, odatiy vazifa XML orqali sozlanmaydi."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:700,marginBottom:5}}>{item.type}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Harakatlar</h3>
+      <P>Vazifaning ketma-ket bajariladigan bir nechta harakati bo'lishi mumkin. Uch xil harakat turi:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
+        {[
+          {type:"Exec",color:"var(--c-system)",desc:<>Bajariladigan faylni ishga tushirish. <code>&lt;Command&gt;</code> = to'liq yo'l yoki muhit-o'zgaruvchi yo'l; <code>&lt;Arguments&gt;</code> = buyruq satri. Eng keng tarqalgan — hujumchilar <code>powershell.exe -enc &lt;b64&gt;</code>, <code>wscript.exe payload.vbs</code>, <code>mshta.exe http://…</code> ishlatadi.</>},
+          {type:"ComHandler",color:"var(--c-warn)",desc:<>COM ob'ektini yaratish va uning <code>ITaskHandler::Start()</code> usulini chaqirish. COM server Task Scheduler xizmati tomonidan jarayon ichida yuklanadigan DLL dir. Windows Update tomonidan ishlatiladi — va hujumchilar tomonidan COM hijacking orqali faylsiz persistenslik uchun.</>},
+          {type:"SendEmail / ShowMessage",color:"#b48cff",desc:"Windows 8+ da eskirgan. Elektron pochta yuborish yoki dialog ko'rsatish. Zamonaviy vazifalarda kamdan-kam qo'llaniladi."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:12,padding:"10px 14px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}25`}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:item.color,minWidth:110,flexShrink:0,fontWeight:700,paddingTop:1}}>{item.type}</span>
+            <span style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Imtiyoz Modeli</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Asosiy Konfiguratsiya","Imtiyoz Darajasi","Eslatmalar"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["UserId=S-1-5-18 (LocalSystem)","SYSTEM","Eng yuqori imkon — vazifa LocalSystem sifatida ishlaydi. Windows komponentlari tomonidan ishlatiladi."],
+            ["UserId=S-1-5-19 (LocalService)","Cheklangan","Past imtiyozli mahalliy akkount, tarmoqsiz."],
+            ["UserId=S-1-5-20 (NetworkService)","Cheklangan + tarmoq","Past imtiyozli, lekin mashina akkaunti sifatida tarmoqqa kira oladi."],
+            ["UserId=DOMAIN\\Foydalanuvchi + parol","O'sha foydalanuvchining imtiyozlari","Hisob ma'lumotlar saqlagichida saqlangan hisob ma'lumotlari — parol talab qiladi."],
+            ["RunLevel=HighestAvailable","Admin (UAC bilan)","Agar RunAs foydalanuvchisi admin bo'lsa, ko'tarma (UAC so'rovsiz jimgina) ishlaydi."],
+            ["LogonType=InteractiveTokenOrPassword","Interaktiv seans","Vazifa foydalanuvchining interaktiv seansida ishlaydi (UI ko'rsatishi mumkin)."],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Hujumchi Texnikalari</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Rejalashtirilgan Vazifa Persistenslik",color:"var(--c-attack)",body:<>Yuklash, kirish yoki qisqa vaqt oralig'ida yuklamani bajara digan vazifani ro'yxatga olish: <code>schtasks /create /tn "WindowsUpdate" /tr "C:\\evil.exe" /sc onlogon /ru SYSTEM /f</code>. <code>/f</code> bayrog'i bu nom bilan vazifa mavjud bo'lsa ham yaratishni majburlaydi. Event 4698 hosil qiladi. Aniqlash: Autoruns "Scheduled Tasks" yorlig'i; Get-ScheduledTask; <code>C:\Windows\System32\Tasks\</code> dagi vazifa XML fayllari.</>},
+          {title:"Task Scheduler orqali UAC Bypass",color:"var(--c-err)",body:<>Ko'plab qonuniy Windows vazifalari (masalan, <code>\Microsoft\Windows\DiskCleanup\SilentCleanup</code>) <code>RunLevel=HighestAvailable</code> bilan chaqiruvchi foydalanuvchi sifatida ishlaydi va UAC so'rovsiz foydalanuvchining tokenini meros qilib oladi. <code>%windir%</code> muhit o'zgaruvchisini foydalanuvchi yoziladigan yo'lga o'zgartirish va SilentCleanup ni ishga tushirish orqali hujumchi UAC so'rovsiz yuqori yaxlitlikda ixtiyoriy kodni bajaradi. Bu UACME #41 texnikasi va ko'plab variantlar.</>},
+          {title:"Faylsiz Vazifa (ComHandler)",color:"var(--c-warn)",body:<>HKCU da foydalanuvchi nazorat qiladigan CLSID ostida COM server (DLL) ro'yxatga olish, keyin shu CLSIDga ishora qiluvchi ComHandler harakat bilan vazifa yaratish. Vazifa ishga tushganida, Task Scheduler DLL ni o'z jarayoniga yuklaydi. DLL Schedule xizmatining jarayon maydonida ishlaydi — bu SYSTEM sifatida ishlaydi. Diskda EXE yo'q, Exec harakat yo'q — buyruq satri naqshlarini qidiradigan ko'plab aniqlash qoidalarini chetlab o'tadi.</>},
+          {title:"Vazifa XML O'zgartirish",color:"var(--c-system)",body:<>Mavjud qonuniy vazifaning XML faylini to'g'ridan-to'g'ri o'zgartirish (<code>C:\Windows\System32\Tasks\Microsoft\Windows\SomeTask</code>) — qo'shimcha harakat qo'shish yoki bajariladigan fayl yo'lini o'zgartirish. Admin huquqlarini talab qiladi, lekin yangi vazifa yaratishni (bu shubhaliroq) oldini oladi. Fayl va registry nusxasi o'rtasidagi nomuvofiqlik buzishning forensics ko'rsatkichi bo'lishi mumkin.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Barcha rejalashtirilgan vazifalarni ro'yxatga olish
+schtasks /query /fo LIST /v | more
+Get-ScheduledTask | Select TaskPath, TaskName, State | Format-Table
+
+# Vazifa XML ni eksport qilish
+schtasks /query /tn "\\Microsoft\\Windows\\Defrag\\ScheduledDefrag" /xml
+
+# Vazifa tafsilotlarini ko'rsatish
+Get-ScheduledTask -TaskName "ScheduledDefrag" | Get-ScheduledTaskInfo
+(Get-ScheduledTask -TaskName "ScheduledDefrag").Actions
+(Get-ScheduledTask -TaskName "ScheduledDefrag").Principal
+
+# Shubhali vazifalarni topish (g'ayri-Microsoft, SYSTEM sifatida ishlaydigan)
+Get-ScheduledTask | Where {
+  $_.Principal.UserId -match "SYSTEM|S-1-5-18" -and
+  $_.Actions.Execute -notmatch "(?i)system32|program files|syswow64"
+} | Select TaskName, @{n='Exec';e={$_.Actions.Execute}}
+
+# Vazifa yaratish / o'chirish
+schtasks /create /tn "Test" /tr "calc.exe" /sc daily /st 12:00 /ru SYSTEM
+schtasks /delete /tn "Test" /f
+
+# Hodisa jurnali audit
+Get-WinEvent -FilterHashtable @{LogName='Security';Id=4698,4699,4700,4702} |
+  Select TimeCreated, @{n='Task';e={$_.Properties[4].Value}} | Format-Table`}</code></pre>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionWindowsLogs() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows Log Files — Forensic Analysis" uz="" />
+      <P>Beyond the Event Log system, Windows produces a rich ecosystem of log files scattered across the filesystem. Knowing where they are, what format they use, and how to parse them is essential for incident response. This lesson covers the <Term>EVTX binary format</Term>, the most important log file locations, techniques for querying and correlating logs, and how to detect log tampering.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — EVTX Binary Format</h3>
+      <P>Windows Vista replaced the legacy binary .evt format with <Term>EVTX</Term> — a structured binary format that supports fast random access, integrity checking, and rich metadata. Structure:</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["EVTX Component","Size","Description"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["File Header","4 KB","Magic 'ElfFile\\0', file version, chunk count, next record ID, header size, flags, CRC32 of header"],
+            ["Chunk (128 KB each)","128 KB × N","Each chunk is self-contained: chunk header + event records. Chunk header has first/last record ID, last written timestamp, event records checksum, header checksum"],
+            ["Event Record","Variable","8-byte magic 0x2a2a, record size, event record ID, timestamp (FILETIME), then BinXML payload"],
+            ["BinXML","Variable","Binary-encoded XML — the event data. Uses a string table to deduplicate repeated strings. Parsed by EvtRender API or python-evtx"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleEn="Detecting selective record deletion" titleUz="">
+        Each event record contains a monotonically incrementing Record ID. If you parse an EVTX file and find a gap in Record IDs (e.g., 10001 → 10050), records were deleted between them. The Windows Event Log service does not create gaps during normal operation (it wraps the whole file, never surgically deletes). Gaps = tampering. Tools like python-evtx and Chainsaw detect this automatically.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Key Log File Locations</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Log File / Artifact","Path","Forensic Value"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Security.evtx","%SystemRoot%\\System32\\winevt\\Logs\\Security.evtx","All authentication, privilege, and object access events — primary forensic log"],
+            ["System.evtx","%SystemRoot%\\System32\\winevt\\Logs\\System.evtx","Service installs, driver loads, shutdown events (6005/6006/6008)"],
+            ["Microsoft-Windows-Sysmon%4Operational.evtx","%SystemRoot%\\System32\\winevt\\Logs\\","Sysmon telemetry — process tree, network, file, registry if deployed"],
+            ["Microsoft-Windows-PowerShell%4Operational.evtx","Same directory","Script block content (4104) — full deobfuscated PS code"],
+            ["Microsoft-Windows-TaskScheduler%4Operational.evtx","Same directory","Task registration/update/launch/complete — 106, 140, 141, 200, 201"],
+            ["WER\\ReportArchive","C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\","Crash reports with process dumps — memory snapshots of crashed malware"],
+            ["Prefetch files","C:\\Windows\\Prefetch\\*.pf","Evidence of execution: EXE name, run count, last run time, file paths accessed (up to 128 files per entry)"],
+            ["$MFT (NTFS Master File Table)","\\$MFT (root of each volume)","Every file ever created: timestamps (MAC + birth), size, parent dir — parse with mftparser or MFTECmd"],
+            ["$UsnJrnl:$J","\\$Extend\\$UsnJrnl","File system change journal: create/modify/rename/delete entries with filename and timestamp — survives file deletion"],
+            ["Shimcache (AppCompatCache)","HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\AppCompatCache","Evidence of execution (last modification time + execution flag) for each PE seen on system — survives reboot, not cleared by wiping event logs"],
+            ["AmCache.hve","C:\\Windows\\AppCompat\\Programs\\Amcache.hve","Program compatibility telemetry: SHA1 hash + publisher + install time for executed binaries — gold for malware identification"],
+            ["SRUM (System Resource Usage Monitor)","C:\\Windows\\System32\\sru\\SRUDB.dat","Network bytes sent/received, CPU/RAM usage per app per hour — attacker data exfiltration volumes even after log clearing"],
+            ["LNK files / JumpLists","C:\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\","Evidence of file access: timestamps, original path, volume serial number"],
+            ["Browser history / WebCache","C:\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\WebCache\\","Download history, visited URLs, cached pages"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Log Analysis Tools</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {tool:"Chainsaw (WithSecure)",use:"EVTX forensics","desc":"Sigma rule engine + EVTX parser. Fast bulk analysis of offline EVTX files against Sigma rules. Essential for triage."},
+          {tool:"Hayabusa",use:"Threat hunting","desc":"Japanese EVTX forensic tool with built-in detection rules, timeline generation, and attack technique mapping to MITRE ATT&CK."},
+          {tool:"python-evtx",use:"Low-level parsing","desc":"Python library for parsing raw EVTX binary. Detect Record ID gaps, recover deleted records from slack space."},
+          {tool:"Velociraptor",use:"DFIR platform","desc":"Open-source DFIR framework. Collect EVTX, prefetch, Shimcache, AmCache, SRUM remotely at scale."},
+          {tool:"KAPE (Triage)",use:"Evidence collection","desc":"Collect all forensic artifacts (EVTX, $MFT, Prefetch, AmCache, SRUM, registry hives) in one pass. Industry standard first-response tool."},
+          {tool:"Eric Zimmerman Tools (MFTECmd, PECmd, SrumECmd, AppCompatCacheParser)",use:"Artifact parsing","desc":"Best-in-class Windows artifact parsers. Each handles one artifact type with timeline-compatible CSV output."},
+          {tool:"Sigma",use:"Detection rules","desc":"YAML-based generic detection rule language for SIEM systems. Write once, convert to Splunk/Elastic/QRadar query automatically."},
+          {tool:"Get-WinEvent / wevtutil",use:"Live query","desc":"Built-in Windows tools. Get-WinEvent supports FilterHashtable for fast channel+ID+time queries without loading all events."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:700,marginBottom:3}}>{item.tool}</div>
+            <div style={{fontSize:10,color:"var(--c-warn)",fontFamily:"var(--font-mono)",marginBottom:5}}>{item.use}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Log Clearing and Tampering Detection</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Event ID 1102 / 104 — Audit Log Cleared",color:"var(--c-attack)",body:<>Event 1102 fires when the Security log is cleared; Event 104 when any other log is cleared. Both record the SubjectUserName and SubjectLogonId of who cleared it. Forward these events to an off-host SIEM in real time — once cleared locally, the original events are gone but the clearing event itself survives in the SIEM. Alert immediately: 1102/104 outside of a maintenance window is a high-fidelity attack indicator.</>},
+          {title:"EVTX Record ID Gaps",color:"var(--c-err)",body:<>Parse the EVTX file offline and check for gaps in the RecordId sequence within each chunk. Normal operation: RecordIds increment continuously. Tampering: gaps appear where records were individually deleted using techniques like direct file modification, EvtClear API calls on specific ranges, or driver-level log manipulation. python-evtx and Chainsaw both detect these gaps automatically.</>},
+          {title:"Log File Timestamps",color:"var(--c-warn)",body:<>The EVTX file's NTFS $STANDARD_INFORMATION timestamps (modify/access/created) and the timestamps of the last written event inside the file should be consistent. If the file modification time precedes the last event timestamp inside it — the timestamps were manipulated (timestomping). Compare with $MFT $FILENAME timestamps (harder to forge) and $UsnJrnl for last write operation.</>},
+          {title:"Sysmon / ETW Provider Gap Detection",color:"var(--c-system)",body:<>If Sysmon is deployed, the absence of Sysmon events during a time window where other activity is visible (e.g., network logs show connections but no corresponding Sysmon Event 3) indicates the Sysmon driver was stopped. Monitor the Sysmon Operational log for Event ID 4 (service state change) and alert on any gap exceeding the normal heartbeat interval.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Forensic Triage Workflow</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {step:"1. Collect",desc:"KAPE triage: collect Security.evtx, System.evtx, Sysmon.evtx, Prefetch (*.pf), AmCache.hve, SRUM DB, $MFT, $UsnJrnl, registry hives. Takes 2–5 minutes on a live system."},
+          {step:"2. Timeline",desc:"Run MFTECmd on $MFT → CSV timeline. Merge with EVTX events and $UsnJrnl using tools like Plaso or Timeline Explorer. Creates a single chronological view of all system activity."},
+          {step:"3. Triage",desc:"Run Chainsaw or Hayabusa against collected EVTX files with built-in Sigma rules. Output: ranked list of suspicious events with MITRE ATT&CK technique IDs."},
+          {step:"4. Pivot",desc:"Starting from the highest-confidence event, pivot: who created that process? What network connections did it make? What files did it create? Use the EVTX process tree (4688 parent-child) + Sysmon Event 1 for full context."},
+          {step:"5. Attribution",desc:"Hash suspicious files against VirusTotal. Check compiler timestamps and rich header. Query AmCache for first-seen timestamp. Compare with threat intelligence feeds."},
+          {step:"6. Scope",desc:"Determine lateral movement scope: 4624 logon type 3 from the compromised host to other hosts in Security logs. Use SRUM to identify data exfiltration by process. Check scheduled tasks (4698) and services (7045) created during the attack window for persistence mechanisms."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:14,padding:"10px 14px",borderRadius:8,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",minWidth:80,flexShrink:0,fontWeight:700}}>{item.step}</span>
+            <span style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Practical Commands</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Chainsaw — bulk Sigma analysis of EVTX files
+chainsaw hunt C:\\Evidence\\Logs\\ -s C:\\sigma\\rules\\ --mapping C:\\chainsaw\\mappings\\sigma-event-logs-all.yml
+
+# Hayabusa — timeline with ATT&CK mapping
+hayabusa.exe csv-timeline -d C:\\Evidence\\Logs\\ -o timeline.csv -p verbose
+
+# KAPE — triage collection (Admin required)
+kape.exe --tsource C: --tdest C:\\Triage --target !SANS_Triage --module !EZParser
+
+# MFTECmd — parse $MFT to timeline CSV
+MFTECmd.exe -f C:\\Evidence\\\\$MFT --csv C:\\out\\ --csvf mft.csv
+
+# AmCache parser
+AppCompatCacheParser.exe -f C:\\Evidence\\SYSTEM --csv C:\\out\\
+
+# SRUM parser — extract per-app network bytes
+SrumECmd.exe -f C:\\Evidence\\SRUDB.dat --csv C:\\out\\
+
+# python-evtx — detect Record ID gaps
+python3 -c "
+import Evtx.Evtx as evtx, Evtx.Views as e_views
+with evtx.Evtx('Security.evtx') as log:
+    prev = None
+    for record in log.records():
+        rid = record.record_num()
+        if prev and rid != prev + 1:
+            print(f'GAP: {prev} -> {rid}')
+        prev = rid
+"`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows Log Fayllari — Forensik Tahlil" en="" />
+      <P>Event Log tizimidan tashqari, Windows fayl tizimida tarqalgan boylik jurnal fayllar ekotizimini ishlab chiqaradi. Ularning joylashuvini, formatini va qanday tahlil qilishni bilish hodisalarga javob berishda muhim. Bu darsda <Term>EVTX ikkilik formati</Term>, eng muhim jurnal fayl joylashuvlari, jurnal so'rov qilish va moslashtirish texnikalari va jurnal buzishni aniqlash usullari ko'rib chiqiladi.</P>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — EVTX Ikkilik Formati</h3>
+      <P>Windows Vista eski ikkilik .evt formatini <Term>EVTX</Term> bilan almashtirdi — tez tasodifiy kirish, yaxlitlik tekshiruvi va boy metama'lumotlarni qo'llab-quvvatlaydigan tuzilgan ikkilik format.</P>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["EVTX Komponenti","Hajmi","Tavsif"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Fayl Sarlavhasi","4 KB","Sehrli so'z 'ElfFile\\0', fayl versiyasi, chunk soni, keyingi yozuv ID, sarlavha hajmi, bayroqlar, sarlavha CRC32"],
+            ["Chunk (128 KB har biri)","128 KB × N","Har bir chunk o'zini-o'zi ta'minlaydi: chunk sarlavhasi + hodisa yozuvlari. Chunk sarlavhasida birinchi/oxirgi yozuv ID, oxirgi yozilgan vaqt belgisi, hodisa yozuvlari nazorat summasi"],
+            ["Hodisa Yozuvi","O'zgaruvchan","8-baytli sehrli so'z 0x2a2a, yozuv hajmi, hodisa yozuv ID, vaqt belgisi (FILETIME), keyin BinXML payload"],
+            ["BinXML","O'zgaruvchan","Ikkilik kodlangan XML — hodisa ma'lumotlari. Takroriy satrlarni bekor qilish uchun satr jadvalidan foydalanadi. EvtRender API yoki python-evtx tomonidan tahlil qilinadi"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-system)" icon="info" titleUz="Tanlab o'chirish aniqlash" titleEn="">
+        Har bir hodisa yozuvida monoton oshib boruvchi Yozuv ID mavjud. EVTX faylini tahlil qilsangiz va Yozuv ID larida bo'shliq topsangiz (masalan, 10001 → 10050), ular o'rtasidagi yozuvlar o'chirilgan. Windows Hodisa Jurnali xizmati normal ishlashda bo'shliqlar yaratmaydi (butun faylni aylanib yozadi, hech qachon jarrohlik bilan o'chirmaydi). Bo'shliqlar = buzish. python-evtx va Chainsaw buni avtomatik aniqlaydi.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Asosiy Jurnal Fayl Joylashuvlari</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["Jurnal Fayli / Artefakt","Yo'l","Forensik Qiymati"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Security.evtx","%SystemRoot%\\System32\\winevt\\Logs\\Security.evtx","Barcha autentifikatsiya, imtiyoz va ob'ektga kirish hodisalari — asosiy forensik jurnal"],
+            ["System.evtx","%SystemRoot%\\System32\\winevt\\Logs\\System.evtx","Servis o'rnatish, drayver yuklash, o'chirish hodisalari (6005/6006/6008)"],
+            ["Microsoft-Windows-Sysmon%4Operational.evtx","%SystemRoot%\\System32\\winevt\\Logs\\","Sysmon telemetriyasi — jarayon daraxti, tarmoq, fayl, registry (agar joylashtirilgan bo'lsa)"],
+            ["Microsoft-Windows-PowerShell%4Operational.evtx","Bir xil katalog","Skript blok tarkibi (4104) — to'liq deobfuskatsiya qilingan PS kodi"],
+            ["Microsoft-Windows-TaskScheduler%4Operational.evtx","Bir xil katalog","Vazifa ro'yxatga olish/yangilash/ishga tushirish/bajarish — 106, 140, 141, 200, 201"],
+            ["WER\\ReportArchive","C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\","Jarayon dumplari bilan crash hisobotlari — ishlamay qolgan zararli dasturning xotira snapshotlari"],
+            ["Prefetch fayllari","C:\\Windows\\Prefetch\\*.pf","Bajarilish dalili: EXE nomi, ishga tushirish soni, oxirgi ishga tushirish vaqti, kirish uchun fayl yo'llari (har bir yozuv uchun 128 tagacha)"],
+            ["$MFT (NTFS Asosiy Fayl Jadvali)","\\$MFT (har bir tomizdagi ildiz)","Hech qachon yaratilgan har bir fayl: vaqt belgilari (MAC + tug'ilish), hajm, ota katalog — mftparser yoki MFTECmd bilan tahlil qilish"],
+            ["$UsnJrnl:$J","\\$Extend\\$UsnJrnl","Fayl tizimi o'zgartirish jurnali: fayl nomi va vaqt belgisi bilan yaratish/o'zgartirish/nomini o'zgartirish/o'chirish yozuvlari — fayl o'chirilgandan keyin ham saqlanadi"],
+            ["Shimcache (AppCompatCache)","HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\AppCompatCache","Tizimda ko'rilgan har bir PE uchun bajarilish dalili (oxirgi o'zgartirish vaqti + bajarilish bayrog'i) — qayta yuklashdan omon qoladi, hodisa jurnallarini o'chirish bilan tozalanmaydi"],
+            ["AmCache.hve","C:\\Windows\\AppCompat\\Programs\\Amcache.hve","Dastur muvofiqligi telemetriyasi: bajarilgan ikkilik fayllar uchun SHA1 hash + nashriyotchi + o'rnatish vaqti — zararli dasturni identifikatsiya qilish uchun oltin"],
+            ["SRUM (Tizim Resurs Foydalanish Monitoru)","C:\\Windows\\System32\\sru\\SRUDB.dat","Dastur boshiga soatlik tarmoq baytlari yuborildi/olindi, CPU/RAM foydalanish — log tozalangandan keyin ham hujumchi ma'lumot eksfiltratsiya hajmlari"],
+            ["LNK fayllari / JumpListlar","C:\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\","Fayl kirishining dalili: vaqt belgilari, asl yo'l, hajm seriya raqami"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:13}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Log Tahlil Vositalari</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {tool:"Chainsaw (WithSecure)",use:"EVTX forensics","desc":"Sigma qoidalar dvigatel + EVTX tahlilchi. Sigma qoidalariga qarshi oflayn EVTX fayllarini tez to'plamli tahlil. Triage uchun muhim."},
+          {tool:"Hayabusa",use:"Tahdidlarni ovlash","desc":"O'rnatilgan aniqlash qoidalari, vaqt jadvali yaratish va MITRE ATT&CK ga hujum texnikasini moslash bilan yapon EVTX forensik vositasi."},
+          {tool:"python-evtx",use:"Past darajali tahlil","desc":"Xom EVTX ikkiligini tahlil qilish uchun Python kutubxonasi. Yozuv ID bo'shliqlarini aniqlash, bo'sh joydan o'chirilgan yozuvlarni tiklash."},
+          {tool:"Velociraptor",use:"DFIR platformasi","desc":"Ochiq manbali DFIR ramkasi. EVTX, prefetch, Shimcache, AmCache, SRUM ni miqyosda masofadan to'plash."},
+          {tool:"KAPE (Triage)",use:"Dalil to'plash","desc":"Barcha forensik artefaktlarni (EVTX, $MFT, Prefetch, AmCache, SRUM, registry hive lar) bir yo'lda to'plash. Sanoat standarti birinchi javob vositasi."},
+          {tool:"Eric Zimmerman vositalari (MFTECmd, PECmd, SrumECmd, AppCompatCacheParser)",use:"Artefakt tahlil","desc":"Eng yaxshi Windows artefakt tahlilchilari. Har biri vaqt jadvali bilan mos CSV chiqishi bilan bitta artefakt turini boshqaradi."},
+          {tool:"Sigma",use:"Aniqlash qoidalari","desc":"SIEM tizimlari uchun YAML asosidagi umumiy aniqlash qoidalari tili. Bir marta yozing, Splunk/Elastic/QRadar so'roviga avtomatik o'tkazing."},
+          {tool:"Get-WinEvent / wevtutil",use:"Jonli so'rov","desc":"O'rnatilgan Windows vositalari. Get-WinEvent barcha hodisalarni yuklashsiz tez kanal+ID+vaqt so'rovlari uchun FilterHashtable ni qo'llab-quvvatlaydi."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:"rgba(255,255,255,0.03)",border:"1px solid var(--border)"}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:700,marginBottom:3}}>{item.tool}</div>
+            <div style={{fontSize:10,color:"var(--c-warn)",fontFamily:"var(--font-mono)",marginBottom:5}}>{item.use}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Log Tozalash va Buzishni Aniqlash</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Event ID 1102 / 104 — Audit Jurnali Tozalandi",color:"var(--c-attack)",body:<>Event 1102 Security jurnali tozalanganida; Event 104 boshqa jurnal tozalanganida ishga tushadi. Ikkalasi ham kim tozalaganini SubjectUserName va SubjectLogonId qilib qayd etadi. Bu hodisalarni real vaqtda tashqi SIEM ga yo'naltiring — mahalliy ravishda tozalangandan keyin asl hodisalar yo'qoladi, lekin tozalash hodisasining o'zi SIEM da saqlanib qoladi.</>},
+          {title:"EVTX Yozuv ID Bo'shliqlari",color:"var(--c-err)",body:<>EVTX faylini oflayn tahlil qiling va har bir chunk ichidagi RecordId ketma-ketligida bo'shliqlarni tekshiring. Normal ishlash: RecordId lar uzluksiz oshib boradi. Buzish: yozuvlar to'g'ridan-to'g'ri fayl o'zgartirish, muayyan diapazondagi EvtClear API chaqiruvlari yoki drayver darajasidagi jurnal manipulyatsiyasi yordamida alohida o'chirilganda bo'shliqlar paydo bo'ladi.</>},
+          {title:"Jurnal Fayl Vaqt Belgilari",color:"var(--c-warn)",body:<>EVTX faylining NTFS $STANDARD_INFORMATION vaqt belgilari va fayl ichidagi oxirgi yozilgan hodisaning vaqt belgilari mos bo'lishi kerak. Agar fayl o'zgartirish vaqti fayl ichidagi oxirgi hodisa vaqt belgisidan oldin bo'lsa — vaqt belgilari manipulyatsiya qilingan (timestomping). $MFT $FILENAME vaqt belgilari (soxtalashtirish qiyinroq) va oxirgi yozuv operatsiyasi uchun $UsnJrnl bilan solishtiring.</>},
+          {title:"Sysmon / ETW Provayder Bo'shliq Aniqlash",color:"var(--c-system)",body:<>Agar Sysmon joylashtirilgan bo'lsa, boshqa faoliyat ko'rinadigan vaqt oralig'ida Sysmon hodisalarining yo'qligi (masalan, tarmoq jurnallari ulanishlarni ko'rsatadi, lekin mos Sysmon Event 3 yo'q) Sysmon drayveri to'xtatilganligini ko'rsatadi. Sysmon Operational jurnalini Event ID 4 (xizmat holati o'zgardi) uchun kuzatib turing va odatiy yurak urish oralig'idan oshib ketgan bo'shliqda ogohlantirish bering.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Forensik Triage Ish Oqimi</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+        {[
+          {step:"1. To'plash",desc:"KAPE triage: Security.evtx, System.evtx, Sysmon.evtx, Prefetch (*.pf), AmCache.hve, SRUM DB, $MFT, $UsnJrnl, registry hive larni to'plash. Jonli tizimda 2–5 daqiqa."},
+          {step:"2. Vaqt Jadvali",desc:"$MFT da MFTECmd ishga tushirish → CSV vaqt jadvali. Plaso yoki Timeline Explorer yordamida EVTX hodisalari va $UsnJrnl bilan birlashtirish. Barcha tizim faoliyatining yagona xronologik ko'rinishi yaratiladi."},
+          {step:"3. Triage",desc:"To'plangan EVTX fayllariga o'rnatilgan Sigma qoidalari bilan Chainsaw yoki Hayabusa ishga tushirish. Chiqish: MITRE ATT&CK texnika ID lari bilan shubhali hodisalarning reytingli ro'yxati."},
+          {step:"4. Pivot",desc:"Eng ishonchli hodisadan boshlab, pivotlash: bu jarayonni kim yaratdi? U qanday tarmoq ulanishlarini amalga oshirdi? U qanday fayllar yaratdi? To'liq kontekst uchun EVTX jarayon daraxti (4688 ota-bola) + Sysmon Event 1 dan foydalaning."},
+          {step:"5. Atribut",desc:"Shubhali fayllarni VirusTotal ga qarshi hashlash. Kompilyator vaqt belgilari va rich sarlavhasini tekshirish. Birinchi ko'rish vaqt belgisi uchun AmCache ni so'rash. Tahdid razvedkasi lentlari bilan solishtirish."},
+          {step:"6. Qamrov",desc:"Lateral movement qamrovini aniqlash: buzilgan hostdan boshqa hostlarga kirish turi 3 bilan 4624. Ma'lumot eksfiltratsiya hajmlarini jarayon bo'yicha aniqlash uchun SRUM ni ishlatish. Hujum oynasida yaratilgan rejalashtirilgan vazifalarni (4698) va xizmatlarni (7045) persistenslik mexanizmlari uchun tekshirish."},
+        ].map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:14,padding:"10px 14px",borderRadius:8,background:"rgba(255,255,255,0.02)",border:"1px solid var(--border)"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)",minWidth:100,flexShrink:0,fontWeight:700}}>{item.step}</span>
+            <span style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Amaliy Buyruqlar</h3>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Chainsaw — EVTX fayllarini to'plamli Sigma tahlil
+chainsaw hunt C:\\Dalil\\Jurnal\\ -s C:\\sigma\\qoidalar\\ --mapping C:\\chainsaw\\mappings\\sigma-event-logs-all.yml
+
+# Hayabusa — ATT&CK moslash bilan vaqt jadvali
+hayabusa.exe csv-timeline -d C:\\Dalil\\Jurnal\\ -o jadval.csv -p verbose
+
+# KAPE — triage to'plash (Admin kerak)
+kape.exe --tsource C: --tdest C:\\Triage --target !SANS_Triage --module !EZParser
+
+# MFTECmd — $MFT ni vaqt jadvali CSV ga tahlil qilish
+MFTECmd.exe -f C:\\Dalil\\\\$MFT --csv C:\\chiqish\\ --csvf mft.csv
+
+# AmCache tahlilchi
+AppCompatCacheParser.exe -f C:\\Dalil\\SYSTEM --csv C:\\chiqish\\
+
+# SRUM tahlilchi — dastur bo'yicha tarmoq baytlarini olish
+SrumECmd.exe -f C:\\Dalil\\SRUDB.dat --csv C:\\chiqish\\
+
+# python-evtx — Yozuv ID bo'shliqlarini aniqlash
+python3 -c "
+import Evtx.Evtx as evtx
+with evtx.Evtx('Security.evtx') as log:
+    prev = None
+    for record in log.records():
+        rid = record.record_num()
+        if prev and rid != prev + 1:
+            print(f'BO_SHLIQ: {prev} -> {rid}')
+        prev = rid
+"`}</code></pre>
     </section>
   );
 }
