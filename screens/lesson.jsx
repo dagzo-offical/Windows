@@ -3468,6 +3468,33 @@ Get-Item -Stream * C:\\path\\innocent.txt
       <P><strong>Share Permissions:</strong> Applied by the Server service (srv2.sys) at the SMB level. Coarser: Full Control, Change, or Read. Only apply to network access — irrelevant for local console access.</P>
       <P><strong>Effective rule:</strong> <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>Effective = NTFS ∩ Share</code> — the more restrictive wins. Best practice: set Share Permissions to "Everyone — Full Control" and control access entirely through NTFS ACLs.</P>
 
+      <h3 className="mono" style={{color:"var(--c-warn)",marginTop:28}}>// PERMISSION TURLARI</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["#","Permission","Description","Files","Folders"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["1","Full Control","Everything — ownership, modify, delete, grant permissions","✔ Read, Write, Execute, Delete, Change perms, Take ownership","✔ All above + delete subfolders & files"],
+            ["2","Modify","Read, write, delete (cannot change ownership)","✔ Read, write, delete","✔ Read, write, delete contents"],
+            ["3","Read & Execute","Read and run (.exe launch)","✔ Read + run executables","✔ List + traverse folders"],
+            ["4","List Folder Contents","View folder contents only (folders only)","—","✔ List files/subfolders only"],
+            ["5","Read","Read only","✔ Open & view","✔ List contents"],
+            ["6","Write","Write only","✔ Create/modify","✔ Create files & subfolders"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",
+              color: j===0?"var(--c-warn)": j===1?"var(--accent)":"var(--text-1)",
+              fontFamily: j<2?"var(--font-mono)":"inherit",
+              fontSize: j<2?12:13
+            }}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-warn)" icon="warning" titleEn="Deny overrides Allow" titleUz="">
+        If a user belongs to two groups — one with <strong>Allow</strong> and one with <strong>Deny</strong> — <strong>Deny always wins</strong>. Use Deny sparingly; prefer removing Allow instead. Also: <em>Full Control</em> includes the right to change permissions and take ownership — never give it to untrusted users.
+      </Callout>
+
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Journaling: $LogFile and $UsnJrnl</h3>
       <P><strong>$LogFile</strong> is NTFS's <Term>write-ahead journal</Term>. Before any metadata change, NTFS writes the intended change to $LogFile first. If the system crashes mid-operation, on next boot NTFS replays or rolls back incomplete transactions. Typically 64MB, circular, on every NTFS volume.</P>
       <P><strong>$UsnJrnl</strong> (Change Journal) records every change to every file/directory: creation, deletion, rename, modification, security change. From a forensics perspective, $UsnJrnl is a goldmine — it shows the history of all file changes, even after files are deleted, until the circular journal wraps around.</P>
