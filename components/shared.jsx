@@ -99,7 +99,7 @@ function ParticleBg({ count = 30, mode = "grid" }) {
 // ─────────────────────────────────────────────────────────────
 // Top Nav
 // ─────────────────────────────────────────────────────────────
-function TopNav({ route, setRoute, user, crumb, onOpenProfile }) {
+function TopNav({ route, setRoute, user, crumb, onOpenProfile, onOpenAIChat, aiChatOpen }) {
   const lang = useLang();
   const nav = (r) => (e) => { e?.preventDefault(); setRoute(r); };
   return (
@@ -133,6 +133,18 @@ function TopNav({ route, setRoute, user, crumb, onOpenProfile }) {
         <LangToggle />
         <button className="btn-ghost btn" style={{ padding: "8px 10px" }} aria-label="Search">
           <Icon name="search" size={15} />
+        </button>
+        <button
+          className="btn-ghost btn"
+          onClick={onOpenAIChat}
+          aria-label="AI Tutor"
+          style={{
+            padding: "8px 10px",
+            color: aiChatOpen ? "var(--accent)" : undefined,
+            background: aiChatOpen ? "var(--accent-soft)" : undefined,
+            borderColor: aiChatOpen ? "var(--accent-border)" : undefined,
+          }}>
+          <Icon name="message" size={15} />
         </button>
         <div onClick={onOpenProfile} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 12px 6px 6px", borderRadius: 999, background: "var(--surface)", border: "1px solid var(--border)", cursor: onOpenProfile ? "pointer" : "default", transition: "border-color 150ms" }}
           onMouseEnter={e => { if (onOpenProfile) e.currentTarget.style.borderColor = "var(--accent-border)"; }}

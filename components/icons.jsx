@@ -102,6 +102,8 @@ const Icon = ({ name, size = 18, stroke = 1.6, ...props }) => {
       return <svg {...common}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg>;
     case "spark":
       return <svg {...common}><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M5 19l4-4M15 9l4-4"/></svg>;
+    case "message":
+      return <svg {...common}><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>;
     default:
       return <svg {...common}><circle cx="12" cy="12" r="9"/></svg>;
   }

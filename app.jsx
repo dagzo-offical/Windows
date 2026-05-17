@@ -101,6 +101,7 @@ function App() {
   }, []);
 
   const [profileOpen, setProfileOpen] = useAS(false);
+  const [aiChatOpen, setAiChatOpen] = useAS(false);
 
   useAE(() => {
     document.documentElement.dataset.theme = theme;
@@ -118,12 +119,13 @@ function App() {
     completedLessons: progress.completedLessons || [],
   };
 
-  const screenProps = { setRoute, user, markLessonComplete, onOpenProfile: () => setProfileOpen(true) };
+  const screenProps = { setRoute, user, markLessonComplete, onOpenProfile: () => setProfileOpen(true), onOpenAIChat: () => setAiChatOpen(v => !v), aiChatOpen };
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>
       <ParticleBg mode="particles" count={80} />
       <RouteRender route={route} screenProps={screenProps} />
+      <AIChat open={aiChatOpen} onClose={() => setAiChatOpen(false)} user={user} route={route} />
       {profileOpen && (
         <ProfileModal
           user={user}

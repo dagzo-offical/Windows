@@ -2,7 +2,7 @@
 
 const { useState: useCS, useEffect: useCE } = React;
 
-function CooldownScreen({ setRoute, user, onOpenProfile }) {
+function CooldownScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOpen }) {
   const lang = useLang();
   const COOLDOWN_KEY = "wa_cooldown_end";
   const DURATION = 30 * 60;
@@ -43,7 +43,7 @@ function CooldownScreen({ setRoute, user, onOpenProfile }) {
 
   return (
     <div>
-      <TopNav route={{ name: "cooldown" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile}
+      <TopNav route={{ name: "cooldown" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen}
         crumb={[
           { label: lang === "en" ? "Section 01" : "01-bo'lim", onClick: () => setRoute({ name: "section", section: 1 }) },
           { label: lang === "en" ? "Quiz cooldown" : "Test bloklash" },

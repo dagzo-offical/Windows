@@ -27,7 +27,7 @@ const EXAM_QUESTIONS = [
   { uz: "Notepad'ni ishga tushirish bitta sichqoncha bosishidan login qilingan user uchun nima qiladi? Barcha qatlamlardan o'tish.", en: "What happens from a single click of Notepad? Trace through every layer.", topic: "Full trace", difficulty: "hard" },
 ];
 
-function FinalExamScreen({ setRoute, user, markLessonComplete, onOpenProfile }) {
+function FinalExamScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpenAIChat, aiChatOpen }) {
   const lang = useLang();
   const [phase, setPhase] = useFS("brief");
   const [answers, setAnswers] = useFS(Array(20).fill(""));
@@ -121,7 +121,7 @@ JSON only: {"score":<0-100>,"passed":<score>=70>,"key_points":["point"],"missing
 
   return (
     <div>
-      {phase !== "taking" && <TopNav route={{ name: "exam" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile}
+      {phase !== "taking" && <TopNav route={{ name: "exam" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen}
         crumb={[
           { label: lang === "en" ? "Section 01" : "01-bo'lim", onClick: () => setRoute({ name: "section", section: 1 }) },
           { label: lang === "en" ? "Final exam" : "Final imtihon" },
