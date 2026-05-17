@@ -12,81 +12,26 @@ const LESSON = {
 };
 
 const LESSONS = {
-  // ── PHASE 1: Fundamentals ──────────────────────────────────────────────
-  1:  { num:"L01", section:"01", uz:"Windows nima?",              en:"What is Windows?",          subUz:"Operatsion tizim asoslari, Windows ekotizimi va GUI kirish",          subEn:"Operating system basics, Windows ecosystem and GUI introduction" },
-  2:  { num:"L02", section:"01", uz:"Windows versiyalari",         en:"Windows Versions",          subUz:"XP dan Win 11 gacha: versiyalar, qo'llab-quvvatlash va farqlar",       subEn:"From XP to Win 11: versions, support lifecycle and key differences" },
-  3:  { num:"L03", section:"01", uz:"Windows o'rnatish",           en:"Windows Installation",      subUz:"ISO tayyorlash, bosqichma-bosqich o'rnatish va drayver sozlash",        subEn:"Prepare ISO, step-by-step installation and driver setup" },
-  4:  { num:"L04", section:"01", uz:"GPT vs MBR",                  en:"GPT vs MBR",                subUz:"Disk bo'limlanish jadvallari, UEFI talablari va Disk Management",       subEn:"Partition tables, UEFI requirements and Disk Management GUI" },
-  5:  { num:"L05", section:"01", uz:"Ish stoli muhiti",            en:"Desktop Environment",       subUz:"Taskbar, Start Menu, Action Center, virtual ish stollari va shortcutlar", subEn:"Taskbar, Start Menu, Action Center, virtual desktops and shortcuts" },
-  6:  { num:"L06", section:"01", uz:"File Explorer",               en:"File Explorer",             subUz:"Navigatsiya, fayl operatsiyalari, yashirin fayllar va qidiruv",          subEn:"Navigation, file operations, hidden files and search" },
-  7:  { num:"L07", section:"01", uz:"Vazifalar Menejeri",          en:"Task Manager",              subUz:"Jarayonlar, ishlash ko'rsatgichlari, ishga tushish va muzlagan tasklar", subEn:"Processes, performance graphs, startup programs and frozen tasks" },
-  8:  { num:"L08", section:"01", uz:"Qurilma Menejeri",            en:"Device Manager",            subUz:"Qurilma holatlari, drayver yangilash/qaytarish va muammolarni hal qilish",subEn:"Device status, update/rollback drivers and hardware troubleshooting" },
-  9:  { num:"L09", section:"01", uz:"Foydalanuvchi hisoblari",     en:"User Accounts",             subUz:"Admin vs Standart, Microsoft va Mahalliy hisob, parol va PIN sozlash",   subEn:"Admin vs Standard, Microsoft vs Local account, password and PIN" },
-  10: { num:"L10", section:"01", uz:"Fayllar va Ruxsatlar",        en:"Files & Permissions",       subUz:"NTFS ruxsatlari, papka ulashish, meros ruxsatlari va keng tarqalgan xatolar", subEn:"NTFS permissions, folder sharing, inherited permissions and common errors" },
-  11: { num:"L11", section:"01", uz:"Windows Update",              en:"Windows Update",            subUz:"Yangilanish turlari, kechiktirish, drayver yangilanishlari va muammo tuzatish", subEn:"Update types, pause/defer, driver updates and troubleshooting failures" },
-  12: { num:"L12", section:"01", uz:"Windows Defender asoslari",   en:"Windows Defender Basics",   subUz:"Windows Security markazi, real-time himoya, skanlar va xatolarni hal qilish", subEn:"Windows Security Center, real-time protection, scans and exclusions" },
-  13: { num:"L13", section:"01", uz:"Tarmoq asoslari",             en:"Networking Basics",         subUz:"IP, subnet, gateway, DNS, DHCP vs statik IP, ipconfig va ping",         subEn:"IP, subnet, gateway, DNS, DHCP vs static, ipconfig and ping" },
-  14: { num:"L14", section:"01", uz:"Fayl va Printer almashish",   en:"File & Printer Sharing",    subUz:"Tarmoq almashish, papka ulashish, network drive va printer sozlash",       subEn:"Network sharing, folder share, map network drive and printer setup" },
-  15: { num:"L15", section:"01", uz:"Zaxiralash va tiklash",       en:"Backup & Restore",          subUz:"Tizim tiklash nuqtalari, File History, Windows Backup va tiklash imkoniyatlari", subEn:"System restore points, File History, Windows Backup and recovery options" },
-  // ── PHASE 2: Administration ───────────────────────────────────────────
-  16: { num:"L16", section:"02", uz:"Servislar",                   en:"Services",                  subUz:"SCM, servis turlari, xizmat akkauntlari, svchost va persistenslik",     subEn:"SCM, service types, service accounts, svchost and persistence" },
-  17: { num:"L17", section:"02", uz:"Event Viewer",                en:"Event Viewer",              subUz:"Windows event log arxitekturasi, Event ID lar, ETW, Sysmon va forensics", subEn:"Windows event log architecture, key Event IDs, ETW, Sysmon and forensics" },
-  18: { num:"L18", section:"02", uz:"Task Scheduler",              en:"Task Scheduler",            subUz:"Vazifa arxitekturasi, triggerlar, harakatlar va persistenslik texnikalari", subEn:"Task architecture, triggers, actions and scheduler-based persistence" },
-  19: { num:"L19", section:"02", uz:"Registry",                    en:"Windows Registry",          subUz:"Ierarxik ma'lumotlar bazasi, hive fayllar va persistenslik joylari",     subEn:"Hierarchical database, hive files and persistence locations" },
-  20: { num:"L20", section:"02", uz:"System Configuration",        en:"System Configuration",      subUz:"msconfig.exe — ishga tushish turlari, xavfsiz yuklash va vositalar",     subEn:"msconfig.exe — startup types, safe boot modes and tools shortcuts" },
-  21: { num:"L21", section:"02", uz:"Kengaytirilgan Sozlamalar",   en:"Advanced System Settings",  subUz:"sysdm.cpl — DEP, virtual xotira, tizim tiklash, DSE va RDP",            subEn:"sysdm.cpl — DEP, virtual memory, system restore, driver signing and RDP" },
-  22: { num:"L22", section:"02", uz:"Kompyuter Boshqaruvi",        en:"Computer Management",       subUz:"compmgmt.msc — ulashimlar, foydalanuvchilar, disk va WMI persistenslik",  subEn:"compmgmt.msc — shares, users, disk management and WMI persistence" },
-  23: { num:"L23", section:"02", uz:"Resource Monitor",            en:"Resource Monitor",          subUz:"resmon.exe 4 tab: CPU/xotira/disk/tarmoq va cmd buyruqlari",             subEn:"resmon.exe 4 tabs: CPU/memory/disk/network and cmd commands" },
-  24: { num:"L24", section:"02", uz:"Settings va Control Panel",   en:"Settings & Control Panel",  subUz:"Settings URI sxemasi, Control Panel appletlari va xavfsizlik sozlamalari", subEn:"Settings URI scheme, Control Panel applets and security settings" },
-  25: { num:"L25", section:"02", uz:"PowerShell asoslari",         en:"PowerShell Basics",         subUz:"Cmdletlar, pipeline, skriptlar, bajarish siyosati va tizim boshqaruvi",   subEn:"Cmdlets, pipeline, scripts, execution policy and system management" },
-  26: { num:"L26", section:"02", uz:"Remote Desktop",              en:"Remote Desktop",            subUz:"RDP yoqish, ulanish, NLA, xavfsizlik va muammolarni hal qilish",          subEn:"Enable RDP, connect, NLA, security considerations and troubleshooting" },
-  27: { num:"L27", section:"02", uz:"Windows Firewall",            en:"Windows Firewall",          subUz:"Firewall profillari, qoidalar yaratish, wf.msc va sinash",                subEn:"Firewall profiles, create rules, wf.msc and testing connectivity" },
-  28: { num:"L28", section:"02", uz:"BitLocker",                   en:"BitLocker",                 subUz:"Disk shifrlash, TPM talablari, tiklash kaliti va BitLocker To Go",        subEn:"Disk encryption, TPM requirements, recovery key and BitLocker To Go" },
-  // ── PHASE 3: Windows Server ───────────────────────────────────────────
-  29: { num:"L29", section:"03", uz:"Windows Server kirish",       en:"Windows Server Intro",      subUz:"Server 2019/2022/2025 versiyalari, rollar va o'rnatish",                 subEn:"Server 2019/2022/2025 editions, roles and installation" },
-  30: { num:"L30", section:"03", uz:"Server Manager",              en:"Server Manager",            subUz:"Server Manager interfeysi, rollar qo'shish va boshqarish",              subEn:"Server Manager interface, adding roles and remote management" },
-  31: { num:"L31", section:"03", uz:"Active Directory",            en:"Active Directory",          subUz:"AD DS, domain tuzilishi, kompyuter va foydalanuvchi ob'ektlari",         subEn:"AD DS, domain structure, computer and user objects" },
-  32: { num:"L32", section:"03", uz:"DNS Server",                  en:"DNS Server",                subUz:"DNS zonalari, A/PTR/MX yozuvlari va DNS muammolarni hal qilish",         subEn:"DNS zones, A/PTR/MX records and DNS troubleshooting" },
-  33: { num:"L33", section:"03", uz:"DHCP Server",                 en:"DHCP Server",               subUz:"DHCP doiralari, zaxira va DHCP failover sozlash",                        subEn:"DHCP scopes, reservations and DHCP failover configuration" },
-  34: { num:"L34", section:"03", uz:"OU tuzilmasi",                en:"OU Structure",              subUz:"Organizational Units, delegatsiya va GPO bog'lash",                      subEn:"Organizational Units, delegation and GPO linking" },
-  35: { num:"L35", section:"03", uz:"Group Policy",                en:"Group Policy",              subUz:"GPO yaratish, sozlash, tartib va tatbiq etish",                          subEn:"Create, configure, order and apply Group Policy Objects" },
-  36: { num:"L36", section:"03", uz:"Fayl Server",                 en:"File Server",               subUz:"SMB ulashimlar, NTFS va ulashim ruxsatlari, DFS va kvotalar",            subEn:"SMB shares, NTFS and share permissions, DFS and quotas" },
-  37: { num:"L37", section:"03", uz:"IIS Web Server",              en:"IIS Web Server",            subUz:"IIS saytlar, applikatsiya poollari, SSL va xavfsizlik",                  subEn:"IIS sites, application pools, SSL/TLS and security hardening" },
-  38: { num:"L38", section:"03", uz:"WSUS",                        en:"WSUS",                      subUz:"Windows Server Update Services, tasdiqlash va hisobot",                  subEn:"Windows Server Update Services, approval and reporting" },
-  39: { num:"L39", section:"03", uz:"Hyper-V",                     en:"Hyper-V",                   subUz:"VM yaratish, snapshot, live migration va tarmoq sozlash",                subEn:"Create VMs, snapshots, live migration and network configuration" },
-  40: { num:"L40", section:"03", uz:"Server monitoring",           en:"Server Monitoring",         subUz:"Performance Monitor, Data Collector Sets va ogohlantirishlar",            subEn:"Performance Monitor, Data Collector Sets and alerts" },
-  41: { num:"L41", section:"03", uz:"Server zaxiralash",           en:"Server Backup",             subUz:"Windows Server Backup, BMR va tiklash opsiyalari",                       subEn:"Windows Server Backup, BMR and recovery options" },
-  // ── PHASE 4: Security ─────────────────────────────────────────────────
-  42: { num:"L42", section:"04", uz:"Autentifikatsiya",            en:"Authentication",            subUz:"Windows autentifikatsiya protokollari, LSA va Credential Guard",          subEn:"Windows authentication protocols, LSA and Credential Guard" },
-  43: { num:"L43", section:"04", uz:"NTLM protokoli",              en:"NTLM Protocol",             subUz:"NTLM challenge/response, relay hujumlari va yumshatish choralari",        subEn:"NTLM challenge/response, relay attacks and mitigations" },
-  44: { num:"L44", section:"04", uz:"Kerberos",                    en:"Kerberos",                  subUz:"TGT/Service Ticket, AS/TGS almashinuvi, Kerberoasting va Golden Ticket",  subEn:"TGT/Service Ticket, AS/TGS exchange, Kerberoasting and Golden Ticket" },
-  45: { num:"L45", section:"04", uz:"Defender ilg'or",             en:"Defender Advanced",         subUz:"ATP, EDR, ASR qoidalari, Tamper Protection va Cloud delivery",           subEn:"ATP, EDR, ASR rules, Tamper Protection and Cloud delivery" },
-  46: { num:"L46", section:"04", uz:"Firewall ilg'or",             en:"Firewall Advanced",         subUz:"Kirishga kiruvchi/chiquvchi qoidalar, IPsec va monitoring",               subEn:"Inbound/outbound rules, IPsec, connection security and monitoring" },
-  47: { num:"L47", section:"04", uz:"AppLocker va WDAC",           en:"AppLocker & WDAC",          subUz:"Ilova nazorati siyosatlari, WDAC siyosat moslash va cheklovlar",          subEn:"Application control policies, WDAC policy crafting and bypasses" },
-  48: { num:"L48", section:"04", uz:"Xavfsizlik loglari",          en:"Security Logging",          subUz:"EVTX format, log yo'llari, log o'chirish aniqlash va forensic tahlil",    subEn:"EVTX format, log paths, clearing detection and forensic analysis" },
-  49: { num:"L49", section:"04", uz:"UAC",                         en:"User Account Control",      subUz:"Ajratilgan token, yaxlitlik darajalari, consent.exe va UAC bypass",      subEn:"Split token, integrity levels, consent.exe and UAC bypass techniques" },
-  50: { num:"L50", section:"04", uz:"Secure Boot va TPM",          en:"Secure Boot & TPM",         subUz:"PK/KEK/db/dbx, TPM PCR banklari, BitLocker va attestatsiya",            subEn:"PK/KEK/db/dbx hierarchy, TPM PCR banks, BitLocker and attestation" },
-  51: { num:"L51", section:"04", uz:"Hodisalarga javob",           en:"Incident Response",         subUz:"IR bosqichlari, artefakt yig'ish, triage va tiklash",                    subEn:"IR phases, artifact collection, triage and recovery procedures" },
-  // ── PHASE 5: Internals ────────────────────────────────────────────────
-  52: { num:"L52", section:"05", uz:"Windows arxitekturasi",       en:"Windows Architecture",      subUz:"Katta rasm, qatlamlar, Executive quyi tizimlari va HAL",                 subEn:"Big picture, layers, Executive subsystems and HAL" },
-  53: { num:"L53", section:"05", uz:"Kernel internallari",         en:"Kernel Internals",          subUz:"ntoskrnl.exe, Executive, Microkernel, HAL va drayverlar",               subEn:"ntoskrnl.exe, Executive, Microkernel, HAL and drivers" },
-  54: { num:"L54", section:"05", uz:"User mode vs Kernel mode",    en:"User Mode vs Kernel Mode",  subUz:"CPU privilege halqalari va chegara nima uchun muhim",                    subEn:"CPU privilege rings and why the boundary matters" },
-  55: { num:"L55", section:"05", uz:"Boot jarayoni chuqur",        en:"Boot Process Deep",         subUz:"UEFI'dan login ekraniga: BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad, kernel", subEn:"UEFI to login screen: BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad, kernel" },
-  56: { num:"L56", section:"05", uz:"BIOS vs UEFI chuqur",         en:"BIOS vs UEFI Deep",         subUz:"16-bit BIOS, UEFI fazalari, Secure Boot zanjiri va bypass texnikalari",  subEn:"16-bit BIOS, UEFI phases, Secure Boot chain and bypass techniques" },
-  57: { num:"L57", section:"05", uz:"Jarayonlar va Thread'lar",    en:"Processes & Threads",       subUz:"EPROCESS/ETHREAD, rejalashtiruvchi, sinxronizatsiya va in'ektsiya",       subEn:"EPROCESS/ETHREAD, scheduler, synchronization and injection" },
-  58: { num:"L58", section:"05", uz:"Handle'lar va Ob'ektlar",     en:"Handles & Objects",         subUz:"Ob'ekt menejeri, handle jadvali, turlari va handle hujumlari",            subEn:"Object Manager, handle table, types and handle-based attacks" },
-  59: { num:"L59", section:"05", uz:"Fayl tizimlari chuqur",       en:"File Systems Deep",         subUz:"VFS, NTFS MFT/atributlar/ADS/EFS va FAT32 tuzilmasi",                   subEn:"VFS, NTFS MFT/attributes/ADS/EFS and FAT32 structure" },
-  60: { num:"L60", section:"05", uz:"GUI arxitekturasi",            en:"GUI Architecture",          subUz:"Win32 oyna modeli, HWND/WndProc, DWM compositor va GUI xavfsizligi",    subEn:"Win32 window model, HWND/WndProc, DWM compositor and GUI security" },
-  // ── PHASE 6: Red Team ─────────────────────────────────────────────────
-  61: { num:"L61", section:"06", uz:"DLL va Injection",             en:"DLL & Injection",           subUz:"PE tuzilmasi, DLL yuklash, qidiruv tartibi va injection texnikalari",    subEn:"PE structure, DLL loading, search order and injection techniques" },
-  62: { num:"L62", section:"06", uz:"Windows API ilg'or",           en:"Windows API Advanced",      subUz:"Win32 qatlami, ntdll syscall ko'prigi, API hooking va monitoring",       subEn:"Win32 layer, ntdll syscall bridge, API hooking and monitoring" },
-  63: { num:"L63", section:"06", uz:"UAC bypass texnikalari",       en:"UAC Bypass Techniques",     subUz:"UAC bypass metodlari, auto-elevation, COM elevation va aniqlash",        subEn:"UAC bypass methods, auto-elevation, COM elevation and detection" },
-  64: { num:"L64", section:"06", uz:"Credential Attacks",           en:"Credential Attacks",        subUz:"SAM, LSASS dump, PtH, DPAPI va hisob ma'lumotlari hujumlari",           subEn:"SAM, LSASS dump, PtH, DPAPI and credential attack techniques" },
-  65: { num:"L65", section:"06", uz:"Event Log Forensics",          en:"Event Log Forensics",       subUz:"Event ID forensics, ETW, Sysmon qoidalari va hodisa aniqlash",           subEn:"Event ID forensics, ETW, Sysmon rules and incident detection" },
-  66: { num:"L66", section:"06", uz:"Registry Persistence",         en:"Registry Persistence",      subUz:"Registry asosidagi persistenslik: Run kalitlar, hijacking va aniqlash",   subEn:"Registry-based persistence: Run keys, hijacking and detection" },
-  67: { num:"L67", section:"06", uz:"Servis Persistence",           en:"Service Persistence",       subUz:"Servis yaratish, ImagePath hijacking, SCM va antifirenslik",              subEn:"Service creation, ImagePath hijacking, SCM abuse and detection" },
-  68: { num:"L68", section:"06", uz:"Task Scheduler Persistence",   en:"Task Scheduler Persistence",subUz:"Vazifa yaratish, trigger bypass va yashirin vazifalarni aniqlash",      subEn:"Task creation, trigger bypass and detecting hidden scheduled tasks" },
-  69: { num:"L69", section:"06", uz:"Windows Logs Forensics",       en:"Windows Logs Forensics",    subUz:"EVTX forensics, tizim log tahlili va hodisalarga javob berish",          subEn:"EVTX forensics, system log analysis and incident response workflow" },
+  1:  { num:"L01", section:"01", uz:"Windows arxitekturasi", en:"Windows Architecture", subUz:"Operatsion tizim ichida nima sodir bo'lmoqda", subEn:"What's actually happening inside the operating system" },
+  2:  { num:"L02", section:"01", uz:"Kernel nima?", en:"What is the kernel?", subUz:"Operatsion tizim yadrosiga kirib borish", subEn:"Deep dive into the operating system core" },
+  3:  { num:"L03", section:"01", uz:"User mode vs Kernel mode", en:"User mode vs Kernel mode", subUz:"CPU imtiyoz halqalari va chegara nima uchun muhim", subEn:"CPU privilege rings and why the boundary matters" },
+  4:  { num:"L04", section:"01", uz:"Windows boot jarayoni", en:"Windows boot process", subUz:"UEFI dan login ekranigacha", subEn:"From UEFI to login screen" },
+  5:  { num:"L05", section:"01", uz:"BIOS vs UEFI", en:"BIOS vs UEFI", subUz:"Firmware arxitekturasi va Secure Boot", subEn:"Firmware architecture and Secure Boot" },
+  6:  { num:"L06", section:"01", uz:"Secure Boot", en:"Secure Boot", subUz:"Bootkit'lardan himoya qilish", subEn:"Protecting against bootkits" },
+  7:  { num:"L07", section:"01", uz:"TPM (Trusted Platform Module)", en:"TPM", subUz:"Apparat asosidagi xavfsizlik chipi", subEn:"Hardware-based security chip" },
+  8:  { num:"L08", section:"01", uz:"Registry", en:"Windows Registry", subUz:"Windows konfiguratsiya ma'lumotlar bazasi", subEn:"Windows configuration database" },
+  9:  { num:"L09", section:"01", uz:"Fayl tizimlari", en:"File systems", subUz:"FAT32 va NTFS arxitekturasi", subEn:"FAT32 and NTFS architecture" },
+  10: { num:"L10", section:"01", uz:"NTFS", en:"NTFS", subUz:"Zamonaviy fayl tizimi chuqur", subEn:"Modern file system in depth" },
+  11: { num:"L11", section:"01", uz:"FAT32", en:"FAT32", subUz:"Klassik fayl tizimi", subEn:"Classic file system" },
+  12: { num:"L12", section:"01", uz:"Jarayonlar (processes)", en:"Processes", subUz:"EPROCESS tuzilmasi va jarayon boshqaruvi", subEn:"EPROCESS structure and process management" },
+  13: { num:"L13", section:"01", uz:"Thread'lar", en:"Threads", subUz:"ETHREAD va rejalashtiruvchi", subEn:"ETHREAD and the scheduler" },
+  14: { num:"L14", section:"01", uz:"Handle'lar", en:"Handles", subUz:"Windows ob'ekt menejeri", subEn:"Windows Object Manager" },
+  15: { num:"L15", section:"01", uz:"Servislar", en:"Services", subUz:"Windows fon jarayonlari va SCM", subEn:"Windows background processes and SCM" },
+  16: { num:"L16", section:"01", uz:"DLL (Dynamic Link Library)", en:"DLL", subUz:"PE format va dinamik yuklash", subEn:"PE format and dynamic loading" },
+  17: { num:"L17", section:"01", uz:"Windows API", en:"Windows API", subUz:"Win32 qatlami va ntdll ko'prigi", subEn:"Win32 layer and ntdll bridge" },
+  18: { num:"L18", section:"01", uz:"Event Viewer", en:"Event Viewer", subUz:"Windows hodisa log tizimi", subEn:"Windows event logging system" },
+  19: { num:"L19", section:"01", uz:"Task Scheduler", en:"Task Scheduler", subUz:"Vazifalarni avtomatlashtirish", subEn:"Automating system tasks" },
+  20: { num:"L20", section:"01", uz:"Windows log fayllari", en:"Windows logs", subUz:"EVTX forensics va hodisalarga javob", subEn:"EVTX forensics and incident response" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -127,57 +72,31 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
         }} />
       </div>
 
-      <div style={{ maxWidth: 860, margin: "0 auto" }}>
-        <div className="page" style={{ padding: "32px 28px 80px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", maxWidth: 1320, margin: "0 auto" }}>
+        <LessonTOC lessonNum={lessonNum} />
+
+        <div className="page" style={{ padding: "32px 28px 80px", maxWidth: "100%" }}>
           <LessonHero lesson={LESSON} lessonNum={lessonNum} />
-          {lessonNum === 1 ? <><SectionWinIntro /></>
-          : lessonNum === 2 ? <><SectionWinVersions /></>
-          : lessonNum === 3 ? <><SectionWinInstall /></>
-          : lessonNum === 4 ? <><SectionGPTMBR /></>
-          : lessonNum === 5 ? <><SectionDesktopEnv /></>
-          : lessonNum === 6 ? <><SectionFileExplorer /></>
-          : lessonNum === 7 ? <><SectionTaskMgrBasic /></>
-          : lessonNum === 8 ? <><SectionDeviceMgrBasic /></>
-          : lessonNum === 9 ? <><SectionUserBasic /></>
-          : lessonNum === 10 ? <><SectionPermsBasic /></>
-          : lessonNum === 11 ? <><SectionWinUpdate /></>
-          : lessonNum === 12 ? <><SectionDefenderBasic /></>
-          : lessonNum === 13 ? <><SectionNetBasic /></>
-          : lessonNum === 14 ? <><SectionFileShare /></>
-          : lessonNum === 15 ? <><SectionBackupRestore /></>
-          : lessonNum === 16 ? <><SectionServices /></>
-          : lessonNum === 17 ? <><SectionEventViewer /></>
-          : lessonNum === 18 ? <><SectionTaskScheduler /></>
-          : lessonNum === 19 ? <><SectionRegistry /></>
-          : lessonNum === 20 ? <><SectionMsconfig /></>
-          : lessonNum === 21 ? <><SectionAdvancedSystem /></>
-          : lessonNum === 22 ? <><SectionComputerMgmt /></>
-          : lessonNum === 23 ? <><SectionResourceMonitor /></>
-          : lessonNum === 24 ? <><SectionSettings /></>
-          : lessonNum === 25 ? <><SectionPSBasic /></>
-          : lessonNum === 26 ? <><SectionRDP /></>
-          : lessonNum === 27 ? <><SectionFirewallBasic /></>
-          : lessonNum === 28 ? <><SectionBitLockerBasic /></>
-          : lessonNum === 49 ? <><SectionUAC /></>
-          : lessonNum === 50 ? <><SectionSecureBoot /><SectionTPM /></>
-          : lessonNum === 52 ? <><Section1Bigpicture /><Section2Theory /><Section3Layered /></>
-          : lessonNum === 53 ? <><SectionKernelWhat /><SectionKernelInside /><SectionKernelDrivers /></>
-          : lessonNum === 54 ? <><SectionRings /><Section8Comparison /><SectionSyscallBrief /></>
-          : lessonNum === 55 ? <><Section4Boot /></>
-          : lessonNum === 56 ? <><SectionBiosUefi /></>
-          : lessonNum === 57 ? <><SectionProcesses /><SectionThreads /></>
-          : lessonNum === 58 ? <><SectionHandles /></>
-          : lessonNum === 59 ? <><SectionFileSystems /><SectionNTFS /><SectionFAT32 /></>
-          : lessonNum === 60 ? <><SectionGUI /></>
-          : lessonNum === 61 ? <><SectionDLL /></>
-          : lessonNum === 62 ? <><SectionWindowsAPI /></>
-          : lessonNum === 63 ? <><SectionUAC /></>
-          : lessonNum === 64 ? <><SectionUserAccounts /></>
-          : lessonNum === 65 ? <><SectionEventViewer /></>
-          : lessonNum === 66 ? <><SectionRegistry /></>
-          : lessonNum === 67 ? <><SectionServices /></>
-          : lessonNum === 68 ? <><SectionTaskScheduler /></>
-          : lessonNum === 69 ? <><SectionWindowsLogs /></>
+          {lessonNum === 1  ? <><Section1Bigpicture /><Section2Theory /><Section3Layered /></>
+          : lessonNum === 2  ? <><SectionKernelWhat /><SectionKernelInside /><SectionKernelDrivers /></>
+          : lessonNum === 3  ? <><SectionRings /><Section8Comparison /><SectionSyscallBrief /></>
+          : lessonNum === 4  ? <><Section4Boot /></>
+          : lessonNum === 5  ? <><SectionBiosUefi /></>
+          : lessonNum === 6  ? <><SectionSecureBoot /></>
+          : lessonNum === 7  ? <><SectionTPM /></>
+          : lessonNum === 8  ? <><SectionRegistry /></>
+          : lessonNum === 9  ? <><SectionFileSystems /></>
+          : lessonNum === 10 ? <><SectionNTFS /></>
+          : lessonNum === 11 ? <><SectionFAT32 /></>
+          : lessonNum === 12 ? <><SectionProcesses /></>
+          : lessonNum === 13 ? <><SectionThreads /></>
+          : lessonNum === 14 ? <><SectionHandles /></>
+          : lessonNum === 15 ? <><SectionServices /></>
+          : lessonNum === 16 ? <><SectionDLL /></>
+          : lessonNum === 17 ? <><SectionWindowsAPI /></>
+          : lessonNum === 18 ? <><SectionEventViewer /></>
+          : lessonNum === 19 ? <><SectionTaskScheduler /></>
+          : lessonNum === 20 ? <><SectionWindowsLogs /></>
           : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -199,20 +118,33 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
 }
 
 // ─────────────────────────────────────────────────────────────
+const TOC_SECTIONS = {
+  1:  [{ id:"big-picture",uz:"Katta rasm",en:"Big picture" },{ id:"theory",uz:"Nazariy asos",en:"Theory" },{ id:"layered",uz:"Qatlamli arxitektura",en:"Layered architecture" },{ id:"boot",uz:"Boot jarayoni",en:"Boot process" },{ id:"syscall",uz:"Syscall oqimi",en:"Syscall flow" },{ id:"security",uz:"Xavfsizlik",en:"Security view" },{ id:"lab",uz:"Laboratoriya",en:"Lab" },{ id:"compare",uz:"Taqqoslash",en:"Comparison" },{ id:"summary",uz:"Xulosa",en:"Summary" }],
+  2:  [{ id:"kernel-what",uz:"Kernel nima",en:"What is the kernel" },{ id:"kernel-inside",uz:"Kernel ichida",en:"Inside the kernel" },{ id:"hal",uz:"HAL",en:"HAL" },{ id:"executive",uz:"Executive",en:"Executive" },{ id:"drivers",uz:"Drayverlar",en:"Drivers" }],
+  3:  [{ id:"rings",uz:"CPU halqalari",en:"CPU rings" },{ id:"boundary",uz:"Chegara",en:"The boundary" },{ id:"syscall-flow",uz:"Syscall oqimi",en:"Syscall flow" },{ id:"comparison",uz:"Taqqoslash",en:"Comparison" }],
+  4:  [{ id:"boot-sequence",uz:"Boot ketma-ketligi",en:"Boot sequence" },{ id:"uefi-phases",uz:"UEFI fazalari",en:"UEFI phases" },{ id:"bootmgr",uz:"BOOTMGR",en:"BOOTMGR" },{ id:"winload",uz:"WinLoad",en:"WinLoad" },{ id:"kernel-init",uz:"Kernel ishga tushishi",en:"Kernel init" }],
+  5:  [{ id:"bios",uz:"BIOS",en:"BIOS" },{ id:"uefi",uz:"UEFI",en:"UEFI" },{ id:"secure-boot",uz:"Secure Boot",en:"Secure Boot" },{ id:"comparison",uz:"Taqqoslash",en:"Comparison" }],
+  6:  [{ id:"secboot-what",uz:"Secure Boot nima",en:"What is Secure Boot" },{ id:"keys",uz:"Kalitlar ierarxiyasi",en:"Key hierarchy" },{ id:"verification",uz:"Imzo tekshiruvi",en:"Signature verification" },{ id:"bypass",uz:"Bypass usullari",en:"Bypass methods" }],
+  7:  [{ id:"tpm-what",uz:"TPM nima",en:"What is TPM" },{ id:"pcr",uz:"PCR banklari",en:"PCR banks" },{ id:"attestation",uz:"Attestatsiya",en:"Attestation" },{ id:"bitlocker",uz:"BitLocker integratsiyasi",en:"BitLocker integration" }],
+  8:  [{ id:"reg-overview",uz:"Registry umumiy",en:"Registry overview" },{ id:"hives",uz:"Hive fayllar",en:"Hive files" },{ id:"keys",uz:"Muhim kalitlar",en:"Critical keys" },{ id:"persistence",uz:"Persistenslik joylari",en:"Persistence locations" },{ id:"forensics",uz:"Forensic tahlil",en:"Forensic analysis" }],
+  9:  [{ id:"vfs",uz:"Virtual fayl tizimi",en:"Virtual file system" },{ id:"types",uz:"Fayl tizimi turlari",en:"File system types" },{ id:"comparison",uz:"Taqqoslash",en:"Comparison" }],
+  10: [{ id:"mft",uz:"MFT (Master File Table)",en:"MFT" },{ id:"attributes",uz:"Atributlar",en:"Attributes" },{ id:"ads",uz:"ADS",en:"ADS" },{ id:"efs",uz:"EFS",en:"EFS" },{ id:"forensics",uz:"NTFS Forensics",en:"NTFS Forensics" }],
+  11: [{ id:"fat-table",uz:"FAT jadvali",en:"FAT table" },{ id:"clusters",uz:"Cluster zanjiri",en:"Cluster chain" },{ id:"limitations",uz:"Cheklovlar",en:"Limitations" }],
+  12: [{ id:"eprocess",uz:"EPROCESS tuzilmasi",en:"EPROCESS structure" },{ id:"peb",uz:"PEB",en:"PEB" },{ id:"vad",uz:"VAD daraxti",en:"VAD tree" },{ id:"creation",uz:"Jarayon yaratish",en:"Process creation" },{ id:"injection",uz:"Injection texnikalar",en:"Injection techniques" }],
+  13: [{ id:"ethread",uz:"ETHREAD",en:"ETHREAD" },{ id:"lifecycle",uz:"Thread lifecycle",en:"Thread lifecycle" },{ id:"scheduler",uz:"Rejalashtiruvchi",en:"Scheduler" },{ id:"sync",uz:"Sinxronizatsiya",en:"Synchronization" }],
+  14: [{ id:"handles",uz:"Handle nima",en:"What is a handle" },{ id:"handle-table",uz:"Handle jadvali",en:"Handle table" },{ id:"objects",uz:"Ob'ekt turlari",en:"Object types" },{ id:"attacks",uz:"Handle hujumlar",en:"Handle-based attacks" }],
+  15: [{ id:"services-overview",uz:"Servislar umumiy",en:"Services overview" },{ id:"scm",uz:"SCM",en:"SCM" },{ id:"types",uz:"Servis turlari",en:"Service types" },{ id:"accounts",uz:"Xizmat akkauntlari",en:"Service accounts" },{ id:"svchost",uz:"svchost guruhlari",en:"svchost groups" }],
+  16: [{ id:"pe-format",uz:"PE format",en:"PE format" },{ id:"dll-loading",uz:"DLL yuklash",en:"DLL loading" },{ id:"injection",uz:"DLL injection",en:"DLL injection" },{ id:"hijacking",uz:"Search order hijacking",en:"Search order hijacking" },{ id:"detection",uz:"Aniqlash",en:"Detection" }],
+  17: [{ id:"win32",uz:"Win32 qatlami",en:"Win32 layer" },{ id:"ntdll",uz:"ntdll ko'prigi",en:"ntdll bridge" },{ id:"hooking",uz:"API hooking",en:"API hooking" },{ id:"monitoring",uz:"Monitoring",en:"Monitoring" }],
+  18: [{ id:"log-arch",uz:"Log arxitekturasi",en:"Log architecture" },{ id:"event-ids",uz:"Asosiy Event ID lar",en:"Key Event IDs" },{ id:"etw",uz:"ETW",en:"ETW" },{ id:"sysmon",uz:"Sysmon",en:"Sysmon" },{ id:"forensics",uz:"Forensic tahlil",en:"Forensic analysis" }],
+  19: [{ id:"task-overview",uz:"Vazifa umumiy",en:"Task overview" },{ id:"triggers",uz:"Triggerlar",en:"Triggers" },{ id:"actions",uz:"Harakatlar",en:"Actions" },{ id:"persistence",uz:"Persistenslik",en:"Persistence" }],
+  20: [{ id:"evtx",uz:"EVTX format",en:"EVTX format" },{ id:"channels",uz:"Log kanallar",en:"Log channels" },{ id:"forensics",uz:"Forensic tahlil",en:"Forensic analysis" },{ id:"ir-workflow",uz:"IR workflow",en:"IR workflow" }],
+};
+
 function LessonTOC({ lessonNum = 1 }) {
   const lang = useLang();
-  const sections = lessonNum === 1 ? [
-    { id: "big-picture", uz: "Katta rasm", en: "Big picture" },
-    { id: "theory", uz: "Nazariy asos", en: "Theory" },
-    { id: "layered", uz: "Qatlamli arxitektura", en: "Layered architecture" },
-  ] : [
-    { id: "boot", uz: "Boot jarayoni", en: "Boot process" },
-    { id: "syscall", uz: "Syscall oqimi", en: "Syscall flow" },
-    { id: "security", uz: "Xavfsizlik nuqtai nazaridan", en: "Security view" },
-    { id: "lab", uz: "Laboratoriya", en: "Lab" },
-    { id: "compare", uz: "Taqqoslash", en: "Comparison" },
-    { id: "summary", uz: "Xulosa", en: "Summary" },
-  ];
+  const meta = LESSON_META[lessonNum] || LESSON_META[1];
+  const sections = TOC_SECTIONS[lessonNum] || TOC_SECTIONS[1];
   const [active, setActive] = useLS("big-picture");
   useLE(() => {
     const onScroll = () => {
@@ -257,10 +189,9 @@ function LessonTOC({ lessonNum = 1 }) {
       <div style={{ marginTop: 24, padding: 14, borderRadius: 10, background: "var(--surface)", border: "1px solid var(--border)" }}>
         <div className="eyebrow" style={{ fontSize: 9.5, marginBottom: 8 }}>// {lang === "en" ? "LESSON STATS" : "STATISTIKA"}</div>
         <div style={{ fontSize: 11, color: "var(--text-2)", display: "flex", flexDirection: "column", gap: 4 }}>
-          <Row k={lang === "en" ? "Reading" : "O'qish"} v="~24 min" />
-          <Row k={lang === "en" ? "Lab" : "Laboratoriya"} v="~12 min" />
-          <Row k={lang === "en" ? "Diagrams" : "Diagrammalar"} v="9" />
-          <Row k={lang === "en" ? "Words" : "So'zlar"} v="3,420" />
+          <Row k={lang === "en" ? "Reading" : "O'qish"} v={`~${meta.min} min`} />
+          <Row k={lang === "en" ? "Labs" : "Laboratoriya"} v={meta.labs} />
+          <Row k={lang === "en" ? "Diagrams" : "Diagrammalar"} v={meta.diagrams} />
         </div>
       </div>
     </aside>
@@ -271,75 +202,26 @@ function Row({ k, v }) {
 }
 
 const LESSON_META = {
-  1:  { min:15, diagrams:3, labs:1, introUz:<><em>Windows</em> — dunyoning eng ko'p ishlatiladigan operatsion tizimi. Bu darsda OS nima ekanligini, Windows ning ekotizimlari va GUI asoslarini bilib olasiz.</>, introEn:<><em>Windows</em> is the world's most-used operating system. This lesson introduces what an OS is, the Windows ecosystem and the foundations of its graphical interface.</> },
-  2:  { min:18, diagrams:4, labs:0, introUz:<><em>Windows versiyalari</em> — XP dan Windows 11 gacha bo'lgan evolyutsiya. Har bir versiyaning asosiy xususiyatlari, qo'llab-quvvatlash muddati va farqlarini o'rganasiz.</>, introEn:<><em>Windows versions</em> — evolution from XP to Windows 11. Learn key features, support lifecycle and differences of each major version.</> },
-  3:  { min:25, diagrams:5, labs:2, introUz:<><em>Windows o'rnatish</em> — ISO tayyorlashdan drayver sozlashgacha bo'lgan bosqichma-bosqich jarayon. Real muhitda Windows o'rnatishni amalda ko'rासiz.</>, introEn:<><em>Windows installation</em> — step-by-step process from preparing ISO to configuring drivers. Practice real-world Windows installation.</> },
-  4:  { min:20, diagrams:3, labs:1, introUz:<><em>GPT va MBR</em> — disk bo'limlanish jadvallari. MBR ning cheklovlari, GPT ning afzalliklari va UEFI talablarini tushunib olasiz.</>, introEn:<><em>GPT and MBR</em> — disk partition tables. Understand MBR limitations, GPT advantages and UEFI requirements.</> },
-  5:  { min:15, diagrams:2, labs:1, introUz:<><em>Ish stoli muhiti</em> — Windows GUI ning anatomiyasi. Taskbar, Start Menu, Action Center, virtual ish stollari va muhim shortcutlarni o'rganasiz.</>, introEn:<><em>Desktop environment</em> — anatomy of the Windows GUI. Learn taskbar, Start Menu, Action Center, virtual desktops and essential shortcuts.</> },
-  6:  { min:18, diagrams:3, labs:2, introUz:<><em>File Explorer</em> — Windows fayl menejeri. Navigatsiya, fayl operatsiyalari, yashirin fayllar va samarali qidiruvni o'rganasiz.</>, introEn:<><em>File Explorer</em> — Windows file manager. Learn navigation, file operations, hidden files and effective search.</> },
-  7:  { min:20, diagrams:3, labs:1, introUz:<><em>Vazifalar Menejeri</em> — tizim monitoringi va muammolarni hal qilish vositasi. Jarayonlar, ishlash ko'rsatgichlari va ishga tushish dasturlarini boshqarasiz.</>, introEn:<><em>Task Manager</em> — system monitoring and troubleshooting tool. Manage processes, performance graphs and startup programs.</> },
-  8:  { min:18, diagrams:2, labs:1, introUz:<><em>Qurilma Menejeri</em> — hardware va drayver boshqaruv markazi. Qurilma holatlari, drayver yangilash/qaytarish va muammolarni hal qilishni o'rganasiz.</>, introEn:<><em>Device Manager</em> — hardware and driver management hub. Learn device status, update/rollback drivers and troubleshoot hardware issues.</> },
-  9:  { min:20, diagrams:3, labs:2, introUz:<><em>Foydalanuvchi hisoblari</em> — Windows da identifikatsiya asoslari. Admin va Standart hisob, Microsoft va Mahalliy hisob, parol va PIN sozlashni o'rganasiz.</>, introEn:<><em>User accounts</em> — identity fundamentals in Windows. Learn Admin vs Standard, Microsoft vs Local account, and password/PIN setup.</> },
-  10: { min:22, diagrams:3, labs:2, introUz:<><em>Fayllar va Ruxsatlar</em> — NTFS ruxsatlari tizimi asoslari. Papkalarni ulashish, meros ruxsatlari va keng tarqalgan "Kirish rad etildi" xatolarini tushunasiz.</>, introEn:<><em>Files and Permissions</em> — NTFS permission system basics. Understand folder sharing, inherited permissions and common access denied errors.</> },
-  11: { min:15, diagrams:2, labs:1, introUz:<><em>Windows Update</em> — xavfsizlik yamoqlarini boshqarish. Yangilanish turlarini, kechiktirishni, drayver yangilanishlarini va yangilanish muammolarini tushunasiz.</>, introEn:<><em>Windows Update</em> — managing security patches. Understand update types, deferral, driver updates and troubleshooting failed updates.</> },
-  12: { min:20, diagrams:3, labs:2, introUz:<><em>Windows Defender asoslari</em> — Windows ning o'rnatilgan antivirus yechimi. Windows Security markazi, skanlar va real-time himoyani sozlashni o'rganasiz.</>, introEn:<><em>Windows Defender basics</em> — Windows built-in antivirus solution. Learn Windows Security Center, scan types and real-time protection configuration.</> },
-  13: { min:25, diagrams:4, labs:2, introUz:<><em>Tarmoq asoslari</em> — IP, subnet, gateway va DNS tushunchalari. DHCP va statik IP farqi, tarmoq adapterni sozlash va ipconfig/ping buyruqlarini o'rganasiz.</>, introEn:<><em>Networking basics</em> — IP, subnet, gateway and DNS concepts. Learn DHCP vs static IP, configure network adapters and use ipconfig/ping.</> },
-  14: { min:20, diagrams:3, labs:2, introUz:<><em>Fayl va Printer almashish</em> — tarmoq orqali resurslarni ulashish. Papkani ulashish, network drive ulash va printer almashishni sozlashni o'rganasiz.</>, introEn:<><em>File and Printer sharing</em> — sharing resources over the network. Learn to share folders, map network drives and configure printer sharing.</> },
-  15: { min:22, diagrams:3, labs:2, introUz:<><em>Zaxiralash va tiklash</em> — ma'lumotlarni himoya qilish strategiyalari. Tizim tiklash nuqtalari, File History, Windows Backup va tiklash imkoniyatlarini o'rganasiz.</>, introEn:<><em>Backup and restore</em> — data protection strategies. Learn system restore points, File History, Windows Backup and recovery options.</> },
-  16: { min:30, diagrams:6, labs:2, introUz:<><em>Servislar</em> — Windows fon jarayonlari. SCM, servis turlari, xizmat akkauntlari, svchost guruhlari va servis asosidagi persistenslik texnikalarini o'rganasiz.</>, introEn:<><em>Services</em> — Windows background processes. Learn SCM, service types, service accounts, svchost groups and service-based persistence techniques.</> },
-  17: { min:24, diagrams:4, labs:2, introUz:<><em>Event Viewer</em> — Windows hodisa loglari. Log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensic tahlilni o'rganasiz.</>, introEn:<><em>Event Viewer</em> — Windows event logs. Learn log architecture, key Event IDs, ETW, Sysmon and forensic analysis.</> },
-  18: { min:22, diagrams:4, labs:1, introUz:<><em>Task Scheduler</em> — vazifalarni avtomatlashtirishTizim. Vazifa arxitekturasi, triggerlar, harakatlar va rejalashtiruvchi asosidagi persistenslikni o'rganasiz.</>, introEn:<><em>Task Scheduler</em> — automate system tasks. Learn task architecture, triggers, actions and scheduler-based persistence techniques.</> },
-  19: { min:38, diagrams:8, labs:3, introUz:<><em>Registry</em> — Windows ning konfiguratsiya ma'lumotlar bazasi. Ierarxik tuzilma, hive fayllar, muhim kalitlar va persistenslik joylarini o'rganasiz.</>, introEn:<><em>Registry</em> — Windows configuration database. Learn hierarchical structure, hive files, critical keys and persistence locations.</> },
-  20: { min:24, diagrams:4, labs:2, introUz:<><em>System Configuration (msconfig)</em> — ishga tushish menejeri. Ishga tushish turlari, Xavfsiz yuklash rejimi va diagnostika vositalarini o'rganasiz.</>, introEn:<><em>System Configuration (msconfig)</em> — startup manager. Learn startup types, Safe Boot modes and diagnostic tools shortcuts.</> },
-  21: { min:30, diagrams:5, labs:2, introUz:<><em>Kengaytirilgan Tizim Sozlamalari</em> — sysdm.cpl chuqur sozlamalar. DEP, virtual xotira, tizim tiklash, drayver imzolash va RDP ni o'rganasiz.</>, introEn:<><em>Advanced System Settings</em> — sysdm.cpl deep settings. Learn DEP, virtual memory, system restore, driver signing and RDP configuration.</> },
-  22: { min:32, diagrams:6, labs:2, introUz:<><em>Kompyuter Boshqaruvi</em> — compmgmt.msc MMC snap-in. Ulashimlar, foydalanuvchilar, disk va WMI persistenslikni o'rganasiz.</>, introEn:<><em>Computer Management</em> — compmgmt.msc MMC snap-in. Learn shares, users, disk management and WMI persistence detection.</> },
-  23: { min:28, diagrams:5, labs:2, introUz:<><em>Resource Monitor</em> — resmon.exe ilg'or monitoring. CPU, xotira, disk va tarmoq tablarini, cmd buyruqlarini o'rganasiz.</>, introEn:<><em>Resource Monitor</em> — resmon.exe advanced monitoring. Learn CPU, memory, disk and network tabs plus essential cmd commands.</> },
-  24: { min:26, diagrams:5, labs:2, introUz:<><em>Settings va Control Panel</em> — Windows boshqarish interfeyslari. Settings URI sxemasi, Control Panel appletlari va xavfsizlik sozlamalarini o'rganasiz.</>, introEn:<><em>Settings and Control Panel</em> — Windows management interfaces. Learn Settings URI scheme, Control Panel applets and security settings.</> },
-  25: { min:30, diagrams:4, labs:3, introUz:<><em>PowerShell asoslari</em> — Windows avtomatlashtirish qobig'i. Cmdletlar, pipeline, o'zgaruvchilar, skriptlar va bajarish siyosatini o'rganasiz.</>, introEn:<><em>PowerShell basics</em> — Windows automation shell. Learn cmdlets, pipeline, variables, scripts and execution policy.</> },
-  26: { min:22, diagrams:3, labs:2, introUz:<><em>Remote Desktop</em> — masofadan boshqarish. RDP yoqish, ulanish, NLA, xavfsizlik va muammolarni hal qilishni o'rganasiz.</>, introEn:<><em>Remote Desktop</em> — remote management. Learn to enable RDP, connect, configure NLA, security and troubleshoot issues.</> },
-  27: { min:24, diagrams:4, labs:2, introUz:<><em>Windows Firewall</em> — tarmoq himoyasi. Firewall profillari, kirishga kiruvchi/chiquvchi qoidalar yaratish va wf.msc bilan ishlashni o'rganasiz.</>, introEn:<><em>Windows Firewall</em> — network protection. Learn firewall profiles, create inbound/outbound rules and work with wf.msc.</> },
-  28: { min:26, diagrams:4, labs:2, introUz:<><em>BitLocker</em> — disk shifrlash texnologiyasi. TPM talablari, BitLocker yoqish, tiklash kaliti va BitLocker To Go ni o'rganasiz.</>, introEn:<><em>BitLocker</em> — disk encryption technology. Learn TPM requirements, enable BitLocker, recovery key management and BitLocker To Go.</> },
-  29: { min:25, diagrams:4, labs:1, introUz:<><em>Windows Server kirish</em> — Server ekotizimlari va rollar. <em>Tez kunda</em></>, introEn:<><em>Windows Server intro</em> — Server editions and roles. <em>Coming soon</em></> },
-  30: { min:20, diagrams:3, labs:1, introUz:<><em>Server Manager</em> — rollar va xususiyatlarni boshqarish. <em>Tez kunda</em></>, introEn:<><em>Server Manager</em> — manage roles and features. <em>Coming soon</em></> },
-  31: { min:40, diagrams:7, labs:3, introUz:<><em>Active Directory</em> — korporativ identifikatsiya va kirish boshqaruvi. <em>Tez kunda</em></>, introEn:<><em>Active Directory</em> — enterprise identity and access management. <em>Coming soon</em></> },
-  32: { min:28, diagrams:5, labs:2, introUz:<><em>DNS Server</em> — domen nomlarini hal qilish. <em>Tez kunda</em></>, introEn:<><em>DNS Server</em> — domain name resolution. <em>Coming soon</em></> },
-  33: { min:22, diagrams:4, labs:2, introUz:<><em>DHCP Server</em> — avtomatik IP manzil taqsimoti. <em>Tez kunda</em></>, introEn:<><em>DHCP Server</em> — automatic IP address allocation. <em>Coming soon</em></> },
-  34: { min:20, diagrams:4, labs:2, introUz:<><em>OU tuzilmasi</em> — Organizational Units va delegatsiya. <em>Tez kunda</em></>, introEn:<><em>OU Structure</em> — Organizational Units and delegation. <em>Coming soon</em></> },
-  35: { min:35, diagrams:6, labs:3, introUz:<><em>Group Policy</em> — korporativ sozlamalarni markazlashgan boshqarish. <em>Tez kunda</em></>, introEn:<><em>Group Policy</em> — centralized configuration management. <em>Coming soon</em></> },
-  36: { min:24, diagrams:4, labs:2, introUz:<><em>Fayl Server</em> — SMB ulashimlar va ruxsatlar. <em>Tez kunda</em></>, introEn:<><em>File Server</em> — SMB shares and permissions. <em>Coming soon</em></> },
-  37: { min:26, diagrams:4, labs:2, introUz:<><em>IIS</em> — Internet Information Services va veb hosting. <em>Tez kunda</em></>, introEn:<><em>IIS</em> — Internet Information Services and web hosting. <em>Coming soon</em></> },
-  38: { min:20, diagrams:3, labs:1, introUz:<><em>WSUS</em> — Windows yangilanishlarini markazlashgan boshqarish. <em>Tez kunda</em></>, introEn:<><em>WSUS</em> — centralized Windows update management. <em>Coming soon</em></> },
-  39: { min:30, diagrams:5, labs:2, introUz:<><em>Hyper-V</em> — Windows virtualizatsiya platformasi. <em>Tez kunda</em></>, introEn:<><em>Hyper-V</em> — Windows virtualization platform. <em>Coming soon</em></> },
-  40: { min:22, diagrams:4, labs:2, introUz:<><em>Server monitoring</em> — ishlashni kuzatish va ogohlantirishlar. <em>Tez kunda</em></>, introEn:<><em>Server monitoring</em> — performance monitoring and alerts. <em>Coming soon</em></> },
-  41: { min:20, diagrams:3, labs:1, introUz:<><em>Server zaxiralash</em> — biznes uzluksizligi uchun zaxiralash. <em>Tez kunda</em></>, introEn:<><em>Server backup</em> — backup for business continuity. <em>Coming soon</em></> },
-  42: { min:28, diagrams:4, labs:2, introUz:<><em>Autentifikatsiya</em> — Windows da kimlik tekshiruvi protokollari. <em>Tez kunda</em></>, introEn:<><em>Authentication</em> — Windows identity verification protocols. <em>Coming soon</em></> },
-  43: { min:24, diagrams:4, labs:1, introUz:<><em>NTLM protokoli</em> — challenge/response autentifikatsiya. <em>Tez kunda</em></>, introEn:<><em>NTLM Protocol</em> — challenge/response authentication. <em>Coming soon</em></> },
-  44: { min:30, diagrams:5, labs:2, introUz:<><em>Kerberos</em> — chiptaga asoslangan autentifikatsiya. <em>Tez kunda</em></>, introEn:<><em>Kerberos</em> — ticket-based authentication protocol. <em>Coming soon</em></> },
-  45: { min:28, diagrams:4, labs:2, introUz:<><em>Defender ilg'or</em> — Microsoft Defender ATP va EDR. <em>Tez kunda</em></>, introEn:<><em>Defender Advanced</em> — Microsoft Defender ATP and EDR. <em>Coming soon</em></> },
-  46: { min:24, diagrams:4, labs:2, introUz:<><em>Firewall ilg'or</em> — IPsec va kengaytirilgan qoidalar. <em>Tez kunda</em></>, introEn:<><em>Firewall Advanced</em> — IPsec and advanced rules. <em>Coming soon</em></> },
-  47: { min:28, diagrams:4, labs:2, introUz:<><em>AppLocker va WDAC</em> — ilova nazorati siyosatlari. <em>Tez kunda</em></>, introEn:<><em>AppLocker and WDAC</em> — application control policies. <em>Coming soon</em></> },
-  48: { min:28, diagrams:5, labs:2, introUz:<><em>Xavfsizlik loglari</em> — EVTX format va forensic log tahlili.</>, introEn:<><em>Security logging</em> — EVTX format and forensic log analysis.</> },
-  49: { min:28, diagrams:5, labs:2, introUz:<><em>UAC (User Account Control)</em> — imtiyozlarni ajratish mexanizmi. Ajratilgan token, yaxlitlik darajalari, consent.exe va UAC bypass texnikalarini o'rganasiz.</>, introEn:<><em>UAC (User Account Control)</em> — privilege separation mechanism. Learn split token, integrity levels, consent.exe and UAC bypass techniques.</> },
-  50: { min:30, diagrams:5, labs:1, introUz:<><em>Secure Boot va TPM</em> — platformani ishonchli yuklanishi. PK/KEK/db/dbx ierarxiyasi, TPM PCR banklari, BitLocker va attestatsiyani o'rganasiz.</>, introEn:<><em>Secure Boot and TPM</em> — trusted platform boot. Learn PK/KEK/db/dbx hierarchy, TPM PCR banks, BitLocker and attestation.</> },
-  51: { min:30, diagrams:4, labs:2, introUz:<><em>Hodisalarga javob</em> — xavfsizlik hodisalarini boshqarish. <em>Tez kunda</em></>, introEn:<><em>Incident Response</em> — security incident management. <em>Coming soon</em></> },
-  52: { min:36, diagrams:9, labs:3, introUz:<><em>Windows arxitekturasi</em> — OS ning to'liq arxitekturasi. Katta rasm, nazariy asos va qatlamli arxitektura diagrammasini o'rganasiz.</>, introEn:<><em>Windows architecture</em> — complete OS architecture. Learn the big picture, theoretical foundation and layered architecture diagram.</> },
-  53: { min:34, diagrams:7, labs:2, introUz:<><em>Kernel internallari</em> — ntoskrnl.exe ning ichki tuzilishi. Executive, Microkernel, HAL va drayverlarni chuqur o'rganasiz.</>, introEn:<><em>Kernel internals</em> — ntoskrnl.exe inner structure. Deep dive into Executive, Microkernel, HAL and drivers.</> },
-  54: { min:32, diagrams:7, labs:2, introUz:<><em>User mode vs Kernel mode</em> — CPU privilege halqalari. Chegara nima uchun muhim va syscall oqimini o'rganasiz.</>, introEn:<><em>User mode vs Kernel mode</em> — CPU privilege rings. Understand why the boundary matters and trace the syscall flow.</> },
-  55: { min:36, diagrams:8, labs:2, introUz:<><em>Boot jarayoni chuqur</em> — UEFI dan login ekranigacha. BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad va kernel bosqichlarini o'rganasiz.</>, introEn:<><em>Boot process deep</em> — UEFI to login screen. Learn BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad and kernel initialization phases.</> },
-  56: { min:22, diagrams:5, labs:1, introUz:<><em>BIOS vs UEFI chuqur</em> — firmware arxitekturasi. 16-bit BIOS, UEFI fazalari, Secure Boot zanjiri va bypass texnikalarini o'rganasiz.</>, introEn:<><em>BIOS vs UEFI deep</em> — firmware architecture. Learn 16-bit BIOS, UEFI phases, Secure Boot chain and bypass techniques.</> },
-  57: { min:36, diagrams:7, labs:3, introUz:<><em>Jarayonlar va Thread'lar</em> — EPROCESS va ETHREAD tuzilmalari. Rejalashtiruvchi, sinxronizatsiya va in'ektsiya texnikalarini o'rganasiz.</>, introEn:<><em>Processes and Threads</em> — EPROCESS and ETHREAD structures. Learn scheduler, synchronization and injection techniques.</> },
-  58: { min:24, diagrams:5, labs:1, introUz:<><em>Handle'lar va Ob'ektlar</em> — Windows ob'ekt menejeri. Handle jadvali, ob'ekt turlari va handle asosidagi hujumlarni o'rganasiz.</>, introEn:<><em>Handles and Objects</em> — Windows Object Manager. Learn handle table, object types and handle-based attacks.</> },
-  59: { min:36, diagrams:8, labs:2, introUz:<><em>Fayl tizimlari chuqur</em> — VFS, NTFS MFT/atributlar/ADS/EFS va FAT32 tuzilmasini chuqur o'rganasiz.</>, introEn:<><em>File systems deep</em> — VFS, NTFS MFT/attributes/ADS/EFS and FAT32 structure in depth.</> },
-  60: { min:26, diagrams:6, labs:2, introUz:<><em>GUI arxitekturasi</em> — Win32 oyna modeli. HWND/WndProc/message pump, DWM compositor, API qatlamlari va GUI xavfsizligi.</>, introEn:<><em>GUI architecture</em> — Win32 window model. Learn HWND/WndProc/message pump, DWM compositor, API layers and GUI security.</> },
-  61: { min:32, diagrams:6, labs:2, introUz:<><em>DLL va Injection</em> — PE tuzilmasi va DLL dinamik yuklash. DLL injection, search order hijacking va aniqlash texnikalarini o'rganasiz.</>, introEn:<><em>DLL and Injection</em> — PE structure and dynamic DLL loading. Learn DLL injection, search order hijacking and detection techniques.</> },
-  62: { min:30, diagrams:5, labs:2, introUz:<><em>Windows API ilg'or</em> — Win32 qatlami va ntdll syscall ko'prigi. API hooking va monitoring texnikalarini o'rganasiz.</>, introEn:<><em>Windows API advanced</em> — Win32 layer and ntdll syscall bridge. Learn API hooking and monitoring techniques.</> },
-  63: { min:32, diagrams:5, labs:2, introUz:<><em>UAC bypass texnikalari</em> — ilg'or UAC chetlab o'tish. Auto-elevation, COM elevation, fodhelper va boshqa bypass metodlarini o'rganasiz.</>, introEn:<><em>UAC bypass techniques</em> — advanced UAC circumvention. Learn auto-elevation, COM elevation, fodhelper and other bypass methods.</> },
-  64: { min:34, diagrams:5, labs:2, introUz:<><em>Credential Attacks</em> — hisob ma'lumotlariga hujumlar. SAM chiqarish, LSASS dump, PtH va DPAPI texnikalarini o'rganasiz.</>, introEn:<><em>Credential Attacks</em> — attacks on Windows credentials. Learn SAM extraction, LSASS dump, PtH and DPAPI techniques.</> },
-  65: { min:28, diagrams:4, labs:2, introUz:<><em>Event Log Forensics</em> — hodisa loglarini forensic tahlili. Event ID forensics, ETW va Sysmon qoidalarini o'rganasiz.</>, introEn:<><em>Event Log Forensics</em> — forensic analysis of event logs. Learn Event ID forensics, ETW and Sysmon rules.</> },
-  66: { min:30, diagrams:5, labs:2, introUz:<><em>Registry Persistence</em> — registry asosidagi doimiylik. Run kalitlar, DLL hijacking va aniqlash usullarini o'rganasiz.</>, introEn:<><em>Registry Persistence</em> — registry-based persistence. Learn Run keys, DLL hijacking via registry and detection methods.</> },
-  67: { min:28, diagrams:5, labs:2, introUz:<><em>Servis Persistence</em> — servis asosidagi doimiylik. Servis yaratish, ImagePath hijacking va aniqlash usullarini o'rganasiz.</>, introEn:<><em>Service Persistence</em> — service-based persistence. Learn service creation, ImagePath hijacking and detection methods.</> },
-  68: { min:24, diagrams:4, labs:1, introUz:<><em>Task Scheduler Persistence</em> — vazifa rejalashtiruvchisi asosidagi doimiylik. Yashirin vazifalarni yaratish va aniqlashni o'rganasiz.</>, introEn:<><em>Task Scheduler Persistence</em> — scheduler-based persistence. Learn creating hidden tasks and detection methods.</> },
-  69: { min:28, diagrams:5, labs:2, introUz:<><em>Windows Logs Forensics</em> — EVTX forensics va hodisalarga javob. Tizim log tahlili va IR workflow ni o'rganasiz.</>, introEn:<><em>Windows Logs Forensics</em> — EVTX forensics and incident response. Learn system log analysis and IR workflow.</> },
+  1:  { min:36, diagrams:9, labs:3, introUz:<><em>Windows arxitekturasi</em> — OS ning to'liq ko'rinishi. User space, kernel space, HAL va Executive qatlamlarini chuqur o'rganasiz.</>, introEn:<><em>Windows architecture</em> — complete OS picture. Deep dive into user space, kernel space, HAL and the Executive layer.</> },
+  2:  { min:34, diagrams:7, labs:2, introUz:<><em>Kernel nima?</em> — ntoskrnl.exe ning ichki tuzilishi. Executive, Microkernel, HAL va kernel drayverlari haqida hamma narsani bilib olasiz.</>, introEn:<><em>What is the kernel?</em> — ntoskrnl.exe inner structure. Learn everything about the Executive, Microkernel, HAL and kernel drivers.</> },
+  3:  { min:32, diagrams:7, labs:2, introUz:<><em>User mode va Kernel mode</em> — CPU imtiyoz halqalari. Ring 0 vs Ring 3, chegara nima uchun muhim va syscall oqimini o'rganasiz.</>, introEn:<><em>User mode vs Kernel mode</em> — CPU privilege rings. Understand Ring 0 vs Ring 3, why the boundary matters and trace syscall flow.</> },
+  4:  { min:36, diagrams:8, labs:2, introUz:<><em>Windows boot jarayoni</em> — UEFI dan login ekranigacha. BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad va kernel bosqichlarini o'rganasiz.</>, introEn:<><em>Windows boot process</em> — UEFI to login screen. Learn BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad and kernel initialization phases.</> },
+  5:  { min:22, diagrams:5, labs:1, introUz:<><em>BIOS vs UEFI</em> — firmware arxitekturasi. 16-bit BIOS, UEFI fazalari, Secure Boot zanjiri va bypass texnikalarini o'rganasiz.</>, introEn:<><em>BIOS vs UEFI</em> — firmware architecture. Learn 16-bit BIOS, UEFI phases, Secure Boot chain and bypass techniques.</> },
+  6:  { min:24, diagrams:5, labs:1, introUz:<><em>Secure Boot</em> — bootkit'lardan himoya. PK/KEK/db/dbx ierarxiyasi, imzo tekshiruvi va Secure Boot bypass usullarini o'rganasiz.</>, introEn:<><em>Secure Boot</em> — protection against bootkits. Learn PK/KEK/db/dbx hierarchy, signature verification and Secure Boot bypass methods.</> },
+  7:  { min:26, diagrams:5, labs:1, introUz:<><em>TPM (Trusted Platform Module)</em> — apparat xavfsizlik chipi. PCR banklari, attestatsiya, BitLocker integratsiyasi va TPM hujumlarini o'rganasiz.</>, introEn:<><em>TPM (Trusted Platform Module)</em> — hardware security chip. Learn PCR banks, attestation, BitLocker integration and TPM attacks.</> },
+  8:  { min:38, diagrams:8, labs:3, introUz:<><em>Windows Registry</em> — konfiguratsiya ma'lumotlar bazasi. Ierarxik tuzilma, hive fayllar, muhim kalitlar, persistenslik joylari va forensic tahlilni o'rganasiz.</>, introEn:<><em>Windows Registry</em> — configuration database. Learn hierarchical structure, hive files, critical keys, persistence locations and forensic analysis.</> },
+  9:  { min:28, diagrams:6, labs:2, introUz:<><em>Fayl tizimlari</em> — VFS va fayl tizimi arxitekturasi. Windows ning turli fayl tizimlarini qanday boshqarishini o'rganasiz.</>, introEn:<><em>File systems</em> — VFS and file system architecture. Learn how Windows manages different file systems.</> },
+  10: { min:32, diagrams:7, labs:2, introUz:<><em>NTFS</em> — zamonaviy fayl tizimi chuqur. MFT, atributlar, ADS, EFS, jurnallar va NTFS forensics ni o'rganasiz.</>, introEn:<><em>NTFS</em> — modern file system in depth. Learn MFT, attributes, ADS, EFS, journals and NTFS forensics.</> },
+  11: { min:18, diagrams:4, labs:1, introUz:<><em>FAT32</em> — klassik fayl tizimi. FAT jadvali, cluster zanjiri va FAT32 ning cheklovlarini o'rganasiz.</>, introEn:<><em>FAT32</em> — classic file system. Learn the FAT table, cluster chain and FAT32 limitations.</> },
+  12: { min:36, diagrams:7, labs:3, introUz:<><em>Jarayonlar</em> — EPROCESS tuzilmasi va jarayon boshqaruvi. PEB, VAD daraxti, jarayon yaratish va in'ektsiya texnikalarini o'rganasiz.</>, introEn:<><em>Processes</em> — EPROCESS structure and process management. Learn PEB, VAD tree, process creation and injection techniques.</> },
+  13: { min:28, diagrams:6, labs:2, introUz:<><em>Thread'lar</em> — ETHREAD va Windows rejalashtiruvchisi. Thread lifecycle, TEB, sinxronizatsiya va thread in'ektsiyasini o'rganasiz.</>, introEn:<><em>Threads</em> — ETHREAD and the Windows scheduler. Learn thread lifecycle, TEB, synchronization and thread injection.</> },
+  14: { min:24, diagrams:5, labs:1, introUz:<><em>Handle'lar va Ob'ektlar</em> — Windows ob'ekt menejeri. Handle jadvali, ob'ekt turlari, kirish nazorati va handle based hujumlarni o'rganasiz.</>, introEn:<><em>Handles and Objects</em> — Windows Object Manager. Learn handle table, object types, access control and handle-based attacks.</> },
+  15: { min:30, diagrams:6, labs:2, introUz:<><em>Servislar</em> — SCM va fon jarayonlari. Servis turlari, xizmat akkauntlari, svchost guruhlari va servis asosidagi persistenslikni o'rganasiz.</>, introEn:<><em>Services</em> — SCM and background processes. Learn service types, service accounts, svchost groups and service-based persistence.</> },
+  16: { min:32, diagrams:6, labs:2, introUz:<><em>DLL va Injection</em> — PE tuzilmasi va dinamik yuklash. DLL injection, search order hijacking va aniqlash texnikalarini o'rganasiz.</>, introEn:<><em>DLL and Injection</em> — PE structure and dynamic loading. Learn DLL injection, search order hijacking and detection techniques.</> },
+  17: { min:30, diagrams:5, labs:2, introUz:<><em>Windows API</em> — Win32 qatlami va ntdll ko'prigi. API hooking, monitoring va syscall ko'rinishini o'rganasiz.</>, introEn:<><em>Windows API</em> — Win32 layer and ntdll bridge. Learn API hooking, monitoring and the syscall view.</> },
+  18: { min:24, diagrams:4, labs:2, introUz:<><em>Event Viewer</em> — Windows hodisa log tizimi. Log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensic tahlilni o'rganasiz.</>, introEn:<><em>Event Viewer</em> — Windows event logging system. Learn log architecture, key Event IDs, ETW, Sysmon and forensic analysis.</> },
+  19: { min:22, diagrams:4, labs:1, introUz:<><em>Task Scheduler</em> — vazifalarni avtomatlashtirish tizimi. Vazifa arxitekturasi, triggerlar, harakatlar va rejalashtiruvchi asosidagi persistenslikni o'rganasiz.</>, introEn:<><em>Task Scheduler</em> — automating system tasks. Learn task architecture, triggers, actions and scheduler-based persistence techniques.</> },
+  20: { min:24, diagrams:4, labs:2, introUz:<><em>Windows log fayllari</em> — EVTX forensics va hodisalarga javob. Tizim log tahlili va IR workflow ni o'rganasiz.</>, introEn:<><em>Windows logs</em> — EVTX forensics and incident response. Learn system log analysis and IR workflow.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
