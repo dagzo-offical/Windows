@@ -40,6 +40,7 @@ const SECTION_DATA = {
       { n: "24", uz: "System Configuration",         en: "System Configuration",        duration: 24, status: "locked", icon: "code",     color: "var(--c-warn)",   labs: 2, diagrams: 4 },
       { n: "25", uz: "Kengaytirilgan Tizim Sozl.",   en: "Advanced System Settings",    duration: 30, status: "locked", icon: "layers",   color: "var(--c-auth)",   labs: 2, diagrams: 5 },
       { n: "26", uz: "Kompyuter Boshqaruvi",         en: "Computer Management",         duration: 32, status: "locked", icon: "shield",   color: "var(--accent)",   labs: 2, diagrams: 6 },
+      { n: "27", uz: "Resource Monitor va CMD",     en: "Resource Monitor & CMD",      duration: 28, status: "locked", icon: "graph",    color: "var(--c-warn)",   labs: 2, diagrams: 5 },
     ],
   },
 };
@@ -99,7 +100,7 @@ function SectionScreen({ setRoute, user, onOpenProfile, section = 1 }) {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <MiniStat labelUz="Darslar" labelEn="Lessons" value="26" sub={lang === "en" ? "1/26 in progress" : "1/26 davom etmoqda"} color={data.color} icon="book" />
+              <MiniStat labelUz="Darslar" labelEn="Lessons" value="27" sub={lang === "en" ? "1/27 in progress" : "1/27 davom etmoqda"} color={data.color} icon="book" />
               <MiniStat labelUz="Laboratoriya" labelEn="Hands-on labs" value="36" sub={lang === "en" ? "0 done" : "0 yakunlangan"} color="var(--c-user)" icon="terminal" />
               <MiniStat labelUz="Diagrammalar" labelEn="Diagrams" value="118" sub="interactive" color="var(--c-system)" icon="graph" />
               <MiniStat labelUz="Final imtihon" labelEn="Final exam" value="20Q" sub={lang === "en" ? "2hr · 85% pass" : "2 soat · 85% o'tish"} color="var(--c-warn)" icon="target" />

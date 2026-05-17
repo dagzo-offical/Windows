@@ -42,6 +42,7 @@ const LESSONS = {
   24: { num: "L24", section: "01", uz: "System Configuration",          en: "System Configuration",        subUz: "msconfig.exe — ishga tushish turlari, xavfsiz yuklash, xizmatlar va vositalar", subEn: "msconfig.exe — startup types, safe boot modes, services tab and tools shortcuts" },
   25: { num: "L25", section: "01", uz: "Kengaytirilgan Tizim Sozlamalari", en: "Advanced System Settings", subUz: "sysdm.cpl — DEP, virtual xotira, tizimni tiklash, drayver imzolash va RDP", subEn: "sysdm.cpl — DEP, virtual memory, system restore, driver signing and RDP" },
   26: { num: "L26", section: "01", uz: "Kompyuter Boshqaruvi",          en: "Computer Management",         subUz: "compmgmt.msc — ulashimlar, foydalanuvchilar, disk, xizmatlar va WMI persistenslik", subEn: "compmgmt.msc — shares, users, disk management, services and WMI persistence" },
+  27: { num: "L27", section: "01", uz: "Resource Monitor va CMD",       en: "Resource Monitor & CMD",       subUz: "resmon.exe 4 tab (CPU/xotira/disk/tarmoq), cmd buyruqlari va Registry Editor", subEn: "resmon.exe 4 tabs (CPU/memory/disk/network), cmd commands and Registry Editor" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -143,6 +144,8 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <SectionAdvancedSystem />
           </> : lessonNum === 26 ? <>
             <SectionComputerMgmt />
+          </> : lessonNum === 27 ? <>
+            <SectionResourceMonitor />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -314,6 +317,9 @@ const LESSON_META = {
   26: { min: 34, diagrams: 6, labs: 2,
        introUz: <><em>Kompyuter Boshqaruvi (compmgmt.msc)</em> — eng muhim Windows boshqaruv vositalarini jamlagan MMC konsolı. Bu darsda Ulashilgan papkalar (yashirin admin ulashimlari C$, ADMIN$, IPC$), Mahalliy foydalanuvchilar va guruhlar, Ishlash monitori, <em>WMI persistenslik va aniqlash</em>, Disk boshqaruvi va masofaviy boshqaruv imkoniyatlarini o'rganasiz.</>,
        introEn: <><em>Computer Management (compmgmt.msc)</em> is the MMC console aggregating Windows' most essential admin tools. This lesson covers Shared Folders (hidden admin shares C$, ADMIN$, IPC$), Local Users and Groups, Performance Monitor, <em>WMI persistence and detection</em>, Disk Management, and remote computer management.</> },
+  27: { min: 30, diagrams: 5, labs: 2,
+       introUz: <><em>Resource Monitor (resmon.exe)</em> — jarayon darajasida CPU, xotira, disk va tarmoqdan foydalanishni, shuningdek deskriptorlar va modullarni ko'rsatadigan ilg'or monitoring vositasi. Bu darsda 4 ta tab (CPU, Memory, Disk, Network), real vaqt grafiklar, xavfsizlik uchun ishlatish, shuningdek <em>cmd.exe</em> asosiy buyruqlari (hostname, whoami, ipconfig, netstat, net) va Registry Editor tezkor ma'lumotnomasini o'rganasiz.</>,
+       introEn: <><em>Resource Monitor (resmon.exe)</em> is the advanced monitoring tool that shows per-process CPU, memory, disk, and network usage along with handles and modules. This lesson covers the 4 tabs (CPU, Memory, Disk, Network), real-time graphs, security use cases, plus <em>cmd.exe</em> essential commands (hostname, whoami, ipconfig, netstat, net), and a Registry Editor quick reference.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -8039,6 +8045,469 @@ Get-WMIObject -Namespace "root\\subscription" -Class "__FilterToConsumerBinding"
 
 # Disk ma'lumotlari
 Get-Disk; Get-Partition; Get-Volume`}</code></pre>
+    </section>
+  );
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// L27 – Resource Monitor & Command Prompt
+// ─────────────────────────────────────────────────────────────
+function SectionResourceMonitor() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Resource Monitor — resmon.exe" uz="" />
+      <P>
+        <Term>Resource Monitor</Term> (resmon.exe) displays per-process CPU, memory, disk, and network usage data,
+        along with which processes are using individual file handles and modules.
+        It includes advanced filtering to isolate data for specific processes, the ability to start/stop/pause services,
+        force-close unresponsive applications, and a <Term>process analysis</Term> function that identifies deadlocked
+        processes and file-locking conflicts — letting you resolve conflicts rather than losing data by killing the app.
+        It is designed for advanced users troubleshooting complex system issues.
+      </P>
+      <Callout color="var(--accent)" icon="info" titleEn="How to open" titleUz="">
+        Run → <code>resmon</code> · Task Manager → Performance tab → "Open Resource Monitor" · msconfig Tools tab → Resource Monitor → Launch · Start Menu → search "Resource Monitor"
+      </Callout>
+
+      {/* Architecture diagram */}
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:14}}><code>{`Resource Monitor Layout:
+┌─────────────────────────────────────────────────────────────────────────┐
+│  [Overview]  [CPU]  [Memory]  [Disk]  [Network]          ← 5 tabs      │
+├─────────────────────────────────────────────┬───────────────────────────┤
+│                                             │  Real-time Graphs Panel   │
+│  Overview tab: 4 collapsible sections       │  ┌─────────────────────┐  │
+│  ┌─ CPU ──────────────────────────────────┐ │  │ CPU Total   ██░░░░  │  │
+│  │  Image  PID  Desc  Status  Threads CPU │ │  │             45%     │  │
+│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
+│  ┌─ Disk ─────────────────────────────────┐ │  │ Disk I/O    ████░░  │  │
+│  │  Image  PID  File   R B/s   W B/s  Pri │ │  │             2.1 MB/s│  │
+│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
+│  ┌─ Network ──────────────────────────────┐ │  │ Network     █░░░░░  │  │
+│  │  Image  PID  Address  Send  Receive    │ │  │             120 Kbps│  │
+│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
+│  ┌─ Memory ───────────────────────────────┐ │  │ Memory      ██████  │  │
+│  │  Image  PID  Hard Faults  Working Set  │ │  │  Used: 6.2 GB       │  │
+│  └────────────────────────────────────────┘ │  └─────────────────────┘  │
+└─────────────────────────────────────────────┴───────────────────────────┘`}</code></pre>
+
+      <H2 num="§2" en="CPU Tab" uz="" />
+      <P>The <Term>CPU tab</Term> shows every process consuming CPU cycles and breaks down activity into 4 sub-tables: Processes, Services, Associated Handles, and Associated Modules.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Processes",c:"var(--accent)",d:"All running processes with: Image name, PID, Description, Status (Running/Suspended), Thread count, CPU % (average + current), CPU cycle delta. Sort by CPU to find the highest consumer."},
+          {t:"Services",c:"var(--c-auth)",d:"Services running inside each process (important for svchost.exe which hosts many services). Shows Service name, PID, Description, Group, Status. Clicking a process filters which services it hosts."},
+          {t:"Associated Handles",c:"var(--c-warn)",d:"Open kernel object handles (files, registry keys, events, mutexes, semaphores) for the selected process. Critical for diagnosing 'file in use' errors and detecting suspicious handle usage (e.g., a process holding a handle to lsass.exe)."},
+          {t:"Associated Modules",c:"var(--c-attack)",d:"DLLs and other modules loaded into the selected process. Shows module path — critical for detecting DLL hijacking (unexpected DLL loaded from %TEMP% or user-writable paths) and reflective injection (no path shown, only in-memory)."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:8}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§3" en="Memory Tab" uz="" />
+      <P>The <Term>Memory tab</Term> shows per-process RAM usage and a physical memory bar at the bottom that maps how RAM is currently divided.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Memory Tab Columns:
+  Image      → process name
+  PID        → process ID
+  Hard Faults/sec → page faults requiring disk access (high = memory pressure)
+  Commit (KB) → virtual memory committed (may exceed physical RAM)
+  Working Set (KB) → pages currently in physical RAM (resident set)
+  Shareable (KB)   → pages shared with other processes (e.g., mapped DLLs)
+  Private (KB)     → pages exclusive to this process (not shareable)
+
+Physical Memory Bar (bottom):
+  ┌────────────────────────────────────────────────────────┐
+  │ In Use │ Modified │ Standby │ Free                     │
+  └────────────────────────────────────────────────────────┘
+  In Use    → actively used by processes + system
+  Modified  → dirty pages waiting to be written to disk
+  Standby   → cached (recently used, available if needed)
+  Free      → zeroed pages, immediately available
+
+Security relevance:
+  Private Working Set = pages only the process uses
+  High private commit for an unknown process → suspicious
+  Hard Faults spike → system swapping to pagefile (memory pressure / forensic)
+  Committed > Physical RAM → heavy paging → check pagefile.sys for artifacts`}</code></pre>
+
+      <H2 num="§4" en="Disk Tab" uz="" />
+      <P>The <Term>Disk tab</Term> shows real-time file I/O per process — which files are being read/written and at what speed. It is the fastest way to find what process is hammering the disk.</P>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Column","Meaning","Security Use"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["Image / PID","Process performing I/O","Identify unknown process reading many files"],
+              ["File","Full path of file being accessed","Detect staging / exfiltration to temp paths"],
+              ["Read B/sec","Bytes read per second","Bulk file read = potential data staging"],
+              ["Write B/sec","Bytes written per second","High write + encrypt filenames = ransomware"],
+              ["I/O Priority","Normal / Background / Critical","Malware often uses Background to stay quiet"],
+              ["Response Time (ms)","Disk latency for each operation","Spikes indicate storage contention or bad sectors"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <H2 num="§5" en="Network Tab" uz="" />
+      <P>The <Term>Network tab</Term> shows active network connections per process — the most useful tab for detecting malware command-and-control traffic and unauthorized connections.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Network Tab — 3 sub-tables:
+
+1. Processes with Network Activity
+   Image | PID | Send B/sec | Receive B/sec | Total B/sec
+   → Sort by Total to find highest bandwidth consumers
+
+2. Network Activity (per connection)
+   Image | PID | Address | Send B/sec | Receive B/sec
+   → See exact remote IPs each process is talking to
+
+3. TCP Connections
+   Image | PID | Local Address:Port | Remote Address:Port | Packet Loss | Latency
+   → Full socket table — equivalent to netstat -ano but with process name
+
+4. Listening Ports
+   Image | PID | Address | Port | Protocol
+   → All open ports (TCP + UDP) with owning process
+   → Critical: find unexpected listener on high port = backdoor indicator
+
+Security checks:
+  Unknown process with outbound connection to unusual IP → C2 beacon
+  Listener on unexpected port (not 80/443/445/3389) → backdoor
+  svchost.exe connecting to external IP → malicious service
+  Process sending more than receiving → data exfiltration`}</code></pre>
+
+      <H2 num="§6" en="Command Prompt — cmd.exe" uz="" />
+      <P>
+        <Term>cmd.exe</Term> (Command Prompt) was the primary interface for early Windows systems before GUI. It remains essential for administration, automation, and security tasks.
+        While PowerShell has largely replaced cmd for advanced tasks, cmd.exe is universally available and lighter.
+      </P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Getting help for any command:
+  <command> /?         → show syntax and parameters
+  ipconfig /?          → ipconfig help
+  netstat /?           → netstat help
+
+  Exception: net commands use a different syntax:
+  net help             → list net subcommands
+  net help user        → help for 'net user'
+  net help localgroup  → help for 'net localgroup'
+
+Clear the screen: cls`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>Essential Commands</h3>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Command","Output","Security Use"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["hostname","Machine name (NetBIOS)","Confirm target machine in engagement"],
+              ["whoami","Current user (domain\\user or PC\\user)","Confirm privileges / identify context"],
+              ["whoami /priv","Token privileges list","Spot SeDebugPrivilege, SeImpersonatePrivilege for privesc"],
+              ["whoami /groups","Group memberships + integrity level","Check if in Administrators, Mandatory Level"],
+              ["ipconfig","IP, subnet, gateway, DNS per adapter","Network recon — find subnets to pivot into"],
+              ["ipconfig /all","Full config + MAC, DHCP, lease","DHCP server IP, DNS servers, full config"],
+              ["netstat -ano","All connections with owning PID","Find C2 connections, unexpected listeners"],
+              ["netstat -ab","Connections with process name","Same but shows process name (needs admin)"],
+              ["net user","List all local user accounts","Enumerate users — find unexpected accounts"],
+              ["net localgroup","List all local groups","Find who is in Administrators"],
+              ["net share","List all network shares","Find exposed shares for lateral movement"],
+              ["net session","Active SMB sessions to this machine","Who is currently connected over network"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <H2 num="§7" en="Registry Editor — Quick Reference" uz="" />
+      <P>
+        <Term>regedit.exe</Term> is the GUI editor for the Windows Registry — the central hierarchical database storing settings for users, applications, and hardware. Windows constantly reads the registry during operation. A full treatment is in <Em>L08 — Windows Registry</Em>; here is the quick reference for tools accessible from msconfig.
+      </P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Registry stores:
+  → Per-user profiles
+  → Installed applications and document type associations
+  → Folder and icon properties
+  → Hardware inventory
+  → Used COM ports and devices
+
+Open: Run → regedit   (requires UAC elevation for HKLM writes)
+
+WARNING: Registry edits can break normal system operation.
+         Always export a key before modifying it:
+         File → Export → save .reg backup
+
+Root keys (hives):
+  HKLM  → machine-wide settings (all users)
+  HKCU  → current user settings
+  HKCR  → file type / COM class associations
+  HKU   → all users' hives
+  HKCC  → current hardware profile
+
+Security relevance:
+  HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run  → auto-start (all users)
+  HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run  → auto-start (current user)
+  HKLM\\SYSTEM\\CurrentControlSet\\Services                → service definitions`}</code></pre>
+
+      <H2 num="§8" en="Practical Commands" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Open Resource Monitor
+resmon
+# From Task Manager: Performance tab → "Open Resource Monitor"
+
+# Find process using a specific file (Handle search in Resource Monitor)
+# CPU tab → Associated Handles → search box
+
+# netstat quick cheatsheet
+netstat -a        # all connections + listening ports
+netstat -n        # numeric IPs (no DNS resolution — faster)
+netstat -o        # show owning PID
+netstat -b        # show owning process name (requires admin)
+netstat -ano      # all + numeric + PID  ← most useful
+netstat -e        # Ethernet statistics (bytes/packets/errors)
+
+# Find process owning a port (combine with tasklist)
+netstat -ano | findstr ":443 "
+tasklist /fi "PID eq 1234"
+
+# User and share enumeration
+net user                         # list local users
+net user Administrator           # details on specific account
+net localgroup                   # list all groups
+net localgroup Administrators    # members of Administrators
+net share                        # list all shares
+net session                      # active SMB sessions
+
+# Quick system info
+systeminfo                       # full OS, RAM, hotfixes, network adapters
+systeminfo | findstr /B /C:"OS" /C:"System Boot"`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Resource Monitor — resmon.exe" en="" />
+      <P>
+        <Term>Resource Monitor</Term> (resmon.exe) har bir jarayon kesimida CPU, xotira, disk va tarmoqdan foydalanish ma'lumotlarini, shuningdek qaysi jarayonlar alohida fayl deskriptorlari (handle) va modullardan foydalanayotganini ko'rsatadi.
+        Kengaytirilgan filtrlash yordamida ma'lum jarayonlar uchun ma'lumotlarni ajratib olish, xizmatlarni boshqarish, javob bermayotgan ilovalarni yopish va <Term>deadlock</Term> (bloklanib qolgan) jarayonlar hamda fayl bloklash nizolarini aniqlash mumkin.
+        Bu utilita murakkab nosozliklarni bartaraf etishi kerak bo'lgan ilg'or foydalanuvchilarga mo'ljallangan.
+      </P>
+      <Callout color="var(--accent)" icon="info" titleUz="Qanday ochish" titleEn="">
+        Run → <code>resmon</code> · Vazifa menejeri → Ishlash tab → "Resurs monitorini ochish" · msconfig Vositalar tab → Resource Monitor → Ishga tushirish · Boshlash menyu → "Resource Monitor" qidirish
+      </Callout>
+
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:14}}><code>{`Resource Monitor Tartibi:
+┌─────────────────────────────────────────────────────────────────────────┐
+│  [Umumiy]  [CPU]  [Xotira]  [Disk]  [Tarmoq]            ← 5 tab       │
+├─────────────────────────────────────────────┬───────────────────────────┤
+│                                             │  Real vaqt grafiklari     │
+│  Umumiy tab: 4 ta kengaytiriluvchi bo'lim   │  ┌─────────────────────┐  │
+│  ┌─ CPU ──────────────────────────────────┐ │  │ CPU Jami    ██░░░░  │  │
+│  │  Nom  PID  Tavsif  Holat  Thread  CPU  │ │  │             45%     │  │
+│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
+│  ┌─ Disk ─────────────────────────────────┐ │  │ Disk I/O    ████░░  │  │
+│  │  Nom  PID  Fayl   O'qish   Yozish  Pri │ │  │             2.1 MB/s│  │
+│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
+│  ┌─ Tarmoq ────────────────────────────────┐│  │ Tarmoq      █░░░░░  │  │
+│  │  Nom  PID  Manzil  Yuborish  Qabul      ││  │             120 Kbps│  │
+│  └────────────────────────────────────────┘ │  ├─────────────────────┤  │
+│  ┌─ Xotira ───────────────────────────────┐ │  │ Xotira      ██████  │  │
+│  │  Nom  PID  Qattiq Xatolar  Ishlash To'p│ │  │  Ishlatilgan: 6.2 GB│  │
+│  └────────────────────────────────────────┘ │  └─────────────────────┘  │
+└─────────────────────────────────────────────┴───────────────────────────┘`}</code></pre>
+
+      <H2 num="§2" uz="CPU Tab" en="" />
+      <P><Term>CPU tab</Term> CPU tsikllarini iste'mol qilayotgan barcha jarayonlarni ko'rsatadi va faoliyatni 4 ta kichik jadvalga ajratadi: Jarayonlar, Xizmatlar, Bog'liq Deskriptorlar va Bog'liq Modullar.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Jarayonlar",c:"var(--accent)",d:"Ishlayotgan barcha jarayonlar: Nom, PID, Tavsif, Holat (Ishlamoqda/To'xtatilgan), Thread soni, CPU % (o'rtacha + joriy). Eng ko'p iste'mol qiluvchini topish uchun CPU bo'yicha saralang."},
+          {t:"Xizmatlar",c:"var(--c-auth)",d:"Har bir jarayon ichida ishlaydigan xizmatlar (ko'plab xizmatlarni joylashtiradigan svchost.exe uchun muhim). Xizmat nomi, PID, Tavsif, Guruh, Holat. Jarayonni bosish qaysi xizmatlarni joylashtirayotganini filtrlaydi."},
+          {t:"Bog'liq Deskriptorlar",c:"var(--c-warn)",d:"Tanlangan jarayon uchun ochiq kernel ob'ekt deskriptorlari (fayllar, registry kalitlari, hodisalar, mutexlar). 'Fayl ishlatilmoqda' xatolarini tashxislash va shubhali deskriptor foydalanishini aniqlash uchun kritik (masalan, lsass.exe ga deskriptor ushlab turgan jarayon)."},
+          {t:"Bog'liq Modullar",c:"var(--c-attack)",d:"Tanlangan jarayonga yuklangan DLL lar va boshqa modullar. Modul yo'lini ko'rsatadi — DLL hijacking (kutilmagan DLL %TEMP% dan yuklangan) va reflektiv in'ektsiyani aniqlash uchun kritik (yo'l ko'rsatilmagan, faqat xotirada)."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:8}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§3" uz="Memory Tab" en="" />
+      <P><Term>Memory tab</Term> jarayon boshiga RAM iste'molini va pastdagi jismoniy xotira panelini ko'rsatadi — RAM qanday taqsimlanganini xaritasini chizadi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Memory Tab Ustunlari:
+  Nom           → jarayon nomi
+  PID           → jarayon ID
+  Qattiq Xatolar/s → diskga murojaat talab qiluvchi sahifa xatolari (yuqori = xotira bosimi)
+  Majburiy (KB) → majburlangan virtual xotira (jismoniy RAM dan oshishi mumkin)
+  Ishlash To'p (KB) → jismoniy RAM dagi sahifalar (rezident to'p)
+  Umumlashtirilgan (KB) → boshqa jarayonlar bilan ulashilgan sahifalar (masalan, DLL lar)
+  Shaxsiy (KB)  → faqat ushbu jarayonga tegishli sahifalar
+
+Jismoniy Xotira Paneli (pastda):
+  ┌────────────────────────────────────────────────────────┐
+  │ Ishlatilmoqda │ O'zgartirilgan │ Standby │ Bo'sh       │
+  └────────────────────────────────────────────────────────┘
+  Ishlatilmoqda  → jarayonlar + tizim tomonidan faol ishlatilmoqda
+  O'zgartirilgan → diskka yozilishini kutayotgan iflos sahifalar
+  Standby        → keshlangan (so'nggi ishlatilgan, zarur bo'lganda mavjud)
+  Bo'sh          → nollangan sahifalar, darhol mavjud
+
+Xavfsizlik ahamiyati:
+  Noma'lum jarayon uchun yuqori shaxsiy majburiy → shubhali
+  Qattiq Xatolar o'sishi → tizim pagefile ga almashmoqda → artefaktlar uchun tekshiring`}</code></pre>
+
+      <H2 num="§4" uz="Disk Tab" en="" />
+      <P><Term>Disk tab</Term> jarayon boshiga real vaqt fayl I/O ni ko'rsatadi — qaysi fayllar o'qilmoqda/yozilmoqda va qanday tezlikda. Diskni eng ko'p ishlatayotgan jarayonni topishning eng tez usuli.</P>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Ustun","Ma'nosi","Xavfsizlik qo'llanilishi"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["Nom / PID","I/O bajarayotgan jarayon","Ko'p fayllarni o'qiyotgan noma'lum jarayonni aniqlash"],
+              ["Fayl","Kiriladigan faylning to'liq yo'li","Vaqtinchalik yo'llarga sahnalashtirish/eksfiltratsiyani aniqlash"],
+              ["O'qish B/s","Soniyasiga o'qilgan baytlar","Ko'p o'qish = potentsial ma'lumotlarni sahnalashtirish"],
+              ["Yozish B/s","Soniyasiga yozilgan baytlar","Yuqori yozish + fayl nomlari o'zgarishi = ransomware"],
+              ["I/O Ustuvorligi","Normal / Fon / Kritik","Zararli dasturlar ko'pincha Fon ustuvorligidan foydalanadi"],
+              ["Javob vaqti (ms)","Har bir operatsiya uchun disk kechikishi","Keskin o'sish saqlash raqobatini yoki yomon sektorlarni ko'rsatadi"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <H2 num="§5" uz="Network Tab" en="" />
+      <P><Term>Network tab</Term> jarayon boshiga faol tarmoq ulanishlarini ko'rsatadi — zararli dastur C2 trafigini va ruxsatsiz ulanishlarni aniqlash uchun eng foydali tab.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Network Tab — 4 ta kichik jadval:
+
+1. Tarmoq faoliyatiga ega jarayonlar
+   Nom | PID | Yuborish B/s | Qabul B/s | Jami B/s
+   → Eng ko'p tarmoq iste'mol qiluvchini topish uchun Jami bo'yicha saralang
+
+2. Tarmoq faoliyati (ulanish boshiga)
+   Nom | PID | Manzil | Yuborish B/s | Qabul B/s
+   → Har bir jarayon qaysi masofaviy IP bilan gaplashayotganini ko'ring
+
+3. TCP Ulanishlari
+   Nom | PID | Mahalliy Manzil:Port | Masofaviy Manzil:Port | Paket yo'qotish | Kechikish
+   → Jarayon nomi bilan to'liq soket jadvali — netstat -ano ekvivalenti
+
+4. Tinglash Portlari
+   Nom | PID | Manzil | Port | Protokol
+   → Jarayon egaligi bilan barcha ochiq portlar (TCP + UDP)
+   → Kritik: kutilmagan baland portdagi tinglovchi = backdoor ko'rsatgich
+
+Xavfsizlik tekshiruvlari:
+  G'ayrioddiy IP ga chiquvchi ulanishli noma'lum jarayon → C2 mayoqi
+  Kutilmagan portdagi tinglovchi (80/443/445/3389 emas) → backdoor
+  Tashqi IP ga ulanayotgan svchost.exe → zararli xizmat
+  Jarayon qabul qilishdan ko'ra ko'proq yuborayotgan → ma'lumot eksfiltratsiyasi`}</code></pre>
+
+      <H2 num="§6" uz="Buyruqlar Satri — cmd.exe" en="" />
+      <P>
+        <Term>cmd.exe</Term> (Buyruqlar Satri) GUI joriy etilishidan oldin dastlabki Windows tizimlarining asosiy interfeysi bo'lgan.
+        PowerShell ilg'or vazifalar uchun cmd ni asosan almashtirgan bo'lsa-da, cmd.exe hamma joyda mavjud va engil.
+      </P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Istalgan buyruq uchun yordam olish:
+  <buyruq> /?       → sintaksis va parametrlarni ko'rsatish
+  ipconfig /?       → ipconfig yordami
+  netstat /?        → netstat yordami
+
+  Istisno: net buyruqlari boshqa sintaksisdan foydalanadi:
+  net help          → net buyruqlarini ro'yxatga olish
+  net help user     → 'net user' uchun yordam
+  net help localgroup → 'net localgroup' uchun yordam
+
+Ekranni tozalash: cls`}</code></pre>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>Asosiy Buyruqlar</h3>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Buyruq","Natija","Xavfsizlik qo'llanilishi"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["hostname","Mashina nomi (NetBIOS)","Nishon mashinasini tasdiqlash"],
+              ["whoami","Joriy foydalanuvchi (domen\\foydalanuvchi)","Imtiyozlarni tasdiqlash / kontekstni aniqlash"],
+              ["whoami /priv","Token imtiyozlari ro'yxati","SeDebugPrivilege, SeImpersonatePrivilege ni tekshirish"],
+              ["whoami /groups","Guruh a'zoliklari + yaxlitlik darajasi","Administratorlar da borligini, Mandatory Level ni tekshirish"],
+              ["ipconfig","IP, subnet, shlyuz, DNS","Tarmoq razvedkasi — pivot uchun subnetlarni topish"],
+              ["ipconfig /all","To'liq konfiguratsiya + MAC, DHCP","DHCP server IP, DNS serverlari, to'liq konfiguratsiya"],
+              ["netstat -ano","Egasi PID bilan barcha ulanishlar","C2 ulanishlarni, kutilmagan tinglovchilarni topish"],
+              ["net user","Barcha mahalliy foydalanuvchilar ro'yxati","Kutilmagan hisoblarni topish"],
+              ["net localgroup","Barcha mahalliy guruhlar ro'yxati","Administratorlar da kimlar borligini topish"],
+              ["net share","Barcha tarmoq ulashimlari ro'yxati","Lateral harakat uchun ochiq ulashimlarni topish"],
+              ["net session","Ushbu mashinaga faol SMB sessiyalari","Tarmoq orqali kim ulangan"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <H2 num="§7" uz="Registry Editor — Tezkor Qo'llanma" en="" />
+      <P>
+        <Term>regedit.exe</Term> — Windows Registry (foydalanuvchilar, ilovalar va apparat uchun sozlamalarni saqlaydigan markaziy ierarxik ma'lumotlar bazasi) ni grafik muharrir. To'liq ko'rib chiqish <Em>L08 — Windows Registry</Em> da; bu yerda msconfig orqali kirish mumkin bo'lgan vosita sifatida tezkor ma'lumotnoma.
+      </P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`Registry nima saqlaydi:
+  → Har bir foydalanuvchi uchun profillar
+  → O'rnatilgan ilovalar va hujjat turi assotsiatsiyalari
+  → Papka va piktogramma (icon) xususiyatlari
+  → Apparat inventarizatsiyasi
+  → Ishlatilgan COM portlari va qurilmalar
+
+Ochish: Run → regedit  (HKLM yozishi uchun UAC kerak)
+
+OGOHLANTIRISH: Registry tahrirlari tizimning oddiy ishlashiga ta'sir qilishi mumkin.
+               O'zgartirishdan oldin har doim kalitni eksport qiling:
+               Fayl → Eksport → .reg zaxira saqla
+
+Asosiy kalitlar (hive):
+  HKLM  → mashina bo'yicha sozlamalar (barcha foydalanuvchilar)
+  HKCU  → joriy foydalanuvchi sozlamalari
+  HKCR  → fayl turi / COM klass assotsiatsiyalari
+  HKU   → barcha foydalanuvchilar hive lari
+  HKCC  → joriy apparat profili
+
+Xavfsizlik ahamiyati:
+  HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run  → avto-ishga tushirish (barcha foydalanuvchilar)
+  HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run  → avto-ishga tushirish (joriy foydalanuvchi)
+  HKLM\\SYSTEM\\CurrentControlSet\\Services               → xizmat ta'riflari`}</code></pre>
+
+      <H2 num="§8" uz="Amaliy Buyruqlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Resource Monitor ochish
+resmon
+# Vazifa menejeri → Ishlash tab → "Resurs monitorini ochish"
+
+# netstat tezkor lug'at
+netstat -a        # barcha ulanishlar + tinglash portlari
+netstat -n        # raqamli IP (DNS aniqlashsiz — tezroq)
+netstat -o        # egasi PID ni ko'rsatish
+netstat -b        # egasi jarayon nomini ko'rsatish (admin talab qiladi)
+netstat -ano      # barcha + raqamli + PID  ← eng foydali
+netstat -e        # Ethernet statistikasi
+
+# Portga egalik qiluvchi jarayonni topish
+netstat -ano | findstr ":443 "
+tasklist /fi "PID eq 1234"
+
+# Foydalanuvchi va ulashim ro'yxati
+net user                         # mahalliy foydalanuvchilar ro'yxati
+net user Administrator           # muayyan hisob haqida tafsilotlar
+net localgroup                   # barcha guruhlar
+net localgroup Administrators    # Administratorlar a'zolari
+net share                        # barcha ulashimlar
+net session                      # faol SMB sessiyalari
+
+# Tizim ma'lumotlari
+systeminfo                       # to'liq OS, RAM, hotfix, tarmoq adapterlari
+systeminfo | findstr /B /C:"OS" /C:"System Boot"`}</code></pre>
     </section>
   );
 }
