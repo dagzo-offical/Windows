@@ -43,6 +43,7 @@ const LESSONS = {
   25: { num: "L25", section: "01", uz: "Kengaytirilgan Tizim Sozlamalari", en: "Advanced System Settings", subUz: "sysdm.cpl — DEP, virtual xotira, tizimni tiklash, drayver imzolash va RDP", subEn: "sysdm.cpl — DEP, virtual memory, system restore, driver signing and RDP" },
   26: { num: "L26", section: "01", uz: "Kompyuter Boshqaruvi",          en: "Computer Management",         subUz: "compmgmt.msc — ulashimlar, foydalanuvchilar, disk, xizmatlar va WMI persistenslik", subEn: "compmgmt.msc — shares, users, disk management, services and WMI persistence" },
   27: { num: "L27", section: "01", uz: "Resource Monitor va CMD",       en: "Resource Monitor & CMD",       subUz: "resmon.exe 4 tab (CPU/xotira/disk/tarmoq), cmd buyruqlari va Registry Editor", subEn: "resmon.exe 4 tabs (CPU/memory/disk/network), cmd commands and Registry Editor" },
+  28: { num: "L28", section: "01", uz: "GUI — Grafik Interfeys",         en: "GUI — Graphical Interface",    subUz: "Win32 oyna modeli, HWND/WndProc, DWM compositor, API qatlamlari va xavfsizlik", subEn: "Win32 window model, HWND/WndProc, DWM compositor, GUI API layers and security" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -146,6 +147,8 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
             <SectionComputerMgmt />
           </> : lessonNum === 27 ? <>
             <SectionResourceMonitor />
+          </> : lessonNum === 28 ? <>
+            <SectionGUI />
           </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
@@ -320,6 +323,9 @@ const LESSON_META = {
   27: { min: 30, diagrams: 5, labs: 2,
        introUz: <><em>Resource Monitor (resmon.exe)</em> — jarayon darajasida CPU, xotira, disk va tarmoqdan foydalanishni, shuningdek deskriptorlar va modullarni ko'rsatadigan ilg'or monitoring vositasi. Bu darsda 4 ta tab (CPU, Memory, Disk, Network), real vaqt grafiklar, xavfsizlik uchun ishlatish, shuningdek <em>cmd.exe</em> asosiy buyruqlari (hostname, whoami, ipconfig, netstat, net) va Registry Editor tezkor ma'lumotnomasini o'rganasiz.</>,
        introEn: <><em>Resource Monitor (resmon.exe)</em> is the advanced monitoring tool that shows per-process CPU, memory, disk, and network usage along with handles and modules. This lesson covers the 4 tabs (CPU, Memory, Disk, Network), real-time graphs, security use cases, plus <em>cmd.exe</em> essential commands (hostname, whoami, ipconfig, netstat, net), and a Registry Editor quick reference.</> },
+  28: { min: 28, diagrams: 6, labs: 2,
+       introUz: <><em>GUI (Graphical User Interface)</em> — Windows ning vizual qatlami. Bu darsda Win32 oyna modeli (HWND, WndProc, xabar nasosi), DWM (Desktop Window Manager) compositor, taskbar/Start Menu anatomiyasi, GUI API evolyutsiyasi (GDI → GDI+ → Direct2D → WPF → UWP/WinUI 3) va UI xavfsizligi (shatter hujumlari, clickjacking, UI Automation) ni o'rganasiz.</>,
+       introEn: <><em>GUI (Graphical User Interface)</em> is Windows' visual layer. This lesson covers the Win32 window model (HWND, WndProc, message pump), DWM (Desktop Window Manager) compositor, taskbar/Start Menu anatomy, GUI API evolution (GDI → GDI+ → Direct2D → WPF → UWP/WinUI 3), and UI security (shatter attacks, clickjacking, UI Automation abuse).</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -4533,7 +4539,59 @@ DuplicateHandle(
         ))}
       </div>
 
-      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Practical Commands</h3>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.6 — Kerberos vs NTLM Authentication</h3>
+      <P>Windows uses two main authentication protocols: <Term>NTLM</Term> (legacy, challenge-response, works without a domain) and <Term>Kerberos</Term> (modern, ticket-based, requires a domain and KDC). Domain-joined systems prefer Kerberos; NTLM is used as a fallback.</P>
+
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Feature","NTLM","Kerberos"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["Type","Challenge-response (3 messages)","Ticket-based (AS + TGS + AP exchange)"],
+              ["Requires DC?","No — works on standalone machines","Yes — needs KDC (Domain Controller)"],
+              ["Mutual auth","No — only server verifies client","Yes — client and server verify each other"],
+              ["Replay protection","Weak (challenge can be relayed)","Strong (timestamps + nonce)"],
+              ["Main attack","Pass-the-Hash, NTLM relay, Responder","Kerberoasting, AS-REP roasting, Pass-the-Ticket, Golden/Silver Ticket"],
+              ["Used when","No domain, SMB fallback, local auth","Domain-joined, Active Directory services"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontSize:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p style={{fontSize:13,color:"var(--text-2)",margin:"16px 0 8px",fontWeight:500}}>Kerberos Authentication Flow (Domain environment):</p>
+      <img src="uploads/Screenshot_2026-05-15_15_19_02.png"
+           alt="Kerberos Authentication Flow — AS Exchange, TGS Exchange, Service Access"
+           style={{width:"100%",borderRadius:8,border:"1px solid var(--border)",marginBottom:14,display:"block"}} />
+      <div style={{fontSize:11,color:"var(--text-3)",fontFamily:"var(--font-mono)",marginBottom:16,textAlign:"center"}}>
+        Kerberos: User → KDC (AS-REQ/AS-REP → TGT) → KDC (TGS-REQ/TGS-REP → Service Ticket) → Service (AP-REQ → Session)
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"AS Exchange (Step 1)",c:"var(--accent)",items:["Client sends AS-REQ (preauth: timestamp encrypted with user's password hash)","KDC verifies, issues TGT (Ticket Granting Ticket) + session key","TGT encrypted with KDC's krbtgt account hash — client cannot decrypt it"]},
+          {t:"TGS Exchange (Step 2)",c:"var(--c-auth)",items:["Client sends TGS-REQ: TGT + SPN (Service Principal Name, e.g. MSSQL/SvcDB)","KDC decrypts TGT, issues Service Ticket encrypted with target service's account hash","Client still cannot decrypt — only the service can"]},
+          {t:"AP Exchange (Step 3)",c:"var(--c-warn)",items:["Client sends AP-REQ: Service Ticket to the target service","Service decrypts ticket with its own hash — verifies client identity","Mutual auth: service sends AP-REP proving it knew the session key"]},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:8}}>{card.t}</div>
+            <ul style={{margin:0,paddingLeft:16,fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>{card.items.map((item,j)=><li key={j}>{item}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+
+      <Callout color="var(--c-attack)" icon="warning" titleEn="Kerberos Attack Techniques" titleUz="">
+        <strong>Kerberoasting:</strong> Any domain user can request a Service Ticket for any SPN. The ticket is encrypted with the service account's hash — crack it offline. Target: service accounts with weak passwords.<br/>
+        <strong>AS-REP Roasting:</strong> Accounts with "Do not require Kerberos pre-authentication" — request an AS-REP without knowing the password, crack the encrypted blob.<br/>
+        <strong>Pass-the-Ticket:</strong> Export a TGT or Service Ticket from memory (mimikatz sekurlsa::tickets) and inject it into another session.<br/>
+        <strong>Golden Ticket:</strong> Forge TGTs using the krbtgt account hash (dumped from DC) — grants domain persistence for years.
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Practical Commands</h3>
       <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# List all handles for a process (Process Hacker CLI / NtQuerySystemInformation)
 handle.exe -p lsass.exe          # Sysinternals handle.exe
 handle64.exe -a -p notepad.exe   # all handle types
@@ -5332,7 +5390,49 @@ S-1-16-16384  Tizim Yaxlitlik Darajasi`}</code></pre>
         ))}
       </div>
 
-      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Amaliy Buyruqlar</h3>
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.7 — Kerberos va NTLM Autentifikatsiyasi</h3>
+      <P>Windows ikkita asosiy autentifikatsiya protokolidan foydalanadi: <Term>NTLM</Term> (eski, muammoga asoslangan/javob) va <Term>Kerberos</Term> (zamonaviy, chiptaga asoslangan). Domen muhitlarida Kerberos afzalroq; NTLM mahalliy hisoblarda va meros tizimlar bilan orqaga qarab muvofiqlik uchun saqlanadi.</P>
+      <div style={{overflowX:"auto",marginTop:14,marginBottom:14}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"2px solid var(--border)"}}>
+            {["Xususiyat","NTLM","Kerberos"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:700}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Turi","Muammoga asoslangan/javob","Chiptaga asoslangan (TGT + xizmat chiptasi)"],
+            ["DC talab qilinadi","Yo'q (mahalliy hisob)","Ha (KDC — Key Distribution Center)"],
+            ["O'zaro autentifikatsiya","Yo'q","Ha (server ham tasdiqlaydi)"],
+            ["Takrorlash himoyasi","Cheklangan","Ha (vaqt tamg'alari, 5 daqiqa oynasi)"],
+            ["Asosiy hujumlar","Pass-the-Hash, NTLM Relay","Kerberoasting, AS-REP Roasting, Golden/Silver Ticket"],
+            ["Foydalanish holati","Mahalliy hisob, meros tizimlar","Domen muhiti (standart)"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--text-2)":j===1?"var(--c-warn)":"var(--c-system)",fontWeight:j===0?600:400,fontSize:12}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <img src="uploads/Screenshot_2026-05-15_15_19_02.png"
+           alt="Kerberos Autentifikatsiya Oqimi — AS almashinuvi, TGS almashinuvi, Xizmatga kirish"
+           style={{width:"100%",borderRadius:8,border:"1px solid var(--border)",marginBottom:14,display:"block"}} />
+      <div style={{fontSize:11,color:"var(--text-2)",textAlign:"center",marginTop:-10,marginBottom:18,fontFamily:"var(--font-mono)"}}>
+        Kerberos: Foydalanuvchi → KDC (AS-REQ/AS-REP → TGT) → KDC (TGS-REQ/TGS-REP → Xizmat Chiptasi) → Xizmat (AP-REQ → Sessiya)
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:4}}>
+        {[
+          {step:"AS Almashinuvi",color:"var(--c-system)",body:"Foydalanuvchi KDC ga AS-REQ yuboradi (foydalanuvchi nomi + vaqt tamg'asi NTLM hash bilan shifrlangan). KDC parolni tekshiradi va TGT (Ticket-Granting Ticket) qaytaradi — AS-REP. TGT krbtgt akkount kaliti bilan shifrlangan; foydalanuvchi uni ochib ko'ra olmaydi."},
+          {step:"TGS Almashinuvi",color:"var(--c-warn)",body:"Foydalanuvchi xizmatlarga kirish kerak bo'lganda TGT bilan TGS-REQ yuboradi. KDC xizmat chiptasini qaytaradi (TGS-REP) — maqsad xizmat uchun shifrlangan. Foydalanuvchi xizmat parolini hech qachon ko'rmaydi."},
+          {step:"AP Almashinuvi",color:"var(--c-attack)",body:"Foydalanuvchi xizmatga xizmat chiptasi bilan AP-REQ yuboradi. Xizmat o'z kaliti bilan chiptani ochib, foydalanuvchi kimligini tekshiradi. O'zaro autentifikatsiya: xizmat AP-REP bilan javob berishi mumkin."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"12px 14px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}25`}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:12,color:item.color,fontWeight:700,marginBottom:6}}>{item.step}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-attack)" icon="warning" titleEn="" titleUz="Kerberos Hujum Texnikalari">
+        <strong>Kerberoasting</strong> — Xizmat chiptasini so'rash va oflayn kraking (xizmat akkountining zaif paroli). <strong>AS-REP Roasting</strong> — Kerberos pre-auth o'chirilgan foydalanuvchilar uchun AS-REP ni kraking qilish. <strong>Pass-the-Ticket</strong> — Xotiradan olingan Kerberos chiptalarini boshqa sessiyaga kiritish. <strong>Golden Ticket</strong> — krbtgt NTLM hash bilan soxta TGT yaratish (domen to'liq buzilganidan keyin).
+      </Callout>
+
+      <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.8 — Amaliy Buyruqlar</h3>
       <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Mahalliy foydalanuvchilar va guruhlarni ro'yxatga olish
 net user
 net user Administrator
@@ -8512,6 +8612,364 @@ systeminfo | findstr /B /C:"OS" /C:"System Boot"`}</code></pre>
   );
 }
 
+
+// ─────────────────────────────────────────────────────────────
+function SectionGUI() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows GUI Architecture" uz="" />
+      <P>The Windows <Term>Graphical User Interface</Term> is built on the Win32 window model, a client/server architecture where user-mode applications send messages to windows, and the kernel (win32k.sys) routes those messages. Every visible element — dialog boxes, buttons, menus, title bars — is a <Term>window</Term> with a unique handle (HWND).</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.8,overflowX:"auto",marginTop:12}}><code>{`┌─────────────────────────────────────────────────────────────┐
+│                    USER SPACE                               │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Application (explorer.exe, notepad.exe, etc.)       │  │
+│  │   │ CreateWindow() → HWND                            │  │
+│  │   │ SendMessage() / PostMessage()                    │  │
+│  │   │ WndProc (message handler callback)               │  │
+│  └──────────────────────┬───────────────────────────────┘  │
+│                         │  user32.dll / gdi32.dll           │
+└─────────────────────────┼───────────────────────────────────┘
+                          │  system call (NtUserXxx)
+┌─────────────────────────▼───────────────────────────────────┐
+│                  KERNEL SPACE                               │
+│   win32k.sys  ──  Window Manager (USER)                    │
+│                ──  Graphics Device Interface (GDI)          │
+│   DWM (dwm.exe, user-mode compositor) ◄── DirectX/DXGI     │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐                │
+│   │ Display  │  │ Input    │  │ Desktop  │                 │
+│   │ Driver   │  │ (HID)    │  │ Heap     │                 │
+│   └──────────┘  └──────────┘  └──────────┘                │
+└─────────────────────────────────────────────────────────────┘`}</code></pre>
+
+      <H2 num="§2" en="Win32 Window Model — HWND and WndProc" uz="" />
+      <P>Every window is identified by an <Term>HWND (Handle to Window)</Term>. When you call <code>CreateWindowEx()</code>, the OS registers the window and returns an HWND. Each window class registers a <Term>WndProc (Window Procedure)</Term> — a callback function that receives and processes messages.</P>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
+        {[
+          {title:"HWND",color:"var(--c-system)",body:"A 32/64-bit handle to a window object managed by win32k.sys. HWNDs are process-relative but can be shared across processes (UI Automation, spy tools). Null HWND = broadcast to all top-level windows."},
+          {title:"WndProc",color:"var(--c-warn)",body:"The message handler function: LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam). Returns 0 = handled; calls DefWindowProc() for unhandled messages. Every control (button, edit box) has its own WndProc."},
+          {title:"Message Queue",color:"var(--accent)",body:"Each thread with a UI has a private message queue. PostMessage() adds to the queue (async); SendMessage() calls WndProc directly and blocks until it returns (sync). GetMessage() / DispatchMessage() = the message pump loop."},
+          {title:"Message Pump",color:"var(--c-system)",body:"while(GetMessage(&msg, NULL, 0, 0)) { TranslateMessage(&msg); DispatchMessage(&msg); } — This loop is what keeps a GUI application alive. A frozen message pump = unresponsive window (spinning cursor)."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"12px 14px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}25`}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:12,color:item.color,fontWeight:700,marginBottom:6}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§3" en="Desktop, Taskbar & Start Menu Anatomy" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.8,overflowX:"auto",marginTop:12}}><code>{`Windows Desktop Hierarchy:
+─────────────────────────────────────────────────────────────
+Window Station (WinSta0)  — security boundary; interactive
+  └─ Desktop Object (Default)  — HWND tree root
+       ├─ Shell_TrayWnd          (Taskbar — explorer.exe)
+       │    ├─ Start button      (opens StartMenuExperienceHost.exe)
+       │    ├─ Taskbar buttons   (running apps)
+       │    ├─ System Tray       (notification icons, clock)
+       │    └─ Action Center     (Quick Settings panel)
+       ├─ WorkerW                (Desktop icon renderer)
+       ├─ Progman               (Program Manager — desktop root)
+       │    └─ SHELLDLL_DefView  (desktop icon ListView)
+       └─ Application Windows   (all user apps)
+
+Key Processes:
+  explorer.exe       Shell, file manager, desktop/taskbar
+  dwm.exe            DWM compositor (all visual rendering)
+  sihost.exe         Shell Infrastructure Host (Start Menu support)
+  StartMenuExperienceHost.exe  WinUI Start Menu
+  SearchHost.exe     Search UI (Cortana replacement)
+  RuntimeBroker.exe  Permission broker for UWP apps`}</code></pre>
+
+      <H2 num="§4" en="DWM — Desktop Window Manager" uz="" />
+      <P><Term>DWM (Desktop Window Manager)</Term> is the compositor process (dwm.exe) introduced in Windows Vista. Instead of apps drawing directly to the screen, each window renders into an off-screen Direct3D surface. DWM composites all surfaces and sends the final frame to the display — enabling transparency (Aero Glass), animations, thumbnail previews, HDR, and per-monitor DPI scaling.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {title:"Redirection Surface",color:"var(--c-system)",body:"Each window's pixels go into a DirectX texture (redirect surface). DWM composites them GPU-side. Apps never write to framebuffer directly."},
+          {title:"Flip Model",color:"var(--accent)",body:"Modern apps (DXGI flip model) skip DWM composition for low-latency rendering. Used by games and video players for tear-free, low-latency display."},
+          {title:"Animation Engine",color:"var(--c-warn)",body:"DWM drives minimize/restore animations, window blur, and Fluent Design effects. Disable DWM = no Aero = flat rendering (Win XP look)."},
+          {title:"Security Boundary",color:"var(--c-attack)",body:"DWM runs at Session 0-like isolation (SYSTEM-level integrity). Apps cannot inject into DWM. Crashing DWM causes the display to momentarily go black before auto-restart."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}22`}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:item.color,fontWeight:700,marginBottom:5}}>{item.title}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§5" en="GUI API Evolution" uz="" />
+      <P>Windows has accumulated multiple GUI API layers over decades. Choosing the right one matters for both capabilities and security posture:</P>
+      <div style={{overflowX:"auto",marginTop:14}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"2px solid var(--border)"}}>
+            {["API Layer","Era","Rendering","Sandboxing","Use Case"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 10px",color:"var(--text-2)",fontWeight:700}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Win32 GDI","Windows 3.1+","CPU rasterizer","None","Legacy: dialogs, menus, most system UI"],
+            ["GDI+","Windows XP","CPU rasterizer","None","Anti-aliased 2D graphics, image loading"],
+            ["Direct2D / DirectWrite","Vista+","GPU accelerated","None","Modern 2D: text, vectors, charts"],
+            ["WPF (.NET)","Vista+","Direct3D via MIL","Partial (ClickOnce)","Enterprise LOB, data binding, XAML"],
+            ["UWP / WinUI 2","Win 10","DirectX","AppContainer sandbox","Store apps, constrained API surface"],
+            ["WinUI 3","Win 10 21H2+","DirectX","Optional AppContainer","Modern desktop apps (decoupled from OS)"],
+            ["Electron / CEF","Any","Chromium GPU","Renderer sandbox","VS Code, Slack, Teams — web-based UI"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"6px 10px",color:j===0?"var(--accent)":j===3?"var(--c-system)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <H2 num="§6" en="Win32 Messages — Key WM_ Constants" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.9,overflowX:"auto",marginTop:10}}><code>{`// Input messages
+WM_KEYDOWN / WM_KEYUP     0x0100 / 0x0101   Key pressed/released (virtual key code in wParam)
+WM_CHAR                   0x0102            Translated character (after TranslateMessage())
+WM_LBUTTONDOWN            0x0201            Left mouse button down (cursor pos in lParam)
+WM_RBUTTONDOWN            0x0204            Right mouse button down
+WM_MOUSEMOVE              0x0200            Mouse moved (cursor pos in lParam)
+WM_MOUSEWHEEL             0x020A            Mouse wheel scrolled (delta in HIWORD(wParam))
+
+// Window lifecycle
+WM_CREATE                 0x0001            Window created (CREATESTRUCT* in lParam)
+WM_DESTROY                0x0002            Window destroyed — post WM_QUIT here
+WM_CLOSE                  0x0010            User clicked X — can intercept to show "Save?" dialog
+WM_QUIT                   0x0012            Terminates message loop (GetMessage returns 0)
+WM_SIZE                   0x0005            Window resized (new size in lParam)
+WM_PAINT                  0x000F            Window needs repainting (use BeginPaint/EndPaint)
+
+// System messages
+WM_TIMER                  0x0113            Timer fired (SetTimer ID in wParam)
+WM_COMMAND                0x0111            Menu item / button clicked (control ID in wParam)
+WM_NOTIFY                 0x004E            Common control notification (NMHDR* in lParam)
+WM_COPYDATA               0x004A            Cross-process data transfer (COPYDATASTRUCT*)
+WM_HOTKEY                 0x0312            System-wide hotkey registered with RegisterHotKey()`}</code></pre>
+
+      <H2 num="§7" en="GUI Security — Attack Vectors" uz="" />
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Shatter Attacks (Classic)",color:"var(--c-attack)",body:<>Pre-Vista: processes at different privilege levels shared the same desktop. A low-privilege process could send <code>WM_SETTEXT</code> + <code>WM_PASTE</code> to a high-privilege window's edit control, then trigger execution via <code>WM_TIMER</code> with a function pointer in lParam. Vista+ User Interface Privilege Isolation (UIPI) blocks cross-integrity-level message sending — low IL cannot send messages to high IL windows.</>},
+          {title:"UIPI — User Interface Privilege Isolation",color:"var(--c-system)",body:<>Enforced by win32k.sys since Vista. A lower-IL process cannot: SendMessage to a higher-IL window, use SetWindowsHookEx to hook higher-IL input, use AttachThreadInput to a higher-IL thread. Exception: <code>ChangeWindowMessageFilterEx()</code> lets a high-IL window explicitly allow specific messages from lower IL.</>},
+          {title:"Clickjacking / UI Redressing",color:"var(--c-warn)",body:<>A malicious transparent window overlaid on a legitimate high-privilege window can capture clicks. The victim thinks they're clicking the UAC prompt but are actually clicking the attacker's window. Mitigations: UAC Secure Desktop (renders on a separate desktop object inaccessible to regular processes), UIPI.</>},
+          {title:"UI Automation Abuse",color:"var(--c-warn)",body:<>UI Automation (UIA) is the accessibility framework that lets screen readers and test tools interact with UI elements. Malware abuses UIA to: read text from password fields (if app exposes them), click UAC prompts programmatically (if running at same IL), extract clipboard contents. Defender monitors for anomalous UIA usage patterns.</>},
+          {title:"Window Enumeration (Recon)",color:"var(--text-2)",body:<><code>EnumWindows()</code> lists all top-level windows. <code>EnumChildWindows()</code> drills into child controls. <code>GetWindowText()</code> reads titles/control text. Attackers use this to detect analysis tools (Wireshark, Process Monitor, debuggers) by window title — if detected, malware exits or changes behavior.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-attack)" icon="warning" titleEn="Window Station Isolation" titleUz="">
+        Services run in Session 0 with no interactive window station (WinSta0 is denied). A service that tries to create a GUI window will fail silently — this is by design. Pre-Vista services could pop dialogs into the user's session (Session 0 isolation bypass). Modern exploits that need GUI interaction must inject into an interactive process running in the user's session.
+      </Callout>
+
+      <H2 num="§8" en="Practical Commands" uz="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Window enumeration (PowerShell)
+Add-Type -AssemblyName System.Windows.Forms
+[System.Windows.Forms.Screen]::AllScreens           # monitor layout
+
+# Find window by title (.NET)
+Add-Type @"
+using System; using System.Runtime.InteropServices;
+public class Win32 {
+  [DllImport("user32.dll")] public static extern IntPtr FindWindow(string cls, string title);
+  [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
+}
+"@
+[Win32]::FindWindow($null, "Notepad")               # HWND of Notepad window
+
+# DWM diagnostics
+Get-Process dwm                                     # DWM process info
+winver                                              # OS build (affects DWM features)
+
+# UI test / spy tools
+Spy++ (spyxx.exe)                                   # VS: enumerate windows, messages, classes
+Accessibility Insights                              # UIA tree viewer (free, Microsoft)
+inspect.exe (Windows SDK)                           # UIA element inspector
+
+# Check UIPI (Integrity Level of a process)
+Get-Process notepad | ForEach { icacls (Get-Process -Id $_.Id).Path }
+whoami /groups | findstr "Integrity"               # current process IL
+
+# List window stations and desktops
+Get-Process | Where {$_.MainWindowTitle -ne ""} | Select Name,Id,MainWindowTitle`}</code></pre>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows GUI Arxitekturasi" en="" />
+      <P>Windows <Term>Grafik Foydalanuvchi Interfeysi (GUI)</Term> Win32 oyna modeliga asoslangan — mijoz/server arxitekturasi bo'lib, foydalanuvchi-rejim ilovalari oynalarga xabarlar yuboradi va kernel (win32k.sys) bu xabarlarni yo'naltiradi. Har bir ko'rinadigan element — dialog oynalar, tugmalar, menyular, sarlavha satrlari — noyob tutqich (HWND) ga ega <Term>oyna</Term> hisoblanadi.</P>
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.8,overflowX:"auto",marginTop:12}}><code>{`┌─────────────────────────────────────────────────────────────┐
+│                  FOYDALANUVCHI FAZOSI                       │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Ilova (explorer.exe, notepad.exe, va h.k.)          │  │
+│  │   │ CreateWindow() → HWND                            │  │
+│  │   │ SendMessage() / PostMessage()                    │  │
+│  │   │ WndProc (xabar ishlovchi callback)               │  │
+│  └──────────────────────┬───────────────────────────────┘  │
+│                         │  user32.dll / gdi32.dll           │
+└─────────────────────────┼───────────────────────────────────┘
+                          │  tizim chaqiruvi (NtUserXxx)
+┌─────────────────────────▼───────────────────────────────────┐
+│                   KERNEL FAZOSI                             │
+│   win32k.sys  ──  Oyna Menejeri (USER)                     │
+│                ──  Grafik Qurilma Interfeysi (GDI)          │
+│   DWM (dwm.exe, foydalanuvchi-rejim compositor) ◄── DirectX│
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐                │
+│   │ Displey  │  │ Kirish   │  │ Ish stoli│                 │
+│   │ Drayveri │  │ (HID)    │  │ Yig'ini  │                 │
+│   └──────────┘  └──────────┘  └──────────┘                │
+└─────────────────────────────────────────────────────────────┘`}</code></pre>
+
+      <H2 num="§2" uz="Win32 Oyna Modeli — HWND va WndProc" en="" />
+      <P>Har bir oyna <Term>HWND (Oyna Tutqichi)</Term> bilan aniqlanadi. <code>CreateWindowEx()</code> chaqirilganda OS oynani ro'yxatdan o'tkazadi va HWND qaytaradi. Har bir oyna sinfi <Term>WndProc (Oyna Prosedurasi)</Term> — xabarlarni qabul qiladigan va qayta ishlaydigan callback funktsiyani ro'yxatdan o'tkazadi.</P>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
+        {[
+          {title:"HWND",color:"var(--c-system)",body:"win32k.sys tomonidan boshqariladigan oyna ob'ektiga 32/64-bit tutqich. HWND lar jarayon-nisbiy, lekin jarayonlar o'rtasida ulashilishi mumkin (UI Automation, spy vositalari). Null HWND = barcha yuqori darajali oynalarga broadcast."},
+          {title:"WndProc",color:"var(--c-warn)",body:"Xabar ishlovchi funktsiya: LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam). 0 qaytarish = ishlandi; ishlanmagan xabarlar uchun DefWindowProc() chaqiriladi. Har bir boshqaruv elementi (tugma, kiritish maydoni) o'z WndProc ga ega."},
+          {title:"Xabar Navbati",color:"var(--accent)",body:"UI ga ega har bir thread shaxsiy xabar navbatiga ega. PostMessage() navbatga qo'shadi (asinxron); SendMessage() WndProc ni to'g'ridan-to'g'ri chaqiradi va qaytguncha bloklanadi (sinxron). GetMessage() / DispatchMessage() = xabar nasos tsikli."},
+          {title:"Xabar Nasosi",color:"var(--c-system)",body:"while(GetMessage(&msg, NULL, 0, 0)) { TranslateMessage(&msg); DispatchMessage(&msg); } — Bu tsikl GUI ilovani tirik saqlaydi. Muzlab qolgan xabar nasosi = javob bermaydigan oyna (aylanuvchi kursor)."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"12px 14px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}25`}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:12,color:item.color,fontWeight:700,marginBottom:6}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.6}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§3" uz="Ish stoli, Vazifalar paneli va Start Menu Anatomiyasi" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.8,overflowX:"auto",marginTop:12}}><code>{`Windows Ish stoli Ierarxiyasi:
+─────────────────────────────────────────────────────────────
+Oyna Stantsiyasi (WinSta0)  — xavfsizlik chegarasi; interaktiv
+  └─ Ish stoli Ob'ekti (Default)  — HWND daraxt ildizi
+       ├─ Shell_TrayWnd          (Vazifalar paneli — explorer.exe)
+       │    ├─ Start tugmasi     (StartMenuExperienceHost.exe ochadi)
+       │    ├─ Vazifalar tugmalari (ishlaydigan ilovalar)
+       │    ├─ Tizim Paneli     (bildirishnoma ikonkalari, soat)
+       │    └─ Harakat Markazi  (Tezkor Sozlamalar paneli)
+       ├─ WorkerW               (Ish stoli ikona renderi)
+       ├─ Progman               (Dastur Menejeri — ish stoli ildizi)
+       │    └─ SHELLDLL_DefView  (ish stoli ikona ListView)
+       └─ Ilova Oynalari        (barcha foydalanuvchi ilovalari)
+
+Asosiy Jarayonlar:
+  explorer.exe       Shell, fayl menejeri, ish stoli/vazifalar paneli
+  dwm.exe            DWM compositor (barcha vizual rendering)
+  sihost.exe         Shell Infratuzilma Hosti (Start Menu qo'llab-quvvatlash)
+  StartMenuExperienceHost.exe  WinUI Start Menu
+  SearchHost.exe     Qidiruv UI (Cortana o'rnini bosuvchi)
+  RuntimeBroker.exe  UWP ilovalar uchun ruxsat brokeri`}</code></pre>
+
+      <H2 num="§4" uz="DWM — Ish stoli Oyna Menejeri" en="" />
+      <P><Term>DWM (Desktop Window Manager)</Term> — Windows Vista da kiritilgan compositor jarayoni (dwm.exe). Ilovalar to'g'ridan-to'g'ri ekranga chizish o'rniga, har bir oyna ekran tashqarisidagi Direct3D yuzasiga render qiladi. DWM barcha yuzalarni kompozit qiladi va yakuniy kadrni displeyga yuboradi — shaffoflik (Aero Glass), animatsiyalar, miniatyura oldinko'rishlari, HDR va monitor-DPI masshtablab ko'rsatishni ta'minlaydi.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+        {[
+          {title:"Yo'naltirish Yuzasi",color:"var(--c-system)",body:"Har bir oynaning piksellari DirectX teksturasiga (yo'naltirish yuzasi) tushadi. DWM ularni GPU tomonida kompozit qiladi. Ilovalar hech qachon to'g'ridan-to'g'ri kadrbuferga yozmaydi."},
+          {title:"Flip Modeli",color:"var(--accent)",body:"Zamonaviy ilovalar (DXGI flip modeli) past kechikish uchun DWM kompozitsiyasini chetlab o'tadi. O'yinlar va video pleyerlar tomonidan yumshoq, past kechikishli ko'rsatish uchun ishlatiladi."},
+          {title:"Animatsiya Mexanizmi",color:"var(--c-warn)",body:"DWM kichraytirish/tiklash animatsiyalarini, oyna loyqalik va Fluent Design effektlarini boshqaradi. DWM ni o'chirish = Aero yo'q = tekis rendering (Win XP ko'rinishi)."},
+          {title:"Xavfsizlik Chegarasi",color:"var(--c-attack)",body:"DWM Session 0 ga o'xshash izolyatsiyada (SYSTEM darajasi) ishlaydi. Ilovalar DWM ga inject qila olmaydi. DWM ni buzish displeyning avtomatik qayta ishga tushishidan oldin qisqacha qorayishiga olib keladi."},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"10px 12px",borderRadius:8,background:`${item.color}08`,border:`1px solid ${item.color}22`}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:item.color,fontWeight:700,marginBottom:5}}>{item.title}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§5" uz="GUI API Evolyutsiyasi" en="" />
+      <P>Windows yillar davomida bir nechta GUI API qatlamlarini to'pladi. To'g'ri tanlov ham imkoniyatlar, ham xavfsizlik nuqtai nazaridan muhim:</P>
+      <div style={{overflowX:"auto",marginTop:14}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"2px solid var(--border)"}}>
+            {["API Qatlami","Davr","Rendering","Sandboxing","Foydalanish Holati"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 10px",color:"var(--text-2)",fontWeight:700}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["Win32 GDI","Windows 3.1+","CPU rasterlash","Yo'q","Meros: dialog, menyu, tizim UI"],
+            ["GDI+","Windows XP","CPU rasterlash","Yo'q","Anti-aliased 2D grafika, rasm yuklash"],
+            ["Direct2D / DirectWrite","Vista+","GPU tezlashtirilgan","Yo'q","Zamonaviy 2D: matn, vektorlar, grafiklar"],
+            ["WPF (.NET)","Vista+","Direct3D MIL orqali","Qisman (ClickOnce)","Korporativ LOB, XAML, data binding"],
+            ["UWP / WinUI 2","Win 10","DirectX","AppContainer sandbox","Do'kon ilovalari, cheklangan API"],
+            ["WinUI 3","Win 10 21H2+","DirectX","Ixtiyoriy AppContainer","Zamonaviy ish stoli ilovalari"],
+            ["Electron / CEF","Har qanday","Chromium GPU","Renderer sandbox","VS Code, Slack, Teams — veb UI"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"6px 10px",color:j===0?"var(--accent)":j===3?"var(--c-system)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+
+      <H2 num="§6" uz="Win32 Xabarlari — Asosiy WM_ Konstantalari" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:11,lineHeight:1.9,overflowX:"auto",marginTop:10}}><code>{`// Kirish xabarlari
+WM_KEYDOWN / WM_KEYUP     0x0100 / 0x0101   Tugma bosildi/qo'yib yuborildi
+WM_CHAR                   0x0102            Tarjima qilingan belgi (TranslateMessage() dan keyin)
+WM_LBUTTONDOWN            0x0201            Chap sichqoncha tugmasi bosildi (lParam da kursor pozitsiyasi)
+WM_RBUTTONDOWN            0x0204            O'ng sichqoncha tugmasi bosildi
+WM_MOUSEMOVE              0x0200            Sichqoncha ko'chdi (lParam da kursor pozitsiyasi)
+WM_MOUSEWHEEL             0x020A            Sichqoncha g'ildiragi (HIWORD(wParam) da delta)
+
+// Oyna hayot tsikli
+WM_CREATE                 0x0001            Oyna yaratildi (lParam da CREATESTRUCT*)
+WM_DESTROY                0x0002            Oyna yo'q qilindi — bu yerda WM_QUIT yuborish
+WM_CLOSE                  0x0010            Foydalanuvchi X ni bosdi — "Saqlashmi?" dialog uchun ushlash mumkin
+WM_QUIT                   0x0012            Xabar tsiklini tugatadi (GetMessage 0 qaytaradi)
+WM_SIZE                   0x0005            Oyna o'lchami o'zgardi (lParam da yangi o'lcham)
+WM_PAINT                  0x000F            Oynani qayta chizish kerak (BeginPaint/EndPaint ishlating)
+
+// Tizim xabarlari
+WM_TIMER                  0x0113            Taymer ishga tushdi (wParam da SetTimer ID)
+WM_COMMAND                0x0111            Menyu elementi / tugma bosildi (wParam da boshqaruv ID)
+WM_NOTIFY                 0x004E            Umumiy boshqaruv bildirishnomasi (lParam da NMHDR*)
+WM_COPYDATA               0x004A            Jarayonlararo ma'lumot uzatish (COPYDATASTRUCT*)
+WM_HOTKEY                 0x0312            RegisterHotKey() bilan ro'yxatdan o'tgan tizimiy shortcut`}</code></pre>
+
+      <H2 num="§7" uz="GUI Xavfsizligi — Hujum Vektorlari" en="" />
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginTop:12}}>
+        {[
+          {title:"Shatter Hujumlari (Klassik)",color:"var(--c-attack)",body:<>Vista gacha: turli imtiyoz darajalaridagi jarayonlar bitta ish stolini ulashardi. Past imtiyozli jarayon yuqori imtiyozli oynaning kiritish maydoniga <code>WM_SETTEXT</code> + <code>WM_PASTE</code> yuborib, keyin lParam da funktsiya ko'rsatkichi bilan <code>WM_TIMER</code> orqali bajarishni ishga tushirishi mumkin edi. Vista+ UIPI (User Interface Privilege Isolation) xoch-yaxlitlik-darajali xabar yuborishni bloklaydi.</>},
+          {title:"UIPI — Foydalanuvchi Interfeys Imtiyozi Izolyatsiyasi",color:"var(--c-system)",body:<>Vista dan beri win32k.sys tomonidan amalga oshiriladi. Past-IL jarayon quyidagilarni qila olmaydi: yuqori-IL oynaga SendMessage, yuqori-IL kirishni kuzatish uchun SetWindowsHookEx, yuqori-IL thread ga AttachThreadInput. Istisno: <code>ChangeWindowMessageFilterEx()</code> yuqori-IL oynaga past IL dan muayyan xabarlarni qabul qilishga ruxsat beradi.</>},
+          {title:"Clickjacking / UI Redressing",color:"var(--c-warn)",body:<>Qonuniy yuqori imtiyozli oynaning ustiga joylashtirilgan zararli shaffof oyna bosinchlarni ushlab qolishi mumkin. Qurbon UAC so'roviga bosdim deb o'ylaydi, lekin aslida tajovuzkorning oynasiga bosyapti. Kamaytirishlar: UAC Xavfsiz Ish stoli (oddiy jarayonlar uchun erimsiz alohida ish stoli ob'ektida render qiladi), UIPI.</>},
+          {title:"UI Automation Suiiste'moli",color:"var(--c-warn)",body:<>UI Automation (UIA) — ekran o'quvchilar va test vositalari UI elementlari bilan munosabat o'rnatishga imkon beradigan maxsus ehtiyojlar freymvorki. Zararli dasturlar UIA ni quyidagilar uchun suiiste'mol qiladi: parol maydonlaridan matn o'qish, UAC so'rovlarini dasturiy ravishda bosish (bir xil IL da ishlayotgan bo'lsa), clipboard mazmunini chiqarish.</>},
+          {title:"Oynalarni Sanab Chiqish (Razvedka)",color:"var(--text-2)",body:<><code>EnumWindows()</code> barcha yuqori darajali oynalarni ro'yxatga oladi. <code>GetWindowText()</code> sarlavha/boshqaruv matnini o'qiydi. Tajovuzkorlar bu orqali tahlil vositalarini (Wireshark, Process Monitor, debuggerlar) oyna sarlavhasi bo'yicha aniqlashadi — agar aniqlansa, zararli dastur chiqadi yoki xatti-harakatini o'zgartiradi.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-attack)" icon="warning" titleEn="" titleUz="Oyna Stantsiyasi Izolyatsiyasi">
+        Xizmatlar interaktiv oyna stantsiyasiz (WinSta0 rad etilgan) Session 0 da ishlaydi. GUI oynasini yaratmoqchi bo'lgan xizmat jimgina muvaffaqiyatsiz bo'ladi — bu ataylab. Vista gacha xizmatlar foydalanuvchi sessiyasiga dialog oynalarini ko'rsatishi mumkin edi (Session 0 izolyatsiyani chetlab o'tish). GUI bilan interaksiyani talab qiladigan zamonaviy ekspluatatsiyalar foydalanuvchi sessiyasida ishlaydigan interaktiv jarayonga inject qilishlari kerak.
+      </Callout>
+
+      <H2 num="§8" uz="Amaliy Buyruqlar" en="" />
+      <pre style={{background:"rgba(0,0,0,0.35)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",fontSize:12,lineHeight:1.7,overflowX:"auto",marginTop:10}}><code>{`# Oynalarni sanab chiqish (PowerShell)
+Add-Type -AssemblyName System.Windows.Forms
+[System.Windows.Forms.Screen]::AllScreens           # monitor joylashuvi
+
+# Sarlavha bo'yicha oynani topish (.NET)
+Add-Type @"
+using System; using System.Runtime.InteropServices;
+public class Win32 {
+  [DllImport("user32.dll")] public static extern IntPtr FindWindow(string cls, string title);
+}
+"@
+[Win32]::FindWindow($null, "Bloknot")               # Bloknot oynasining HWND si
+
+# DWM diagnostikasi
+Get-Process dwm                                     # DWM jarayoni ma'lumoti
+winver                                              # OS versiyasi (DWM imkoniyatlariga ta'sir qiladi)
+
+# UI spy vositalari
+Spy++ (spyxx.exe)                                   # VS: oynalar, xabarlar, sinflarni sanab chiqish
+Accessibility Insights                              # UIA daraxt ko'ruvchisi (bepul, Microsoft)
+inspect.exe (Windows SDK)                           # UIA element inspektori
+
+# Jarayon yaxlitlik darajasini tekshirish
+whoami /groups | findstr "Integrity"               # joriy jarayon IL
+
+# Oyna sarlavhalari bilan ishlaydigan jarayonlar
+Get-Process | Where {$_.MainWindowTitle -ne ""} | Select Name,Id,MainWindowTitle`}</code></pre>
+    </section>
+  );
+}
 
 // ─────────────────────────────────────────────────────────────
 // Text helpers
