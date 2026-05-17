@@ -3,6 +3,28 @@
 
 const { useState: useLS, useEffect: useLE, useRef: useLR } = React;
 
+// ── Time tracking ─────────────────────────────────────────────
+const TIME_KEY = "wa_time_spent";
+function getTimeSpent() {
+  try { return JSON.parse(localStorage.getItem(TIME_KEY) || "{}"); } catch { return {}; }
+}
+function addTimeSpent(key, seconds) {
+  if (seconds <= 0) return;
+  try {
+    const all = getTimeSpent();
+    all[key] = (all[key] || 0) + seconds;
+    localStorage.setItem(TIME_KEY, JSON.stringify(all));
+  } catch {}
+}
+function fmtTime(totalSec, lang) {
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return lang === "en" ? `${h}h ${m}m` : `${h} soat ${m} daqiqa`;
+  if (m > 0) return lang === "en" ? `${m}m ${s}s` : `${m} daqiqa ${s} soniya`;
+  return lang === "en" ? `${s}s` : `${s} soniya`;
+}
+
 const LESSON = {
   num: "L01", section: "01",
   uz: "Windows arxitekturasi",
@@ -62,6 +84,35 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   const lessonKey = `s${sectionLabel}_l${String(lessonNum).padStart(2,"0")}`;
   const hasContent = true; // TEMP: all unlocked for review
 
+  // ── Session timer ─────────────────────────────────────────
+  const [sessionSec, setSessionSec] = useLS(0);
+  const savedOnMountRef = useLR(0);
+  useLE(() => {
+    savedOnMountRef.current = getTimeSpent()[lessonKey] || 0;
+    const start = Date.now();
+    let lastSaved = 0;
+
+    const tick = setInterval(() => {
+      setSessionSec(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+
+    const autosave = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      const toAdd = elapsed - lastSaved;
+      lastSaved = elapsed;
+      if (toAdd > 0) addTimeSpent(lessonKey, toAdd);
+    }, 10000);
+
+    return () => {
+      clearInterval(tick);
+      clearInterval(autosave);
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      addTimeSpent(lessonKey, elapsed - lastSaved);
+    };
+  }, [lessonKey]);
+
+  const totalTimeSec = (savedOnMountRef.current || 0) + sessionSec;
+
   useLE(() => {
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -95,7 +146,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
         <LessonTOC lessonNum={lessonNum} />
 
         <div className="page" style={{ padding: "32px 28px 80px", maxWidth: "100%" }}>
-          <LessonHero lesson={LESSON} lessonNum={lessonNum} />
+          <LessonHero lesson={LESSON} lessonNum={lessonNum} totalTimeSec={totalTimeSec} />
           {lessonNum === 1  ? <><Section1Bigpicture /><Section2Theory /><Section3Layered /></>
           : lessonNum === 2  ? <><SectionKernelWhat /><SectionKernelInside /><SectionKernelDrivers /></>
           : lessonNum === 3  ? <><SectionRings /><Section8Comparison /><SectionSyscallBrief /></>
@@ -295,7 +346,7 @@ const LESSON_META = {
 };
 
 // ─────────────────────────────────────────────────────────────
-function LessonHero({ lesson, lessonNum = 1 }) {
+function LessonHero({ lesson, lessonNum = 1, totalTimeSec = 0 }) {
   const lang = useLang();
   const meta = LESSON_META[lessonNum] || LESSON_META[1];
   return (
@@ -310,11 +361,21 @@ function LessonHero({ lesson, lessonNum = 1 }) {
       <div style={{ color: "var(--text-2)", fontSize: 17, marginTop: 8 }}>{lang === "en" ? lesson.subEn : lesson.subUz}</div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 24, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <span className="chip"><Icon name="clock" size={11} /> {meta.min} min</span>
           <span className="chip chip-blue"><Icon name="graph" size={11} /> {lang === "en" ? `${meta.diagrams} diagrams` : `${meta.diagrams} diagramma`}</span>
-          <span className="chip chip-purple"><Icon name="terminal" size={11} /> {lang === "en" ? `${meta.labs} lab${meta.labs > 1 ? "s" : ""}` : `${meta.labs} lab`}</span>
           <span className="chip chip-yellow"><Icon name="warning" size={11} /> {lang === "en" ? "foundational" : "asosiy"}</span>
+          <span className="chip" style={{
+            background: "rgba(0,255,136,0.08)",
+            border: "1px solid rgba(0,255,136,0.3)",
+            color: "var(--accent)",
+            fontFamily: "var(--font-mono)",
+            fontVariantNumeric: "tabular-nums",
+            animation: "none",
+          }}>
+            <Icon name="clock" size={11} />
+            &nbsp;{lang === "en" ? "Time spent:" : "Vaqt:"} <strong>{fmtTime(totalTimeSec, lang)}</strong>
+          </span>
         </div>
         <div style={{ flex: 1 }} />
         <div className="mono" style={{ fontSize: 11, color: "var(--text-2)" }}>

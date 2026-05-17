@@ -104,15 +104,27 @@ const SECTION_DATA = {
   },
 };
 
+function getTimeSpentAll() {
+  try { return JSON.parse(localStorage.getItem("wa_time_spent") || "{}"); } catch { return {}; }
+}
+function fmtTimeShort(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${sec}s`;
+}
+
 function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen, onOpenSearch }) {
   const lang = useLang();
   const data = SECTION_DATA[section] || SECTION_DATA[1];
   const completedLessons = user?.completedLessons || [];
+  const timeSpentAll = getTimeSpentAll();
   const rawLessons = data.lessons.map(l => {
     const n = parseInt(l.n);
     const key = `s${n <= 20 ? "01" : "02"}_l${String(n).padStart(2, "0")}`;
     const isDone = completedLessons.includes(key);
-    return { ...l, status: isDone ? "done" : "available", _key: key };
+    return { ...l, status: isDone ? "done" : "available", _key: key, timeSpent: timeSpentAll[key] || 0 };
   });
   const firstAvail = rawLessons.find(l => l.status === "available");
   const lessons = rawLessons.map(l =>
@@ -304,7 +316,9 @@ function LessonRow({ l, idx, sectionNum, setRoute, completedLessons }) {
       <div style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>{lang === "en" ? l.en : l.uz}</div>
 
       <div className="mono" style={{ fontSize: 11, color: "var(--text-2)", display: "flex", gap: 14 }}>
-        <span><Icon name="clock" size={11} /> &nbsp;{l.duration}m</span>
+        {l.timeSpent > 0
+          ? <span style={{ color: "var(--accent)" }}><Icon name="clock" size={11} /> &nbsp;{fmtTimeShort(l.timeSpent)}</span>
+          : <span><Icon name="clock" size={11} /> &nbsp;{l.duration}m</span>}
         <span><Icon name="graph" size={11} /> &nbsp;{l.diagrams}</span>
       </div>
 
