@@ -32,6 +32,23 @@ const LESSONS = {
   18: { num:"L18", section:"01", uz:"Event Viewer", en:"Event Viewer", subUz:"Windows hodisa log tizimi", subEn:"Windows event logging system" },
   19: { num:"L19", section:"01", uz:"Task Scheduler", en:"Task Scheduler", subUz:"Vazifalarni avtomatlashtirish", subEn:"Automating system tasks" },
   20: { num:"L20", section:"01", uz:"Windows log fayllari", en:"Windows logs", subUz:"EVTX forensics va hodisalarga javob", subEn:"EVTX forensics and incident response" },
+  21: { num:"L21", section:"02", uz:"Task Manager", en:"Task Manager", subUz:"Jarayonlar, resurslar va ish unumdorligini kuzatish", subEn:"Monitoring processes, resources and performance" },
+  22: { num:"L22", section:"02", uz:"Device Manager", en:"Device Manager", subUz:"Qurilma drayverlari va apparat boshqaruvi", subEn:"Hardware devices and driver management" },
+  23: { num:"L23", section:"02", uz:"Foydalanuvchi hisoblari", en:"User Accounts & Profiles", subUz:"Mahalliy foydalanuvchilar va profillarni boshqarish", subEn:"Managing local users and profiles" },
+  24: { num:"L24", section:"02", uz:"User Account Control (UAC)", en:"User Account Control", subUz:"Imtiyozlarni boshqarish va UAC mexanizmi", subEn:"Privilege management and the UAC mechanism" },
+  25: { num:"L25", section:"02", uz:"Settings va Control Panel", en:"Settings & Control Panel", subUz:"Tizim sozlamalarini boshqarish interfeyslari", subEn:"System settings management interfaces" },
+  26: { num:"L26", section:"02", uz:"MSConfig", en:"MSConfig", subUz:"Tizim konfiguratsiyasi va yuklash sozlamalari", subEn:"System configuration and startup settings" },
+  27: { num:"L27", section:"02", uz:"Computer Management", en:"Computer Management", subUz:"Markaziy boshqaruv konsoli", subEn:"Central management console" },
+  28: { num:"L28", section:"02", uz:"Resource Monitor", en:"Resource Monitor", subUz:"CPU, xotira, disk va tarmoq resurslarini kuzatish", subEn:"Monitoring CPU, memory, disk and network resources" },
+  29: { num:"L29", section:"02", uz:"Windows Update", en:"Windows Update", subUz:"Tizim yangilanishlari va yamoqlarni boshqarish", subEn:"Managing system updates and patches" },
+  30: { num:"L30", section:"02", uz:"Windows Defender", en:"Windows Defender", subUz:"O'rnatilgan antivirus va real vaqt himoyasi", subEn:"Built-in antivirus and real-time protection" },
+  31: { num:"L31", section:"02", uz:"Windows Firewall", en:"Windows Firewall", subUz:"Tarmoq trafikini filtrlash va qoidalar", subEn:"Network traffic filtering and rules" },
+  32: { num:"L32", section:"02", uz:"BitLocker", en:"BitLocker", subUz:"Disk shifrlash va ma'lumotlarni himoya qilish", subEn:"Disk encryption and data protection" },
+  33: { num:"L33", section:"02", uz:"PowerShell asoslari", en:"PowerShell Basics", subUz:"Buyruqlar qatori orqali tizimni avtomatlashtirish", subEn:"Automating system management from the command line" },
+  34: { num:"L34", section:"02", uz:"Remote Desktop (RDP)", en:"Remote Desktop (RDP)", subUz:"Masofaviy ish stoli bilan ulanish va boshqarish", subEn:"Connecting and managing remote desktops" },
+  35: { num:"L35", section:"02", uz:"Tarmoq sozlamalari", en:"Network Configuration", subUz:"IP, DNS, adapter va tarmoq ulanishlarini boshqarish", subEn:"Managing IP, DNS, adapters and network connections" },
+  36: { num:"L36", section:"02", uz:"Fayl ulashish", en:"File Sharing", subUz:"Shared folders va tarmoq ulashish sozlamalari", subEn:"Shared folders and network sharing settings" },
+  37: { num:"L37", section:"02", uz:"Zaxira nusxa va tiklash", en:"Backup & Restore", subUz:"Ma'lumotlarni zaxiralash va tiklash strategiyalari", subEn:"Data backup and recovery strategies" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -40,7 +57,9 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
   const [progress, setProgress] = useLS(0);
   const [quizOpen, setQuizOpen] = useLS(false);
   const LESSON = LESSONS[lessonNum] || { num: `L${String(lessonNum).padStart(2,"0")}`, section: "01", uz: "Dars", en: "Lesson", subUz: "Tez kunda", subEn: "Coming soon" };
-  const lessonKey = `s01_l${String(lessonNum).padStart(2,"0")}`;
+  const sectionNum = lessonNum <= 20 ? 1 : 2;
+  const sectionLabel = sectionNum === 1 ? "01" : "02";
+  const lessonKey = `s${sectionLabel}_l${String(lessonNum).padStart(2,"0")}`;
   const hasContent = true; // TEMP: all unlocked for review
 
   useLE(() => {
@@ -58,7 +77,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
       <TopNav route={{ name: "lesson" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile}
         crumb={[
           { label: lang === "en" ? "Courses" : "Kurslar", onClick: () => setRoute({ name: "dashboard" }) },
-          { label: lang === "en" ? "Sec 01" : "01-bo'lim", onClick: () => setRoute({ name: "section", section: 1 }) },
+          { label: lang === "en" ? `Sec ${sectionLabel}` : `${sectionLabel}-bo'lim`, onClick: () => setRoute({ name: "section", section: sectionNum }) },
           { label: `${LESSON.num}: ${lang === "en" ? LESSON.en : LESSON.uz}` },
         ]} />
 
@@ -97,9 +116,26 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
           : lessonNum === 18 ? <><SectionEventViewer /></>
           : lessonNum === 19 ? <><SectionTaskScheduler /></>
           : lessonNum === 20 ? <><SectionWindowsLogs /></>
+          : lessonNum === 21 ? <><SectionTaskMgrBasic /></>
+          : lessonNum === 22 ? <><SectionDeviceMgrBasic /></>
+          : lessonNum === 23 ? <><SectionUserAccounts /></>
+          : lessonNum === 24 ? <><SectionUAC /></>
+          : lessonNum === 25 ? <><SectionSettings /></>
+          : lessonNum === 26 ? <><SectionMsconfig /></>
+          : lessonNum === 27 ? <><SectionComputerMgmt /></>
+          : lessonNum === 28 ? <><SectionResourceMonitor /></>
+          : lessonNum === 29 ? <><SectionWinUpdate /></>
+          : lessonNum === 30 ? <><SectionDefenderBasic /></>
+          : lessonNum === 31 ? <><SectionFirewallBasic /></>
+          : lessonNum === 32 ? <><SectionBitLockerBasic /></>
+          : lessonNum === 33 ? <><SectionPSBasic /></>
+          : lessonNum === 34 ? <><SectionRDP /></>
+          : lessonNum === 35 ? <><SectionNetBasic /></>
+          : lessonNum === 36 ? <><SectionFileShare /></>
+          : lessonNum === 37 ? <><SectionBackupRestore /></>
           : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
-          {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
+          {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} sectionNum={sectionNum} />}
         </div>
       </div>
 
@@ -109,7 +145,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
         onPass={() => {
           setQuizOpen(false);
           if (markLessonComplete) markLessonComplete(lessonKey);
-          setRoute({ name: "section", section: 1 });
+          setRoute({ name: "section", section: sectionNum });
         }}
         onFail={() => { setQuizOpen(false); setRoute({ name: "cooldown" }); }}
       />}
@@ -139,6 +175,23 @@ const TOC_SECTIONS = {
   18: [{ id:"log-arch",uz:"Log arxitekturasi",en:"Log architecture" },{ id:"event-ids",uz:"Asosiy Event ID lar",en:"Key Event IDs" },{ id:"etw",uz:"ETW",en:"ETW" },{ id:"sysmon",uz:"Sysmon",en:"Sysmon" },{ id:"forensics",uz:"Forensic tahlil",en:"Forensic analysis" }],
   19: [{ id:"task-overview",uz:"Vazifa umumiy",en:"Task overview" },{ id:"triggers",uz:"Triggerlar",en:"Triggers" },{ id:"actions",uz:"Harakatlar",en:"Actions" },{ id:"persistence",uz:"Persistenslik",en:"Persistence" }],
   20: [{ id:"evtx",uz:"EVTX format",en:"EVTX format" },{ id:"channels",uz:"Log kanallar",en:"Log channels" },{ id:"forensics",uz:"Forensic tahlil",en:"Forensic analysis" },{ id:"ir-workflow",uz:"IR workflow",en:"IR workflow" }],
+  21: [{ id:"taskmgr-overview",uz:"Task Manager umumiy",en:"Task Manager overview" },{ id:"processes-tab",uz:"Processlar tab",en:"Processes tab" },{ id:"performance-tab",uz:"Performance tab",en:"Performance tab" },{ id:"startup-tab",uz:"Startup tab",en:"Startup tab" }],
+  22: [{ id:"devmgr-overview",uz:"Device Manager umumiy",en:"Device Manager overview" },{ id:"drivers",uz:"Drayverlar",en:"Drivers" },{ id:"errors",uz:"Xatoliklar",en:"Device errors" },{ id:"update-rollback",uz:"Yangilash va qaytarish",en:"Update & rollback" }],
+  23: [{ id:"accounts-overview",uz:"Hisoblar umumiy",en:"Accounts overview" },{ id:"local-users",uz:"Mahalliy foydalanuvchilar",en:"Local users" },{ id:"groups",uz:"Guruhlar",en:"Groups" },{ id:"profiles",uz:"Profillar",en:"Profiles" }],
+  24: [{ id:"uac-overview",uz:"UAC umumiy",en:"UAC overview" },{ id:"elevation",uz:"Imtiyozlarni oshirish",en:"Elevation" },{ id:"integrity",uz:"Yaxlitlik darajalari",en:"Integrity levels" },{ id:"bypass",uz:"UAC bypass",en:"UAC bypass" }],
+  25: [{ id:"settings-overview",uz:"Settings umumiy",en:"Settings overview" },{ id:"control-panel",uz:"Control Panel",en:"Control Panel" },{ id:"key-settings",uz:"Asosiy sozlamalar",en:"Key settings" }],
+  26: [{ id:"msconfig-overview",uz:"MSConfig umumiy",en:"MSConfig overview" },{ id:"startup",uz:"Yuklash",en:"Startup" },{ id:"services-tab",uz:"Servislar",en:"Services" },{ id:"boot-tab",uz:"Boot",en:"Boot" }],
+  27: [{ id:"compmgmt-overview",uz:"Computer Management umumiy",en:"Overview" },{ id:"event-viewer",uz:"Event Viewer",en:"Event Viewer" },{ id:"disk-mgmt",uz:"Disk boshqaruvi",en:"Disk Management" },{ id:"local-users-groups",uz:"Foydalanuvchilar va guruhlar",en:"Local Users & Groups" }],
+  28: [{ id:"resmon-overview",uz:"Resource Monitor umumiy",en:"Resource Monitor overview" },{ id:"cpu-tab",uz:"CPU",en:"CPU" },{ id:"memory-tab",uz:"Xotira",en:"Memory" },{ id:"disk-tab",uz:"Disk",en:"Disk" },{ id:"network-tab",uz:"Tarmoq",en:"Network" }],
+  29: [{ id:"update-overview",uz:"Windows Update umumiy",en:"Windows Update overview" },{ id:"update-types",uz:"Yangilanish turlari",en:"Update types" },{ id:"wsus",uz:"WSUS",en:"WSUS" },{ id:"troubleshoot",uz:"Muammolarni hal qilish",en:"Troubleshooting" }],
+  30: [{ id:"defender-overview",uz:"Defender umumiy",en:"Defender overview" },{ id:"real-time",uz:"Real vaqt himoyasi",en:"Real-time protection" },{ id:"exclusions",uz:"Istisnolar",en:"Exclusions" },{ id:"asr",uz:"ASR qoidalar",en:"ASR rules" }],
+  31: [{ id:"firewall-overview",uz:"Firewall umumiy",en:"Firewall overview" },{ id:"profiles",uz:"Profillar",en:"Profiles" },{ id:"rules",uz:"Qoidalar",en:"Rules" },{ id:"advanced",uz:"Kengaytirilgan sozlamalar",en:"Advanced settings" }],
+  32: [{ id:"bitlocker-overview",uz:"BitLocker umumiy",en:"BitLocker overview" },{ id:"tpm-bitlocker",uz:"TPM integratsiyasi",en:"TPM integration" },{ id:"recovery",uz:"Tiklash kaliti",en:"Recovery key" },{ id:"manage-bde",uz:"manage-bde",en:"manage-bde" }],
+  33: [{ id:"ps-overview",uz:"PowerShell umumiy",en:"PowerShell overview" },{ id:"cmdlets",uz:"Cmdlet'lar",en:"Cmdlets" },{ id:"pipeline",uz:"Pipeline",en:"Pipeline" },{ id:"remoting",uz:"PS Remoting",en:"PS Remoting" }],
+  34: [{ id:"rdp-overview",uz:"RDP umumiy",en:"RDP overview" },{ id:"setup",uz:"RDP sozlash",en:"RDP setup" },{ id:"security",uz:"RDP xavfsizlik",en:"RDP security" },{ id:"rdp-attacks",uz:"RDP hujumlar",en:"RDP attacks" }],
+  35: [{ id:"net-overview",uz:"Tarmoq umumiy",en:"Network overview" },{ id:"ip-config",uz:"IP sozlamalar",en:"IP configuration" },{ id:"dns",uz:"DNS",en:"DNS" },{ id:"troubleshoot",uz:"Muammolarni hal qilish",en:"Troubleshooting" }],
+  36: [{ id:"share-overview",uz:"Ulashish umumiy",en:"File sharing overview" },{ id:"smb",uz:"SMB protokoli",en:"SMB protocol" },{ id:"permissions",uz:"Ulashish ruxsatlari",en:"Share permissions" },{ id:"hidden-shares",uz:"Yashirin ulashishlar",en:"Hidden shares" }],
+  37: [{ id:"backup-overview",uz:"Zaxira umumiy",en:"Backup overview" },{ id:"windows-backup",uz:"Windows Backup",en:"Windows Backup" },{ id:"shadow-copy",uz:"Shadow Copy",en:"Shadow Copy" },{ id:"restore",uz:"Tiklash",en:"Restore" }],
 };
 
 function LessonTOC({ lessonNum = 1 }) {
@@ -222,6 +275,23 @@ const LESSON_META = {
   18: { min:24, diagrams:4, labs:2, introUz:<><em>Event Viewer</em> — Windows hodisa log tizimi. Log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensic tahlilni o'rganasiz.</>, introEn:<><em>Event Viewer</em> — Windows event logging system. Learn log architecture, key Event IDs, ETW, Sysmon and forensic analysis.</> },
   19: { min:22, diagrams:4, labs:1, introUz:<><em>Task Scheduler</em> — vazifalarni avtomatlashtirish tizimi. Vazifa arxitekturasi, triggerlar, harakatlar va rejalashtiruvchi asosidagi persistenslikni o'rganasiz.</>, introEn:<><em>Task Scheduler</em> — automating system tasks. Learn task architecture, triggers, actions and scheduler-based persistence techniques.</> },
   20: { min:24, diagrams:4, labs:2, introUz:<><em>Windows log fayllari</em> — EVTX forensics va hodisalarga javob. Tizim log tahlili va IR workflow ni o'rganasiz.</>, introEn:<><em>Windows logs</em> — EVTX forensics and incident response. Learn system log analysis and IR workflow.</> },
+  21: { min:24, diagrams:5, labs:2, introUz:<><em>Task Manager</em> — jarayonlar, CPU, xotira va tarmoqni real vaqtda kuzatish. Startup elementlarini boshqarishni o'rganasiz.</>, introEn:<><em>Task Manager</em> — real-time monitoring of processes, CPU, memory and network. Learn to manage startup items.</> },
+  22: { min:20, diagrams:4, labs:1, introUz:<><em>Device Manager</em> — qurilma drayverlari va apparat boshqaruvi. Drayver xatoliklarini bartaraf etishni o'rganasiz.</>, introEn:<><em>Device Manager</em> — hardware devices and driver management. Learn to diagnose and fix driver errors.</> },
+  23: { min:28, diagrams:5, labs:2, introUz:<><em>Foydalanuvchi hisoblari</em> — mahalliy foydalanuvchilar, guruhlar va profillarni boshqarish. Hisob xavfsizligi asoslarini o'rganasiz.</>, introEn:<><em>User Accounts</em> — managing local users, groups and profiles. Learn the basics of account security.</> },
+  24: { min:26, diagrams:5, labs:2, introUz:<><em>User Account Control</em> — UAC mexanizmi, imtiyozlarni oshirish va yaxlitlik darajalari. UAC bypass texnikalarini o'rganasiz.</>, introEn:<><em>User Account Control</em> — UAC mechanism, privilege elevation and integrity levels. Learn UAC bypass techniques.</> },
+  25: { min:22, diagrams:4, labs:1, introUz:<><em>Settings va Control Panel</em> — Windows sozlamalar interfeyslari. Tizim konfiguratsiyasining asosiy nuqtalarini o'rganasiz.</>, introEn:<><em>Settings and Control Panel</em> — Windows settings interfaces. Learn the key system configuration points.</> },
+  26: { min:20, diagrams:4, labs:1, introUz:<><em>MSConfig</em> — tizim konfiguratsiyasi va yuklash sozlamalari. Servislar va startup elementlarini boshqarishni o'rganasiz.</>, introEn:<><em>MSConfig</em> — system configuration and startup settings. Learn to manage services and startup items.</> },
+  27: { min:26, diagrams:5, labs:2, introUz:<><em>Computer Management</em> — markaziy boshqaruv konsoli. Disk, event log, foydalanuvchilar va servislarni bir joydan boshqarishni o'rganasiz.</>, introEn:<><em>Computer Management</em> — central management console. Learn to manage disks, event logs, users and services from one place.</> },
+  28: { min:24, diagrams:5, labs:2, introUz:<><em>Resource Monitor</em> — CPU, xotira, disk va tarmoqni batafsil kuzatish. Tizim muammolarini tashxis qilishni o'rganasiz.</>, introEn:<><em>Resource Monitor</em> — detailed monitoring of CPU, memory, disk and network. Learn to diagnose system issues.</> },
+  29: { min:18, diagrams:4, labs:1, introUz:<><em>Windows Update</em> — tizim yangilanishlari va yamoqlarni boshqarish. WSUS va yangilanish muammolarini hal qilishni o'rganasiz.</>, introEn:<><em>Windows Update</em> — managing system updates and patches. Learn WSUS and troubleshooting update issues.</> },
+  30: { min:26, diagrams:5, labs:2, introUz:<><em>Windows Defender</em> — o'rnatilgan antivirus va real vaqt himoyasi. ASR qoidalari va istisnolarni boshqarishni o'rganasiz.</>, introEn:<><em>Windows Defender</em> — built-in antivirus and real-time protection. Learn to manage ASR rules and exclusions.</> },
+  31: { min:28, diagrams:5, labs:2, introUz:<><em>Windows Firewall</em> — tarmoq trafikini filtrlash va qoidalar. Kiruvchi va chiquvchi qoidalarni boshqarishni o'rganasiz.</>, introEn:<><em>Windows Firewall</em> — network traffic filtering and rules. Learn to manage inbound and outbound firewall rules.</> },
+  32: { min:24, diagrams:4, labs:1, introUz:<><em>BitLocker</em> — disk shifrlash va ma'lumotlarni himoya qilish. TPM bilan integratsiya va tiklash kalitlarini o'rganasiz.</>, introEn:<><em>BitLocker</em> — disk encryption and data protection. Learn TPM integration and recovery key management.</> },
+  33: { min:30, diagrams:5, labs:2, introUz:<><em>PowerShell asoslari</em> — cmdlet'lar, pipeline va PS Remoting. Tizimni buyruqlar qatori orqali avtomatlashtirish asoslarini o'rganasiz.</>, introEn:<><em>PowerShell Basics</em> — cmdlets, pipeline and PS Remoting. Learn the fundamentals of automating system management from the command line.</> },
+  34: { min:22, diagrams:5, labs:2, introUz:<><em>Remote Desktop (RDP)</em> — masofaviy ish stoli ulanishi va boshqaruvi. RDP xavfsizligi va hujum vektorlarini o'rganasiz.</>, introEn:<><em>Remote Desktop (RDP)</em> — remote desktop connection and management. Learn RDP security and attack vectors.</> },
+  35: { min:28, diagrams:5, labs:2, introUz:<><em>Tarmoq sozlamalari</em> — IP, DNS va adapter konfiguratsiyasi. Tarmoq muammolarini tashxis qilishni o'rganasiz.</>, introEn:<><em>Network Configuration</em> — IP, DNS and adapter configuration. Learn to diagnose network issues.</> },
+  36: { min:24, diagrams:4, labs:2, introUz:<><em>Fayl ulashish</em> — SMB protokoli va shared folder ruxsatnomalari. Yashirin ulashishlar va xavfsizlik muammolarini o'rganasiz.</>, introEn:<><em>File Sharing</em> — SMB protocol and shared folder permissions. Learn about hidden shares and security implications.</> },
+  37: { min:20, diagrams:4, labs:1, introUz:<><em>Zaxira nusxa va tiklash</em> — Windows Backup, Shadow Copy va tiklash strategiyalari. Ma'lumotlarni yo'qotmaslik uchun zarur ko'nikmalar.</>, introEn:<><em>Backup and Restore</em> — Windows Backup, Shadow Copy and recovery strategies. Essential skills to prevent data loss.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -1688,12 +1758,12 @@ function MindMap({ nodes }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-function LessonNextNav({ setRoute, onQuizStart, lessonNum }) {
+function LessonNextNav({ setRoute, onQuizStart, lessonNum, sectionNum = 1 }) {
   const lang = useLang();
   return (
     <div style={{ marginTop: 60, paddingTop: 32, borderTop: "1px solid var(--border)" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, alignItems: "center" }}>
-        <button className="btn" onClick={() => setRoute({ name: "section", section: 1 })} style={{ justifySelf: "start" }}>
+        <button className="btn" onClick={() => setRoute({ name: "section", section: sectionNum })} style={{ justifySelf: "start" }}>
           <Icon name="arrow-left" size={14} /> {lang === "en" ? "Section overview" : "Bo'limga qaytish"}
         </button>
         <div style={{ textAlign: "center" }}>

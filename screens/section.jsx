@@ -13,6 +13,23 @@ const SECTION_DATA = {
     difficulty: "foundational",
     instructorUz: "Aziz R. — Senior Red Team Operator",
     instructorEn: "Former defender of a Fortune 500 enterprise · OSCP, CRTO, CRTP",
+    outcomesUz: [
+      "Windows arxitekturasini qatlamma-qatlam chizib bera olish",
+      "Kernel mode va user mode farqini chuqur tushunish",
+      "Boot ketma-ketligini har bir bosqichi bilan ko'rsatish",
+      "Processlar, thread'lar va handle'larni real holatda tahlil qilish",
+      "Registry hive'lari va muhim kalitlarini topish",
+      "PowerShell orqali tizimni jonli kuzatish",
+    ],
+    outcomesEn: [
+      "Draw the Windows architecture layer by layer",
+      "Deeply understand kernel vs user mode",
+      "Walk through every step of the boot sequence",
+      "Analyze processes, threads and handles in real-time",
+      "Locate every registry hive and persistence key",
+      "Observe the system live with PowerShell",
+    ],
+    tooling: ["PowerShell", "Process Explorer", "WinDbg", "Sysinternals", "ProcMon", "Autoruns", "Regedit", "Event Viewer"],
     lessons: [
       { n: "01", uz: "Windows arxitekturasi",        en: "Windows architecture",        duration: 36, status: "in-progress", icon: "cpu",      color: "var(--c-system)", labs: 3, diagrams: 9 },
       { n: "02", uz: "Kernel nima?",                 en: "What is the kernel?",         duration: 28, status: "locked", icon: "layers",   color: "var(--c-system)", labs: 2, diagrams: 6 },
@@ -36,6 +53,55 @@ const SECTION_DATA = {
       { n: "20", uz: "Windows log fayllari",         en: "Windows logs",                duration: 28, status: "locked", icon: "graph",    color: "var(--accent)",   labs: 2, diagrams: 5 },
     ],
   },
+  2: {
+    num: "02",
+    uz: "Windows Administratsiya",
+    en: "Windows Administration",
+    descUz: "Ushbu bo'limda Windows tizimini boshqarish ko'nikmalarini amaliy o'rganasiz: foydalanuvchi hisoblari, xavfsizlik vositalari, tarmoq sozlamalari, resurs monitoring va tizimni avtomatlashtirish. Real sysadmin va defender vazifalari.",
+    descEn: "In this section you'll learn practical Windows administration skills: user accounts, security tools, network configuration, resource monitoring and automation. Real sysadmin and defender tasks.",
+    color: "var(--c-auth)",
+    duration: "~8 soat",
+    durationEn: "~8 hrs",
+    difficulty: "practical",
+    instructorUz: "Aziz R. — Senior Red Team Operator",
+    instructorEn: "Former defender of a Fortune 500 enterprise · OSCP, CRTO, CRTP",
+    outcomesUz: [
+      "Task Manager orqali jarayonlar va resurslarni boshqarish",
+      "Windows himoya vositalarini sozlash (Defender, Firewall)",
+      "Foydalanuvchi hisoblari va UAC ni boshqarish",
+      "BitLocker bilan diskni shifrlash",
+      "PowerShell orqali tizimni avtomatlashtirish",
+      "Tarmoq sozlamalari, RDP va fayl ulashishni boshqarish",
+    ],
+    outcomesEn: [
+      "Manage processes and resources with Task Manager",
+      "Configure Windows security tools (Defender, Firewall)",
+      "Manage user accounts and UAC",
+      "Protect disk with BitLocker encryption",
+      "Automate system management with PowerShell",
+      "Configure networking, RDP and file sharing",
+    ],
+    tooling: ["Task Manager", "Device Manager", "PowerShell", "Windows Defender", "BitLocker", "Resource Monitor", "Computer Management", "MSConfig"],
+    lessons: [
+      { n: "21", uz: "Task Manager",               en: "Task Manager",               duration: 24, status: "available", icon: "cpu",          color: "var(--c-user)",   labs: 2, diagrams: 5 },
+      { n: "22", uz: "Device Manager",             en: "Device Manager",             duration: 20, status: "available", icon: "settings",      color: "var(--c-hw)",     labs: 1, diagrams: 4 },
+      { n: "23", uz: "Foydalanuvchi hisoblari",    en: "User Accounts & Profiles",   duration: 28, status: "available", icon: "shield",        color: "var(--c-auth)",   labs: 2, diagrams: 5 },
+      { n: "24", uz: "User Account Control (UAC)", en: "User Account Control",       duration: 26, status: "available", icon: "lock",          color: "var(--c-warn)",   labs: 2, diagrams: 5 },
+      { n: "25", uz: "Settings va Control Panel",  en: "Settings & Control Panel",   duration: 22, status: "available", icon: "settings",      color: "var(--c-system)", labs: 1, diagrams: 4 },
+      { n: "26", uz: "MSConfig",                   en: "MSConfig",                   duration: 20, status: "available", icon: "database",      color: "var(--c-system)", labs: 1, diagrams: 4 },
+      { n: "27", uz: "Computer Management",        en: "Computer Management",        duration: 26, status: "available", icon: "graph",         color: "var(--c-system)", labs: 2, diagrams: 5 },
+      { n: "28", uz: "Resource Monitor",           en: "Resource Monitor",           duration: 24, status: "available", icon: "graph",         color: "var(--c-user)",   labs: 2, diagrams: 5 },
+      { n: "29", uz: "Windows Update",             en: "Windows Update",             duration: 18, status: "available", icon: "shield-check",  color: "var(--accent)",   labs: 1, diagrams: 4 },
+      { n: "30", uz: "Windows Defender",           en: "Windows Defender",           duration: 26, status: "available", icon: "shield",        color: "var(--c-warn)",   labs: 2, diagrams: 5 },
+      { n: "31", uz: "Windows Firewall",           en: "Windows Firewall",           duration: 28, status: "available", icon: "shield",        color: "var(--accent)",   labs: 2, diagrams: 5 },
+      { n: "32", uz: "BitLocker",                  en: "BitLocker",                  duration: 24, status: "available", icon: "lock",          color: "var(--c-auth)",   labs: 1, diagrams: 4 },
+      { n: "33", uz: "PowerShell asoslari",        en: "PowerShell Basics",          duration: 30, status: "available", icon: "terminal",      color: "var(--c-user)",   labs: 2, diagrams: 5 },
+      { n: "34", uz: "Remote Desktop (RDP)",       en: "Remote Desktop (RDP)",       duration: 22, status: "available", icon: "eye",           color: "var(--accent)",   labs: 2, diagrams: 5 },
+      { n: "35", uz: "Tarmoq sozlamalari",         en: "Network Configuration",      duration: 28, status: "available", icon: "graph",         color: "var(--c-system)", labs: 2, diagrams: 5 },
+      { n: "36", uz: "Fayl ulashish",              en: "File Sharing",               duration: 24, status: "available", icon: "database",      color: "var(--c-system)", labs: 2, diagrams: 4 },
+      { n: "37", uz: "Zaxira nusxa va tiklash",    en: "Backup & Restore",           duration: 20, status: "available", icon: "database",      color: "var(--c-auth)",   labs: 1, diagrams: 4 },
+    ],
+  },
 };
 
 function SectionScreen({ setRoute, user, section = 1 }) {
@@ -45,6 +111,11 @@ function SectionScreen({ setRoute, user, section = 1 }) {
     ...l,
     status: i === 0 ? "in-progress" : "available",
   }));
+
+  const totalLessons = lessons.length;
+  const totalLabs = lessons.reduce((s, l) => s + l.labs, 0);
+  const totalDiagrams = lessons.reduce((s, l) => s + l.diagrams, 0);
+  const firstLessonN = parseInt(lessons[0].n);
 
   return (
     <div>
@@ -68,7 +139,7 @@ function SectionScreen({ setRoute, user, section = 1 }) {
           <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 36, alignItems: "start" }}>
             <div>
               <div className="eyebrow" style={{ color: data.color, marginBottom: 16 }}>
-                {lang === "en" ? `// SECTION ${data.num} · FOUNDATIONAL LEVEL` : `// ${data.num}-BO'LIM · ASOSIY DARAJA`}
+                {lang === "en" ? `// SECTION ${data.num} · ${data.difficulty.toUpperCase()} LEVEL` : `// ${data.num}-BO'LIM · ${data.difficulty === "foundational" ? "ASOSIY" : "AMALIY"} DARAJA`}
               </div>
               <h1 className="display" style={{ fontSize: 44, margin: "0 0 8px", letterSpacing: "-0.02em" }}>
                 {lang === "en" ? data.en : data.uz}
@@ -78,23 +149,23 @@ function SectionScreen({ setRoute, user, section = 1 }) {
               </p>
 
               <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
-                <button className="btn btn-primary" onClick={() => setRoute({ name: "lesson", section, lesson: 1 })}>
-                  <Icon name="play" size={14} /> {lang === "en" ? "Resume · L01" : "Davom etish · L01"}
+                <button className="btn btn-primary" onClick={() => setRoute({ name: "lesson", section, lesson: firstLessonN })}>
+                  <Icon name="play" size={14} /> {lang === "en" ? `Resume · L${String(firstLessonN).padStart(2,"0")}` : `Davom etish · L${String(firstLessonN).padStart(2,"0")}`}
                 </button>
                 <button className="btn"><Icon name="book" size={14} /> {lang === "en" ? "Syllabus PDF" : "Dastur PDF"}</button>
               </div>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <MiniStat labelUz="Darslar" labelEn="Lessons" value="20" sub={lang === "en" ? "1/20 in progress" : "1/20 davom etmoqda"} color={data.color} icon="book" />
-              <MiniStat labelUz="Laboratoriya" labelEn="Hands-on labs" value="36" sub={lang === "en" ? "0 done" : "0 yakunlangan"} color="var(--c-user)" icon="terminal" />
-              <MiniStat labelUz="Diagrammalar" labelEn="Diagrams" value="118" sub="interactive" color="var(--c-system)" icon="graph" />
+              <MiniStat labelUz="Darslar" labelEn="Lessons" value={String(totalLessons)} sub={lang === "en" ? `1/${totalLessons} in progress` : `1/${totalLessons} davom etmoqda`} color={data.color} icon="book" />
+              <MiniStat labelUz="Laboratoriya" labelEn="Hands-on labs" value={String(totalLabs)} sub={lang === "en" ? "0 done" : "0 yakunlangan"} color="var(--c-user)" icon="terminal" />
+              <MiniStat labelUz="Diagrammalar" labelEn="Diagrams" value={String(totalDiagrams)} sub="interactive" color="var(--c-system)" icon="graph" />
               <MiniStat labelUz="Final imtihon" labelEn="Final exam" value="20Q" sub={lang === "en" ? "2hr · 85% pass" : "2 soat · 85% o'tish"} color="var(--c-warn)" icon="target" />
             </div>
           </div>
 
           <div style={{ position: "relative", marginTop: 28, paddingTop: 20, borderTop: `1px solid ${data.color}22` }}>
-            <Progress value={1} max={20} label={lang === "en" ? "Section progress" : "Bo'lim taraqqiyoti"} color={data.color} />
+            <Progress value={1} max={totalLessons} label={lang === "en" ? "Section progress" : "Bo'lim taraqqiyoti"} color={data.color} />
           </div>
         </div>
 
@@ -132,7 +203,7 @@ function SectionScreen({ setRoute, user, section = 1 }) {
             <div className="glass" style={{ padding: 20 }}>
               <div className="eyebrow" style={{ marginBottom: 12 }}>// YOU_WILL_LEARN</div>
               <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-                {(lang === "en" ? OUTCOMES_EN : OUTCOMES_UZ).map((t, i) => (
+                {(lang === "en" ? data.outcomesEn : data.outcomesUz).map((t, i) => (
                   <li key={i} style={{ display: "flex", gap: 8, fontSize: 12.5, lineHeight: 1.5 }}>
                     <span style={{ color: data.color, flexShrink: 0, marginTop: 2 }}><Icon name="check" size={12} /></span>
                     <span style={{ color: "var(--text-0)" }}>{t}</span>
@@ -144,7 +215,7 @@ function SectionScreen({ setRoute, user, section = 1 }) {
             <div className="glass" style={{ padding: 20 }}>
               <div className="eyebrow" style={{ marginBottom: 10 }}>// TOOLING</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {["PowerShell", "Process Explorer", "WinDbg", "Sysinternals", "ProcMon", "Autoruns", "Regedit", "Event Viewer"].map((t) => (
+                {data.tooling.map((t) => (
                   <span key={t} className="chip chip-gray" style={{ fontSize: 9.5 }}>{t}</span>
                 ))}
               </div>
@@ -155,23 +226,6 @@ function SectionScreen({ setRoute, user, section = 1 }) {
     </div>
   );
 }
-
-const OUTCOMES_UZ = [
-  "Windows arxitekturasini qatlamma-qatlam chizib bera olish",
-  "Kernel mode va user mode farqini chuqur tushunish",
-  "Boot ketma-ketligini har bir bosqichi bilan ko'rsatish",
-  "Processlar, thread'lar va handle'larni real holatda tahlil qilish",
-  "Registry hive'lari va muhim kalitlarini topish",
-  "PowerShell orqali tizimni jonli kuzatish",
-];
-const OUTCOMES_EN = [
-  "Draw the Windows architecture layer by layer",
-  "Deeply understand kernel vs user mode",
-  "Walk through every step of the boot sequence",
-  "Analyze processes, threads and handles in real-time",
-  "Locate every registry hive and persistence key",
-  "Observe the system live with PowerShell",
-];
 
 function MiniStat({ labelUz, labelEn, value, sub, color, icon }) {
   const lang = useLang();
@@ -201,7 +255,7 @@ function LessonRow({ l, idx, sectionNum, setRoute }) {
   const isActive = l.status === "in-progress";
 
   return (
-    <div onClick={() => !isLocked && setRoute({ name: "lesson", section: sectionNum, lesson: idx + 1 })}
+    <div onClick={() => !isLocked && setRoute({ name: "lesson", section: sectionNum, lesson: parseInt(l.n) })}
       style={{
         display: "grid",
         gridTemplateColumns: "auto 40px 1fr auto auto auto",
