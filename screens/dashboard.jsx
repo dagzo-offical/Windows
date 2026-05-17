@@ -343,7 +343,7 @@ function SectionProgress({ setRoute }) {
   const lang = useLang();
   const sections = [
     { num: "01", uz: "Windows asoslari",    en: "Windows Fundamentals",  done: 1,  total: 20, color: "var(--c-system)", state: "active" },
-    { num: "02", uz: "Administratsiya",     en: "Administration",        done: 0,  total: 20, color: "var(--c-user)",   state: "locked" },
+    { num: "02", uz: "Administratsiya",     en: "Administration",        done: 0,  total: 17, color: "var(--c-user)",   state: "active" },
     { num: "03", uz: "Windows xavfsizligi", en: "Windows Security",      done: 0,  total: 20, color: "var(--accent)",   state: "locked" },
     { num: "04", uz: "Pentesting",          en: "Pentesting",            done: 0,  total: 20, color: "var(--c-attack)", state: "locked" },
     { num: "05", uz: "Forensics",           en: "Forensics",             done: 0,  total: 20, color: "var(--c-auth)",   state: "locked" },
