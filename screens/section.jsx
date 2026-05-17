@@ -43,7 +43,7 @@ function SectionScreen({ setRoute, user, section = 1 }) {
   const data = SECTION_DATA[section] || SECTION_DATA[1];
   const lessons = data.lessons.map((l, i) => ({
     ...l,
-    status: i === 0 ? "in-progress" : "locked",
+    status: i === 0 ? "in-progress" : "available",
   }));
 
   return (
