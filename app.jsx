@@ -17,7 +17,7 @@ function loadProgress() {
     const s = localStorage.getItem(PROGRESS_KEY);
     if (s) return JSON.parse(s);
   } catch {}
-  return { xp: 0, level: 1, completedLessons: [], name: "Dagzo", initials: "DZ" };
+  return { xp: 0, level: 1, completedLessons: [], lessonDates: {}, quizScores: {}, name: "Dagzo", initials: "DZ" };
 }
 
 function saveProgress(p) {
@@ -88,13 +88,15 @@ function App() {
     });
   }, []);
 
-  const markLessonComplete = useACB((lessonKey) => {
+  const markLessonComplete = useACB((lessonKey, score) => {
     _setProgress(prev => {
       if (prev.completedLessons.includes(lessonKey)) return prev;
       const completedLessons = [...prev.completedLessons, lessonKey];
+      const lessonDates = { ...(prev.lessonDates || {}), [lessonKey]: Date.now() };
+      const quizScores = { ...(prev.quizScores || {}), ...(score != null ? { [lessonKey]: score } : {}) };
       const xp = prev.xp + XP_PER_LESSON;
       const level = xpToLevel(xp);
-      const next = { ...prev, completedLessons, xp, level };
+      const next = { ...prev, completedLessons, lessonDates, quizScores, xp, level };
       saveProgress(next);
       return next;
     });
@@ -102,6 +104,7 @@ function App() {
 
   const [profileOpen, setProfileOpen] = useAS(false);
   const [aiChatOpen, setAiChatOpen] = useAS(false);
+  const [searchOpen, setSearchOpen] = useAS(false);
 
   useAE(() => {
     document.documentElement.dataset.theme = theme;
@@ -117,15 +120,18 @@ function App() {
     level: progress.level || 1,
     xp: progress.xp ? progress.xp.toLocaleString() : "0",
     completedLessons: progress.completedLessons || [],
+    lessonDates: progress.lessonDates || {},
+    quizScores: progress.quizScores || {},
   };
 
-  const screenProps = { setRoute, user, markLessonComplete, onOpenProfile: () => setProfileOpen(true), onOpenAIChat: () => setAiChatOpen(v => !v), aiChatOpen };
+  const screenProps = { setRoute, user, markLessonComplete, onOpenProfile: () => setProfileOpen(true), onOpenAIChat: () => setAiChatOpen(v => !v), aiChatOpen, onOpenSearch: () => setSearchOpen(true) };
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>
-      <ParticleBg mode="particles" count={80} />
+      <ParticleBg mode="particles" count={200} />
       <RouteRender route={route} screenProps={screenProps} />
       <AIChat open={aiChatOpen} onClose={() => setAiChatOpen(false)} user={user} route={route} />
+      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} setRoute={(r) => { setRoute(r); setSearchOpen(false); }} />}
       {profileOpen && (
         <ProfileModal
           user={user}

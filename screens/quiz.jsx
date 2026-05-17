@@ -340,7 +340,7 @@ Return STRICT JSON only, no markdown: {"questions":[{"uz":"...","en":"..."},{"uz
             <Result
               results={results} questions={questions} answers={answers}
               overall={overall} passed={passed} lessonNum={lessonNum}
-              onContinue={() => passed ? onPass() : onFail()}
+              onContinue={() => passed ? onPass(overall) : onFail()}
             />
           )}
           {err && <div style={{ color: "var(--c-attack)", padding: 12, fontSize: 12 }}>Error: {err}</div>}

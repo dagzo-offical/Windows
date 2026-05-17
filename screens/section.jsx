@@ -104,7 +104,7 @@ const SECTION_DATA = {
   },
 };
 
-function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen }) {
+function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen, onOpenSearch }) {
   const lang = useLang();
   const data = SECTION_DATA[section] || SECTION_DATA[1];
   const lessons = data.lessons.map((l, i) => ({
@@ -119,7 +119,7 @@ function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen }
 
   return (
     <div>
-      <TopNav route={{ name: "section" }} setRoute={setRoute} user={user} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen}
+      <TopNav route={{ name: "section" }} setRoute={setRoute} user={user} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen} onOpenSearch={onOpenSearch}
         crumb={[
           { label: lang === "en" ? "Courses" : "Kurslar", onClick: () => setRoute({ name: "dashboard" }) },
           { label: `${lang === "en" ? "Section" : "Bo'lim"} ${data.num}: ${lang === "en" ? data.en : data.uz}` },
@@ -192,9 +192,9 @@ function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen }
             <div className="glass" style={{ padding: 20 }}>
               <div className="eyebrow" style={{ marginBottom: 10 }}>// INSTRUCTOR</div>
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg, var(--c-attack), var(--c-warn))", color: "#04060d", fontWeight: 700, display: "grid", placeItems: "center", fontFamily: "var(--font-mono)", fontSize: 14 }}>AR</div>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg, var(--c-attack), var(--c-warn))", color: "#04060d", fontWeight: 700, display: "grid", placeItems: "center", fontFamily: "var(--font-mono)", fontSize: 14 }}>{user?.initials || "AR"}</div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>{lang === "en" ? "Aziz R." : data.instructorUz}</div>
+                  <div style={{ fontWeight: 600, fontSize: 13 }}>{user?.name || "Aziz R."}</div>
                   <div style={{ fontSize: 11, color: "var(--text-3)" }}>{data.instructorEn}</div>
                 </div>
               </div>

@@ -52,7 +52,7 @@ const LESSONS = {
 };
 
 // ─────────────────────────────────────────────────────────────
-function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpenAIChat, aiChatOpen, lessonNum = 1 }) {
+function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpenAIChat, aiChatOpen, onOpenSearch, lessonNum = 1 }) {
   const lang = useLang();
   const [progress, setProgress] = useLS(0);
   const [quizOpen, setQuizOpen] = useLS(false);
@@ -74,7 +74,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
 
   return (
     <div>
-      <TopNav route={{ name: "lesson" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen}
+      <TopNav route={{ name: "lesson" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen} onOpenSearch={onOpenSearch}
         crumb={[
           { label: lang === "en" ? "Courses" : "Kurslar", onClick: () => setRoute({ name: "dashboard" }) },
           { label: lang === "en" ? `Sec ${sectionLabel}` : `${sectionLabel}-bo'lim`, onClick: () => setRoute({ name: "section", section: sectionNum }) },
@@ -142,9 +142,9 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
       {quizOpen && <QuizModal
         lessonNum={lessonNum}
         onClose={() => setQuizOpen(false)}
-        onPass={() => {
+        onPass={(score) => {
           setQuizOpen(false);
-          if (markLessonComplete) markLessonComplete(lessonKey);
+          if (markLessonComplete) markLessonComplete(lessonKey, score);
           setRoute({ name: "section", section: sectionNum });
         }}
         onFail={() => { setQuizOpen(false); setRoute({ name: "cooldown" }); }}
@@ -3512,6 +3512,33 @@ function SectionNTFS() {
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.3 — NTFS Ruxsatlari vs Ulashish Ruxsatlari</h3>
       <P><strong>NTFS Ruxsatlari:</strong> ntfs.sys tomonidan ta'minlanadi. DACL va ACElardan iborat Xavfsizlik Tavsiflovchisi sifatida saqlanadi. Mahalliy yoki tarmoq kirishida amal qiladi.</P>
       <P><strong>Ulashish Ruxsatlari:</strong> SMB darajasida qo'llaniladi. Faqat tarmoq kirishiga tegishli. <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>Samarali = NTFS ∩ Ulashish</code> — qattiqroq g'alaba qozonadi. Eng yaxshi amaliyot: Ulashish Ruxsatlarini "Hamma — To'liq" ga o'rnating va kirishni to'liq NTFS ACLlar orqali boshqaring.</P>
+
+      <h3 className="mono" style={{color:"var(--c-warn)",marginTop:28}}>// RUXSATNOMA TURLARI</h3>
+      <div style={{overflowX:"auto",marginTop:12}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>
+            {["#","Ruxsatnoma","Tavsif","Fayllar","Papkalar"].map(h=><th key={h} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-2)",fontWeight:600}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{[
+            ["1","Full Control","Hamma narsa — egalik, o'zgartirish, o'chirish, ruxsat berish","✔ O'qish, yozish, bajarish, o'chirish, ruxsat o'zgartirish, egalikni olish","✔ Yuqoridagilar + ichki fayllar va papkalarni o'chirish"],
+            ["2","Modify","O'qish, yozish, o'chirish (egalikni o'zgartira olmaydi)","✔ O'qish, yozish, o'chirish","✔ O'qish, yozish, tarkibini o'chirish"],
+            ["3","Read & Execute","O'qish va ishga tushirish (.exe)","✔ O'qish + bajariluvchi fayllarni ishga tushirish","✔ Ro'yxat + papkalarni bosib o'tish"],
+            ["4","List Folder Contents","Faqat papka tarkibini ko'rish (faqat papkalar uchun)","—","✔ Faqat fayl va ichki papkalarni ro'yxatlash"],
+            ["5","Read","Faqat o'qish","✔ Ochish va ko'rish","✔ Tarkibni ro'yxatlash"],
+            ["6","Write","Faqat yozish","✔ Yaratish / o'zgartirish","✔ Fayl va ichki papkalar yaratish"],
+          ].map((r,i)=><tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.015)"}}>
+            {r.map((c,j)=><td key={j} style={{padding:"7px 12px",
+              color: j===0?"var(--c-warn)": j===1?"var(--accent)":"var(--text-1)",
+              fontFamily: j<2?"var(--font-mono)":"inherit",
+              fontSize: j<2?12:13
+            }}>{c}</td>)}
+          </tr>)}
+          </tbody>
+        </table>
+      </div>
+      <Callout color="var(--c-warn)" icon="warning" titleUz="Deny (taqiqlash) har doim Allow (ruxsat)dan ustun turadi" titleEn="">
+        Agar foydalanuvchi ikki guruhga tegishli bo'lsa — biri <strong>Allow</strong>, ikkinchisi <strong>Deny</strong> bilan — <strong>Deny har doim g'alaba qozonadi</strong>. Deny ni ehtiyotkorlik bilan ishlating; buning o'rniga Allow ni olib tashlash afzal. Shuningdek: <em>Full Control</em> ruxsatlarni o'zgartirish va egalikni olish huquqini o'z ichiga oladi — uni ishonchsiz foydalanuvchilarga hech qachon bermang.
+      </Callout>
 
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.4 — Jurnalling: $LogFile va $UsnJrnl</h3>
       <P><strong>$LogFile</strong> — oldindan yozish jurnali. Har qanday metadata o'zgarishidan oldin NTFS o'zgarishni avval $LogFile ga yozadi. Tizim o'rta yo'lda ishdan chiqsa, keyingi yuklashda tugallanmagan tranzaktsiyalar qayta ishlanadi yoki ortga qaytariladi.</P>

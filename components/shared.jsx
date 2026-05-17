@@ -99,7 +99,7 @@ function ParticleBg({ count = 30, mode = "grid" }) {
 // ─────────────────────────────────────────────────────────────
 // Top Nav
 // ─────────────────────────────────────────────────────────────
-function TopNav({ route, setRoute, user, crumb, onOpenProfile, onOpenAIChat, aiChatOpen }) {
+function TopNav({ route, setRoute, user, crumb, onOpenProfile, onOpenAIChat, aiChatOpen, onOpenSearch }) {
   const lang = useLang();
   const nav = (r) => (e) => { e?.preventDefault(); setRoute(r); };
   return (
@@ -131,7 +131,7 @@ function TopNav({ route, setRoute, user, crumb, onOpenProfile, onOpenAIChat, aiC
       </nav>
       <div className="topnav-r">
         <LangToggle />
-        <button className="btn-ghost btn" style={{ padding: "8px 10px" }} aria-label="Search">
+        <button className="btn-ghost btn" style={{ padding: "8px 10px" }} aria-label="Search" onClick={onOpenSearch}>
           <Icon name="search" size={15} />
         </button>
         <button
@@ -361,8 +361,127 @@ function LabStep({ n, title, titleEn, children, done }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+// Search Modal
+// ─────────────────────────────────────────────────────────────
+const LESSONS_SEARCH = [
+  { n: 1,  uz: "Windows arxitekturasi",        en: "Windows architecture",        subUz: "kernel, ring, HAL, arxitektura",           subEn: "kernel, ring, HAL, architecture" },
+  { n: 2,  uz: "Kernel nima?",                 en: "What is the kernel?",         subUz: "ntoskrnl, kernel, yadro",                  subEn: "ntoskrnl, kernel, core" },
+  { n: 3,  uz: "User mode vs Kernel mode",     en: "User mode vs Kernel mode",    subUz: "ring 0, ring 3, syscall",                  subEn: "ring 0, ring 3, syscall" },
+  { n: 4,  uz: "Windows boot jarayoni",        en: "Windows boot process",        subUz: "UEFI, bootloader, LSASS",                  subEn: "UEFI, bootloader, LSASS" },
+  { n: 5,  uz: "BIOS vs UEFI",                 en: "BIOS vs UEFI",                subUz: "MBR, GPT, firmware",                       subEn: "MBR, GPT, firmware" },
+  { n: 6,  uz: "Secure Boot",                  en: "Secure Boot",                 subUz: "PK, KEK, db, xavfsiz yuklash",             subEn: "PK, KEK, db, secure boot" },
+  { n: 7,  uz: "TPM",                          en: "TPM",                         subUz: "PCR, BitLocker, kriptografiya",             subEn: "PCR, BitLocker, cryptography" },
+  { n: 8,  uz: "Registry",                     en: "Windows Registry",            subUz: "HKLM, HKCU, hive, kalit",                  subEn: "HKLM, HKCU, hive, key" },
+  { n: 9,  uz: "Fayl tizimlari",               en: "File systems",                subUz: "FAT, NTFS, IRP, drayver",                  subEn: "FAT, NTFS, IRP, driver" },
+  { n: 10, uz: "NTFS",                         en: "NTFS",                        subUz: "MFT, ADS, ruxsatnoma, ACL",                subEn: "MFT, ADS, permissions, ACL" },
+  { n: 11, uz: "FAT32",                        en: "FAT32",                       subUz: "klaster, zanjir, ESP, 4GB",                subEn: "cluster, chain, ESP, 4GB" },
+  { n: 12, uz: "Jarayonlar (processes)",       en: "Processes",                   subUz: "EPROCESS, token, DLL in'ektsiya",          subEn: "EPROCESS, token, DLL injection" },
+  { n: 13, uz: "Thread'lar",                   en: "Threads",                     subUz: "ETHREAD, scheduler, prioritet",            subEn: "ETHREAD, scheduler, priority" },
+  { n: 14, uz: "Handle'lar",                   en: "Handles",                     subUz: "handle jadval, kirish huquqi, sizish",     subEn: "handle table, access rights, leak" },
+  { n: 15, uz: "Servislar",                    en: "Services",                    subUz: "SCM, services.exe, LocalSystem",           subEn: "SCM, services.exe, LocalSystem" },
+  { n: 16, uz: "DLL",                          en: "DLL",                         subUz: "dynamic link library, PE, import",         subEn: "dynamic link library, PE, import" },
+  { n: 17, uz: "Windows API",                  en: "Windows API",                 subUz: "Win32, syscall, NtDll, hooking",           subEn: "Win32, syscall, NtDll, hooking" },
+  { n: 18, uz: "Event Viewer",                 en: "Event Viewer",                subUz: "EVTX, event log, Sysmon",                  subEn: "EVTX, event log, Sysmon" },
+  { n: 19, uz: "Task Scheduler",               en: "Task Scheduler",              subUz: "vazifa, trigger, persistence",             subEn: "task, trigger, persistence" },
+  { n: 20, uz: "Windows log fayllari",         en: "Windows logs",                subUz: "log, audit, PowerShell log",               subEn: "log, audit, PowerShell log" },
+  { n: 21, uz: "Task Manager",                 en: "Task Manager",                subUz: "jarayonlar, resurs, CPU, xotira",          subEn: "processes, resource, CPU, memory" },
+  { n: 22, uz: "Device Manager",               en: "Device Manager",              subUz: "qurilma, drayver, apparat",                subEn: "device, driver, hardware" },
+  { n: 23, uz: "Foydalanuvchi hisoblari",      en: "User Accounts & Profiles",    subUz: "foydalanuvchi, profil, guruh",             subEn: "user, profile, group" },
+  { n: 24, uz: "User Account Control (UAC)",   en: "User Account Control",        subUz: "UAC, elevation, admin",                   subEn: "UAC, elevation, admin" },
+  { n: 25, uz: "Settings va Control Panel",    en: "Settings & Control Panel",    subUz: "sozlamalar, panel, Windows Settings",      subEn: "settings, control panel, Windows" },
+  { n: 26, uz: "MSConfig",                     en: "MSConfig",                    subUz: "tizim konfiguratsiyasi, startup, boot",    subEn: "system configuration, startup, boot" },
+  { n: 27, uz: "Computer Management",          en: "Computer Management",         subUz: "disk management, disk, bo'lim",            subEn: "disk management, partition, shares" },
+  { n: 28, uz: "Resource Monitor",             en: "Resource Monitor",            subUz: "CPU, disk, tarmoq, xotira monitoring",     subEn: "CPU, disk, network, memory monitor" },
+  { n: 29, uz: "Windows Update",               en: "Windows Update",              subUz: "yangilanish, patch, WSUS",                 subEn: "update, patch, WSUS" },
+  { n: 30, uz: "Windows Defender",             en: "Windows Defender",            subUz: "antivirus, himoya, real-time",             subEn: "antivirus, protection, real-time" },
+  { n: 31, uz: "Windows Firewall",             en: "Windows Firewall",            subUz: "tarmoq himoyasi, port, qoidalar",          subEn: "network protection, port, rules" },
+  { n: 32, uz: "BitLocker",                    en: "BitLocker",                   subUz: "shifrlash, TPM, disk himoyasi",            subEn: "encryption, TPM, disk protection" },
+  { n: 33, uz: "PowerShell asoslari",          en: "PowerShell Basics",           subUz: "skript, cmdlet, avtomatlashtirish",        subEn: "script, cmdlet, automation" },
+  { n: 34, uz: "Remote Desktop (RDP)",         en: "Remote Desktop (RDP)",        subUz: "masofaviy ish stoli, RDP, ulash",          subEn: "remote desktop, RDP, connect" },
+  { n: 35, uz: "Tarmoq sozlamalari",           en: "Network Configuration",       subUz: "IP, DNS, adapter, tarmoq",                 subEn: "IP, DNS, adapter, network" },
+  { n: 36, uz: "Fayl ulashish",               en: "File Sharing",                subUz: "SMB, ulashim, ruxsat",                     subEn: "SMB, share, permission" },
+  { n: 37, uz: "Zaxira nusxa va tiklash",      en: "Backup & Restore",            subUz: "zaxira, tiklash, VSS",                     subEn: "backup, restore, VSS" },
+];
+
+function SearchModal({ onClose, setRoute }) {
+  const lang = useLang();
+  const [q, setQ] = useState("");
+  const [idx, setIdx] = useState(0);
+  const inputRef = useRef(null);
+
+  useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, []);
+
+  const results = useMemo(() => {
+    if (!q.trim()) return LESSONS_SEARCH;
+    const lo = q.toLowerCase();
+    return LESSONS_SEARCH.filter(l =>
+      [l.uz, l.en, l.subUz, l.subEn].some(t => t.toLowerCase().includes(lo))
+    );
+  }, [q]);
+
+  useEffect(() => { setIdx(0); }, [q]);
+
+  const handleKey = (e) => {
+    if (e.key === "Escape") { onClose(); return; }
+    if (e.key === "ArrowDown") { e.preventDefault(); setIdx(i => Math.min(i + 1, results.length - 1)); }
+    if (e.key === "ArrowUp")   { e.preventDefault(); setIdx(i => Math.max(i - 1, 0)); }
+    if (e.key === "Enter" && results[idx]) { setRoute({ name: "lesson", lesson: results[idx].n }); }
+  };
+
+  const sectionLabel = (n) => n <= 20 ? "01" : "02";
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(2,4,10,0.85)", backdropFilter: "blur(10px)", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 80 }}
+         onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div style={{ width: "100%", maxWidth: 600, background: "rgba(8,12,24,0.98)", border: "1px solid var(--accent-border)", borderRadius: 16, overflow: "hidden", boxShadow: "0 30px 80px rgba(0,0,0,0.6), 0 0 40px var(--accent-soft)" }}
+           onKeyDown={handleKey}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", borderBottom: "1px solid var(--border)" }}>
+          <Icon name="search" size={16} style={{ color: "var(--accent)", flexShrink: 0 }} />
+          <input ref={inputRef} value={q} onChange={e => setQ(e.target.value)}
+            placeholder={lang === "en" ? "Search lessons…" : "Darslarni qidiring…"}
+            style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 16, fontFamily: "var(--font-display)", color: "var(--text-0)", caretColor: "var(--accent)" }} />
+          <span className="mono" style={{ fontSize: 10, color: "var(--text-3)" }}>ESC</span>
+        </div>
+        <div style={{ maxHeight: 420, overflowY: "auto" }}>
+          {results.length === 0 ? (
+            <div style={{ padding: "24px 20px", textAlign: "center", color: "var(--text-3)", fontSize: 13 }}>
+              {lang === "en" ? "No results found" : "Natija topilmadi"}
+            </div>
+          ) : results.map((l, i) => (
+            <div key={l.n} onClick={() => setRoute({ name: "lesson", lesson: l.n })}
+              style={{ display: "flex", alignItems: "center", gap: 14, padding: "11px 18px", cursor: "pointer",
+                background: i === idx ? "var(--accent-soft)" : "transparent",
+                borderLeft: `2px solid ${i === idx ? "var(--accent)" : "transparent"}`,
+                transition: "all 100ms" }}
+              onMouseEnter={() => setIdx(i)}>
+              <div className="mono" style={{ fontSize: 11, color: "var(--text-3)", minWidth: 36 }}>
+                S{sectionLabel(l.n)}·L{String(l.n).padStart(2,"0")}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: i === idx ? "var(--accent)" : "var(--text-0)" }}>
+                  {lang === "en" ? l.en : l.uz}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 1 }}>
+                  {lang === "en" ? l.subEn : l.subUz}
+                </div>
+              </div>
+              <Icon name="chevron-right" size={13} style={{ color: "var(--text-3)" }} />
+            </div>
+          ))}
+        </div>
+        <div style={{ padding: "8px 18px", borderTop: "1px solid var(--border)", display: "flex", gap: 16, fontSize: 10.5, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
+          <span>↑↓ {lang === "en" ? "navigate" : "navigatsiya"}</span>
+          <span>↵ {lang === "en" ? "open" : "ochish"}</span>
+          <span>ESC {lang === "en" ? "close" : "yopish"}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Expose
-Object.assign(window, { Bi, T, tt, useLang, useSetLang, LangContext, LangToggle, ParticleBg, TopNav, NavLink, Progress, Terminal, Code, NodeChip, LiveDot, SectionH, LabStep, AIKeyPanel, gradeWithAI });
+Object.assign(window, { Bi, T, tt, useLang, useSetLang, LangContext, LangToggle, ParticleBg, TopNav, NavLink, Progress, Terminal, Code, NodeChip, LiveDot, SectionH, LabStep, AIKeyPanel, gradeWithAI, SearchModal });
 
 // ─────────────────────────────────────────────────────────────
 // Multi-provider AI grader
