@@ -490,11 +490,12 @@ function Achievements({ user }) {
 
 function UpcomingExam({ setRoute, user }) {
   const lang = useLang();
-  const completed = (user?.completedLessons || []).filter(k => k.startsWith("s01")).length;
+  const s01done = (user?.completedLessons || []).filter(k => k.startsWith("s01")).length;
+  const examUnlocked = s01done >= 20;
   return (
-    <div className="glass" style={{ padding: 22, position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, background: "radial-gradient(circle, rgba(255,204,68,0.2), transparent 70%)" }} />
-      <div className="eyebrow" style={{ color: "var(--c-warn)" }}>// FINAL_EXAM_PREVIEW</div>
+    <div className="glass" style={{ padding: 22, position: "relative", overflow: "hidden", opacity: examUnlocked ? 1 : 0.85 }}>
+      <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, background: `radial-gradient(circle, ${examUnlocked ? "rgba(255,204,68,0.2)" : "rgba(255,255,255,0.05)"}, transparent 70%)` }} />
+      <div className="eyebrow" style={{ color: examUnlocked ? "var(--c-warn)" : "var(--text-3)" }}>// FINAL_EXAM_PREVIEW</div>
       <h3 style={{ margin: "8px 0 6px", fontFamily: "var(--font-display)", fontSize: 18 }}>
         {lang === "en" ? "Section 01 final" : "01-bo'lim final imtihoni"}
       </h3>
@@ -502,11 +503,23 @@ function UpcomingExam({ setRoute, user }) {
         {lang === "en" ? "20 questions · 2 hours · 85% to pass" : "20 ta savol · 2 soat · 85% o'tish"}
       </p>
       <div style={{ marginTop: 14 }}>
-        <Progress value={completed} max={20} label={lang === "en" ? "S01 lessons complete" : "S01 darslar yakunlangan"} color="var(--c-warn)" />
+        <Progress value={s01done} max={20} label={lang === "en" ? "S01 lessons complete" : "S01 darslar yakunlangan"} color={examUnlocked ? "var(--c-warn)" : "var(--text-3)"} />
       </div>
-      <button className="btn" onClick={() => setRoute({ name: "exam" })}
-        style={{ marginTop: 16, width: "100%", justifyContent: "center", borderColor: "rgba(255,204,68,0.35)", color: "var(--c-warn)" }}>
-        <Icon name="target" size={14} /> {lang === "en" ? "Preview the final" : "Imtihonni ko'rib chiqish"}
+      <button
+        className="btn"
+        onClick={() => examUnlocked && setRoute({ name: "exam" })}
+        disabled={!examUnlocked}
+        style={{
+          marginTop: 16, width: "100%", justifyContent: "center",
+          borderColor: examUnlocked ? "rgba(255,204,68,0.35)" : "var(--border)",
+          color: examUnlocked ? "var(--c-warn)" : "var(--text-3)",
+          cursor: examUnlocked ? "pointer" : "not-allowed",
+          opacity: examUnlocked ? 1 : 0.6,
+        }}>
+        <Icon name={examUnlocked ? "target" : "lock"} size={14} />
+        {examUnlocked
+          ? (lang === "en" ? "Preview the final" : "Imtihonni ko'rib chiqish")
+          : (lang === "en" ? `Complete all 20 lessons to unlock (${s01done}/20)` : `${s01done}/20 dars tugatilganda ochiladi`)}
       </button>
     </div>
   );

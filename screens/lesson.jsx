@@ -7146,6 +7146,39 @@ function SectionWindowsAPI() {
       <H2 num="§1" uz="Windows API — OS ga Interfeys" en="" />
       <P><Term>Windows API</Term> (Win32 API ham deyiladi) — foydalanuvchi rejimi dasturlariga OS xizmatlariga kirish imkonini beruvchi C chaqiriladigan funksiyalar to'plami: jarayonlar yaratish, fayllarni o'qish, xotirani boshqarish, ekranga chizish, tarmoqqa kirish. U qatlamli stek sifatida tashkil etilgan — har bir qatlam uning ostidagisiga qo'shimcha abstraktsiya va xavfsizlik tekshiruvlarini qo'shadi. Bu stekni tushunish hujumkor va himoyaviy xavfsizlik uchun ham asosiy hisoblanadi, chunki har bir hujum texnikasi va har bir aniqlash usuli oxir-oqibat bu qatlamlardan birida ishlaydi.</P>
 
+      <h3 className="mono" style={{color:"var(--c-warn)",marginTop:28}}>// FAYL OCHILISH JARAYONI — 9 QADAM</h3>
+      <P>Tasavvur qiling: siz restoran mijozisiz. Notepad sizning buyurtmangiz — "Menga <code style={{fontFamily:"var(--font-mono)",fontSize:12,background:"rgba(255,255,255,0.06)",padding:"1px 6px",borderRadius:4}}>maxfiy.txt</code> faylini o'qib ber." Bu buyurtma qattiq diskka (omborxonaga) yetib borguncha bir necha bosqichdan o'tadi va natija xuddi shu yo'ldan orqaga qaytadi.</P>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:14}}>
+        {[
+          {n:"1",label:"Dastur (Ring 3)",sub:'Notepad → ReadFile(handle, buffer) — "Menga shu faylni o\'qib ber!" deb buyruq beradi.',color:"#b48cff",mode:"Ring 3 · User Mode",icon:"📄"},
+          {n:"2",label:"kernel32.dll — Ofitsiant",sub:"Buyurtmani qabul qiladi, oshxona tiliga o'giradi: NtReadFile(...) — ntdll ga uzatadi.",color:"#00d4ff",mode:"Ring 3 · User Mode",icon:"🤵"},
+          {n:"3",label:"ntdll.dll — Oshxona eshigi",sub:"mov eax, SSN  ; syscall raqami\nsyscall       ; Ring 3 → Ring 0 chegarasini kesib o'tish (Syscall Gate)",color:"#ff9145",mode:"Ring 3 → Ring 0 CHEGARASI",icon:"🚪"},
+          {n:"4",label:"Security Check — Qorovul (Ring 0)",sub:"Kernel darhol ACL tekshiradi: 'Sizning ushbu faylni o\'qishga huquqingiz bormi?' Agar ruxsat yo'q bo'lsa — ACCESS_DENIED.",color:"#ff3a5e",mode:"Ring 0 · Kernel Mode",icon:"🛡"},
+          {n:"5",label:"I/O Manager — Buyruq uzatish",sub:"Kernel I/O so'rovini qurilma drayver stekiga uzatadi. ntfs.sys fayl manzilini aniqlaydi.",color:"#ff9145",mode:"Ring 0 · Kernel Mode",icon:"⚙"},
+          {n:"6",label:"Hardware — Omborxona",sub:"SSD/HDD ishga tushadi: .txt faylidagi baytlarni diskdan topadi va bufferga ko'chiradi.",color:"#00ff9c",mode:"Hardware",icon:"💾"},
+          {n:"7",label:"Kernel → ntdll.dll",sub:"Ma'lumot kernel buferdan user-mode bufferiga ko'chiriladi. Kernel ring 3 ga qaytadi.",color:"#ff9145",mode:"Ring 0 → Ring 3",icon:"⬆"},
+          {n:"8",label:"ntdll.dll → kernel32.dll",sub:"Native API natijani Win32 formatiga o'giradi va ReadFile() ga qaytaradi.",color:"#00d4ff",mode:"Ring 3 · User Mode",icon:"🔄"},
+          {n:"9",label:"Notepad — Natija",sub:"ReadFile() muvaffaqiyatli tugadi. Ekranda maxfiy.txt mazmuni paydo bo'ladi.",color:"#b48cff",mode:"Ring 3 · User Mode",icon:"✅"},
+        ].map((step,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"stretch",gap:0}}>
+            <div style={{width:3,flexShrink:0,background:step.color,opacity:0.7}}/>
+            <div style={{flex:1,padding:"10px 14px",borderBottom:"1px solid var(--border)",background:i===3?"rgba(255,58,94,0.07)":i===5?"rgba(0,255,156,0.04)":"transparent"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:8,flexWrap:"wrap"}}>
+                <span style={{fontFamily:"var(--font-display)",fontSize:13,fontWeight:700,color:step.color}}>
+                  <span style={{fontFamily:"var(--font-mono)",fontSize:11,opacity:0.6,marginRight:8}}>{step.n}.</span>
+                  {step.icon} {step.label}
+                </span>
+                <span style={{fontFamily:"var(--font-mono)",fontSize:10,color:i===3||i===4||i===5?"var(--c-err)":i===6?"var(--c-warn)":"var(--c-system)",flexShrink:0}}>{step.mode}</span>
+              </div>
+              <div style={{fontSize:12,color:"var(--text-2)",marginTop:4,fontFamily:"var(--font-mono)",whiteSpace:"pre-wrap"}}>{step.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-warn)" icon="info" titleUz="Xavfsizlik nuqtai nazari" titleEn="">
+        Har bir fayl ochilish so'rovida kernel <strong>Security Reference Monitor</strong> orqali ACL tekshiradi — bu tekshiruv chetlab o'tib bo'lmaydi. Shuning uchun NTFS ruxsatnomalari eng quyi darajadagi himoya hisoblanadi. Foydalanuvchi qancha kreativ usul bilan urinmasin, kernel darajasidagi tekshiruv doim ishlaydi.
+      </Callout>
+
       <h3 className="mono" style={{color:"var(--accent)",marginTop:28}}>1.1 — API Qatlamli Steki</h3>
       <div style={{display:"flex",flexDirection:"column",gap:0,marginTop:14}}>
         {[

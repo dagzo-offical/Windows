@@ -107,10 +107,17 @@ const SECTION_DATA = {
 function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen, onOpenSearch }) {
   const lang = useLang();
   const data = SECTION_DATA[section] || SECTION_DATA[1];
-  const lessons = data.lessons.map((l, i) => ({
-    ...l,
-    status: i === 0 ? "in-progress" : "available",
-  }));
+  const completedLessons = user?.completedLessons || [];
+  const rawLessons = data.lessons.map(l => {
+    const n = parseInt(l.n);
+    const key = `s${n <= 20 ? "01" : "02"}_l${String(n).padStart(2, "0")}`;
+    const isDone = completedLessons.includes(key);
+    return { ...l, status: isDone ? "done" : "available", _key: key };
+  });
+  const firstAvail = rawLessons.find(l => l.status === "available");
+  const lessons = rawLessons.map(l =>
+    l._key === firstAvail?._key ? { ...l, status: "in-progress" } : l
+  );
 
   const totalLessons = lessons.length;
   const totalLabs = lessons.reduce((s, l) => s + l.labs, 0);
@@ -183,7 +190,7 @@ function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen, 
 
             <div style={{ display: "flex", flexDirection: "column" }}>
               {lessons.map((l, i) => (
-                <LessonRow key={l.n} l={l} idx={i} sectionNum={section} setRoute={setRoute} />
+                <LessonRow key={l.n} l={l} idx={i} sectionNum={section} setRoute={setRoute} completedLessons={completedLessons} />
               ))}
             </div>
           </div>
@@ -248,7 +255,7 @@ function MiniStat({ labelUz, labelEn, value, sub, color, icon }) {
   );
 }
 
-function LessonRow({ l, idx, sectionNum, setRoute }) {
+function LessonRow({ l, idx, sectionNum, setRoute, completedLessons }) {
   const lang = useLang();
   const isLocked = l.status === "locked";
   const isDone = l.status === "done";
@@ -258,7 +265,7 @@ function LessonRow({ l, idx, sectionNum, setRoute }) {
     <div onClick={() => !isLocked && setRoute({ name: "lesson", section: sectionNum, lesson: parseInt(l.n) })}
       style={{
         display: "grid",
-        gridTemplateColumns: "auto 40px 1fr auto auto auto",
+        gridTemplateColumns: "auto 40px 1fr auto auto",
         gap: 16, alignItems: "center",
         padding: "16px 18px",
         borderRadius: 10,
@@ -298,7 +305,6 @@ function LessonRow({ l, idx, sectionNum, setRoute }) {
 
       <div className="mono" style={{ fontSize: 11, color: "var(--text-2)", display: "flex", gap: 14 }}>
         <span><Icon name="clock" size={11} /> &nbsp;{l.duration}m</span>
-        <span><Icon name="terminal" size={11} /> &nbsp;{l.labs}</span>
         <span><Icon name="graph" size={11} /> &nbsp;{l.diagrams}</span>
       </div>
 
