@@ -86,6 +86,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
 
   // ── Session timer ─────────────────────────────────────────
   const [sessionSec, setSessionSec] = useLS(0);
+  const [quizPassed, setQuizPassed] = useLS(false);
   const savedOnMountRef = useLR(0);
   useLE(() => {
     savedOnMountRef.current = getTimeSpent()[lessonKey] || 0;
@@ -112,6 +113,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   }, [lessonKey]);
 
   const totalTimeSec = (savedOnMountRef.current || 0) + sessionSec;
+  const quizUnlocked = totalTimeSec >= (LESSON_META[lessonNum]?.min || 10) * 60;
 
   useLE(() => {
     const onScroll = () => {
@@ -186,7 +188,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
           : lessonNum === 37 ? <><SectionBackupRestore /></>
           : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
-          {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} sectionNum={sectionNum} />}
+          {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} sectionNum={sectionNum} quizUnlocked={quizUnlocked} totalTimeSec={totalTimeSec} quizPassed={quizPassed} />}
         </div>
       </div>
 
@@ -196,7 +198,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
         onPass={(score) => {
           setQuizOpen(false);
           if (markLessonComplete) markLessonComplete(lessonKey, score);
-          setRoute({ name: "section", section: sectionNum });
+          setQuizPassed(true);
         }}
         onFail={() => { setQuizOpen(false); setRoute({ name: "cooldown" }); }}
       />}
@@ -1819,22 +1821,83 @@ function MindMap({ nodes }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-function LessonNextNav({ setRoute, onQuizStart, lessonNum, sectionNum = 1 }) {
+function LessonNextNav({ setRoute, onQuizStart, lessonNum, sectionNum = 1, quizUnlocked, totalTimeSec, quizPassed }) {
   const lang = useLang();
+  const meta = LESSON_META[lessonNum] || LESSON_META[1];
+  const neededSec = (meta.min || 10) * 60;
+  const remainSec = Math.max(0, neededSec - (totalTimeSec || 0));
+  const remainMin = Math.floor(remainSec / 60);
+  const remainS = remainSec % 60;
+  const nextLesson = lessonNum < 37 ? lessonNum + 1 : null;
+  const nextSec = nextLesson ? (nextLesson <= 20 ? 1 : 2) : sectionNum;
+
   return (
     <div style={{ marginTop: 60, paddingTop: 32, borderTop: "1px solid var(--border)" }}>
+      {quizPassed && nextLesson && (
+        <div style={{
+          marginBottom: 20, padding: "14px 20px",
+          background: "rgba(0,255,136,0.07)", border: "1px solid var(--accent-border)",
+          borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Icon name="check" size={16} style={{ color: "var(--accent)" }} />
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 13.5, color: "var(--accent)" }}>
+                {lang === "en" ? "Quiz passed!" : "Test muvaffaqiyatli topshirildi!"}
+              </div>
+              <div style={{ fontSize: 11.5, color: "var(--text-2)", marginTop: 1 }}>
+                {lang === "en" ? "You can now move to the next lesson." : "Endi keyingi darsga o'tishingiz mumkin."}
+              </div>
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={() => setRoute({ name: "lesson", lesson: nextLesson })} style={{ flexShrink: 0 }}>
+            {lang === "en" ? "Next lesson" : "Keyingi darsga"} <Icon name="arrow-right" size={14} />
+          </button>
+        </div>
+      )}
+      {quizPassed && !nextLesson && (
+        <div style={{
+          marginBottom: 20, padding: "14px 20px",
+          background: "rgba(0,255,136,0.07)", border: "1px solid var(--accent-border)",
+          borderRadius: 12, display: "flex", alignItems: "center", gap: 12,
+        }}>
+          <Icon name="trophy" size={18} style={{ color: "var(--accent)" }} />
+          <div style={{ fontWeight: 600, fontSize: 13.5, color: "var(--accent)" }}>
+            {lang === "en" ? "Section complete! All lessons done." : "Bo'lim tugadi! Barcha darslar bajarildi."}
+          </div>
+        </div>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, alignItems: "center" }}>
         <button className="btn" onClick={() => setRoute({ name: "section", section: sectionNum })} style={{ justifySelf: "start" }}>
           <Icon name="arrow-left" size={14} /> {lang === "en" ? "Section overview" : "Bo'limga qaytish"}
         </button>
         <div style={{ textAlign: "center" }}>
           <div className="eyebrow">// {lang === "en" ? "LESSON_COMPLETE" : "DARS_TUGADI"}</div>
-          <div style={{ color: "var(--text-2)", fontSize: 12, marginTop: 4 }}>
-            {lang === "en" ? "Pass the quiz to unlock the next lesson" : "Keyingi darsga o'tish uchun testni topshiring"}
-          </div>
+          {!quizUnlocked && (
+            <div style={{ fontSize: 11, color: "var(--c-warn)", marginTop: 4, fontFamily: "var(--font-mono)" }}>
+              {lang === "en"
+                ? `${remainMin}m ${String(remainS).padStart(2,"0")}s more to unlock quiz`
+                : `Test ochilishi uchun yana ${remainMin}m ${String(remainS).padStart(2,"0")}s qoldi`}
+            </div>
+          )}
+          {quizUnlocked && !quizPassed && (
+            <div style={{ color: "var(--text-2)", fontSize: 12, marginTop: 4 }}>
+              {lang === "en" ? "Pass the quiz to unlock the next lesson" : "Keyingi darsga o'tish uchun testni topshiring"}
+            </div>
+          )}
         </div>
-        <button className="btn btn-primary" onClick={onQuizStart} style={{ justifySelf: "end" }}>
-          <Icon name="target" size={14} /> {lang === "en" ? "Start the quiz" : "Testni boshlash"} <Icon name="arrow-right" size={14} />
+        <button
+          className="btn btn-primary"
+          onClick={quizUnlocked ? onQuizStart : undefined}
+          disabled={!quizUnlocked}
+          style={{
+            justifySelf: "end",
+            opacity: quizUnlocked ? 1 : 0.45,
+            cursor: quizUnlocked ? "pointer" : "not-allowed",
+          }}>
+          {quizUnlocked
+            ? <><Icon name="target" size={14} /> {lang === "en" ? "Start the quiz" : "Testni boshlash"} <Icon name="arrow-right" size={14} /></>
+            : <><Icon name="lock" size={14} /> {lang === "en" ? "Quiz locked" : "Test qulflangan"}</>}
         </button>
       </div>
     </div>

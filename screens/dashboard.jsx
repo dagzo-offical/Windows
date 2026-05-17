@@ -534,10 +534,6 @@ function SectionProgress({ setRoute, user }) {
   const sections = [
     { num: "01", uz: "Windows asoslari",    en: "Windows Fundamentals",  done: s01done, total: 20, color: "var(--c-system)", state: "active" },
     { num: "02", uz: "Administratsiya",     en: "Administration",        done: s02done, total: 17, color: "var(--c-user)",   state: "active" },
-    { num: "03", uz: "Windows xavfsizligi", en: "Windows Security",      done: 0,       total: 20, color: "var(--accent)",   state: "locked" },
-    { num: "04", uz: "Pentesting",          en: "Pentesting",            done: 0,       total: 20, color: "var(--c-attack)", state: "locked" },
-    { num: "05", uz: "Forensics",           en: "Forensics",             done: 0,       total: 20, color: "var(--c-auth)",   state: "locked" },
-    { num: "06", uz: "Server Infra",        en: "Server Infrastructure", done: 0,       total: 20, color: "var(--c-warn)",   state: "locked" },
   ];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

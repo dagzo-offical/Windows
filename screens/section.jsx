@@ -313,7 +313,14 @@ function LessonRow({ l, idx, sectionNum, setRoute, completedLessons }) {
         <Icon name={isLocked ? "lock" : isDone ? "check" : l.icon} size={16} />
       </div>
 
-      <div style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>{lang === "en" ? l.en : l.uz}</div>
+      <div>
+        <div style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>{lang === "en" ? l.en : l.uz}</div>
+        {l.timeSpent > 0 && (
+          <div className="mono" style={{ fontSize: 10.5, color: "var(--accent)", marginTop: 3 }}>
+            {lang === "en" ? `Active: ${fmtTimeShort(l.timeSpent)}` : `Siz ushbu mavzuda ${fmtTimeShort(l.timeSpent)} faol bo'ldingiz`}
+          </div>
+        )}
+      </div>
 
       <div className="mono" style={{ fontSize: 11, color: "var(--text-2)", display: "flex", gap: 14 }}>
         {l.timeSpent > 0
