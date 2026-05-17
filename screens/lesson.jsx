@@ -82,7 +82,11 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   const sectionNum = lessonNum <= 20 ? 1 : 2;
   const sectionLabel = sectionNum === 1 ? "01" : "02";
   const lessonKey = `s${sectionLabel}_l${String(lessonNum).padStart(2,"0")}`;
-  const hasContent = true; // TEMP: all unlocked for review
+  const completedLessons = user?.completedLessons || [];
+  const prevLessonNum = lessonNum - 1;
+  const prevSection = prevLessonNum <= 20 ? "01" : "02";
+  const prevKey = lessonNum > 1 ? `s${prevSection}_l${String(prevLessonNum).padStart(2,"0")}` : null;
+  const isLocked = lessonNum > 1 && !completedLessons.includes(prevKey);
 
   // ── Session timer ─────────────────────────────────────────
   const [sessionSec, setSessionSec] = useLS(0);
@@ -148,47 +152,51 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
         <LessonTOC lessonNum={lessonNum} />
 
         <div className="page" style={{ padding: "32px 28px 80px", maxWidth: "100%" }}>
-          <LessonHero lesson={LESSON} lessonNum={lessonNum} totalTimeSec={totalTimeSec} />
-          {lessonNum === 1  ? <><Section1Bigpicture /><Section2Theory /><Section3Layered /></>
-          : lessonNum === 2  ? <><SectionKernelWhat /><SectionKernelInside /><SectionKernelDrivers /></>
-          : lessonNum === 3  ? <><SectionRings /><Section8Comparison /><SectionSyscallBrief /></>
-          : lessonNum === 4  ? <><Section4Boot /></>
-          : lessonNum === 5  ? <><SectionBiosUefi /></>
-          : lessonNum === 6  ? <><SectionSecureBoot /></>
-          : lessonNum === 7  ? <><SectionTPM /></>
-          : lessonNum === 8  ? <><SectionRegistry /></>
-          : lessonNum === 9  ? <><SectionFileSystems /></>
-          : lessonNum === 10 ? <><SectionNTFS /></>
-          : lessonNum === 11 ? <><SectionFAT32 /></>
-          : lessonNum === 12 ? <><SectionProcesses /></>
-          : lessonNum === 13 ? <><SectionThreads /></>
-          : lessonNum === 14 ? <><SectionHandles /></>
-          : lessonNum === 15 ? <><SectionServices /></>
-          : lessonNum === 16 ? <><SectionDLL /></>
-          : lessonNum === 17 ? <><SectionWindowsAPI /></>
-          : lessonNum === 18 ? <><SectionEventViewer /></>
-          : lessonNum === 19 ? <><SectionTaskScheduler /></>
-          : lessonNum === 20 ? <><SectionWindowsLogs /></>
-          : lessonNum === 21 ? <><SectionTaskMgrBasic /></>
-          : lessonNum === 22 ? <><SectionDeviceMgrBasic /></>
-          : lessonNum === 23 ? <><SectionUserAccounts /></>
-          : lessonNum === 24 ? <><SectionUAC /></>
-          : lessonNum === 25 ? <><SectionSettings /></>
-          : lessonNum === 26 ? <><SectionMsconfig /></>
-          : lessonNum === 27 ? <><SectionComputerMgmt /></>
-          : lessonNum === 28 ? <><SectionResourceMonitor /></>
-          : lessonNum === 29 ? <><SectionWinUpdate /></>
-          : lessonNum === 30 ? <><SectionDefenderBasic /></>
-          : lessonNum === 31 ? <><SectionFirewallBasic /></>
-          : lessonNum === 32 ? <><SectionBitLockerBasic /></>
-          : lessonNum === 33 ? <><SectionPSBasic /></>
-          : lessonNum === 34 ? <><SectionRDP /></>
-          : lessonNum === 35 ? <><SectionNetBasic /></>
-          : lessonNum === 36 ? <><SectionFileShare /></>
-          : lessonNum === 37 ? <><SectionBackupRestore /></>
-          : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
-
-          {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} sectionNum={sectionNum} quizUnlocked={quizUnlocked} totalTimeSec={totalTimeSec} quizPassed={quizPassed} />}
+          <LessonHero lesson={LESSON} lessonNum={lessonNum} totalTimeSec={isLocked ? 0 : totalTimeSec} />
+          {isLocked
+            ? <LessonLocked lessonNum={lessonNum} prevLessonNum={prevLessonNum} setRoute={setRoute} sectionNum={sectionNum} />
+            : <>
+                {lessonNum === 1  ? <><Section1Bigpicture /><Section2Theory /><Section3Layered /></>
+                : lessonNum === 2  ? <><SectionKernelWhat /><SectionKernelInside /><SectionKernelDrivers /></>
+                : lessonNum === 3  ? <><SectionRings /><Section8Comparison /><SectionSyscallBrief /></>
+                : lessonNum === 4  ? <><Section4Boot /></>
+                : lessonNum === 5  ? <><SectionBiosUefi /></>
+                : lessonNum === 6  ? <><SectionSecureBoot /></>
+                : lessonNum === 7  ? <><SectionTPM /></>
+                : lessonNum === 8  ? <><SectionRegistry /></>
+                : lessonNum === 9  ? <><SectionFileSystems /></>
+                : lessonNum === 10 ? <><SectionNTFS /></>
+                : lessonNum === 11 ? <><SectionFAT32 /></>
+                : lessonNum === 12 ? <><SectionProcesses /></>
+                : lessonNum === 13 ? <><SectionThreads /></>
+                : lessonNum === 14 ? <><SectionHandles /></>
+                : lessonNum === 15 ? <><SectionServices /></>
+                : lessonNum === 16 ? <><SectionDLL /></>
+                : lessonNum === 17 ? <><SectionWindowsAPI /></>
+                : lessonNum === 18 ? <><SectionEventViewer /></>
+                : lessonNum === 19 ? <><SectionTaskScheduler /></>
+                : lessonNum === 20 ? <><SectionWindowsLogs /></>
+                : lessonNum === 21 ? <><SectionTaskMgrBasic /></>
+                : lessonNum === 22 ? <><SectionDeviceMgrBasic /></>
+                : lessonNum === 23 ? <><SectionUserAccounts /></>
+                : lessonNum === 24 ? <><SectionUAC /></>
+                : lessonNum === 25 ? <><SectionSettings /></>
+                : lessonNum === 26 ? <><SectionMsconfig /></>
+                : lessonNum === 27 ? <><SectionComputerMgmt /></>
+                : lessonNum === 28 ? <><SectionResourceMonitor /></>
+                : lessonNum === 29 ? <><SectionWinUpdate /></>
+                : lessonNum === 30 ? <><SectionDefenderBasic /></>
+                : lessonNum === 31 ? <><SectionFirewallBasic /></>
+                : lessonNum === 32 ? <><SectionBitLockerBasic /></>
+                : lessonNum === 33 ? <><SectionPSBasic /></>
+                : lessonNum === 34 ? <><SectionRDP /></>
+                : lessonNum === 35 ? <><SectionNetBasic /></>
+                : lessonNum === 36 ? <><SectionFileShare /></>
+                : lessonNum === 37 ? <><SectionBackupRestore /></>
+                : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
+                <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} sectionNum={sectionNum} quizUnlocked={quizUnlocked} totalTimeSec={totalTimeSec} quizPassed={quizPassed} />
+              </>
+          }
         </div>
       </div>
 
@@ -8077,6 +8085,41 @@ function SectionWindowsLogs() {
 }
 
 // ─────────────────────────────────────────────────────────────
+function LessonLocked({ lessonNum, prevLessonNum, setRoute, sectionNum = 1 }) {
+  const lang = useLang();
+  const prevLesson = LESSONS[prevLessonNum];
+  return (
+    <div style={{ textAlign: "center", padding: "80px 32px" }}>
+      <div style={{
+        width: 80, height: 80, borderRadius: "50%",
+        background: "rgba(255,180,0,0.08)", border: "1px solid rgba(255,180,0,0.3)",
+        margin: "0 auto 24px", display: "grid", placeItems: "center", color: "var(--c-warn)",
+      }}>
+        <Icon name="lock" size={36} />
+      </div>
+      <div className="eyebrow" style={{ color: "var(--c-warn)", marginBottom: 12 }}>
+        // {lang === "en" ? "LESSON_LOCKED" : "DARS_QULFLANGAN"}
+      </div>
+      <h2 className="display" style={{ fontSize: 32, margin: "0 0 10px", letterSpacing: "-0.02em" }}>
+        {lang === "en" ? "This lesson is locked" : "Bu dars qulflangan"}
+      </h2>
+      <p style={{ color: "var(--text-2)", fontSize: 15, maxWidth: 460, margin: "0 auto 32px", lineHeight: 1.65 }}>
+        {lang === "en"
+          ? <>Complete <strong>L{String(prevLessonNum).padStart(2,"0")}{prevLesson ? ` — ${prevLesson.en}` : ""}</strong> and pass its quiz to unlock this lesson.</>
+          : <><strong>L{String(prevLessonNum).padStart(2,"0")}{prevLesson ? ` — ${prevLesson.uz}` : ""}</strong> darsini tugating va testini topshiring — bu dars avtomatik ochiladi.</>}
+      </p>
+      <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+        <button className="btn" onClick={() => setRoute({ name: "section", section: sectionNum })}>
+          <Icon name="arrow-left" size={14} /> {lang === "en" ? "Back to section" : "Bo'limga qaytish"}
+        </button>
+        <button className="btn btn-primary" onClick={() => setRoute({ name: "lesson", lesson: prevLessonNum })}>
+          {lang === "en" ? `Go to L${String(prevLessonNum).padStart(2,"0")}` : `L${String(prevLessonNum).padStart(2,"0")} darsiga o'tish`} <Icon name="arrow-right" size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ComingSoon({ lesson, lessonNum, setRoute }) {
   const lang = useLang();
   return (

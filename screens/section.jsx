@@ -124,11 +124,11 @@ function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen, 
     const n = parseInt(l.n);
     const key = `s${n <= 20 ? "01" : "02"}_l${String(n).padStart(2, "0")}`;
     const isDone = completedLessons.includes(key);
-    return { ...l, status: isDone ? "done" : "available", _key: key, timeSpent: timeSpentAll[key] || 0 };
+    return { ...l, status: isDone ? "done" : "locked", _key: key, timeSpent: timeSpentAll[key] || 0 };
   });
-  const firstAvail = rawLessons.find(l => l.status === "available");
+  const firstLocked = rawLessons.find(l => l.status === "locked");
   const lessons = rawLessons.map(l =>
-    l._key === firstAvail?._key ? { ...l, status: "in-progress" } : l
+    l._key === firstLocked?._key ? { ...l, status: "in-progress" } : l
   );
 
   const totalLessons = lessons.length;
