@@ -12,38 +12,81 @@ const LESSON = {
 };
 
 const LESSONS = {
-  1:  { num: "L01", section: "01", uz: "Windows arxitekturasi",        en: "Windows Architecture",
-        subUz: "Katta rasm, nazariy asos, qatlamli arxitektura",           subEn: "Big picture, theory, layered architecture" },
-  2:  { num: "L02", section: "01", uz: "Kernel nima?",                  en: "What is the Kernel?",
-        subUz: "ntoskrnl.exe, Executive, Microkernel, HAL va drayverlar",   subEn: "ntoskrnl.exe, Executive, Microkernel, HAL and drivers" },
-  3:  { num: "L03", section: "01", uz: "User mode va Kernel mode",      en: "User Mode vs Kernel Mode",
-        subUz: "CPU privilege halqalari va chegara nima uchun muhim",        subEn: "CPU privilege rings and why the boundary matters" },
-  4:  { num: "L04", section: "01", uz: "Windows boot jarayoni",         en: "Windows Boot Process",
-        subUz: "UEFI'dan login ekraniga: har bir bosqich va xavfsizlik",     subEn: "UEFI to login: every step and its security implications" },
-  5:  { num: "L05", section: "01", uz: "BIOS vs UEFI",                  en: "BIOS vs UEFI",                subUz: "16-bit BIOS, MBR, UEFI fazalari, Secure Boot asoslari", subEn: "16-bit BIOS, MBR, UEFI phases, Secure Boot fundamentals" },
-  6:  { num: "L06", section: "01", uz: "Secure Boot",                   en: "Secure Boot",                 subUz: "PK/KEK/db/dbx ierarxiyasi, imzo zanjiri va chetlab o'tish texnikalari", subEn: "PK/KEK/db/dbx hierarchy, signature chain and bypass techniques" },
-  7:  { num: "L07", section: "01", uz: "TPM",                           en: "TPM",                         subUz: "PCR banklari, kalitlarni muhrlab qo'yish, BitLocker va attestatsiya", subEn: "PCR banks, key sealing, BitLocker integration and attestation" },
-  8:  { num: "L08", section: "01", uz: "Registry",                      en: "Windows Registry",            subUz: "Ierarxik ma'lumotlar bazasi, hive fayllar va persistenslik joylari", subEn: "Hierarchical database, hive files, and persistence locations" },
-  9:  { num: "L09", section: "01", uz: "Fayl tizimlari",                en: "File Systems",                subUz: "VFS, FAT/NTFS/exFAT arxitekturasi va Windows I/O menejeri", subEn: "VFS, FAT/NTFS/exFAT architecture and the Windows I/O Manager" },
-  10: { num: "L10", section: "01", uz: "NTFS",                          en: "NTFS",                        subUz: "MFT, atributlar, ADS, ruxsatlar, jurnalling va EFS", subEn: "MFT, attributes, ADS, permissions, journaling and EFS" },
-  11: { num: "L11", section: "01", uz: "FAT32",                         en: "FAT32",                       subUz: "FAT jadvali, klaster ajratish, cheklovlar va ESP", subEn: "FAT table, cluster allocation, limitations and the EFI System Partition" },
-  12: { num: "L12", section: "01", uz: "Jarayonlar (Processes)",        en: "Processes",                   subUz: "EPROCESS, virtual manzil fazosi, kirish tokeni va jarayon in'ektsiya texnikalari", subEn: "EPROCESS, virtual address space, access token, and process injection techniques" },
-  13: { num: "L13", section: "01", uz: "Thread'lar",                    en: "Threads",                     subUz: "ETHREAD, rejalashtiruvchi, prioritetlar, sinxronizatsiya va thread in'ektsiya", subEn: "ETHREAD, scheduler, priorities, synchronization, and thread injection" },
-  14: { num: "L14", section: "01", uz: "Handle'lar",                    en: "Handles",                     subUz: "Ob'ekt menejeri, handle jadvali, turlari, takrorlash, xavfsizlik va handle hujumlari", subEn: "Object Manager, handle table, types, duplication, security, and handle-based attacks" },
-  15: { num: "L15", section: "01", uz: "Servislar",                     en: "Services",                    subUz: "SCM, servis turlari, xizmat akkauntlari, svchost guruhlari va servis persistenslik texnikalari", subEn: "SCM, service types, service accounts, svchost groups, and service-based persistence techniques" },
-  16: { num: "L16", section: "01", uz: "Foydalanuvchi hisoblari",        en: "User Accounts",               subUz: "SAM, SID/RID, NTLM hash, foydalanuvchi profil tuzilmasi, DPAPI va hisob ma'lumotlari hujumlari", subEn: "SAM, SID/RID, NTLM hashing, user profile structure, DPAPI, and credential attacks" },
-  17: { num: "L17", section: "01", uz: "UAC (User Account Control)",    en: "User Account Control",        subUz: "Ajratilgan token, yaxlitlik darajalari, consent.exe, auto-elevation va UAC bypass texnikalari", subEn: "Split token, integrity levels, consent.exe, auto-elevation, and UAC bypass techniques" },
-  18: { num: "L18", section: "01", uz: "DLL",                           en: "DLL",                         subUz: "PE tuzilmasi, DLL yuklash, qidiruv tartibi, in'ektsiya va DLL hijacking texnikalari", subEn: "PE structure, DLL loading, search order, injection, and DLL hijacking techniques" },
-  19: { num: "L19", section: "01", uz: "Windows API",                   en: "Windows API",                 subUz: "Win32 qatlami, ntdll syscall ko'prigi, API hooking va monitoring texnikalari", subEn: "Win32 layer, ntdll syscall bridge, API hooking, and monitoring techniques" },
-  20: { num: "L20", section: "01", uz: "Event Viewer",                  en: "Event Viewer",                subUz: "Windows event log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensics", subEn: "Windows event log architecture, key Event IDs, ETW, Sysmon, and forensic analysis" },
-  21: { num: "L21", section: "01", uz: "Task Scheduler",                en: "Task Scheduler",              subUz: "Vazifa arxitekturasi, triggerlar, harakatlar, imtiyozlar va persistenslik texnikalari", subEn: "Task architecture, triggers, actions, privileges, and scheduler-based persistence techniques" },
-  22: { num: "L22", section: "01", uz: "Windows log fayllari",          en: "Windows Logs",                subUz: "EVTX format, log yo'llari, log o'chirish aniqlash va forensic tekshiruv", subEn: "EVTX format, log paths, log clearing detection, and forensic log analysis" },
-  23: { num: "L23", section: "01", uz: "Settings va Control Panel",     en: "Settings & Control Panel",    subUz: "Settings URI sxemasi, Control Panel appletlari, xavfsizlik sozlamalari va GPO", subEn: "Settings URI scheme, Control Panel applets, security settings and Group Policy" },
-  24: { num: "L24", section: "01", uz: "System Configuration",          en: "System Configuration",        subUz: "msconfig.exe — ishga tushish turlari, xavfsiz yuklash, xizmatlar va vositalar", subEn: "msconfig.exe — startup types, safe boot modes, services tab and tools shortcuts" },
-  25: { num: "L25", section: "01", uz: "Kengaytirilgan Tizim Sozlamalari", en: "Advanced System Settings", subUz: "sysdm.cpl — DEP, virtual xotira, tizimni tiklash, drayver imzolash va RDP", subEn: "sysdm.cpl — DEP, virtual memory, system restore, driver signing and RDP" },
-  26: { num: "L26", section: "01", uz: "Kompyuter Boshqaruvi",          en: "Computer Management",         subUz: "compmgmt.msc — ulashimlar, foydalanuvchilar, disk, xizmatlar va WMI persistenslik", subEn: "compmgmt.msc — shares, users, disk management, services and WMI persistence" },
-  27: { num: "L27", section: "01", uz: "Resource Monitor va CMD",       en: "Resource Monitor & CMD",       subUz: "resmon.exe 4 tab (CPU/xotira/disk/tarmoq), cmd buyruqlari va Registry Editor", subEn: "resmon.exe 4 tabs (CPU/memory/disk/network), cmd commands and Registry Editor" },
-  28: { num: "L28", section: "01", uz: "GUI — Grafik Interfeys",         en: "GUI — Graphical Interface",    subUz: "Win32 oyna modeli, HWND/WndProc, DWM compositor, API qatlamlari va xavfsizlik", subEn: "Win32 window model, HWND/WndProc, DWM compositor, GUI API layers and security" },
+  // ── PHASE 1: Fundamentals ──────────────────────────────────────────────
+  1:  { num:"L01", section:"01", uz:"Windows nima?",              en:"What is Windows?",          subUz:"Operatsion tizim asoslari, Windows ekotizimi va GUI kirish",          subEn:"Operating system basics, Windows ecosystem and GUI introduction" },
+  2:  { num:"L02", section:"01", uz:"Windows versiyalari",         en:"Windows Versions",          subUz:"XP dan Win 11 gacha: versiyalar, qo'llab-quvvatlash va farqlar",       subEn:"From XP to Win 11: versions, support lifecycle and key differences" },
+  3:  { num:"L03", section:"01", uz:"Windows o'rnatish",           en:"Windows Installation",      subUz:"ISO tayyorlash, bosqichma-bosqich o'rnatish va drayver sozlash",        subEn:"Prepare ISO, step-by-step installation and driver setup" },
+  4:  { num:"L04", section:"01", uz:"GPT vs MBR",                  en:"GPT vs MBR",                subUz:"Disk bo'limlanish jadvallari, UEFI talablari va Disk Management",       subEn:"Partition tables, UEFI requirements and Disk Management GUI" },
+  5:  { num:"L05", section:"01", uz:"Ish stoli muhiti",            en:"Desktop Environment",       subUz:"Taskbar, Start Menu, Action Center, virtual ish stollari va shortcutlar", subEn:"Taskbar, Start Menu, Action Center, virtual desktops and shortcuts" },
+  6:  { num:"L06", section:"01", uz:"File Explorer",               en:"File Explorer",             subUz:"Navigatsiya, fayl operatsiyalari, yashirin fayllar va qidiruv",          subEn:"Navigation, file operations, hidden files and search" },
+  7:  { num:"L07", section:"01", uz:"Vazifalar Menejeri",          en:"Task Manager",              subUz:"Jarayonlar, ishlash ko'rsatgichlari, ishga tushish va muzlagan tasklar", subEn:"Processes, performance graphs, startup programs and frozen tasks" },
+  8:  { num:"L08", section:"01", uz:"Qurilma Menejeri",            en:"Device Manager",            subUz:"Qurilma holatlari, drayver yangilash/qaytarish va muammolarni hal qilish",subEn:"Device status, update/rollback drivers and hardware troubleshooting" },
+  9:  { num:"L09", section:"01", uz:"Foydalanuvchi hisoblari",     en:"User Accounts",             subUz:"Admin vs Standart, Microsoft va Mahalliy hisob, parol va PIN sozlash",   subEn:"Admin vs Standard, Microsoft vs Local account, password and PIN" },
+  10: { num:"L10", section:"01", uz:"Fayllar va Ruxsatlar",        en:"Files & Permissions",       subUz:"NTFS ruxsatlari, papka ulashish, meros ruxsatlari va keng tarqalgan xatolar", subEn:"NTFS permissions, folder sharing, inherited permissions and common errors" },
+  11: { num:"L11", section:"01", uz:"Windows Update",              en:"Windows Update",            subUz:"Yangilanish turlari, kechiktirish, drayver yangilanishlari va muammo tuzatish", subEn:"Update types, pause/defer, driver updates and troubleshooting failures" },
+  12: { num:"L12", section:"01", uz:"Windows Defender asoslari",   en:"Windows Defender Basics",   subUz:"Windows Security markazi, real-time himoya, skanlar va xatolarni hal qilish", subEn:"Windows Security Center, real-time protection, scans and exclusions" },
+  13: { num:"L13", section:"01", uz:"Tarmoq asoslari",             en:"Networking Basics",         subUz:"IP, subnet, gateway, DNS, DHCP vs statik IP, ipconfig va ping",         subEn:"IP, subnet, gateway, DNS, DHCP vs static, ipconfig and ping" },
+  14: { num:"L14", section:"01", uz:"Fayl va Printer almashish",   en:"File & Printer Sharing",    subUz:"Tarmoq almashish, papka ulashish, network drive va printer sozlash",       subEn:"Network sharing, folder share, map network drive and printer setup" },
+  15: { num:"L15", section:"01", uz:"Zaxiralash va tiklash",       en:"Backup & Restore",          subUz:"Tizim tiklash nuqtalari, File History, Windows Backup va tiklash imkoniyatlari", subEn:"System restore points, File History, Windows Backup and recovery options" },
+  // ── PHASE 2: Administration ───────────────────────────────────────────
+  16: { num:"L16", section:"02", uz:"Servislar",                   en:"Services",                  subUz:"SCM, servis turlari, xizmat akkauntlari, svchost va persistenslik",     subEn:"SCM, service types, service accounts, svchost and persistence" },
+  17: { num:"L17", section:"02", uz:"Event Viewer",                en:"Event Viewer",              subUz:"Windows event log arxitekturasi, Event ID lar, ETW, Sysmon va forensics", subEn:"Windows event log architecture, key Event IDs, ETW, Sysmon and forensics" },
+  18: { num:"L18", section:"02", uz:"Task Scheduler",              en:"Task Scheduler",            subUz:"Vazifa arxitekturasi, triggerlar, harakatlar va persistenslik texnikalari", subEn:"Task architecture, triggers, actions and scheduler-based persistence" },
+  19: { num:"L19", section:"02", uz:"Registry",                    en:"Windows Registry",          subUz:"Ierarxik ma'lumotlar bazasi, hive fayllar va persistenslik joylari",     subEn:"Hierarchical database, hive files and persistence locations" },
+  20: { num:"L20", section:"02", uz:"System Configuration",        en:"System Configuration",      subUz:"msconfig.exe — ishga tushish turlari, xavfsiz yuklash va vositalar",     subEn:"msconfig.exe — startup types, safe boot modes and tools shortcuts" },
+  21: { num:"L21", section:"02", uz:"Kengaytirilgan Sozlamalar",   en:"Advanced System Settings",  subUz:"sysdm.cpl — DEP, virtual xotira, tizim tiklash, DSE va RDP",            subEn:"sysdm.cpl — DEP, virtual memory, system restore, driver signing and RDP" },
+  22: { num:"L22", section:"02", uz:"Kompyuter Boshqaruvi",        en:"Computer Management",       subUz:"compmgmt.msc — ulashimlar, foydalanuvchilar, disk va WMI persistenslik",  subEn:"compmgmt.msc — shares, users, disk management and WMI persistence" },
+  23: { num:"L23", section:"02", uz:"Resource Monitor",            en:"Resource Monitor",          subUz:"resmon.exe 4 tab: CPU/xotira/disk/tarmoq va cmd buyruqlari",             subEn:"resmon.exe 4 tabs: CPU/memory/disk/network and cmd commands" },
+  24: { num:"L24", section:"02", uz:"Settings va Control Panel",   en:"Settings & Control Panel",  subUz:"Settings URI sxemasi, Control Panel appletlari va xavfsizlik sozlamalari", subEn:"Settings URI scheme, Control Panel applets and security settings" },
+  25: { num:"L25", section:"02", uz:"PowerShell asoslari",         en:"PowerShell Basics",         subUz:"Cmdletlar, pipeline, skriptlar, bajarish siyosati va tizim boshqaruvi",   subEn:"Cmdlets, pipeline, scripts, execution policy and system management" },
+  26: { num:"L26", section:"02", uz:"Remote Desktop",              en:"Remote Desktop",            subUz:"RDP yoqish, ulanish, NLA, xavfsizlik va muammolarni hal qilish",          subEn:"Enable RDP, connect, NLA, security considerations and troubleshooting" },
+  27: { num:"L27", section:"02", uz:"Windows Firewall",            en:"Windows Firewall",          subUz:"Firewall profillari, qoidalar yaratish, wf.msc va sinash",                subEn:"Firewall profiles, create rules, wf.msc and testing connectivity" },
+  28: { num:"L28", section:"02", uz:"BitLocker",                   en:"BitLocker",                 subUz:"Disk shifrlash, TPM talablari, tiklash kaliti va BitLocker To Go",        subEn:"Disk encryption, TPM requirements, recovery key and BitLocker To Go" },
+  // ── PHASE 3: Windows Server ───────────────────────────────────────────
+  29: { num:"L29", section:"03", uz:"Windows Server kirish",       en:"Windows Server Intro",      subUz:"Server 2019/2022/2025 versiyalari, rollar va o'rnatish",                 subEn:"Server 2019/2022/2025 editions, roles and installation" },
+  30: { num:"L30", section:"03", uz:"Server Manager",              en:"Server Manager",            subUz:"Server Manager interfeysi, rollar qo'shish va boshqarish",              subEn:"Server Manager interface, adding roles and remote management" },
+  31: { num:"L31", section:"03", uz:"Active Directory",            en:"Active Directory",          subUz:"AD DS, domain tuzilishi, kompyuter va foydalanuvchi ob'ektlari",         subEn:"AD DS, domain structure, computer and user objects" },
+  32: { num:"L32", section:"03", uz:"DNS Server",                  en:"DNS Server",                subUz:"DNS zonalari, A/PTR/MX yozuvlari va DNS muammolarni hal qilish",         subEn:"DNS zones, A/PTR/MX records and DNS troubleshooting" },
+  33: { num:"L33", section:"03", uz:"DHCP Server",                 en:"DHCP Server",               subUz:"DHCP doiralari, zaxira va DHCP failover sozlash",                        subEn:"DHCP scopes, reservations and DHCP failover configuration" },
+  34: { num:"L34", section:"03", uz:"OU tuzilmasi",                en:"OU Structure",              subUz:"Organizational Units, delegatsiya va GPO bog'lash",                      subEn:"Organizational Units, delegation and GPO linking" },
+  35: { num:"L35", section:"03", uz:"Group Policy",                en:"Group Policy",              subUz:"GPO yaratish, sozlash, tartib va tatbiq etish",                          subEn:"Create, configure, order and apply Group Policy Objects" },
+  36: { num:"L36", section:"03", uz:"Fayl Server",                 en:"File Server",               subUz:"SMB ulashimlar, NTFS va ulashim ruxsatlari, DFS va kvotalar",            subEn:"SMB shares, NTFS and share permissions, DFS and quotas" },
+  37: { num:"L37", section:"03", uz:"IIS Web Server",              en:"IIS Web Server",            subUz:"IIS saytlar, applikatsiya poollari, SSL va xavfsizlik",                  subEn:"IIS sites, application pools, SSL/TLS and security hardening" },
+  38: { num:"L38", section:"03", uz:"WSUS",                        en:"WSUS",                      subUz:"Windows Server Update Services, tasdiqlash va hisobot",                  subEn:"Windows Server Update Services, approval and reporting" },
+  39: { num:"L39", section:"03", uz:"Hyper-V",                     en:"Hyper-V",                   subUz:"VM yaratish, snapshot, live migration va tarmoq sozlash",                subEn:"Create VMs, snapshots, live migration and network configuration" },
+  40: { num:"L40", section:"03", uz:"Server monitoring",           en:"Server Monitoring",         subUz:"Performance Monitor, Data Collector Sets va ogohlantirishlar",            subEn:"Performance Monitor, Data Collector Sets and alerts" },
+  41: { num:"L41", section:"03", uz:"Server zaxiralash",           en:"Server Backup",             subUz:"Windows Server Backup, BMR va tiklash opsiyalari",                       subEn:"Windows Server Backup, BMR and recovery options" },
+  // ── PHASE 4: Security ─────────────────────────────────────────────────
+  42: { num:"L42", section:"04", uz:"Autentifikatsiya",            en:"Authentication",            subUz:"Windows autentifikatsiya protokollari, LSA va Credential Guard",          subEn:"Windows authentication protocols, LSA and Credential Guard" },
+  43: { num:"L43", section:"04", uz:"NTLM protokoli",              en:"NTLM Protocol",             subUz:"NTLM challenge/response, relay hujumlari va yumshatish choralari",        subEn:"NTLM challenge/response, relay attacks and mitigations" },
+  44: { num:"L44", section:"04", uz:"Kerberos",                    en:"Kerberos",                  subUz:"TGT/Service Ticket, AS/TGS almashinuvi, Kerberoasting va Golden Ticket",  subEn:"TGT/Service Ticket, AS/TGS exchange, Kerberoasting and Golden Ticket" },
+  45: { num:"L45", section:"04", uz:"Defender ilg'or",             en:"Defender Advanced",         subUz:"ATP, EDR, ASR qoidalari, Tamper Protection va Cloud delivery",           subEn:"ATP, EDR, ASR rules, Tamper Protection and Cloud delivery" },
+  46: { num:"L46", section:"04", uz:"Firewall ilg'or",             en:"Firewall Advanced",         subUz:"Kirishga kiruvchi/chiquvchi qoidalar, IPsec va monitoring",               subEn:"Inbound/outbound rules, IPsec, connection security and monitoring" },
+  47: { num:"L47", section:"04", uz:"AppLocker va WDAC",           en:"AppLocker & WDAC",          subUz:"Ilova nazorati siyosatlari, WDAC siyosat moslash va cheklovlar",          subEn:"Application control policies, WDAC policy crafting and bypasses" },
+  48: { num:"L48", section:"04", uz:"Xavfsizlik loglari",          en:"Security Logging",          subUz:"EVTX format, log yo'llari, log o'chirish aniqlash va forensic tahlil",    subEn:"EVTX format, log paths, clearing detection and forensic analysis" },
+  49: { num:"L49", section:"04", uz:"UAC",                         en:"User Account Control",      subUz:"Ajratilgan token, yaxlitlik darajalari, consent.exe va UAC bypass",      subEn:"Split token, integrity levels, consent.exe and UAC bypass techniques" },
+  50: { num:"L50", section:"04", uz:"Secure Boot va TPM",          en:"Secure Boot & TPM",         subUz:"PK/KEK/db/dbx, TPM PCR banklari, BitLocker va attestatsiya",            subEn:"PK/KEK/db/dbx hierarchy, TPM PCR banks, BitLocker and attestation" },
+  51: { num:"L51", section:"04", uz:"Hodisalarga javob",           en:"Incident Response",         subUz:"IR bosqichlari, artefakt yig'ish, triage va tiklash",                    subEn:"IR phases, artifact collection, triage and recovery procedures" },
+  // ── PHASE 5: Internals ────────────────────────────────────────────────
+  52: { num:"L52", section:"05", uz:"Windows arxitekturasi",       en:"Windows Architecture",      subUz:"Katta rasm, qatlamlar, Executive quyi tizimlari va HAL",                 subEn:"Big picture, layers, Executive subsystems and HAL" },
+  53: { num:"L53", section:"05", uz:"Kernel internallari",         en:"Kernel Internals",          subUz:"ntoskrnl.exe, Executive, Microkernel, HAL va drayverlar",               subEn:"ntoskrnl.exe, Executive, Microkernel, HAL and drivers" },
+  54: { num:"L54", section:"05", uz:"User mode vs Kernel mode",    en:"User Mode vs Kernel Mode",  subUz:"CPU privilege halqalari va chegara nima uchun muhim",                    subEn:"CPU privilege rings and why the boundary matters" },
+  55: { num:"L55", section:"05", uz:"Boot jarayoni chuqur",        en:"Boot Process Deep",         subUz:"UEFI'dan login ekraniga: BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad, kernel", subEn:"UEFI to login screen: BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad, kernel" },
+  56: { num:"L56", section:"05", uz:"BIOS vs UEFI chuqur",         en:"BIOS vs UEFI Deep",         subUz:"16-bit BIOS, UEFI fazalari, Secure Boot zanjiri va bypass texnikalari",  subEn:"16-bit BIOS, UEFI phases, Secure Boot chain and bypass techniques" },
+  57: { num:"L57", section:"05", uz:"Jarayonlar va Thread'lar",    en:"Processes & Threads",       subUz:"EPROCESS/ETHREAD, rejalashtiruvchi, sinxronizatsiya va in'ektsiya",       subEn:"EPROCESS/ETHREAD, scheduler, synchronization and injection" },
+  58: { num:"L58", section:"05", uz:"Handle'lar va Ob'ektlar",     en:"Handles & Objects",         subUz:"Ob'ekt menejeri, handle jadvali, turlari va handle hujumlari",            subEn:"Object Manager, handle table, types and handle-based attacks" },
+  59: { num:"L59", section:"05", uz:"Fayl tizimlari chuqur",       en:"File Systems Deep",         subUz:"VFS, NTFS MFT/atributlar/ADS/EFS va FAT32 tuzilmasi",                   subEn:"VFS, NTFS MFT/attributes/ADS/EFS and FAT32 structure" },
+  60: { num:"L60", section:"05", uz:"GUI arxitekturasi",            en:"GUI Architecture",          subUz:"Win32 oyna modeli, HWND/WndProc, DWM compositor va GUI xavfsizligi",    subEn:"Win32 window model, HWND/WndProc, DWM compositor and GUI security" },
+  // ── PHASE 6: Red Team ─────────────────────────────────────────────────
+  61: { num:"L61", section:"06", uz:"DLL va Injection",             en:"DLL & Injection",           subUz:"PE tuzilmasi, DLL yuklash, qidiruv tartibi va injection texnikalari",    subEn:"PE structure, DLL loading, search order and injection techniques" },
+  62: { num:"L62", section:"06", uz:"Windows API ilg'or",           en:"Windows API Advanced",      subUz:"Win32 qatlami, ntdll syscall ko'prigi, API hooking va monitoring",       subEn:"Win32 layer, ntdll syscall bridge, API hooking and monitoring" },
+  63: { num:"L63", section:"06", uz:"UAC bypass texnikalari",       en:"UAC Bypass Techniques",     subUz:"UAC bypass metodlari, auto-elevation, COM elevation va aniqlash",        subEn:"UAC bypass methods, auto-elevation, COM elevation and detection" },
+  64: { num:"L64", section:"06", uz:"Credential Attacks",           en:"Credential Attacks",        subUz:"SAM, LSASS dump, PtH, DPAPI va hisob ma'lumotlari hujumlari",           subEn:"SAM, LSASS dump, PtH, DPAPI and credential attack techniques" },
+  65: { num:"L65", section:"06", uz:"Event Log Forensics",          en:"Event Log Forensics",       subUz:"Event ID forensics, ETW, Sysmon qoidalari va hodisa aniqlash",           subEn:"Event ID forensics, ETW, Sysmon rules and incident detection" },
+  66: { num:"L66", section:"06", uz:"Registry Persistence",         en:"Registry Persistence",      subUz:"Registry asosidagi persistenslik: Run kalitlar, hijacking va aniqlash",   subEn:"Registry-based persistence: Run keys, hijacking and detection" },
+  67: { num:"L67", section:"06", uz:"Servis Persistence",           en:"Service Persistence",       subUz:"Servis yaratish, ImagePath hijacking, SCM va antifirenslik",              subEn:"Service creation, ImagePath hijacking, SCM abuse and detection" },
+  68: { num:"L68", section:"06", uz:"Task Scheduler Persistence",   en:"Task Scheduler Persistence",subUz:"Vazifa yaratish, trigger bypass va yashirin vazifalarni aniqlash",      subEn:"Task creation, trigger bypass and detecting hidden scheduled tasks" },
+  69: { num:"L69", section:"06", uz:"Windows Logs Forensics",       en:"Windows Logs Forensics",    subUz:"EVTX forensics, tizim log tahlili va hodisalarga javob berish",          subEn:"EVTX forensics, system log analysis and incident response workflow" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -87,69 +130,55 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, lesso
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
         <div className="page" style={{ padding: "32px 28px 80px" }}>
           <LessonHero lesson={LESSON} lessonNum={lessonNum} />
-          {lessonNum === 1 ? <>
-            <Section1Bigpicture />
-            <Section2Theory />
-            <Section3Layered />
-          </> : lessonNum === 2 ? <>
-            <SectionKernelWhat />
-            <SectionKernelInside />
-            <SectionKernelDrivers />
-          </> : lessonNum === 3 ? <>
-            <SectionRings />
-            <Section8Comparison />
-            <SectionSyscallBrief />
-          </> : lessonNum === 4 ? <>
-            <Section4Boot />
-          </> : lessonNum === 5 ? <>
-            <SectionBiosUefi />
-          </> : lessonNum === 6 ? <>
-            <SectionSecureBoot />
-          </> : lessonNum === 7 ? <>
-            <SectionTPM />
-          </> : lessonNum === 8 ? <>
-            <SectionRegistry />
-          </> : lessonNum === 9 ? <>
-            <SectionFileSystems />
-          </> : lessonNum === 10 ? <>
-            <SectionNTFS />
-          </> : lessonNum === 11 ? <>
-            <SectionFAT32 />
-          </> : lessonNum === 12 ? <>
-            <SectionProcesses />
-          </> : lessonNum === 13 ? <>
-            <SectionThreads />
-          </> : lessonNum === 14 ? <>
-            <SectionHandles />
-          </> : lessonNum === 15 ? <>
-            <SectionServices />
-          </> : lessonNum === 16 ? <>
-            <SectionUserAccounts />
-          </> : lessonNum === 17 ? <>
-            <SectionUAC />
-          </> : lessonNum === 18 ? <>
-            <SectionDLL />
-          </> : lessonNum === 19 ? <>
-            <SectionWindowsAPI />
-          </> : lessonNum === 20 ? <>
-            <SectionEventViewer />
-          </> : lessonNum === 21 ? <>
-            <SectionTaskScheduler />
-          </> : lessonNum === 22 ? <>
-            <SectionWindowsLogs />
-          </> : lessonNum === 23 ? <>
-            <SectionSettings />
-          </> : lessonNum === 24 ? <>
-            <SectionMsconfig />
-          </> : lessonNum === 25 ? <>
-            <SectionAdvancedSystem />
-          </> : lessonNum === 26 ? <>
-            <SectionComputerMgmt />
-          </> : lessonNum === 27 ? <>
-            <SectionResourceMonitor />
-          </> : lessonNum === 28 ? <>
-            <SectionGUI />
-          </> : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
+          {lessonNum === 1 ? <><SectionWinIntro /></>
+          : lessonNum === 2 ? <><SectionWinVersions /></>
+          : lessonNum === 3 ? <><SectionWinInstall /></>
+          : lessonNum === 4 ? <><SectionGPTMBR /></>
+          : lessonNum === 5 ? <><SectionDesktopEnv /></>
+          : lessonNum === 6 ? <><SectionFileExplorer /></>
+          : lessonNum === 7 ? <><SectionTaskMgrBasic /></>
+          : lessonNum === 8 ? <><SectionDeviceMgrBasic /></>
+          : lessonNum === 9 ? <><SectionUserBasic /></>
+          : lessonNum === 10 ? <><SectionPermsBasic /></>
+          : lessonNum === 11 ? <><SectionWinUpdate /></>
+          : lessonNum === 12 ? <><SectionDefenderBasic /></>
+          : lessonNum === 13 ? <><SectionNetBasic /></>
+          : lessonNum === 14 ? <><SectionFileShare /></>
+          : lessonNum === 15 ? <><SectionBackupRestore /></>
+          : lessonNum === 16 ? <><SectionServices /></>
+          : lessonNum === 17 ? <><SectionEventViewer /></>
+          : lessonNum === 18 ? <><SectionTaskScheduler /></>
+          : lessonNum === 19 ? <><SectionRegistry /></>
+          : lessonNum === 20 ? <><SectionMsconfig /></>
+          : lessonNum === 21 ? <><SectionAdvancedSystem /></>
+          : lessonNum === 22 ? <><SectionComputerMgmt /></>
+          : lessonNum === 23 ? <><SectionResourceMonitor /></>
+          : lessonNum === 24 ? <><SectionSettings /></>
+          : lessonNum === 25 ? <><SectionPSBasic /></>
+          : lessonNum === 26 ? <><SectionRDP /></>
+          : lessonNum === 27 ? <><SectionFirewallBasic /></>
+          : lessonNum === 28 ? <><SectionBitLockerBasic /></>
+          : lessonNum === 49 ? <><SectionUAC /></>
+          : lessonNum === 50 ? <><SectionSecureBoot /><SectionTPM /></>
+          : lessonNum === 52 ? <><Section1Bigpicture /><Section2Theory /><Section3Layered /></>
+          : lessonNum === 53 ? <><SectionKernelWhat /><SectionKernelInside /><SectionKernelDrivers /></>
+          : lessonNum === 54 ? <><SectionRings /><Section8Comparison /><SectionSyscallBrief /></>
+          : lessonNum === 55 ? <><Section4Boot /></>
+          : lessonNum === 56 ? <><SectionBiosUefi /></>
+          : lessonNum === 57 ? <><SectionProcesses /><SectionThreads /></>
+          : lessonNum === 58 ? <><SectionHandles /></>
+          : lessonNum === 59 ? <><SectionFileSystems /><SectionNTFS /><SectionFAT32 /></>
+          : lessonNum === 60 ? <><SectionGUI /></>
+          : lessonNum === 61 ? <><SectionDLL /></>
+          : lessonNum === 62 ? <><SectionWindowsAPI /></>
+          : lessonNum === 63 ? <><SectionUAC /></>
+          : lessonNum === 64 ? <><SectionUserAccounts /></>
+          : lessonNum === 65 ? <><SectionEventViewer /></>
+          : lessonNum === 66 ? <><SectionRegistry /></>
+          : lessonNum === 67 ? <><SectionServices /></>
+          : lessonNum === 68 ? <><SectionTaskScheduler /></>
+          : lessonNum === 69 ? <><SectionWindowsLogs /></>
+          : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
 
           {hasContent && <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} />}
         </div>
@@ -242,90 +271,75 @@ function Row({ k, v }) {
 }
 
 const LESSON_META = {
-  1: { min: 36, diagrams: 9, labs: 3,
-       introUz: <>Windows tizimining to'liq arxitekturasi — hardware'dan boshlab, <em>user mode va kernel mode</em>, executive qatlam, microkernel, HAL, va bir sichqoncha bosishi shu qatlamlarning har biridan qanday o'tishini ko'ramiz.</>,
-       introEn: <>The complete Windows architecture from the silicon up — <em>user mode vs kernel mode</em>, the executive layer, microkernel, HAL, and how a single mouse click cascades through every one of them.</> },
-  2: { min: 28, diagrams: 6, labs: 1,
-       introUz: <><em>Kernel</em> — operatsion tizimning yuragi. Bu darsda <em>ntoskrnl.exe</em> ichida nima borligini, Executive va Microkernel farqini, HAL nima ekanini va drayverlar nima uchun xavfli ekanini o'rganasiz.</>,
-       introEn: <>The <em>kernel</em> is the heart of the OS. You'll learn what lives inside <em>ntoskrnl.exe</em>, the difference between the Executive and Microkernel, what the HAL does, and why drivers are a serious security risk.</> },
-  3: { min: 32, diagrams: 5, labs: 1,
-       introUz: <>CPU <em>privilege halqalari</em> nima, ring 3 va ring 0 farqi, bu chegara nima uchun mavjud, har bir rejimda xato qilsangiz nima bo'ladi — va kernel mode'ga qanday qonuniy o'tish mumkin.</>,
-       introEn: <>What CPU <em>privilege rings</em> are, the difference between ring 3 and ring 0, why this boundary exists, what happens when code crashes in each mode — and how to legally cross into kernel mode.</> },
-  4: { min: 36, diagrams: 8, labs: 2,
-       introUz: <>UEFI'dan login ekraniga qadar Windows qanday ishga tushishini har bir bosqichda ko'rasiz: POST, Secure Boot, <em>bootmgr → winload → ntoskrnl → LSASS</em> — va har bir bosqich xavfsizlik uchun nimani anglatadi.</>,
-       introEn: <>Walk through every step of the Windows boot — POST, Secure Boot, <em>bootmgr → winload → ntoskrnl → LSASS</em> — and understand what each stage means for security.</> },
-  5: { min: 32, diagrams: 7, labs: 2,
-       introUz: <><em>BIOS</em> va <em>UEFI</em> — kompyuter yoqilganda birinchi ishga tushadigan dasturiy ta'minot. Bu darsda ikkalasining arxitekturasini, MBR va GPT farqini, Secure Boot qanday ishlashini va firmwarelar qanday qilib hujum yuzasiga aylanishini ko'rasiz.</>,
-       introEn: <><em>BIOS</em> and <em>UEFI</em> are the first software that runs when you power on. This lesson covers both architectures, MBR vs GPT, how Secure Boot works, and how firmware became a critical attack surface.</> },
-  6: { min: 34, diagrams: 6, labs: 2,
-       introUz: <><em>Secure Boot</em> — yuklash jarayonini kriptografik zanjir orqali himoya qiladigan UEFI mexanizmi. Bu darsda <em>PK → KEK → db/dbx</em> kalit ierarxiyasi, imzo tekshiruvi oqimi, BlackLotus va BootHole kabi real chetlab o'tish texnikalarini va Linux'da Secure Boot qanday ishlashini o'rganasiz.</>,
-       introEn: <><em>Secure Boot</em> is the UEFI mechanism that protects the boot process with a cryptographic chain. This lesson covers the <em>PK → KEK → db/dbx</em> key hierarchy, signature verification flow, real bypass techniques like BlackLotus and BootHole, and how Secure Boot works on Linux.</> },
-  7: { min: 30, diagrams: 5, labs: 2,
-       introUz: <><em>TPM (Trusted Platform Module)</em> — apparat xavfsizlik chipi bo'lib, kriptografik kalitlarni saqlaydi, tizim holatini o'lchaydi va BitLocker, Windows Hello, Credential Guard kabi texnologiyalarga asos bo'ladi. Bu darsda PCR banklari, kalit muhrlash, attestatsiya va real hujum vektorlarini o'rganasiz.</>,
-       introEn: <><em>TPM (Trusted Platform Module)</em> is a hardware security chip that stores cryptographic keys, measures system state, and underpins BitLocker, Windows Hello, and Credential Guard. This lesson covers PCR banks, key sealing, attestation, and real attack vectors against TPM.</> },
-  8: { min: 32, diagrams: 5, labs: 2,
-       introUz: <><em>Windows Registry</em> — barcha tizim sozlamalari, dasturlar konfiguratsiyasi va xavfsizlik siyosatlari saqlanadigan markaziy ierarxik ma'lumotlar bazasi. Bu darsda 5 ta asosiy kalit, hive fayllar, ma'lumot turlari va zararli dasturlar persistenslik uchun foydalanadigan joylarni o'rganasiz.</>,
-       introEn: <><em>Windows Registry</em> is the central hierarchical database where all system settings, application config, and security policies are stored. This lesson covers the 5 root keys, hive files on disk, data types, and the registry locations malware uses for persistence.</> },
-  9: { min: 28, diagrams: 6, labs: 1,
-       introUz: <><em>Fayl tizimi</em> — fizik saqlash qurilmasi ustida mantiqiy ma'lumotlar tashkilotchisi. Bu darsda Windows I/O menejeri va VFS qatlami, FAT/NTFS/exFAT arxitekturasi, Windows fayl tizimi drayverlari va filtr drayverlari qanday ishlashini o'rganasiz.</>,
-       introEn: <><em>File systems</em> are the logical organizers of data on top of physical storage. This lesson covers the Windows I/O Manager and VFS layer, FAT/NTFS/exFAT architectures, Windows file system drivers, and how filter drivers intercept I/O for antivirus and encryption.</> },
-  10: { min: 36, diagrams: 7, labs: 3,
-       introUz: <><em>NTFS</em> — Windows'ning asosiy fayl tizimi. Bu darsda <em>Master File Table (MFT)</em>, NTFS atributlari, Alternate Data Streams (ADS) va ularning yashirin ma'lumot saqlash uchun ishlatilishi, NTFS ruxsatlari, jurnalling ($LogFile/$UsnJrnl), EFS shifrlash, hard link/junction/symlink farqlari va xavfsizlik oqibatlarini o'rganasiz.</>,
-       introEn: <><em>NTFS</em> is Windows' primary file system. This lesson covers the <em>Master File Table (MFT)</em>, NTFS attributes, Alternate Data Streams (ADS) and their use for hiding data, NTFS permissions, journaling ($LogFile/$UsnJrnl), EFS encryption, hard links/junctions/symlinks, and security implications.</> },
-  11: { min: 26, diagrams: 4, labs: 1,
-       introUz: <><em>FAT32</em> — eng oddiy va keng tarqalgan fayl tizimlaridan biri. Bu darsda FAT jadvalining tuzilishi, klaster ajratish, FAT12/16/32 farqlari, asosiy cheklovlar (4GB fayl, 32GB hajm), nima uchun hali ham USB disklar va EFI System Partition (ESP) uchun ishlatilishini va qoplash usullarini o'rganasiz.</>,
-       introEn: <><em>FAT32</em> is one of the simplest and most widely deployed file systems. This lesson covers the FAT table structure, cluster allocation, FAT12/16/32 differences, key limitations (4GB file size, 32GB volume), why it's still used for USB drives and the EFI System Partition, and data recovery considerations.</> },
-  12: { min: 38, diagrams: 7, labs: 3,
-       introUz: <><em>Jarayon (Process)</em> — Windows'da bajariladigan dasturning asosiy konteyneri: virtual manzil fazosi, handle jadvali, kirish tokeni va mavzular to'plami. Bu darsda <em>EPROCESS</em> tuzilmasi, CreateProcess oqimi, manzil fazosi tartibi, yaxlitlik darajalari va tajovuzkorlar foydalanadigan DLL in'ektsiya, jarayon bo'shatish kabi texnikalarni o'rganasiz.</>,
-       introEn: <><em>A process</em> is Windows' primary container for executing code: a virtual address space, handle table, access token, and a set of threads. This lesson covers the <em>EPROCESS</em> structure, the CreateProcess flow, address space layout, integrity levels, and the techniques attackers use — DLL injection, process hollowing, and more.</> },
-  13: { min: 34, diagrams: 6, labs: 2,
-       introUz: <><em>Thread</em> — jarayon ichidagi bajariladigan oqim. Bu darsda <em>ETHREAD</em> va TEB tuzilmalari, Windows rejalashtiruvchisi (0–31 prioritet, kvant, prioritet ko'tarish), thread holatlari, sinxronizatsiya primitivlari (mutex, event, critical section, SRWLock), thread in'ektsiya texnikalari (CreateRemoteThread, APC) va ularni kuzatishni o'rganasiz.</>,
-       introEn: <><em>A thread</em> is the unit of execution inside a process. This lesson covers the <em>ETHREAD</em> and TEB structures, the Windows scheduler (0–31 priorities, quanta, priority boost), thread states, synchronization primitives (mutex, event, critical section, SRWLock), thread injection techniques (CreateRemoteThread, APC), and how to monitor for them.</> },
-  14: { min: 32, diagrams: 5, labs: 2,
-       introUz: <><em>Handle</em> — jarayon kernel ob'ektiga (fayl, jarayon, thread, token, event, mutex) murojaat qilish uchun ishlatiladigan abstrakt raqam. Bu darsda <em>Object Manager</em>, handle jadvalining tuzilishi, handle turlari, DuplicateHandle API, handle merosxo'rligi, handle sizishi va tajovuzkorlar foydalanadigan handle o'g'irlash texnikalarini o'rganasiz.</>,
-       introEn: <><em>A handle</em> is the abstract number a process uses to reference a kernel object — file, process, thread, token, event, mutex. This lesson covers the <em>Object Manager</em>, handle table structure, handle types, DuplicateHandle API, handle inheritance, handle leaks, and the handle-theft techniques attackers use to escalate privileges.</> },
-  15: { min: 36, diagrams: 6, labs: 2,
-       introUz: <><em>Windows Service</em> — fon rejimida ishlaydigan, foydalanuvchi tizimga kirmagan vaqtda ham faol bo'lgan jarayon. Bu darsda <em>Service Control Manager (SCM)</em>, servis turlari va holatlari, servis akkauntlari (LocalSystem, LocalService, NetworkService), svchost.exe −k guruhlari, servis DACL lari va tajovuzkorlar foydalanadigan servis persistenslik va imtiyozlarni ko'tarish texnikalarini o'rganasiz.</>,
-       introEn: <><em>A Windows Service</em> is a process that runs in the background even when no user is logged in. This lesson covers the <em>Service Control Manager (SCM)</em>, service types and states, service accounts (LocalSystem, LocalService, NetworkService), svchost.exe -k groups, service DACLs, and the service persistence and privilege-escalation techniques attackers rely on.</> },
-  16: { min: 32, diagrams: 5, labs: 2,
-       introUz: <><em>Foydalanuvchi hisoblari</em> — Windows xavfsizligining asosi. Bu darsda <em>SAM ma'lumotlar bazasi</em>, SID/RID tuzilmasi, NTLM hash mexanizmi, foydalanuvchi profil katalog tuzilmasi (AppData, NTUSER.DAT, DPAPI), maxsus tizim akkauntlari (SYSTEM, LocalService) va hujumchilar foydalanadigan hisob ma'lumotlarini o'g'irlash texnikalarini o'rganasiz.</>,
-       introEn: <><em>User accounts</em> are the foundation of Windows security. This lesson covers the <em>SAM database</em>, SID/RID structure, NTLM hashing mechanics, user profile directory structure (AppData, NTUSER.DAT, DPAPI), special system accounts (SYSTEM, LocalService), and the credential theft techniques attackers use.</> },
-  17: { min: 34, diagrams: 6, labs: 2,
-       introUz: <><em>UAC (User Account Control)</em> — hatto adminlar ham standart foydalanuvchi sifatida ishlashiga majburlayan imtiyoz ajratish mexanizmi. Bu darsda <em>ajratilgan token modeli</em>, yaxlitlik darajalari (Untrusted/Low/Medium/High/System), consent.exe va AppInfo, auto-elevation mezonlari va hujumchilar UAC ni chetlab o'tish uchun foydalanadigan texnikalarni o'rganasiz.</>,
-       introEn: <><em>UAC (User Account Control)</em> is the privilege-separation mechanism that forces even admins to run as standard users by default. This lesson covers the <em>split token model</em>, integrity levels (Untrusted/Low/Medium/High/System), consent.exe and AppInfo, auto-elevation criteria, and the techniques attackers use to bypass UAC.</> },
-  18: { min: 36, diagrams: 7, labs: 3,
-       introUz: <><em>DLL (Dynamic Link Library)</em> — bir nechta jarayonlar baham ko'ra oladigan umumiy kod va resurslar kutubxonasi. Bu darsda <em>PE formati</em>, DLL yuklash mexanizmi (LoadLibrary, implicit linking), Windows DLL qidiruv tartibi, <em>KnownDlls</em>, DllMain hayot tsikli, DLL in'ektsiya texnikalari (klassik, reflektiv, AppInit) va DLL hijacking hujumlarini o'rganasiz.</>,
-       introEn: <><em>A DLL (Dynamic Link Library)</em> is a shared library of code and resources that multiple processes can map into their address space simultaneously. This lesson covers the <em>PE format</em>, DLL loading mechanics (LoadLibrary, implicit linking), Windows DLL search order, <em>KnownDlls</em>, DllMain lifecycle, DLL injection techniques (classic, reflective, AppInit), and DLL hijacking attacks.</> },
-  19: { min: 38, diagrams: 6, labs: 2,
-       introUz: <><em>Windows API</em> — dasturlar operatsion tizim xizmatlariga murojaat qilish uchun foydalanadigan funksiyalar to'plami. Bu darsda <em>Win32 → ntdll → syscall</em> zanjiri, asosiy DLL lar (kernel32, ntdll, advapi32, user32), chaqiruv konventsiyalari (x64 fastcall), <em>API hooking</em> texnikalari (IAT, inline, SSDT), WOW64 qatlami va API monitoringi usullarini o'rganasiz.</>,
-       introEn: <><em>The Windows API</em> is the set of functions applications call to access OS services. This lesson covers the <em>Win32 → ntdll → syscall</em> chain, key DLLs (kernel32, ntdll, advapi32, user32), calling conventions (x64 fastcall), <em>API hooking</em> techniques (IAT, inline, SSDT), the WOW64 layer, and API monitoring methods.</> },
-  20: { min: 34, diagrams: 5, labs: 2,
-       introUz: <><em>Windows Event Log</em> — tizim, xavfsizlik va dastur hodisalarini yozib oladigan markaziy jurnal tizimi. Bu darsda <em>ETW (Event Tracing for Windows)</em> arxitekturasi, EVTX format, xavfsizlik auditi uchun muhim Event ID lar (4624, 4625, 4688, 4698, 7045…), Sysmon integratsiyasi va hujumchilar log larni qanday o'chirish yoki chetlab o'tishga urinishlarini o'rganasiz.</>,
-       introEn: <><em>Windows Event Log</em> is the central journaling system that records system, security, and application events. This lesson covers the <em>ETW (Event Tracing for Windows)</em> architecture, EVTX format, critical Event IDs for security auditing (4624, 4625, 4688, 4698, 7045…), Sysmon integration, and how attackers attempt to clear or bypass logging.</> },
-  21: { min: 32, diagrams: 5, labs: 2,
-       introUz: <><em>Windows Task Scheduler</em> — vaqt yoki tizim hodisalariga asosida vazifalarni avtomatik bajaradigan tizim. Bu darsda vazifa XML tuzilmasi, trigger turlari (vaqt, hodisa, yuklash, kirish), harakatlar, imtiyozlar, <em>COM-asosli bajarish</em> mexanizmi va hujumchilar Task Scheduler dan persistenslik, lateral movement va UAC bypass uchun qanday foydalanishini o'rganasiz.</>,
-       introEn: <><em>Windows Task Scheduler</em> is the system that automatically runs tasks based on time or system events. This lesson covers task XML structure, trigger types (time, event, boot, logon), actions, privilege settings, the <em>COM-based execution</em> mechanism, and how attackers use the Task Scheduler for persistence, lateral movement, and UAC bypass.</> },
-  22: { min: 30, diagrams: 4, labs: 2,
-       introUz: <><em>Windows log fayllari</em> — tizim faoliyatining doimiy yozuvi. Bu darsda <em>EVTX ikkilik formati</em>, asosiy log fayllari va ularning yo'llari, PowerShell/WMI/ETW yordamida log so'rov qilish, log o'chirish va tahrif qilish aniqlash usullari va real forensics tekshiruvida qanday izlarni qidirish kerakligini o'rganasiz.</>,
-       introEn: <><em>Windows log files</em> are the persistent record of system activity. This lesson covers the <em>EVTX binary format</em>, key log files and their paths, querying logs with PowerShell/WMI/ETW, detecting log clearing and tampering, and what traces to look for in a real forensic investigation.</> },
-  23: { min: 28, diagrams: 5, labs: 2,
-       introUz: <><em>Settings va Control Panel</em> — Windows konfiguratsiyasining ikki interfeysi. Bu darsda zamonaviy <em>Settings ilovasi</em> (ms-settings: URI sxemasi, WinRT/UWP), eski <em>Control Panel</em> appletlari, xavfsizlikka oid muhim sozlamalar va ularning registry bilan bog'liqligini o'rganasiz.</>,
-       introEn: <><em>Settings and Control Panel</em> are Windows' two configuration interfaces. This lesson covers the modern <em>Settings app</em> (ms-settings: URI scheme, WinRT/UWP), legacy <em>Control Panel</em> applets, security-relevant settings, and how they map to the underlying registry.</> },
-  24: { min: 26, diagrams: 4, labs: 2,
-       introUz: <><em>msconfig.exe (System Configuration)</em> — Windows ishga tushish harakatini boshqarish uchun klassik vosita. Bu darsda 5 ta tab (Umumiy, Yuklash, Xizmatlar, Ishga tushish, Vositalar), <em>Xavfsiz Yuklash</em> rejimlari, BCD sozlamalari va xavfsizlik oqibatlarini o'rganasiz.</>,
-       introEn: <><em>msconfig.exe (System Configuration)</em> is the classic tool for managing Windows startup behavior. This lesson covers all 5 tabs (General, Boot, Services, Startup, Tools), <em>Safe Boot</em> modes, BCD settings, and security implications of startup configuration.</> },
-  25: { min: 32, diagrams: 5, labs: 2,
-       introUz: <><em>sysdm.cpl (Tizim Xususiyatlari)</em> — asosiy tizim konfiguratsiyasi markazi. Bu darsda 5 ta tab: Kompyuter nomi (domen qo'shilish), Apparat (<em>DSE drayver imzolash</em>), Kengaytirilgan (<em>DEP, virtual xotira, BSOD dump turlari</em>), Tizim himoyasi (VSS/shadow copies) va Masofadan (RDP hujum vektorlari) orqali o'tamiz.</>,
-       introEn: <><em>sysdm.cpl (System Properties)</em> is the core system configuration hub. This lesson walks through all 5 tabs: Computer Name (domain join), Hardware (<em>DSE driver signing enforcement</em>), Advanced (<em>DEP, virtual memory, BSOD dump types</em>), System Protection (VSS/shadow copies), and Remote (RDP attack vectors).</> },
-  26: { min: 34, diagrams: 6, labs: 2,
-       introUz: <><em>Kompyuter Boshqaruvi (compmgmt.msc)</em> — eng muhim Windows boshqaruv vositalarini jamlagan MMC konsolı. Bu darsda Ulashilgan papkalar (yashirin admin ulashimlari C$, ADMIN$, IPC$), Mahalliy foydalanuvchilar va guruhlar, Ishlash monitori, <em>WMI persistenslik va aniqlash</em>, Disk boshqaruvi va masofaviy boshqaruv imkoniyatlarini o'rganasiz.</>,
-       introEn: <><em>Computer Management (compmgmt.msc)</em> is the MMC console aggregating Windows' most essential admin tools. This lesson covers Shared Folders (hidden admin shares C$, ADMIN$, IPC$), Local Users and Groups, Performance Monitor, <em>WMI persistence and detection</em>, Disk Management, and remote computer management.</> },
-  27: { min: 30, diagrams: 5, labs: 2,
-       introUz: <><em>Resource Monitor (resmon.exe)</em> — jarayon darajasida CPU, xotira, disk va tarmoqdan foydalanishni, shuningdek deskriptorlar va modullarni ko'rsatadigan ilg'or monitoring vositasi. Bu darsda 4 ta tab (CPU, Memory, Disk, Network), real vaqt grafiklar, xavfsizlik uchun ishlatish, shuningdek <em>cmd.exe</em> asosiy buyruqlari (hostname, whoami, ipconfig, netstat, net) va Registry Editor tezkor ma'lumotnomasini o'rganasiz.</>,
-       introEn: <><em>Resource Monitor (resmon.exe)</em> is the advanced monitoring tool that shows per-process CPU, memory, disk, and network usage along with handles and modules. This lesson covers the 4 tabs (CPU, Memory, Disk, Network), real-time graphs, security use cases, plus <em>cmd.exe</em> essential commands (hostname, whoami, ipconfig, netstat, net), and a Registry Editor quick reference.</> },
-  28: { min: 28, diagrams: 6, labs: 2,
-       introUz: <><em>GUI (Graphical User Interface)</em> — Windows ning vizual qatlami. Bu darsda Win32 oyna modeli (HWND, WndProc, xabar nasosi), DWM (Desktop Window Manager) compositor, taskbar/Start Menu anatomiyasi, GUI API evolyutsiyasi (GDI → GDI+ → Direct2D → WPF → UWP/WinUI 3) va UI xavfsizligi (shatter hujumlari, clickjacking, UI Automation) ni o'rganasiz.</>,
-       introEn: <><em>GUI (Graphical User Interface)</em> is Windows' visual layer. This lesson covers the Win32 window model (HWND, WndProc, message pump), DWM (Desktop Window Manager) compositor, taskbar/Start Menu anatomy, GUI API evolution (GDI → GDI+ → Direct2D → WPF → UWP/WinUI 3), and UI security (shatter attacks, clickjacking, UI Automation abuse).</> },
+  1:  { min:15, diagrams:3, labs:1, introUz:<><em>Windows</em> — dunyoning eng ko'p ishlatiladigan operatsion tizimi. Bu darsda OS nima ekanligini, Windows ning ekotizimlari va GUI asoslarini bilib olasiz.</>, introEn:<><em>Windows</em> is the world's most-used operating system. This lesson introduces what an OS is, the Windows ecosystem and the foundations of its graphical interface.</> },
+  2:  { min:18, diagrams:4, labs:0, introUz:<><em>Windows versiyalari</em> — XP dan Windows 11 gacha bo'lgan evolyutsiya. Har bir versiyaning asosiy xususiyatlari, qo'llab-quvvatlash muddati va farqlarini o'rganasiz.</>, introEn:<><em>Windows versions</em> — evolution from XP to Windows 11. Learn key features, support lifecycle and differences of each major version.</> },
+  3:  { min:25, diagrams:5, labs:2, introUz:<><em>Windows o'rnatish</em> — ISO tayyorlashdan drayver sozlashgacha bo'lgan bosqichma-bosqich jarayon. Real muhitda Windows o'rnatishni amalda ko'rासiz.</>, introEn:<><em>Windows installation</em> — step-by-step process from preparing ISO to configuring drivers. Practice real-world Windows installation.</> },
+  4:  { min:20, diagrams:3, labs:1, introUz:<><em>GPT va MBR</em> — disk bo'limlanish jadvallari. MBR ning cheklovlari, GPT ning afzalliklari va UEFI talablarini tushunib olasiz.</>, introEn:<><em>GPT and MBR</em> — disk partition tables. Understand MBR limitations, GPT advantages and UEFI requirements.</> },
+  5:  { min:15, diagrams:2, labs:1, introUz:<><em>Ish stoli muhiti</em> — Windows GUI ning anatomiyasi. Taskbar, Start Menu, Action Center, virtual ish stollari va muhim shortcutlarni o'rganasiz.</>, introEn:<><em>Desktop environment</em> — anatomy of the Windows GUI. Learn taskbar, Start Menu, Action Center, virtual desktops and essential shortcuts.</> },
+  6:  { min:18, diagrams:3, labs:2, introUz:<><em>File Explorer</em> — Windows fayl menejeri. Navigatsiya, fayl operatsiyalari, yashirin fayllar va samarali qidiruvni o'rganasiz.</>, introEn:<><em>File Explorer</em> — Windows file manager. Learn navigation, file operations, hidden files and effective search.</> },
+  7:  { min:20, diagrams:3, labs:1, introUz:<><em>Vazifalar Menejeri</em> — tizim monitoringi va muammolarni hal qilish vositasi. Jarayonlar, ishlash ko'rsatgichlari va ishga tushish dasturlarini boshqarasiz.</>, introEn:<><em>Task Manager</em> — system monitoring and troubleshooting tool. Manage processes, performance graphs and startup programs.</> },
+  8:  { min:18, diagrams:2, labs:1, introUz:<><em>Qurilma Menejeri</em> — hardware va drayver boshqaruv markazi. Qurilma holatlari, drayver yangilash/qaytarish va muammolarni hal qilishni o'rganasiz.</>, introEn:<><em>Device Manager</em> — hardware and driver management hub. Learn device status, update/rollback drivers and troubleshoot hardware issues.</> },
+  9:  { min:20, diagrams:3, labs:2, introUz:<><em>Foydalanuvchi hisoblari</em> — Windows da identifikatsiya asoslari. Admin va Standart hisob, Microsoft va Mahalliy hisob, parol va PIN sozlashni o'rganasiz.</>, introEn:<><em>User accounts</em> — identity fundamentals in Windows. Learn Admin vs Standard, Microsoft vs Local account, and password/PIN setup.</> },
+  10: { min:22, diagrams:3, labs:2, introUz:<><em>Fayllar va Ruxsatlar</em> — NTFS ruxsatlari tizimi asoslari. Papkalarni ulashish, meros ruxsatlari va keng tarqalgan "Kirish rad etildi" xatolarini tushunasiz.</>, introEn:<><em>Files and Permissions</em> — NTFS permission system basics. Understand folder sharing, inherited permissions and common access denied errors.</> },
+  11: { min:15, diagrams:2, labs:1, introUz:<><em>Windows Update</em> — xavfsizlik yamoqlarini boshqarish. Yangilanish turlarini, kechiktirishni, drayver yangilanishlarini va yangilanish muammolarini tushunasiz.</>, introEn:<><em>Windows Update</em> — managing security patches. Understand update types, deferral, driver updates and troubleshooting failed updates.</> },
+  12: { min:20, diagrams:3, labs:2, introUz:<><em>Windows Defender asoslari</em> — Windows ning o'rnatilgan antivirus yechimi. Windows Security markazi, skanlar va real-time himoyani sozlashni o'rganasiz.</>, introEn:<><em>Windows Defender basics</em> — Windows built-in antivirus solution. Learn Windows Security Center, scan types and real-time protection configuration.</> },
+  13: { min:25, diagrams:4, labs:2, introUz:<><em>Tarmoq asoslari</em> — IP, subnet, gateway va DNS tushunchalari. DHCP va statik IP farqi, tarmoq adapterni sozlash va ipconfig/ping buyruqlarini o'rganasiz.</>, introEn:<><em>Networking basics</em> — IP, subnet, gateway and DNS concepts. Learn DHCP vs static IP, configure network adapters and use ipconfig/ping.</> },
+  14: { min:20, diagrams:3, labs:2, introUz:<><em>Fayl va Printer almashish</em> — tarmoq orqali resurslarni ulashish. Papkani ulashish, network drive ulash va printer almashishni sozlashni o'rganasiz.</>, introEn:<><em>File and Printer sharing</em> — sharing resources over the network. Learn to share folders, map network drives and configure printer sharing.</> },
+  15: { min:22, diagrams:3, labs:2, introUz:<><em>Zaxiralash va tiklash</em> — ma'lumotlarni himoya qilish strategiyalari. Tizim tiklash nuqtalari, File History, Windows Backup va tiklash imkoniyatlarini o'rganasiz.</>, introEn:<><em>Backup and restore</em> — data protection strategies. Learn system restore points, File History, Windows Backup and recovery options.</> },
+  16: { min:30, diagrams:6, labs:2, introUz:<><em>Servislar</em> — Windows fon jarayonlari. SCM, servis turlari, xizmat akkauntlari, svchost guruhlari va servis asosidagi persistenslik texnikalarini o'rganasiz.</>, introEn:<><em>Services</em> — Windows background processes. Learn SCM, service types, service accounts, svchost groups and service-based persistence techniques.</> },
+  17: { min:24, diagrams:4, labs:2, introUz:<><em>Event Viewer</em> — Windows hodisa loglari. Log arxitekturasi, asosiy Event ID lar, ETW, Sysmon va forensic tahlilni o'rganasiz.</>, introEn:<><em>Event Viewer</em> — Windows event logs. Learn log architecture, key Event IDs, ETW, Sysmon and forensic analysis.</> },
+  18: { min:22, diagrams:4, labs:1, introUz:<><em>Task Scheduler</em> — vazifalarni avtomatlashtirishTizim. Vazifa arxitekturasi, triggerlar, harakatlar va rejalashtiruvchi asosidagi persistenslikni o'rganasiz.</>, introEn:<><em>Task Scheduler</em> — automate system tasks. Learn task architecture, triggers, actions and scheduler-based persistence techniques.</> },
+  19: { min:38, diagrams:8, labs:3, introUz:<><em>Registry</em> — Windows ning konfiguratsiya ma'lumotlar bazasi. Ierarxik tuzilma, hive fayllar, muhim kalitlar va persistenslik joylarini o'rganasiz.</>, introEn:<><em>Registry</em> — Windows configuration database. Learn hierarchical structure, hive files, critical keys and persistence locations.</> },
+  20: { min:24, diagrams:4, labs:2, introUz:<><em>System Configuration (msconfig)</em> — ishga tushish menejeri. Ishga tushish turlari, Xavfsiz yuklash rejimi va diagnostika vositalarini o'rganasiz.</>, introEn:<><em>System Configuration (msconfig)</em> — startup manager. Learn startup types, Safe Boot modes and diagnostic tools shortcuts.</> },
+  21: { min:30, diagrams:5, labs:2, introUz:<><em>Kengaytirilgan Tizim Sozlamalari</em> — sysdm.cpl chuqur sozlamalar. DEP, virtual xotira, tizim tiklash, drayver imzolash va RDP ni o'rganasiz.</>, introEn:<><em>Advanced System Settings</em> — sysdm.cpl deep settings. Learn DEP, virtual memory, system restore, driver signing and RDP configuration.</> },
+  22: { min:32, diagrams:6, labs:2, introUz:<><em>Kompyuter Boshqaruvi</em> — compmgmt.msc MMC snap-in. Ulashimlar, foydalanuvchilar, disk va WMI persistenslikni o'rganasiz.</>, introEn:<><em>Computer Management</em> — compmgmt.msc MMC snap-in. Learn shares, users, disk management and WMI persistence detection.</> },
+  23: { min:28, diagrams:5, labs:2, introUz:<><em>Resource Monitor</em> — resmon.exe ilg'or monitoring. CPU, xotira, disk va tarmoq tablarini, cmd buyruqlarini o'rganasiz.</>, introEn:<><em>Resource Monitor</em> — resmon.exe advanced monitoring. Learn CPU, memory, disk and network tabs plus essential cmd commands.</> },
+  24: { min:26, diagrams:5, labs:2, introUz:<><em>Settings va Control Panel</em> — Windows boshqarish interfeyslari. Settings URI sxemasi, Control Panel appletlari va xavfsizlik sozlamalarini o'rganasiz.</>, introEn:<><em>Settings and Control Panel</em> — Windows management interfaces. Learn Settings URI scheme, Control Panel applets and security settings.</> },
+  25: { min:30, diagrams:4, labs:3, introUz:<><em>PowerShell asoslari</em> — Windows avtomatlashtirish qobig'i. Cmdletlar, pipeline, o'zgaruvchilar, skriptlar va bajarish siyosatini o'rganasiz.</>, introEn:<><em>PowerShell basics</em> — Windows automation shell. Learn cmdlets, pipeline, variables, scripts and execution policy.</> },
+  26: { min:22, diagrams:3, labs:2, introUz:<><em>Remote Desktop</em> — masofadan boshqarish. RDP yoqish, ulanish, NLA, xavfsizlik va muammolarni hal qilishni o'rganasiz.</>, introEn:<><em>Remote Desktop</em> — remote management. Learn to enable RDP, connect, configure NLA, security and troubleshoot issues.</> },
+  27: { min:24, diagrams:4, labs:2, introUz:<><em>Windows Firewall</em> — tarmoq himoyasi. Firewall profillari, kirishga kiruvchi/chiquvchi qoidalar yaratish va wf.msc bilan ishlashni o'rganasiz.</>, introEn:<><em>Windows Firewall</em> — network protection. Learn firewall profiles, create inbound/outbound rules and work with wf.msc.</> },
+  28: { min:26, diagrams:4, labs:2, introUz:<><em>BitLocker</em> — disk shifrlash texnologiyasi. TPM talablari, BitLocker yoqish, tiklash kaliti va BitLocker To Go ni o'rganasiz.</>, introEn:<><em>BitLocker</em> — disk encryption technology. Learn TPM requirements, enable BitLocker, recovery key management and BitLocker To Go.</> },
+  29: { min:25, diagrams:4, labs:1, introUz:<><em>Windows Server kirish</em> — Server ekotizimlari va rollar. <em>Tez kunda</em></>, introEn:<><em>Windows Server intro</em> — Server editions and roles. <em>Coming soon</em></> },
+  30: { min:20, diagrams:3, labs:1, introUz:<><em>Server Manager</em> — rollar va xususiyatlarni boshqarish. <em>Tez kunda</em></>, introEn:<><em>Server Manager</em> — manage roles and features. <em>Coming soon</em></> },
+  31: { min:40, diagrams:7, labs:3, introUz:<><em>Active Directory</em> — korporativ identifikatsiya va kirish boshqaruvi. <em>Tez kunda</em></>, introEn:<><em>Active Directory</em> — enterprise identity and access management. <em>Coming soon</em></> },
+  32: { min:28, diagrams:5, labs:2, introUz:<><em>DNS Server</em> — domen nomlarini hal qilish. <em>Tez kunda</em></>, introEn:<><em>DNS Server</em> — domain name resolution. <em>Coming soon</em></> },
+  33: { min:22, diagrams:4, labs:2, introUz:<><em>DHCP Server</em> — avtomatik IP manzil taqsimoti. <em>Tez kunda</em></>, introEn:<><em>DHCP Server</em> — automatic IP address allocation. <em>Coming soon</em></> },
+  34: { min:20, diagrams:4, labs:2, introUz:<><em>OU tuzilmasi</em> — Organizational Units va delegatsiya. <em>Tez kunda</em></>, introEn:<><em>OU Structure</em> — Organizational Units and delegation. <em>Coming soon</em></> },
+  35: { min:35, diagrams:6, labs:3, introUz:<><em>Group Policy</em> — korporativ sozlamalarni markazlashgan boshqarish. <em>Tez kunda</em></>, introEn:<><em>Group Policy</em> — centralized configuration management. <em>Coming soon</em></> },
+  36: { min:24, diagrams:4, labs:2, introUz:<><em>Fayl Server</em> — SMB ulashimlar va ruxsatlar. <em>Tez kunda</em></>, introEn:<><em>File Server</em> — SMB shares and permissions. <em>Coming soon</em></> },
+  37: { min:26, diagrams:4, labs:2, introUz:<><em>IIS</em> — Internet Information Services va veb hosting. <em>Tez kunda</em></>, introEn:<><em>IIS</em> — Internet Information Services and web hosting. <em>Coming soon</em></> },
+  38: { min:20, diagrams:3, labs:1, introUz:<><em>WSUS</em> — Windows yangilanishlarini markazlashgan boshqarish. <em>Tez kunda</em></>, introEn:<><em>WSUS</em> — centralized Windows update management. <em>Coming soon</em></> },
+  39: { min:30, diagrams:5, labs:2, introUz:<><em>Hyper-V</em> — Windows virtualizatsiya platformasi. <em>Tez kunda</em></>, introEn:<><em>Hyper-V</em> — Windows virtualization platform. <em>Coming soon</em></> },
+  40: { min:22, diagrams:4, labs:2, introUz:<><em>Server monitoring</em> — ishlashni kuzatish va ogohlantirishlar. <em>Tez kunda</em></>, introEn:<><em>Server monitoring</em> — performance monitoring and alerts. <em>Coming soon</em></> },
+  41: { min:20, diagrams:3, labs:1, introUz:<><em>Server zaxiralash</em> — biznes uzluksizligi uchun zaxiralash. <em>Tez kunda</em></>, introEn:<><em>Server backup</em> — backup for business continuity. <em>Coming soon</em></> },
+  42: { min:28, diagrams:4, labs:2, introUz:<><em>Autentifikatsiya</em> — Windows da kimlik tekshiruvi protokollari. <em>Tez kunda</em></>, introEn:<><em>Authentication</em> — Windows identity verification protocols. <em>Coming soon</em></> },
+  43: { min:24, diagrams:4, labs:1, introUz:<><em>NTLM protokoli</em> — challenge/response autentifikatsiya. <em>Tez kunda</em></>, introEn:<><em>NTLM Protocol</em> — challenge/response authentication. <em>Coming soon</em></> },
+  44: { min:30, diagrams:5, labs:2, introUz:<><em>Kerberos</em> — chiptaga asoslangan autentifikatsiya. <em>Tez kunda</em></>, introEn:<><em>Kerberos</em> — ticket-based authentication protocol. <em>Coming soon</em></> },
+  45: { min:28, diagrams:4, labs:2, introUz:<><em>Defender ilg'or</em> — Microsoft Defender ATP va EDR. <em>Tez kunda</em></>, introEn:<><em>Defender Advanced</em> — Microsoft Defender ATP and EDR. <em>Coming soon</em></> },
+  46: { min:24, diagrams:4, labs:2, introUz:<><em>Firewall ilg'or</em> — IPsec va kengaytirilgan qoidalar. <em>Tez kunda</em></>, introEn:<><em>Firewall Advanced</em> — IPsec and advanced rules. <em>Coming soon</em></> },
+  47: { min:28, diagrams:4, labs:2, introUz:<><em>AppLocker va WDAC</em> — ilova nazorati siyosatlari. <em>Tez kunda</em></>, introEn:<><em>AppLocker and WDAC</em> — application control policies. <em>Coming soon</em></> },
+  48: { min:28, diagrams:5, labs:2, introUz:<><em>Xavfsizlik loglari</em> — EVTX format va forensic log tahlili.</>, introEn:<><em>Security logging</em> — EVTX format and forensic log analysis.</> },
+  49: { min:28, diagrams:5, labs:2, introUz:<><em>UAC (User Account Control)</em> — imtiyozlarni ajratish mexanizmi. Ajratilgan token, yaxlitlik darajalari, consent.exe va UAC bypass texnikalarini o'rganasiz.</>, introEn:<><em>UAC (User Account Control)</em> — privilege separation mechanism. Learn split token, integrity levels, consent.exe and UAC bypass techniques.</> },
+  50: { min:30, diagrams:5, labs:1, introUz:<><em>Secure Boot va TPM</em> — platformani ishonchli yuklanishi. PK/KEK/db/dbx ierarxiyasi, TPM PCR banklari, BitLocker va attestatsiyani o'rganasiz.</>, introEn:<><em>Secure Boot and TPM</em> — trusted platform boot. Learn PK/KEK/db/dbx hierarchy, TPM PCR banks, BitLocker and attestation.</> },
+  51: { min:30, diagrams:4, labs:2, introUz:<><em>Hodisalarga javob</em> — xavfsizlik hodisalarini boshqarish. <em>Tez kunda</em></>, introEn:<><em>Incident Response</em> — security incident management. <em>Coming soon</em></> },
+  52: { min:36, diagrams:9, labs:3, introUz:<><em>Windows arxitekturasi</em> — OS ning to'liq arxitekturasi. Katta rasm, nazariy asos va qatlamli arxitektura diagrammasini o'rganasiz.</>, introEn:<><em>Windows architecture</em> — complete OS architecture. Learn the big picture, theoretical foundation and layered architecture diagram.</> },
+  53: { min:34, diagrams:7, labs:2, introUz:<><em>Kernel internallari</em> — ntoskrnl.exe ning ichki tuzilishi. Executive, Microkernel, HAL va drayverlarni chuqur o'rganasiz.</>, introEn:<><em>Kernel internals</em> — ntoskrnl.exe inner structure. Deep dive into Executive, Microkernel, HAL and drivers.</> },
+  54: { min:32, diagrams:7, labs:2, introUz:<><em>User mode vs Kernel mode</em> — CPU privilege halqalari. Chegara nima uchun muhim va syscall oqimini o'rganasiz.</>, introEn:<><em>User mode vs Kernel mode</em> — CPU privilege rings. Understand why the boundary matters and trace the syscall flow.</> },
+  55: { min:36, diagrams:8, labs:2, introUz:<><em>Boot jarayoni chuqur</em> — UEFI dan login ekranigacha. BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad va kernel bosqichlarini o'rganasiz.</>, introEn:<><em>Boot process deep</em> — UEFI to login screen. Learn BIOS/UEFI, MBR/GPT, BOOTMGR, WinLoad and kernel initialization phases.</> },
+  56: { min:22, diagrams:5, labs:1, introUz:<><em>BIOS vs UEFI chuqur</em> — firmware arxitekturasi. 16-bit BIOS, UEFI fazalari, Secure Boot zanjiri va bypass texnikalarini o'rganasiz.</>, introEn:<><em>BIOS vs UEFI deep</em> — firmware architecture. Learn 16-bit BIOS, UEFI phases, Secure Boot chain and bypass techniques.</> },
+  57: { min:36, diagrams:7, labs:3, introUz:<><em>Jarayonlar va Thread'lar</em> — EPROCESS va ETHREAD tuzilmalari. Rejalashtiruvchi, sinxronizatsiya va in'ektsiya texnikalarini o'rganasiz.</>, introEn:<><em>Processes and Threads</em> — EPROCESS and ETHREAD structures. Learn scheduler, synchronization and injection techniques.</> },
+  58: { min:24, diagrams:5, labs:1, introUz:<><em>Handle'lar va Ob'ektlar</em> — Windows ob'ekt menejeri. Handle jadvali, ob'ekt turlari va handle asosidagi hujumlarni o'rganasiz.</>, introEn:<><em>Handles and Objects</em> — Windows Object Manager. Learn handle table, object types and handle-based attacks.</> },
+  59: { min:36, diagrams:8, labs:2, introUz:<><em>Fayl tizimlari chuqur</em> — VFS, NTFS MFT/atributlar/ADS/EFS va FAT32 tuzilmasini chuqur o'rganasiz.</>, introEn:<><em>File systems deep</em> — VFS, NTFS MFT/attributes/ADS/EFS and FAT32 structure in depth.</> },
+  60: { min:26, diagrams:6, labs:2, introUz:<><em>GUI arxitekturasi</em> — Win32 oyna modeli. HWND/WndProc/message pump, DWM compositor, API qatlamlari va GUI xavfsizligi.</>, introEn:<><em>GUI architecture</em> — Win32 window model. Learn HWND/WndProc/message pump, DWM compositor, API layers and GUI security.</> },
+  61: { min:32, diagrams:6, labs:2, introUz:<><em>DLL va Injection</em> — PE tuzilmasi va DLL dinamik yuklash. DLL injection, search order hijacking va aniqlash texnikalarini o'rganasiz.</>, introEn:<><em>DLL and Injection</em> — PE structure and dynamic DLL loading. Learn DLL injection, search order hijacking and detection techniques.</> },
+  62: { min:30, diagrams:5, labs:2, introUz:<><em>Windows API ilg'or</em> — Win32 qatlami va ntdll syscall ko'prigi. API hooking va monitoring texnikalarini o'rganasiz.</>, introEn:<><em>Windows API advanced</em> — Win32 layer and ntdll syscall bridge. Learn API hooking and monitoring techniques.</> },
+  63: { min:32, diagrams:5, labs:2, introUz:<><em>UAC bypass texnikalari</em> — ilg'or UAC chetlab o'tish. Auto-elevation, COM elevation, fodhelper va boshqa bypass metodlarini o'rganasiz.</>, introEn:<><em>UAC bypass techniques</em> — advanced UAC circumvention. Learn auto-elevation, COM elevation, fodhelper and other bypass methods.</> },
+  64: { min:34, diagrams:5, labs:2, introUz:<><em>Credential Attacks</em> — hisob ma'lumotlariga hujumlar. SAM chiqarish, LSASS dump, PtH va DPAPI texnikalarini o'rganasiz.</>, introEn:<><em>Credential Attacks</em> — attacks on Windows credentials. Learn SAM extraction, LSASS dump, PtH and DPAPI techniques.</> },
+  65: { min:28, diagrams:4, labs:2, introUz:<><em>Event Log Forensics</em> — hodisa loglarini forensic tahlili. Event ID forensics, ETW va Sysmon qoidalarini o'rganasiz.</>, introEn:<><em>Event Log Forensics</em> — forensic analysis of event logs. Learn Event ID forensics, ETW and Sysmon rules.</> },
+  66: { min:30, diagrams:5, labs:2, introUz:<><em>Registry Persistence</em> — registry asosidagi doimiylik. Run kalitlar, DLL hijacking va aniqlash usullarini o'rganasiz.</>, introEn:<><em>Registry Persistence</em> — registry-based persistence. Learn Run keys, DLL hijacking via registry and detection methods.</> },
+  67: { min:28, diagrams:5, labs:2, introUz:<><em>Servis Persistence</em> — servis asosidagi doimiylik. Servis yaratish, ImagePath hijacking va aniqlash usullarini o'rganasiz.</>, introEn:<><em>Service Persistence</em> — service-based persistence. Learn service creation, ImagePath hijacking and detection methods.</> },
+  68: { min:24, diagrams:4, labs:1, introUz:<><em>Task Scheduler Persistence</em> — vazifa rejalashtiruvchisi asosidagi doimiylik. Yashirin vazifalarni yaratish va aniqlashni o'rganasiz.</>, introEn:<><em>Task Scheduler Persistence</em> — scheduler-based persistence. Learn creating hidden tasks and detection methods.</> },
+  69: { min:28, diagrams:5, labs:2, introUz:<><em>Windows Logs Forensics</em> — EVTX forensics va hodisalarga javob. Tizim log tahlili va IR workflow ni o'rganasiz.</>, introEn:<><em>Windows Logs Forensics</em> — EVTX forensics and incident response. Learn system log analysis and IR workflow.</> },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -4741,6 +4755,1842 @@ logman start HandleTrace -p "Microsoft-Windows-Kernel-Object" 0xFFFF 5 -ets
 # ... sizishni takrorlash ...
 logman stop HandleTrace -ets
 tracerpt HandleTrace.etl -o handles.xml`}</code></pre>
+    </section>
+  );
+}
+
+
+// ─────────────────────────────────────────────────────────────
+function SectionWinIntro() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="What is Windows?" uz="" />
+      <P>
+        <Term>Windows</Term> is an operating system (OS) developed by Microsoft.
+        An OS is the software layer between your hardware and your apps — it manages
+        memory, storage, input devices, and the graphical interface you interact with every day.
+        Windows is the most widely used desktop OS on Earth, running on over <Em>1.5 billion</Em> active devices.
+      </P>
+      <pre><code>{`
+  ┌─────────────────────────────────────────┐
+  │          Your Applications              │  ← Office, Chrome, Games
+  ├─────────────────────────────────────────┤
+  │         Windows OS (Kernel)             │  ← Manages everything below
+  ├──────────────┬──────────────────────────┤
+  │     CPU      │  RAM   │  Disk  │  GPU   │  ← Hardware
+  └──────────────┴──────────────────────────┘`}</code></pre>
+      <H2 num="§2" en="What Does Windows Do?" uz="" />
+      <P>Windows handles five core responsibilities:</P>
+      <ul>
+        <li><Term>Process management</Term> — runs and schedules programs</li>
+        <li><Term>Memory management</Term> — allocates RAM to each app</li>
+        <li><Term>File system</Term> — organises data on drives (NTFS)</li>
+        <li><Term>Device drivers</Term> — lets hardware talk to software</li>
+        <li><Term>Security</Term> — user accounts, permissions, firewall, Defender</li>
+      </ul>
+      <H2 num="§3" en="Windows Editions Overview" uz="" />
+      <table>
+        <thead><tr><th>Edition</th><th>Target</th><th>Key Feature</th></tr></thead>
+        <tbody>
+          <tr><td>Windows 11 Home</td><td>Home users</td><td>TPM 2.0, DirectStorage</td></tr>
+          <tr><td>Windows 11 Pro</td><td>Professionals</td><td>BitLocker, Group Policy, RDP</td></tr>
+          <tr><td>Windows 11 Enterprise</td><td>Large orgs</td><td>WDAC, AppLocker, Entra ID</td></tr>
+          <tr><td>Windows Server 2025</td><td>Datacenters</td><td>AD DS, Hyper-V, IIS</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" en="GUI First: Finding Your Way Around" uz="" />
+      <P>When Windows boots you land on the <Term>Desktop</Term>. Key areas:</P>
+      <ul>
+        <li><Em>Taskbar</Em> — bottom bar with Start, pinned apps, system tray</li>
+        <li><Em>Start Menu</Em> — search bar + pinned shortcuts (Win key)</li>
+        <li><Em>File Explorer</Em> — folder browser (Win+E)</li>
+        <li><Em>Settings</Em> — modern control panel (Win+I)</li>
+        <li><Em>Action Center</Em> — notifications + quick settings (Win+A)</li>
+      </ul>
+      <Callout kind="tip">Press <Em>Win+Pause</Em> to open System Info. Press <Em>Win+I</Em> for Settings. These two shortcuts are your first go-to for any PC.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows nima?" en="" />
+      <P>
+        <Term>Windows</Term> — Microsoft tomonidan ishlab chiqilgan operatsion tizim (OT).
+        OT — bu qurilma va dasturlar o'rtasidagi dasturiy qatlam: xotira, saqlash, kiritish qurilmalari
+        va grafik interfeysni boshqaradi. Windows dunyoda eng ko'p ishlatiladigan ish stoli OT bo'lib,
+        <Em>1,5 milliarddan ortiq</Em> qurilmada ishlaydi.
+      </P>
+      <pre><code>{`
+  ┌─────────────────────────────────────────┐
+  │           Dasturlaringiz                │  ← Office, Chrome, O'yinlar
+  ├─────────────────────────────────────────┤
+  │       Windows OT (Yadro/Kernel)         │  ← Hamma narsani boshqaradi
+  ├──────────────┬──────────────────────────┤
+  │     CPU      │  RAM   │  Disk  │  GPU   │  ← Qurilma
+  └──────────────┴──────────────────────────┘`}</code></pre>
+      <H2 num="§2" uz="Windows nima qiladi?" en="" />
+      <P>Windows beshta asosiy vazifani bajaradi:</P>
+      <ul>
+        <li><Term>Jarayonlarni boshqarish</Term> — dasturlarni ishga tushirish va rejalashtirish</li>
+        <li><Term>Xotirani boshqarish</Term> — har bir dasturga RAM ajratish</li>
+        <li><Term>Fayl tizimi</Term> — disklardagi ma'lumotlarni tartibga solish (NTFS)</li>
+        <li><Term>Qurilma drayverlari</Term> — qurilma va dastur o'rtasida muloqot</li>
+        <li><Term>Xavfsizlik</Term> — foydalanuvchi hisoblar, ruxsatlar, xavfsizlik devori, Defender</li>
+      </ul>
+      <H2 num="§3" uz="Windows versiyalari" en="" />
+      <table>
+        <thead><tr><th>Nashr</th><th>Maqsad</th><th>Asosiy xususiyat</th></tr></thead>
+        <tbody>
+          <tr><td>Windows 11 Home</td><td>Uy foydalanuvchilari</td><td>TPM 2.0, DirectStorage</td></tr>
+          <tr><td>Windows 11 Pro</td><td>Mutaxassislar</td><td>BitLocker, Group Policy, RDP</td></tr>
+          <tr><td>Windows 11 Enterprise</td><td>Yirik tashkilotlar</td><td>WDAC, AppLocker, Entra ID</td></tr>
+          <tr><td>Windows Server 2025</td><td>Ma'lumot markazlari</td><td>AD DS, Hyper-V, IIS</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" uz="Grafik interfeys: atrofingizni o'rganish" en="" />
+      <P>Windows yuklanganda <Term>Ish stoli</Term> (Desktop) ochiladi. Asosiy bo'limlar:</P>
+      <ul>
+        <li><Em>Vazifalar paneli</Em> — pastki panel: Start, pinlangan dasturlar, tizim belgisi</li>
+        <li><Em>Start menyusi</Em> — qidiruv + qisqichalar (Win tugmasi)</li>
+        <li><Em>File Explorer</Em> — papka ko'ruvchi (Win+E)</li>
+        <li><Em>Sozlamalar</Em> — zamonaviy boshqaruv paneli (Win+I)</li>
+        <li><Em>Harakat markazi</Em> — bildirishnomalar + tez sozlamalar (Win+A)</li>
+      </ul>
+      <Callout kind="tip"><Em>Win+Pause</Em> — Tizim ma'lumotlari. <Em>Win+I</Em> — Sozlamalar. Bu ikkita tugma kombinatsiyasi har qanday kompyuter uchun birinchi qo'llanma.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionWinVersions() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows Version History" uz="" />
+      <P>Understanding the Windows timeline helps you support legacy systems and choose the right OS for each workload.</P>
+      <pre><code>{`
+  Windows XP (2001) ──► Vista (2007) ──► 7 (2009) ──► 8/8.1 (2012)
+       ↓
+  Windows 10 (2015) ──────────────────────────────────► Still supported
+       ↓
+  Windows 11 (2021) ─── TPM 2.0 required ─────────────► Current`}</code></pre>
+      <table>
+        <thead><tr><th>Version</th><th>Released</th><th>EOL</th><th>Notable</th></tr></thead>
+        <tbody>
+          <tr><td>Windows 7</td><td>2009</td><td>2020</td><td>Widely used, Aero glass UI</td></tr>
+          <tr><td>Windows 10</td><td>2015</td><td>Oct 2025</td><td>Free upgrade, WaaS model</td></tr>
+          <tr><td>Windows 11</td><td>2021</td><td>2031+</td><td>TPM 2.0, Android apps, Copilot</td></tr>
+          <tr><td>Server 2019</td><td>2018</td><td>2029</td><td>Nano Server, containers</td></tr>
+          <tr><td>Server 2022</td><td>2021</td><td>2031</td><td>Secured-core, TLS 1.3</td></tr>
+          <tr><td>Server 2025</td><td>2024</td><td>2034</td><td>AI features, SMB over QUIC</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" en="Checking Your Windows Version" uz="" />
+      <P>GUI method (recommended): <Em>Win+R</Em> → type <code>winver</code> → Enter. You will see the exact build number and edition.</P>
+      <P>Also useful: <Em>Settings → System → About</Em> shows edition, version, OS build, and device specs.</P>
+      <H2 num="§3" en="Windows 10 vs Windows 11 — Key Differences" uz="" />
+      <table>
+        <thead><tr><th>Feature</th><th>Windows 10</th><th>Windows 11</th></tr></thead>
+        <tbody>
+          <tr><td>Start Menu</td><td>Left-aligned tiles</td><td>Centered, no live tiles</td></tr>
+          <tr><td>TPM requirement</td><td>None</td><td>TPM 2.0 required</td></tr>
+          <tr><td>Snap layouts</td><td>Basic snap</td><td>Snap Layouts grid</td></tr>
+          <tr><td>Android apps</td><td>No</td><td>Yes (Amazon App Store)</td></tr>
+          <tr><td>DirectStorage</td><td>No</td><td>Yes (NVMe acceleration)</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="warn">Windows 10 reaches End of Life in <Em>October 2025</Em>. Plan migrations to Windows 11 now.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows versiyalari tarixi" en="" />
+      <P>Windows tarixini bilish eski tizimlarni qo'llab-quvvatlash va har bir ish uchun to'g'ri OT tanlashga yordam beradi.</P>
+      <pre><code>{`
+  Windows XP (2001) ──► Vista (2007) ──► 7 (2009) ──► 8/8.1 (2012)
+       ↓
+  Windows 10 (2015) ──────────────────────────────────► Hali qo'llaniladi
+       ↓
+  Windows 11 (2021) ─── TPM 2.0 talab ────────────────► Joriy versiya`}</code></pre>
+      <table>
+        <thead><tr><th>Versiya</th><th>Chiqarilgan</th><th>Qo'llab-quvvatlash tugashi</th><th>Muhim</th></tr></thead>
+        <tbody>
+          <tr><td>Windows 7</td><td>2009</td><td>2020</td><td>Keng tarqalgan, Aero shisha UI</td></tr>
+          <tr><td>Windows 10</td><td>2015</td><td>Okt 2025</td><td>Bepul yangilash, WaaS modeli</td></tr>
+          <tr><td>Windows 11</td><td>2021</td><td>2031+</td><td>TPM 2.0, Android dasturlari</td></tr>
+          <tr><td>Server 2019</td><td>2018</td><td>2029</td><td>Nano Server, konteynerlari</td></tr>
+          <tr><td>Server 2022</td><td>2021</td><td>2031</td><td>Secured-core, TLS 1.3</td></tr>
+          <tr><td>Server 2025</td><td>2024</td><td>2034</td><td>AI funksiyalar, SMB over QUIC</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" uz="Windows versiyangizni tekshirish" en="" />
+      <P>GUI usuli (tavsiya etiladi): <Em>Win+R</Em> → <code>winver</code> kiriting → Enter. Aniq build raqami va nashrini ko'rasiz.</P>
+      <P>Bundan ham: <Em>Sozlamalar → Tizim → Haqida</Em> — nashr, versiya, OS build va qurilma parametrlarini ko'rsatadi.</P>
+      <H2 num="§3" uz="Windows 10 vs Windows 11 — Asosiy farqlar" en="" />
+      <table>
+        <thead><tr><th>Xususiyat</th><th>Windows 10</th><th>Windows 11</th></tr></thead>
+        <tbody>
+          <tr><td>Start menyusi</td><td>Chapga tekislangan plitalar</td><td>Markazlashgan, jonli plitasiz</td></tr>
+          <tr><td>TPM talabi</td><td>Yo'q</td><td>TPM 2.0 talab</td></tr>
+          <tr><td>Snap tartib</td><td>Oddiy snap</td><td>Snap Layouts panjarasi</td></tr>
+          <tr><td>Android dasturlar</td><td>Yo'q</td><td>Ha (Amazon App Store)</td></tr>
+          <tr><td>DirectStorage</td><td>Yo'q</td><td>Ha (NVMe tezlashtirish)</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="warn">Windows 10 <Em>2025-yil oktyabrda</Em> qo'llab-quvvatlanishni to'xtatadi. Hoziroq Windows 11 ga o'tishni rejalashtiring.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionWinInstall() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="System Requirements — Windows 11" uz="" />
+      <table>
+        <thead><tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr></thead>
+        <tbody>
+          <tr><td>CPU</td><td>1 GHz, 2 cores, 64-bit</td><td>Intel 12th gen / AMD Ryzen 5000+</td></tr>
+          <tr><td>RAM</td><td>4 GB</td><td>16 GB</td></tr>
+          <tr><td>Storage</td><td>64 GB</td><td>256 GB SSD</td></tr>
+          <tr><td>TPM</td><td>TPM 2.0 (required)</td><td>TPM 2.0</td></tr>
+          <tr><td>Display</td><td>720p, 9"</td><td>1080p+</td></tr>
+          <tr><td>UEFI</td><td>Secure Boot capable</td><td>UEFI with Secure Boot on</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" en="Creating Installation Media" uz="" />
+      <P>The official tool is the <Term>Media Creation Tool</Term> from Microsoft. Steps:</P>
+      <ol>
+        <li>Download <code>mediacreationtool.exe</code> from microsoft.com/software-download</li>
+        <li>Run as Administrator</li>
+        <li>Choose: <Em>Create installation media (USB/DVD)</Em></li>
+        <li>Select Language, Edition, Architecture (64-bit)</li>
+        <li>Choose USB flash drive (8 GB+ recommended)</li>
+        <li>Wait for download + formatting (15-30 min)</li>
+      </ol>
+      <H2 num="§3" en="Clean Installation Steps" uz="" />
+      <pre><code>{`
+  Boot from USB
+       ↓
+  Language / Time / Keyboard → Next
+       ↓
+  Install Now → Enter product key (or skip)
+       ↓
+  Custom: Install Windows only (advanced)
+       ↓
+  Select/format partition → Next
+       ↓
+  Windows installs (reboots 2-3×)
+       ↓
+  OOBE: region, keyboard, account setup
+       ↓
+  Desktop appears — install drivers!`}</code></pre>
+      <H2 num="§4" en="Post-Install Checklist" uz="" />
+      <ul>
+        <li>Check Device Manager for unknown devices</li>
+        <li>Run Windows Update (Settings → Update &amp; Security)</li>
+        <li>Install chipset, GPU, network drivers</li>
+        <li>Activate Windows (Settings → System → Activation)</li>
+        <li>Enable Secure Boot in BIOS/UEFI if not already on</li>
+      </ul>
+      <Callout kind="tip">After installation, open <Em>Device Manager</Em> (Win+X → Device Manager). Any device with a yellow exclamation mark needs a driver.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Tizim talablari — Windows 11" en="" />
+      <table>
+        <thead><tr><th>Komponent</th><th>Minimal</th><th>Tavsiya etilgan</th></tr></thead>
+        <tbody>
+          <tr><td>CPU</td><td>1 GHz, 2 yadroli, 64-bit</td><td>Intel 12-avlod / AMD Ryzen 5000+</td></tr>
+          <tr><td>RAM</td><td>4 GB</td><td>16 GB</td></tr>
+          <tr><td>Saqlash</td><td>64 GB</td><td>256 GB SSD</td></tr>
+          <tr><td>TPM</td><td>TPM 2.0 (majburiy)</td><td>TPM 2.0</td></tr>
+          <tr><td>Displey</td><td>720p, 9"</td><td>1080p+</td></tr>
+          <tr><td>UEFI</td><td>Secure Boot qodir</td><td>UEFI with Secure Boot yoqilgan</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" uz="O'rnatish muhitini yaratish" en="" />
+      <P>Rasmiy vosita — Microsoft saytidan <Term>Media Creation Tool</Term>. Qadamlar:</P>
+      <ol>
+        <li>microsoft.com/software-download saytidan <code>mediacreationtool.exe</code> yuklab oling</li>
+        <li>Administrator sifatida ishga tushiring</li>
+        <li>Tanlang: <Em>O'rnatish muhitini yarating (USB/DVD)</Em></li>
+        <li>Til, Nashr, Arxitektura (64-bit) tanlang</li>
+        <li>USB flesh-disk tanlang (8 GB+ tavsiya etiladi)</li>
+        <li>Yuklab olish + formatlashni kuting (15-30 daqiqa)</li>
+      </ol>
+      <H2 num="§3" uz="Toza o'rnatish qadamlari" en="" />
+      <pre><code>{`
+  USB dan yuklash
+       ↓
+  Til / Vaqt / Klaviatura → Keyingi
+       ↓
+  Hozir o'rnating → Mahsulot kalitini kiriting (yoki o'tkazib yuboring)
+       ↓
+  Maxsus: Faqat Windowsni o'rnating (kengaytirilgan)
+       ↓
+  Qism tanlash/formatlash → Keyingi
+       ↓
+  Windows o'rnatiladi (2-3× qayta yuklaydi)
+       ↓
+  OOBE: hudud, klaviatura, hisob sozlamalari
+       ↓
+  Ish stoli ko'rinadi — drayvlarni o'rnating!`}</code></pre>
+      <H2 num="§4" uz="O'rnatishdan keyingi nazorat ro'yxati" en="" />
+      <ul>
+        <li>Device Manager da noma'lum qurilmalarni tekshiring</li>
+        <li>Windows Update ni ishga tushiring (Sozlamalar → Yangilash va Xavfsizlik)</li>
+        <li>Chipset, GPU, tarmoq drayverlarini o'rnating</li>
+        <li>Windowsni faollashtiring (Sozlamalar → Tizim → Faollashtirish)</li>
+        <li>BIOS/UEFI da Secure Boot yoqilganligini tekshiring</li>
+      </ul>
+      <Callout kind="tip">O'rnatishdan so'ng <Em>Device Manager</Em> ni oching (Win+X → Device Manager). Sariq undov belgisi bo'lgan har qanday qurilmaga drayver kerak.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionGPTMBR() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="MBR vs GPT — Partition Table Formats" uz="" />
+      <P>Every storage drive needs a <Term>partition table</Term> — a map at the start of the disk that tells the OS where each partition begins and ends. Two formats exist: the legacy <Term>MBR</Term> and the modern <Term>GPT</Term>.</P>
+      <table>
+        <thead><tr><th>Feature</th><th>MBR</th><th>GPT</th></tr></thead>
+        <tbody>
+          <tr><td>Max disk size</td><td>2 TB</td><td>18 EB (exabytes)</td></tr>
+          <tr><td>Max partitions</td><td>4 primary</td><td>128 partitions</td></tr>
+          <tr><td>Boot firmware</td><td>BIOS (legacy)</td><td>UEFI</td></tr>
+          <tr><td>Redundancy</td><td>Single copy</td><td>Primary + backup at end of disk</td></tr>
+          <tr><td>Windows 11</td><td>Not supported</td><td>Required</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" en="Disk Layout Diagram" uz="" />
+      <pre><code>{`
+  GPT Disk Layout:
+  ┌──────────┬────────────────┬──────────────┬───────┬──────────┐
+  │Prot. MBR │  GPT Header    │  Partitions  │  ...  │ Backup   │
+  │ (sector 0│  (sector 1)    │ EFI | C: | D:│       │ GPT hdr  │
+  └──────────┴────────────────┴──────────────┴───────┴──────────┘
+
+  EFI System Partition (ESP) — ~100 MB — holds bootloader
+  MSR — Microsoft Reserved — ~16 MB
+  C: Windows — main OS partition
+  Recovery — ~500 MB — WinRE`}</code></pre>
+      <H2 num="§3" en="Disk Management GUI" uz="" />
+      <P>Open with: <Em>Win+X → Disk Management</Em> (or <code>diskmgmt.msc</code>)</P>
+      <ul>
+        <li>Top pane: list of volumes with letters, file system, capacity, free space</li>
+        <li>Bottom pane: graphical map of each physical disk</li>
+        <li>Right-click a partition: Shrink, Extend, Format, Change Drive Letter</li>
+        <li>Right-click unallocated space: New Simple Volume</li>
+      </ul>
+      <H2 num="§4" en="Common Tasks in Disk Management" uz="" />
+      <table>
+        <thead><tr><th>Task</th><th>Steps</th></tr></thead>
+        <tbody>
+          <tr><td>Add new drive</td><td>Right-click disk → Initialize → GPT → New Simple Volume</td></tr>
+          <tr><td>Shrink C:</td><td>Right-click C: → Shrink Volume → enter MB to shrink</td></tr>
+          <tr><td>Extend partition</td><td>Right-click volume → Extend Volume (needs adjacent unallocated)</td></tr>
+          <tr><td>Change drive letter</td><td>Right-click → Change Drive Letter and Paths</td></tr>
+          <tr><td>Format drive</td><td>Right-click → Format → NTFS → Quick format</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="warn">Shrinking or deleting the wrong partition can make Windows unbootable. Always check the partition type before making changes.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="MBR va GPT — bo'lim jadvali formatlari" en="" />
+      <P>Har bir saqlash diskida <Term>bo'lim jadvali</Term> bo'lishi kerak — diskdagi har bir bo'limning boshlanishi va tugashini OT ga ko'rsatuvchi xarita. Ikki format mavjud: eskirgan <Term>MBR</Term> va zamonaviy <Term>GPT</Term>.</P>
+      <table>
+        <thead><tr><th>Xususiyat</th><th>MBR</th><th>GPT</th></tr></thead>
+        <tbody>
+          <tr><td>Maksimal disk hajmi</td><td>2 TB</td><td>18 EB (eksabayt)</td></tr>
+          <tr><td>Maksimal bo'limlar</td><td>4 asosiy</td><td>128 bo'lim</td></tr>
+          <tr><td>Yuklash dasturiy ta'minoti</td><td>BIOS (eski)</td><td>UEFI</td></tr>
+          <tr><td>Zaxiralash</td><td>Bitta nusxa</td><td>Asosiy + disk oxiridagi zaxira</td></tr>
+          <tr><td>Windows 11</td><td>Qo'llab-quvvatlanmaydi</td><td>Talab etiladi</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" uz="Disk tartibi diagramasi" en="" />
+      <pre><code>{`
+  GPT Disk tartibi:
+  ┌──────────┬────────────────┬──────────────┬───────┬──────────┐
+  │Him. MBR  │  GPT sarlavhasi│  Bo'limlar   │  ...  │ Zaxira   │
+  │(sektor 0)│  (sektor 1)    │ EFI | C: | D:│       │ GPT sarl.│
+  └──────────┴────────────────┴──────────────┴───────┴──────────┘
+
+  EFI tizim bo'limi (ESP) — ~100 MB — yuklash boshqaruvchisi
+  MSR — Microsoft ajratilgan — ~16 MB
+  C: Windows — asosiy OT bo'limi
+  Tiklash — ~500 MB — WinRE`}</code></pre>
+      <H2 num="§3" uz="Disk Management grafik interfeysi" en="" />
+      <P>Ochish: <Em>Win+X → Disk Management</Em> (yoki <code>diskmgmt.msc</code>)</P>
+      <ul>
+        <li>Yuqori panel: harflar, fayl tizimi, hajm, bo'sh joy bilan tomlar ro'yxati</li>
+        <li>Pastki panel: har bir jismoniy diskning grafik xaritasi</li>
+        <li>Bo'limni o'ng tugma bilan bosing: Kichraytirish, Kengaytirish, Formatlash, Disk harfini o'zgartirish</li>
+        <li>Ajratilmagan joyni o'ng tugma bilan bosing: Yangi oddiy tom</li>
+      </ul>
+      <H2 num="§4" uz="Disk Management da umumiy vazifalar" en="" />
+      <table>
+        <thead><tr><th>Vazifa</th><th>Qadamlar</th></tr></thead>
+        <tbody>
+          <tr><td>Yangi disk qo'shish</td><td>Diskni o'ng tugma bilan bosing → Ishga tushirish → GPT → Yangi oddiy tom</td></tr>
+          <tr><td>C: ni kichraytirish</td><td>C: ni o'ng tugma bilan bosing → Tomni kichraytirish → MB ni kiriting</td></tr>
+          <tr><td>Bo'limni kengaytirish</td><td>Tomni o'ng tugma bilan bosing → Tomni kengaytirish (qo'shni bo'sh joy kerak)</td></tr>
+          <tr><td>Disk harfini o'zgartirish</td><td>O'ng tugma → Disk harfi va yo'llarini o'zgartirish</td></tr>
+          <tr><td>Diskni formatlash</td><td>O'ng tugma → Formatlash → NTFS → Tez formatlash</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="warn">Noto'g'ri bo'limni kichraytirish yoki o'chirish Windows ni yuklana olmaydigan qilib qo'yishi mumkin. O'zgartirishlardan oldin har doim bo'lim turini tekshiring.</Callout>
+    </section>
+  );
+}
+
+
+// ─────────────────────────────────────────────────────────────
+function SectionDesktopEnv() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="The Windows Desktop Environment" uz="" />
+      <P>The Windows desktop is your primary workspace. It consists of several interconnected components managed by the <Term>Windows Shell</Term> (explorer.exe).</P>
+      <pre><code>{`
+  ┌─────────────────────────────────────────────────────────┐
+  │                    Desktop (wallpaper)                   │
+  │  ┌────────────────────────────────────────────────────┐  │
+  │  │  Icons: This PC, Recycle Bin, shortcuts            │  │
+  │  └────────────────────────────────────────────────────┘  │
+  ├─────────────────────────────────────────────────────────┤
+  │ [⊞Start] [Search] [TaskView] [Pinned Apps]  [Tray] [🔔] │  ← Taskbar
+  └─────────────────────────────────────────────────────────┘`}</code></pre>
+      <H2 num="§2" en="Start Menu" uz="" />
+      <P>Press <Em>Win</Em> or click the Start button. In Windows 11:</P>
+      <ul>
+        <li><Em>Search bar</Em> — finds apps, files, settings, web</li>
+        <li><Em>Pinned apps</Em> — customizable grid (right-click → Pin to Start)</li>
+        <li><Em>Recommended</Em> — recently opened files and apps</li>
+        <li><Em>All apps</Em> — alphabetical app list</li>
+        <li><Em>Power button</Em> — Sleep, Shut down, Restart</li>
+      </ul>
+      <H2 num="§3" en="Taskbar Components" uz="" />
+      <table>
+        <thead><tr><th>Area</th><th>What it does</th><th>Shortcut</th></tr></thead>
+        <tbody>
+          <tr><td>Start button</td><td>Opens Start menu</td><td>Win</td></tr>
+          <tr><td>Search</td><td>System-wide search</td><td>Win+S</td></tr>
+          <tr><td>Task View</td><td>Virtual desktops + timeline</td><td>Win+Tab</td></tr>
+          <tr><td>Pinned apps</td><td>Quick launch</td><td>Win+1..9</td></tr>
+          <tr><td>System tray</td><td>Running background apps</td><td>Win+A (Action Center)</td></tr>
+          <tr><td>Clock/date</td><td>Calendar popup</td><td>Click to expand</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" en="Virtual Desktops" uz="" />
+      <P>Windows 11 supports multiple virtual desktops — separate workspaces with different open windows.</P>
+      <ul>
+        <li><Em>Win+Tab</Em> — open Task View, see all desktops</li>
+        <li><Em>Win+Ctrl+D</Em> — create new desktop</li>
+        <li><Em>Win+Ctrl+→/←</Em> — switch between desktops</li>
+        <li><Em>Win+Ctrl+F4</Em> — close current desktop</li>
+      </ul>
+      <H2 num="§5" en="Essential Desktop Shortcuts" uz="" />
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>Win+D</td><td>Show/hide desktop</td></tr>
+          <tr><td>Win+E</td><td>Open File Explorer</td></tr>
+          <tr><td>Win+I</td><td>Open Settings</td></tr>
+          <tr><td>Win+L</td><td>Lock screen</td></tr>
+          <tr><td>Win+X</td><td>Power User menu (admin tools)</td></tr>
+          <tr><td>Alt+F4</td><td>Close current window</td></tr>
+          <tr><td>Win+←/→</td><td>Snap window left/right</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="tip"><Em>Win+X</Em> is the admin's best friend — it gives instant access to Device Manager, Disk Management, Event Viewer, Task Manager, PowerShell, and more.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows ish stoli muhiti" en="" />
+      <P>Windows ish stoli — asosiy ish maydoningiz. U <Term>Windows Shell</Term> (explorer.exe) tomonidan boshqariladigan bir necha o'zaro bog'liq komponentlardan iborat.</P>
+      <pre><code>{`
+  ┌─────────────────────────────────────────────────────────┐
+  │               Ish stoli (fon rasm)                      │
+  │  ┌────────────────────────────────────────────────────┐  │
+  │  │  Ikonalar: Bu kompyuter, Savat, qisqichalar        │  │
+  │  └────────────────────────────────────────────────────┘  │
+  ├─────────────────────────────────────────────────────────┤
+  │ [⊞Start] [Qidiruv] [TaskView] [Pinlangan]  [Tray] [🔔] │  ← Vazifalar paneli
+  └─────────────────────────────────────────────────────────┘`}</code></pre>
+      <H2 num="§2" uz="Start menyusi" en="" />
+      <P><Em>Win</Em> tugmasini bosing yoki Start tugmasini bosing. Windows 11 da:</P>
+      <ul>
+        <li><Em>Qidiruv paneli</Em> — dasturlar, fayllar, sozlamalar, veb topadi</li>
+        <li><Em>Pinlangan dasturlar</Em> — sozlanuvchi panjara (o'ng tugma → Start ga pin qiling)</li>
+        <li><Em>Tavsiya etilgan</Em> — so'nggi ochilgan fayllar va dasturlar</li>
+        <li><Em>Barcha dasturlar</Em> — alifbo tartibidagi dasturlar ro'yxati</li>
+        <li><Em>Quvvat tugmasi</Em> — Uyqu rejimi, O'chirish, Qayta ishga tushirish</li>
+      </ul>
+      <H2 num="§3" uz="Vazifalar paneli komponentlari" en="" />
+      <table>
+        <thead><tr><th>Hudud</th><th>Vazifasi</th><th>Tugma</th></tr></thead>
+        <tbody>
+          <tr><td>Start tugmasi</td><td>Start menyusini ochadi</td><td>Win</td></tr>
+          <tr><td>Qidiruv</td><td>Tizimli qidiruv</td><td>Win+S</td></tr>
+          <tr><td>Vazifa ko'rinishi</td><td>Virtual ish stolli + vaqt jadvali</td><td>Win+Tab</td></tr>
+          <tr><td>Pinlangan dasturlar</td><td>Tezkor ishga tushirish</td><td>Win+1..9</td></tr>
+          <tr><td>Tizim belgisi</td><td>Fonda ishlaydigan dasturlar</td><td>Win+A (Harakat markazi)</td></tr>
+          <tr><td>Soat/sana</td><td>Taqvim oynasi</td><td>Kengaytirish uchun bosing</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" uz="Virtual ish stollari" en="" />
+      <P>Windows 11 bir necha virtual ish stollarini qo'llab-quvvatlaydi — turli ochiq oynalar bilan alohida ish maydonlari.</P>
+      <ul>
+        <li><Em>Win+Tab</Em> — Vazifa ko'rinishini oching, barcha ish stollarini ko'ring</li>
+        <li><Em>Win+Ctrl+D</Em> — yangi ish stoli yarating</li>
+        <li><Em>Win+Ctrl+→/←</Em> — ish stollari o'rtasida o'tish</li>
+        <li><Em>Win+Ctrl+F4</Em> — joriy ish stolini yoping</li>
+      </ul>
+      <H2 num="§5" uz="Muhim ish stoli tugma kombinatsiyalari" en="" />
+      <table>
+        <thead><tr><th>Tugma</th><th>Harakat</th></tr></thead>
+        <tbody>
+          <tr><td>Win+D</td><td>Ish stolini ko'rsatish/yashirish</td></tr>
+          <tr><td>Win+E</td><td>File Explorer ni ochish</td></tr>
+          <tr><td>Win+I</td><td>Sozlamalarni ochish</td></tr>
+          <tr><td>Win+L</td><td>Ekranni qulflash</td></tr>
+          <tr><td>Win+X</td><td>Kuchli foydalanuvchi menyusi (admin vositalari)</td></tr>
+          <tr><td>Alt+F4</td><td>Joriy oynani yopish</td></tr>
+          <tr><td>Win+←/→</td><td>Oynani chapga/o'ngga joylashtirish</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="tip"><Em>Win+X</Em> — administrator do'sti: Device Manager, Disk Management, Event Viewer, Task Manager, PowerShell va boshqalarga tezkor kirish.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionFileExplorer() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="File Explorer Overview" uz="" />
+      <P><Term>File Explorer</Term> (explorer.exe) is the built-in file manager for browsing drives, folders, and files. Open it with <Em>Win+E</Em> or from the taskbar.</P>
+      <pre><code>{`
+  ┌────────────────────────────────────────────────────────┐
+  │ ← → ↑  │  C:\Users\Alice\Documents        │ 🔍 Search │
+  ├─────────┼─────────────────────────────────────────────┤
+  │ Quick   │  Name        │ Date modified │ Size │ Type  │
+  │ Access  ├─────────────────────────────────────────────┤
+  │ OneDrive│  📁 Projects  │ 5/17/2026    │      │ Folder│
+  │ This PC │  📄 report.docx│ 5/16/2026   │ 45KB │ Word  │
+  │ Network │  📊 data.xlsx  │ 5/15/2026   │ 12KB │ Excel │
+  └─────────┴─────────────────────────────────────────────┘`}</code></pre>
+      <H2 num="§2" en="Navigation and Views" uz="" />
+      <ul>
+        <li><Em>Address bar</Em> — click to type a path directly (e.g., <code>C:\Windows\System32</code>)</li>
+        <li><Em>Navigation pane</Em> — left panel with Quick Access, This PC, Network</li>
+        <li><Em>View options</Em> — View tab → Extra large icons, Details, Compact view</li>
+        <li><Em>Sort &amp; Group</Em> — click column headers in Details view</li>
+      </ul>
+      <H2 num="§3" en="Essential File Operations" uz="" />
+      <table>
+        <thead><tr><th>Action</th><th>Method</th></tr></thead>
+        <tbody>
+          <tr><td>Copy</td><td>Ctrl+C then Ctrl+V (or drag with Ctrl held)</td></tr>
+          <tr><td>Move</td><td>Ctrl+X then Ctrl+V (or drag)</td></tr>
+          <tr><td>Rename</td><td>F2 or right-click → Rename</td></tr>
+          <tr><td>Delete</td><td>Delete key (to Recycle Bin) or Shift+Delete (permanent)</td></tr>
+          <tr><td>New folder</td><td>Ctrl+Shift+N</td></tr>
+          <tr><td>Select all</td><td>Ctrl+A</td></tr>
+          <tr><td>Properties</td><td>Alt+Enter or right-click → Properties</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" en="Showing Hidden Files and Extensions" uz="" />
+      <P>By default, Windows hides file extensions and system files. To reveal them:</P>
+      <ol>
+        <li>Open File Explorer → View tab (Windows 10) or View → Show (Windows 11)</li>
+        <li>Check <Em>File name extensions</Em></li>
+        <li>Check <Em>Hidden items</Em></li>
+      </ol>
+      <P>Important hidden locations: <code>C:\Users\[name]\AppData</code> (app settings), <code>C:\Windows\System32</code> (system files).</P>
+      <H2 num="§5" en="Search in File Explorer" uz="" />
+      <P>Click the search box (top right) and type. Windows indexes common locations for fast search. For advanced searches:</P>
+      <ul>
+        <li><code>kind:document name:report</code> — search by file type and name</li>
+        <li><code>datemodified:last week</code> — filter by date</li>
+        <li><code>size:&gt;10MB</code> — filter by size</li>
+      </ul>
+      <Callout kind="tip">To go directly to a folder, click the address bar and type the full path. Example: <code>%AppData%</code> opens your Roaming AppData folder directly.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="File Explorer umumiy ko'rinishi" en="" />
+      <P><Term>File Explorer</Term> (explorer.exe) — disklar, papkalar va fayllarni ko'rish uchun o'rnatilgan fayl menejeri. <Em>Win+E</Em> yoki vazifalar panelidan oching.</P>
+      <pre><code>{`
+  ┌────────────────────────────────────────────────────────┐
+  │ ← → ↑  │  C:\Users\Ali\Documents           │ 🔍 Qidiruv│
+  ├─────────┼─────────────────────────────────────────────┤
+  │ Tezkor  │  Nomi       │ O'zg. sanasi │ Hajmi│  Turi   │
+  │ Kirish  ├─────────────────────────────────────────────┤
+  │ OneDrive│  📁 Loyihalar │ 17.05.2026  │      │ Papka   │
+  │ Bu komp.│  📄 hisobot.docx│ 16.05.2026│ 45KB │ Word   │
+  │ Tarmoq  │  📊 ma'lumot.xlsx│15.05.2026 │ 12KB│ Excel  │
+  └─────────┴─────────────────────────────────────────────┘`}</code></pre>
+      <H2 num="§2" uz="Navigatsiya va ko'rinishlar" en="" />
+      <ul>
+        <li><Em>Manzil satri</Em> — to'g'ridan-to'g'ri yo'l kiriting (masalan, <code>C:\Windows\System32</code>)</li>
+        <li><Em>Navigatsiya paneli</Em> — chap panel: Tezkor kirish, Bu kompyuter, Tarmoq</li>
+        <li><Em>Ko'rinish parametrlari</Em> — Ko'rinish tab → Katta ikonalar, Tafsilotlar, Ixcham ko'rinish</li>
+        <li><Em>Saralash va guruhlash</Em> — Tafsilotlar ko'rinishida ustun sarlavhalariga bosing</li>
+      </ul>
+      <H2 num="§3" uz="Asosiy fayl amaliyotlari" en="" />
+      <table>
+        <thead><tr><th>Harakat</th><th>Usul</th></tr></thead>
+        <tbody>
+          <tr><td>Nusxa olish</td><td>Ctrl+C keyin Ctrl+V (yoki Ctrl bilan sudrab)</td></tr>
+          <tr><td>Ko'chirish</td><td>Ctrl+X keyin Ctrl+V (yoki sudrab)</td></tr>
+          <tr><td>Nomini o'zgartirish</td><td>F2 yoki o'ng tugma → Nomini o'zgartirish</td></tr>
+          <tr><td>O'chirish</td><td>Delete (Savatga) yoki Shift+Delete (butunlay)</td></tr>
+          <tr><td>Yangi papka</td><td>Ctrl+Shift+N</td></tr>
+          <tr><td>Hammasini tanlash</td><td>Ctrl+A</td></tr>
+          <tr><td>Xususiyatlar</td><td>Alt+Enter yoki o'ng tugma → Xususiyatlar</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" uz="Yashirin fayllar va kengaytmalarni ko'rsatish" en="" />
+      <P>Windows standart holda fayl kengaytmalari va tizim fayllarini yashiradi. Ko'rsatish uchun:</P>
+      <ol>
+        <li>File Explorer → Ko'rinish tab (Windows 10) yoki Ko'rinish → Ko'rsatish (Windows 11)</li>
+        <li><Em>Fayl nomi kengaytmalari</Em> ni belgilang</li>
+        <li><Em>Yashirin elementlar</Em> ni belgilang</li>
+      </ol>
+      <P>Muhim yashirin joylashuvlar: <code>C:\Users\[ism]\AppData</code> (dastur sozlamalari), <code>C:\Windows\System32</code> (tizim fayllari).</P>
+      <H2 num="§5" uz="File Explorer da qidiruv" en="" />
+      <P>Qidiruv maydonini bosing (yuqori o'ng) va yozing. Windows tez qidiruv uchun umumiy joylarni indekslaydi. Kengaytirilgan qidiruv uchun:</P>
+      <ul>
+        <li><code>kind:document name:hisobot</code> — fayl turi va nomi bo'yicha qidirish</li>
+        <li><code>datemodified:last week</code> — sana bo'yicha filtrlash</li>
+        <li><code>size:&gt;10MB</code> — hajm bo'yicha filtrlash</li>
+      </ul>
+      <Callout kind="tip">Papkaga to'g'ridan-to'g'ri o'tish uchun manzil satrini bosing va to'liq yo'lni kiriting. Masalan: <code>%AppData%</code> — Roaming AppData papkangizni to'g'ridan-to'g'ri ochadi.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionTaskMgrBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Task Manager Overview" uz="" />
+      <P><Term>Task Manager</Term> is your live window into everything running on the system. Open it with <Em>Ctrl+Shift+Esc</Em> (fastest) or right-click the taskbar → Task Manager, or <Em>Ctrl+Alt+Del</Em> → Task Manager.</P>
+      <H2 num="§2" en="Processes Tab" uz="" />
+      <P>The most-used tab. Shows every running process with real-time CPU, Memory, Disk, Network, GPU usage.</P>
+      <ul>
+        <li><Em>Apps</Em> — foreground applications you opened</li>
+        <li><Em>Background processes</Em> — services and background apps</li>
+        <li><Em>Windows processes</Em> — core OS components</li>
+      </ul>
+      <P>Right-click any process for options:</P>
+      <ul>
+        <li><Em>End task</Em> — force-kills the process (use for frozen apps)</li>
+        <li><Em>Open file location</Em> — find the executable on disk</li>
+        <li><Em>Search online</Em> — look up the process name</li>
+        <li><Em>Properties</Em> — digital signature, version info</li>
+      </ul>
+      <H2 num="§3" en="Performance Tab" uz="" />
+      <P>Real-time graphs for CPU, Memory, Disk, Network, GPU. Click each resource for details:</P>
+      <table>
+        <thead><tr><th>Resource</th><th>What to watch</th></tr></thead>
+        <tbody>
+          <tr><td>CPU</td><td>% utilization, cores, speed, uptime</td></tr>
+          <tr><td>Memory</td><td>In use vs Available (low Available = RAM pressure)</td></tr>
+          <tr><td>Disk</td><td>Active time %; 100% = bottleneck</td></tr>
+          <tr><td>Network</td><td>Send/Receive speed, adapter name</td></tr>
+          <tr><td>GPU</td><td>GPU engine usage, dedicated vs shared memory</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" en="Startup Tab — Control Boot Time" uz="" />
+      <P>Shows programs that automatically start when Windows boots. High startup impact programs slow boot time.</P>
+      <ul>
+        <li>Right-click any entry → <Em>Disable</Em> to prevent it from auto-starting</li>
+        <li>Only disable programs you recognize — do not disable security software or drivers</li>
+        <li>Common safe-to-disable: Spotify, Teams, Discord, OneDrive (if not needed at boot)</li>
+      </ul>
+      <H2 num="§5" en="Troubleshooting with Task Manager" uz="" />
+      <table>
+        <thead><tr><th>Problem</th><th>Task Manager Action</th></tr></thead>
+        <tbody>
+          <tr><td>App frozen</td><td>Processes tab → right-click → End task</td></tr>
+          <tr><td>Slow PC</td><td>Check CPU/RAM/Disk % — identify the bottleneck</td></tr>
+          <tr><td>Slow boot</td><td>Startup tab → disable high-impact entries</td></tr>
+          <tr><td>Unknown process</td><td>Right-click → Search online</td></tr>
+          <tr><td>High memory</td><td>Sort by Memory column — find the top consumer</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="tip">If Task Manager itself won't open, try <Em>Win+R</Em> → <code>taskmgr</code>. If that fails too, the system may be compromised or critically low on resources.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Task Manager umumiy ko'rinishi" en="" />
+      <P><Term>Task Manager</Term> — tizimda ishlayotgan hamma narsaga jonli ko'rish oynasi. <Em>Ctrl+Shift+Esc</Em> (eng tez) yoki vazifalar panelini o'ng tugma bilan bosib → Task Manager, yoki <Em>Ctrl+Alt+Del</Em> → Task Manager.</P>
+      <H2 num="§2" uz="Jarayonlar yorlig'i" en="" />
+      <P>Eng ko'p ishlatiladigan yorliq. Har bir ishlaydigan jarayonni real vaqtda CPU, RAM, Disk, Tarmoq, GPU foydalanish bilan ko'rsatadi.</P>
+      <ul>
+        <li><Em>Dasturlar</Em> — siz ochgan old fon dasturlari</li>
+        <li><Em>Fon jarayonlari</Em> — xizmatlar va fon dasturlari</li>
+        <li><Em>Windows jarayonlari</Em> — asosiy OT komponentlari</li>
+      </ul>
+      <P>Har qanday jarayonni o'ng tugma bilan bosing:</P>
+      <ul>
+        <li><Em>Vazifani tugatish</Em> — jarayonni majburiy to'xtatish (muzlagan dasturlar uchun)</li>
+        <li><Em>Fayl joylashuvini ochish</Em> — diskdagi bajariladigan faylni topish</li>
+        <li><Em>Onlayn qidirish</Em> — jarayon nomini qidirish</li>
+        <li><Em>Xususiyatlar</Em> — raqamli imzo, versiya ma'lumotlari</li>
+      </ul>
+      <H2 num="§3" uz="Ishlash yorlig'i" en="" />
+      <P>CPU, RAM, Disk, Tarmoq, GPU uchun real vaqtli grafiklar. Tafsilotlar uchun har bir manbani bosing:</P>
+      <table>
+        <thead><tr><th>Manba</th><th>Nimaga e'tibor berish</th></tr></thead>
+        <tbody>
+          <tr><td>CPU</td><td>% foydalanish, yadrolar, tezlik, ishlash vaqti</td></tr>
+          <tr><td>RAM</td><td>Foydalanilgan va Mavjud (kam Mavjud = RAM bosimi)</td></tr>
+          <tr><td>Disk</td><td>Faol vaqt %; 100% = to'siq</td></tr>
+          <tr><td>Tarmoq</td><td>Yuborish/Qabul qilish tezligi, adapter nomi</td></tr>
+          <tr><td>GPU</td><td>GPU mexanizm foydalanish, ajratilgan va umumiy xotira</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" uz="Ishga tushirish yorlig'i — yuklash vaqtini boshqarish" en="" />
+      <P>Windows yuklanganda avtomatik ishlaydigan dasturlarni ko'rsatadi. Yuqori ta'sirli dasturlar yuklash vaqtini sekinlashtiradi.</P>
+      <ul>
+        <li>Har qanday yozuvni o'ng tugma bilan bosing → <Em>O'chirib qo'yish</Em></li>
+        <li>Faqat tanish dasturlarni o'chiring — xavfsizlik dasturlarini o'chirmang</li>
+        <li>Xavfsiz o'chirish mumkin: Spotify, Teams, Discord, OneDrive (yuklashda shart bo'lmasa)</li>
+      </ul>
+      <H2 num="§5" uz="Task Manager bilan muammolarni hal qilish" en="" />
+      <table>
+        <thead><tr><th>Muammo</th><th>Task Manager harakati</th></tr></thead>
+        <tbody>
+          <tr><td>Dastur muzlagan</td><td>Jarayonlar → o'ng tugma → Vazifani tugatish</td></tr>
+          <tr><td>Sekin kompyuter</td><td>CPU/RAM/Disk % tekshirish — to'siqni aniqlash</td></tr>
+          <tr><td>Sekin yuklash</td><td>Ishga tushirish → yuqori ta'sirli yozuvlarni o'chirish</td></tr>
+          <tr><td>Noma'lum jarayon</td><td>O'ng tugma → Onlayn qidirish</td></tr>
+          <tr><td>Yuqori RAM</td><td>RAM ustuni bo'yicha saralash — eng ko'p ishlatuvchini topish</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="tip">Task Manager ochilmasa, <Em>Win+R</Em> → <code>taskmgr</code> ni sinab ko'ring. Bu ham ishlamasa, tizim buzilgan yoki kritik tarzda resurslar yetishmayotgan bo'lishi mumkin.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionDeviceMgrBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Device Manager Overview" uz="" />
+      <P><Term>Device Manager</Term> is the central console for all hardware in your PC. Open it: <Em>Win+X → Device Manager</Em> or <code>devmgmt.msc</code>.</P>
+      <P>It shows every device Windows recognises — CPU, GPU, storage, network adapters, USB controllers, audio, and more — organised in a tree by category.</P>
+      <H2 num="§2" en="Reading Device Status Icons" uz="" />
+      <table>
+        <thead><tr><th>Icon</th><th>Meaning</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>✔ (no icon)</td><td>Working correctly</td><td>None needed</td></tr>
+          <tr><td>⚠ Yellow !</td><td>Problem / driver issue</td><td>Update or reinstall driver</td></tr>
+          <tr><td>❌ Red X</td><td>Device disabled</td><td>Right-click → Enable device</td></tr>
+          <tr><td>❓ Question mark</td><td>Unknown device (no driver)</td><td>Install correct driver</td></tr>
+          <tr><td>↓ Down arrow</td><td>Manually disabled</td><td>Right-click → Enable</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" en="Driver Management" uz="" />
+      <P>Drivers are software that let Windows communicate with hardware. Common driver tasks:</P>
+      <ul>
+        <li><Em>Update driver</Em> — right-click device → Update driver → Search automatically</li>
+        <li><Em>Roll back driver</Em> — right-click → Properties → Driver tab → Roll Back Driver (useful when an update breaks something)</li>
+        <li><Em>Uninstall device</Em> — removes driver; Windows reinstalls on next boot</li>
+        <li><Em>Scan for hardware changes</Em> — Action menu → detects newly connected devices</li>
+      </ul>
+      <H2 num="§4" en="Device Properties Deep Dive" uz="" />
+      <P>Double-click any device to open Properties. Key tabs:</P>
+      <table>
+        <thead><tr><th>Tab</th><th>What you find</th></tr></thead>
+        <tbody>
+          <tr><td>General</td><td>Device status, error codes</td></tr>
+          <tr><td>Driver</td><td>Driver version, date, publisher; Update/Rollback/Uninstall buttons</td></tr>
+          <tr><td>Details</td><td>Hardware IDs — use these to find the right driver manually</td></tr>
+          <tr><td>Events</td><td>Recent device events, errors, warnings</td></tr>
+          <tr><td>Resources</td><td>IRQ, memory addresses (advanced)</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§5" en="Troubleshooting Common Device Issues" uz="" />
+      <table>
+        <thead><tr><th>Issue</th><th>Steps</th></tr></thead>
+        <tbody>
+          <tr><td>No sound</td><td>Device Manager → Sound → check for ⚠ → update driver</td></tr>
+          <tr><td>No Wi-Fi</td><td>Network adapters → find Wi-Fi adapter → update driver</td></tr>
+          <tr><td>GPU not detected</td><td>Display adapters → check if listed; try uninstall + reboot</td></tr>
+          <tr><td>USB device unknown</td><td>Universal Serial Bus → Unknown USB Device → update driver</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="tip">To find the right driver manually: Device Manager → device Properties → Details tab → change dropdown to <Em>Hardware IDs</Em> → copy the top ID → search on the manufacturer's site.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Device Manager umumiy ko'rinishi" en="" />
+      <P><Term>Device Manager</Term> — kompyuteringizdagi barcha qurilmalar uchun markaziy konsol. Oching: <Em>Win+X → Device Manager</Em> yoki <code>devmgmt.msc</code>.</P>
+      <P>Windows tanigan har bir qurilmani ko'rsatadi — CPU, GPU, saqlash, tarmoq adapterlari, USB kontrollerlari, audio va boshqalar — kategoriya bo'yicha daraxtda tashkil etilgan.</P>
+      <H2 num="§2" uz="Qurilma holati ikonalarini o'qish" en="" />
+      <table>
+        <thead><tr><th>Ikona</th><th>Ma'nosi</th><th>Harakat</th></tr></thead>
+        <tbody>
+          <tr><td>✔ (ikona yo'q)</td><td>To'g'ri ishlayapti</td><td>Hech narsa kerak emas</td></tr>
+          <tr><td>⚠ Sariq !</td><td>Muammo / drayver xatosi</td><td>Drayverni yangilang yoki qayta o'rnating</td></tr>
+          <tr><td>❌ Qizil X</td><td>Qurilma o'chirilgan</td><td>O'ng tugma → Qurilmani yoqish</td></tr>
+          <tr><td>❓ Savol belgisi</td><td>Noma'lum qurilma (drayver yo'q)</td><td>To'g'ri drayverni o'rnating</td></tr>
+          <tr><td>↓ Pastga o'q</td><td>Qo'lda o'chirilgan</td><td>O'ng tugma → Yoqish</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" uz="Drayverni boshqarish" en="" />
+      <P>Drayverlar — Windows ni qurilma bilan bog'laydigan dasturlar. Umumiy drayver vazifalari:</P>
+      <ul>
+        <li><Em>Drayverni yangilash</Em> — qurilmani o'ng tugma bilan bosing → Drayverni yangilash → Avtomatik qidirish</li>
+        <li><Em>Drayverni qaytarish</Em> — o'ng tugma → Xususiyatlar → Drayver yorlig'i → Drayverni qaytarish (yangilanish biror narsani buzganda foydali)</li>
+        <li><Em>Qurilmani o'chirish</Em> — drayverni olib tashlaydi; Windows keyingi yuklanishda qayta o'rnatadi</li>
+        <li><Em>Qurilma o'zgarishlarini skanerlash</Em> — Harakat menyusi → yangi ulangan qurilmalarni aniqlaydi</li>
+      </ul>
+      <H2 num="§4" uz="Qurilma xususiyatlariga chuqur kirib borish" en="" />
+      <P>Xususiyatlarni ochish uchun har qanday qurilmani ikki marta bosing. Asosiy yorliqlar:</P>
+      <table>
+        <thead><tr><th>Yorliq</th><th>Nima topasiz</th></tr></thead>
+        <tbody>
+          <tr><td>Umumiy</td><td>Qurilma holati, xato kodlari</td></tr>
+          <tr><td>Drayver</td><td>Drayver versiyasi, sanasi, nashriyotchi; Yangilash/Qaytarish/O'chirish tugmalari</td></tr>
+          <tr><td>Tafsilotlar</td><td>Qurilma IDlari — to'g'ri drayverni qo'lda topish uchun</td></tr>
+          <tr><td>Voqealar</td><td>So'nggi qurilma voqealari, xatolar, ogohlantirishlar</td></tr>
+          <tr><td>Resurslar</td><td>IRQ, xotira manzillari (kengaytirilgan)</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§5" uz="Umumiy qurilma muammolarini hal qilish" en="" />
+      <table>
+        <thead><tr><th>Muammo</th><th>Qadamlar</th></tr></thead>
+        <tbody>
+          <tr><td>Ovoz yo'q</td><td>Device Manager → Ovoz → ⚠ tekshirish → drayverni yangilash</td></tr>
+          <tr><td>Wi-Fi yo'q</td><td>Tarmoq adapterlari → Wi-Fi adapterni toping → drayverni yangilang</td></tr>
+          <tr><td>GPU aniqlanmadi</td><td>Displey adapterlari → ro'yxatda borligini tekshirish; o'chirish + qayta yuklashni sinab ko'ring</td></tr>
+          <tr><td>USB qurilma noma'lum</td><td>Universal Serial Bus → Noma'lum USB qurilmasi → drayverni yangilang</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="tip">Drayverni qo'lda topish uchun: Device Manager → qurilma Xususiyatlari → Tafsilotlar yorlig'i → ochiladigan ro'yxatni <Em>Qurilma IDlari</Em> ga o'zgartirish → yuqori IDni nusxa olish → ishlab chiqaruvchi saytida qidirish.</Callout>
+    </section>
+  );
+}
+
+
+// ─────────────────────────────────────────────────────────────
+function SectionUserBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Account Types in Windows" uz="" />
+      <P>Windows supports several account types, each with different levels of access and management.</P>
+      <table>
+        <thead><tr><th>Type</th><th>Scope</th><th>Best for</th></tr></thead>
+        <tbody>
+          <tr><td>Microsoft Account</td><td>Cloud-linked (Entra ID / outlook.com)</td><td>Personal PCs, sync settings across devices</td></tr>
+          <tr><td>Local Account</td><td>This PC only</td><td>Privacy-focused, no internet required</td></tr>
+          <tr><td>Administrator</td><td>Full system control</td><td>IT admins, power users</td></tr>
+          <tr><td>Standard User</td><td>Limited — can't install software or change system</td><td>Daily use, children, employees</td></tr>
+          <tr><td>Guest (removed)</td><td>Temporary, no password</td><td>Removed in Windows 10+</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" en="Creating a New User Account" uz="" />
+      <P>GUI method: <Em>Settings → Accounts → Other users → Add other user</Em></P>
+      <ol>
+        <li>Settings → Accounts → Other users</li>
+        <li>Click <Em>Add account</Em></li>
+        <li>Choose: Microsoft account (enter email) or Local account (click "I don't have this person's sign-in information" → "Add a user without a Microsoft account")</li>
+        <li>Enter username and password</li>
+        <li>Select account type: Standard User or Administrator</li>
+      </ol>
+      <H2 num="§3" en="Changing Account Type" uz="" />
+      <P>Settings → Accounts → Other users → click account → <Em>Change account type</Em></P>
+      <Callout kind="warn">Giving users Administrator rights means they can install software, modify system settings, and access other users' files. Only grant this when necessary.</Callout>
+      <H2 num="§4" en="Password and PIN Management" uz="" />
+      <P>Settings → Accounts → Sign-in options:</P>
+      <ul>
+        <li><Em>PIN (Windows Hello)</Em> — recommended; faster and more secure than passwords for local login</li>
+        <li><Em>Password</Em> — traditional account password</li>
+        <li><Em>Fingerprint / Face</Em> — biometric options (requires compatible hardware)</li>
+        <li><Em>Security key</Em> — physical FIDO2 key</li>
+      </ul>
+      <H2 num="§5" en="User Profile Folders" uz="" />
+      <P>Each user gets a profile folder at <code>C:\Users\[username]</code>. Key subfolders:</P>
+      <table>
+        <thead><tr><th>Folder</th><th>Contains</th></tr></thead>
+        <tbody>
+          <tr><td>Desktop</td><td>Desktop shortcuts and files</td></tr>
+          <tr><td>Documents</td><td>User documents</td></tr>
+          <tr><td>Downloads</td><td>Browser downloads</td></tr>
+          <tr><td>AppData\Roaming</td><td>App settings that sync (hidden)</td></tr>
+          <tr><td>AppData\Local</td><td>App settings local only (hidden)</td></tr>
+          <tr><td>NTUSER.DAT</td><td>User's registry hive (hidden)</td></tr>
+        </tbody>
+      </table>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows da hisob turlari" en="" />
+      <P>Windows bir necha hisob turlarini qo'llab-quvvatlaydi, har biri turli kirish darajasiga ega.</P>
+      <table>
+        <thead><tr><th>Tur</th><th>Ko'lam</th><th>Uchun eng yaxshi</th></tr></thead>
+        <tbody>
+          <tr><td>Microsoft hisobi</td><td>Bulutga ulangan (Entra ID / outlook.com)</td><td>Shaxsiy kompyuterlar, sozlamalarni sinxronlash</td></tr>
+          <tr><td>Mahalliy hisob</td><td>Faqat shu kompyuter</td><td>Maxfiylik, internet kerak emas</td></tr>
+          <tr><td>Administrator</td><td>To'liq tizim nazorati</td><td>IT adminlar, kuchli foydalanuvchilar</td></tr>
+          <tr><td>Oddiy foydalanuvchi</td><td>Cheklangan — dastur o'rnatish yoki tizimni o'zgartira olmaydi</td><td>Kunlik foydalanish, bolalar, xodimlar</td></tr>
+          <tr><td>Mehmon (olib tashlangan)</td><td>Vaqtinchalik, parolsiz</td><td>Windows 10+ da olib tashlangan</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" uz="Yangi foydalanuvchi hisobini yaratish" en="" />
+      <P>GUI usuli: <Em>Sozlamalar → Hisoblar → Boshqa foydalanuvchilar → Boshqa foydalanuvchi qo'shish</Em></P>
+      <ol>
+        <li>Sozlamalar → Hisoblar → Boshqa foydalanuvchilar</li>
+        <li><Em>Hisob qo'shish</Em> ni bosing</li>
+        <li>Tanlang: Microsoft hisobi (email kiriting) yoki Mahalliy hisob ("Bu shaxsning kirish ma'lumotlari yo'q" → "Microsoft hisobsiz foydalanuvchi qo'shish")</li>
+        <li>Foydalanuvchi nomi va parolni kiriting</li>
+        <li>Hisob turini tanlang: Oddiy foydalanuvchi yoki Administrator</li>
+      </ol>
+      <H2 num="§3" uz="Hisob turini o'zgartirish" en="" />
+      <P>Sozlamalar → Hisoblar → Boshqa foydalanuvchilar → hisobni bosing → <Em>Hisob turini o'zgartirish</Em></P>
+      <Callout kind="warn">Foydalanuvchilarga Administrator huquqlari berish ularning dastur o'rnatishi, tizim sozlamalarini o'zgartirishi va boshqa foydalanuvchilar fayllariga kirishi mumkinligini anglatadi. Faqat zarur bo'lganda bering.</Callout>
+      <H2 num="§4" uz="Parol va PIN boshqaruvi" en="" />
+      <P>Sozlamalar → Hisoblar → Kirish parametrlari:</P>
+      <ul>
+        <li><Em>PIN (Windows Hello)</Em> — tavsiya etiladi; mahalliy kirish uchun paroldan tezroq va xavfsizroq</li>
+        <li><Em>Parol</Em> — an'anaviy hisob paroli</li>
+        <li><Em>Barmoq izi / Yuz</Em> — biometrik variantlar (mos qurilma talab)</li>
+        <li><Em>Xavfsizlik kaliti</Em> — fizik FIDO2 kaliti</li>
+      </ul>
+      <H2 num="§5" uz="Foydalanuvchi profil papkalari" en="" />
+      <P>Har bir foydalanuvchi <code>C:\Users\[foydalanuvchi nomi]</code> da profil papkasiga ega. Asosiy pastki papkalar:</P>
+      <table>
+        <thead><tr><th>Papka</th><th>Nimani o'z ichiga oladi</th></tr></thead>
+        <tbody>
+          <tr><td>Desktop</td><td>Ish stoli qisqichalari va fayllari</td></tr>
+          <tr><td>Documents</td><td>Foydalanuvchi hujjatlari</td></tr>
+          <tr><td>Downloads</td><td>Brauzer yuklab olishlari</td></tr>
+          <tr><td>AppData\Roaming</td><td>Sinxronlashuvchi dastur sozlamalari (yashirin)</td></tr>
+          <tr><td>AppData\Local</td><td>Faqat mahalliy dastur sozlamalari (yashirin)</td></tr>
+          <tr><td>NTUSER.DAT</td><td>Foydalanuvchining ro'yxatga olish kitobi yig'masi (yashirin)</td></tr>
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionPermsBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="NTFS Permissions — The Basics" uz="" />
+      <P>Every file and folder on an NTFS volume has an <Term>Access Control List (ACL)</Term> — a list of who can do what. Right-click any file/folder → <Em>Properties → Security tab</Em> to view them.</P>
+      <table>
+        <thead><tr><th>Permission</th><th>Files</th><th>Folders</th></tr></thead>
+        <tbody>
+          <tr><td>Full Control</td><td>Read, write, execute, delete, change permissions</td><td>All above + delete subfolders</td></tr>
+          <tr><td>Modify</td><td>Read, write, delete</td><td>Read, write, delete contents</td></tr>
+          <tr><td>Read &amp; Execute</td><td>Open and run files</td><td>List folder, run files inside</td></tr>
+          <tr><td>Read</td><td>View file contents</td><td>List folder contents</td></tr>
+          <tr><td>Write</td><td>Create/modify files</td><td>Create files and subfolders</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" en="Viewing and Changing Permissions (GUI)" uz="" />
+      <ol>
+        <li>Right-click folder → Properties → <Em>Security</Em> tab</li>
+        <li>Click a user/group in the top list to see their permissions below</li>
+        <li>Click <Em>Edit</Em> to change permissions</li>
+        <li>Click <Em>Add</Em> to add a new user or group</li>
+        <li>Check/uncheck Allow or Deny for each permission</li>
+        <li>Click OK → Apply</li>
+      </ol>
+      <Callout kind="warn"><Em>Deny</Em> always overrides <Em>Allow</Em>. If a user is in two groups — one allowed and one denied — the Deny wins. Use Deny sparingly.</Callout>
+      <H2 num="§3" en="Inheritance" uz="" />
+      <P>By default, subfolders and files <Term>inherit</Term> permissions from their parent folder. This means you usually only need to set permissions at the top-level folder. To override inheritance on a specific subfolder:</P>
+      <ol>
+        <li>Properties → Security → Advanced → Disable inheritance</li>
+        <li>Choose: <Em>Convert</Em> (copy parent's permissions then customize) or <Em>Remove</Em> (start fresh)</li>
+      </ol>
+      <H2 num="§4" en="Basic Sharing — Share a Folder" uz="" />
+      <ol>
+        <li>Right-click folder → Properties → <Em>Sharing</Em> tab → <Em>Share</Em></li>
+        <li>Type a username or group → Add → set Permission Level (Read / Read-Write)</li>
+        <li>Click <Em>Share</Em> — Windows shows the network path (\\PC-NAME\FolderName)</li>
+      </ol>
+      <P>Other PCs on the same network can access it via <code>\\PC-NAME\FolderName</code> in File Explorer address bar.</P>
+      <H2 num="§5" en="Access Denied — Troubleshooting" uz="" />
+      <table>
+        <thead><tr><th>Cause</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>Not logged in as owner/admin</td><td>Run as Administrator or log in as folder owner</td></tr>
+          <tr><td>Permissions not granted</td><td>Check Security tab — add user with correct permissions</td></tr>
+          <tr><td>Deny permission set</td><td>Remove Deny entry from ACL</td></tr>
+          <tr><td>Encrypted file (EFS)</td><td>Need the encryption certificate of the original user</td></tr>
+          <tr><td>Ownership issue</td><td>Properties → Security → Advanced → Change Owner</td></tr>
+        </tbody>
+      </table>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="NTFS ruxsatlari — asoslar" en="" />
+      <P>NTFS hajmidagi har bir fayl va papkada <Term>Kirish nazorati ro'yxati (ACL)</Term> bor — kim nima qilishi mumkinligi ro'yxati. Har qanday fayl/papkani o'ng tugma bilan bosib → <Em>Xususiyatlar → Xavfsizlik yorlig'i</Em> da ko'ring.</P>
+      <table>
+        <thead><tr><th>Ruxsat</th><th>Fayllar</th><th>Papkalar</th></tr></thead>
+        <tbody>
+          <tr><td>To'liq nazorat</td><td>O'qish, yozish, bajarish, o'chirish, ruxsatlarni o'zgartirish</td><td>Yuqoridagilarning barchasi + pastki papkalarni o'chirish</td></tr>
+          <tr><td>O'zgartirish</td><td>O'qish, yozish, o'chirish</td><td>Tarkibni o'qish, yozish, o'chirish</td></tr>
+          <tr><td>O'qish va bajarish</td><td>Fayllarni ochish va ishga tushirish</td><td>Papkani ro'yxatga olish, ichidagi fayllarni bajarish</td></tr>
+          <tr><td>O'qish</td><td>Fayl tarkibini ko'rish</td><td>Papka tarkibini ro'yxatga olish</td></tr>
+          <tr><td>Yozish</td><td>Fayllarni yaratish/o'zgartirish</td><td>Fayllar va pastki papkalar yaratish</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§2" uz="Ruxsatlarni ko'rish va o'zgartirish (GUI)" en="" />
+      <ol>
+        <li>Papkani o'ng tugma bilan bosing → Xususiyatlar → <Em>Xavfsizlik</Em> yorlig'i</li>
+        <li>Yuqori ro'yxatda foydalanuvchi/guruhni bosing — pastda ularning ruxsatlarini ko'ring</li>
+        <li>Ruxsatlarni o'zgartirish uchun <Em>Tahrirlash</Em> ni bosing</li>
+        <li>Yangi foydalanuvchi yoki guruh qo'shish uchun <Em>Qo'shish</Em> ni bosing</li>
+        <li>Har bir ruxsat uchun Ruxsat berish yoki Rad etishni belgilang/olib tashlang</li>
+        <li>OK → Qo'llash</li>
+      </ol>
+      <Callout kind="warn"><Em>Rad etish</Em> har doim <Em>Ruxsat berish</Em> dan ustun turadi. Agar foydalanuvchi ikki guruhda bo'lsa — biri ruxsat berilgan, biri rad etilgan — Rad etish g'alaba qiladi. Rad etishni kamdan-kam ishlating.</Callout>
+      <H2 num="§3" uz="Meros" en="" />
+      <P>Standart holda, pastki papkalar va fayllar ota-papkadan ruxsatlarni <Term>meros qilib oladi</Term>. Bu odatda faqat yuqori darajadagi papkada ruxsatlarni o'rnatishingiz kerakligini anglatadi. Muayyan pastki papkada merosni bekor qilish uchun:</P>
+      <ol>
+        <li>Xususiyatlar → Xavfsizlik → Kengaytirilgan → Merosni o'chirib qo'yish</li>
+        <li>Tanlang: <Em>Konvertatsiya qilish</Em> (ota ruxsatlarini nusxalash va moslash) yoki <Em>Olib tashlash</Em> (noldan boshlash)</li>
+      </ol>
+      <H2 num="§4" uz="Asosiy ulashish — papkani ulashish" en="" />
+      <ol>
+        <li>Papkani o'ng tugma bilan bosing → Xususiyatlar → <Em>Ulashish</Em> yorlig'i → <Em>Ulashish</Em></li>
+        <li>Foydalanuvchi nomi yoki guruhni kiriting → Qo'shish → Ruxsat darajasini o'rnating (O'qish / O'qish-Yozish)</li>
+        <li><Em>Ulashish</Em> ni bosing — Windows tarmoq yo'lini ko'rsatadi (\\KOMPYUTER-NOMI\PapkaNomi)</li>
+      </ol>
+      <P>Bir xil tarmoqdagi boshqa kompyuterlar File Explorer manzil satrida <code>\\KOMPYUTER-NOMI\PapkaNomi</code> orqali kirishi mumkin.</P>
+      <H2 num="§5" uz="Kirish rad etildi — muammolarni hal qilish" en="" />
+      <table>
+        <thead><tr><th>Sabab</th><th>Yechim</th></tr></thead>
+        <tbody>
+          <tr><td>Egasi/admin sifatida kirmagan</td><td>Administrator sifatida ishga tushirish yoki papka egasi sifatida kirish</td></tr>
+          <tr><td>Ruxsatlar berilmagan</td><td>Xavfsizlik yorlig'ini tekshirish — foydalanuvchini to'g'ri ruxsatlar bilan qo'shish</td></tr>
+          <tr><td>Rad etish ruxsati o'rnatilgan</td><td>ACL dan Rad etish yozuvini olib tashlash</td></tr>
+          <tr><td>Shifrlangan fayl (EFS)</td><td>Asl foydalanuvchining shifrlash sertifikati kerak</td></tr>
+          <tr><td>Egalik muammosi</td><td>Xususiyatlar → Xavfsizlik → Kengaytirilgan → Egani o'zgartirish</td></tr>
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionWinUpdate() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows Update Overview" uz="" />
+      <P><Term>Windows Update</Term> delivers security patches, feature updates, and driver updates automatically. It is the single most important security control for any Windows machine. Access via: <Em>Settings → Windows Update</Em>.</P>
+      <H2 num="§2" en="Update Types" uz="" />
+      <table>
+        <thead><tr><th>Type</th><th>Description</th><th>Frequency</th></tr></thead>
+        <tbody>
+          <tr><td>Security updates</td><td>Patch known vulnerabilities (CVEs)</td><td>Monthly (Patch Tuesday)</td></tr>
+          <tr><td>Quality updates</td><td>Bug fixes, reliability, performance</td><td>Monthly</td></tr>
+          <tr><td>Feature updates</td><td>New Windows version (22H2, 23H2...)</td><td>Annual</td></tr>
+          <tr><td>Driver updates</td><td>Hardware driver updates via Windows</td><td>As needed</td></tr>
+          <tr><td>Definition updates</td><td>Windows Defender signature updates</td><td>Multiple times daily</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" en="Managing Updates" uz="" />
+      <P><Em>Settings → Windows Update → Advanced options:</Em></P>
+      <ul>
+        <li><Em>Pause updates</Em> — delay up to 5 weeks (useful before major feature updates on production systems)</li>
+        <li><Em>Active hours</Em> — set times when Windows should not restart for updates</li>
+        <li><Em>Optional updates</Em> — driver and non-critical updates you can install manually</li>
+        <li><Em>Windows Insider Program</Em> — preview builds (not for production)</li>
+      </ul>
+      <H2 num="§4" en="Troubleshooting Windows Update" uz="" />
+      <table>
+        <thead><tr><th>Problem</th><th>Steps</th></tr></thead>
+        <tbody>
+          <tr><td>Updates stuck / fail</td><td>Settings → Windows Update → Troubleshoot → Windows Update troubleshooter</td></tr>
+          <tr><td>Error codes</td><td>Search the error code on support.microsoft.com</td></tr>
+          <tr><td>SFC scan</td><td>Open CMD as Admin → <code>sfc /scannow</code></td></tr>
+          <tr><td>DISM repair</td><td><code>DISM /Online /Cleanup-Image /RestoreHealth</code></td></tr>
+          <tr><td>Reset update components</td><td>Stop wuauserv, delete SoftwareDistribution folder, restart service</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="warn">Never disable Windows Update entirely. If you must delay updates (testing, critical systems), use the Pause feature, not a registry hack that stops updates permanently.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows Update umumiy ko'rinishi" en="" />
+      <P><Term>Windows Update</Term> — xavfsizlik yamoqlari, xususiyat yangilanishlari va drayver yangilanishlarini avtomatik yetkazib beradi. Bu har qanday Windows mashinasi uchun eng muhim xavfsizlik nazorati. Kirish: <Em>Sozlamalar → Windows Update</Em>.</P>
+      <H2 num="§2" uz="Yangilanish turlari" en="" />
+      <table>
+        <thead><tr><th>Tur</th><th>Tavsif</th><th>Chastota</th></tr></thead>
+        <tbody>
+          <tr><td>Xavfsizlik yangilanishlari</td><td>Ma'lum zaifliklarni (CVE) yamoqlash</td><td>Oylik (Patch Tuesday)</td></tr>
+          <tr><td>Sifat yangilanishlari</td><td>Xato tuzatishlari, ishonchlilik, ishlash</td><td>Oylik</td></tr>
+          <tr><td>Xususiyat yangilanishlari</td><td>Yangi Windows versiyasi (22H2, 23H2...)</td><td>Yillik</td></tr>
+          <tr><td>Drayver yangilanishlari</td><td>Windows orqali apparat drayver yangilanishlari</td><td>Kerak bo'lganda</td></tr>
+          <tr><td>Ta'rif yangilanishlari</td><td>Windows Defender imzo yangilanishlari</td><td>Kuniga bir necha marta</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" uz="Yangilanishlarni boshqarish" en="" />
+      <P><Em>Sozlamalar → Windows Update → Kengaytirilgan parametrlar:</Em></P>
+      <ul>
+        <li><Em>Yangilanishlarni to'xtatib turish</Em> — 5 haftaga kechiktirish (ishlab chiqarish tizimlarida katta xususiyat yangilanishlaridan oldin foydali)</li>
+        <li><Em>Faol soatlar</Em> — Windows yangilanishlar uchun qayta ishga tushirmasligi kerak bo'lgan vaqtlarni o'rnating</li>
+        <li><Em>Ixtiyoriy yangilanishlar</Em> — qo'lda o'rnatish mumkin bo'lgan drayver va muhim bo'lmagan yangilanishlar</li>
+        <li><Em>Windows Insider dasturi</Em> — oldindan ko'rish assembleri (ishlab chiqarish uchun emas)</li>
+      </ul>
+      <H2 num="§4" uz="Windows Update ni tuzatish" en="" />
+      <table>
+        <thead><tr><th>Muammo</th><th>Qadamlar</th></tr></thead>
+        <tbody>
+          <tr><td>Yangilanishlar tiqilib qoldi / muvaffaqiyatsiz</td><td>Sozlamalar → Windows Update → Muammolarni bartaraf etish → Windows Update muammolarini bartaraf etuvchisi</td></tr>
+          <tr><td>Xato kodlari</td><td>support.microsoft.com da xato kodini qidiring</td></tr>
+          <tr><td>SFC skanerlash</td><td>CMD ni Admin sifatida oching → <code>sfc /scannow</code></td></tr>
+          <tr><td>DISM tuzatish</td><td><code>DISM /Online /Cleanup-Image /RestoreHealth</code></td></tr>
+          <tr><td>Yangilanish komponentlarini tiklash</td><td>wuauserv ni to'xtating, SoftwareDistribution papkasini o'chirib tashlang, xizmatni qayta ishga tushiring</td></tr>
+        </tbody>
+      </table>
+      <Callout kind="warn">Windows Update ni umuman o'chirmang. Yangilanishlarni kechiktirish kerak bo'lsa (sinov, muhim tizimlar), doimiy yangilanishlarni to'xtatadigan ro'yxatga olish kitobi hackidan emas, To'xtatib turish funksiyasidan foydalaning.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionDefenderBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows Security Center" uz="" />
+      <P><Term>Windows Security</Term> (formerly Windows Defender) is the built-in security suite in Windows 10/11. Open it: <Em>Start → Windows Security</Em> or the shield icon in the system tray.</P>
+      <pre><code>{`
+  Windows Security Dashboard
+  ┌─────────────────────────────────────────────┐
+  │ 🛡 Virus & threat protection    ✔ No action │
+  │ 🔒 Account protection           ✔ Good      │
+  │ 🌐 Firewall & network           ✔ On        │
+  │ 📱 App & browser control        ✔ On        │
+  │ 🖥 Device security              ✔ On        │
+  │ ⚡ Device performance           ✔ Good      │
+  │ 👨‍👩‍👧 Family options             ─ Optional  │
+  └─────────────────────────────────────────────┘`}</code></pre>
+      <H2 num="§2" en="Virus and Threat Protection" uz="" />
+      <P>The core antivirus engine. Key actions:</P>
+      <ul>
+        <li><Em>Quick scan</Em> — scans common malware locations (2-5 minutes)</li>
+        <li><Em>Full scan</Em> — scans all files on all drives (30-60+ minutes)</li>
+        <li><Em>Custom scan</Em> — scan a specific folder</li>
+        <li><Em>Microsoft Defender Offline scan</Em> — boots into a separate environment to remove persistent malware</li>
+      </ul>
+      <H2 num="§3" en="Real-time Protection and Settings" uz="" />
+      <table>
+        <thead><tr><th>Setting</th><th>What it does</th><th>Recommendation</th></tr></thead>
+        <tbody>
+          <tr><td>Real-time protection</td><td>Scans files as they're accessed</td><td>Always ON</td></tr>
+          <tr><td>Cloud-delivered protection</td><td>Checks files against cloud database</td><td>ON</td></tr>
+          <tr><td>Automatic sample submission</td><td>Sends suspicious files to Microsoft</td><td>ON (unless air-gapped)</td></tr>
+          <tr><td>Tamper protection</td><td>Prevents malware from disabling Defender</td><td>Always ON</td></tr>
+          <tr><td>Controlled folder access</td><td>Blocks unauthorised apps from modifying Documents/Desktop</td><td>ON for high-risk users</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" en="Adding Exclusions" uz="" />
+      <P>Sometimes Defender flags legitimate files (false positives). To add an exclusion:</P>
+      <ol>
+        <li>Windows Security → Virus &amp; threat protection → Manage settings</li>
+        <li>Scroll to <Em>Exclusions</Em> → Add or remove exclusions</li>
+        <li>Add: File, Folder, File type, or Process</li>
+      </ol>
+      <Callout kind="warn">Only add exclusions for files/folders you are certain are safe. Malware authors often instruct victims to add exclusions to bypass Defender. Never add <code>C:\</code> as an exclusion.</Callout>
+      <H2 num="§5" en="When Defender Finds a Threat" uz="" />
+      <P>Defender automatically quarantines detected threats. Check: Windows Security → Virus &amp; threat protection → <Em>Protection history</Em>. Options for each item:</P>
+      <ul>
+        <li><Em>Remove</Em> — permanently deletes the file</li>
+        <li><Em>Restore</Em> — restores from quarantine (only for confirmed false positives)</li>
+        <li><Em>Allow</Em> — whitelists the item (use with extreme caution)</li>
+      </ul>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows Security markazi" en="" />
+      <P><Term>Windows Security</Term> (ilgari Windows Defender) — Windows 10/11 da o'rnatilgan xavfsizlik to'plami. Oching: <Em>Start → Windows Security</Em> yoki tizim belgisidagi qalqon ikonasi.</P>
+      <pre><code>{`
+  Windows Security boshqaruv paneli
+  ┌─────────────────────────────────────────────┐
+  │ 🛡 Virus va tahdidlardan himoya  ✔ Yaxshi   │
+  │ 🔒 Hisob himoyasi               ✔ Yaxshi    │
+  │ 🌐 Xavfsizlik devori va tarmoq  ✔ Yoqilgan  │
+  │ 📱 Dastur va brauzer nazorati   ✔ Yoqilgan  │
+  │ 🖥 Qurilma xavfsizligi          ✔ Yoqilgan  │
+  │ ⚡ Qurilma ishlashi             ✔ Yaxshi    │
+  │ 👨‍👩‍👧 Oilaviy parametrlar        ─ Ixtiyoriy │
+  └─────────────────────────────────────────────┘`}</code></pre>
+      <H2 num="§2" uz="Virus va tahdidlardan himoya" en="" />
+      <P>Asosiy antivirus mexanizmi. Asosiy harakatlar:</P>
+      <ul>
+        <li><Em>Tezkor skanerlash</Em> — umumiy zararli dastur joylashuvlarini skanerlaydi (2-5 daqiqa)</li>
+        <li><Em>To'liq skanerlash</Em> — barcha disklardagi barcha fayllarni skanerlaydi (30-60+ daqiqa)</li>
+        <li><Em>Maxsus skanerlash</Em> — muayyan papkani skanerlash</li>
+        <li><Em>Microsoft Defender oflayn skanerlash</Em> — doimiy zararli dasturlarni olib tashlash uchun alohida muhitga yuklanadi</li>
+      </ul>
+      <H2 num="§3" uz="Real vaqtli himoya va sozlamalar" en="" />
+      <table>
+        <thead><tr><th>Sozlama</th><th>Nima qiladi</th><th>Tavsiya</th></tr></thead>
+        <tbody>
+          <tr><td>Real vaqtli himoya</td><td>Fayllarga kirilganda skanerlaydi</td><td>Har doim YOQILGAN</td></tr>
+          <tr><td>Bulutga asoslangan himoya</td><td>Fayllarni bulut ma'lumotlar bazasi bilan tekshiradi</td><td>YOQILGAN</td></tr>
+          <tr><td>Avtomatik namuna yuborish</td><td>Shubhali fayllarni Microsoftga yuboradi</td><td>YOQILGAN (havo oralig'isiz)</td></tr>
+          <tr><td>Buzilishdan himoya</td><td>Zararli dasturlarning Defender ni o'chirishining oldini oladi</td><td>Har doim YOQILGAN</td></tr>
+          <tr><td>Nazorat qilinadigan papkaga kirish</td><td>Ruxsatsiz dasturlarning Hujjatlar/Ish stolini o'zgartirishini bloklaydi</td><td>Yuqori xavfli foydalanuvchilar uchun YOQILGAN</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" uz="Istisnolar qo'shish" en="" />
+      <P>Ba'zida Defender qonuniy fayllarni belgilaydi (noto'g'ri aniqlanish). Istisno qo'shish uchun:</P>
+      <ol>
+        <li>Windows Security → Virus va tahdidlardan himoya → Sozlamalarni boshqarish</li>
+        <li><Em>Istisnolar</Em> ga o'ting → Istisnolarni qo'shish yoki olib tashlash</li>
+        <li>Qo'shing: Fayl, Papka, Fayl turi yoki Jarayon</li>
+      </ol>
+      <Callout kind="warn">Faqat ishonchli bo'lgan fayllar/papkalar uchun istisnolar qo'shing. Zararli dastur mualliflari ko'pincha qurbonlarga Defender ni chetlab o'tish uchun istisnolar qo'shishni buyuradi. Hech qachon <code>C:\</code> ni istisno sifatida qo'shmang.</Callout>
+      <H2 num="§5" uz="Defender tahdid topganda" en="" />
+      <P>Defender aniqlangan tahdidlarni avtomatik ravishda karantinga oladi. Tekshirish: Windows Security → Virus va tahdidlardan himoya → <Em>Himoya tarixi</Em>. Har bir element uchun variantlar:</P>
+      <ul>
+        <li><Em>Olib tashlash</Em> — faylni butunlay o'chiradi</li>
+        <li><Em>Tiklash</Em> — karantindan qayta tiklaydi (faqat tasdiqlangan noto'g'ri aniqlanishlar uchun)</li>
+        <li><Em>Ruxsat berish</Em> — elementni oq ro'yxatga qo'shadi (juda ehtiyotkorlik bilan ishlating)</li>
+      </ul>
+    </section>
+  );
+}
+
+
+// ─────────────────────────────────────────────────────────────
+function SectionNetBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Networking Concepts for Windows Users" uz="" />
+      <P>Every Windows PC on a network has an <Term>IP address</Term> — a unique number that identifies it on the network. To see your network configuration:</P>
+      <P>GUI: <Em>Settings → Network &amp; internet → Properties</Em> (for your active connection)</P>
+      <H2 num="§2" en="Key Network Terms" uz="" />
+      <table>
+        <thead><tr><th>Term</th><th>What it is</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>IP Address</td><td>Your device's network identity</td><td>192.168.1.100</td></tr>
+          <tr><td>Subnet Mask</td><td>Defines the network vs host portion</td><td>255.255.255.0 (/24)</td></tr>
+          <tr><td>Default Gateway</td><td>Router IP — traffic exits through here</td><td>192.168.1.1</td></tr>
+          <tr><td>DNS Server</td><td>Translates hostnames to IP addresses</td><td>8.8.8.8 (Google DNS)</td></tr>
+          <tr><td>DHCP</td><td>Server that auto-assigns IP settings</td><td>Your home router</td></tr>
+          <tr><td>MAC Address</td><td>Hardware address of network card</td><td>00:1A:2B:3C:4D:5E</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" en="DHCP vs Static IP" uz="" />
+      <table>
+        <thead><tr><th></th><th>DHCP (Automatic)</th><th>Static (Manual)</th></tr></thead>
+        <tbody>
+          <tr><td>Setup</td><td>Zero config — router assigns</td><td>Must enter IP/mask/gateway/DNS</td></tr>
+          <tr><td>Best for</td><td>Home users, laptops</td><td>Servers, printers, NAS</td></tr>
+          <tr><td>IP changes?</td><td>May change at each lease renewal</td><td>Always the same</td></tr>
+          <tr><td>GUI</td><td>Settings → Network → adapter → Edit (Automatic)</td><td>Settings → Network → adapter → Edit (Manual)</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" en="Essential Network Commands" uz="" />
+      <pre><code>{`ipconfig              # Show all IP configuration
+ipconfig /all         # Full details including MAC, DHCP server
+ipconfig /release     # Release DHCP lease
+ipconfig /renew       # Renew DHCP lease (fixes many connectivity issues)
+ipconfig /flushdns    # Clear DNS cache (fixes DNS resolution issues)
+
+ping 8.8.8.8          # Test internet connectivity
+ping google.com       # Test DNS + internet
+ping 192.168.1.1      # Test gateway connectivity`}</code></pre>
+      <H2 num="§5" en="Network Troubleshooting Workflow" uz="" />
+      <pre><code>{`
+  No network? Follow this sequence:
+  1. ipconfig → Do you have an IP? (169.x.x.x = no DHCP)
+  2. ping 127.0.0.1  → TCP/IP stack working?
+  3. ping [gateway]  → Router reachable?
+  4. ping 8.8.8.8    → Internet reachable?
+  5. ping google.com → DNS working?
+  → Each step pinpoints where the break is.`}</code></pre>
+      <Callout kind="tip">Settings → Network &amp; internet → Troubleshoot → Internet Connections runs the built-in wizard. It fixes most common issues automatically.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows foydalanuvchilari uchun tarmoq tushunchalari" en="" />
+      <P>Tarmoqdagi har bir Windows kompyuterida <Term>IP manzil</Term> bor — uni tarmoqda aniqlaydigan noyob raqam. Tarmoq konfiguratsiyangizni ko'rish uchun:</P>
+      <P>GUI: <Em>Sozlamalar → Tarmoq va internet → Xususiyatlar</Em> (faol ulanishingiz uchun)</P>
+      <H2 num="§2" uz="Asosiy tarmoq atamalari" en="" />
+      <table>
+        <thead><tr><th>Atama</th><th>Nima</th><th>Misol</th></tr></thead>
+        <tbody>
+          <tr><td>IP manzil</td><td>Qurilmangizning tarmoq identifikatori</td><td>192.168.1.100</td></tr>
+          <tr><td>Pastki tarmoq niqobi</td><td>Tarmoq va xost qismini belgilaydi</td><td>255.255.255.0 (/24)</td></tr>
+          <tr><td>Standart shlyuz</td><td>Router IP — trafik shu orqali chiqadi</td><td>192.168.1.1</td></tr>
+          <tr><td>DNS server</td><td>Xost nomlarini IP manzillarga aylantiradi</td><td>8.8.8.8 (Google DNS)</td></tr>
+          <tr><td>DHCP</td><td>IP sozlamalarini avtomatik tayinlaydigan server</td><td>Uy routeringiz</td></tr>
+          <tr><td>MAC manzil</td><td>Tarmoq kartasining qurilma manzili</td><td>00:1A:2B:3C:4D:5E</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" uz="DHCP va statik IP" en="" />
+      <table>
+        <thead><tr><th></th><th>DHCP (Avtomatik)</th><th>Statik (Qo'lda)</th></tr></thead>
+        <tbody>
+          <tr><td>Sozlash</td><td>Nol konfiguratsiya — router tayinlaydi</td><td>IP/maska/shlyuz/DNS kiritish kerak</td></tr>
+          <tr><td>Eng yaxshi</td><td>Uy foydalanuvchilari, noutbuklar</td><td>Serverlar, printerlar, NAS</td></tr>
+          <tr><td>IP o'zgaradimi?</td><td>Har ijaraga olish yangilanishida o'zgarishi mumkin</td><td>Har doim bir xil</td></tr>
+          <tr><td>GUI</td><td>Sozlamalar → Tarmoq → adapter → Tahrirlash (Avtomatik)</td><td>Sozlamalar → Tarmoq → adapter → Tahrirlash (Qo'lda)</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§4" uz="Muhim tarmoq buyruqlari" en="" />
+      <pre><code>{`ipconfig              # Barcha IP konfiguratsiyani ko'rsatish
+ipconfig /all         # MAC, DHCP server bilan to'liq tafsilotlar
+ipconfig /release     # DHCP ijarasini bo'shatish
+ipconfig /renew       # DHCP ijarasini yangilash (ko'p ulanish muammolarini tuzatadi)
+ipconfig /flushdns    # DNS keshini tozalash (DNS muammolarini tuzatadi)
+
+ping 8.8.8.8          # Internet ulanishini tekshirish
+ping google.com       # DNS + internetni tekshirish
+ping 192.168.1.1      # Shlyuz ulanishini tekshirish`}</code></pre>
+      <H2 num="§5" uz="Tarmoq muammolarini hal qilish tartibi" en="" />
+      <pre><code>{`
+  Tarmoq yo'qmi? Quyidagi ketma-ketlikni bajaring:
+  1. ipconfig → IP manzilingiz bormi? (169.x.x.x = DHCP yo'q)
+  2. ping 127.0.0.1  → TCP/IP steki ishlayaptimi?
+  3. ping [shlyuz]   → Router erishish mumkinmi?
+  4. ping 8.8.8.8    → Internetga erishish mumkinmi?
+  5. ping google.com → DNS ishlayaptimi?
+  → Har bir qadam qayerda uzilish borligini ko'rsatadi.`}</code></pre>
+      <Callout kind="tip">Sozlamalar → Tarmoq va internet → Muammolarni bartaraf etish → Internet ulanishlari — o'rnatilgan ustani ishga tushiradi. Ko'pgina umumiy muammolarni avtomatik ravishda tuzatadi.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionFileShare() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Network File Sharing Overview" uz="" />
+      <P>Windows uses the <Term>SMB protocol</Term> (Server Message Block) to share files and printers across a local network. Shared resources are accessed via UNC paths like <code>\\SERVER\ShareName</code>.</P>
+      <H2 num="§2" en="Sharing a Folder" uz="" />
+      <ol>
+        <li>Right-click the folder → <Em>Properties → Sharing → Share</Em></li>
+        <li>Type username or group (e.g., "Everyone" for all network users)</li>
+        <li>Set permission level: <Em>Read</Em> or <Em>Read/Write</Em></li>
+        <li>Click <Em>Share</Em> — note the network path shown (e.g., <code>\\DESKTOP-ABC\Documents</code>)</li>
+        <li>Ensure <Em>Network discovery</Em> and <Em>File and printer sharing</Em> are on:
+          Settings → Network → Advanced network settings → Advanced sharing settings</li>
+      </ol>
+      <H2 num="§3" en="Accessing a Shared Folder" uz="" />
+      <ul>
+        <li><Em>File Explorer address bar</Em>: type <code>\\PC-NAME\ShareName</code> → Enter</li>
+        <li><Em>Run dialog</Em>: Win+R → type <code>\\192.168.1.100\ShareName</code></li>
+        <li><Em>Map Network Drive</Em>: assigns a drive letter (e.g., Z:) for easy repeated access</li>
+      </ul>
+      <H2 num="§4" en="Mapping a Network Drive" uz="" />
+      <ol>
+        <li>File Explorer → This PC → <Em>Map network drive</Em> (in the toolbar)</li>
+        <li>Choose a drive letter (e.g., Z:)</li>
+        <li>Enter the folder path: <code>\\SERVER\ShareName</code></li>
+        <li>Check <Em>Reconnect at sign-in</Em> to make it persistent</li>
+        <li>Click Finish — enter credentials if prompted</li>
+      </ol>
+      <H2 num="§5" en="Printer Sharing" uz="" />
+      <ol>
+        <li>Settings → Bluetooth &amp; devices → Printers &amp; scanners → click the printer → Printer properties</li>
+        <li>Sharing tab → check <Em>Share this printer</Em> → give it a share name</li>
+        <li>On other PCs: Settings → Printers &amp; scanners → Add a printer → select the shared printer</li>
+      </ol>
+      <Callout kind="warn">Sharing folders with "Everyone" + Read/Write on an unsecured network is a security risk. Use specific usernames or groups, and only share what's necessary.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Tarmoq orqali fayl ulashish umumiy ko'rinishi" en="" />
+      <P>Windows mahalliy tarmoqda fayl va printerlarni ulashish uchun <Term>SMB protokolidan</Term> (Server Message Block) foydalanadi. Ulashilgan resurslar <code>\\SERVER\UlashishNomi</code> kabi UNC yo'llari orqali kiriladi.</P>
+      <H2 num="§2" uz="Papkani ulashish" en="" />
+      <ol>
+        <li>Papkani o'ng tugma bilan bosing → <Em>Xususiyatlar → Ulashish → Ulashish</Em></li>
+        <li>Foydalanuvchi nomi yoki guruhni kiriting (masalan, barcha tarmoq foydalanuvchilari uchun "Everyone")</li>
+        <li>Ruxsat darajasini o'rnating: <Em>O'qish</Em> yoki <Em>O'qish/Yozish</Em></li>
+        <li><Em>Ulashish</Em> ni bosing — ko'rsatilgan tarmoq yo'lini yozib oling (masalan, <code>\\DESKTOP-ABC\Documents</code>)</li>
+        <li><Em>Tarmoqni kashf etish</Em> va <Em>Fayl va printer ulashish</Em> yoqilganligini tekshiring:
+          Sozlamalar → Tarmoq → Kengaytirilgan tarmoq sozlamalari → Kengaytirilgan ulashish sozlamalari</li>
+      </ol>
+      <H2 num="§3" uz="Ulashilgan papkaga kirish" en="" />
+      <ul>
+        <li><Em>File Explorer manzil satri</Em>: <code>\\KOMPYUTER-NOMI\UlashishNomi</code> kiriting → Enter</li>
+        <li><Em>Ishga tushirish dialogi</Em>: Win+R → <code>\\192.168.1.100\UlashishNomi</code> kiriting</li>
+        <li><Em>Tarmoq drayverini moslashtirish</Em>: oson qayta kirish uchun disk harfi (masalan, Z:) tayinlaydi</li>
+      </ul>
+      <H2 num="§4" uz="Tarmoq drayverini moslashtirish" en="" />
+      <ol>
+        <li>File Explorer → Bu kompyuter → <Em>Tarmoq drayverini moslashtirish</Em> (asboblar panelidagi)</li>
+        <li>Disk harfini tanlang (masalan, Z:)</li>
+        <li>Papka yo'lini kiriting: <code>\\SERVER\UlashishNomi</code></li>
+        <li>Uni doimiy qilish uchun <Em>Kirishda qayta ulash</Em> ni belgilang</li>
+        <li>Tugatish ni bosing — so'ralsa hisob ma'lumotlarini kiriting</li>
+      </ol>
+      <H2 num="§5" uz="Printerni ulashish" en="" />
+      <ol>
+        <li>Sozlamalar → Bluetooth va qurilmalar → Printerlar va skanerlar → printerni bosing → Printer xususiyatlari</li>
+        <li>Ulashish yorlig'i → <Em>Ushbu printerni ulash</Em> ni belgilang → ulashish nomi bering</li>
+        <li>Boshqa kompyuterlarda: Sozlamalar → Printerlar va skanerlar → Printer qo'shish → ulashilgan printerni tanlang</li>
+      </ol>
+      <Callout kind="warn">Xavfsizlanmagan tarmoqda "Everyone" + O'qish/Yozish bilan papkalarni ulashish xavfsizlik xavfidir. Muayyan foydalanuvchi nomlari yoki guruhlaridan foydalaning va faqat zarur narsalarni ulashing.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionBackupRestore() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Why Backup Matters" uz="" />
+      <P>Hardware fails. Ransomware encrypts files. Users accidentally delete things. The <Term>3-2-1 backup rule</Term> is the gold standard:</P>
+      <pre><code>{`
+  3 copies of data
+  ├── 2 on different media (e.g., local drive + USB)
+  └── 1 offsite or cloud (e.g., OneDrive, external at different location)`}</code></pre>
+      <H2 num="§2" en="System Restore" uz="" />
+      <P><Term>System Restore</Term> creates snapshots called <Em>restore points</Em> of Windows system files and the registry. It does NOT back up personal files.</P>
+      <ul>
+        <li><Em>Enable</Em>: Control Panel → System → System Protection → Configure → Turn on system protection</li>
+        <li><Em>Create manual point</Em>: System Protection → Create → give it a name</li>
+        <li><Em>Restore</Em>: System Protection → System Restore → choose a restore point</li>
+        <li>Windows creates restore points automatically before updates and app installations</li>
+      </ul>
+      <Callout kind="tip">If Windows misbehaves after an update or driver install, System Restore is often the fastest fix. It takes 15-30 minutes and does not affect your files.</Callout>
+      <H2 num="§3" en="File History" uz="" />
+      <P><Term>File History</Term> continuously backs up files in your Libraries, Desktop, Contacts, and Favorites to an external drive or network location.</P>
+      <ol>
+        <li>Connect an external drive</li>
+        <li>Settings → Update &amp; Security → Backup → <Em>Add a drive</Em></li>
+        <li>Turn on <Em>Automatically back up my files</Em></li>
+        <li>Click <Em>More options</Em> to set backup frequency and retention period</li>
+      </ol>
+      <P>To restore: open the File History drive in Explorer → navigate to the file → select version → click the green restore button.</P>
+      <H2 num="§4" en="Windows Backup (Full System Backup)" uz="" />
+      <P>For a full system image backup: <Em>Control Panel → Backup and Restore (Windows 7)</Em> (yes, still present in Windows 10/11).</P>
+      <ul>
+        <li><Em>Create a system image</Em> — full disk image to external drive, DVD, or network</li>
+        <li><Em>Create a system repair disc</Em> — bootable CD/USB to start recovery</li>
+      </ul>
+      <H2 num="§5" en="Windows Recovery Options" uz="" />
+      <table>
+        <thead><tr><th>Option</th><th>What it does</th><th>Loses files?</th></tr></thead>
+        <tbody>
+          <tr><td>System Restore</td><td>Roll back system files to earlier state</td><td>No</td></tr>
+          <tr><td>Startup Repair</td><td>Fixes boot issues automatically</td><td>No</td></tr>
+          <tr><td>Reset this PC (Keep files)</td><td>Reinstalls Windows, keeps Documents etc.</td><td>Apps removed</td></tr>
+          <tr><td>Reset this PC (Remove all)</td><td>Full reinstall, everything deleted</td><td>Yes</td></tr>
+          <tr><td>System Image Recovery</td><td>Restore from a full system image</td><td>Replaces everything</td></tr>
+        </tbody>
+      </table>
+      <P>Access recovery: <Em>Settings → System → Recovery → Advanced startup → Restart now</Em></P>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Nima uchun zaxiralash muhim" en="" />
+      <P>Qurilma ishdan chiqadi. Ransomware fayllarni shifrlaydi. Foydalanuvchilar tasodifan o'chiradi. <Term>3-2-1 zaxiralash qoidasi</Term> oltin standart:</P>
+      <pre><code>{`
+  Ma'lumotlarning 3 nusxasi
+  ├── Turli muhitlarda 2 ta (masalan, mahalliy disk + USB)
+  └── 1 ta saytdan tashqarida yoki bulutda (masalan, OneDrive, tashqi)`}</code></pre>
+      <H2 num="§2" uz="Tizimni tiklash" en="" />
+      <P><Term>Tizimni tiklash</Term> (System Restore) — Windows tizim fayllari va ro'yxatga olish kitobining <Em>tiklash nuqtalari</Em> deb ataladigan suratlarini yaratadi. Shaxsiy fayllarni zaxiralamaydi.</P>
+      <ul>
+        <li><Em>Yoqish</Em>: Boshqaruv paneli → Tizim → Tizimni himoyalash → Sozlash → Tizimni himoyalashni yoqish</li>
+        <li><Em>Qo'lda nuqta yaratish</Em>: Tizimni himoyalash → Yaratish → nom bering</li>
+        <li><Em>Tiklash</Em>: Tizimni himoyalash → Tizimni tiklash → tiklash nuqtasini tanlang</li>
+        <li>Windows yangilanishlar va dastur o'rnatishlaridan oldin avtomatik tiklash nuqtalarini yaratadi</li>
+      </ul>
+      <Callout kind="tip">Windows yangilanish yoki drayver o'rnatishdan keyin noto'g'ri ishlasa, Tizimni tiklash ko'pincha eng tez yechim. 15-30 daqiqa davom etadi va fayllaringizga ta'sir qilmaydi.</Callout>
+      <H2 num="§3" uz="Fayl tarixi" en="" />
+      <P><Term>Fayl tarixi</Term> (File History) — Kutubxonalar, Ish stoli, Kontaktlar va Sevimlilardagi fayllarni tashqi disk yoki tarmoq joyiga uzluksiz zaxiralaydi.</P>
+      <ol>
+        <li>Tashqi diskni ulang</li>
+        <li>Sozlamalar → Yangilash va Xavfsizlik → Zaxiralash → <Em>Disk qo'shish</Em></li>
+        <li><Em>Fayllarimni avtomatik zaxiralash</Em> ni yoqing</li>
+        <li>Zaxiralash chastotasi va saqlash davrini o'rnatish uchun <Em>Ko'proq parametrlar</Em> ni bosing</li>
+      </ol>
+      <P>Tiklash uchun: Explorerdagi Fayl tarixi diskini oching → faylga o'ting → versiyani tanlang → yashil tiklash tugmasini bosing.</P>
+      <H2 num="§4" uz="Windows zaxiralash (to'liq tizim zaxirasi)" en="" />
+      <P>To'liq tizim tasviri zaxirasi uchun: <Em>Boshqaruv paneli → Zaxiralash va tiklash (Windows 7)</Em> (ha, Windows 10/11 da ham mavjud).</P>
+      <ul>
+        <li><Em>Tizim tasvirini yaratish</Em> — tashqi disk, DVD yoki tarmoqqa to'liq disk tasviri</li>
+        <li><Em>Tizimni tiklash diskini yaratish</Em> — tiklashni boshlash uchun yuklash mumkin bo'lgan CD/USB</li>
+      </ul>
+      <H2 num="§5" uz="Windows tiklash parametrlari" en="" />
+      <table>
+        <thead><tr><th>Parametr</th><th>Nima qiladi</th><th>Fayllarni yo'qotadimi?</th></tr></thead>
+        <tbody>
+          <tr><td>Tizimni tiklash</td><td>Tizim fayllarini oldingi holatga qaytarish</td><td>Yo'q</td></tr>
+          <tr><td>Ishga tushirishni ta'mirlash</td><td>Yuklash muammolarini avtomatik tuzatish</td><td>Yo'q</td></tr>
+          <tr><td>Bu kompyuterni tiklash (Fayllarni saqlash)</td><td>Windowsni qayta o'rnatish, Hujjatlarni saqlash</td><td>Dasturlar o'chiriladi</td></tr>
+          <tr><td>Bu kompyuterni tiklash (Hammasini o'chirish)</td><td>To'liq qayta o'rnatish, hamma narsa o'chiriladi</td><td>Ha</td></tr>
+          <tr><td>Tizim tasviri orqali tiklash</td><td>To'liq tizim tasviridan tiklash</td><td>Hamma narsani almashtiradi</td></tr>
+        </tbody>
+      </table>
+      <P>Tiklashga kirish: <Em>Sozlamalar → Tizim → Tiklash → Kengaytirilgan ishga tushirish → Hozir qayta ishga tushirish</Em></P>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionPSBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="What is PowerShell?" uz="" />
+      <P><Term>PowerShell</Term> is Microsoft's modern command-line shell and scripting language. Unlike CMD which works with plain text, PowerShell works with <Em>objects</Em> — structured data that can be filtered, sorted, and piped between commands. It's the standard tool for Windows administration.</P>
+      <P>Open: <Em>Win+X → Windows PowerShell (Admin)</Em> or search "PowerShell" in Start.</P>
+      <H2 num="§2" en="Essential Cmdlets" uz="" />
+      <table>
+        <thead><tr><th>Cmdlet</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>Get-Help Get-Process</code></td><td>Get help for any cmdlet</td></tr>
+          <tr><td><code>Get-Process</code></td><td>List running processes</td></tr>
+          <tr><td><code>Stop-Process -Name notepad</code></td><td>Kill a process by name</td></tr>
+          <tr><td><code>Get-Service</code></td><td>List all services</td></tr>
+          <tr><td><code>Start-Service -Name wuauserv</code></td><td>Start a service</td></tr>
+          <tr><td><code>Get-EventLog -LogName System -Newest 20</code></td><td>Last 20 System events</td></tr>
+          <tr><td><code>Get-NetIPAddress</code></td><td>Network adapter IPs</td></tr>
+          <tr><td><code>Test-NetConnection google.com</code></td><td>Ping + TCP test</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" en="The Pipeline" uz="" />
+      <P>The <Term>pipeline</Term> (<code>|</code>) passes the output of one cmdlet as input to the next — but as objects, not text.</P>
+      <pre><code>{`# Find top 5 memory-consuming processes
+Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 5
+
+# List all stopped services
+Get-Service | Where-Object {$_.Status -eq "Stopped"}
+
+# Get all .log files larger than 1MB
+Get-ChildItem C:\Windows\Logs -Recurse -Filter *.log |
+  Where-Object {$_.Length -gt 1MB}`}</code></pre>
+      <H2 num="§4" en="Variables and Scripts" uz="" />
+      <pre><code>{`$name = "Alice"           # Assign variable
+$procs = Get-Process      # Assign cmdlet output
+Write-Host "Hello $name"  # Print with variable expansion
+
+# Save to .ps1 file and run:
+.\myscript.ps1`}</code></pre>
+      <H2 num="§5" en="Execution Policy" uz="" />
+      <P>By default, PowerShell blocks script execution for security. Check and set:</P>
+      <pre><code>{`Get-ExecutionPolicy           # Check current policy
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+# RemoteSigned: local scripts run freely; downloaded scripts must be signed`}</code></pre>
+      <Callout kind="warn">Never set ExecutionPolicy to Unrestricted in production. RemoteSigned is the standard safe setting for administrators.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="PowerShell nima?" en="" />
+      <P><Term>PowerShell</Term> — Microsoftning zamonaviy buyruq qatori qobig'i va skript tili. Oddiy matn bilan ishlaydigan CMD dan farqli o'laroq, PowerShell <Em>ob'ektlar</Em> bilan ishlaydi — buyruqlar o'rtasida filtrlash, saralash va quvurdan o'tkazish mumkin bo'lgan tuzilgan ma'lumotlar. Bu Windows boshqaruvi uchun standart vosita.</P>
+      <P>Ochish: <Em>Win+X → Windows PowerShell (Admin)</Em> yoki Start da "PowerShell" ni qidiring.</P>
+      <H2 num="§2" uz="Muhim Cmdlet lar" en="" />
+      <table>
+        <thead><tr><th>Cmdlet</th><th>Harakat</th></tr></thead>
+        <tbody>
+          <tr><td><code>Get-Help Get-Process</code></td><td>Har qanday cmdlet uchun yordam olish</td></tr>
+          <tr><td><code>Get-Process</code></td><td>Ishlaydigan jarayonlar ro'yxati</td></tr>
+          <tr><td><code>Stop-Process -Name notepad</code></td><td>Jarayonni nom bo'yicha to'xtatish</td></tr>
+          <tr><td><code>Get-Service</code></td><td>Barcha xizmatlar ro'yxati</td></tr>
+          <tr><td><code>Start-Service -Name wuauserv</code></td><td>Xizmatni ishga tushirish</td></tr>
+          <tr><td><code>Get-EventLog -LogName System -Newest 20</code></td><td>So'nggi 20 ta tizim hodisasi</td></tr>
+          <tr><td><code>Get-NetIPAddress</code></td><td>Tarmoq adapteri IP lari</td></tr>
+          <tr><td><code>Test-NetConnection google.com</code></td><td>Ping + TCP testi</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" uz="Quvur (Pipeline)" en="" />
+      <P><Term>Quvur</Term> (<code>|</code>) bir cmdlet chiqishini keyingisiga kirish sifatida uzatadi — lekin matn sifatida emas, ob'ektlar sifatida.</P>
+      <pre><code>{`# Eng ko'p xotira ishlatadigan 5 ta jarayonni topish
+Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 5
+
+# Barcha to'xtatilgan xizmatlarni ro'yxatlash
+Get-Service | Where-Object {$_.Status -eq "Stopped"}
+
+# 1 MB dan katta barcha .log fayllarni olish
+Get-ChildItem C:\Windows\Logs -Recurse -Filter *.log |
+  Where-Object {$_.Length -gt 1MB}`}</code></pre>
+      <H2 num="§4" uz="O'zgaruvchilar va skriptlar" en="" />
+      <pre><code>{`$ism = "Ali"              # O'zgaruvchi tayinlash
+$jarayonlar = Get-Process # Cmdlet chiqishini tayinlash
+Write-Host "Salom $ism"   # O'zgaruvchi kengaytmasi bilan chop etish
+
+# .ps1 fayliga saqlang va ishga tushiring:
+.\mening_skriptim.ps1`}</code></pre>
+      <H2 num="§5" uz="Bajarish siyosati" en="" />
+      <P>Standart holda, PowerShell xavfsizlik uchun skript bajarishini bloklaydi. Tekshirish va o'rnatish:</P>
+      <pre><code>{`Get-ExecutionPolicy           # Joriy siyosatni tekshirish
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+# RemoteSigned: mahalliy skriptlar erkin ishlaydi; yuklangan skriptlar imzolanishi kerak`}</code></pre>
+      <Callout kind="warn">Hech qachon ishlab chiqarishda ExecutionPolicy ni Unrestricted ga o'rnatmang. RemoteSigned administratorlar uchun standart xavfsiz sozlama.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionRDP() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Remote Desktop Protocol Overview" uz="" />
+      <P><Term>Remote Desktop Protocol (RDP)</Term> lets you connect to and control a remote Windows PC over a network, as if you were sitting in front of it. It runs on <Em>TCP port 3389</Em> and is built into all Windows Pro/Enterprise editions.</P>
+      <pre><code>{`
+  Your PC (RDP Client)          Remote PC (RDP Server)
+  ┌─────────────────┐           ┌──────────────────────┐
+  │ mstsc.exe       │──TCP 3389─►│ TermService (svchost)│
+  │ Remote Desktop  │           │ Displays remote       │
+  │ Connection app  │◄──screen──│ desktop to you        │
+  └─────────────────┘           └──────────────────────┘`}</code></pre>
+      <H2 num="§2" en="Enabling RDP on the Target PC" uz="" />
+      <ol>
+        <li>Settings → System → <Em>Remote Desktop</Em></li>
+        <li>Toggle <Em>Enable Remote Desktop</Em> → ON</li>
+        <li>Note the <Em>PC name</Em> shown — you'll use this to connect</li>
+        <li>Click <Em>Remote Desktop users</Em> to add users who can connect (Administrators can always connect)</li>
+      </ol>
+      <Callout kind="warn">Only enable RDP when needed. An internet-exposed RDP port is one of the most attacked services globally. Always use VPN + NLA when exposing RDP.</Callout>
+      <H2 num="§3" en="Connecting via RDP" uz="" />
+      <ol>
+        <li>Open <Em>Remote Desktop Connection</Em>: Win+R → <code>mstsc</code></li>
+        <li>Enter the computer name or IP address</li>
+        <li>Click <Em>Show Options</Em> to configure display size, local resource sharing (drives, printers, clipboard)</li>
+        <li>Click Connect → enter credentials</li>
+      </ol>
+      <H2 num="§4" en="Network Level Authentication (NLA)" uz="" />
+      <P><Term>NLA</Term> requires the user to authenticate before a full RDP session is established. This prevents unauthenticated access to the login screen (which can be exploited). NLA is enabled by default and should be left on.</P>
+      <H2 num="§5" en="RDP Troubleshooting" uz="" />
+      <table>
+        <thead><tr><th>Issue</th><th>Cause &amp; Fix</th></tr></thead>
+        <tbody>
+          <tr><td>Can't connect</td><td>RDP not enabled / firewall blocking port 3389 — check both</td></tr>
+          <tr><td>Wrong credentials</td><td>Use domain\username format on domain PCs</td></tr>
+          <tr><td>Certificate warning</td><td>Self-signed cert on target — safe to proceed on your own network</td></tr>
+          <tr><td>Session limit reached</td><td>Windows desktop editions allow 1 RDP session only; Server supports multiple</td></tr>
+          <tr><td>Blank screen</td><td>GPU driver issue — add <code>/admin</code> flag or try lower display settings</td></tr>
+        </tbody>
+      </table>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Masofaviy ish stoli protokoli umumiy ko'rinishi" en="" />
+      <P><Term>Masofaviy ish stoli protokoli (RDP)</Term> — tarmoq orqali masofaviy Windows kompyuteriga ulanish va boshqarish imkonini beradi, go'yo uning oldida o'tirgandek. <Em>TCP port 3389</Em> da ishlaydi va barcha Windows Pro/Enterprise nashrlarda o'rnatilgan.</P>
+      <pre><code>{`
+  Sizning kompyuteringiz (RDP Mijoz)    Masofaviy kompyuter (RDP Server)
+  ┌─────────────────────┐              ┌──────────────────────────────┐
+  │ mstsc.exe           │──TCP 3389───►│ TermService (svchost)        │
+  │ Masofaviy ish stoli │              │ Masofaviy ish stolini         │
+  │ Ulanish ilovasi     │◄──ekran─────│ sizga ko'rsatadi              │
+  └─────────────────────┘              └──────────────────────────────┘`}</code></pre>
+      <H2 num="§2" uz="Maqsadli kompyuterda RDP ni yoqish" en="" />
+      <ol>
+        <li>Sozlamalar → Tizim → <Em>Masofaviy ish stoli</Em></li>
+        <li><Em>Masofaviy ish stolini yoqish</Em> ni YOQING</li>
+        <li>Ko'rsatilgan <Em>Kompyuter nomini</Em> yozib oling — ulanish uchun ishlatiladi</li>
+        <li>Ulanadigan foydalanuvchilarni qo'shish uchun <Em>Masofaviy ish stoli foydalanuvchilari</Em> ni bosing (Administratorlar har doim ulana oladi)</li>
+      </ol>
+      <Callout kind="warn">RDP ni faqat kerak bo'lganda yoqing. Internet ga ochiq RDP porti dunyo bo'ylab eng ko'p hujumga uchragan xizmatlardan biri. RDP ni ochganda har doim VPN + NLA dan foydalaning.</Callout>
+      <H2 num="§3" uz="RDP orqali ulanish" en="" />
+      <ol>
+        <li><Em>Masofaviy ish stoli ulanishini</Em> oching: Win+R → <code>mstsc</code></li>
+        <li>Kompyuter nomi yoki IP manzilini kiriting</li>
+        <li>Displey hajmi, mahalliy resurslarni ulashishni (disklar, printerlar, bufer) sozlash uchun <Em>Parametrlarni ko'rsatish</Em> ni bosing</li>
+        <li>Ulanish ni bosing → hisob ma'lumotlarini kiriting</li>
+      </ol>
+      <H2 num="§4" uz="Tarmoq darajasida autentifikatsiya (NLA)" en="" />
+      <P><Term>NLA</Term> — to'liq RDP seansi o'rnatilishidan oldin foydalanuvchidan autentifikatsiya talab qiladi. Bu kirish ekraniga autentifikatsiyasiz kirishning oldini oladi (bu suiiste'mol qilinishi mumkin). NLA standart holda yoqilgan va yoqiq qolishi kerak.</P>
+      <H2 num="§5" uz="RDP ni tuzatish" en="" />
+      <table>
+        <thead><tr><th>Muammo</th><th>Sabab va yechim</th></tr></thead>
+        <tbody>
+          <tr><td>Ulanib bo'lmaydi</td><td>RDP yoqilmagan / xavfsizlik devori 3389 portini bloklayapti — ikkalasini tekshiring</td></tr>
+          <tr><td>Noto'g'ri hisob ma'lumotlari</td><td>Domen kompyuterlarida domen\foydalanuvchi_nomi formatini ishlating</td></tr>
+          <tr><td>Sertifikat ogohlantirishlari</td><td>Maqsadli kompyuterdagi o'z-o'zini imzolagan sertifikat — o'z tarmog'ingizda xavfsiz davom ettirish mumkin</td></tr>
+          <tr><td>Seans chekloviga yetildi</td><td>Windows ish stoli nashrlari faqat 1 RDP seaniga ruxsat beradi; Server bir nechtasini qo'llab-quvvatlaydi</td></tr>
+          <tr><td>Bo'sh ekran</td><td>GPU drayver muammosi — <code>/admin</code> flagini qo'shing yoki pastroq displey sozlamalarini sinab ko'ring</td></tr>
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionFirewallBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Windows Firewall Overview" uz="" />
+      <P><Term>Windows Defender Firewall</Term> is a host-based stateful firewall built into every Windows installation. It filters inbound and outbound network traffic based on rules. Access via: <Em>Settings → Privacy &amp; security → Windows Security → Firewall &amp; network protection</Em>, or <code>wf.msc</code> for advanced settings.</P>
+      <H2 num="§2" en="Network Profiles" uz="" />
+      <P>The firewall applies different rule sets based on the detected network type:</P>
+      <table>
+        <thead><tr><th>Profile</th><th>When used</th><th>Default stance</th></tr></thead>
+        <tbody>
+          <tr><td>Domain</td><td>Domain-joined PCs on corp network</td><td>Managed by Group Policy</td></tr>
+          <tr><td>Private</td><td>Trusted home or work networks</td><td>Allows file/printer sharing</td></tr>
+          <tr><td>Public</td><td>Airports, coffee shops, unknown networks</td><td>Most restrictive — blocks discovery</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" en="Checking Firewall Status" uz="" />
+      <P>Windows Security → Firewall &amp; network protection — you'll see Domain / Private / Public with ON/OFF status. All three should normally be ON.</P>
+      <H2 num="§4" en="Advanced Firewall — wf.msc" uz="" />
+      <P>Run <code>wf.msc</code> for the full Windows Defender Firewall with Advanced Security console.</P>
+      <pre><code>{`
+  wf.msc layout:
+  ├── Inbound Rules  — controls what can reach YOUR PC
+  ├── Outbound Rules — controls what YOUR PC can reach
+  ├── Connection Security Rules — IPsec rules
+  └── Monitoring — active rules and connections`}</code></pre>
+      <P>Creating a new inbound rule:</P>
+      <ol>
+        <li>wf.msc → Inbound Rules → <Em>New Rule</Em> (right panel)</li>
+        <li>Rule type: Port</li>
+        <li>Protocol: TCP, port: 8080</li>
+        <li>Action: Allow the connection</li>
+        <li>Profiles: check as appropriate</li>
+        <li>Name it and click Finish</li>
+      </ol>
+      <H2 num="§5" en="Testing the Firewall" uz="" />
+      <pre><code>{`# Test if port is blocked (PowerShell):
+Test-NetConnection -ComputerName localhost -Port 3389
+
+# List all active firewall rules:
+Get-NetFirewallRule | Where-Object {$_.Enabled -eq "True"} | Select DisplayName, Direction, Action`}</code></pre>
+      <Callout kind="warn">Never turn off the firewall for "testing" and forget to re-enable it. If an app needs a port opened, create a specific rule rather than disabling the firewall entirely.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows xavfsizlik devori umumiy ko'rinishi" en="" />
+      <P><Term>Windows Defender Firewall</Term> — har bir Windows o'rnatmasiga o'rnatilgan xost asosidagi holat saqlash xavfsizlik devori. Qoidalar asosida kiruvchi va chiquvchi tarmoq trafikini filtrlaydi. Kirish: <Em>Sozlamalar → Maxfiylik va xavfsizlik → Windows Security → Xavfsizlik devori va tarmoq himoyasi</Em>, yoki kengaytirilgan sozlamalar uchun <code>wf.msc</code>.</P>
+      <H2 num="§2" uz="Tarmoq profillari" en="" />
+      <P>Xavfsizlik devori aniqlangan tarmoq turiga qarab turli qoidalar to'plamini qo'llaydi:</P>
+      <table>
+        <thead><tr><th>Profil</th><th>Qachon ishlatiladi</th><th>Standart holat</th></tr></thead>
+        <tbody>
+          <tr><td>Domen</td><td>Korporativ tarmoqda domenga qo'shilgan kompyuterlar</td><td>Group Policy tomonidan boshqariladi</td></tr>
+          <tr><td>Shaxsiy</td><td>Ishonchli uy yoki ish tarmoqlari</td><td>Fayl/printer ulashishga ruxsat beradi</td></tr>
+          <tr><td>Ommaviy</td><td>Aeroportlar, qahvaxonalar, noma'lum tarmoqlar</td><td>Eng cheklovchi — kashfiyotni bloklaydi</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" uz="Xavfsizlik devori holatini tekshirish" en="" />
+      <P>Windows Security → Xavfsizlik devori va tarmoq himoyasi — Domen / Shaxsiy / Ommaviy ni YOQILGAN/O'CHIRILGAN holati bilan ko'rasiz. Odatda uchtasi ham YOQILGAN bo'lishi kerak.</P>
+      <H2 num="§4" uz="Kengaytirilgan xavfsizlik devori — wf.msc" en="" />
+      <P>To'liq Windows Defender Firewall with Advanced Security konsolini ochish uchun <code>wf.msc</code> ni ishga tushiring.</P>
+      <pre><code>{`
+  wf.msc tuzilishi:
+  ├── Kiruvchi qoidalar  — SIZNING kompyuteringizga nima yetib kelishini nazorat qiladi
+  ├── Chiquvchi qoidalar — SIZNING kompyuteringiz nimaga yetib borishini nazorat qiladi
+  ├── Ulanish xavfsizligi qoidalari — IPsec qoidalari
+  └── Monitoring — faol qoidalar va ulanishlar`}</code></pre>
+      <P>Yangi kiruvchi qoida yaratish:</P>
+      <ol>
+        <li>wf.msc → Kiruvchi qoidalar → <Em>Yangi qoida</Em> (o'ng panel)</li>
+        <li>Qoida turi: Port</li>
+        <li>Protokol: TCP, port: 8080</li>
+        <li>Harakat: Ulanishga ruxsat berish</li>
+        <li>Profil: mosiga qarab belgilang</li>
+        <li>Nomi bering va Tugatish ni bosing</li>
+      </ol>
+      <H2 num="§5" uz="Xavfsizlik devorini sinash" en="" />
+      <pre><code>{`# Port bloklanganligini tekshirish (PowerShell):
+Test-NetConnection -ComputerName localhost -Port 3389
+
+# Barcha faol xavfsizlik devori qoidalarini ro'yxatlash:
+Get-NetFirewallRule | Where-Object {$_.Enabled -eq "True"} | Select DisplayName, Direction, Action`}</code></pre>
+      <Callout kind="warn">Xavfsizlik devorini "sinov" uchun o'chirib, qayta yoqishni unutmang. Agar dasturga port kerak bo'lsa, xavfsizlik devorini butunlay o'chirish o'rniga muayyan qoida yarating.</Callout>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+function SectionBitLockerBasic() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="What is BitLocker?" uz="" />
+      <P><Term>BitLocker</Term> is Windows' full-disk encryption feature, available on Pro/Enterprise/Education editions. It encrypts the entire drive using <Em>AES-256</Em>, protecting data if the device is lost or stolen. Even if someone removes the drive and puts it in another PC, the data is unreadable without the key.</P>
+      <H2 num="§2" en="TPM Requirement" uz="" />
+      <P>BitLocker works best with a <Term>TPM 2.0</Term> (Trusted Platform Module) chip — a secure hardware chip that stores the encryption key and verifies the boot process hasn't been tampered with.</P>
+      <table>
+        <thead><tr><th>Scenario</th><th>Unlock method</th></tr></thead>
+        <tbody>
+          <tr><td>PC with TPM 2.0</td><td>Automatic unlock at boot (seamless)</td></tr>
+          <tr><td>TPM + PIN</td><td>TPM validates boot + user enters PIN</td></tr>
+          <tr><td>No TPM</td><td>USB key required at every boot (requires Group Policy change)</td></tr>
+          <tr><td>Recovery situation</td><td>48-digit Recovery Key (must be backed up!)</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" en="Enabling BitLocker" uz="" />
+      <ol>
+        <li>Open <Em>Control Panel → BitLocker Drive Encryption</Em> (or search "Manage BitLocker")</li>
+        <li>Click <Em>Turn on BitLocker</Em> next to the C: drive</li>
+        <li>Choose how to unlock at startup: TPM only / TPM + PIN / USB key</li>
+        <li>Choose how to back up your recovery key: <Em>Microsoft account</Em>, <Em>USB flash drive</Em>, <Em>file</Em>, or <Em>print</Em></li>
+        <li>Choose encryption mode: <Em>New encryption mode (XTS-AES 128-bit)</Em> for fixed drives</li>
+        <li>Click <Em>Start encrypting</Em> — runs in background, PC usable during encryption</li>
+      </ol>
+      <H2 num="§4" en="Recovery Key — Critical Step" uz="" />
+      <P>The <Term>Recovery Key</Term> is a 48-digit code that unlocks the drive if TPM fails, you change BIOS settings, or you forget your PIN. <Em>You must save it somewhere safe.</Em></P>
+      <ul>
+        <li>Best: Save to Microsoft Account (accessible from account.microsoft.com)</li>
+        <li>Good: Print and store in a safe</li>
+        <li>Never: Store only on the encrypted drive itself</li>
+      </ul>
+      <H2 num="§5" en="BitLocker To Go — Removable Drives" uz="" />
+      <P>BitLocker To Go encrypts USB drives and external hard drives. Same process — right-click the drive in Explorer → <Em>Turn on BitLocker</Em>. Uses a password instead of TPM.</P>
+      <Callout kind="warn">If you lose your Recovery Key and can't boot, your data is gone forever. There is no backdoor. Always back up the recovery key before enabling BitLocker.</Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="BitLocker nima?" en="" />
+      <P><Term>BitLocker</Term> — Windows ning to'liq disk shifrlash xususiyati, Pro/Enterprise/Education nashrlarda mavjud. Butun diskni <Em>AES-256</Em> yordamida shifrlaydi, qurilma yo'qolgan yoki o'g'irlangan holda ma'lumotlarni himoya qiladi. Hatto kimdir diskni chiqarib boshqa kompyuterga qo'ysada, kalit bo'lmasa ma'lumotlar o'qib bo'lmaydi.</P>
+      <H2 num="§2" uz="TPM talabi" en="" />
+      <P>BitLocker <Term>TPM 2.0</Term> (Ishonchli platforma moduli) chipi bilan eng yaxshi ishlaydi — shifrlash kalitini saqlaydigan va yuklash jarayoni buzilmaganligini tekshiradigan xavfsiz apparat chipi.</P>
+      <table>
+        <thead><tr><th>Holat</th><th>Qulfni ochish usuli</th></tr></thead>
+        <tbody>
+          <tr><td>TPM 2.0 li kompyuter</td><td>Yuklashda avtomatik qulfni ochish (muammosiz)</td></tr>
+          <tr><td>TPM + PIN</td><td>TPM yuklashni tekshiradi + foydalanuvchi PIN kiritadi</td></tr>
+          <tr><td>TPM yo'q</td><td>Har yuklashda USB kalit kerak (Group Policy o'zgartirishini talab qiladi)</td></tr>
+          <tr><td>Tiklash holati</td><td>48 raqamli Tiklash kaliti (zaxiralanishi shart!)</td></tr>
+        </tbody>
+      </table>
+      <H2 num="§3" uz="BitLocker ni yoqish" en="" />
+      <ol>
+        <li><Em>Boshqaruv paneli → BitLocker Disk Shifrlash</Em> ni oching (yoki "Manage BitLocker" ni qidiring)</li>
+        <li>C: drayveri yonidagi <Em>BitLocker ni yoqish</Em> ni bosing</li>
+        <li>Yuklashda qulfni qanday ochishni tanlang: Faqat TPM / TPM + PIN / USB kalit</li>
+        <li>Tiklash kalitini qanday zaxiralashni tanlang: <Em>Microsoft hisobi</Em>, <Em>USB flesh-disk</Em>, <Em>fayl</Em> yoki <Em>chop etish</Em></li>
+        <li>Shifrlash rejimini tanlang: Sabit disklar uchun <Em>Yangi shifrlash rejimi (XTS-AES 128-bit)</Em></li>
+        <li><Em>Shifrashni boshlash</Em> ni bosing — fonda ishlaydi, shifrlash paytida kompyuter ishlatish mumkin</li>
+      </ol>
+      <H2 num="§4" uz="Tiklash kaliti — Muhim qadam" en="" />
+      <P><Term>Tiklash kaliti</Term> — TPM ishdan chiqsa, BIOS sozlamalarini o'zgartirsangiz yoki PIN ni unutsangiz diskni ochadigan 48 raqamli kod. <Em>Uni xavfsiz joyda saqlashingiz shart.</Em></P>
+      <ul>
+        <li>Eng yaxshi: Microsoft hisobiga saqlash (account.microsoft.com orqali kirish mumkin)</li>
+        <li>Yaxshi: Chop etib xavfsiz joyda saqlash</li>
+        <li>Hech qachon: Faqat shifrlangan diskning o'zida saqlash</li>
+      </ul>
+      <H2 num="§5" uz="BitLocker To Go — Olinadigan disklar" en="" />
+      <P>BitLocker To Go USB disklar va tashqi qattiq disklarni shifrlaydi. Bir xil jarayon — Explorerda diskni o'ng tugma bilan bosing → <Em>BitLocker ni yoqish</Em>. TPM o'rniga paroldan foydalanadi.</P>
+      <Callout kind="warn">Tiklash kalitini yo'qotsangiz va yuklay olmasangiz, ma'lumotlaringiz abadiy yo'qoladi. Orqa eshik yo'q. BitLocker ni yoqishdan oldin har doim tiklash kalitini zaxiralang.</Callout>
     </section>
   );
 }
