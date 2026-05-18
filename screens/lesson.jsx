@@ -91,9 +91,8 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   // ── Session timer ─────────────────────────────────────────
   const [sessionSec, setSessionSec] = useLS(0);
   const [quizPassed, setQuizPassed] = useLS(false);
-  const savedOnMountRef = useLR(0);
+  const [savedTime] = useLS(() => getTimeSpent()[lessonKey] || 0);
   useLE(() => {
-    savedOnMountRef.current = getTimeSpent()[lessonKey] || 0;
     const start = Date.now();
     let lastSaved = 0;
 
@@ -116,7 +115,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
     };
   }, [lessonKey]);
 
-  const totalTimeSec = (savedOnMountRef.current || 0) + sessionSec;
+  const totalTimeSec = savedTime + sessionSec;
   const quizUnlocked = totalTimeSec >= (LESSON_META[lessonNum]?.min || 10) * 60;
 
   useLE(() => {

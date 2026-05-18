@@ -32,20 +32,20 @@ function AIChat({ open, onClose, user, route }) {
         ? `Section ${String(route.section || 1).padStart(2, "0")}`
         : "Dashboard";
 
-    const sys = `You are an AI tutor strictly integrated into "Windows Academy" — an online learning platform for Windows internals and cybersecurity.
+    const sys = `You are a helpful AI assistant integrated into "Windows Academy" — an online learning platform for Windows internals and cybersecurity.
 
 User: ${user?.name || "Student"}. Current page: ${currentPage}.
 Completed lessons: [${completedList}].
 
-STRICT RULES:
-1. You may ONLY answer questions about topics covered in the lessons the user has already completed: [${completedList}].
-2. If the user asks about a topic from a lesson they have NOT yet completed, do NOT explain it. Instead, tell them which lesson number covers that topic and encourage them to complete it first.
-3. If the user asks about anything unrelated to the Windows Academy course (general programming, science, translations, personal questions, etc.), politely decline and redirect them to course topics they have completed.
-4. Never answer questions outside the scope of this course.
+Course covers: Windows architecture, kernel, processes, NTFS, registry, boot process, security tools, administration, networking, PowerShell, and more.
 
-Course lessons cover: Windows architecture, kernel, user/kernel mode, boot process, BIOS/UEFI, Secure Boot, TPM, Registry, file systems, NTFS, FAT32, processes, threads, handles, services, DLL, Windows API, Event Viewer, Task Scheduler, Windows logs, Task Manager, Device Manager, user accounts, UAC, Settings, MSConfig, Computer Management, Resource Monitor, Windows Update, Windows Defender, Firewall, BitLocker, PowerShell, RDP, network configuration, file sharing, backup and restore.
+You can help with:
+- Course topics and explanations (Windows internals, cybersecurity, IT)
+- General questions about technology, programming, science
+- Translations between Uzbek, English, Russian, or other languages
+- Any other question the user asks
 
-Respond in the same language the user writes in. Be encouraging but firm about the rules.`;
+Keep answers clear and concise. Respond in the same language the user writes in. Be friendly and encouraging.`;
 
     const history = messages.map(m =>
       `${m.role === "user" ? "User" : "Assistant"}: ${m.text}`
@@ -122,8 +122,8 @@ Respond in the same language the user writes in. Be encouraging but firm about t
               {lang === "en" ? "AI Tutor" : "AI Muallim"}
             </div>
             {lang === "en"
-              ? "Ask me about lessons you've already completed. I can only help with topics you've studied."
-              : "Faqat tugatgan darslaringiz bo'yicha savol bering. Men faqat o'rganilgan mavzular bo'yicha yordam bera olaman."}
+              ? "Ask me anything — course topics, translations, or general questions!"
+              : "Istalgan savol bering — dars mavzulari, tarjima yoki umumiy savollar!"}
           </div>
         )}
         {!hasKey() && messages.length === 0 && (
