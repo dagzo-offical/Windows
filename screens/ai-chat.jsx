@@ -2,12 +2,31 @@
 
 const { useState: useChS, useEffect: useChE, useRef: useChR } = React;
 
-function AIChat({ open, onClose, user, route }) {
+function AIChat({ open, onClose, user, route, initialQuery, onQueryHandled }) {
   const lang = useLang();
   const [messages, setMessages] = useChS([]);
   const [input, setInput] = useChS("");
   const [loading, setLoading] = useChS(false);
   const bottomRef = useChR(null);
+
+  useChE(() => {
+    if (!initialQuery || !open) return;
+    const userMsg = initialQuery;
+    setMessages([{ role: "user", text: userMsg }]);
+    setLoading(true);
+    gradeWithAI(buildPrompt(userMsg))
+      .then(reply => setMessages(prev => [...prev, { role: "assistant", text: reply.trim() }]))
+      .catch(e => {
+        const errMsg = e.message === "no_key"
+          ? (lang === "en" ? "Please set your AI key in Profile settings first." : "Avval Profil sozlamalarida AI kalitini o'rnating.")
+          : (lang === "en" ? "Error: " + e.message : "Xatolik: " + e.message);
+        setMessages(prev => [...prev, { role: "assistant", text: errMsg, isError: true }]);
+      })
+      .finally(() => {
+        setLoading(false);
+        if (onQueryHandled) onQueryHandled();
+      });
+  }, [initialQuery]);
 
   const hasKey = () => !!(localStorage.getItem("wa_ai_provider") && localStorage.getItem("wa_ai_key"));
 

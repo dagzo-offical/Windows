@@ -119,6 +119,11 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   const quizUnlocked = totalTimeSec >= (LESSON_META[lessonNum]?.min || 10) * 60;
 
   useLE(() => {
+    window._termAIOpen = (query) => { if (onOpenAIChat) onOpenAIChat(query); };
+    return () => { window._termAIOpen = null; };
+  }, [onOpenAIChat]);
+
+  useLE(() => {
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const p = Math.min(100, Math.max(0, (window.scrollY / max) * 100));
@@ -8888,7 +8893,30 @@ function P({ children, style }) {
   return <p style={{ fontSize: 15, lineHeight: 1.72, color: "var(--text-1)", margin: "10px 0", textWrap: "pretty", ...style }}>{children}</p>;
 }
 function Term({ children }) {
-  return <span style={{ color: "var(--accent)", fontWeight: 600, borderBottom: "1px dotted var(--accent-border)", cursor: "help" }}>{children}</span>;
+  const [hov, setHov] = useLS(false);
+  const text = typeof children === "string" ? children
+    : Array.isArray(children) ? children.map(c => typeof c === "string" ? c : "").join("") : String(children);
+  return (
+    <span style={{ position: "relative", display: "inline" }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}>
+      <span style={{ color: "var(--accent)", fontWeight: 600, borderBottom: "1px dotted var(--accent-border)", cursor: "help" }}>{children}</span>
+      {hov && (
+        <span
+          onClick={e => { e.stopPropagation(); e.preventDefault(); if (window._termAIOpen) window._termAIOpen(text); }}
+          style={{
+            position: "absolute", top: -9, right: -13,
+            width: 17, height: 17, borderRadius: "50%",
+            background: "var(--accent)", color: "#04060d",
+            fontSize: 10, fontWeight: 800,
+            cursor: "pointer",
+            boxShadow: "0 2px 10px rgba(0,255,136,0.5)",
+            zIndex: 200, userSelect: "none", display: "grid", placeItems: "center",
+          }}
+        >?</span>
+      )}
+    </span>
+  );
 }
 function Em({ children }) {
   return <em style={{ color: "var(--text-0)", fontStyle: "italic", fontWeight: 500 }}>{children}</em>;

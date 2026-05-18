@@ -104,6 +104,7 @@ function App() {
 
   const [profileOpen, setProfileOpen] = useAS(false);
   const [aiChatOpen, setAiChatOpen] = useAS(false);
+  const [aiQuery, setAiQuery] = useAS("");
   const [searchOpen, setSearchOpen] = useAS(false);
 
   useAE(() => {
@@ -124,13 +125,13 @@ function App() {
     quizScores: progress.quizScores || {},
   };
 
-  const screenProps = { setRoute, user, markLessonComplete, onOpenProfile: () => setProfileOpen(true), onOpenAIChat: () => setAiChatOpen(v => !v), aiChatOpen, onOpenSearch: () => setSearchOpen(true) };
+  const screenProps = { setRoute, user, markLessonComplete, onOpenProfile: () => setProfileOpen(true), onOpenAIChat: (query) => { if (query) setAiQuery(query); setAiChatOpen(true); }, aiChatOpen, onOpenSearch: () => setSearchOpen(true) };
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>
       <ParticleBg mode="particles" count={200} />
       <RouteRender route={route} screenProps={screenProps} />
-      <AIChat open={aiChatOpen} onClose={() => setAiChatOpen(false)} user={user} route={route} />
+      <AIChat open={aiChatOpen} onClose={() => setAiChatOpen(false)} user={user} route={route} initialQuery={aiQuery} onQueryHandled={() => setAiQuery("")} />
       {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} setRoute={(r) => { setRoute(r); setSearchOpen(false); }} />}
       {profileOpen && (
         <ProfileModal
