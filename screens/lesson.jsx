@@ -113,22 +113,16 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
     return Math.min(getTimeSpent()[lessonKey] || 0, maxAllowed);
   });
   useLE(() => {
-    const IDLE_MS = 60000;
-    let lastActivity = Date.now();
     let tabVisible = !document.hidden;
     let activeElapsed = 0;
     let lastSaved = 0;
     let lastXPTick = 0;
 
-    const onActivity = () => { lastActivity = Date.now(); };
     const onVisibility = () => { tabVisible = !document.hidden; };
-    const evts = ["mousemove", "keydown", "scroll", "click"];
-
     document.addEventListener("visibilitychange", onVisibility);
-    evts.forEach(e => document.addEventListener(e, onActivity, { passive: true }));
 
     const tick = setInterval(() => {
-      if (tabVisible && Date.now() - lastActivity < IDLE_MS) {
+      if (tabVisible) {
         activeElapsed++;
         setSessionSec(activeElapsed);
         if (activeElapsed - lastXPTick >= 60) {
@@ -148,7 +142,6 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
       clearInterval(tick);
       clearInterval(autosave);
       document.removeEventListener("visibilitychange", onVisibility);
-      evts.forEach(e => document.removeEventListener(e, onActivity));
       const toAdd = activeElapsed - lastSaved;
       if (toAdd > 0) addTimeSpent(lessonKey, toAdd);
     };
@@ -199,7 +192,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
           {isLocked
             ? <LessonLocked lessonNum={lessonNum} prevLessonNum={prevLessonNum} setRoute={setRoute} sectionNum={sectionNum} />
             : <>
-                {lessonNum === 1  ? <><Section1Bigpicture /><Section2Theory /><Section3Layered /></>
+                {lessonNum === 1  ? <><Section1Bigpicture /><Section2Theory /></>
                 : lessonNum === 2  ? <><SectionKernelWhat /><SectionKernelInside /><SectionKernelDrivers /></>
                 : lessonNum === 3  ? <><SectionRings /><Section8Comparison /><SectionSyscallBrief /></>
                 : lessonNum === 4  ? <><Section4Boot /></>
@@ -259,7 +252,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
 
 // ─────────────────────────────────────────────────────────────
 const TOC_SECTIONS = {
-  1:  [{ id:"big-picture",uz:"Katta rasm",en:"Big picture" },{ id:"theory",uz:"Nazariy asos",en:"Theory" },{ id:"layered",uz:"Qatlamli arxitektura",en:"Layered architecture" },{ id:"boot",uz:"Boot jarayoni",en:"Boot process" },{ id:"syscall",uz:"Syscall oqimi",en:"Syscall flow" },{ id:"security",uz:"Xavfsizlik",en:"Security view" },{ id:"lab",uz:"Laboratoriya",en:"Lab" },{ id:"compare",uz:"Taqqoslash",en:"Comparison" },{ id:"summary",uz:"Xulosa",en:"Summary" }],
+  1:  [{ id:"big-picture",uz:"Katta rasm",en:"Big picture" },{ id:"theory",uz:"Nazariy asos",en:"Theory" },{ id:"boot",uz:"Boot jarayoni",en:"Boot process" },{ id:"syscall",uz:"Syscall oqimi",en:"Syscall flow" },{ id:"security",uz:"Xavfsizlik",en:"Security view" },{ id:"lab",uz:"Laboratoriya",en:"Lab" },{ id:"compare",uz:"Taqqoslash",en:"Comparison" },{ id:"summary",uz:"Xulosa",en:"Summary" }],
   2:  [{ id:"kernel-what",uz:"Kernel nima",en:"What is the kernel" },{ id:"kernel-inside",uz:"Kernel ichida",en:"Inside the kernel" },{ id:"hal",uz:"HAL",en:"HAL" },{ id:"executive",uz:"Executive",en:"Executive" },{ id:"drivers",uz:"Drayverlar",en:"Drivers" }],
   3:  [{ id:"rings",uz:"CPU halqalari",en:"CPU rings" },{ id:"boundary",uz:"Chegara",en:"The boundary" },{ id:"syscall-flow",uz:"Syscall oqimi",en:"Syscall flow" },{ id:"comparison",uz:"Taqqoslash",en:"Comparison" }],
   4:  [{ id:"boot-sequence",uz:"Boot ketma-ketligi",en:"Boot sequence" },{ id:"uefi-phases",uz:"UEFI fazalari",en:"UEFI phases" },{ id:"bootmgr",uz:"BOOTMGR",en:"BOOTMGR" },{ id:"winload",uz:"WinLoad",en:"WinLoad" },{ id:"kernel-init",uz:"Kernel ishga tushishi",en:"Kernel init" }],
@@ -742,184 +735,11 @@ function Section2Theory() {
           : <>Microkernel'dan pastda <Term>HAL (Hardware Abstraction Layer)</Term> — <code>hal.dll</code> da amalga oshiriladi. HAL ma'lum protsessor platformalar o'rtasidagi farqlarni yashiradi, shunda bir xil <code>ntoskrnl.exe</code> binary Intel, AMD va ARM'da qayta kompilyatsiyasiz ishlaydi. HAL quyidagilarni boshqaradi: uzilish kontrolleri yo'naltirish (x64 da APIC, ARM'da GIC), yuqori aniqlikdagi taymer kalibrlash (15.6 ms scheduler tikki uchun), ko'p protsessorli yuklash (Application Processor yadrolarini uyg'otish) va DMA bufer boshqaruvi. HALsiz, Microsoft har bir CPU platformasi uchun alohida kernel to'plami kerak bo'lardi — buning o'rniga faqat HAL har bir platform uchun qayta to'planadi, ntoskrnl esa bir xil qoladi.</>}
       </P>
 
-      {/* ── 2.4 Subsystems & Win32 ── */}
-      <h3 style={subhead}>{lang === "en" ? "2.4 — Subsystems, Win32, and the call chain" : "2.4 — Subsistemalar, Win32 va chaqiruv zanjiri"}</h3>
-      <P>
-        {lang === "en"
-          ? <>Applications never call the kernel directly. Every call passes through a strict chain of DLLs. At the top are the <Term>Win32 subsystem DLLs</Term>, which expose the familiar Windows API (~10,000 functions). Below them is <code>ntdll.dll</code>, which provides the <Em>Native API</Em> — a much smaller set of ~460 functions that map directly to kernel syscall numbers. <code>ntdll.dll</code> is the last stop in ring 3 before the <code>SYSCALL</code> instruction fires and the CPU switches to ring 0.</>
-          : <>Ilovalar hech qachon kernelga to'g'ridan-to'g'ri murojaat qilmaydi. Har bir chaqiruv qat'iy DLL'lar zanjiridanf o'tadi. Eng yuqorida tanish Windows API'ni (~10,000 funksiya) taqdim etuvchi <Term>Win32 quyi tizim DLL</Term>'lari joylashgan. Ularning ostida <code>ntdll.dll</code> bor, u <Em>Native API</Em>'ni — kernel syscall raqamlariga to'g'ridan-to'g'ri mos keladigan ~460 funksiyaning ancha kichikroq to'plamini — taqdim etadi. <code>ntdll.dll</code> — <code>SYSCALL</code> buyrug'i o'qqa to'lib, protsessor ring 0 ga o'tgunga qadar ring 3 dagi oxirgi to'xtash joyi.</>}
-      </P>
-
-      <div style={{ margin: "18px 0", padding: "18px 20px", borderRadius: 12, background: "var(--bg-2)", border: "1px solid var(--border)" }}>
-        <div className="eyebrow" style={{ marginBottom: 12 }}>// FULL CALL CHAIN — ReadFile("secret.txt") step by step</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 5, fontFamily: "var(--font-mono)", fontSize: 12 }}>
-          {[
-            { ring: "Ring 3", label: "notepad.exe", call: 'ReadFile(hFile, buffer, 1024, &bytesRead, NULL)', color: "var(--c-user)", note: "Win32 API — developer-facing" },
-            { ring: "Ring 3", label: "kernel32.dll", call: 'translates → NtReadFile(handle, event, apcRoutine, ...)', color: "var(--c-user)", note: "Win32 subsystem DLL" },
-            { ring: "Ring 3", label: "ntdll.dll", call: 'mov eax, 0x0006   ; syscall number for NtReadFile\nsyscall            ; cross into ring 0', color: "var(--c-warn)", note: "Native API — last ring 3 stop" },
-            { ring: "Ring 0", label: "ntoskrnl.exe", call: 'I/O Manager: validate params, build IRP\nSRM: check handle vs ACL', color: "var(--c-system)", note: "Executive: security + dispatch" },
-            { ring: "Ring 0", label: "ntfs.sys → disk.sys", call: 'handle IRP_MJ_READ\nread sectors from disk via DMA', color: "var(--c-system)", note: "Driver stack" },
-          ].map((row, i) => (
-            <div key={i} style={{
-              display: "grid", gridTemplateColumns: "52px 1fr",
-              padding: "8px 10px", borderRadius: 7, gap: 12, alignItems: "flex-start",
-              background: i >= 3 ? "rgba(0,212,255,0.05)" : "rgba(255,145,69,0.04)",
-              borderLeft: `2px solid ${row.color}`,
-            }}>
-              <span className="mono" style={{ fontSize: 9.5, color: row.color, paddingTop: 2 }}>{row.ring}</span>
-              <div>
-                <div style={{ fontSize: 10.5, color: "var(--text-2)", marginBottom: 2 }}>{row.label} — <em style={{ color: "var(--text-3)" }}>{row.note}</em></div>
-                <div style={{ color: "var(--text-1)", whiteSpace: "pre-wrap" }}>{row.call}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <P>
-        {lang === "en"
-          ? <>One more critical piece: <Term>WOW64 (Windows-on-Windows 64)</Term>. When a 32-bit app (compiled for x86) runs on 64-bit Windows, WOW64 intercepts every syscall and re-translates the 32-bit calling convention into 64-bit before passing it to the actual kernel. The 32-bit app believes it is on a 32-bit OS; the kernel never sees a 32-bit call. This transparent translation layer is why 32-bit software still runs unchanged on Windows 11 x64. Importantly for security: EDRs must hook BOTH the 64-bit ntdll.dll and the 32-bit ntdll inside WOW64, otherwise a 32-bit process can bypass 64-bit hooks entirely.</>
-          : <>Yana bir muhim qism: <Term>WOW64 (Windows-on-Windows 64)</Term>. 64-bit Windows da 32-bit ilova (x86 uchun kompilyatsiya qilingan) ishlayotganida, WOW64 har bir syscall'ni ushlab oladi va 32-bit chaqiruv konvensiyasini haqiqiy kernelga topshirishdan oldin 64-bit ga qayta tarjima qiladi. 32-bit ilova 32-bit OS'da ishlayotgandek his qiladi; kernel 32-bit chaqiruvni hech qachon ko'rmaydi. Bu shaffof tarjima qatlami sababli 32-bit dasturiy ta'minot hali ham Windows 11 x64 da o'zgarishsiz ishlaydi. Xavfsizlik nuqtai nazaridan muhimi: EDR'lar HAM 64-bit ntdll.dll, ham WOW64 ichidagi 32-bit ntdll'ga hook qo'yishi kerak — aks holda 32-bit jarayon 64-bit hook'larini butunlay chetlab o'ta oladi.</>}
-      </P>
     </section>
   );
 }
 const subhead = { fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 600, margin: "28px 0 8px", letterSpacing: "-0.01em" };
 
-// ─────────────────────────────────────────────────────────────
-function Section3Layered() {
-  const lang = useLang();
-
-  const layers = [
-    {
-      ring: "Ring 3", color: "var(--c-user)",
-      uz: "Foydalanuvchi ilovalar", en: "User Applications",
-      files: "notepad.exe · chrome.exe · powershell.exe · malware.exe ...",
-      bodyUz: "Har qanday EXE fayl shu qatlamda ishlaydi. Faqat OS ruxsat bergan narsani qila oladi: o'z xotirasini o'qish/yozish, Win32 API chaqirish, syscall orqali kernelga so'rov yuborish. Hardware ko'rinmaydi. Boshqa jarayon xotirasiga tegib bo'lmaydi. Bu qatlam qulab tushsa — faqat o'sha jarayon o'ladi.",
-      bodyEn: "Any EXE runs here. Can only do what the OS permits: read/write its own memory, call Win32 API, send requests to the kernel via syscall. Hardware is invisible. Cannot touch other process memory. If this layer crashes — only that one process dies.",
-    },
-    {
-      ring: "Ring 3", color: "var(--c-user)",
-      uz: "Win32 quyi tizim DLL'lari", en: "Win32 Subsystem DLLs",
-      files: "kernel32.dll · user32.dll · gdi32.dll · advapi32.dll · ws2_32.dll",
-      bodyUz: "Dasturchilar yozgan tanish funksiyalarni (CreateFile, DrawText, RegOpenKey, connect) kernelning Native API'ga tarjima qiladi. ~10,000 Win32 funksiya mavjud. Bu qatlam Windows dasturlashning boshlanish nuqtasi — deyarli barcha dasturlar shu DLL'lardan birortasiga bog'liq.",
-      bodyEn: "Translates the familiar developer-facing functions (CreateFile, DrawText, RegOpenKey, connect) into the kernel's Native API. ~10,000 Win32 functions exist. This layer is the starting point for all Windows programming — nearly every program links to at least one of these DLLs.",
-    },
-    {
-      ring: "Ring 3", color: "var(--c-warn)",
-      uz: "Native API — oxirgi user-mode to'xtash joyi", en: "Native API — last user-mode stop",
-      files: "ntdll.dll",
-      bodyUz: "Win32 DLL'larning barchasi oxirida ntdll.dll funksiyalarini chaqiradi (NtCreateFile, NtReadFile, NtOpenProcess...). ntdll ichidagi har bir Nt* funksiya protsessorda syscall buyrug'ini bajaradi — bu ring 3 dan ring 0 ga o'tishning yagona qonuniy usuli. EDR va antivirus tizimlari hook'larini aynan shu joyga — ntdll ichiga — qo'yadi, chunki bu syscall'dan oldingi so'nggi nuqta.",
-      bodyEn: "All Win32 DLLs ultimately call ntdll.dll (NtCreateFile, NtReadFile, NtOpenProcess...). Each Nt* function inside ntdll executes the syscall instruction on the CPU — the only legal way to cross from ring 3 to ring 0. EDR and antivirus systems place their hooks exactly here — inside ntdll — because this is the last point before the syscall.",
-    },
-    {
-      ring: "Syscall", color: "#f5a623",
-      uz: "Syscall chegarasi — ring 3 → ring 0", en: "Syscall gate — ring 3 → ring 0",
-      files: "SYSCALL instruction (x64) · SYSENTER (x86 legacy)",
-      bodyUz: "Bu yagona qonuniy o'tish nuqtasi. SYSCALL protsessorda atomik ravishda: (1) RIP ni LSTAR MSR'dagi kernel handler manziliga o'rnatadi, (2) CS'ni 0x0010 (ring 0) ga o'zgartiradi, (3) RSP'ni kernel stack'ga ko'chiradi, (4) RFLAGS'ni tozalaydi. Bu to'rtta qadam bittada — uziltirib bo'lmaydi. Syscall raqami EAX registrida uzatiladi (masalan, NtReadFile = 0x0006).",
-      bodyEn: "This is the single legal crossing point. SYSCALL atomically: (1) sets RIP to the kernel handler address from LSTAR MSR, (2) changes CS to 0x0010 (ring 0), (3) moves RSP to the kernel stack, (4) clears RFLAGS. All four steps happen as one — cannot be interrupted. The syscall number is passed in EAX (e.g. NtReadFile = 0x0006).",
-    },
-    {
-      ring: "Ring 0", color: "var(--c-system)",
-      uz: "Executive — 6 menejer", en: "Executive — 6 managers",
-      files: "ntoskrnl.exe (Process · Memory · I/O · Object · SRM · Cache Managers)",
-      bodyUz: "Barcha OS siyosatini amalga oshiradi. Har bir Nt* chaqiruvi parametrlarni tekshiradi, xavfsizlik tekshiruvini o'tkazadi, tegishli menejerga yo'naltiradi. Xotira ajratadi, jarayonlar yaratadi, fayllarni boshqaradi, har bir kirish so'rovida token ↔ ACL tekshiruvi o'tkazadi. Executive kernel'dagi barcha 'nima va nega' qarorlarini qabul qiladi.",
-      bodyEn: "Implements all OS policy. Every Nt* call validates parameters, runs security checks, routes to the appropriate manager. Allocates memory, creates processes, manages files, runs token ↔ ACL checks on every access request. The Executive makes all the 'what and why' decisions in the kernel.",
-    },
-    {
-      ring: "Ring 0", color: "var(--c-system)",
-      uz: "Microkernel — CPU mexanikasi", en: "Microkernel — CPU mechanics",
-      files: "ntoskrnl.exe (kernel core) — scheduler · IDT · spinlocks · DPC",
-      bodyUz: "Thread'larni rejalashtirishni (prioritet 0-31, 15.6 ms kvant), uzilishlarni yo'naltirishni (IDT — 256 yozuv), CPU sinxronizatsiyasini (spinlock'lar) va DPC (Deferred Procedure Call) navbatlarini boshqaradi. Siyosat qarorlarini qabul qilmaydi — bu Executive ishi. Faqat mexanikani ta'minlaydi.",
-      bodyEn: "Handles thread scheduling (priority 0-31, 15.6 ms quantum), interrupt routing (IDT — 256 entries), CPU synchronisation (spinlocks), and DPC (Deferred Procedure Call) queues. Makes no policy decisions — that is the Executive's job. Only provides the mechanics.",
-    },
-    {
-      ring: "Ring 0", color: "#5dade2",
-      uz: "HAL — Hardware Abstraction Layer", en: "HAL — Hardware Abstraction Layer",
-      files: "hal.dll",
-      bodyUz: "Protsessor platformasi farqlarini yashiradi. Bir xil ntoskrnl.exe Intel, AMD va ARM chiplarida ishlaydi, chunki HAL har bir platforma uchun uzilish yo'naltirish (APIC/GIC), yuqori aniqlikdagi taymer va DMA'ni boshqaradi. HALsiz — har bir CPU platformasi uchun alohida kernel kerak bo'lardi.",
-      bodyEn: "Hides CPU platform differences. The same ntoskrnl.exe runs on Intel, AMD and ARM chips because HAL manages interrupt routing (APIC/GIC), high-precision timer, and DMA for each platform. Without HAL — a separate kernel would be needed for every CPU platform.",
-    },
-    {
-      ring: "Hardware", color: "#8390a8",
-      uz: "Fizik hardware", en: "Physical hardware",
-      files: "CPU · RAM · NVMe SSD · NIC · GPU · TPM · USB controllers ...",
-      bodyUz: "Haqiqiy silikon. OS bu qatlamga hech qachon to'g'ridan-to'g'ri murojaat qilmaydi — HAL orqali o'tadi. Ilovalar bu qatlamni umuman ko'rmaydi. Hardware'ga to'g'ridan-to'g'ri murojaat qilishga urinish #GP fault yoki hardware exception bilan tugaydi.",
-      bodyEn: "The actual silicon. The OS never touches this layer directly — it goes through HAL. Applications never see this layer at all. Attempting to directly access hardware from user mode triggers a #GP fault or hardware exception.",
-    },
-  ];
-
-  return (
-    <section id="layered" style={{ scrollMarginTop: 80, marginBottom: 56 }}>
-      <H2 num="03" uz="Qatlamli arxitektura" en="Layered architecture" />
-      <P>
-        {lang === "en"
-          ? <>Windows is built in strict layers — each layer can only communicate with the layers immediately above and below it, never skipping. This is not just good engineering; it is a <Em>security boundary</Em>. No application can reach the hardware without passing through every gate above it. The interactive diagram below shows the full stack. Below that, a layer-by-layer breakdown explains every level in detail.</>
-          : <>Windows qat'iy qatlamlarda qurilgan — har bir qatlam faqat undan darhol yuqori va pastdagi qatlamlar bilan muloqot qila oladi, hech qachon o'tkazib yubormaydi. Bu nafaqat yaxshi muhandislik; bu <Em>xavfsizlik chegarasi</Em>. Hech bir ilova uning ustidagi har bir eshikdan o'tmasdan hardware'ga yeta olmaydi. Quyidagi interaktiv diagramma to'liq stekni ko'rsatadi. Undan keyin, qatlam-qatlamli tahlil har bir darajani batafsil tushuntiradi.</>}
-      </P>
-
-      <div style={{ marginTop: 20 }}>
-        <WindowsArchDiagram />
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginTop: 18 }}>
-        <Callout color="var(--c-user)" icon="user" titleUz="Ring 3 (user)" titleEn="Ring 3 (user)" small>
-          {lang === "en" ? "Sandboxed. Can't touch hardware, can't read kernel memory." : "Sandbox'lashtirilgan. Hardware'ga tegmaydi, kernel xotirasini ko'rmaydi."}
-        </Callout>
-        <Callout color="var(--c-warn)" icon="warning" titleUz="Syscall chegarasi" titleEn="Syscall gate" small>
-          {lang === "en" ? "The single legal door — every privileged action passes through here." : "Yagona qonuniy eshik — har bir imtiyozli amal shu yerdan o'tadi."}
-        </Callout>
-        <Callout color="var(--c-system)" icon="cpu" titleUz="Ring 0 (kernel)" titleEn="Ring 0 (kernel)" small>
-          {lang === "en" ? "Full access. One bug here = blue screen for the whole machine." : "To'liq kirish. Bu yerdagi bitta xato = butun mashinaga ko'k ekran."}
-        </Callout>
-      </div>
-
-      <h3 style={subhead}>{lang === "en" ? "3.1 — Layer-by-layer breakdown" : "3.1 — Qatlam-qatlam batafsil tahlil"}</h3>
-      <P>
-        {lang === "en"
-          ? <>Each row below shows one layer of the Windows architecture stack: the privilege ring it runs in, which files implement it, and exactly what it does. Read top-to-bottom — this is the path every API call follows from your application down to the physical disk.</>
-          : <>Quyidagi har bir qator Windows arxitektura stekining bir qatlamini ko'rsatadi: u ishlayotgan imtiyoz ringi, uni amalga oshiradigan fayllar va u nima qilishi. Yuqoridan pastga o'qing — bu har bir API chaqiruvi sizning ilovangizdan jismoniy diskgacha o'tadigan yo'l.</>}
-      </P>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 14 }}>
-        {layers.map((layer, i) => (
-          <div key={i} style={{
-            display: "grid", gridTemplateColumns: "64px 1fr",
-            borderRadius: 10, overflow: "hidden",
-            border: `1px solid ${layer.color}30`,
-          }}>
-            <div style={{
-              background: `${layer.color}18`,
-              borderRight: `2px solid ${layer.color}50`,
-              padding: "12px 8px",
-              display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center",
-            }}>
-              <div className="mono" style={{ fontSize: 9, color: layer.color, textAlign: "center", letterSpacing: 0.04, lineHeight: 1.4 }}>
-                {layer.ring.split(" ").map((w, j) => <div key={j}>{w}</div>)}
-              </div>
-            </div>
-            <div style={{ padding: "12px 16px", background: `${layer.color}05` }}>
-              <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: layer.color, marginBottom: 2 }}>
-                {lang === "en" ? layer.en : layer.uz}
-              </div>
-              <div className="mono" style={{ fontSize: 10.5, color: "var(--text-2)", marginBottom: 7 }}>{layer.files}</div>
-              <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.7 }}>
-                {lang === "en" ? layer.bodyEn : layer.bodyUz}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <Callout color="var(--c-attack)" icon="skull" titleUz="Hujumchi nuqtai nazaridan — nima uchun bu stack muhim" titleEn="Attacker's perspective — why this stack matters">
-        {lang === "en"
-          ? <>An attacker's goal is almost always to move <Em>down</Em> this stack — from a sandboxed process (ring 3) toward the kernel (ring 0). Every layer is a potential attack surface: injecting a DLL gives code in user space, hooking ntdll bypasses EDR monitoring, exploiting a driver vulnerability achieves full ring 0 control over the entire machine. Understanding each layer's role is the foundation of both attack and defence — you cannot protect what you don't understand, and you cannot exploit what you haven't mapped.</>
-          : <>Hujumchining maqsadi deyarli har doim shu stackda <Em>pastga</Em> tushish — sandboxlangan jarayondan (ring 3) kernelga (ring 0) tomon. Har bir qatlam potensial hujum yuzasi: DLL kiritish user space'da kod beradi, ntdll'ga hook qo'yish EDR monitoringini chetlab o'tadi, drayver zaifligini ekspluatatsiya qilish butun mashinada to'liq ring 0 nazoratini ta'minlaydi. Har bir qatlamning rolini tushunish hujum va mudofaaning ham asosi — tushunmagan narsangizni himoya qila olmaysiz va xaritalamagan narsangizni ekspluatatsiya qila olmaysiz.</>}
-      </Callout>
-    </section>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────
 // Boot step card component
