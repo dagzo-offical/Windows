@@ -481,15 +481,42 @@ function SearchModal({ onClose, setRoute }) {
 }
 
 // Expose
-Object.assign(window, { Bi, T, tt, useLang, useSetLang, LangContext, LangToggle, ParticleBg, TopNav, NavLink, Progress, Terminal, Code, NodeChip, LiveDot, SectionH, LabStep, AIKeyPanel, gradeWithAI, SearchModal });
+Object.assign(window, { Bi, T, tt, useLang, useSetLang, LangContext, LangToggle, ParticleBg, TopNav, NavLink, Progress, Terminal, Code, NodeChip, LiveDot, SectionH, LabStep, AIKeyPanel, gradeWithAI, sanitizeForPrompt, SearchModal });
+
+// ─────────────────────────────────────────────────────────────
+// Prompt injection protection
+// ─────────────────────────────────────────────────────────────
+function sanitizeForPrompt(text, maxLen = 2000) {
+  if (typeof text !== "string") return "";
+  return text
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "") // strip control chars (keep \t \n \r)
+    .replace(/\r\n|\r/g, "\n")
+    .slice(0, maxLen);
+}
 
 // ─────────────────────────────────────────────────────────────
 // Multi-provider AI grader
 // ─────────────────────────────────────────────────────────────
 async function gradeWithAI(prompt) {
-  const provider = localStorage.getItem("wa_ai_provider") || "";
-  const key      = localStorage.getItem("wa_ai_key") || "";
-  if (!provider || !key) throw new Error("no_key");
+  const provider  = localStorage.getItem("wa_ai_provider") || "";
+  const key       = localStorage.getItem("wa_ai_key") || "";
+  const proxyUrl  = localStorage.getItem("wa_ai_proxy") || "";
+
+  if (!provider) throw new Error("no_key");
+
+  // Route through self-hosted proxy if configured (keeps key server-side)
+  if (proxyUrl) {
+    const r = await fetch(proxyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ provider, prompt }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || `Proxy error ${r.status}`);
+    return d.text;
+  }
+
+  if (!key) throw new Error("no_key");
 
   if (provider === "openai") {
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -557,12 +584,19 @@ function AIKeyPanel() {
   const { useState: useS } = React;
   const [provider, setProvider] = useS(() => localStorage.getItem("wa_ai_provider") || "");
   const [key, setKey]           = useS(() => localStorage.getItem("wa_ai_key") || "");
+  const [proxy, setProxy]       = useS(() => localStorage.getItem("wa_ai_proxy") || "");
   const [show, setShow]         = useS(false);
   const [saved, setSaved]       = useS(false);
 
   const save = () => {
     localStorage.setItem("wa_ai_provider", provider);
-    localStorage.setItem("wa_ai_key", key);
+    if (proxy.trim()) {
+      localStorage.setItem("wa_ai_proxy", proxy.trim());
+      localStorage.removeItem("wa_ai_key");
+    } else {
+      localStorage.setItem("wa_ai_key", key);
+      localStorage.removeItem("wa_ai_proxy");
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -590,26 +624,51 @@ function AIKeyPanel() {
       </div>
 
       {provider && (
-        <div style={{ position: "relative" }}>
+        <>
+          <div style={{ fontSize: 9.5, color: "var(--text-3)", marginBottom: 4, fontFamily: "var(--font-mono)" }}>
+            Proxy URL (ixtiyoriy — kalitni serverda saqlash uchun):
+          </div>
           <input
-            type={show ? "text" : "password"}
-            placeholder={PROVIDERS.find(p => p.id === provider)?.hint || "API Key"}
-            value={key}
-            onChange={e => setKey(e.target.value)}
+            type="text"
+            placeholder="https://yourserver.com/ai-proxy  (bo'sh = to'g'ridan-to'g'ri)"
+            value={proxy}
+            onChange={e => setProxy(e.target.value)}
             style={{
-              width: "100%", boxSizing: "border-box",
-              background: "rgba(0,0,0,0.2)", border: "1px solid var(--border)",
-              borderRadius: 7, padding: "6px 36px 6px 9px",
+              width: "100%", boxSizing: "border-box", marginBottom: 6,
+              background: "rgba(0,0,0,0.2)", border: `1px solid ${proxy ? "var(--accent-border)" : "var(--border)"}`,
+              borderRadius: 7, padding: "6px 9px",
               fontSize: 10.5, fontFamily: "var(--font-mono)",
               color: "var(--text-0)", outline: "none",
             }}
           />
-          <button onClick={() => setShow(s => !s)} style={{
-            position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
-            appearance: "none", background: "none", border: "none", cursor: "pointer",
-            color: "var(--text-3)", fontSize: 12, padding: 2,
-          }}>{show ? "🙈" : "👁"}</button>
-        </div>
+          {!proxy && (
+            <div style={{ position: "relative", marginBottom: 0 }}>
+              <input
+                type={show ? "text" : "password"}
+                placeholder={PROVIDERS.find(p => p.id === provider)?.hint || "API Key"}
+                value={key}
+                onChange={e => setKey(e.target.value)}
+                style={{
+                  width: "100%", boxSizing: "border-box",
+                  background: "rgba(0,0,0,0.2)", border: "1px solid var(--border)",
+                  borderRadius: 7, padding: "6px 36px 6px 9px",
+                  fontSize: 10.5, fontFamily: "var(--font-mono)",
+                  color: "var(--text-0)", outline: "none",
+                }}
+              />
+              <button onClick={() => setShow(s => !s)} style={{
+                position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
+                appearance: "none", background: "none", border: "none", cursor: "pointer",
+                color: "var(--text-3)", fontSize: 12, padding: 2,
+              }}>{show ? "🙈" : "👁"}</button>
+            </div>
+          )}
+          {proxy && (
+            <div style={{ fontSize: 9.5, color: "var(--accent)", fontFamily: "var(--font-mono)", marginBottom: 2 }}>
+              ✓ Proxy rejimi — API kalit brauzerda saqlanmaydi
+            </div>
+          )}
+        </>
       )}
 
       {provider && (
