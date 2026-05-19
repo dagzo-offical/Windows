@@ -194,6 +194,29 @@ const FALLBACK_QUESTIONS = {
 
 const COOLDOWN_KEY = "wa_cooldown_end";
 const COOLDOWN_DURATION = 30 * 60 * 1000; // 30 min in ms
+const CD_SALT = "wac_2025";
+
+function setCooldownEnd(end) {
+  try {
+    localStorage.setItem(COOLDOWN_KEY, String(end));
+    localStorage.setItem("wa_cd_c", btoa(String(end) + CD_SALT));
+  } catch {}
+}
+function getCooldownEnd() {
+  try {
+    const raw = +localStorage.getItem(COOLDOWN_KEY) || 0;
+    if (!raw) return 0;
+    const expected = btoa(String(raw) + CD_SALT);
+    const stored = localStorage.getItem("wa_cd_c") || "";
+    if (stored !== expected) {
+      // Tampered — reinstate fresh cooldown
+      const fresh = Date.now() + COOLDOWN_DURATION;
+      setCooldownEnd(fresh);
+      return fresh;
+    }
+    return raw;
+  } catch { return 0; }
+}
 
 function QuizModal({ onClose, onPass, onFail, lessonNum = 1 }) {
   const lang = useLang();
@@ -674,14 +697,14 @@ function Result({ results, questions, answers, overall, passed, onContinue, less
   // Write cooldown start time when failed result first shown
   useQE(() => {
     if (!passed) {
-      const existing = localStorage.getItem(COOLDOWN_KEY);
-      if (!existing || +existing <= Date.now()) {
-        localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_DURATION));
+      const existing = getCooldownEnd();
+      if (!existing || existing <= Date.now()) {
+        setCooldownEnd(Date.now() + COOLDOWN_DURATION);
       }
     }
   }, [passed]);
 
-  const endsAt = !passed ? (+localStorage.getItem(COOLDOWN_KEY) || 0) : 0;
+  const endsAt = !passed ? getCooldownEnd() : 0;
   const remaining = Math.max(0, Math.floor((endsAt - now) / 1000));
   const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
   const ss = String(remaining % 60).padStart(2, "0");

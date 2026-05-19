@@ -105,7 +105,18 @@ const SECTION_DATA = {
 };
 
 function getTimeSpentAll() {
-  try { return JSON.parse(localStorage.getItem("wa_time_spent") || "{}"); } catch { return {}; }
+  try {
+    const raw = JSON.parse(localStorage.getItem("wa_time_spent") || "{}");
+    if (typeof raw !== "object" || Array.isArray(raw)) return {};
+    const clean = {};
+    for (const [k, v] of Object.entries(raw)) {
+      if (/^s0[12]_l\d{2}$/.test(k)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) clean[k] = Math.min(Math.floor(n), 14400);
+      }
+    }
+    return clean;
+  } catch { return {}; }
 }
 function fmtTimeShort(sec) {
   const h = Math.floor(sec / 3600);

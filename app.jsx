@@ -46,6 +46,8 @@ function clearAll() {
     localStorage.removeItem(PROGRESS_KEY);
     localStorage.removeItem(ROUTE_KEY);
     localStorage.removeItem("wa_cooldown_end");
+    localStorage.removeItem("wa_cd_c");
+    localStorage.removeItem("wa_time_spent");
     localStorage.removeItem("wa_lang");
     localStorage.removeItem("wa_ai_provider");
     localStorage.removeItem("wa_ai_key");

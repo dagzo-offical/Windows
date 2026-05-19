@@ -5,14 +5,31 @@ const { useState: useLS, useEffect: useLE, useRef: useLR } = React;
 
 // ── Time tracking ─────────────────────────────────────────────
 const TIME_KEY = "wa_time_spent";
+const MAX_LESSON_SECS = 4 * 3600;   // 4h absolute cap per lesson
+const MAX_WRITE_SECS  = 15;          // max seconds per single write (10s autosave + buffer)
+const VALID_KEY = /^s0[12]_l\d{2}$/;
+
 function getTimeSpent() {
-  try { return JSON.parse(localStorage.getItem(TIME_KEY) || "{}"); } catch { return {}; }
+  try {
+    const raw = JSON.parse(localStorage.getItem(TIME_KEY) || "{}");
+    if (typeof raw !== "object" || Array.isArray(raw)) return {};
+    const clean = {};
+    for (const [k, v] of Object.entries(raw)) {
+      if (VALID_KEY.test(k)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) clean[k] = Math.min(Math.floor(n), MAX_LESSON_SECS);
+      }
+    }
+    return clean;
+  } catch { return {}; }
 }
 function addTimeSpent(key, seconds) {
-  if (seconds <= 0) return;
+  if (!VALID_KEY.test(key)) return;
+  const secs = Math.min(Math.max(0, Math.round(seconds)), MAX_WRITE_SECS);
+  if (secs <= 0) return;
   try {
     const all = getTimeSpent();
-    all[key] = (all[key] || 0) + seconds;
+    all[key] = Math.min((all[key] || 0) + secs, MAX_LESSON_SECS);
     localStorage.setItem(TIME_KEY, JSON.stringify(all));
   } catch {}
 }
@@ -91,7 +108,10 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   // ── Session timer ─────────────────────────────────────────
   const [sessionSec, setSessionSec] = useLS(0);
   const [quizPassed, setQuizPassed] = useLS(false);
-  const [savedTime] = useLS(() => getTimeSpent()[lessonKey] || 0);
+  const [savedTime] = useLS(() => {
+    const maxAllowed = (LESSON_META[lessonNum]?.min || 60) * 2 * 60;
+    return Math.min(getTimeSpent()[lessonKey] || 0, maxAllowed);
+  });
   useLE(() => {
     const IDLE_MS = 60000;
     let lastActivity = Date.now();

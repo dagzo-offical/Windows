@@ -2,19 +2,42 @@
 
 const { useState: useCS, useEffect: useCE } = React;
 
+const _CD_KEY  = "wa_cooldown_end";
+const _CD_DUR  = 30 * 60 * 1000;
+const _CD_SALT = "wac_2025";
+
+function _setCooldownEnd(end) {
+  try {
+    localStorage.setItem(_CD_KEY, String(end));
+    localStorage.setItem("wa_cd_c", btoa(String(end) + _CD_SALT));
+  } catch {}
+}
+function _getCooldownEnd() {
+  try {
+    const raw = +localStorage.getItem(_CD_KEY) || 0;
+    if (!raw) return 0;
+    const expected = btoa(String(raw) + _CD_SALT);
+    const stored = localStorage.getItem("wa_cd_c") || "";
+    if (stored !== expected) {
+      const fresh = Date.now() + _CD_DUR;
+      _setCooldownEnd(fresh);
+      return fresh;
+    }
+    return raw;
+  } catch { return 0; }
+}
+
 function CooldownScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOpen }) {
   const lang = useLang();
-  const COOLDOWN_KEY = "wa_cooldown_end";
   const DURATION = 30 * 60;
 
   const lessonNum = (() => { try { const r = JSON.parse(localStorage.getItem("wa_route") || "{}"); return r.lesson || 1; } catch { return 1; } })();
 
   const [endsAt, setEndsAt] = useCS(() => {
-    const stored = localStorage.getItem(COOLDOWN_KEY);
-    if (stored && +stored > Date.now()) return +stored;
-    // Already handled by quiz — if no key set, create 30 min from now
+    const existing = _getCooldownEnd();
+    if (existing > Date.now()) return existing;
     const e = Date.now() + DURATION * 1000;
-    localStorage.setItem(COOLDOWN_KEY, String(e));
+    _setCooldownEnd(e);
     return e;
   });
   const [now, setNow] = useCS(Date.now());
@@ -33,12 +56,9 @@ function CooldownScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOpe
   const unlocked = remaining === 0;
 
   const reset = () => {
-    localStorage.removeItem(COOLDOWN_KEY);
+    localStorage.removeItem(_CD_KEY);
+    localStorage.removeItem("wa_cd_c");
     setRoute({ name: "lesson", section: 1, lesson: lessonNum });
-  };
-  const skipForDemo = () => {
-    localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
-    setEndsAt(Date.now());
   };
 
   return (
@@ -149,14 +169,9 @@ function CooldownScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOpe
               </button>
             </>
           ) : (
-            <>
-              <button className="btn" onClick={() => setRoute({ name: "lesson", section: 1, lesson: lessonNum })}>
-                <Icon name="book" size={14} /> {lang === "en" ? "Read the lesson meanwhile" : "Bu vaqtda darsni o'qing"}
-              </button>
-              <button className="btn btn-ghost" onClick={skipForDemo} title="Demo only: skip timer">
-                <Icon name="zap" size={14} /> Skip (demo)
-              </button>
-            </>
+            <button className="btn" onClick={() => setRoute({ name: "lesson", section: 1, lesson: lessonNum })}>
+              <Icon name="book" size={14} /> {lang === "en" ? "Read the lesson meanwhile" : "Bu vaqtda darsni o'qing"}
+            </button>
           )}
         </div>
 
