@@ -15,9 +15,9 @@ const ROUTE_KEY    = "wa_route";
 function loadProgress() {
   try {
     const s = localStorage.getItem(PROGRESS_KEY);
-    if (s) return JSON.parse(s);
+    if (s) return migrateProgress(JSON.parse(s));
   } catch {}
-  return { xp: 0, level: 1, completedLessons: [], lessonDates: {}, quizScores: {}, name: "Dagzo", initials: "DZ" };
+  return migrateProgress({});
 }
 
 function saveProgress(p) {
@@ -52,8 +52,31 @@ function clearAll() {
   } catch {}
 }
 
-const XP_PER_LESSON = 120;
+const XP_PER_LESSON  = 120;
+const XP_DAILY_LOGIN = 25;
+const XP_AI_QUESTION = 10;
+const AI_DAILY_LIMIT = 5;
 function xpToLevel(xp) { return Math.max(1, Math.floor(xp / 500) + 1); }
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+
+function migrateProgress(p) {
+  const today = todayStr();
+  return {
+    xp: p.xp || 0,
+    level: p.level || 1,
+    completedLessons: p.completedLessons || [],
+    lessonDates: p.lessonDates || {},
+    quizScores: p.quizScores || {},
+    name: p.name || "Dagzo",
+    initials: p.initials || "DZ",
+    lastLoginDate: p.lastLoginDate || null,
+    streak: p.streak || 0,
+    todayXP: p.todayDate === today ? (p.todayXP || 0) : 0,
+    todayDate: p.todayDate === today ? p.todayDate : null,
+    aiQuestionsToday: p.aiXPDate === today ? (p.aiQuestionsToday || 0) : 0,
+    aiXPDate: p.aiXPDate || null,
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 function App() {
@@ -91,16 +114,60 @@ function App() {
   const markLessonComplete = useACB((lessonKey, score) => {
     _setProgress(prev => {
       if (prev.completedLessons.includes(lessonKey)) return prev;
+      const today = todayStr();
       const completedLessons = [...prev.completedLessons, lessonKey];
       const lessonDates = { ...(prev.lessonDates || {}), [lessonKey]: Date.now() };
       const quizScores = { ...(prev.quizScores || {}), ...(score != null ? { [lessonKey]: score } : {}) };
       const xp = prev.xp + XP_PER_LESSON;
       const level = xpToLevel(xp);
-      const next = { ...prev, completedLessons, lessonDates, quizScores, xp, level };
+      const todayXP = (prev.todayDate === today ? (prev.todayXP || 0) : 0) + XP_PER_LESSON;
+      const next = { ...prev, completedLessons, lessonDates, quizScores, xp, level, todayXP, todayDate: today };
       saveProgress(next);
       return next;
     });
   }, []);
+
+  // Daily login XP + streak
+  useAE(() => {
+    _setProgress(prev => {
+      const today = todayStr();
+      if (prev.lastLoginDate === today) return prev;
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      const newStreak = prev.lastLoginDate === yesterday ? (prev.streak || 0) + 1 : 1;
+      const todayXP = (prev.todayDate === today ? (prev.todayXP || 0) : 0) + XP_DAILY_LOGIN;
+      const xp = prev.xp + XP_DAILY_LOGIN;
+      const next = { ...prev, xp, level: xpToLevel(xp), lastLoginDate: today, streak: newStreak, todayXP, todayDate: today };
+      saveProgress(next);
+      return next;
+    });
+  }, []);
+
+  // Generic XP award (reading, AI) — exposed globally for lesson.jsx / ai-chat.jsx
+  const addXP = useACB((amount, source) => {
+    _setProgress(prev => {
+      const today = todayStr();
+      if (source === "ai") {
+        const q = prev.aiXPDate === today ? (prev.aiQuestionsToday || 0) : 0;
+        if (q >= AI_DAILY_LIMIT) return prev;
+      }
+      const todayXP = (prev.todayDate === today ? (prev.todayXP || 0) : 0) + amount;
+      const aiQuestionsToday = source === "ai"
+        ? (prev.aiXPDate === today ? (prev.aiQuestionsToday || 0) : 0) + 1
+        : (prev.aiXPDate === today ? (prev.aiQuestionsToday || 0) : 0);
+      const xp = prev.xp + amount;
+      const next = {
+        ...prev, xp, level: xpToLevel(xp), todayXP, todayDate: today,
+        ...(source === "ai" ? { aiQuestionsToday, aiXPDate: today } : {}),
+      };
+      saveProgress(next);
+      return next;
+    });
+  }, []);
+
+  useAE(() => {
+    window._addXP = addXP;
+    return () => { window._addXP = null; };
+  }, [addXP]);
 
   const [profileOpen, setProfileOpen] = useAS(false);
   const [aiChatOpen, setAiChatOpen] = useAS(false);
@@ -123,6 +190,9 @@ function App() {
     completedLessons: progress.completedLessons || [],
     lessonDates: progress.lessonDates || {},
     quizScores: progress.quizScores || {},
+    streak: progress.streak || 0,
+    todayXP: progress.todayDate === todayStr() ? (progress.todayXP || 0) : 0,
+    aiQuestionsToday: progress.aiXPDate === todayStr() ? (progress.aiQuestionsToday || 0) : 0,
   };
 
   const screenProps = { setRoute, user, markLessonComplete, onOpenProfile: () => setProfileOpen(true), onOpenAIChat: (query) => { if (query) setAiQuery(query); setAiChatOpen(true); }, aiChatOpen, onOpenSearch: () => setSearchOpen(true) };

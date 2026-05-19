@@ -146,12 +146,16 @@ function DashboardScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOp
         </div>
 
         {/* STAT ROW */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 14 }}>
           <StatCard icon="flame" color="var(--c-attack)" n={user?.level || 1} suffix={lang === "en" ? "lvl" : "lvl"} uz="Daraja" en="Level" />
           <StatCard icon="zap" color="var(--accent)" n={user?.xp || "0"} uz="Tajriba" en="Total XP" />
           <StatCard icon="trophy" color="var(--c-warn)" n={completed.length} suffix={`/ ${TOTAL_LESSONS}`} uz="Darslar" en="Lessons done" />
           <StatCard icon="target" color="var(--c-auth)" n={avgScore != null ? `${avgScore}%` : "—"} uz="O'rtacha test" en="Avg quiz score" />
         </div>
+
+        {/* TODAY ROW */}
+        <TodayStats user={user} />
+
 
         {/* MAIN GRID */}
         <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 18 }}>
@@ -188,6 +192,46 @@ function DashboardScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOp
           <SectionProgress setRoute={setRoute} user={user} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function TodayStats({ user }) {
+  const lang = useLang();
+  const streak = user?.streak || 0;
+  const todayXP = user?.todayXP || 0;
+  const aiLeft = Math.max(0, 5 - (user?.aiQuestionsToday || 0));
+
+  const totalSec = (() => {
+    try { return Object.values(JSON.parse(localStorage.getItem("wa_time_spent") || "{}")).reduce((a, b) => a + b, 0); }
+    catch { return 0; }
+  })();
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const timeStr = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m` : `${totalSec}s`;
+
+  const chip = (icon, color, label) => (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 8, padding: "8px 14px",
+      background: color + "0d", border: `1px solid ${color}33`, borderRadius: 10,
+      fontSize: 12.5, fontFamily: "var(--font-mono)", color,
+    }}>
+      <Icon name={icon} size={13} /> {label}
+    </div>
+  );
+
+  return (
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24 }}>
+      {chip("flame", "var(--c-attack)",
+        streak > 0
+          ? (lang === "en" ? `${streak}-day streak 🔥` : `${streak} kunlik seriya 🔥`)
+          : (lang === "en" ? "No streak yet" : "Seriya yo'q"))}
+      {chip("zap", "var(--accent)",
+        lang === "en" ? `+${todayXP} XP today` : `Bugun +${todayXP} XP`)}
+      {chip("clock", "var(--c-auth)",
+        lang === "en" ? `${timeStr} total reading` : `Jami o'qish: ${timeStr}`)}
+      {chip("spark", "var(--c-user)",
+        lang === "en" ? `AI XP: ${aiLeft}/5 left` : `AI XP: ${aiLeft}/5 qoldi`)}
     </div>
   );
 }

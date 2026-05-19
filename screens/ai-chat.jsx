@@ -15,7 +15,10 @@ function AIChat({ open, onClose, user, route, initialQuery, onQueryHandled }) {
     setMessages([{ role: "user", text: userMsg }]);
     setLoading(true);
     gradeWithAI(buildPrompt(userMsg))
-      .then(reply => setMessages(prev => [...prev, { role: "assistant", text: reply.trim() }]))
+      .then(reply => {
+        setMessages(prev => [...prev, { role: "assistant", text: reply.trim() }]);
+        if (window._addXP) window._addXP(10, "ai");
+      })
       .catch(e => {
         const errMsg = e.message === "no_key"
           ? (lang === "en" ? "Please set your AI key in Profile settings first." : "Avval Profil sozlamalarida AI kalitini o'rnating.")
@@ -82,6 +85,7 @@ Keep answers clear and concise. Respond in the same language the user writes in.
     try {
       const reply = await gradeWithAI(buildPrompt(userMsg));
       setMessages(prev => [...prev, { role: "assistant", text: reply.trim() }]);
+      if (window._addXP) window._addXP(10, "ai");
     } catch (e) {
       const errMsg = e.message === "no_key"
         ? (lang === "en" ? "Please set your AI key in Profile settings first." : "Avval Profil sozlamalarida AI kalitini o'rnating.")

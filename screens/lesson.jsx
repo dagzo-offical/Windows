@@ -93,25 +93,44 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   const [quizPassed, setQuizPassed] = useLS(false);
   const [savedTime] = useLS(() => getTimeSpent()[lessonKey] || 0);
   useLE(() => {
-    const start = Date.now();
+    const IDLE_MS = 60000;
+    let lastActivity = Date.now();
+    let tabVisible = !document.hidden;
+    let activeElapsed = 0;
     let lastSaved = 0;
+    let lastXPTick = 0;
+
+    const onActivity = () => { lastActivity = Date.now(); };
+    const onVisibility = () => { tabVisible = !document.hidden; };
+    const evts = ["mousemove", "keydown", "scroll", "click"];
+
+    document.addEventListener("visibilitychange", onVisibility);
+    evts.forEach(e => document.addEventListener(e, onActivity, { passive: true }));
 
     const tick = setInterval(() => {
-      setSessionSec(Math.floor((Date.now() - start) / 1000));
+      if (tabVisible && Date.now() - lastActivity < IDLE_MS) {
+        activeElapsed++;
+        setSessionSec(activeElapsed);
+        if (activeElapsed - lastXPTick >= 60) {
+          lastXPTick = activeElapsed;
+          if (window._addXP) window._addXP(1, "reading");
+        }
+      }
     }, 1000);
 
     const autosave = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - start) / 1000);
-      const toAdd = elapsed - lastSaved;
-      lastSaved = elapsed;
+      const toAdd = activeElapsed - lastSaved;
+      lastSaved = activeElapsed;
       if (toAdd > 0) addTimeSpent(lessonKey, toAdd);
     }, 10000);
 
     return () => {
       clearInterval(tick);
       clearInterval(autosave);
-      const elapsed = Math.floor((Date.now() - start) / 1000);
-      addTimeSpent(lessonKey, elapsed - lastSaved);
+      document.removeEventListener("visibilitychange", onVisibility);
+      evts.forEach(e => document.removeEventListener(e, onActivity));
+      const toAdd = activeElapsed - lastSaved;
+      if (toAdd > 0) addTimeSpent(lessonKey, toAdd);
     };
   }, [lessonKey]);
 
