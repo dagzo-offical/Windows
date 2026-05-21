@@ -106,17 +106,18 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   const isLocked = lessonNum > 1 && !completedLessons.includes(prevKey);
 
   // ── Session timer ─────────────────────────────────────────
-  const [sessionSec, setSessionSec] = useLS(0);
   const [quizPassed, setQuizPassed] = useLS(false);
-  const [savedTime] = useLS(() => {
-    const maxAllowed = (LESSON_META[lessonNum]?.min || 60) * 2 * 60;
-    return Math.min(getTimeSpent()[lessonKey] || 0, maxAllowed);
-  });
+  const maxAllowedSec = (LESSON_META[lessonNum]?.min || 60) * 2 * 60;
+  const [totalTimeSec, setTotalTimeSec] = useLS(() =>
+    Math.min(getTimeSpent()[lessonKey] || 0, maxAllowedSec)
+  );
   useLE(() => {
+    // Start activeElapsed from what was saved — so display is always cumulative
+    const initialSaved = Math.min(getTimeSpent()[lessonKey] || 0, maxAllowedSec);
     let tabVisible = !document.hidden;
-    let activeElapsed = 0;
-    let lastSaved = 0;
-    let lastXPTick = 0;
+    let activeElapsed = initialSaved;
+    let lastSaved = initialSaved;
+    let lastXPTick = initialSaved;
 
     const onVisibility = () => { tabVisible = !document.hidden; };
     document.addEventListener("visibilitychange", onVisibility);
@@ -124,7 +125,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
     const tick = setInterval(() => {
       if (tabVisible) {
         activeElapsed++;
-        setSessionSec(activeElapsed);
+        setTotalTimeSec(activeElapsed);
         if (activeElapsed - lastXPTick >= 60) {
           lastXPTick = activeElapsed;
           if (window._addXP) window._addXP(1, "reading");
@@ -147,7 +148,6 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
     };
   }, [lessonKey]);
 
-  const totalTimeSec = savedTime + sessionSec;
   const quizUnlocked = totalTimeSec >= (LESSON_META[lessonNum]?.min || 10) * 60;
 
   useLE(() => {

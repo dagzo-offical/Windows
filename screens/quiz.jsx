@@ -219,7 +219,7 @@ function getCooldownEnd() {
 
 const ABANDON_KEY = "wa_quiz_abandon";
 const TEST_START_KEY = "wa_quiz_start";
-const LOCK_SEC = 30 * 60; // 30 min lock — abandon button hidden until elapsed
+const LOCK_SEC = 0; // no time lock — abandon button always visible
 
 function getAbandonBan() {
   try { return JSON.parse(localStorage.getItem(ABANDON_KEY)) || { until: 0, count: 0 }; }
