@@ -209,13 +209,29 @@ function getCooldownEnd() {
     const expected = btoa(String(raw) + CD_SALT);
     const stored = localStorage.getItem("wa_cd_c") || "";
     if (stored !== expected) {
-      // Tampered — reinstate fresh cooldown
       const fresh = Date.now() + COOLDOWN_DURATION;
       setCooldownEnd(fresh);
       return fresh;
     }
     return raw;
   } catch { return 0; }
+}
+
+const ABANDON_KEY = "wa_quiz_abandon";
+const TEST_START_KEY = "wa_quiz_start";
+const LOCK_SEC = 30 * 60; // 30 min lock — abandon button hidden until elapsed
+
+function getAbandonBan() {
+  try { return JSON.parse(localStorage.getItem(ABANDON_KEY)) || { until: 0, count: 0 }; }
+  catch { return { until: 0, count: 0 }; }
+}
+function recordAbandon() {
+  const ban = getAbandonBan();
+  const count = (ban.count || 0) + 1;
+  const hours = Math.pow(2, count - 1); // 1h, 2h, 4h, 8h…
+  const until = Date.now() + hours * 3600000;
+  localStorage.setItem(ABANDON_KEY, JSON.stringify({ until, count }));
+  return { until, hours };
 }
 
 function QuizModal({ onClose, onPass, onFail, lessonNum = 1 }) {
@@ -227,8 +243,38 @@ function QuizModal({ onClose, onPass, onFail, lessonNum = 1 }) {
   const [results, setResults] = useQS(null);
   const [loading, setLoading] = useQS(false);
   const [err, setErr] = useQS(null);
+  const [testStartTime, setTestStartTime] = useQS(null);
+  const [elapsed, setElapsed] = useQS(0);
 
   const hasKey = () => !!(localStorage.getItem("wa_ai_provider") && localStorage.getItem("wa_ai_key"));
+
+  // Elapsed timer while answering
+  useQE(() => {
+    if (phase !== "answering") return;
+    const start = testStartTime || parseInt(localStorage.getItem(TEST_START_KEY) || "0") || Date.now();
+    const tick = setInterval(() => setElapsed(Math.floor((Date.now() - start) / 1000)), 1000);
+    return () => clearInterval(tick);
+  }, [phase, testStartTime]);
+
+  // Warn on tab close while test is active
+  useQE(() => {
+    if (phase !== "answering" && phase !== "grading") return;
+    const handler = (e) => { e.preventDefault(); e.returnValue = ""; };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [phase]);
+
+  const abandon = () => {
+    const ok = window.confirm(
+      lang === "en"
+        ? "End the test early? This will start a ban timer (1h → 2h → 4h… doubling each time)."
+        : "Testni erta tugatmoqchimisiz? Ban boshlanadi (1s → 2s → 4s… har safar ikki barobarga oshadi)."
+    );
+    if (!ok) return;
+    recordAbandon();
+    localStorage.removeItem(TEST_START_KEY);
+    onClose();
+  };
 
   const gradeOne = async (q, answer) => {
     // Sanitize student answer to prevent prompt injection
@@ -347,10 +393,16 @@ Return STRICT JSON only, no markdown: {"questions":[{"uz":"...","en":"..."},{"uz
       } else {
         setQuestions(FALLBACK_QUESTIONS[lessonNum] || FALLBACK_QUESTIONS[1]);
       }
+      const now = Date.now();
+      setTestStartTime(now);
+      localStorage.setItem(TEST_START_KEY, String(now));
       setPhase("answering");
     } catch (e) {
       console.warn("Question gen failed, using fallback:", e);
       setQuestions(FALLBACK_QUESTIONS[lessonNum] || FALLBACK_QUESTIONS[1]);
+      const now = Date.now();
+      setTestStartTime(now);
+      localStorage.setItem(TEST_START_KEY, String(now));
       setPhase("answering");
     } finally {
       setLoading(false);
@@ -386,6 +438,7 @@ Return STRICT JSON only, no markdown: {"questions":[{"uz":"...","en":"..."},{"uz
               questions={questions} answers={answers} setAnswers={setAnswers}
               current={current} setCurrent={setCurrent}
               onSubmit={submit}
+              elapsed={elapsed} lockSec={LOCK_SEC} onAbandon={abandon}
             />
           )}
           {phase === "grading" && <Grading />}
@@ -472,6 +525,7 @@ function ModalHeader({ phase, onClose, lessonNum = 1 }) {
     result: { uz: "Natijalar", en: "Results" },
   };
   const t = LESSON_TITLES[lessonNum] || LESSON_TITLES[1];
+  const locked = phase === "answering" || phase === "grading";
   return (
     <div style={{
       padding: "20px 32px",
@@ -490,7 +544,9 @@ function ModalHeader({ phase, onClose, lessonNum = 1 }) {
           </div>
         </div>
       </div>
-      <button onClick={onClose} className="btn-ghost btn" style={{ padding: 8 }}><Icon name="x" size={16} /></button>
+      {!locked && (
+        <button onClick={onClose} className="btn-ghost btn" style={{ padding: 8 }}><Icon name="x" size={16} /></button>
+      )}
     </div>
   );
 }
@@ -499,6 +555,38 @@ function Intro({ onStart, loading, lessonNum = 1 }) {
   const lang = useLang();
   const hasKey = !!(localStorage.getItem("wa_ai_provider") && localStorage.getItem("wa_ai_key"));
   const t = LESSON_TITLES[lessonNum] || LESSON_TITLES[1];
+  const [now, setNow] = useQS(Date.now());
+  useQE(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const abandonBan = getAbandonBan();
+  const isBanned = abandonBan.until > now;
+  const banRem = Math.max(0, Math.floor((abandonBan.until - now) / 1000));
+  const banH = String(Math.floor(banRem / 3600)).padStart(2, "0");
+  const banM = String(Math.floor((banRem % 3600) / 60)).padStart(2, "0");
+  const banS = String(banRem % 60).padStart(2, "0");
+
+  if (isBanned) {
+    return (
+      <div style={{ padding: "48px 0", textAlign: "center" }}>
+        <div style={{ fontSize: 52, marginBottom: 16 }}>🚫</div>
+        <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 600, color: "var(--c-attack)", marginBottom: 8 }}>
+          {lang === "en" ? "Access Banned" : "Kirish bloklangan"}
+        </div>
+        <div style={{ color: "var(--text-2)", fontSize: 13, marginBottom: 28 }}>
+          {lang === "en" ? "You ended a test early. Wait until the ban expires." : "Siz testni erta yakunladingiz. Ban tugashini kuting."}
+        </div>
+        <div className="display" style={{ fontSize: 64, fontWeight: 700, letterSpacing: "-0.04em", color: "var(--c-attack)", fontVariantNumeric: "tabular-nums", lineHeight: 1, marginBottom: 8 }}>
+          {banH}:{banM}:{banS}
+        </div>
+        <div className="mono" style={{ fontSize: 10, color: "var(--text-3)", letterSpacing: 0.18, marginTop: 6 }}>
+          {lang === "en" ? "TIME REMAINING" : "QOLGAN VAQT"}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: "32px 0", textAlign: "center" }}>
       <div style={{
@@ -546,11 +634,25 @@ function Intro({ onStart, loading, lessonNum = 1 }) {
       )}
       <div style={{ padding: 16, background: "rgba(255,58,94,0.06)", border: "1px solid rgba(255,58,94,0.25)", borderRadius: 10, textAlign: "left", marginBottom: 24, display: "flex", gap: 12, alignItems: "flex-start" }}>
         <Icon name="warning" size={16} style={{ color: "var(--c-attack)", flexShrink: 0, marginTop: 2 }} />
-        <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.55 }}>
-          <b style={{ color: "var(--c-attack)" }}>{lang === "en" ? "Heads up:" : "Diqqat:"}</b>{" "}
-          {lang === "en"
-            ? <>If you fail, a <code style={{ color: "var(--c-attack)" }}>30-minute</code> lockout begins and fresh questions will be generated for your next attempt.</>
-            : <>Yiqilsangiz <code style={{ color: "var(--c-attack)" }}>30 daqiqalik</code> bloklash boshlanadi va keyingi urinishda yangi savollar bo'ladi.</>}
+        <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.6 }}>
+          <b style={{ color: "var(--c-attack)" }}>{lang === "en" ? "Rules:" : "Qoidalar:"}</b>
+          <ul style={{ margin: "6px 0 0", paddingLeft: 18 }}>
+            {lang === "en" ? (
+              <>
+                <li>Once you click <b>Begin</b>, the <b>close button disappears</b> — you cannot exit.</li>
+                <li>After <b>30 minutes</b>, a <b>"Testni yakunlash"</b> button appears if you need to leave early.</li>
+                <li>Using that button starts a <b>ban: 1h → 2h → 4h…</b> doubling each time.</li>
+                <li>Failing the test adds a separate <b>30-minute</b> cooldown.</li>
+              </>
+            ) : (
+              <>
+                <li><b>Boshlashni</b> bosgandan so'ng <b>yopish tugmasi yo'qoladi</b> — chiqib bo'lmaydi.</li>
+                <li><b>30 daqiqadan</b> so'ng erta chiqish uchun <b>"Testni yakunlash"</b> tugmasi paydo bo'ladi.</li>
+                <li>U tugmani bossangiz <b>ban boshlanadi: 1s → 2s → 4s…</b> har safar ikki barobarga oshadi.</li>
+                <li>Testdan yiqilsangiz alohida <b>30 daqiqalik</b> bloklash qo'shiladi.</li>
+              </>
+            )}
+          </ul>
         </div>
       </div>
 
@@ -561,12 +663,16 @@ function Intro({ onStart, loading, lessonNum = 1 }) {
   );
 }
 
-function Answering({ questions, answers, setAnswers, current, setCurrent, onSubmit }) {
+function Answering({ questions, answers, setAnswers, current, setCurrent, onSubmit, elapsed, lockSec, onAbandon }) {
   const lang = useLang();
   const q = questions[current];
   const a = answers[current];
   const wordCount = a.trim() ? a.trim().split(/\s+/).length : 0;
   const allAnswered = answers.every((x) => x.trim().length > 10);
+  const locked = elapsed < lockSec;
+  const lockRem = Math.max(0, lockSec - elapsed);
+  const lockMM = String(Math.floor(lockRem / 60)).padStart(2, "0");
+  const lockSS = String(lockRem % 60).padStart(2, "0");
 
   const update = (val) => {
     const next = [...answers]; next[current] = val; setAnswers(next);
@@ -574,6 +680,34 @@ function Answering({ questions, answers, setAnswers, current, setCurrent, onSubm
 
   return (
     <div style={{ paddingTop: 18 }}>
+      {/* Lock / abandon banner */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "8px 14px", borderRadius: 8, marginBottom: 16,
+        background: locked ? "rgba(255,58,94,0.06)" : "rgba(255,145,0,0.06)",
+        border: `1px solid ${locked ? "rgba(255,58,94,0.25)" : "rgba(255,145,0,0.3)"}`,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: locked ? "var(--c-attack)" : "var(--c-warn)" }}>
+          <Icon name="lock" size={13} />
+          {locked
+            ? (lang === "en" ? `Locked — ${lockMM}:${lockSS} until exit allowed` : `Bloklangan — ${lockMM}:${lockSS} chiqishga ruxsat bo'lguncha`)
+            : (lang === "en" ? "Exit available — ban applies if used" : "Chiqish mumkin — foydalansangiz ban boshlanadi")}
+        </div>
+        {!locked && (
+          <button
+            onClick={onAbandon}
+            style={{
+              appearance: "none", border: "1px solid rgba(255,145,0,0.5)",
+              background: "rgba(255,145,0,0.08)", color: "var(--c-warn)",
+              borderRadius: 6, padding: "4px 10px", fontSize: 12,
+              cursor: "pointer", display: "flex", alignItems: "center", gap: 5,
+            }}>
+            <Icon name="x" size={12} />
+            {lang === "en" ? "End test" : "Testni yakunlash"}
+          </button>
+        )}
+      </div>
+
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 22 }}>
         {questions.map((_, i) => (
           <div key={i} onClick={() => setCurrent(i)} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
