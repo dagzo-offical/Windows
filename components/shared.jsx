@@ -136,7 +136,7 @@ function TopNav({ route, setRoute, user, crumb, onOpenProfile, onOpenAIChat, aiC
         </button>
         <button
           className="btn-ghost btn"
-          onClick={onOpenAIChat}
+          onClick={() => onOpenAIChat()}
           aria-label="AI Tutor"
           style={{
             padding: "8px 10px",
