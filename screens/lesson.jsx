@@ -107,13 +107,12 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
 
   // ── Session timer ─────────────────────────────────────────
   const [quizPassed, setQuizPassed] = useLS(false);
-  const maxAllowedSec = (LESSON_META[lessonNum]?.min || 60) * 2 * 60;
   const [totalTimeSec, setTotalTimeSec] = useLS(() =>
-    Math.min(getTimeSpent()[lessonKey] || 0, maxAllowedSec)
+    Math.min(getTimeSpent()[lessonKey] || 0, MAX_LESSON_SECS)
   );
   useLE(() => {
-    // Start activeElapsed from what was saved — so display is always cumulative
-    const initialSaved = Math.min(getTimeSpent()[lessonKey] || 0, maxAllowedSec);
+    // Start activeElapsed from saved value so display is always cumulative
+    const initialSaved = Math.min(getTimeSpent()[lessonKey] || 0, MAX_LESSON_SECS);
     let tabVisible = !document.hidden;
     let activeElapsed = initialSaved;
     let lastSaved = initialSaved;

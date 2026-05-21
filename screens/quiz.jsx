@@ -639,17 +639,15 @@ function Intro({ onStart, loading, lessonNum = 1 }) {
           <ul style={{ margin: "6px 0 0", paddingLeft: 18 }}>
             {lang === "en" ? (
               <>
-                <li>Once you click <b>Begin</b>, the <b>close button disappears</b> — you cannot exit.</li>
-                <li>After <b>30 minutes</b>, a <b>"Testni yakunlash"</b> button appears if you need to leave early.</li>
-                <li>Using that button starts a <b>ban: 1h → 2h → 4h…</b> doubling each time.</li>
-                <li>Failing the test adds a separate <b>30-minute</b> cooldown.</li>
+                <li>Once you click <b>Begin</b>, the <b>close (×) button disappears</b> — you cannot exit normally.</li>
+                <li>A <b>"End test"</b> button is available if you must leave early — but using it starts a <b>ban: 1h → 2h → 4h…</b> doubling each time.</li>
+                <li>Failing the test (score below 70) starts a separate <b>30-minute</b> cooldown before you can retry.</li>
               </>
             ) : (
               <>
-                <li><b>Boshlashni</b> bosgandan so'ng <b>yopish tugmasi yo'qoladi</b> — chiqib bo'lmaydi.</li>
-                <li><b>30 daqiqadan</b> so'ng erta chiqish uchun <b>"Testni yakunlash"</b> tugmasi paydo bo'ladi.</li>
-                <li>U tugmani bossangiz <b>ban boshlanadi: 1s → 2s → 4s…</b> har safar ikki barobarga oshadi.</li>
-                <li>Testdan yiqilsangiz alohida <b>30 daqiqalik</b> bloklash qo'shiladi.</li>
+                <li><b>Boshlashni</b> bosgandan so'ng <b>yopish (×) tugmasi yo'qoladi</b> — oddiy yo'l bilan chiqa olmaysiz.</li>
+                <li><b>"Testni yakunlash"</b> tugmasi har doim mavjud, lekin bossangiz <b>ban boshlanadi: 1s → 2s → 4s…</b> har safar ikki barobarga oshadi.</li>
+                <li>Testdan yiqilsangiz (70 dan past ball) qayta urinish uchun alohida <b>30 daqiqalik</b> bloklash qo'shiladi.</li>
               </>
             )}
           </ul>
