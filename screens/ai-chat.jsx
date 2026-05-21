@@ -31,7 +31,8 @@ function AIChat({ open, onClose, user, route, initialQuery, onQueryHandled }) {
       });
   }, [initialQuery]);
 
-  const hasKey = () => !!(localStorage.getItem("wa_ai_provider") && localStorage.getItem("wa_ai_key"));
+  const hasKey = () => !!(localStorage.getItem("wa_ai_provider") &&
+    (localStorage.getItem("wa_ai_key") || localStorage.getItem("wa_ai_proxy")));
 
   useChE(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,9 +55,7 @@ function AIChat({ open, onClose, user, route, initialQuery, onQueryHandled }) {
         ? `Section ${String(route.section || 1).padStart(2, "0")}`
         : "Dashboard";
 
-    // Sanitize user-controlled values before embedding in the system prompt
-    const safeName = sanitizeForPrompt(user?.name || "Student", 60)
-      .replace(/[\n\r]/g, " ").replace(/[^\x20-\x7E -￿]/g, "");
+    const safeName = sanitizeForPrompt(user?.name || "Student", 60);
 
     const sys = `You are a helpful AI assistant integrated into "Windows Academy" — an online learning platform for Windows internals and cybersecurity.
 

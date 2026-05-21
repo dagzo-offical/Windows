@@ -602,6 +602,7 @@ function AIKeyPanel() {
   };
 
   const PROVIDERS = [
+    { id: "groq",      label: "Groq ✦",   hint: "gsk_..." },
     { id: "openai",    label: "OpenAI",    hint: "sk-..." },
     { id: "anthropic", label: "Claude",    hint: "sk-ant-..." },
     { id: "gemini",    label: "Gemini",    hint: "AIza..." },
