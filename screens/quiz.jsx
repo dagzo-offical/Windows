@@ -37,7 +37,7 @@ const FALLBACK_QUESTIONS = {
   ],
   7: [
     { uz: "TPM (Trusted Platform Module) nima va u qanday asosiy funksiyalarni ta'minlaydi? fTPM va diskret TPM o'rtasidagi farq nima?", en: "What is a TPM (Trusted Platform Module) and what core functions does it provide? What is the difference between fTPM and a discrete TPM?" },
-    { uz: "PCR (Platform Configuration Register) nima va u qanday ishlaydi? PCR kengaytirish formulasini tushuntiring.", en: "What is a PCR (Platform Configuration Register) and how does it work? Explain the PCR extension formula." },
+    { uz: "TPM nima uchun faqat to'g'ri yuklash ketma-ketligida BitLocker kalitini chiqaradi? Noto'g'ri ketma-ketlik bo'lsa nima sodir bo'ladi?", en: "Why does the TPM only release the BitLocker key for a correct boot sequence? What happens if the boot sequence is incorrect?" },
     { uz: "Windows TPM dan qanday foydalanadi? BitLocker va Windows Hello uchun TPM qanday rol o'ynaydi?", en: "How does Windows use the TPM? What role does TPM play for BitLocker and Windows Hello?" },
   ],
   8: [
@@ -77,13 +77,13 @@ const FALLBACK_QUESTIONS = {
   ],
   15: [
     { uz: "Windows Service Control Manager (SCM) nima va u services.exe da qanday ishlaydi? Servislarning hayot tsiklini boshqarish uchun SCM qanday mexanizmlardan foydalanadi (bog'liqlik hal qilish, muvaffaqiyatsizlik harakatlari, DACL)?", en: "What is the Windows Service Control Manager (SCM) and how does it run inside services.exe? What mechanisms does the SCM use to manage service lifecycles — dependency resolution, failure actions, and DACLs?" },
-    { uz: "Servis akkauntlarini solishtiring: LocalSystem, LocalService, NetworkService va Virtual Servis Akkaunti. Har birining imtiyozlari va tarmoq identifikatori nimadan iborat va qaysi biri eng xavfli va nima uchun?", en: "Compare service accounts: LocalSystem, LocalService, NetworkService, and Virtual Service Account. What are the privileges and network identity of each, and which is most dangerous and why?" },
-    { uz: "Servis persistenslik va imtiyoz ko'tarish uchun ishlatiladigan kamida 3 ta texnikani tushuntiring — masalan, yangi servis yaratish, qo'shtirnoqsiz servis yo'li va DLL qidiruv tartibi o'g'irlash. Har biri qanday ishlaydi va qanday aniqlanadi?", en: "Explain at least 3 techniques attackers use for service-based persistence and privilege escalation — such as creating a new service, unquoted service path, and DLL search order hijacking. How does each work and how is it detected?" },
+    { uz: "LocalSystem va NetworkService akkauntlarining asosiy farqi nima? LocalSystem nima qila oladi, NetworkService esa nima qila olmaydi?", en: "What is the key difference between LocalSystem and NetworkService accounts? What can LocalSystem do that NetworkService cannot?" },
+    { uz: "Qo'shtirnoqsiz servis yo'li (unquoted service path) zaifligi nima va u qanday imtiyoz ko'tarishga imkon beradi? Kuchsiz servis ruxsatlari (weak service permissions) esa qanday ekspluatatsiya qilinadi?", en: "What is the unquoted service path vulnerability and how does it allow privilege escalation? How are weak service permissions exploited?" },
   ],
   16: [
     { uz: "DLL nima va u EXE dan qanday farq qiladi? Implicit va explicit DLL bog'lash o'rtasidagi farqni tushuntiring — loader ularni qachon va qanday qayta ishlaydi?", en: "What is a DLL and how does it differ from an EXE? Explain the difference between implicit and explicit DLL linking — when and how does the loader process each?" },
     { uz: "Windows DLL qidiruv tartibi nima? Hujumchilar DLL hijacking uchun qaysi bosqichlarni ekspluatatsiya qiladi va bu hujumni Process Monitor yordamida qanday aniqlash mumkin?", en: "What is the Windows DLL search order? Which steps do attackers exploit for DLL hijacking and how can this attack be detected using Process Monitor?" },
-    { uz: "Klassik DLL in'ektsiya, reflektiv DLL in'ektsiya va COM hijacking texnikalarini solishtiring. Har biri qanday ishlaydi, qanday aniqlash mumkin va DllMain da nima uchun LoadLibrary ni chaqirmaslik kerak?", en: "Compare classic DLL injection, reflective DLL injection, and COM hijacking techniques. How does each work, how is it detected, and why must you never call LoadLibrary from inside DllMain?" },
+    { uz: "Reflektiv DLL in'ektsiya oddiy DLL in'ektsiyadan qanday farq qiladi — reflektiv usul nima uchun diskka yozishdan qochadi? COM hijacking esa qaysi registry kalitidagi kamchilikni ishlatadi?", en: "How does reflective DLL injection differ from classic DLL injection — why does the reflective approach avoid writing to disk? And which missing registry key does COM hijacking exploit?" },
   ],
   17: [
     { uz: "Windows API qatlamli stekini tushuntiring: ilova Win32 API chaqirganda qanday yo'l bosib o'tiladi?", en: "Explain the Windows API layered stack: what path is taken when an app calls a Win32 API?" },

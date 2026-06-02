@@ -583,22 +583,6 @@ function Section2Theory() {
           : <>Ichkarida kernel har bir jarayonni sahifasiz kernel xotirasida saqlangan <Term>EPROCESS</Term> (Executive Process bloki) tuzilmasi orqali kuzatib boradi. <code>EPROCESS</code> quyidagilarni o'z ichiga oladi: PID, ota PID, yaratilish vaqti, xavfsizlik tokeni ko'rsatgichi, thread'lar ro'yxati (<code>ETHREAD</code> tuzilmalari sifatida), handle jadval ko'rsatgichi va butun virtual manzil maydonini xaritalovchi Virtual Address Descriptor (VAD) daraxti. Process Hacker kabi sud-tibbiyot tizimlari bu tuzilmalarni to'g'ridan-to'g'ri o'qiydi — shuning uchun malware Task Manager'ning oddiy API chaqiruvlaridan o'zini yashirsa ham, ular jarayonlarni ko'rsata oladi.</>}
       </P>
 
-      <div style={{ margin: "20px 0", padding: "16px 20px", borderRadius: 10, background: "var(--bg-2)", border: "1px solid var(--border)", fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.85 }}>
-        <div className="eyebrow" style={{ marginBottom: 8 }}>// EPROCESS — simplified kernel structure (one per running process)</div>
-        <div style={{ color: "var(--c-system)" }}>struct <span style={{ color: "var(--accent)" }}>_EPROCESS</span> {"{"}</div>
-        <div style={{ paddingLeft: 24, color: "var(--text-1)" }}>
-          <div><span style={{ color: "var(--c-warn)" }}>ULONG</span>{"       "}UniqueProcessId;{"            "}<span style={{ color: "var(--text-3)" }}>// PID e.g. 1234</span></div>
-          <div><span style={{ color: "var(--c-warn)" }}>ULONG</span>{"       "}InheritedFromUniqueProcessId; <span style={{ color: "var(--text-3)" }}>// Parent PID</span></div>
-          <div><span style={{ color: "var(--c-warn)" }}>EX_FAST_REF</span>{" "}Token;{"                    "}<span style={{ color: "var(--text-3)" }}>// Security token (SID, privileges)</span></div>
-          <div><span style={{ color: "var(--c-warn)" }}>LIST_ENTRY</span>{"  "}ThreadListHead;{"            "}<span style={{ color: "var(--text-3)" }}>// Linked list of all ETHREADs</span></div>
-          <div><span style={{ color: "var(--c-warn)" }}>PVOID</span>{"       "}ObjectTable;{"               "}<span style={{ color: "var(--text-3)" }}>// Handle table pointer</span></div>
-          <div><span style={{ color: "var(--c-warn)" }}>PVOID</span>{"       "}VadRoot;{"                   "}<span style={{ color: "var(--text-3)" }}>// VAD tree (virtual memory map)</span></div>
-          <div><span style={{ color: "var(--c-warn)" }}>LARGE_INTEGER</span>{" "}CreateTime;{"              "}<span style={{ color: "var(--text-3)" }}>// When was it spawned?</span></div>
-          <div><span style={{ color: "var(--c-warn)" }}>UCHAR</span>{"[15]    "}ImageFileName;{"            "}<span style={{ color: "var(--text-3)" }}>// First 15 chars of exe name</span></div>
-        </div>
-        <div style={{ color: "var(--c-system)" }}>{"}"}</div>
-      </div>
-
       {/* ── 2.2 User mode vs Kernel mode ── */}
       <h3 style={subhead}>{lang === "en" ? "2.2 — User mode vs Kernel mode" : "2.2 — User mode va Kernel mode"}</h3>
       <P>
@@ -606,63 +590,6 @@ function Section2Theory() {
           ? <>The x86-64 CPU architecture defines <Em>four privilege rings</Em>: ring 0 (most privileged) through ring 3 (least privileged). Windows uses only two: <Em>ring 0</Em> (kernel mode) for the OS, and <Em>ring 3</Em> (user mode) for every application. Rings 1 and 2 were designed for OS subsystems and device drivers in older systems (like OS/2); Windows NT deliberately skips them — all drivers run at full ring 0 privilege.</>
           : <>x86-64 CPU arxitekturasi <Em>to'rtta imtiyoz halqasini</Em> belgilaydi: ring 0 (eng imtiyozli) dan ring 3 (eng kam imtiyozli) gacha. Windows faqat ikkitasini ishlatadi: <Em>ring 0</Em> (kernel mode) — OS uchun, va <Em>ring 3</Em> (user mode) — har bir ilova uchun. Ring 1 va ring 2 eski tizimlarda (OS/2 kabi) OS quyi tizimlari va drayverlar uchun mo'ljallangan; Windows NT ularni ataylab o'tkazib yuboradi — barcha drayverlar to'liq ring 0 imtiyozi bilan ishlaydi.</>}
       </P>
-      <P>
-        {lang === "en"
-          ? <>The CPU knows which ring it is in through two bits (bits 0–1) of the <code>CS</code> (Code Segment) register — called the <Em>CPL (Current Privilege Level)</Em>. When <code>CS = 0x0008</code>, bits 0–1 are both 0 → CPL = 0 (kernel). When <code>CS = 0x0033</code>, bits 0–1 are both 1 → CPL = 3 (user). The hardware checks CPL on <Em>every single instruction</Em>. If ring 3 code tries to run a privileged instruction (like <code>HLT</code> to stop the CPU or <code>MOV CR0</code> to change paging), the CPU immediately raises a <Em>#GP (General Protection Fault)</Em> — exception number 13 — and Windows terminates the program with <code>0xC0000005 ACCESS_VIOLATION</code>. The crash never reaches any other process.</>
-          : <>Protsessor <code>CS</code> (Code Segment) registrining ikki biti (0–1 bitlar) orqali qaysi ringda ekanini biladi — bu <Em>CPL (Current Privilege Level)</Em> deb ataladi. <code>CS = 0x0008</code> bo'lsa, 0–1 bitlar har ikkalasi 0 → CPL = 0 (kernel). <code>CS = 0x0033</code> bo'lsa, 0–1 bitlar har ikkalasi 1 → CPL = 3 (user). Hardware CPL ni <Em>har bir buyruq</Em> uchun tekshiradi. Agar ring 3 kod imtiyozli buyruqni (<code>HLT</code> — protsessorni to'xtatish yoki <code>MOV CR0</code> — sahifalashni o'zgartirish kabi) bajarishga harakat qilsa, protsessor darhol <Em>#GP (General Protection Fault)</Em> — 13-raqamli istisno — ko'taradi va Windows dasturni <code>0xC0000005 ACCESS_VIOLATION</code> bilan o'chiradi. Crash boshqa hech bir jarayonga yetmaydi.</>}
-      </P>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
-        <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,145,69,0.06)", border: "1px solid rgba(255,145,69,0.28)" }}>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "var(--c-user)", marginBottom: 10 }}>
-            {lang === "en" ? "Ring 3 (user mode) — CAN do:" : "Ring 3 (user mode) — QILA OLADI:"}
-          </div>
-          {(lang === "en" ? [
-            "Normal arithmetic, logic, string operations",
-            "Read/write its own process memory (within its VAD)",
-            "Call Win32 API (kernel32.dll, user32.dll, gdi32.dll)",
-            "Allocate virtual memory via VirtualAlloc()",
-            "Create threads, open files, sockets via handles",
-            "Cross into ring 0 only via the syscall instruction",
-          ] : [
-            "Oddiy arifmetik, mantiqiy, satr operatsiyalari",
-            "O'z jarayon xotirasini o'qish/yozish (VAD ichida)",
-            "Win32 API chaqirish (kernel32.dll, user32.dll, gdi32.dll)",
-            "VirtualAlloc() orqali virtual xotira ajratish",
-            "Thread yaratish, handle orqali fayl va socket ochish",
-            "Ring 0 ga faqat syscall buyrug'i orqali o'tish",
-          ]).map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 12.5, color: "var(--text-1)" }}>
-              <span style={{ color: "var(--c-user)", flexShrink: 0 }}>✓</span>{item}
-            </div>
-          ))}
-        </div>
-        <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,58,94,0.06)", border: "1px solid rgba(255,58,94,0.28)" }}>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "var(--c-attack)", marginBottom: 10 }}>
-            {lang === "en" ? "Ring 3 — CANNOT do (triggers #GP fault):" : "Ring 3 — QILA OLMAYDI (#GP xato):"}
-          </div>
-          {(lang === "en" ? [
-            "HLT — halt the CPU",
-            "LGDT / LIDT — load Global/Interrupt Descriptor Tables",
-            "MOV CR0–CR4 — modify control registers (paging, protection)",
-            "WRMSR / RDMSR — write/read model-specific registers",
-            "IN / OUT — directly access hardware I/O ports",
-            "CLI / STI — disable / re-enable hardware interrupts",
-          ] : [
-            "HLT — protsessorni to'xtatish",
-            "LGDT / LIDT — Global/Interrupt Descriptor Jadvallarini yuklash",
-            "MOV CR0–CR4 — boshqaruv registrlarini o'zgartirish (sahifalash, himoya)",
-            "WRMSR / RDMSR — model-specific registrlarni yozish/o'qish",
-            "IN / OUT — hardware I/O portlarini to'g'ridan-to'g'ri o'qish/yozish",
-            "CLI / STI — hardware uzilishlarini o'chirish / qayta yoqish",
-          ]).map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 12.5, color: "var(--text-1)" }}>
-              <span style={{ color: "var(--c-attack)", flexShrink: 0 }}>✗</span>{item}
-            </div>
-          ))}
-        </div>
-      </div>
-
       <Callout color="var(--c-attack)" icon="skull" titleUz="Kernel mode xatosi = BSOD" titleEn="Kernel mode crash = BSOD">
         {lang === "en"
           ? <>When user-mode (ring 3) code crashes — say, Notepad has a bug — Windows simply terminates that one process. The rest of the system keeps running untouched. But when kernel-mode (ring 0) code crashes — a driver dereferences a null pointer, a timer callback corrupts the stack — there is no higher authority to contain it. The entire machine halts: <Em>Bug Check (Blue Screen of Death)</Em>. The system writes a memory dump to disk and reboots. This is why driver quality is the #1 stability factor in Windows — and why Microsoft requires all third-party drivers to be digitally signed.</>
@@ -875,38 +802,11 @@ flowchart TD
       </div>
 
       {/* ── Extended detail sections ── */}
-      <h3 style={subhead}>{lang === "en" ? "4.1 — Secure Boot: the cryptographic chain of trust" : "4.1 — Secure Boot: kriptografik ishonch zanjiri"}</h3>
       <P>
         {lang === "en"
-          ? <><Term>Secure Boot</Term> is a UEFI feature that ensures every piece of software loaded during boot has been cryptographically signed by a trusted authority. It uses a chain of public/private key pairs stored inside UEFI firmware. There are two key databases: <Em>db</Em> (allowed signatures — Microsoft, OEM) and <Em>dbx</Em> (revoked signatures — known malware, revoked certificates). If any loaded binary's hash does not match a trusted entry in db — or matches a revoked entry in dbx — UEFI halts the boot immediately.</>
-          : <><Term>Secure Boot</Term> — UEFI xususiyati bo'lib, yuklash paytida yuklanadigan har bir dasturiy ta'minot parcha ishonchli organ tomonidan kriptografik imzolanganligi ta'minlanadi. U UEFI dasturiy ta'minotiga o'rnatilgan ochiq/yopiq kalit juftliklardan foydalanadi. Ikkita asosiy ma'lumotlar bazasi mavjud: <Em>db</Em> (ruxsat etilgan imzolar — Microsoft, OEM) va <Em>dbx</Em> (bekor qilingan imzolar — ma'lum zararli dasturlar, bekor qilingan sertifikatlar). Agar yuklanadigan binary'ning xeshi db dagi ishonchli yozuvga mos kelmasa — yoki dbx dagi bekor qilingan yozuvga mos kelsa — UEFI yuklashni darhol to'xtatadi.</>}
+          ? <>Modern systems use <Term>Secure Boot</Term> to cryptographically verify each bootloader stage before execution — ensuring no tampered code can run during startup. You will explore the full key hierarchy, chain of trust, and real-world bypass techniques in <Em>Lesson 6</Em>.</>
+          : <>Zamonaviy tizimlar <Term>Secure Boot</Term> dan foydalanib, har bir bootloader bosqichini bajarishdan oldin kriptografik tekshiruvdan o'tkazadi — ishga tushish paytida hech qanday buzilgan kod ishga tushmasligi ta'minlanadi. To'liq kalit ierarxiyasi, ishonch zanjiri va haqiqiy bypass texnikalarini <Em>6-darsda</Em> o'rganasiz.</>}
       </P>
-
-      <div style={{ margin: "16px 0", padding: "18px 20px", borderRadius: 12, background: "var(--bg-2)", border: "1px solid var(--border)" }}>
-        <div className="eyebrow" style={{ marginBottom: 12 }}>// SECURE BOOT — chain of trust (each step verifies the next)</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {[
-            { from: "UEFI Firmware (ROM)", to: "bootmgr.efi", detail: lang === "en" ? "SHA-256 hash of bootmgr.efi checked against db. Algorithm: RSA-2048 + SHA-256." : "bootmgr.efi ning SHA-256 xeshi db bilan solishtiriladi. Algoritm: RSA-2048 + SHA-256.", color: "var(--c-warn)" },
-            { from: "bootmgr.efi", to: "winload.efi", detail: lang === "en" ? "Boot manager verifies the Windows loader's signature via the same certificate chain." : "Boot manager Windows loader'ning imzosini bir xil sertifikat zanjiri orqali tekshiradi.", color: "var(--accent)" },
-            { from: "winload.efi", to: "ntoskrnl.exe + hal.dll", detail: lang === "en" ? "Windows loader verifies the kernel image and HAL using Microsoft's code-signing certificate." : "Windows loader yadro tasvirini va HAL ni Microsoft'ning kod imzolash sertifikati yordamida tekshiradi.", color: "var(--c-system)" },
-            { from: "ntoskrnl.exe", to: "Boot drivers (*.sys)", detail: lang === "en" ? "Kernel checks WHQL / EV certificate on every driver. Unsigned → BSOD (or test-signed mode only)." : "Kernel har bir drayverda WHQL / EV sertifikatini tekshiradi. Imzosiz → BSOD (yoki faqat test-sign rejimida).", color: "var(--c-system)" },
-          ].map((step, i) => (
-            <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "8px 10px", borderRadius: 8, background: `${step.color}08`, borderLeft: `2px solid ${step.color}` }}>
-              <div style={{ flexShrink: 0, paddingTop: 2 }}>
-                <div className="mono" style={{ fontSize: 10, color: step.color }}>{step.from}</div>
-                <div className="mono" style={{ fontSize: 9, color: "var(--text-3)" }}>→ {step.to}</div>
-              </div>
-              <div style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.6 }}>{step.detail}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <Callout color="var(--c-attack)" icon="skull" titleUz="BlackLotus — Secure Boot'ni chetlab o'tish (2023)" titleEn="BlackLotus — bypassing Secure Boot (2023)">
-        {lang === "en"
-          ? <><code>BlackLotus</code> was the first publicly documented UEFI bootkit to bypass Secure Boot on <Em>fully-patched Windows 11</Em>. It exploited a 2022 vulnerability (CVE-2022-21894, "baton drop") in the Windows boot process. The technique: before Secure Boot checked the revocation list (dbx), BlackLotus patched the dbx verification code in memory, removing its own certificate from the revoked list. The signature check then passed normally. Once resident in the EFI System Partition, it loaded a kernel driver that disabled <Em>Driver Signature Enforcement (DSE)</Em> — giving attackers unrestricted ring 0 access on a "secure" system.</>
-          : <><code>BlackLotus</code> — <Em>to'liq yamoqlangan Windows 11</Em> da Secure Boot'ni chetlab o'tgan birinchi ommaviy hujjatlashtirilgan UEFI bootkit. U Windows boot jarayonidagi 2022 yil zaifligini (CVE-2022-21894, "baton drop") ekspluatatsiya qildi. Texnika: Secure Boot revokatsiya ro'yxatini (dbx) tekshirishdan oldin, BlackLotus xotiradagi dbx tekshiruv kodini yamab, o'zining sertifikatini bekor qilingan ro'yxatdan olib tashladi. Imzo tekshiruvi so'ngra odatdagidek o'tdi. EFI System Partition'ga joylashgach, u <Em>Driver Signature Enforcement (DSE)</Em>'ni o'chiruvchi kernel drayveri yukladi — bu "xavfsiz" tizimda hujumchilarga cheksiz ring 0 kirishini ta'minladi.</>}
-      </Callout>
 
       <h3 style={subhead}>{lang === "en" ? "4.2 — BCD: Boot Configuration Data" : "4.2 — BCD: Boot Configuration Data"}</h3>
       <P>
