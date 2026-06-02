@@ -131,36 +131,6 @@ function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen, 
   const data = SECTION_DATA[section] || SECTION_DATA[1];
   const completedLessons = user?.completedLessons || [];
 
-  if (section === 2) {
-    const sec1Keys = Array.from({ length: 20 }, (_, i) => `s01_l${String(i + 1).padStart(2, "0")}`);
-    const sec1Done = sec1Keys.filter(k => completedLessons.includes(k)).length;
-    if (sec1Done < 20) {
-      return (
-        <div>
-          <TopNav route={{ name: "section" }} setRoute={setRoute} user={user} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen} onOpenSearch={onOpenSearch}
-            crumb={[
-              { label: lang === "en" ? "Courses" : "Kurslar", onClick: () => setRoute({ name: "dashboard" }) },
-              { label: lang === "en" ? "Section 02" : "02-bo'lim" },
-            ]}
-          />
-          <div className="page" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", textAlign: "center", gap: 16 }}>
-            <div style={{ fontSize: 48 }}>🔒</div>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 28, margin: 0 }}>
-              {lang === "en" ? "Section 02 is locked" : "02-bo'lim qulflangan"}
-            </h2>
-            <p style={{ color: "var(--text-1)", maxWidth: 400, lineHeight: 1.65 }}>
-              {lang === "en"
-                ? <>Complete all <strong>20 lessons</strong> of Section 01 and pass their quizzes to unlock this section. Progress: <strong>{sec1Done} / 20</strong></>
-                : <>Ushbu bo'limni ochish uchun 01-bo'limdagi barcha <strong>20 ta darsni</strong> tugatib, testlarini topshiring. Holat: <strong>{sec1Done} / 20</strong></>}
-            </p>
-            <button className="btn btn-primary" onClick={() => setRoute({ name: "section", section: 1 })}>
-              {lang === "en" ? "Go to Section 01" : "01-bo'limga o'tish"} <Icon name="arrow-right" size={14} />
-            </button>
-          </div>
-        </div>
-      );
-    }
-  }
 
   const timeSpentAll = getTimeSpentAll();
   const rawLessons = data.lessons.map(l => {

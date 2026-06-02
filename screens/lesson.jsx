@@ -105,7 +105,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   const prevKey = lessonNum > 1 ? `s${prevSection}_l${String(prevLessonNum).padStart(2,"0")}` : null;
   const sec1Keys = Array.from({ length: 20 }, (_, i) => `s01_l${String(i + 1).padStart(2, "0")}`);
   const sec1Complete = sec1Keys.every(k => completedLessons.includes(k));
-  const isLocked = lessonNum > 1 && (lessonNum >= 21 ? !sec1Complete : !completedLessons.includes(prevKey));
+  const isLocked = false;
 
   // ── Session timer ─────────────────────────────────────────
   const [quizPassed, setQuizPassed] = useLS(false);
@@ -4809,6 +4809,29 @@ function SectionNetBasic() {
         </tbody>
       </table>
       <H2 num="§4" en="Essential Network Commands" uz="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Command","What it shows","Common use"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["ipconfig","IP, subnet mask, gateway per adapter","Check current IP settings"],
+              ["ipconfig /all","Full details: MAC, DHCP server, DNS, lease","Find DHCP server or MAC address"],
+              ["ipconfig /flushdns","Clears DNS resolver cache","Fix stale DNS causing wrong sites"],
+              ["ipconfig /release & /renew","Drop then request new DHCP lease","Fix IP address not assigned"],
+              ["ping 8.8.8.8","Round-trip time to host","Test basic internet connectivity"],
+              ["ping -t 8.8.8.8","Continuous ping (Ctrl+C to stop)","Monitor connection stability"],
+              ["nslookup google.com","Resolve hostname via configured DNS","Test DNS resolution"],
+              ["tracert 8.8.8.8","Each hop from PC to destination","Find where packets are dropping"],
+              ["netstat -ano","All TCP/UDP connections with owning PIDs","Spot unexpected open ports"],
+              ["pathping 8.8.8.8","tracert + packet loss stats per hop","Advanced route diagnostics"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <H2 num="§5" en="Network Troubleshooting Workflow" uz="" />
       <Callout kind="tip">Settings → Network &amp; internet → Troubleshoot → Internet Connections runs the built-in wizard. It fixes most common issues automatically.</Callout>
     </section>
@@ -4840,6 +4863,29 @@ function SectionNetBasic() {
         </tbody>
       </table>
       <H2 num="§4" uz="Muhim tarmoq buyruqlari" en="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Buyruq","Ko'rsatadigan narsalar","Qo'llanilishi"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["ipconfig","Har bir adapter uchun IP, maska, shlyuz","Joriy IP sozlamalarini tekshirish"],
+              ["ipconfig /all","To'liq ma'lumot: MAC, DHCP server, DNS, ijara","DHCP server yoki MAC manzilini topish"],
+              ["ipconfig /flushdns","DNS kesimini tozalash","Noto'g'ri saytlarga olib boradigan DNS ni tuzatish"],
+              ["ipconfig /release va /renew","DHCP ijarasini tashlab, yangi so'rash","IP manzil tayinlanmagan xatoni tuzatish"],
+              ["ping 8.8.8.8","Xostgacha davra vaqti","Asosiy internet ulanishni tekshirish"],
+              ["ping -t 8.8.8.8","Uzluksiz ping (Ctrl+C to'xtatish)","Ulanish barqarorligini kuzatish"],
+              ["nslookup google.com","Sozlangan DNS orqali xost nomini aniqlash","DNS ishlashini tekshirish"],
+              ["tracert 8.8.8.8","Kompyuterdan manzilgacha har bir ko'chish","Paketlar qayerda yo'qolayotganini topish"],
+              ["netstat -ano","Egasi PID bilan barcha TCP/UDP ulanishlar","Kutilmagan ochiq portlarni aniqlash"],
+              ["pathping 8.8.8.8","tracert + har bir ko'chishdagi paket yo'qotish","Kengaytirilgan marshrutni tashxislash"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <H2 num="§5" uz="Tarmoq muammolarini hal qilish tartibi" en="" />
       <Callout kind="tip">Sozlamalar → Tarmoq va internet → Muammolarni bartaraf etish → Internet ulanishlari — o'rnatilgan ustani ishga tushiradi. Ko'pgina umumiy muammolarni avtomatik ravishda tuzatadi.</Callout>
     </section>
@@ -5035,6 +5081,17 @@ function SectionPSBasic() {
       <H2 num="§3" en="The Pipeline" uz="" />
       <P>The <Term>pipeline</Term> (<code>|</code>) passes the output of one cmdlet as input to the next — but as objects, not text.</P>
       <H2 num="§4" en="Variables and Scripts" uz="" />
+      <P>Variables start with <code>$</code>. Assign with <code>=</code>, reference with the same name. Scripts are plain text files saved as <code>.ps1</code>.</P>
+      <div style={{background:"var(--surface-2)",borderRadius:8,padding:"14px 18px",fontFamily:"var(--font-mono)",fontSize:12,lineHeight:2,margin:"12px 0",color:"var(--text-1)"}}>
+        <span style={{color:"var(--c-auth)"}}>$name</span> = <span style={{color:"var(--accent)"}}>"Alice"</span><br/>
+        <span style={{color:"var(--c-auth)"}}>$count</span> = <span style={{color:"var(--c-warn)"}}>42</span><br/>
+        <span style={{color:"var(--text-2)"}}>Write-Output</span> <span style={{color:"var(--accent)"}}>"Hello, $name"</span>{"   "}<span style={{color:"var(--text-3)"}}># Hello, Alice</span><br/><br/>
+        <span style={{color:"var(--text-3)"}}># Conditional</span><br/>
+        <span style={{color:"var(--c-system)"}}>if</span> (<span style={{color:"var(--c-auth)"}}>$count</span> -gt <span style={{color:"var(--c-warn)"}}>10</span>) {"{"} <span style={{color:"var(--text-2)"}}>Write-Output</span> <span style={{color:"var(--accent)"}}>"Big"</span> {"}"} <span style={{color:"var(--c-system)"}}>else</span> {"{"} <span style={{color:"var(--text-2)"}}>Write-Output</span> <span style={{color:"var(--accent)"}}>"Small"</span> {"}"}<br/><br/>
+        <span style={{color:"var(--text-3)"}}># Loop over all services</span><br/>
+        <span style={{color:"var(--c-system)"}}>foreach</span> (<span style={{color:"var(--c-auth)"}}>$svc</span> <span style={{color:"var(--c-system)"}}>in</span> <span style={{color:"var(--text-2)"}}>Get-Service</span>) {"{"} <span style={{color:"var(--text-2)"}}>Write-Output</span> <span style={{color:"var(--c-auth)"}}>$svc</span>.Name {"}"}
+      </div>
+      <P>Run a script: <code>.\myscript.ps1</code>. Use <code>#</code> for comments. Execution policy must allow scripts first (see §5).</P>
       <H2 num="§5" en="Execution Policy" uz="" />
       <P>By default, PowerShell blocks script execution for security. Check and set:</P>
       <Callout kind="warn">Never set ExecutionPolicy to Unrestricted in production. RemoteSigned is the standard safe setting for administrators.</Callout>
@@ -5061,6 +5118,17 @@ function SectionPSBasic() {
       <H2 num="§3" uz="Quvur (Pipeline)" en="" />
       <P><Term>Quvur</Term> (<code>|</code>) bir cmdlet chiqishini keyingisiga kirish sifatida uzatadi — lekin matn sifatida emas, ob'ektlar sifatida.</P>
       <H2 num="§4" uz="O'zgaruvchilar va skriptlar" en="" />
+      <P>O'zgaruvchilar <code>$</code> bilan boshlanadi. <code>=</code> bilan tayinlang, bir xil nom bilan murojaat qiling. Skriptlar <code>.ps1</code> kengaytmali oddiy matn fayllari.</P>
+      <div style={{background:"var(--surface-2)",borderRadius:8,padding:"14px 18px",fontFamily:"var(--font-mono)",fontSize:12,lineHeight:2,margin:"12px 0",color:"var(--text-1)"}}>
+        <span style={{color:"var(--c-auth)"}}>$ism</span> = <span style={{color:"var(--accent)"}}>"Ali"</span><br/>
+        <span style={{color:"var(--c-auth)"}}>$son</span> = <span style={{color:"var(--c-warn)"}}>42</span><br/>
+        <span style={{color:"var(--text-2)"}}>Write-Output</span> <span style={{color:"var(--accent)"}}>"Salom, $ism"</span>{"   "}<span style={{color:"var(--text-3)"}}># Salom, Ali</span><br/><br/>
+        <span style={{color:"var(--text-3)"}}># Shartli ifoda</span><br/>
+        <span style={{color:"var(--c-system)"}}>if</span> (<span style={{color:"var(--c-auth)"}}>$son</span> -gt <span style={{color:"var(--c-warn)"}}>10</span>) {"{"} <span style={{color:"var(--text-2)"}}>Write-Output</span> <span style={{color:"var(--accent)"}}>"Katta"</span> {"}"} <span style={{color:"var(--c-system)"}}>else</span> {"{"} <span style={{color:"var(--text-2)"}}>Write-Output</span> <span style={{color:"var(--accent)"}}>"Kichik"</span> {"}"}<br/><br/>
+        <span style={{color:"var(--text-3)"}}># Barcha xizmatlar ustida tsikl</span><br/>
+        <span style={{color:"var(--c-system)"}}>foreach</span> (<span style={{color:"var(--c-auth)"}}>$xiz</span> <span style={{color:"var(--c-system)"}}>in</span> <span style={{color:"var(--text-2)"}}>Get-Service</span>) {"{"} <span style={{color:"var(--text-2)"}}>Write-Output</span> <span style={{color:"var(--c-auth)"}}>$xiz</span>.Name {"}"}
+      </div>
+      <P>Skriptni ishga tushirish: <code>.\myscript.ps1</code>. Izohlar uchun <code>#</code> dan foydalaning. Avval bajarish siyosati skriptlarga ruxsat berishi kerak (§5 ga qarang).</P>
       <H2 num="§5" uz="Bajarish siyosati" en="" />
       <P>Standart holda, PowerShell xavfsizlik uchun skript bajarishini bloklaydi. Tekshirish va o'rnatish:</P>
       <Callout kind="warn">Hech qachon ishlab chiqarishda ExecutionPolicy ni Unrestricted ga o'rnatmang. RemoteSigned administratorlar uchun standart xavfsiz sozlama.</Callout>
@@ -7337,6 +7405,31 @@ function SectionSettings() {
       <H2 num="§2" en="Settings App — URI Deep Links" uz="" />
       <P>The Settings app (<code>SystemSettings.exe</code>) uses the <Term>ms-settings:</Term> URI scheme for deep-linking to any page. Settings are stored in <code>HKCU</code> (per-user) or <code>HKLM</code> (machine-wide).</P>
       <H2 num="§3" en="Control Panel — Key Applets" uz="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Run command","Applet","What it controls"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["control userpasswords2","User Accounts","Local accounts, auto-login bypass toggle"],
+              ["netplwiz","Network Passwords Wizard","Same as above — cleaner UI"],
+              ["appwiz.cpl","Programs & Features","Uninstall/change installed programs"],
+              ["sysdm.cpl","System Properties","Computer name, hardware, DEP, crash dumps, RDP"],
+              ["firewall.cpl","Windows Firewall","Turn firewall on/off, basic allow rules"],
+              ["ncpa.cpl","Network Connections","All network adapters, manual IP config"],
+              ["hdwwiz.cpl","Add Hardware Wizard","Manually install legacy hardware"],
+              ["desk.cpl","Display Settings","Resolution, scaling, multiple monitors"],
+              ["powercfg.cpl","Power Options","Sleep, hibernate, battery plans"],
+              ["timedate.cpl","Date and Time","Clock, time zones, time server (NTP)"],
+              ["intl.cpl","Region","Language, number/date format, keyboard layout"],
+              ["mmsys.cpl","Sound","Audio devices, volume mixer, recording"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <H2 num="§4" en="Security-Relevant Settings" uz="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         {[
@@ -7352,6 +7445,28 @@ function SectionSettings() {
         ))}
       </div>
       <H2 num="§5" en="Practical Commands" uz="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Command","Opens"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["start ms-settings:","Settings app home"],
+              ["start ms-settings:privacy-diagnostics","Diagnostic data settings"],
+              ["start ms-settings:windowsdefender","Windows Security"],
+              ["start ms-settings:windowsupdate","Windows Update"],
+              ["start ms-settings:accounts","Accounts & sign-in options"],
+              ["control","Control Panel home"],
+              ["gpedit.msc","Group Policy Editor (Pro/Enterprise only)"],
+              ["secpol.msc","Local Security Policy"],
+              ["lusrmgr.msc","Local Users and Groups"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   ) : (
     <section>
@@ -7370,6 +7485,30 @@ function SectionSettings() {
       <H2 num="§2" uz="Settings Ilovasi — URI Havolalari" en="" />
       <P>Settings ilovasi (<code>SystemSettings.exe</code>) har qanday sahifaga chuqur havola uchun <Term>ms-settings:</Term> URI sxemasidan foydalanadi. Sozlamalar <code>HKCU</code> (foydalanuvchi uchun) yoki <code>HKLM</code> (mashina uchun) da saqlanadi.</P>
       <H2 num="§3" uz="Control Panel — Asosiy Appletlar" en="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Ishga tushirish buyrug'i","Applet","Boshqaradigan narsa"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["control userpasswords2","Foydalanuvchi hisoblar","Mahalliy hisoblar, avtomatik kirish"],
+              ["netplwiz","Tarmoq parollari","Bir xil, aniqroq interfeys"],
+              ["appwiz.cpl","Dasturlar va Xususiyatlar","O'rnatilgan dasturlarni o'chirish/o'zgartirish"],
+              ["sysdm.cpl","Tizim Xususiyatlari","Kompyuter nomi, DEP, crash dump, RDP"],
+              ["firewall.cpl","Windows Xavfsizlik devori","Xavfsizlik devorini yoqish/o'chirish"],
+              ["ncpa.cpl","Tarmoq ulanishlari","Barcha tarmoq adapterlari, qo'lda IP"],
+              ["desk.cpl","Displey Sozlamalari","Ruxsat, masshtab, bir nechta monitor"],
+              ["powercfg.cpl","Quvvat Parametrlari","Uyqu, qish uyqusi, batareya rejimlari"],
+              ["timedate.cpl","Sana va Vaqt","Soat, vaqt zonalari, NTP serveri"],
+              ["intl.cpl","Mintaqa","Til, raqam/sana formati, klaviatura"],
+              ["mmsys.cpl","Ovoz","Audio qurilmalar, ovoz miksheri, yozish"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <H2 num="§4" uz="Xavfsizlikka Oid Sozlamalar" en="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         {[
@@ -7385,6 +7524,28 @@ function SectionSettings() {
         ))}
       </div>
       <H2 num="§5" uz="Amaliy Buyruqlar" en="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Buyruq","Nima ochadi"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["start ms-settings:","Settings ilovasi bosh sahifasi"],
+              ["start ms-settings:privacy-diagnostics","Diagnostika ma'lumotlari sozlamalari"],
+              ["start ms-settings:windowsdefender","Windows Xavfsizligi"],
+              ["start ms-settings:windowsupdate","Windows Update"],
+              ["start ms-settings:accounts","Hisoblar va kirish parametrlari"],
+              ["control","Control Panel bosh sahifasi"],
+              ["gpedit.msc","Guruh siyosati muharriri (faqat Pro/Enterprise)"],
+              ["secpol.msc","Mahalliy xavfsizlik siyosati"],
+              ["lusrmgr.msc","Mahalliy foydalanuvchilar va guruhlar"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
@@ -7435,7 +7596,50 @@ function SectionMsconfig() {
         Attackers disable security services here or via <code>sc config</code> to blind defenses. Investigate any security service (Defender, Sysmon, EventLog) found unexpectedly disabled. Event ID 7036 = service state change.
       </Callout>
       <H2 num="§5" en="Tools Tab — Utility Shortcuts" uz="" />
+      <P>The <Term>Tools tab</Term> provides one-click access to 20+ built-in system utilities. Select a tool and click <Em>Launch</Em>. All can also be run directly from Win+R.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,margin:"12px 0"}}>
+        {[
+          {t:"Computer Management",cmd:"compmgmt.msc",c:"var(--accent)"},
+          {t:"Event Viewer",cmd:"eventvwr.msc",c:"var(--c-warn)"},
+          {t:"System Information",cmd:"msinfo32",c:"var(--c-auth)"},
+          {t:"Performance Monitor",cmd:"perfmon",c:"var(--accent)"},
+          {t:"Resource Monitor",cmd:"resmon",c:"var(--accent)"},
+          {t:"Task Manager",cmd:"taskmgr",c:"var(--c-system)"},
+          {t:"Command Prompt (Admin)",cmd:"cmd (as admin)",c:"var(--c-warn)"},
+          {t:"Registry Editor",cmd:"regedit",c:"var(--c-attack)"},
+          {t:"Internet Options",cmd:"inetcpl.cpl",c:"var(--text-2)"},
+          {t:"System Properties",cmd:"sysdm.cpl",c:"var(--c-auth)"},
+          {t:"Problem Reports",cmd:"WerFault",c:"var(--text-2)"},
+          {t:"UAC Settings",cmd:"useraccountcontrolsettings",c:"var(--c-system)"},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"8px 12px",background:`${item.c}06`,border:`1px solid ${item.c}20`,borderRadius:8,display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+            <span style={{fontSize:12,color:"var(--text-1)"}}>{item.t}</span>
+            <code style={{fontSize:10,color:item.c}}>{item.cmd}</code>
+          </div>
+        ))}
+      </div>
       <H2 num="§6" en="Practical Commands" uz="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Command","Action"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["msconfig","Open System Configuration"],
+              ["bcdedit","View/edit boot configuration (run as admin)"],
+              ["bcdedit /set {default} safeboot minimal","Boot into Safe Mode (minimal) on next restart"],
+              ["bcdedit /deletevalue {default} safeboot","Remove Safe Boot flag — return to normal boot"],
+              ["sc query","List all service states (running/stopped)"],
+              ["sc config ServiceName start= disabled","Disable a service (note: space after =)"],
+              ["net start ServiceName","Start a service"],
+              ["net stop ServiceName","Stop a service"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   ) : (
     <section>
@@ -7478,7 +7682,48 @@ function SectionMsconfig() {
         Hujumchilar himoyani ko'r qilish uchun xavfsizlik xizmatlarini bu yerda yoki <code>sc config</code> orqali o'chiradi. Kutilmaganda o'chirilgan Defender, Sysmon, EventLog xizmatlarini tekshiring. Event ID 7036 = xizmat holati o'zgarishi.
       </Callout>
       <H2 num="§5" uz="Vositalar Tab — Yorliqlar" en="" />
+      <P><Term>Vositalar tab</Term> 20+ o'rnatilgan tizim utilitalariga bir marta bosish bilan kirish imkonini beradi. Vositani tanlang va <Em>Ishga tushirish</Em> ni bosing. Barchasini Win+R dan ham to'g'ridan-to'g'ri ishga tushirish mumkin.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,margin:"12px 0"}}>
+        {[
+          {t:"Kompyuter Boshqaruvi",cmd:"compmgmt.msc",c:"var(--accent)"},
+          {t:"Hodisalar Ko'ruvchisi",cmd:"eventvwr.msc",c:"var(--c-warn)"},
+          {t:"Tizim Ma'lumoti",cmd:"msinfo32",c:"var(--c-auth)"},
+          {t:"Ishlash Monitori",cmd:"perfmon",c:"var(--accent)"},
+          {t:"Resurs Monitori",cmd:"resmon",c:"var(--accent)"},
+          {t:"Vazifa Menejeri",cmd:"taskmgr",c:"var(--c-system)"},
+          {t:"Buyruqlar Satri (Admin)",cmd:"cmd (admin)",c:"var(--c-warn)"},
+          {t:"Registry Muharriri",cmd:"regedit",c:"var(--c-attack)"},
+          {t:"Tizim Xususiyatlari",cmd:"sysdm.cpl",c:"var(--c-auth)"},
+          {t:"UAC Sozlamalari",cmd:"useraccountcontrolsettings",c:"var(--c-system)"},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"8px 12px",background:`${item.c}06`,border:`1px solid ${item.c}20`,borderRadius:8,display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+            <span style={{fontSize:12,color:"var(--text-1)"}}>{item.t}</span>
+            <code style={{fontSize:10,color:item.c}}>{item.cmd}</code>
+          </div>
+        ))}
+      </div>
       <H2 num="§6" uz="Amaliy Buyruqlar" en="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Buyruq","Harakat"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["msconfig","Tizim konfiguratsiyasini ochish"],
+              ["bcdedit","Yuklash konfiguratsiyasini ko'rish/tahrirlash (admin sifatida)"],
+              ["bcdedit /set {default} safeboot minimal","Keyingi qayta yoqishda Xavfsiz rejimda yuklash"],
+              ["bcdedit /deletevalue {default} safeboot","Xavfsiz yuklash flagini o'chirish — normal yuklashga qaytish"],
+              ["sc query","Barcha xizmat holatlarini ro'yxatlash"],
+              ["sc config XizmatNomi start= disabled","Xizmatni o'chirish (eslatma: = dan keyin bo'sh joy)"],
+              ["net start XizmatNomi","Xizmatni ishga tushirish"],
+              ["net stop XizmatNomi","Xizmatni to'xtatish"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
@@ -7596,6 +7841,20 @@ function SectionComputerMgmt() {
         </table>
       </div>
       <H2 num="§3" en="Local Users and Groups" uz="" />
+      <P>The <Term>Local Users and Groups</Term> node (lusrmgr.msc) manages accounts and groups on a standalone machine. On domain-joined PCs, domain accounts are managed through Active Directory — but local groups still control what domain users can do locally.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>Built-in Users</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}><b>Administrator</b> — disabled by default<br/><b>Guest</b> — disabled by default<br/><b>DefaultAccount</b> — UWP app support<br/><b>WDAGUtilityAccount</b> — Windows Defender Application Guard<br/>User-created accounts appear here too</div>
+        </div>
+        <div style={{padding:14,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>Key Built-in Groups</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}><b>Administrators</b> — full system control<br/><b>Users</b> — standard users (default)<br/><b>Remote Desktop Users</b> — can RDP in<br/><b>Backup Operators</b> — bypass file ACLs for backup<br/><b>Power Users</b> — legacy, limited extra rights</div>
+        </div>
+      </div>
+      <Callout color="var(--c-attack)" icon="warning" titleEn="Security Tip" titleUz="">
+        Attackers often add their account to the Administrators or Remote Desktop Users group for persistence. Monitor Event ID 4732 (member added to a local group). Check who is in Administrators with: <code>net localgroup Administrators</code>
+      </Callout>
       <H2 num="§4" en="Performance Monitor — Security Use" uz="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
@@ -7613,7 +7872,49 @@ function SectionComputerMgmt() {
         Any WMI subscription you didn't create is suspicious. Autoruns.exe (Sysinternals WMI tab) reveals them. Removal: <code>Get-WMIObject -Namespace root\subscription -Class __EventFilter | Remove-WmiObject</code>. Monitor with Sysmon Event ID 19, 20, 21.
       </Callout>
       <H2 num="§6" en="Disk Management — Key Concepts" uz="" />
+      <P><Term>Disk Management</Term> (diskmgmt.msc) is the GUI tool for managing physical disks, partitions, and volumes. Access via Computer Management or <code>diskmgmt.msc</code> from Run.</P>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Concept","Meaning","Security Relevance"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["MBR vs GPT","Partition table format — GPT is modern, required for UEFI boot","GPT supports Secure Boot; MBR systems are vulnerable to bootkit attacks in the MBR sector"],
+              ["Primary partition","Main data partition (up to 4 on MBR, unlimited on GPT)","OS lives here; encrypting with BitLocker locks the whole partition"],
+              ["System Reserved","Small hidden partition (500MB) holding BCD and boot files","Attackers target this for bootkit persistence — protect with Secure Boot"],
+              ["EFI System Partition","GPT boot partition (~100MB, FAT32)","Contains boot loader — monitored by Secure Boot signature verification"],
+              ["Recovery partition","WinRE (Windows Recovery Environment)","If deleted, cannot use F8 recovery — ransomware sometimes deletes it"],
+              ["Volume letter","Drive letter mapping (C:, D:, etc.)","Network shares using admin shares (C$) can be remapped for lateral movement"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <H2 num="§7" en="Practical Commands" uz="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Command","Action"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["compmgmt.msc","Open Computer Management"],
+              ["lusrmgr.msc","Open Local Users and Groups directly"],
+              ["diskmgmt.msc","Open Disk Management directly"],
+              ["net user","List all local user accounts"],
+              ["net user username /add","Create a new local user"],
+              ["net localgroup Administrators","List members of Administrators group"],
+              ["net localgroup Administrators username /add","Add user to Administrators"],
+              ["net share","List all shared folders including admin shares"],
+              ["Get-WmiObject Win32_LogicalDisk","PowerShell: list all drives with sizes"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   ) : (
     <section>
@@ -7641,6 +7942,20 @@ function SectionComputerMgmt() {
         </table>
       </div>
       <H2 num="§3" uz="Mahalliy Foydalanuvchilar va Guruhlar" en="" />
+      <P><Term>Mahalliy Foydalanuvchilar va Guruhlar</Term> (lusrmgr.msc) mustaqil mashinadagi hisoblar va guruhlarni boshqaradi. Domenga qo'shilgan kompyuterlarda domen hisoblari Active Directory orqali boshqariladi, lekin mahalliy guruhlar domen foydalanuvchilari mahalliy imkoniyatlarini nazorat qiladi.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>O'rnatilgan Foydalanuvchilar</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}><b>Administrator</b> — standart holda o'chirilgan<br/><b>Guest</b> — standart holda o'chirilgan<br/><b>DefaultAccount</b> — UWP ilova qo'llab-quvvatlash<br/><b>WDAGUtilityAccount</b> — Defender Application Guard<br/>Foydalanuvchi yaratgan hisoblar ham shu yerda</div>
+        </div>
+        <div style={{padding:14,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>Asosiy O'rnatilgan Guruhlar</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}><b>Administratorlar</b> — to'liq tizim nazorati<br/><b>Foydalanuvchilar</b> — standart foydalanuvchilar<br/><b>Masofaviy ish stoli foydalanuvchilari</b> — RDP kirishi<br/><b>Zaxira operatorlari</b> — zaxira uchun fayl ACL larini chetlab o'tish<br/><b>Power Users</b> — meros, cheklangan qo'shimcha huquqlar</div>
+        </div>
+      </div>
+      <Callout color="var(--c-attack)" icon="warning" titleUz="Xavfsizlik Maslahati" titleEn="">
+        Hujumchilar ko'pincha persistenslik uchun hisobini Administratorlar yoki Masofaviy ish stoli foydalanuvchilari guruhiga qo'shadi. Event ID 4732 ni kuzating (mahalliy guruhga a'zo qo'shildi). Administratorlar guruhini tekshirish: <code>net localgroup Administrators</code>
+      </Callout>
       <H2 num="§4" uz="Ishlash Monitori — Xavfsizlik Qo'llanilishi" en="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
         <div style={{padding:14,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
@@ -7657,7 +7972,49 @@ function SectionComputerMgmt() {
       <Callout color="var(--c-attack)" icon="warning" titleUz="WMI Persistenslikni Aniqlash" titleEn="">
         Siz yaratmagan har qanday WMI obunasi shubhali. Autoruns.exe (Sysinternals WMI tab) ularni ko'rsatadi. O'chirish: <code>Get-WMIObject -Namespace root\subscription -Class __EventFilter | Remove-WmiObject</code>. Sysmon Event ID 19, 20, 21 bilan kuzating.
       </Callout>
-      <H2 num="§6" uz="Amaliy Buyruqlar" en="" />
+      <H2 num="§6" uz="Disk Boshqaruvi — Asosiy Tushunchalar" en="" />
+      <P><Term>Disk Boshqaruvi</Term> (diskmgmt.msc) — jismoniy disklar, bo'limlar va hajmlarni boshqarish uchun GUI vosita. Kompyuter Boshqaruvi orqali yoki Run dan <code>diskmgmt.msc</code> orqali kirish.</P>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Tushuncha","Ma'nosi","Xavfsizlik bog'liqligi"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["MBR vs GPT","Bo'lim jadvali formati — GPT zamonaviy, UEFI uchun kerak","GPT Secure Boot ni qo'llab-quvvatlaydi; MBR tizimlar MBR sektorida bootkit hujumlariga zaif"],
+              ["Asosiy bo'lim","Asosiy ma'lumot bo'limi (MBR da 4 tagacha, GPT da cheksiz)","OS shu yerda; BitLocker bilan shifrlash butun bo'limni qulflaydi"],
+              ["Tizim zahirasi","BCD va yuklash fayllarini o'z ichiga olgan kichik yashirin bo'lim","Bootkit persistenslik uchun maqsad — Secure Boot bilan himoya qiling"],
+              ["EFI tizim bo'limi","GPT yuklash bo'limi (~100MB, FAT32)","Yuklash yuklovchisini o'z ichiga oladi — Secure Boot tomonidan kuzatiladi"],
+              ["Tiklash bo'limi","WinRE (Windows Recovery Environment)","O'chirilsa F8 tiklash ishlamaydi — ransomware ba'zan o'chiradi"],
+              ["Hajm harfi","Disk harfi xaritasi (C:, D:, va h.)","Admin ulashimlar (C$) lateral harakatlar uchun qayta xaritalanishi mumkin"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <H2 num="§7" uz="Amaliy Buyruqlar" en="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Buyruq","Harakat"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["compmgmt.msc","Kompyuter Boshqaruvini ochish"],
+              ["lusrmgr.msc","Mahalliy foydalanuvchilar va guruhlarni to'g'ridan-to'g'ri ochish"],
+              ["diskmgmt.msc","Disk Boshqaruvini to'g'ridan-to'g'ri ochish"],
+              ["net user","Barcha mahalliy foydalanuvchi hisoblarini ro'yxatlash"],
+              ["net user foydalanuvchi /add","Yangi mahalliy foydalanuvchi yaratish"],
+              ["net localgroup Administrators","Administratorlar guruh a'zolarini ro'yxatlash"],
+              ["net localgroup Administrators foydalanuvchi /add","Foydalanuvchini Administratorlarga qo'shish"],
+              ["net share","Admin ulashimlar bilan barcha ulashilgan papkalarni ro'yxatlash"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
@@ -7768,6 +8125,28 @@ function SectionResourceMonitor() {
       </P>
 
       <H2 num="§8" en="Practical Commands" uz="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Command","Action"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["resmon","Open Resource Monitor"],
+              ["tasklist","List all running processes with PIDs (cmd)"],
+              ["tasklist /svc","List processes with hosted services"],
+              ["taskkill /PID 1234 /F","Force-kill process by PID"],
+              ["Get-Process | Sort-Object CPU -Desc | Select -First 10","Top 10 CPU consumers (PowerShell)"],
+              ["Get-Process | Sort-Object WorkingSet -Desc | Select -First 10","Top 10 RAM consumers (PowerShell)"],
+              ["netstat -ano","All connections with owning PIDs"],
+              ["netstat -b","Connections with process name (admin required)"],
+              ["handle64.exe -p lsass","Sysinternals: show who has handles to lsass"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   ) : (
     <section>
@@ -7863,6 +8242,27 @@ function SectionResourceMonitor() {
       </P>
 
       <H2 num="§8" uz="Amaliy Buyruqlar" en="" />
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Buyruq","Harakat"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["resmon","Resurs Monitorini ochish"],
+              ["tasklist","Barcha jarayonlarni PID bilan ro'yxatlash (cmd)"],
+              ["tasklist /svc","Jarayonlarni joylashtirilgan xizmatlar bilan ro'yxatlash"],
+              ["taskkill /PID 1234 /F","Jarayonni PID bo'yicha majburiy o'ldirish"],
+              ["Get-Process | Sort-Object CPU -Desc | Select -First 10","Eng ko'p CPU ishlatayotgan 10 ta jarayon (PowerShell)"],
+              ["Get-Process | Sort-Object WorkingSet -Desc | Select -First 10","Eng ko'p RAM ishlatayotgan 10 ta jarayon (PowerShell)"],
+              ["netstat -ano","Egasi PID bilan barcha ulanishlar"],
+              ["netstat -b","Jarayon nomi bilan ulanishlar (admin talab qilinadi)"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
