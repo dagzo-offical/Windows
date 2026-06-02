@@ -103,7 +103,9 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   const prevLessonNum = lessonNum - 1;
   const prevSection = prevLessonNum <= 20 ? "01" : "02";
   const prevKey = lessonNum > 1 ? `s${prevSection}_l${String(prevLessonNum).padStart(2,"0")}` : null;
-  const isLocked = lessonNum > 1 && !completedLessons.includes(prevKey);
+  const sec1Keys = Array.from({ length: 20 }, (_, i) => `s01_l${String(i + 1).padStart(2, "0")}`);
+  const sec1Complete = sec1Keys.every(k => completedLessons.includes(k));
+  const isLocked = lessonNum > 1 && (lessonNum >= 21 ? !sec1Complete : !completedLessons.includes(prevKey));
 
   // ── Session timer ─────────────────────────────────────────
   const [quizPassed, setQuizPassed] = useLS(false);
