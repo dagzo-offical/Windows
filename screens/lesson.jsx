@@ -461,12 +461,6 @@ function Section1Bigpicture() {
           : <>Windows — bu <Term>gibrid yadro</Term> operatsion tizimi: u eng past darajadagi CPU mexanikasi (rejalashtirish, uzilishlar, sinxronizatsiya) uchun mas'ul kichik microkernel'ni va fayl tizimlari, tarmoq, xavfsizlik hamda xotira boshqaruvini kernel mode'da amalga oshiradigan boy <Em>Executive</Em> qatlamini birlashtiradi. Bu Linux'dan (monolitik yadro, drayverlar yadro tasviriga kompilyatsiya qilinadi) va macOS'dan (Mach microkernel + uning ustidagi BSD quyi tizimi) farq qiladi.</>}
       </P>
 
-      <Callout color="var(--c-system)" icon="info" titleUz="Tarixiy eslatma — Dave Cutler va VMS" titleEn="Historical note — Dave Cutler and VMS">
-        {lang === "en"
-          ? <>Windows NT kernel was designed by <strong>Dave Cutler</strong>, who had previously led the VAX/VMS project at DEC (Digital Equipment Corporation). He brought VMS's design philosophy to Windows NT: strictly separate user mode from kernel mode, give each process a private address space, and never trust user input in privileged code. Windows NT 3.1 shipped in August 1993 — it ran on as little as 8 MB of RAM. The architecture he designed has not fundamentally changed since then: Windows 11 still uses the same ring-based privilege model, the same Executive managers, and the same syscall dispatch table design from 1993.</>
-          : <>Windows NT yadrosi <strong>Dave Cutler</strong> tomonidan loyihalashtirilgan — u DEC (Digital Equipment Corporation) kompaniyasida VAX/VMS loyihasini boshqargan. U VMS'ning dizayn falsafasini Windows NT ga olib keldi: user mode'ni kernel mode'dan qat'iy ajratish, har bir jarayonga shaxsiy manzil maydoni berish va hech qachon imtiyozli kodda foydalanuvchi ma'lumotiga ishonmaslik. Windows NT 3.1 1993 yil avgustda chiqdi — u 8 MB RAM da ishladi. U loyihalagan arxitektura o'shandan beri asosan o'zgarmagan: Windows 11 hali ham 1993 yildan o'sha ring-asosidagi imtiyoz modelini, xuddi o'sha Executive menejerlarini va syscall dispatch jadval dizaynini ishlatadi.</>}
-      </Callout>
-
       <h3 style={subhead}>{lang === "en" ? "1.1 — The 4 fundamental jobs of any OS" : "1.1 — Har qanday OS'ning 4 ta asosiy vazifasi"}</h3>
       <P>
         {lang === "en"
