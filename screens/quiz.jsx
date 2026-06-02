@@ -8,7 +8,7 @@ const FALLBACK_QUESTIONS = {
   1: [
     { uz: "Operatsion tizim nima va u qanday 4 ta asosiy vazifani bajaradi? Windows bu vazifalarni qanday amalga oshiradi?", en: "What is an operating system and what are its 4 main jobs? How does Windows carry these out?" },
     { uz: "User mode (ring 3) va Kernel mode (ring 0) farqini tushuntiring. Nega bu ikki rejim mavjud va ular o'rtasidagi chegara nima uchun muhim?", en: "Explain the difference between user mode (ring 3) and kernel mode (ring 0). Why do these two modes exist and why is the boundary important?" },
-    { uz: "ntoskrnl.exe ichida Microkernel va Executive nima rol o'ynaydi? HAL (Hardware Abstraction Layer) nima uchun zarur?", en: "What roles do the Microkernel and Executive play inside ntoskrnl.exe? Why is the HAL (Hardware Abstraction Layer) needed?" },
+    { uz: "x86-64 protsessori nechta imtiyoz halqasini belgilaydi va Windows ulardan nechtasini ishlatadi? Ring 0 va ring 3 o'rtasidagi asosiy farq nima? Agar ring 3 dastur imtiyozli buyruq bajarishga harakat qilsa nima bo'ladi?", en: "How many privilege rings does the x86-64 CPU define, and how many does Windows actually use? What is the main difference between ring 0 and ring 3? What happens if a ring 3 program tries to execute a privileged instruction?" },
   ],
   2: [
     { uz: "Kernel nima? U operatsion tizimda qanday asosiy vazifalarni bajaradi? Windows kerneli qaysi faylda joylashgan?", en: "What is a kernel? What are its main tasks in an operating system? Which file contains the Windows kernel?" },
@@ -31,14 +31,14 @@ const FALLBACK_QUESTIONS = {
     { uz: "Nima uchun BIOS davridagi tizimlar MBR bootkit hujumlariga zaif edi? UEFI Secure Boot bu muammoni qanday hal qiladi?", en: "Why were BIOS-era systems vulnerable to MBR bootkit attacks? How does UEFI Secure Boot address this?" },
   ],
   6: [
-    { uz: "Secure Boot nima va u nima uchun yaratilgan? PK, KEK, db va dbx kalitlari qanday ierarxiya hosil qiladi va har birining roli nima?", en: "What is Secure Boot and why was it created? How do the PK, KEK, db, and dbx keys form a hierarchy and what is each one's role?" },
-    { uz: "Secure Boot tekshiruvi qanday ishlaydi — UEFI firmware bootloaderni yuklashdan oldin qanday tekshiradi? Tekshiruv muvaffaqiyatsiz bo'lsa nima bo'ladi?", en: "How does Secure Boot verification work — how does UEFI firmware verify a bootloader before running it? What happens if verification fails?" },
-    { uz: "BlackLotus (CVE-2022-21894) yoki BootHole (CVE-2020-10713) kabi haqiqiy Secure Boot chetlab o'tish texnikasini tushuntiring. Bu hujum qanday ishladi va Microsoft qanday javob berdi?", en: "Explain a real Secure Boot bypass technique such as BlackLotus (CVE-2022-21894) or BootHole (CVE-2020-10713). How did the attack work and how did Microsoft respond?" },
+    { uz: "Secure Boot nima va u nima uchun yaratilgan? U qanday muammoni hal qiladi?", en: "What is Secure Boot and why was it created? What problem does it solve?" },
+    { uz: "Secure Boot tekshiruvi qanday ishlaydi? UEFI firmware bootloaderni yuklashdan oldin nima qiladi? Tekshiruv muvaffaqiyatsiz bo'lsa nima bo'ladi?", en: "How does Secure Boot verification work? What does UEFI firmware do before loading a bootloader? What happens if verification fails?" },
+    { uz: "Secure Boot kalit ierarxiyasini tushuntiring: PK, KEK, db va dbx nima va ularning roli nima?", en: "Explain the Secure Boot key hierarchy: what are PK, KEK, db and dbx and what is the role of each?" },
   ],
   7: [
-    { uz: "TPM (Trusted Platform Module) nima va u qanday asosiy kriptografik funksiyalarni ta'minlaydi? fTPM va diskret TPM o'rtasidagi farq nima?", en: "What is a TPM (Trusted Platform Module) and what core cryptographic functions does it provide? What is the difference between fTPM and a discrete TPM?" },
-    { uz: "PCR (Platform Configuration Register) nima va u qanday ishlaydi? BitLocker PCR larni qanday ishlatadi va nima uchun bu muhim?", en: "What is a PCR (Platform Configuration Register) and how does it work? How does BitLocker use PCRs and why does this matter?" },
-    { uz: "TPM ga qarshi haqiqiy hujum vektorini tushuntiring — masalan, Evil Maid hujumi yoki TPM avtobus tinglash. Bu hujum qanday ishlaydi va qanday kamaytiriladi?", en: "Explain a real attack vector against TPM — for example, the Evil Maid attack or TPM bus sniffing. How does the attack work and how is it mitigated?" },
+    { uz: "TPM (Trusted Platform Module) nima va u qanday asosiy funksiyalarni ta'minlaydi? fTPM va diskret TPM o'rtasidagi farq nima?", en: "What is a TPM (Trusted Platform Module) and what core functions does it provide? What is the difference between fTPM and a discrete TPM?" },
+    { uz: "PCR (Platform Configuration Register) nima va u qanday ishlaydi? PCR kengaytirish formulasini tushuntiring.", en: "What is a PCR (Platform Configuration Register) and how does it work? Explain the PCR extension formula." },
+    { uz: "Windows TPM dan qanday foydalanadi? BitLocker va Windows Hello uchun TPM qanday rol o'ynaydi?", en: "How does Windows use the TPM? What role does TPM play for BitLocker and Windows Hello?" },
   ],
   8: [
     { uz: "Windows Registry nima? Uning 5 ta asosiy kaliti (HKLM, HKCU, HKCR, HKU, HKCC) nima uchun ishlatiladi va ular qaysi disk fayllariga mos keladi?", en: "What is the Windows Registry? What are its 5 root keys (HKLM, HKCU, HKCR, HKU, HKCC) used for and which disk files do they map to?" },
@@ -51,9 +51,9 @@ const FALLBACK_QUESTIONS = {
     { uz: "Filtr drayverlari nima va ular Windows fayl tizimi xavfsizligi uchun nima uchun muhim? Bir nechta filtr drayveri misolini keltiring.", en: "What are filter drivers and why are they important for Windows file system security? Give several examples of filter drivers." },
   ],
   10: [
-    { uz: "NTFS Master Fayl Jadvali (MFT) nima? Rezident va norezident ma'lumotlar o'rtasidagi farq nima va bu forensics uchun nima anglatadi?", en: "What is the NTFS Master File Table (MFT)? What is the difference between resident and non-resident data and what does this mean for forensics?" },
-    { uz: "NTFS Muqobil Ma'lumot Oqimlari (ADS) nima? Zararli dasturlar ularni qanday ishlatadi va ADS ni qanday aniqlash mumkin?", en: "What are NTFS Alternate Data Streams (ADS)? How do malware programs use them and how can ADS be detected?" },
-    { uz: "NTFS ruxsatlari va ulashish ruxsatlari o'rtasidagi farq nima? Tarmoq orqali faylga kirishda ular qanday birgalikda ishlaydi? $UsnJrnl nima va forensics uchun nima uchun muhim?", en: "What is the difference between NTFS permissions and share permissions? How do they work together when accessing a file over the network? What is $UsnJrnl and why is it important for forensics?" },
+    { uz: "NTFS Master Fayl Jadvali (MFT) nima? Rezident va norezident ma'lumotlar o'rtasidagi farq nima?", en: "What is the NTFS Master File Table (MFT)? What is the difference between resident and non-resident data?" },
+    { uz: "NTFS Muqobil Ma'lumot Oqimlari (ADS) nima? Zararli dasturlar ularni qanday ishlatishi mumkin?", en: "What are NTFS Alternate Data Streams (ADS)? How could malicious programs use them?" },
+    { uz: "NTFS ruxsatlari va ulashish ruxsatlari o'rtasidagi farq nima? $UsnJrnl nima?", en: "What is the difference between NTFS permissions and share permissions? What is $UsnJrnl?" },
   ],
   11: [
     { uz: "FAT32 da fayl ma'lumotlari diskda qanday saqlanadi? FAT jadvali, klaster zanjiri va katalog yozuvlari bir-biri bilan qanday bog'liq?", en: "How is file data stored on disk in FAT32? How do the FAT table, cluster chain, and directory entries relate to each other?" },
@@ -61,19 +61,19 @@ const FALLBACK_QUESTIONS = {
     { uz: "Nima uchun EFI Tizim Bo'limi (ESP) FAT32 sifatida formatlanishi shart? Bu xavfsizlik nuqtai nazaridan qanday muammolar tug'diradi?", en: "Why must the EFI System Partition (ESP) be formatted as FAT32? What security implications does this create?" },
   ],
   12: [
-    { uz: "Windows'da jarayon nima? EPROCESS tuzilmasida qanday asosiy maydonlar bor va ular birgalikda jarayon izolyatsiyasini qanday ta'minlaydi?", en: "What is a process in Windows? What are the key fields in the EPROCESS structure and how do they together provide process isolation?" },
-    { uz: "Kirish tokeni nima va u jarayon xavfsizlik kontekstini qanday belgilaydi? Yaxlitlik darajalari (Integrity Levels) nima va UAC qanday ishlaydi?", en: "What is an access token and how does it define a process's security context? What are Integrity Levels and how does UAC work?" },
-    { uz: "DLL in'ektsiya va jarayon bo'shatish (process hollowing) texnikalarini tushuntiring. Ular qanday ishlaydi va qanday aniqlanadi?", en: "Explain the DLL injection and process hollowing techniques. How does each one work and how are they detected?" },
+    { uz: "Windows'da jarayon nima? Har bir jarayon nimalarga ega (virtual manzil maydoni, token, handle jadvali)?", en: "What is a process in Windows? What does each process have (virtual address space, token, handle table)?" },
+    { uz: "Kirish tokeni nima va u jarayon xavfsizligini qanday belgilaydi? Yaxlitlik darajalari (Integrity Levels) nima?", en: "What is an access token and how does it define process security? What are Integrity Levels?" },
+    { uz: "DLL in'ektsiya texnikasi nima va u qanday ishlaydi? Nima uchun u xavfli?", en: "What is DLL injection and how does it work? Why is it dangerous?" },
   ],
   13: [
-    { uz: "Thread nima va u jarayondan qanday farq qiladi? ETHREAD va TEB tuzilmalari qanday asosiy ma'lumotlarni saqlaydi?", en: "What is a thread and how does it differ from a process? What key information do the ETHREAD and TEB structures contain?" },
-    { uz: "Windows rejalashtiruvchisi qanday ishlaydi? 0-31 prioritet darajalari, kvant va prioritet ko'tarish mexanizmini tushuntiring.", en: "How does the Windows scheduler work? Explain the 0-31 priority levels, thread quantum, and the priority boost mechanism." },
-    { uz: "Thread in'ektsiya texnikalarini solishtiring: CreateRemoteThread, QueueUserAPC va Thread Hijacking. Har biri qanday ishlaydi va Sysmon qaysi hodisalarni yozib oladi?", en: "Compare thread injection techniques: CreateRemoteThread, QueueUserAPC, and Thread Hijacking. How does each work and which Sysmon events capture them?" },
+    { uz: "Thread nima va u jarayondan qanday farq qiladi? Thread'lar jarayonning xotirasini baham ko'radimi?", en: "What is a thread and how does it differ from a process? Do threads share the process's memory?" },
+    { uz: "Windows rejalashtiruvchisi qanday ishlaydi? 0-31 prioritet darajalari va kvant nima?", en: "How does the Windows scheduler work? What are the 0-31 priority levels and what is a quantum?" },
+    { uz: "Thread in'ektsiya nima? CreateRemoteThread yordamida qanday in'ektsiya amalga oshiriladi?", en: "What is thread injection? How is injection performed using CreateRemoteThread?" },
   ],
   14: [
-    { uz: "Windows da handle nima? Handle javalining tuzilishi (ObjectPointerBits, GrantedAccessBits, Attributes) qanday va kirish huquqlari nima uchun ochilish vaqtida belgilanadi, har bir foydalanishda emas?", en: "What is a handle in Windows? How is a handle table entry structured (ObjectPointerBits, GrantedAccessBits, Attributes), and why are access rights baked in at open time rather than checked on every use?" },
-    { uz: "DuplicateHandle API qanday ishlaydi va u nima uchun xavfsizlik xavfini tug'diradi? Handle o'g'irlash texnikasini tushuntiring — hujumchi qanday EDR hookini chetlab o'tib LSASS xotirasini o'qiy oladi?", en: "How does DuplicateHandle work and why does it create a security risk? Explain the handle theft technique — how can an attacker read LSASS memory while bypassing EDR hooks on OpenProcess?" },
-    { uz: "Handle sizishi nima va u uzoq muddatli xizmat uchun nima uchun muammo? Handle sizishini qanday aniqlash va kuzatish mumkin? OBJECT_HEADER da HandleCount va PointerCount ning farqi nima?", en: "What is a handle leak and why is it a problem for a long-running service? How can you detect and track handle leaks? What is the difference between HandleCount and PointerCount in OBJECT_HEADER?" },
+    { uz: "Windows'da handle nima? Handle jaralishi qachon amalga oshiriladi va u qanday ishlaydi?", en: "What is a handle in Windows? When is a handle created and how does it work?" },
+    { uz: "DuplicateHandle API nima qiladi va u nima uchun xavfsizlik xavfini tug'diradi?", en: "What does DuplicateHandle do and why does it create a security risk?" },
+    { uz: "Handle sizishi (handle leak) nima va u nima uchun muammo? Qanday aniqlash mumkin?", en: "What is a handle leak and why is it a problem? How can it be detected?" },
   ],
   15: [
     { uz: "Windows Service Control Manager (SCM) nima va u services.exe da qanday ishlaydi? Servislarning hayot tsiklini boshqarish uchun SCM qanday mexanizmlardan foydalanadi (bog'liqlik hal qilish, muvaffaqiyatsizlik harakatlari, DACL)?", en: "What is the Windows Service Control Manager (SCM) and how does it run inside services.exe? What mechanisms does the SCM use to manage service lifecycles — dependency resolution, failure actions, and DACLs?" },
@@ -86,14 +86,14 @@ const FALLBACK_QUESTIONS = {
     { uz: "Klassik DLL in'ektsiya, reflektiv DLL in'ektsiya va COM hijacking texnikalarini solishtiring. Har biri qanday ishlaydi, qanday aniqlash mumkin va DllMain da nima uchun LoadLibrary ni chaqirmaslik kerak?", en: "Compare classic DLL injection, reflective DLL injection, and COM hijacking techniques. How does each work, how is it detected, and why must you never call LoadLibrary from inside DllMain?" },
   ],
   17: [
-    { uz: "Windows API qatlamli stekini tushuntiring: dasturdan ntdll gacha, va ntdll dan kernel SSDT gacha. Har bir qatlamning vazifasi nima va syscall ko'rsatmasi qanday CPU rejimini almashtiradi?", en: "Explain the Windows API layered stack: from the application to ntdll, and from ntdll to the kernel SSDT. What is the role of each layer, and how does the SYSCALL instruction switch CPU modes?" },
-    { uz: "IAT hooking, inline hooking (trampolin) va SSDT hookingni solishtiring. Har biri qanday ishlaydi, qaysi biri zamonaviy EDR lar tomonidan qo'llaniladi va hujumchilar foydalanuvchi makon hooklerini qanday chetlab o'tadi?", en: "Compare IAT hooking, inline hooking (trampoline), and SSDT hooking. How does each work, which is used by modern EDRs, and how do attackers bypass userland hooks (direct syscall, ntdll unhooking)?" },
-    { uz: "WOW64 nima va u 32-bit jarayon 64-bit Windows da syscall bajarganida qanday ishlaydi? 'Heaven's Gate' nima va u nima uchun xavfsizlik aniqlash bo'shlig'ini yaratadi?", en: "What is WOW64 and how does it work when a 32-bit process makes a syscall on 64-bit Windows? What is 'Heaven's Gate' and why does it create a security detection gap?" },
+    { uz: "Windows API qatlamli stekini tushuntiring: ilova Win32 API chaqirganda qanday yo'l bosib o'tiladi?", en: "Explain the Windows API layered stack: what path is taken when an app calls a Win32 API?" },
+    { uz: "IAT hooking va inline hooking (trampolin) nima? Ularning farqi nima?", en: "What are IAT hooking and inline hooking (trampoline)? What is the difference between them?" },
+    { uz: "Syscall nima va u qanday ring 3 dan ring 0 ga o'tadi? SYSCALL buyrug'i nima qiladi?", en: "What is a syscall and how does it transition from ring 3 to ring 0? What does the SYSCALL instruction do?" },
   ],
   18: [
-    { uz: "ETW (Event Tracing for Windows) arxitekturasini tushuntiring: provayder, seans va iste'molchi rollari. Security jurnali standart bo'yicha oz narsa jurnallaydigan bo'lsa, xavfsizlik auditi uchun muhim hodisalarni (4624, 4688, 7045) yoqish uchun nima qilish kerak?", en: "Explain the ETW (Event Tracing for Windows) architecture: the roles of provider, session, and consumer. If the Security log logs very little by default, what must be done to enable important security events (4624, 4688, 7045) for auditing?" },
-    { uz: "Sysmon Event ID 1, 3, 8 va 10 ni solishtiring. Har biri nima qayd etadi va qaysi biri LSASS hisob ma'lumotlarini dumplash uchun eng muhim aniqlash signal beradi? Nima uchun?", en: "Compare Sysmon Event IDs 1, 3, 8, and 10. What does each record, and which provides the most critical detection signal for LSASS credential dumping? Why?" },
-    { uz: "Hujumchi jurnal izlarini yo'q qilish uchun qanday 4 xil usul qo'llashi mumkin — wevtutil tozalash, ETW provider yamash, Sysmon drayverni to'xtatish va VSS o'chirish? Har biri uchun aniqlash strategiyasini tushuntiring.", en: "What are 4 different methods an attacker might use to destroy log evidence — wevtutil clearing, ETW provider patching, Sysmon driver stopping, and VSS deletion? Explain a detection strategy for each." },
+    { uz: "ETW (Event Tracing for Windows) arxitekturasini tushuntiring: provayder, seans va iste'molchi rollari nima?", en: "Explain ETW (Event Tracing for Windows) architecture: what are the roles of provider, session and consumer?" },
+    { uz: "Xavfsizlik auditi uchun muhim hodisa IDlari qaysilar? Event ID 4624, 4688 va 7045 nima anglatadi?", en: "What are the important event IDs for security auditing? What do Event IDs 4624, 4688 and 7045 mean?" },
+    { uz: "Sysmon nima va u qanday asosiy hodisalarni qayd etadi? Sysmon Event ID 1 va 10 nima anglatadi?", en: "What is Sysmon and what key events does it record? What do Sysmon Event IDs 1 and 10 mean?" },
   ],
   19: [
     { uz: "Windows Task Scheduler vazifasining XML tuzilishini tushuntiring: Triggers, Principals, Actions va Settings elementlari nima uchun kerak? LogonTrigger va BootTrigger hujumchilar uchun nima uchun eng foydali?", en: "Explain the XML structure of a Windows Task Scheduler task: what are Triggers, Principals, Actions, and Settings for? Why are LogonTrigger and BootTrigger most useful for attackers?" },
@@ -101,9 +101,9 @@ const FALLBACK_QUESTIONS = {
     { uz: "Schtasks /query, Event ID 4698/4702 va Autoruns.exe yordamida shubhali vazifalarni qanday aniqlash mumkin? Task XML da qanday belgilar (trigger turi, amal, principal) shubhali ekanligini ko'rsatadi?", en: "How can you detect suspicious tasks using schtasks /query, Event IDs 4698/4702, and Autoruns.exe? What indicators in a task XML (trigger type, action, principal) suggest malicious use?" },
   ],
   20: [
-    { uz: "EVTX ikkilik formatini tushuntiring: fayl sarlavhasi, chunk va hodisa yozuv tuzilmalari. Yozuv ID bo'shliqlari nima uchun jurnal buzishining dalili?", en: "Explain the EVTX binary format: file header, chunk, and event record structures. Why are Record ID gaps evidence of log tampering?" },
-    { uz: "Windows forensics uchun EVTX fayllaridan tashqari eng muhim 5 ta artefaktni keltiring (Prefetch, AmCache, SRUM, $MFT, Shimcache). Har biri qanday ma'lumot beradi va ular nima uchun jurnal tozalash bilan yo'q qilinmaydi?", en: "Name the 5 most important forensic artifacts beyond EVTX (Prefetch, AmCache, SRUM, $MFT, Shimcache). What information does each provide and why can't they be destroyed by clearing event logs?" },
-    { uz: "Hodisaga javob berish triage ish oqimini tushuntiring: KAPE yig'ish, MFTECmd vaqt jadvali, Chainsaw/Sigma tahlili, pivotlash va qamrovni aniqlash. Har bir bosqichda qaysi vositalar ishlatiladi?", en: "Explain the incident response triage workflow: KAPE collection, MFTECmd timeline, Chainsaw/Sigma analysis, pivoting, and scoping. Which tools are used at each stage?" },
+    { uz: "Windows Event Log fayllari (EVTX) qayerda saqlanadi va ular qanday formatda? Asosiy log kanallari qaysilar?", en: "Where are Windows Event Log files (EVTX) stored and in what format? What are the main log channels?" },
+    { uz: "Forensics uchun EVTX dan tashqari muhim artefaktlar qaysilar? Prefetch va AmCache nima haqida ma'lumot beradi?", en: "What are important forensic artifacts beyond EVTX? What information do Prefetch and AmCache provide?" },
+    { uz: "Hodisaga javob berish (incident response) da birinchi bajariladigan asosiy qadamlar qaysilar?", en: "What are the main first steps in incident response?" },
   ],
   21: [
     { uz: "Task Manager ning 5 ta tabini tushuntiring: Processes, Performance, App History, Startup va Users/Details/Services. Har bir tab qanday ma'lumot beradi va ular qachon ishlatiladi?", en: "Explain Task Manager's 5 tabs: Processes, Performance, App History, Startup, and Users/Details/Services. What information does each tab provide and when is each used?" },
