@@ -669,70 +669,67 @@ function Section2Theory() {
           : <>User mode (ring 3) kodi qulab tushganda — masalan, Notepad'da xato bo'lsa — Windows faqat o'sha jarayonni o'chiradi. Tizimning qolgan qismi ta'sirlanmasdan ishlashda davom etadi. Lekin kernel mode (ring 0) kodi qulab tushganda — drayver null ko'rsatgichni dereference qiladi, taymer callback stack'ni buzadi — uni ushlaydigan yuqori hokimiyat yo'q. Butun mashina to'xtaydi: <Em>Bug Check (Ko'k Ekran O'limi — BSOD)</Em>. Tizim xotira dumpini diskka yozadi va qayta ishga tushadi. Shuning uchun drayver sifati Windows'dagi №1 barqarorlik omili — va Microsoft nima uchun barcha uchinchi tomon drayverlarni raqamli imzolashni talab qiladi.</>}
       </Callout>
 
-      {/* ── 2.3 Executive & Microkernel ── */}
-      <h3 style={subhead}>{lang === "en" ? "2.3 — The Executive and the Microkernel" : "2.3 — Executive va Microkernel"}</h3>
+      {/* ── 2.3 CPU Rings (expanded) ── */}
+      <h3 style={subhead}>{lang === "en" ? "2.3 — The four CPU privilege rings" : "2.3 — To'rtta CPU imtiyoz halqasi"}</h3>
       <P>
         {lang === "en"
-          ? <>Both the Executive and the Microkernel live inside a single file: <code>ntoskrnl.exe</code> (~10 MB on Windows 11 x64, exporting ~4,000 symbols). The <Term>Microkernel</Term> is the small, ultra-stable core that handles the most fundamental CPU operations — it never makes policy decisions. The <Term>Executive</Term> is the richer layer above it that implements all OS policy. Together they are called the <Em>Windows Executive</Em> or simply <Em>the kernel</Em> in everyday language.</>
-          : <>Executive va Microkernel ikkisi ham bitta faylda yashaydi: <code>ntoskrnl.exe</code> (Windows 11 x64 da ~10 MB, ~4,000 ta simvol eksport qiladi). <Term>Microkernel</Term> — eng asosiy CPU operatsiyalarini boshqaradigan kichik, o'ta barqaror yadro — u hech qachon siyosat qarorlari qabul qilmaydi. <Term>Executive</Term> — barcha OS siyosatlarini amalga oshiradigan uning ustidagi boy qatlam. Birgalikda ular <Em>Windows Executive</Em> yoki kundalik tilda oddiygina <Em>kernel</Em> deb ataladi.</>}
+          ? <>The x86-64 architecture defines rings 0 through 3 as concentric trust levels — each inner ring has more CPU power than the outer ones. Windows only uses rings 0 and 3. Understanding each ring's purpose explains why the kernel and user apps are separated so strictly.</>
+          : <>x86-64 arxitekturasi ring 0 dan ring 3 gacha bo'lgan konsentrik ishonch darajalarini belgilaydi — har bir ichki halqa tashqilaridan ko'ra ko'proq CPU kuchiga ega. Windows faqat ring 0 va ring 3 dan foydalanadi. Har bir halqaning maqsadini tushunish kernel va foydalanuvchi ilovalarining nima uchun bunday qattiq ajratilganini tushuntiradi.</>}
       </P>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }}>
-        <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(0,212,255,0.06)", border: "1px solid rgba(0,212,255,0.25)" }}>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "var(--c-system)", marginBottom: 10 }}>
-            {lang === "en" ? "Microkernel handles:" : "Microkernel boshqaradi:"}
-          </div>
-          {(lang === "en" ? [
-            "Thread scheduling — priority 0-31, 15.6 ms quantum",
-            "IDT (Interrupt Descriptor Table) — 256-entry CPU exception routing",
-            "Spinlocks & dispatcher locks — multi-CPU synchronisation",
-            "Clock interrupts — HPET / APIC timer at 15.6 ms",
-            "Trap / exception dispatch — routes #GP, #PF, NMI to handlers",
-            "DPC (Deferred Procedure Call) — post-interrupt work queue",
-          ] : [
-            "Thread rejalashtiruvi — prioritet 0-31, 15.6 ms kvant",
-            "IDT (Interrupt Descriptor Table) — 256 yozuvli CPU istisno yo'naltirish",
-            "Spinlock va dispatcher lock'lar — ko'p CPU sinxronizatsiyasi",
-            "Soat uzilishlari — HPET / APIC taymer, 15.6 ms da",
-            "Trap / exception dispatch — #GP, #PF, NMI ni handlerlarga yo'naltirish",
-            "DPC (Deferred Procedure Call) — uzilishdan keyingi ish navbati",
-          ]).map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 12.5, color: "var(--text-1)" }}>
-              <span style={{ color: "var(--c-system)", flexShrink: 0 }}>▸</span>{item}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10, marginTop: 16, maxWidth: 640, margin: "16px auto 0" }}>
+        {(lang === "en" ? [
+          { ring: "Ring 0", label: "Kernel mode", color: "var(--c-attack)", bg: "rgba(255,58,94,0.07)", border: "rgba(255,58,94,0.35)",
+            who: "ntoskrnl.exe, hal.dll, all .sys drivers",
+            can: "Any CPU instruction (HLT, LGDT, MOV CR0, RDMSR, CLI/STI, IN/OUT). Direct hardware access. Full memory access.",
+            crash: "Crash → entire machine halts (BSOD). No recovery possible." },
+          { ring: "Ring 1", label: "Not used by Windows", color: "var(--text-3)", bg: "var(--bg-2)", border: "var(--border)",
+            who: "—",
+            can: "Designed for OS subsystems (OS/2, original VMS design). Windows NT deliberately skips rings 1 and 2 — all drivers run at full ring 0 instead.",
+            crash: "N/A" },
+          { ring: "Ring 2", label: "Not used by Windows", color: "var(--text-3)", bg: "var(--bg-2)", border: "var(--border)",
+            who: "—",
+            can: "Originally for device drivers in older OS designs. Windows skips this entirely.",
+            crash: "N/A" },
+          { ring: "Ring 3", label: "User mode", color: "var(--c-user)", bg: "rgba(255,145,69,0.06)", border: "rgba(255,145,69,0.3)",
+            who: "chrome.exe, notepad.exe, winword.exe — every regular application",
+            can: "Math, logic, Win32 API calls, VirtualAlloc(). Cannot touch hardware directly. Must cross to ring 0 via SYSCALL to do anything privileged.",
+            crash: "Crash → only that process dies. Other apps and the OS continue running." },
+        ] : [
+          { ring: "Ring 0", label: "Kernel mode", color: "var(--c-attack)", bg: "rgba(255,58,94,0.07)", border: "rgba(255,58,94,0.35)",
+            who: "ntoskrnl.exe, hal.dll, barcha .sys drayverlar",
+            can: "Har qanday CPU buyrug'i (HLT, LGDT, MOV CR0, RDMSR, CLI/STI, IN/OUT). To'g'ridan-to'g'ri hardware kirishi. To'liq xotira kirishi.",
+            crash: "Xato → butun mashina to'xtaydi (BSOD). Tiklash mumkin emas." },
+          { ring: "Ring 1", label: "Windows ishlatmaydi", color: "var(--text-3)", bg: "var(--bg-2)", border: "var(--border)",
+            who: "—",
+            can: "OS quyi tizimlari uchun mo'ljallangan (OS/2, asl VMS dizayni). Windows NT ring 1 va ring 2 ni ataylab o'tkazib yuboradi — barcha drayverlar to'liq ring 0'da ishlaydi.",
+            crash: "Tegishli emas" },
+          { ring: "Ring 2", label: "Windows ishlatmaydi", color: "var(--text-3)", bg: "var(--bg-2)", border: "var(--border)",
+            who: "—",
+            can: "Eski OS dizaynlarida qurilma drayverlari uchun. Windows buni butunlay o'tkazib yuboradi.",
+            crash: "Tegishli emas" },
+          { ring: "Ring 3", label: "User mode", color: "var(--c-user)", bg: "rgba(255,145,69,0.06)", border: "rgba(255,145,69,0.3)",
+            who: "chrome.exe, notepad.exe, winword.exe — har bir oddiy ilova",
+            can: "Matematika, mantiq, Win32 API chaqiruvlari, VirtualAlloc(). Hardware ga to'g'ridan-to'g'ri tegalay olmaydi. Imtiyozli ishlash uchun SYSCALL orqali ring 0 ga o'tishi kerak.",
+            crash: "Xato → faqat o'sha jarayon o'ladi. Boshqa ilovalar va OS ishlashda davom etadi." },
+        ]).map((r, i) => (
+          <div key={i} style={{ padding: "14px 18px", borderRadius: 10, background: r.bg, border: `1px solid ${r.border}`, borderLeft: `4px solid ${r.color}`, opacity: r.color === "var(--text-3)" ? 0.6 : 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 700, color: r.color, minWidth: 56 }}>{r.ring}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: r.color }}>{r.label}</div>
+              <div style={{ marginLeft: "auto", fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--text-3)" }}>{r.who}</div>
             </div>
-          ))}
-        </div>
-        <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(180,100,255,0.06)", border: "1px solid rgba(180,100,255,0.25)" }}>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "#b48cff", marginBottom: 10 }}>
-            {lang === "en" ? "Executive — 6 managers:" : "Executive — 6 ta menejer:"}
+            <div style={{ fontSize: 12, color: "var(--text-1)", lineHeight: 1.55, marginBottom: r.crash !== "N/A" && r.crash !== "Tegishli emas" ? 6 : 0 }}>{r.can}</div>
+            {r.crash !== "N/A" && r.crash !== "Tegishli emas" && (
+              <div style={{ fontSize: 11.5, color: r.color, marginTop: 4 }}>⚠ {r.crash}</div>
+            )}
           </div>
-          {(lang === "en" ? [
-            "Process Manager — EPROCESS/ETHREAD, NtCreateProcess",
-            "Memory Manager — virtual memory, page faults, pagefile.sys, ASLR",
-            "I/O Manager — IRP lifecycle, driver stack dispatch",
-            "Object Manager — reference counting, handle table",
-            "Security Reference Monitor — token ↔ ACL check on every Nt* call",
-            "Cache Manager — write-back file cache, mapped sections",
-          ] : [
-            "Jarayon Menejeri — EPROCESS/ETHREAD, NtCreateProcess",
-            "Xotira Menejeri — virtual xotira, sahifa xatolari, pagefile.sys, ASLR",
-            "I/O Menejeri — IRP hayot tsikli, drayver stekini yuborish",
-            "Ob'ekt Menejeri — reference counting, handle jadvali",
-            "Xavfsizlik Reference Monitor — har bir Nt* chaqiruvda token ↔ ACL tekshiruvi",
-            "Kesh Menejeri — write-back fayl keshi, xaritalangan bo'limlar",
-          ]).map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 12.5, color: "var(--text-1)" }}>
-              <span style={{ color: "#b48cff", flexShrink: 0 }}>▸</span>{item}
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
-
-      <P style={{ marginTop: 16 }}>
+      <Callout color="var(--c-system)" icon="info" titleUz="Nima uchun ring 1 va 2 ishlatilmaydi?" titleEn="Why skip rings 1 and 2?">
         {lang === "en"
-          ? <>Below the microkernel sits the <Term>HAL (Hardware Abstraction Layer)</Term> — implemented in <code>hal.dll</code>. HAL hides the differences between specific processor platforms so the same <code>ntoskrnl.exe</code> binary runs on Intel, AMD, and ARM without recompilation. HAL handles: interrupt controller routing (APIC on x64, GIC on ARM), high-resolution timer calibration (for the 15.6 ms scheduler tick), multi-processor boot (waking Application Processor cores), and DMA buffer management. Without HAL, Microsoft would need a separate kernel build for every CPU platform — instead, only HAL is rebuilt per platform, and ntoskrnl stays the same.</>
-          : <>Microkernel'dan pastda <Term>HAL (Hardware Abstraction Layer)</Term> — <code>hal.dll</code> da amalga oshiriladi. HAL ma'lum protsessor platformalar o'rtasidagi farqlarni yashiradi, shunda bir xil <code>ntoskrnl.exe</code> binary Intel, AMD va ARM'da qayta kompilyatsiyasiz ishlaydi. HAL quyidagilarni boshqaradi: uzilish kontrolleri yo'naltirish (x64 da APIC, ARM'da GIC), yuqori aniqlikdagi taymer kalibrlash (15.6 ms scheduler tikki uchun), ko'p protsessorli yuklash (Application Processor yadrolarini uyg'otish) va DMA bufer boshqaruvi. HALsiz, Microsoft har bir CPU platformasi uchun alohida kernel to'plami kerak bo'lardi — buning o'rniga faqat HAL har bir platform uchun qayta to'planadi, ntoskrnl esa bir xil qoladi.</>}
-      </P>
+          ? <>Dave Cutler's NT design philosophy was simplicity: a clean two-layer model (kernel vs user) is easier to secure and verify than a four-layer model. Rings 1 and 2 were used in older x86 OSes (OS/2, NetWare) for device drivers — but maintaining three privilege boundaries added complexity without enough security benefit. Windows NT put all drivers in ring 0 and added driver signing instead.</>
+          : <>Dave Cutlerning NT dizayn falsafasi soddalik edi: to'rt qatlamli modeldan ancha sodda va xavfsizroq ikki qatlamli model (kernel vs user). Ring 1 va 2 eski x86 OS'larda (OS/2, NetWare) qurilma drayverlari uchun ishlatilgan, ammo uch imtiyoz chegarasini saqlash murakkablikni orttirib, xavfsizlik foydasini oshirmagan. Windows NT barcha drayverlarni ring 0 ga joylashtirdi va buning o'rniga drayver imzolashni joriy etdi.</>}
+      </Callout>
 
     </section>
   );
