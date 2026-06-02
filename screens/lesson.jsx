@@ -583,8 +583,8 @@ function Section2Theory() {
           : <>Ichkarida kernel har bir jarayonni sahifasiz kernel xotirasida saqlangan <Term>EPROCESS</Term> (Executive Process bloki) tuzilmasi orqali kuzatib boradi. <code>EPROCESS</code> quyidagilarni o'z ichiga oladi: PID, ota PID, yaratilish vaqti, xavfsizlik tokeni ko'rsatgichi, thread'lar ro'yxati (<code>ETHREAD</code> tuzilmalari sifatida), handle jadval ko'rsatgichi va butun virtual manzil maydonini xaritalovchi Virtual Address Descriptor (VAD) daraxti. Process Hacker kabi sud-tibbiyot tizimlari bu tuzilmalarni to'g'ridan-to'g'ri o'qiydi — shuning uchun malware Task Manager'ning oddiy API chaqiruvlaridan o'zini yashirsa ham, ular jarayonlarni ko'rsata oladi.</>}
       </P>
 
-      {/* ── 2.2 User mode vs Kernel mode ── */}
-      <h3 style={subhead}>{lang === "en" ? "2.2 — User mode vs Kernel mode" : "2.2 — User mode va Kernel mode"}</h3>
+      {/* ── 2.2 User mode vs Kernel mode & CPU rings ── */}
+      <h3 style={subhead}>{lang === "en" ? "2.2 — User mode, Kernel mode & CPU privilege rings" : "2.2 — User mode, Kernel mode va CPU imtiyoz halqalari"}</h3>
       <P>
         {lang === "en"
           ? <>The x86-64 CPU architecture defines <Em>four privilege rings</Em>: ring 0 (most privileged) through ring 3 (least privileged). Windows uses only two: <Em>ring 0</Em> (kernel mode) for the OS, and <Em>ring 3</Em> (user mode) for every application. Rings 1 and 2 were designed for OS subsystems and device drivers in older systems (like OS/2); Windows NT deliberately skips them — all drivers run at full ring 0 privilege.</>
@@ -596,13 +596,6 @@ function Section2Theory() {
           : <>User mode (ring 3) kodi qulab tushganda — masalan, Notepad'da xato bo'lsa — Windows faqat o'sha jarayonni o'chiradi. Tizimning qolgan qismi ta'sirlanmasdan ishlashda davom etadi. Lekin kernel mode (ring 0) kodi qulab tushganda — drayver null ko'rsatgichni dereference qiladi, taymer callback stack'ni buzadi — uni ushlaydigan yuqori hokimiyat yo'q. Butun mashina to'xtaydi: <Em>Bug Check (Ko'k Ekran O'limi — BSOD)</Em>. Tizim xotira dumpini diskka yozadi va qayta ishga tushadi. Shuning uchun drayver sifati Windows'dagi №1 barqarorlik omili — va Microsoft nima uchun barcha uchinchi tomon drayverlarni raqamli imzolashni talab qiladi.</>}
       </Callout>
 
-      {/* ── 2.3 CPU Rings (expanded) ── */}
-      <h3 style={subhead}>{lang === "en" ? "2.3 — The four CPU privilege rings" : "2.3 — To'rtta CPU imtiyoz halqasi"}</h3>
-      <P>
-        {lang === "en"
-          ? <>The x86-64 architecture defines rings 0 through 3 as concentric trust levels — each inner ring has more CPU power than the outer ones. Windows only uses rings 0 and 3. Understanding each ring's purpose explains why the kernel and user apps are separated so strictly.</>
-          : <>x86-64 arxitekturasi ring 0 dan ring 3 gacha bo'lgan konsentrik ishonch darajalarini belgilaydi — har bir ichki halqa tashqilaridan ko'ra ko'proq CPU kuchiga ega. Windows faqat ring 0 va ring 3 dan foydalanadi. Har bir halqaning maqsadini tushunish kernel va foydalanuvchi ilovalarining nima uchun bunday qattiq ajratilganini tushuntiradi.</>}
-      </P>
       <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10, marginTop: 16, maxWidth: 640, margin: "16px auto 0" }}>
         {(lang === "en" ? [
           { ring: "Ring 0", label: "Kernel mode", color: "var(--c-attack)", bg: "rgba(255,58,94,0.07)", border: "rgba(255,58,94,0.35)",
