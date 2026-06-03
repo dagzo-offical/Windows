@@ -119,6 +119,7 @@ const SECTION_DATA = {
     tooling: ["PowerShell", "ADUC", "ADSI Edit", "BloodHound", "Mimikatz", "Impacket", "Rubeus", "Group Policy Management"],
     lessons: [
       { n: "38", uz: "Active Directory asoslari", en: "Active Directory Basics", duration: 30, status: "available", icon: "shield", color: "var(--c-warn)", labs: 1, diagrams: 4 },
+      { n: "39", uz: "AD da foydalanuvchi va kompyuter boshqaruvi", en: "Managing Users & Computers in AD", duration: 32, status: "available", icon: "settings", color: "var(--c-auth)", labs: 2, diagrams: 4 },
     ],
   },
 };

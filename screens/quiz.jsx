@@ -195,6 +195,11 @@ const FALLBACK_QUESTIONS = {
     { uz: "Active Directory da uchta asosiy ob'ekt turini (Users, Machines, Security Groups) tushuntiring. Qurilma hisob qaydnomasi nomi qanday ko'rinishda bo'ladi?", en: "Explain the three main AD object types: Users, Machines, and Security Groups. What does a machine account name look like?" },
     { uz: "Tashkiliy Bo'linmalar (OU) va Xavfsizlik Guruhlari (Security Groups) o'rtasidagi asosiy farq nima? Qaysi biri siyosat qo'llash uchun, qaysi biri ruxsat berish uchun ishlatiladi?", en: "What is the key difference between Organisational Units (OUs) and Security Groups? Which is used for applying policies and which for granting resource permissions?" },
   ],
+  39: [
+    { uz: "ADda OUni o'chirishdan oldin nima qilish kerak va nima uchun? 'Tasodifiy o'chirishdan himoya' qanday o'chiriladi?", en: "What must you do before deleting an OU in AD and why? How do you disable accidental deletion protection?" },
+    { uz: "Delegatsiya (Delegation) nima? IT qo'llab-quvvatlash xizmatiga faqat parol tiklash huquqini berish uchun qanday amallar bajariladi?", en: "What is delegation in AD? What steps are needed to give an IT support user only the right to reset passwords?" },
+    { uz: "AD da kompyuterlar qanday uchta asosiy toifaga bo'linadi va har birining vazifasi nima?", en: "What are the three main categories of computers in AD and what is the role of each?" },
+  ],
 };
 
 const COOLDOWN_KEY = "wa_cooldown_end";
@@ -520,6 +525,7 @@ const LESSON_TITLES = {
   36: { uz: "Fayl ulashish",            en: "File Sharing" },
   37: { uz: "Zaxira nusxa va tiklash",  en: "Backup & Restore" },
   38: { uz: "Active Directory asoslari", en: "Active Directory Basics" },
+  39: { uz: "AD da foydalanuvchi va kompyuter boshqaruvi", en: "Managing Users & Computers in AD" },
 };
 
 function ModalHeader({ phase, onClose, lessonNum = 1 }) {

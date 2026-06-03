@@ -89,6 +89,7 @@ const LESSONS = {
   36: { num:"L36", section:"02", uz:"Fayl ulashish", en:"File Sharing", subUz:"Shared folders va tarmoq ulashish sozlamalari", subEn:"Shared folders and network sharing settings" },
   37: { num:"L37", section:"02", uz:"Zaxira nusxa va tiklash", en:"Backup & Restore", subUz:"Ma'lumotlarni zaxiralash va tiklash strategiyalari", subEn:"Data backup and recovery strategies" },
   38: { num:"L38", section:"03", uz:"Active Directory asoslari", en:"Active Directory Basics", subUz:"Windows domeni, AD DS va asosiy ob'ektlar", subEn:"Windows domain, AD DS and core objects" },
+  39: { num:"L39", section:"03", uz:"AD da foydalanuvchi va kompyuter boshqaruvi", en:"Managing Users & Computers in AD", subUz:"OU boshqaruvi, delegatsiya va qurilmalarni tashkil etish", subEn:"OU management, delegation and organising computers" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -238,6 +239,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
                 : lessonNum === 36 ? <><SectionFileShare /></>
                 : lessonNum === 37 ? <><SectionBackupRestore /></>
                 : lessonNum === 38 ? <><SectionADBasics /></>
+                : lessonNum === 39 ? <><SectionADUsers /></>
                 : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
                 <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} sectionNum={sectionNum} quizUnlocked={quizUnlocked} totalTimeSec={totalTimeSec} quizPassed={quizPassed} />
               </>
@@ -8646,6 +8648,191 @@ function SectionADBasics() {
           <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Resurs <b>ruxsatlarini</b> berish uchun<br/>Foydalanuvchi ko'p guruhda bo'lishi mumkin<br/>Foydalanuvchi, mashina, guruhlar<br/>Misol: ShareAccess, PrinterUsers<br/><span style={{color:"var(--accent)"}}>→ Ruxsat konteynerlari</span></div>
         </div>
       </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L39 — AD da foydalanuvchi va kompyuter boshqaruvi
+// ─────────────────────────────────────────────────────────────
+function SectionADUsers() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="Managing the OU Structure" uz="" />
+      <P>As a new domain admin, your first task is to check the existing OU and user structure and align it with the company's org chart. You may need to create missing OUs, delete obsolete ones, and add or remove user accounts accordingly.</P>
+      <Callout color="var(--accent)" icon="info" titleEn="Typical first steps" titleUz="">
+        Open ADUC (<code>dsa.msc</code>) → compare existing OUs to the org chart → delete obsolete OUs → create/delete users to match the chart.
+      </Callout>
+
+      <H2 num="§2" en="Deleting an OU — Accidental Deletion Protection" uz="" />
+      <P>By default, OUs are protected against accidental deletion. If you right-click an OU and try to delete it, you'll see an error. To delete it:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:10,margin:"14px 0"}}>
+        {[
+          {n:"1",t:"Enable Advanced Features",d:'In ADUC → View menu → check "Advanced Features". This reveals additional containers and properties.'},
+          {n:"2",t:"Open OU Properties",d:"Right-click the OU → Properties → Object tab."},
+          {n:"3",t:"Uncheck protection",d:'Uncheck "Protect object from accidental deletion" → OK.'},
+          {n:"4",t:"Delete the OU",d:"Right-click the OU → Delete. Confirm — this also deletes ALL users, groups, and sub-OUs inside it."},
+        ].map((s,i)=>(
+          <div key={i} style={{display:"flex",gap:14,alignItems:"flex-start",padding:"12px 14px",background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:8}}>
+            <div style={{minWidth:28,height:28,borderRadius:"50%",background:"var(--accent)",display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--bg-1)",flexShrink:0}}>{s.n}</div>
+            <div><div style={{fontWeight:600,fontSize:13,color:"var(--text-0)",marginBottom:3}}>{s.t}</div><div style={{fontSize:12,color:"var(--text-2)",lineHeight:1.6}}>{s.d}</div></div>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-attack)" icon="warning" titleEn="Warning" titleUz="">
+        Deleting an OU permanently removes everything inside it — users, groups, sub-OUs. There is no Recycle Bin by default. Enable AD Recycle Bin from Active Directory Administrative Center before doing bulk deletions.
+      </Callout>
+
+      <H2 num="§3" en="Creating and Deleting Users" uz="" />
+      <P>To create a user: right-click an OU → New → User. Fill in first name, last name, username (<Term>User Logon Name</Term>) and set an initial password. To delete: right-click the user → Delete.</P>
+      <P>Common tasks when aligning AD to an org chart:</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Create missing users",c:"var(--accent)",d:"Add accounts for new employees shown in org chart but not yet in AD."},
+          {t:"Delete departed users",c:"var(--c-attack)",d:"Remove accounts of employees who have left. Leaving them active is a security risk — orphaned accounts can be exploited."},
+          {t:"Move users to correct OU",c:"var(--c-auth)",d:"Drag-and-drop or right-click → Move to place users in the right OU so correct Group Policies apply."},
+          {t:"Reset passwords",c:"var(--c-warn)",d:"Right-click user → Reset Password. Can also force password change on next login."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§4" en="Delegation — Granting OU Control" uz="" />
+      <P><Term>Delegation</Term> lets you give a specific user partial control over an OU — without making them a Domain Admin. The most common use case: granting IT support the right to reset passwords without full admin access.</P>
+      <P>To delegate control over an OU:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:10,margin:"14px 0"}}>
+        {[
+          {n:"1",t:"Right-click the OU",d:'In ADUC, right-click the target OU → "Delegate Control…"'},
+          {n:"2",t:"Add the user",d:'Click Add → type the username (e.g. "phillip") → Check Names → OK.'},
+          {n:"3",t:"Select the task",d:'Choose "Reset user passwords and force password change at next logon" → Next → Finish.'},
+        ].map((s,i)=>(
+          <div key={i} style={{display:"flex",gap:14,alignItems:"flex-start",padding:"12px 14px",background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:8}}>
+            <div style={{minWidth:28,height:28,borderRadius:"50%",background:"var(--c-auth)",display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--bg-1)",flexShrink:0}}>{s.n}</div>
+            <div><div style={{fontWeight:600,fontSize:13,color:"var(--text-0)",marginBottom:3}}>{s.t}</div><div style={{fontSize:12,color:"var(--text-2)",lineHeight:1.6}}>{s.d}</div></div>
+          </div>
+        ))}
+      </div>
+      <P>After delegation, the user can reset passwords in that OU but cannot open ADUC (no full admin rights). They use PowerShell instead:</P>
+      <div style={{background:"var(--surface-2)",borderRadius:8,padding:"12px 16px",fontFamily:"var(--font-mono)",fontSize:12,lineHeight:1.9,margin:"10px 0"}}>
+        <span style={{color:"var(--text-3)"}}># Reset password</span><br/>
+        <span style={{color:"var(--text-2)"}}>Set-ADAccountPassword</span> sophie -Reset -NewPassword (<span style={{color:"var(--text-2)"}}>Read-Host</span> -AsSecureString -Prompt <span style={{color:"var(--accent)"}}>'New Password'</span>)<br/><br/>
+        <span style={{color:"var(--text-3)"}}># Force password change on next login</span><br/>
+        <span style={{color:"var(--text-2)"}}>Set-ADUser</span> -ChangePasswordAtLogon <span style={{color:"var(--c-warn)"}}>$true</span> -Identity sophie
+      </div>
+
+      <H2 num="§5" en="Managing Computers in AD" uz="" />
+      <P>By default, all domain-joined machines land in the <Term>Computers</Term> container. It's best practice to organise them into separate OUs so you can apply different policies to different device types.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10,margin:"14px 0"}}>
+        {[
+          {t:"Workstations",c:"var(--accent)",d:"Most common devices — desktops and laptops used by employees for daily work. Standard users log in here. High-privilege accounts should NEVER log into workstations."},
+          {t:"Servers",c:"var(--c-auth)",d:"Provide services to users or other servers (file servers, web servers, print servers). Need stricter policies than workstations."},
+          {t:"Domain Controllers",c:"var(--c-attack)",d:"The most sensitive machines in the domain — they hold hashed passwords of every user. Already have their own default OU. Tightly restricted access."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§6" en="Organising Computers into OUs" uz="" />
+      <P>Create two new OUs directly under the domain root: <Em>Workstations</Em> and <Em>Servers</Em>. Then move machines from the default Computers container into the appropriate OU.</P>
+      <P>To move a computer object: in ADUC, find the machine in Computers → right-click → Move → select the target OU. After this, Group Policy assigned to the OU will apply to that machine on next Group Policy refresh (<code>gpupdate /force</code>).</P>
+      <Callout color="var(--c-warn)" icon="info" titleEn="Security benefit" titleUz="">
+        Separating Workstations from Servers lets you apply a stricter policy to servers: block USB drives, disable interactive login for most users, enforce different password policies, and restrict internet access.
+      </Callout>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="OU Tuzilmasini Boshqarish" en="" />
+      <P>Yangi domen administratori sifatidagi birinchi vazifangiz — mavjud OU va foydalanuvchilar tuzilmasini tashkiliy sxema bilan solishtirish. Ortiqcha OUlarni o'chirish, yo'q foydalanuvchilarni qo'shish va ketgan xodimlar hisoblarini o'chirish kerak.</P>
+      <Callout color="var(--accent)" icon="info" titleUz="Birinchi qadamlar" titleEn="">
+        ADUC ni oching (<code>dsa.msc</code>) → mavjud OUlarni tashkiliy sxema bilan solishtiring → ortiqcha OUlarni o'chiring → foydalanuvchilarni yangilang.
+      </Callout>
+
+      <H2 num="§2" uz="OU ni O'chirish — Tasodifiy O'chirishdan Himoya" en="" />
+      <P>Standart holda, OUlar tasodifiy o'chirishdan himoyalangan. O'ng tugma bosib o'chirmoqchi bo'lsangiz, xato xabari chiqadi. O'chirish uchun:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:10,margin:"14px 0"}}>
+        {[
+          {n:"1",t:"Kengaytirilgan xususiyatlarni yoqing",d:'ADUC → Ko\'rish menyusi → "Advanced Features" ni belgilang. Qo\'shimcha konteynerlar va xususiyatlar paydo bo\'ladi.'},
+          {n:"2",t:"OU xususiyatlarini oching",d:'OU ustiga o\'ng tugma → Xususiyatlar → "Object" yorlig\'i.'},
+          {n:"3",t:"Himoyani o\'chiring",d:'"Protect object from accidental deletion" katagidan belgini olib tashlang → OK.'},
+          {n:"4",t:"OUni o\'chiring",d:"O'ng tugma → Delete. Tasdiqlang — bu ichidagi barcha foydalanuvchilar, guruhlar va sub-OUlarni ham o'chiradi."},
+        ].map((s,i)=>(
+          <div key={i} style={{display:"flex",gap:14,alignItems:"flex-start",padding:"12px 14px",background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:8}}>
+            <div style={{minWidth:28,height:28,borderRadius:"50%",background:"var(--accent)",display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--bg-1)",flexShrink:0}}>{s.n}</div>
+            <div><div style={{fontWeight:600,fontSize:13,color:"var(--text-0)",marginBottom:3}}>{s.t}</div><div style={{fontSize:12,color:"var(--text-2)",lineHeight:1.6}}>{s.d}</div></div>
+          </div>
+        ))}
+      </div>
+      <Callout color="var(--c-attack)" icon="warning" titleUz="Ogohlantirish" titleEn="">
+        OUni o'chirish ichidagi hamma narsani — foydalanuvchilar, guruhlar, sub-OUlarni — butunlay o'chiradi. Standart holda Recycle Bin yo'q. Ko'p o'chirishdan oldin Active Directory Administrative Center dan AD Recycle Bin ni yoqing.
+      </Callout>
+
+      <H2 num="§3" uz="Foydalanuvchilarni Yaratish va O'chirish" en="" />
+      <P>Foydalanuvchi yaratish: OUga o'ng tugma → Yangi → Foydalanuvchi. Ism, familiya, login nomi (<Term>User Logon Name</Term>) kiritib dastlabki parol o'rnating. O'chirish: foydalanuvchiga o'ng tugma → Delete.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Yo'q foydalanuvchilarni qo'shish",c:"var(--accent)",d:"Tashkiliy sxemada bor lekin AD da yo'q yangi xodimlar uchun hisob yarating."},
+          {t:"Ketgan xodimlarni o'chirish",c:"var(--c-attack)",d:"Tashkilotdan ketgan xodimlar hisoblarini o'chiring. Faol qoldirish xavfsizlik xavfi — tashlab ketilgan hisoblar ekspluatatsiya qilinishi mumkin."},
+          {t:"Foydalanuvchilarni to'g'ri OUga ko'chirish",c:"var(--c-auth)",d:"Sudrab tashla yoki o'ng tugma → Ko'chirish. To'g'ri OU to'g'ri Group Policyni qo'llaydi."},
+          {t:"Parollarni tiklash",c:"var(--c-warn)",d:"Foydalanuvchiga o'ng tugma → Parolni tiklash. Keyingi kirishda parol o'zgartirishni majburlash mumkin."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§4" uz="Delegatsiya — OU Ustidan Nazoratni Topshirish" en="" />
+      <P><Term>Delegatsiya</Term> — muayyan foydalanuvchiga OU ustidan qisman nazorat huquqini berish. Uni Domen Admini qilmasdan. Eng keng tarqalgan holat: IT qo'llab-quvvatlash xizmatiga parol tiklash huquqini berish.</P>
+      <P>OU ustidan nazoratni delegatsiya qilish:</P>
+      <div style={{display:"flex",flexDirection:"column",gap:10,margin:"14px 0"}}>
+        {[
+          {n:"1",t:"OUga o'ng tugma bosing",d:'ADUC da maqsadli OUga o\'ng tugma → "Delegate Control…"'},
+          {n:"2",t:"Foydalanuvchini qo'shing",d:'Add → foydalanuvchi nomini kiriting (masalan "phillip") → Ismlarni tekshirish → OK.'},
+          {n:"3",t:"Vazifani tanlang",d:'"Reset user passwords and force password change at next logon" → Keyingi → Tayyor.'},
+        ].map((s,i)=>(
+          <div key={i} style={{display:"flex",gap:14,alignItems:"flex-start",padding:"12px 14px",background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:8}}>
+            <div style={{minWidth:28,height:28,borderRadius:"50%",background:"var(--c-auth)",display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--bg-1)",flexShrink:0}}>{s.n}</div>
+            <div><div style={{fontWeight:600,fontSize:13,color:"var(--text-0)",marginBottom:3}}>{s.t}</div><div style={{fontSize:12,color:"var(--text-2)",lineHeight:1.6}}>{s.d}</div></div>
+          </div>
+        ))}
+      </div>
+      <P>Delegatsiyadan so'ng foydalanuvchi o'sha OU da parollarni tiklay oladi, lekin ADUC ni ochish huquqi yo'q. U PowerShell dan foydalanadi:</P>
+      <div style={{background:"var(--surface-2)",borderRadius:8,padding:"12px 16px",fontFamily:"var(--font-mono)",fontSize:12,lineHeight:1.9,margin:"10px 0"}}>
+        <span style={{color:"var(--text-3)"}}># Parolni tiklash</span><br/>
+        <span style={{color:"var(--text-2)"}}>Set-ADAccountPassword</span> sophie -Reset -NewPassword (<span style={{color:"var(--text-2)"}}>Read-Host</span> -AsSecureString -Prompt <span style={{color:"var(--accent)"}}>'Yangi Parol'</span>)<br/><br/>
+        <span style={{color:"var(--text-3)"}}># Keyingi kirishda parol o'zgartirishni majburlash</span><br/>
+        <span style={{color:"var(--text-2)"}}>Set-ADUser</span> -ChangePasswordAtLogon <span style={{color:"var(--c-warn)"}}>$true</span> -Identity sophie
+      </div>
+
+      <H2 num="§5" uz="AD da Kompyuterlarni Boshqarish" en="" />
+      <P>Standart holda, domenge qo'shilgan barcha mashinalar <Term>Computers</Term> konteyneriga tushadi. Turli qurilma turlari uchun turli siyosatlar qo'llash maqsadida ularni alohida OUlarga ajratish tavsiya etiladi.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10,margin:"14px 0"}}>
+        {[
+          {t:"Ishchi Stansiyalar (Workstations)",c:"var(--accent)",d:"Eng keng tarqalgan qurilmalar — xodimlar kundalik ish uchun foydalanadigan kompyuter va noutbuklar. Standart foydalanuvchilar shu yerda ishlaydi. Yuqori imtiyozli hisoblar hech qachon ishchi stansiyalarga kirmasligi kerak."},
+          {t:"Serverlar (Servers)",c:"var(--c-auth)",d:"Foydalanuvchilarga yoki boshqa serverlarga xizmat ko'rsatadi (fayl serverlari, veb serverlar, print serverlar). Ishchi stansiyalarga qaraganda qattiqroq siyosat kerak."},
+          {t:"Domen Kontrollerlari (Domain Controllers)",c:"var(--c-attack)",d:"Domendagi eng nozik mashinalar — barcha foydalanuvchi parollarining xeshlarini saqlaydi. O'zining standart OUi bor. Kirish jiddiy cheklangan bo'lishi shart."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§6" uz="Kompyuterlarni OUlarga Joylashtirish" en="" />
+      <P>Domen ildizi ostida ikkita yangi OU yarating: <Em>Workstations</Em> va <Em>Servers</Em>. Keyin mashinalari Computers konteyneridan tegishli OUga ko'chiring.</P>
+      <P>Kompyuter ob'ektini ko'chirish: ADUC da Computers konteyneridan mashinani toping → o'ng tugma → Ko'chirish → maqsadli OUni tanlang. Ko'chirilgandan so'ng, OUga tayinlangan Group Policy keyingi yangilanishda (<code>gpupdate /force</code>) o'sha mashinaga qo'llanadi.</P>
+      <Callout color="var(--c-warn)" icon="info" titleUz="Xavfsizlik foydasi" titleEn="">
+        Workstations va Servers ni ajratish serverlarga qattiqroq siyosat qo'llash imkonini beradi: USB qurilmalarni bloklash, interaktiv kirishni cheklash, turli parol siyosatini qo'llash va internet kirishni cheklash.
+      </Callout>
     </section>
   );
 }
