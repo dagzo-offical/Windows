@@ -29,7 +29,7 @@ function AIChat({ open, onClose, user, route, initialQuery, onQueryHandled }) {
         setLoading(false);
         if (onQueryHandled) onQueryHandled();
       });
-  }, [initialQuery]);
+  }, [initialQuery, open]);
 
   const hasKey = () => !!(localStorage.getItem("wa_ai_provider") &&
     (localStorage.getItem("wa_ai_key") || localStorage.getItem("wa_ai_proxy")));

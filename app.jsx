@@ -51,6 +51,7 @@ function clearAll() {
     localStorage.removeItem("wa_lang");
     localStorage.removeItem("wa_ai_provider");
     localStorage.removeItem("wa_ai_key");
+    localStorage.removeItem("wa_ai_keys");
   } catch {}
 }
 
@@ -233,21 +234,32 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
   const lang = useLang();
   const [name, setName] = useAS(user.name);
   const [provider, setProvider] = useAS(() => localStorage.getItem("wa_ai_provider") || "");
-  const [apiKey, setApiKey]     = useAS(() => localStorage.getItem("wa_ai_key") || "");
   const [showKey, setShowKey]   = useAS(false);
   const [saved, setSaved]       = useAS(false);
 
+  // Har bir provayderning kaliti alohida saqlanadi
+  const [keys, setKeys] = useAS(() => {
+    try {
+      return JSON.parse(localStorage.getItem("wa_ai_keys") || "{}");
+    } catch { return {}; }
+  });
+  const setKeyFor = (prov, val) => setKeys(prev => ({ ...prev, [prov]: val }));
+
   const PROVIDERS = [
-    { id: "groq",      label: "Groq",    hint: "gsk_...",    url: "https://console.groq.com/keys",               free: true },
-    { id: "openai",    label: "OpenAI",  hint: "sk-...",     url: "https://platform.openai.com/api-keys",        free: false },
-    { id: "anthropic", label: "Claude",  hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys", free: false },
-    { id: "gemini",    label: "Gemini",  hint: "AIza...",    url: "https://aistudio.google.com/api-keys",        free: false },
+    { id: "kiro",      label: "Kiro (Claude)", hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys", free: false },
+    { id: "groq",      label: "Groq",          hint: "gsk_...",    url: "https://console.groq.com/keys",               free: true },
+    { id: "openai",    label: "OpenAI",        hint: "sk-...",     url: "https://platform.openai.com/api-keys",        free: false },
+    { id: "anthropic", label: "Claude",        hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys", free: false },
+    { id: "gemini",    label: "Gemini",        hint: "AIza...",    url: "https://aistudio.google.com/api-keys",        free: false },
   ];
   const THEMES = ["green", "blue", "purple"];
 
   const handleSave = () => {
     localStorage.setItem("wa_ai_provider", provider);
-    localStorage.setItem("wa_ai_key", apiKey);
+    localStorage.setItem("wa_ai_keys", JSON.stringify(keys));
+    // Faol provayderning kalitini wa_ai_key ga yoz (gradeWithAI shu yerdan o'qiydi)
+    const activeKey = keys[provider] || "";
+    localStorage.setItem("wa_ai_key", activeKey);
     onSave({ name: name.trim() || "Dagzo" });
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
@@ -344,14 +356,15 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
             </div>
             {provider && (() => {
               const prov = PROVIDERS.find(p => p.id === provider);
+              const currentKey = keys[provider] || "";
               return (
                 <div>
                   <div style={{ position: "relative" }}>
                     <input
                       type={showKey ? "text" : "password"}
                       placeholder={prov?.hint}
-                      value={apiKey}
-                      onChange={e => setApiKey(e.target.value)}
+                      value={currentKey}
+                      onChange={e => setKeyFor(provider, e.target.value)}
                       style={{ width: "100%", boxSizing: "border-box", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 40px 10px 14px", fontSize: 13, fontFamily: "var(--font-mono)", color: "var(--text-0)", outline: "none" }}
                       onFocus={e => e.target.style.borderColor = "var(--accent)"}
                       onBlur={e => e.target.style.borderColor = "var(--border)"}
@@ -360,6 +373,11 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
                       {showKey ? "🙈" : "👁"}
                     </button>
                   </div>
+                  {currentKey && (
+                    <div style={{ marginTop: 6, fontSize: 10, color: "var(--accent)", fontFamily: "var(--font-mono)", display: "flex", alignItems: "center", gap: 4 }}>
+                      <Icon name="check" size={10} /> {lang === "en" ? "Key saved for " : "Kalit saqlangan: "}{prov.label}
+                    </div>
+                  )}
                   {prov?.url && (
                     <a href={prov.url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", opacity: 0.8, textDecoration: "none" }}>
                       <Icon name="arrow-right" size={10} /> {lang === "en" ? `Get ${prov.label} API key →` : `${prov.label} API kalitini olish →`}

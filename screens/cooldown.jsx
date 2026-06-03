@@ -32,6 +32,7 @@ function CooldownScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOpe
   const DURATION = 30 * 60;
 
   const lessonNum = (() => { try { const r = JSON.parse(localStorage.getItem("wa_route") || "{}"); return r.lesson || 1; } catch { return 1; } })();
+  const sectionNum = lessonNum <= 20 ? 1 : lessonNum <= 37 ? 2 : 3;
 
   const [endsAt, setEndsAt] = useCS(() => {
     const existing = _getCooldownEnd();
@@ -58,14 +59,14 @@ function CooldownScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOpe
   const reset = () => {
     localStorage.removeItem(_CD_KEY);
     localStorage.removeItem("wa_cd_c");
-    setRoute({ name: "lesson", section: 1, lesson: lessonNum });
+    setRoute({ name: "lesson", section: sectionNum, lesson: lessonNum });
   };
 
   return (
     <div>
       <TopNav route={{ name: "cooldown" }} setRoute={setRoute} user={user} onOpenProfile={onOpenProfile} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen}
         crumb={[
-          { label: lang === "en" ? "Section 01" : "01-bo'lim", onClick: () => setRoute({ name: "section", section: 1 }) },
+          { label: lang === "en" ? `Section ${String(sectionNum).padStart(2,"0")}` : `${String(sectionNum).padStart(2,"0")}-bo'lim`, onClick: () => setRoute({ name: "section", section: sectionNum }) },
           { label: lang === "en" ? "Quiz cooldown" : "Test bloklash" },
         ]} />
 
@@ -164,12 +165,12 @@ function CooldownScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOpe
               <button className="btn btn-primary" onClick={reset}>
                 <Icon name="play" size={14} /> {lang === "en" ? "Retry with new questions" : "Yangi savollar bilan qayta urinish"}
               </button>
-              <button className="btn" onClick={() => setRoute({ name: "lesson", section: 1, lesson: lessonNum })}>
+              <button className="btn" onClick={() => setRoute({ name: "lesson", section: sectionNum, lesson: lessonNum })}>
                 <Icon name="book" size={14} /> {lang === "en" ? "Review the lesson" : "Darsni qayta ko'rish"}
               </button>
             </>
           ) : (
-            <button className="btn" onClick={() => setRoute({ name: "lesson", section: 1, lesson: lessonNum })}>
+            <button className="btn" onClick={() => setRoute({ name: "lesson", section: sectionNum, lesson: lessonNum })}>
               <Icon name="book" size={14} /> {lang === "en" ? "Read the lesson meanwhile" : "Bu vaqtda darsni o'qing"}
             </button>
           )}

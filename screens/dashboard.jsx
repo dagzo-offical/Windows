@@ -12,6 +12,7 @@ const LESSON_TITLES_DASH = {
   30:"Windows Defender", 31:"Windows Firewall", 32:"BitLocker",
   33:"PowerShell asoslari", 34:"Remote Desktop (RDP)", 35:"Tarmoq sozlamalari",
   36:"Fayl ulashish", 37:"Zaxira nusxa va tiklash",
+  38:"Active Directory asoslari", 39:"AD da foydalanuvchi va kompyuter boshqaruvi",
 };
 const LESSON_TITLES_DASH_EN = {
   1:"Windows architecture", 2:"What is the kernel?", 3:"User mode vs Kernel mode",
@@ -25,12 +26,13 @@ const LESSON_TITLES_DASH_EN = {
   30:"Windows Defender", 31:"Windows Firewall", 32:"BitLocker",
   33:"PowerShell Basics", 34:"Remote Desktop (RDP)", 35:"Network Configuration",
   36:"File Sharing", 37:"Backup & Restore",
+  38:"Active Directory Basics", 39:"Managing Users & Computers in AD",
 };
 
-const TOTAL_LESSONS = 37;
+const TOTAL_LESSONS = 39;
 
 function lessonKey(n) {
-  return `s${n <= 20 ? "01" : "02"}_l${String(n).padStart(2, "0")}`;
+  return `s${n <= 20 ? "01" : n <= 37 ? "02" : "03"}_l${String(n).padStart(2, "0")}`;
 }
 
 const ALL_BADGES = [

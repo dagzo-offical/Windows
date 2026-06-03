@@ -130,7 +130,7 @@ function getTimeSpentAll() {
     if (typeof raw !== "object" || Array.isArray(raw)) return {};
     const clean = {};
     for (const [k, v] of Object.entries(raw)) {
-      if (/^s0[12]_l\d{2}$/.test(k)) {
+      if (/^s0[123]_l\d{2}$/.test(k)) {
         const n = Number(v);
         if (Number.isFinite(n) && n >= 0) clean[k] = Math.min(Math.floor(n), 14400);
       }
@@ -368,7 +368,7 @@ function LessonRow({ l, idx, sectionNum, setRoute, completedLessons }) {
     <div onClick={() => !isLocked && setRoute({ name: "lesson", section: sectionNum, lesson: parseInt(l.n) })}
       style={{
         display: "grid",
-        gridTemplateColumns: "auto 40px 1fr auto auto",
+        gridTemplateColumns: "auto 40px 1fr auto auto auto",
         gap: 16, alignItems: "center",
         padding: "16px 18px",
         borderRadius: 10,
