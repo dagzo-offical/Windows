@@ -8561,8 +8561,14 @@ function SectionADBasics() {
   ) : (
     <section>
       <H2 num="§1" uz="Windows Domeni nima?" en="" />
-      <P>Tasavvur qiling: 5 ta kompyuter va 5 ta xodim bor — har birini qo'lda sozlash mumkin. Endi 157 ta kompyuter va 320 ta foydalanuvchi bo'lsa-chi? Ularni alohida boshqarish imkonsiz bo'lib qoladi.</P>
-      <P><Term>Windows domeni</Term> — bitta boshqaruv ostidagi foydalanuvchilar va kompyuterlar guruhi. Barcha komponentlarni markaziy boshqarish uchun <Term>Active Directory (AD)</Term> degan yagona ombordan foydalaniladi. AD xizmatlarini ishga tushiruvchi server esa <Term>Domen Kontrolleri (DC)</Term> deyiladi.</P>
+      <P>Tasavvur qiling, siz atigi beshta kompyuter va beshta xodimdan iborat kichik biznes tarmog'ini boshqaryapsiz. Bunday kichik tarmoqda siz har bir kompyuterni muammosiz alohida sozlashingiz mumkin: har biriga qo'lda tizimga kirasiz, foydalanuvchilar yaratasiz va maxsus sozlamalar qilasiz.</P>
+      <P>Faraz qilaylik, sizning biznesingiz to'satdan o'sib, hozirda to'rtta turli idorada joylashgan 157 ta kompyuter va 320 ta foydalanuvchiga ega bo'ldi. Siz hali ham har bir kompyuterni alohida boshqara olasizmi, tarmoqdagi har bir foydalanuvchi uchun qoidalarni qo'lda sozlaysizmi? Javob, katta ehtimol bilan, <Em>yo'q</Em>.</P>
+      <P>Ushbu cheklovlarni bartaraf etish uchun <Term>Windows domenidan</Term> foydalaniladi. Oddiy qilib aytganda, Windows domeni — bu ma'lum bir biznes ma'muriyati ostidagi foydalanuvchilar va kompyuterlar guruhi. Domen ortidagi asosiy g'oya — Windows kompyuter tarmog'ining umumiy komponentlarini <Term>Active Directory (AD)</Term> deb nomlanuvchi yagona omborda markazlashtirishdir. Active Directory xizmatlarini ishga tushiradigan server esa <Term>Domen Kontrolleri (DC)</Term> deb ataladi.</P>
+      <P><Term>Domen Kontrolleri</Term> — foydalanuvchi akkauntlari haqidagi ma'lumotlarni saqlaydigan va tarmoqdagi resurslarga kirishni nazorat qiladigan server. U tarmoq infratuzilmasini boshqarish va himoyalash uchun juda muhim komponent hisoblanadi.</P>
+      <Callout color="var(--c-auth)" icon="info" titleUz="Domenning asosiy afzalliklari" titleEn="">
+        <b>Markazlashtirilgan identifikatsiyani boshqarish:</b> Barcha foydalanuvchilar minimal kuch sarflab Active Directory'dan sozlanishi mumkin.<br/>
+        <b>Xavfsizlik siyosatlarini boshqarish:</b> Siyosatlarni to'g'ridan-to'g'ri Active Directory'dan sozlab, kerak bo'lganda tarmoqdagi foydalanuvchilar va kompyuterlarga qo'llash mumkin.
+      </Callout>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,margin:"18px 0"}}>
         <div style={{padding:16,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
           <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>DOMENSIЗ</div>
@@ -8579,15 +8585,15 @@ function SectionADBasics() {
       <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s4_p1.png" caption="Windows Domeni — foydalanuvchilar va kompyuterlar Domen Kontrolleri orqali markaziy boshqariladi" />
 
       <H2 num="§2" uz="Active Directory Domain Services (AD DS)" en="" />
-      <P>Har qanday Windows domenining o'zagi — <Term>Active Directory domen xizmati (AD DS)</Term>. Bu tarmoqdagi barcha <Em>ob'ektlar</Em> haqidagi ma'lumotlarni saqlaydigan katalog xizmat: foydalanuvchilar, guruhlar, kompyuterlar, printerlar, umumiy papkalar va boshqalar.</P>
-      <P>AD DS <Term>Domen Kontrollerida</Term> o'rnatiladi. Domendagi boshqa barcha mashinalar autentifikatsiya va siyosatlar uchun DC ga ishonadi.</P>
+      <P>Har qanday Windows domenining o'zagi — <Term>Active Directory domen xizmati (AD DS)</Term>. Ushbu xizmat tarmog'ingizda mavjud bo'lgan barcha <Em>ob'ektlar</Em> ma'lumotlarini o'zida saqlaydigan katalog vazifasini bajaradi. AD tomonidan qo'llab-quvvatlanadigan ko'plab ob'ektlar qatoriga foydalanuvchilar, guruhlar, qurilmalar, printerlar, umumiy tarmoq jildlari (shares) va boshqa ko'plab narsalar kiradi.</P>
+      <P>AD DS <Term>Domen Kontrollerida</Term> o'rnatiladi. Domendagi boshqa barcha mashinalar autentifikatsiya va siyosatlar uchun DC ga ishonadi va unga tayanadi.</P>
 
       <H2 num="§3" uz="AD Ob'ektlari: Foydalanuvchilar, Qurilmalar, Guruhlar" en="" />
       <div style={{display:"flex",flexDirection:"column",gap:12,margin:"14px 0"}}>
         {[
-          {title:"Foydalanuvchilar (Users)",color:"var(--accent)",body:<>AD dagi eng keng tarqalgan ob'ekt turi. Foydalanuvchilar <Term>xavfsizlik sub'ektlari</Term> — domen ularni autentifikatsiya qiladi va resurslarga huquqlar beradi. Ikki tur:<br/><b>Odamlar</b>: tarmoqqa kirish kerak bo'lgan xodimlar.<br/><b>Xizmatlar</b>: IIS yoki MSSQL kabi xizmatlar uchun hisoblar — faqat o'z xizmatini ishga tushirish huquqiga ega.</>},
-          {title:"Qurilmalar (Machines)",color:"var(--c-auth)",body:<>Domenge qo'shilgan har bir kompyuter uchun qurilma ob'ekti yaratiladi. Qurilmalar ham xavfsizlik sub'ektlari — o'z hisob qaydnomasiga ega. Qurilma hisob nomi kompyuter nomidan keyin <code>$</code> belgisi bilan hosil bo'ladi: masalan <code>DC01$</code>. Parollar avtomatik yangilanadi (120 ta tasodifiy belgi).</>},
-          {title:"Xavfsizlik Guruhlari (Security Groups)",color:"var(--c-warn)",body:<>Guruhlar orqali bir vaqtda ko'plab foydalanuvchilarga ruxsat beriladi. Guruhga qo'shilgan foydalanuvchi uning barcha huquqlarini meros qilib oladi. Guruhlar foydalanuvchilarni, qurilmalarni va boshqa guruhlarni o'z ichiga olishi mumkin. Ular ham xavfsizlik sub'ektlari.</>},
+          {title:"Foydalanuvchilar (Users)",color:"var(--accent)",body:<>Foydalanuvchilar — Active Directory-dagi eng keng tarqalgan ob'ekt turlaridan biri. Ular <Term>xavfsizlik sub'ektlari</Term> — domen ularni autentifikatsiya qiladi va ularga resurslar ustidan huquqlar tayinlanishi mumkin. Ikki tur:<br/><b>Odamlar:</b> tashkilotda tarmoqqa kirishi kerak bo'lgan shaxslar, ya'ni xodimlar.<br/><b>Xizmatlar:</b> IIS yoki MSSQL kabi xizmatlar uchun yaratilgan hisoblar — ular faqat o'zlarining maxsus xizmatini ishga tushirish uchun zarur bo'lgan huquqlarga ega.</>},
+          {title:"Qurilmalar (Machines)",color:"var(--c-auth)",body:<>Active Directory domeniga qo'shilgan har bir kompyuter uchun qurilma ob'ekti yaratiladi. Qurilmalar ham "xavfsizlik sub'ektlari" hisoblanadi — xuddi oddiy foydalanuvchi kabi ularga ham hisob qaydnomasi tayinlanadi. Qurilma hisob qaydnomasi nomi kompyuter nomidan keyin dollar belgisi (<code>$</code>) qo'yilishi bilan hosil bo'ladi: masalan, DC01 qurilmasi <code>DC01$</code> hisob qaydnomasiga ega. Parollar avtomatik ravishda yangilanib turadi (120 ta tasodifiy belgi).</>},
+          {title:"Xavfsizlik Guruhlari (Security Groups)",color:"var(--c-warn)",body:<>Xavfsizlik guruhlari alohida foydalanuvchilarga emas, balki butun guruhga fayllar yoki resurslarga kirish huquqlarini tayinlash imkonini beradi. Guruhga qo'shilgan foydalanuvchi avtomatik ravishda guruhning barcha huquqlarini meros qilib oladi. Guruhlar ham xavfsizlik sub'ektlari — tarmoqdagi resurslar ustidan huquqlarga ega bo'lishi mumkin. Guruhlar aʼzo sifatida foydalanuvchilarga, qurilmalarga va boshqa guruhlarga ega bo'lishi mumkin.</>},
         ].map((item,i)=>(
           <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
             <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
@@ -8622,8 +8628,9 @@ function SectionADBasics() {
       <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s7_p1.png" caption="Active Directory Users and Computers da ko'rinadigan standart domen guruhlari" />
 
       <H2 num="§5" uz="Active Directory Users and Computers (ADUC)" en="" />
-      <P>AD da foydalanuvchilar, guruhlar va mashinalarni boshqarish uchun DC da <Term>Active Directory Users and Computers</Term> ni oching (boshlash menyusidan yoki <code>dsa.msc</code> orqali). Bu domendagi barcha ob'ektlarning to'liq ierarxiyasini ko'rsatadi.</P>
-      <P>Ob'ektlar <Term>Tashkiliy Bo'linmalar (TB / OU)</Term> ichida tashkil etiladi — bu konteyner ob'ektlar guruh siyosatlarini qo'llash imkonini beradi. Odatda domen kompaniya tuzilishini aks ettiradi: IT, Menejment, Marketing, Savdo — har birining o'z TB si.</P>
+      <P>Active Directory da foydalanuvchilar, guruhlar yoki mashinalarni sozlash uchun Domen boshqaruvchisiga kirishimiz va boshlash menyusidan <Term>Active Directory Users and Computers</Term> buyrug'ini ishga tushirishimiz kerak (yoki <code>dsa.msc</code> orqali).</P>
+      <P>Bu domenda mavjud bo'lgan foydalanuvchilar, kompyuterlar va guruhlar ierarxiyasini ko'rishingiz mumkin bo'lgan oynani ochadi. Ushbu ob'ektlar <Term>Tashkiliy Bo'linmalar (TB / OU)</Term> da tashkil etilgan — bu konteyner ob'ektlar foydalanuvchilar va mashinalarni tasniflash imkonini beradi.</P>
+      <P>TBlar asosan o'xshash siyosat talablariga ega foydalanuvchilar to'plamlarini aniqlash uchun ishlatiladi. Masalan, tashkilotingizning savdo bo'limidagi odamlar IT sohasidagi odamlarga qaraganda boshqa siyosatlar to'plamiga ega bo'lishlari mumkin. Mashinamizni tekshirib ko'rsak, IT, menejment, marketing va savdo bo'limlari uchun bola TBlar bilan asosiy domen TB si mavjudligini ko'rishimiz mumkin.</P>
       <Callout color="var(--c-auth)" icon="info" titleUz="Asosiy qoida" titleEn="">
         Foydalanuvchi bir vaqtda faqat BITTA TB da bo'lishi mumkin (lekin ko'plab Security Group larda bo'lishi mumkin). TB lar siyosat qo'llash uchun; Security Groups ruxsat berish uchun.
       </Callout>
@@ -8648,14 +8655,15 @@ function SectionADBasics() {
       </div>
 
       <H2 num="§7" uz="TB lar va Security Groups farqi" en="" />
+      <P>Nima uchun bizda ham guruhlar, ham OUlar borligi haqida o'ylayotgan bo'lishingiz mumkin. Garchi ikkalasi ham foydalanuvchilar va kompyuterlarni tasniflash uchun ishlatilsa-da, ularning maqsadlari butunlay boshqacha:</P>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,margin:"14px 0"}}>
         <div style={{padding:16,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
           <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>TASHKILIY BO'LINMALAR (TB / OU)</div>
-          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Siyosatlarni <b>qo'llash</b> uchun (GPO)<br/>Foydalanuvchi faqat 1 ta TB da<br/>Kompaniya tuzilishini aks ettiradi<br/>Misol: IT, Savdo, Menejment<br/><span style={{color:"var(--c-auth)"}}>→ Siyosat konteynerlari</span></div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Foydalanuvchilar va kompyuterlarga <b>siyosatlarni qo'llash</b> uchun qulay. Muayyan rolga qarab foydalanuvchilar to'plamiga maxsus sozlamalar qo'llanadi.<br/><br/>Foydalanuvchi bir vaqtning o'zida faqat <b>bitta OUning a'zosi</b> bo'lishi mumkin.<br/><span style={{color:"var(--c-auth)"}}>→ Siyosat konteynerlari</span></div>
         </div>
         <div style={{padding:16,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
           <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>XAVFSIZLIK GURUHLARI</div>
-          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Resurs <b>ruxsatlarini</b> berish uchun<br/>Foydalanuvchi ko'p guruhda bo'lishi mumkin<br/>Foydalanuvchi, mashina, guruhlar<br/>Misol: ShareAccess, PrinterUsers<br/><span style={{color:"var(--accent)"}}>→ Ruxsat konteynerlari</span></div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Resurslar ustidan <b>ruxsatlar berish</b> uchun ishlatiladi. Masalan, umumiy tarmoq jildiga yoki printerga kirishga ruxsat berishda guruhlardan foydalaniladi.<br/><br/>Foydalanuvchi <b>ko'plab guruhlarning a'zosi</b> bo'lishi mumkin.<br/><span style={{color:"var(--accent)"}}>→ Ruxsat konteynerlari</span></div>
         </div>
       </div>
     </section>
@@ -8771,14 +8779,15 @@ function SectionADUsers() {
   ) : (
     <section>
       <H2 num="§1" uz="OU Tuzilmasini Boshqarish" en="" />
-      <P>Yangi domen administratori sifatidagi birinchi vazifangiz — mavjud OU va foydalanuvchilar tuzilmasini tashkiliy sxema bilan solishtirish. Ortiqcha OUlarni o'chirish, yo'q foydalanuvchilarni qo'shish va ketgan xodimlar hisoblarini o'chirish kerak.</P>
+      <P>Yangi domen administratori sifatidagi birinchi vazifangiz mavjud AD OU (tashkiliy birliklar) va foydalanuvchilarini tekshirishdan iborat, chunki yaqinda biznesda ba'zi o'zgarishlar yuz berdi. Sizga quyidagi tashkiliy sxema berilgan va AD ga unga mos keladigan o'zgarishlar kiritishingiz kutilmoqda.</P>
       <Callout color="var(--accent)" icon="info" titleUz="Birinchi qadamlar" titleEn="">
-        ADUC ni oching (<code>dsa.msc</code>) → mavjud OUlarni tashkiliy sxema bilan solishtiring → ortiqcha OUlarni o'chiring → foydalanuvchilarni yangilang.
+        ADUC ni oching (<code>dsa.msc</code>) → mavjud OUlarni tashkiliy sxema bilan solishtiring → ortiqcha OUlarni o'chiring → yo'q foydalanuvchilarni yarating, ketgan xodimlar hisoblarini o'chiring.
       </Callout>
       <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s2_p1.png" caption="Kompaniya tashkiliy sxemasi — AD OU tuzilmasini moslashtirish uchun asosiy manba" />
 
       <H2 num="§2" uz="OU ni O'chirish — Tasodifiy O'chirishdan Himoya" en="" />
-      <P>Standart holda, OUlar tasodifiy o'chirishdan himoyalangan. O'ng tugma bosib o'chirmoqchi bo'lsangiz, xato xabari chiqadi. O'chirish uchun:</P>
+      <P>Siz e'tibor berishingiz kerak bo'lgan birinchi narsa — joriy AD konfiguratsiyangizda tashkiliy sxemada ko'rinmaydigan qo'shimcha bo'lim OUi mavjudligi. U yopilgani va domendan olib tashlanishi kerak.</P>
+      <P>Standart holda, OUlar tasodifiy o'chirishdan himoyalangan. Agar siz sichqonchaning o'ng tugmasini bosib, OUni o'chirishga harakat qilsangiz, quyidagi xatoni ko'rasiz. OUni o'chirish uchun:</P>
       <div style={{display:"flex",flexDirection:"column",gap:10,margin:"14px 0"}}>
         {[
           {n:"1",t:"Kengaytirilgan xususiyatlarni yoqing",d:'ADUC → Ko\'rish menyusi → "Advanced Features" ni belgilang. Qo\'shimcha konteynerlar va xususiyatlar paydo bo\'ladi.'},
@@ -8795,6 +8804,7 @@ function SectionADUsers() {
       <Callout color="var(--c-attack)" icon="warning" titleUz="Ogohlantirish" titleEn="">
         OUni o'chirish ichidagi hamma narsani — foydalanuvchilar, guruhlar, sub-OUlarni — butunlay o'chiradi. Standart holda Recycle Bin yo'q. Ko'p o'chirishdan oldin Active Directory Administrative Center dan AD Recycle Bin ni yoqing.
       </Callout>
+      <P>Qo'shimcha OUni o'chirib tashlaganingizdan so'ng, ba'zi bo'limlar uchun AD dagi foydalanuvchilar tashkiliy jadvalidagi foydalanuvchilar bilan mos kelmasligini payqashingiz kerak. Ularga mos kelish uchun kerak bo'lganda foydalanuvchilarni yarating va o'chiring.</P>
       <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s3_p2.png" caption="Himoyalangan OUni o'chirishga urinilganda xato xabari" />
       <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s4_p1.png" caption={"ADUC Ko'rish menyusidan \"Advanced Features\" ni yoqish"} />
       <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s5_p1.png" caption={"Object yorlig'i — o'chirishdan oldin \"Protect object from accidental deletion\" katagidan belgini oling"} />
@@ -8816,8 +8826,9 @@ function SectionADUsers() {
       </div>
 
       <H2 num="§4" uz="Delegatsiya — OU Ustidan Nazoratni Topshirish" en="" />
-      <P><Term>Delegatsiya</Term> — muayyan foydalanuvchiga OU ustidan qisman nazorat huquqini berish. Uni Domen Admini qilmasdan. Eng keng tarqalgan holat: IT qo'llab-quvvatlash xizmatiga parol tiklash huquqini berish.</P>
-      <P>OU ustidan nazoratni delegatsiya qilish:</P>
+      <P>AD da amalga oshirish mumkin bo'lgan ajoyib imkoniyatlardan biri — muayyan foydalanuvchilarga ba'zi OUlar ustidan qisman nazorat huquqini berishdir. Ushbu jarayon <Term>delegatsiya</Term> (vakolat berish) deb nomlanadi va u Domen Administratorining aralashuvisiz foydalanuvchilarga OUlarda ilg'or vazifalarni bajarish uchun maxsus imtiyozlar taqdim etish imkonini beradi.</P>
+      <P>Buning uchun eng keng tarqalgan holat — IT qo'llab-quvvatlash xizmatiga boshqa past imtiyozli foydalanuvchilarning parollarini tiklash huquqini berishdir. Bizning tashkiliy sxemamizga ko'ra, Fillip IT qo'llab-quvvatlash xizmatiga mas'ul, shuning uchun biz Sales (Savdo), Marketing va Management (Boshqaruv) OUlari ustidan parollarni tiklash nazoratini unga topshiramiz.</P>
+      <P>OU ustidan nazoratni delegatsiya qilish uchun:</P>
       <div style={{display:"flex",flexDirection:"column",gap:10,margin:"14px 0"}}>
         {[
           {n:"1",t:"OUga o'ng tugma bosing",d:'ADUC da maqsadli OUga o\'ng tugma → "Delegate Control…"'},
@@ -8830,7 +8841,7 @@ function SectionADUsers() {
           </div>
         ))}
       </div>
-      <P>Delegatsiyadan so'ng foydalanuvchi o'sha OU da parollarni tiklay oladi, lekin ADUC ni ochish huquqi yo'q. U PowerShell dan foydalanadi:</P>
+      <P>Delegatsiyadan so'ng Fillip savdo bo'limidagi istalgan foydalanuvchi uchun parollarni qayta tiklay oladi. Biroq u ADUC ni ochish huquqiga ega emas — shuning uchun parolni qayta tiklash uchun PowerShell dan foydalanish kerak:</P>
       <div style={{background:"var(--surface-2)",borderRadius:8,padding:"12px 16px",fontFamily:"var(--font-mono)",fontSize:12,lineHeight:1.9,margin:"10px 0"}}>
         <span style={{color:"var(--text-3)"}}># Parolni tiklash</span><br/>
         <span style={{color:"var(--text-2)"}}>Set-ADAccountPassword</span> sophie -Reset -NewPassword (<span style={{color:"var(--text-2)"}}>Read-Host</span> -AsSecureString -Prompt <span style={{color:"var(--accent)"}}>'Yangi Parol'</span>)<br/><br/>
@@ -8845,12 +8856,13 @@ function SectionADUsers() {
       <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s11_p3.png" caption="PowerShell — Set-ADUser majburiy parol o'zgartirish natijasi" />
 
       <H2 num="§5" uz="AD da Kompyuterlarni Boshqarish" en="" />
-      <P>Standart holda, domenge qo'shilgan barcha mashinalar <Term>Computers</Term> konteyneriga tushadi. Turli qurilma turlari uchun turli siyosatlar qo'llash maqsadida ularni alohida OUlarga ajratish tavsiya etiladi.</P>
+      <P>Standart holda, domenga qo'shilgan barcha mashinalar (DClardan tashqari) <Term>Computers</Term> deb nomlangan konteynerga joylashtiriladi. Barcha qurilmalarimizning u yerda bo'lishi eng yaxshi yechim emas, chunki serverlaringiz va oddiy foydalanuvchilar kundalik foydalanadigan mashinalar uchun turli xil siyosatlarni xohlashingiz ehtimoli juda yuqori.</P>
+      <P>Qurilmalaringizni qanday tashkil qilish bo'yicha qat'iy qoida mavjud bo'lmasa-da, qurilmalarni ulardan foydalanish maqsadiga ko'ra ajratish ajoyib boshlang'ich nuqta hisoblanadi. Umuman olganda, qurilmalar kamida quyidagi uchta toifaga bo'linadi:</P>
       <div style={{display:"grid",gridTemplateColumns:"1fr",gap:10,margin:"14px 0"}}>
         {[
-          {t:"Ishchi Stansiyalar (Workstations)",c:"var(--accent)",d:"Eng keng tarqalgan qurilmalar — xodimlar kundalik ish uchun foydalanadigan kompyuter va noutbuklar. Standart foydalanuvchilar shu yerda ishlaydi. Yuqori imtiyozli hisoblar hech qachon ishchi stansiyalarga kirmasligi kerak."},
-          {t:"Serverlar (Servers)",c:"var(--c-auth)",d:"Foydalanuvchilarga yoki boshqa serverlarga xizmat ko'rsatadi (fayl serverlari, veb serverlar, print serverlar). Ishchi stansiyalarga qaraganda qattiqroq siyosat kerak."},
-          {t:"Domen Kontrollerlari (Domain Controllers)",c:"var(--c-attack)",d:"Domendagi eng nozik mashinalar — barcha foydalanuvchi parollarining xeshlarini saqlaydi. O'zining standart OUi bor. Kirish jiddiy cheklangan bo'lishi shart."},
+          {t:"Ishchi Stansiyalar (Workstations)",c:"var(--accent)",d:"Active Directory domenidagi eng keng tarqalgan qurilmalardan biri. Domendagi har bir foydalanuvchi, ehtimol, ishchi stansiyaga tizimga kiradi — bu ular o'z ishlarini bajarish yoki oddiy brauzer faoliyatini amalga oshirish uchun foydalanadigan qurilmadir. Bu qurilmalarga hech qachon yuqori imtiyozli foydalanuvchi tizimga kirmasligi kerak."},
+          {t:"Serverlar (Servers)",c:"var(--c-auth)",d:"Active Directory domenidagi ikkinchi eng keng tarqalgan qurilma. Serverlar odatda foydalanuvchilarga yoki boshqa serverlarga xizmat ko'rsatish uchun ishlatiladi (fayl serverlari, veb serverlar, print serverlar). Ishchi stansiyalarga qaraganda qattiqroq siyosat talab etiladi."},
+          {t:"Domen Kontrollerlari (Domain Controllers)",c:"var(--c-attack)",d:"Active Directory domenidagi uchinchi toifa — va eng nozik mashinalar. Domen kontrollerlari muhitdagi barcha foydalanuvchi hisoblarining xeshlangan parollarini o'z ichiga oladi. Ushbu qurilmalar ko'pincha tarmoqdagi eng muhim qurilmalar hisoblanadi. Kirishni jiddiy cheklash shart."},
         ].map((card,i)=>(
           <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
             <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
@@ -8861,8 +8873,8 @@ function SectionADUsers() {
       <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s12_p2.png" caption="ADUC dagi standart Computers konteyneri — yangi qo'shilgan barcha mashinalar shu yerga tushadi" />
 
       <H2 num="§6" uz="Kompyuterlarni OUlarga Joylashtirish" en="" />
-      <P>Domen ildizi ostida ikkita yangi OU yarating: <Em>Workstations</Em> va <Em>Servers</Em>. Keyin mashinalari Computers konteyneridan tegishli OUga ko'chiring.</P>
-      <P>Kompyuter ob'ektini ko'chirish: ADUC da Computers konteyneridan mashinani toping → o'ng tugma → Ko'chirish → maqsadli OUni tanlang. Ko'chirilgandan so'ng, OUga tayinlangan Group Policy keyingi yangilanishda (<code>gpupdate /force</code>) o'sha mashinaga qo'llanadi.</P>
+      <P>AD ni tartibga solayotganimiz sababli, Ishchi stansiyalar va Serverlar uchun ikkita alohida OU yarataylik (Domen kontrollerlari allaqachon Windows tomonidan yaratilgan OU ichida joylashgan). Biz ularni to'g'ridan-to'g'ri domen konteyneri ostida yaratamiz. Yakunda sizda quyidagi OU tuzilmasi bo'lishi kerak.</P>
+      <P>Kompyuter ob'ektini ko'chirish: ADUC da Computers konteyneridan mashinani toping → o'ng tugma → Ko'chirish → maqsadli OUni tanlang. Shaxsiy kompyuterlar va noutbuklarni <Em>Workstations</Em> OUga, serverlarni esa <Em>Servers</Em> OUga ko'chiring. Ko'chirilgandan so'ng, OUga tayinlangan Group Policy keyingi yangilanishda (<code>gpupdate /force</code>) o'sha mashinaga qo'llanadi. Bu bizga keyinchalik har bir OU uchun siyosatlarni sozlash imkonini beradi.</P>
       <Callout color="var(--c-warn)" icon="info" titleUz="Xavfsizlik foydasi" titleEn="">
         Workstations va Servers ni ajratish serverlarga qattiqroq siyosat qo'llash imkonini beradi: USB qurilmalarni bloklash, interaktiv kirishni cheklash, turli parol siyosatini qo'llash va internet kirishni cheklash.
       </Callout>
