@@ -402,6 +402,8 @@ const LESSONS_SEARCH = [
   { n: 35, uz: "Tarmoq sozlamalari",           en: "Network Configuration",       subUz: "IP, DNS, adapter, tarmoq",                 subEn: "IP, DNS, adapter, network" },
   { n: 36, uz: "Fayl ulashish",               en: "File Sharing",                subUz: "SMB, ulashim, ruxsat",                     subEn: "SMB, share, permission" },
   { n: 37, uz: "Zaxira nusxa va tiklash",      en: "Backup & Restore",            subUz: "zaxira, tiklash, VSS",                     subEn: "backup, restore, VSS" },
+  { n: 38, uz: "Active Directory asoslari",    en: "Active Directory Basics",     subUz: "domen, AD DS, ob'ektlar, forest",          subEn: "domain, AD DS, objects, forest" },
+  { n: 39, uz: "AD da foydalanuvchi va kompyuter boshqaruvi", en: "Managing Users & Computers in AD", subUz: "OU, delegatsiya, kompyuter, foydalanuvchi", subEn: "OU, delegation, computer, user" },
 ];
 
 function SearchModal({ onClose, setRoute }) {
@@ -429,7 +431,7 @@ function SearchModal({ onClose, setRoute }) {
     if (e.key === "Enter" && results[idx]) { setRoute({ name: "lesson", lesson: results[idx].n }); }
   };
 
-  const sectionLabel = (n) => n <= 20 ? "01" : "02";
+  const sectionLabel = (n) => n <= 20 ? "01" : n <= 37 ? "02" : "03";
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(2,4,10,0.85)", backdropFilter: "blur(10px)", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 80 }}

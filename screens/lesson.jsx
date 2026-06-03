@@ -7,7 +7,7 @@ const { useState: useLS, useEffect: useLE, useRef: useLR } = React;
 const TIME_KEY = "wa_time_spent";
 const MAX_LESSON_SECS = 4 * 3600;   // 4h absolute cap per lesson
 const MAX_WRITE_SECS  = 15;          // max seconds per single write (10s autosave + buffer)
-const VALID_KEY = /^s0[12]_l\d{2}$/;
+const VALID_KEY = /^s0[123]_l\d{2}$/;
 
 function getTimeSpent() {
   try {

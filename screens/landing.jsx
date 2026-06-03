@@ -4,9 +4,9 @@ function LandingScreen({ setRoute }) {
   const lang = useLang();
 
   const stats = [
-    { n: "6",    uz: "Bo'limlar",    en: "Sections" },
-    { n: "120+", uz: "Darslar",      en: "Lessons" },
-    { n: "85",   uz: "Laboratoriya", en: "Labs" },
+    { n: "3",    uz: "Bo'limlar",    en: "Sections" },
+    { n: "39",   uz: "Darslar",      en: "Lessons" },
+    { n: "70+",  uz: "Laboratoriya", en: "Labs" },
     { n: "AI",   uz: "Tekshiruv",    en: "Validation" },
   ];
 
