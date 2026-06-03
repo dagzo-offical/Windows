@@ -51,6 +51,8 @@ function clearAll() {
     localStorage.removeItem("wa_lang");
     localStorage.removeItem("wa_ai_provider");
     localStorage.removeItem("wa_ai_key");
+    localStorage.removeItem("wa_ai_keys");
+    localStorage.removeItem("wa_ai_active_id");
   } catch {}
 }
 
@@ -232,10 +234,17 @@ function App() {
 function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
   const lang = useLang();
   const [name, setName] = useAS(user.name);
-  const [provider, setProvider] = useAS(() => localStorage.getItem("wa_ai_provider") || "");
-  const [apiKey, setApiKey]     = useAS(() => localStorage.getItem("wa_ai_key") || "");
-  const [showKey, setShowKey]   = useAS(false);
-  const [saved, setSaved]       = useAS(false);
+  const [saved, setSaved] = useAS(false);
+  const [aiKeys, setAiKeys] = useAS(() => loadAiKeys());
+  const [activeId, setActiveId] = useAS(() => {
+    const k = loadAiKeys();
+    const id = localStorage.getItem("wa_ai_active_id") || "";
+    return k.find(x => x.id === id) ? id : (k[0]?.id || "");
+  });
+  const [addingKey, setAddingKey] = useAS(false);
+  const [newProvider, setNewProvider] = useAS("");
+  const [newKey, setNewKey] = useAS("");
+  const [showNewKey, setShowNewKey] = useAS(false);
 
   const PROVIDERS = [
     { id: "groq",      label: "Groq",    hint: "gsk_...",    url: "https://console.groq.com/keys",               free: true },
@@ -246,11 +255,38 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
   const THEMES = ["green", "blue", "purple"];
 
   const handleSave = () => {
-    localStorage.setItem("wa_ai_provider", provider);
-    localStorage.setItem("wa_ai_key", apiKey);
     onSave({ name: name.trim() || "Dagzo" });
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
+  };
+
+  const addKey = () => {
+    if (!newProvider || !newKey.trim() || aiKeys.length >= 3) return;
+    const entry = { id: Date.now().toString(), provider: newProvider, key: newKey.trim() };
+    const updated = [...aiKeys, entry];
+    setAiKeys(updated);
+    try { localStorage.setItem("wa_ai_keys", JSON.stringify(updated)); } catch {}
+    if (!activeId) {
+      setActiveId(entry.id);
+      try { localStorage.setItem("wa_ai_active_id", entry.id); } catch {}
+    }
+    setNewProvider(""); setNewKey(""); setAddingKey(false);
+  };
+
+  const removeKey = (id) => {
+    const updated = aiKeys.filter(k => k.id !== id);
+    setAiKeys(updated);
+    try { localStorage.setItem("wa_ai_keys", JSON.stringify(updated)); } catch {}
+    if (activeId === id) {
+      const next = updated[0]?.id || "";
+      setActiveId(next);
+      try { localStorage.setItem("wa_ai_active_id", next); } catch {}
+    }
+  };
+
+  const activateKey = (id) => {
+    setActiveId(id);
+    try { localStorage.setItem("wa_ai_active_id", id); } catch {}
   };
 
   const initials = (name.trim() || "Dagzo").slice(0, 2).toUpperCase();
@@ -322,52 +358,100 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
             </div>
           </div>
 
-          {/* AI Provider */}
+          {/* AI Keys */}
           <div>
             <label style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
-              {lang === "en" ? "// AI_GRADER · PROVIDER" : "// AI_TEKSHIRUVCHI · PROVIDER"}
+              {lang === "en" ? "// AI_KEYS" : "// AI_KALITLAR"}
             </label>
-            <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-              {PROVIDERS.map(p => (
-                <button key={p.id} onClick={() => setProvider(p.id)} style={{
-                  flex: "1 1 auto", padding: "9px 8px", borderRadius: 8, cursor: "pointer", appearance: "none",
-                  border: `1.5px solid ${provider === p.id ? "var(--accent)" : "var(--border)"}`,
-                  background: provider === p.id ? "var(--accent-soft)" : "var(--bg-2)",
-                  color: provider === p.id ? "var(--accent)" : "var(--text-2)",
-                  fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700,
-                  transition: "all 150ms", display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-                }}>
-                  {p.label}
-                  {p.free && <span style={{ fontSize: 9, color: "var(--accent)", opacity: 0.8, fontWeight: 900 }}>BEPUL</span>}
-                </button>
-              ))}
-            </div>
-            {provider && (() => {
-              const prov = PROVIDERS.find(p => p.id === provider);
+
+            {aiKeys.map(k => {
+              const prov = PROVIDERS.find(p => p.id === k.provider);
+              const isActive = k.id === activeId;
+              const maskedKey = k.key.length > 8 ? k.key.slice(0,4) + "****" + k.key.slice(-4) : "****";
               return (
-                <div>
-                  <div style={{ position: "relative" }}>
+                <div key={k.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, marginBottom: 6, border: `1.5px solid ${isActive ? "var(--accent)" : "var(--border)"}`, background: isActive ? "var(--accent-soft)" : "var(--bg-2)" }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: isActive ? "var(--accent)" : "var(--border)", flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: isActive ? "var(--accent)" : "var(--text-1)" }}>{prov?.label || k.provider}</span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-3)", marginLeft: 8 }}>{maskedKey}</span>
+                  </div>
+                  {isActive
+                    ? <span style={{ fontSize: 9, fontFamily: "var(--font-mono)", color: "var(--accent)", fontWeight: 900, padding: "2px 6px", border: "1px solid var(--accent)", borderRadius: 4 }}>{lang === "en" ? "ACTIVE" : "FAOL"}</span>
+                    : <button onClick={() => activateKey(k.id)} style={{ appearance: "none", background: "none", border: "1px solid var(--border)", borderRadius: 6, cursor: "pointer", fontSize: 9, fontFamily: "var(--font-mono)", color: "var(--text-2)", padding: "2px 6px", fontWeight: 700 }}>{lang === "en" ? "Activate" : "Faollashtir"}</button>
+                  }
+                  <button onClick={() => removeKey(k.id)} style={{ appearance: "none", background: "none", border: "none", cursor: "pointer", color: "var(--c-attack)", opacity: 0.7, padding: "0 2px", fontSize: 14, flexShrink: 0, lineHeight: 1 }}>✕</button>
+                </div>
+              );
+            })}
+
+            {aiKeys.length === 0 && !addingKey && (
+              <div style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "var(--font-mono)", padding: "6px 0 4px", textAlign: "center" }}>
+                {lang === "en" ? "No API keys added yet" : "Hali API kalit qo'shilmagan"}
+              </div>
+            )}
+
+            {addingKey && (
+              <div style={{ background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: 12, marginTop: 4, marginBottom: 4 }}>
+                <div style={{ display: "flex", gap: 5, marginBottom: 8, flexWrap: "wrap" }}>
+                  {PROVIDERS.map(p => (
+                    <button key={p.id} onClick={() => setNewProvider(p.id)} style={{
+                      flex: "1 1 auto", padding: "7px 6px", borderRadius: 7, cursor: "pointer", appearance: "none",
+                      border: `1.5px solid ${newProvider === p.id ? "var(--accent)" : "var(--border)"}`,
+                      background: newProvider === p.id ? "var(--accent-soft)" : "transparent",
+                      color: newProvider === p.id ? "var(--accent)" : "var(--text-2)",
+                      fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, transition: "all 150ms",
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 1,
+                    }}>
+                      {p.label}
+                      {p.free && <span style={{ fontSize: 8, color: "var(--accent)", fontWeight: 900 }}>BEPUL</span>}
+                    </button>
+                  ))}
+                </div>
+                {newProvider && (
+                  <div style={{ position: "relative", marginBottom: 8 }}>
                     <input
-                      type={showKey ? "text" : "password"}
-                      placeholder={prov?.hint}
-                      value={apiKey}
-                      onChange={e => setApiKey(e.target.value)}
-                      style={{ width: "100%", boxSizing: "border-box", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 40px 10px 14px", fontSize: 13, fontFamily: "var(--font-mono)", color: "var(--text-0)", outline: "none" }}
+                      type={showNewKey ? "text" : "password"}
+                      placeholder={PROVIDERS.find(p => p.id === newProvider)?.hint || ""}
+                      value={newKey}
+                      onChange={e => setNewKey(e.target.value)}
+                      style={{ width: "100%", boxSizing: "border-box", background: "rgba(0,0,0,0.25)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 38px 9px 12px", fontSize: 12, fontFamily: "var(--font-mono)", color: "var(--text-0)", outline: "none" }}
                       onFocus={e => e.target.style.borderColor = "var(--accent)"}
                       onBlur={e => e.target.style.borderColor = "var(--border)"}
                     />
-                    <button onClick={() => setShowKey(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: 14, padding: 0 }}>
-                      {showKey ? "🙈" : "👁"}
+                    <button onClick={() => setShowNewKey(s => !s)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: 13, padding: 0 }}>
+                      {showNewKey ? "🙈" : "👁"}
                     </button>
                   </div>
-                  {prov?.url && (
-                    <a href={prov.url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", opacity: 0.8, textDecoration: "none" }}>
-                      <Icon name="arrow-right" size={10} /> {lang === "en" ? `Get ${prov.label} API key →` : `${prov.label} API kalitini olish →`}
+                )}
+                {newProvider && (() => {
+                  const prov = PROVIDERS.find(p => p.id === newProvider);
+                  return prov?.url && (
+                    <a href={prov.url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 8, fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--accent)", opacity: 0.8, textDecoration: "none" }}>
+                      <Icon name="arrow-right" size={9} /> {lang === "en" ? `Get ${prov.label} key →` : `${prov.label} kalitini olish →`}
                     </a>
-                  )}
+                  );
+                })()}
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button onClick={() => { setAddingKey(false); setNewProvider(""); setNewKey(""); }} style={{ flex: "0 0 auto", padding: "7px 12px", borderRadius: 7, cursor: "pointer", appearance: "none", border: "1px solid var(--border)", background: "transparent", color: "var(--text-2)", fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700 }}>
+                    {lang === "en" ? "Cancel" : "Bekor"}
+                  </button>
+                  <button onClick={addKey} disabled={!newProvider || !newKey.trim()} style={{ flex: 1, padding: "7px 0", borderRadius: 7, cursor: newProvider && newKey.trim() ? "pointer" : "not-allowed", appearance: "none", border: `1px solid ${newProvider && newKey.trim() ? "var(--accent)" : "var(--border)"}`, background: newProvider && newKey.trim() ? "var(--accent)" : "transparent", color: newProvider && newKey.trim() ? "#04060d" : "var(--text-3)", fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700 }}>
+                    {lang === "en" ? "Add Key" : "Kalit qo'shish"}
+                  </button>
                 </div>
-              );
-            })()}
+              </div>
+            )}
+
+            {!addingKey && aiKeys.length < 3 && (
+              <button onClick={() => setAddingKey(true)} style={{ width: "100%", marginTop: 6, padding: "8px 0", borderRadius: 9, cursor: "pointer", appearance: "none", border: "1px dashed var(--border)", background: "transparent", color: "var(--text-2)", fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                + {lang === "en" ? "Add API key" : "API kalit qo'shish"}{aiKeys.length > 0 ? ` (${aiKeys.length}/3)` : ""}
+              </button>
+            )}
+            {!addingKey && aiKeys.length >= 3 && (
+              <div style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "var(--font-mono)", textAlign: "center", marginTop: 4 }}>
+                {lang === "en" ? "Maximum 3 keys (full)" : "Maksimal 3 ta kalit (to'ldi)"}
+              </div>
+            )}
           </div>
 
           {/* Actions */}

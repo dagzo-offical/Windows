@@ -495,17 +495,41 @@ function sanitizeForPrompt(text, maxLen = 2000) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Multi-key AI storage helpers
+// ─────────────────────────────────────────────────────────────
+const AI_KEYS_STORE = "wa_ai_keys";
+const AI_ACTIVE_STORE = "wa_ai_active_id";
+
+function loadAiKeys() {
+  try {
+    const s = localStorage.getItem(AI_KEYS_STORE);
+    if (s) return JSON.parse(s);
+  } catch {}
+  const provider = localStorage.getItem("wa_ai_provider") || "";
+  const key = localStorage.getItem("wa_ai_key") || "";
+  if (provider && key) {
+    const keys = [{ id: "legacy_1", provider, key }];
+    try { localStorage.setItem(AI_KEYS_STORE, JSON.stringify(keys)); localStorage.setItem(AI_ACTIVE_STORE, "legacy_1"); } catch {}
+    return keys;
+  }
+  return [];
+}
+
+function getActiveAiKey() {
+  const keys = loadAiKeys();
+  if (!keys.length) return null;
+  const activeId = localStorage.getItem(AI_ACTIVE_STORE) || "";
+  return keys.find(k => k.id === activeId) || keys[0];
+}
+
+// ─────────────────────────────────────────────────────────────
 // Multi-provider AI grader
 // ─────────────────────────────────────────────────────────────
 async function gradeWithAI(prompt) {
-  const provider  = localStorage.getItem("wa_ai_provider") || "";
-  const key       = localStorage.getItem("wa_ai_key") || "";
   const proxyUrl  = localStorage.getItem("wa_ai_proxy") || "";
 
-  if (!provider) throw new Error("no_key");
-
-  // Route through self-hosted proxy if configured (keeps key server-side)
   if (proxyUrl) {
+    const provider = localStorage.getItem("wa_ai_provider") || "";
     const r = await fetch(proxyUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -516,6 +540,10 @@ async function gradeWithAI(prompt) {
     return d.text;
   }
 
+  const active = getActiveAiKey();
+  if (!active || !active.provider) throw new Error("no_key");
+  const provider = active.provider;
+  const key = active.key || "";
   if (!key) throw new Error("no_key");
 
   if (provider === "openai") {
