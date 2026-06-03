@@ -190,6 +190,11 @@ const FALLBACK_QUESTIONS = {
     { uz: "Volume Shadow Copy Service (VSS) nima va u qanday ishlaydi? System Restore VSS dan qanday foydalanadi? Faylning oldingi versiyasini (Previous Versions) qanday tiklash mumkin?", en: "What is Volume Shadow Copy Service (VSS) and how does it work? How does System Restore use VSS? How do you restore a previous version of a file (Previous Versions)?" },
     { uz: "3-2-1 zaxira qoidasi nima? Ransomware VSS nusxalarini qanday o'chiradi (vssadmin delete shadows)? Ma'lumotlarni yo'qotmaslik uchun qanday yaxshi amaliyotlarni qo'llash kerak?", en: "What is the 3-2-1 backup rule? How does ransomware delete VSS shadow copies (vssadmin delete shadows)? What best practices should be applied to prevent data loss?" },
   ],
+  38: [
+    { uz: "Windows domeni nima va u domensizdан qanday farq qiladi? Domen Kontrolleri (DC) qanday vazifani bajaradi?", en: "What is a Windows domain and how does it differ from a workgroup? What is the role of a Domain Controller (DC)?" },
+    { uz: "Active Directory da uchta asosiy ob'ekt turini (Users, Machines, Security Groups) tushuntiring. Qurilma hisob qaydnomasi nomi qanday ko'rinishda bo'ladi?", en: "Explain the three main AD object types: Users, Machines, and Security Groups. What does a machine account name look like?" },
+    { uz: "Tashkiliy Bo'linmalar (OU) va Xavfsizlik Guruhlari (Security Groups) o'rtasidagi asosiy farq nima? Qaysi biri siyosat qo'llash uchun, qaysi biri ruxsat berish uchun ishlatiladi?", en: "What is the key difference between Organisational Units (OUs) and Security Groups? Which is used for applying policies and which for granting resource permissions?" },
+  ],
 };
 
 const COOLDOWN_KEY = "wa_cooldown_end";
@@ -514,6 +519,7 @@ const LESSON_TITLES = {
   35: { uz: "Tarmoq sozlamalari",       en: "Network Configuration" },
   36: { uz: "Fayl ulashish",            en: "File Sharing" },
   37: { uz: "Zaxira nusxa va tiklash",  en: "Backup & Restore" },
+  38: { uz: "Active Directory asoslari", en: "Active Directory Basics" },
 };
 
 function ModalHeader({ phase, onClose, lessonNum = 1 }) {

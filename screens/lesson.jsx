@@ -88,6 +88,7 @@ const LESSONS = {
   35: { num:"L35", section:"02", uz:"Tarmoq sozlamalari", en:"Network Configuration", subUz:"IP, DNS, adapter va tarmoq ulanishlarini boshqarish", subEn:"Managing IP, DNS, adapters and network connections" },
   36: { num:"L36", section:"02", uz:"Fayl ulashish", en:"File Sharing", subUz:"Shared folders va tarmoq ulashish sozlamalari", subEn:"Shared folders and network sharing settings" },
   37: { num:"L37", section:"02", uz:"Zaxira nusxa va tiklash", en:"Backup & Restore", subUz:"Ma'lumotlarni zaxiralash va tiklash strategiyalari", subEn:"Data backup and recovery strategies" },
+  38: { num:"L38", section:"03", uz:"Active Directory asoslari", en:"Active Directory Basics", subUz:"Windows domeni, AD DS va asosiy ob'ektlar", subEn:"Windows domain, AD DS and core objects" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -236,6 +237,7 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
                 : lessonNum === 35 ? <><SectionNetBasic /></>
                 : lessonNum === 36 ? <><SectionFileShare /></>
                 : lessonNum === 37 ? <><SectionBackupRestore /></>
+                : lessonNum === 38 ? <><SectionADBasics /></>
                 : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
                 <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} sectionNum={sectionNum} quizUnlocked={quizUnlocked} totalTimeSec={totalTimeSec} quizPassed={quizPassed} />
               </>
@@ -8444,6 +8446,206 @@ function SectionGUI() {
       </Callout>
 
       <H2 num="§8" uz="Amaliy Buyruqlar" en="" />
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// L38 — Active Directory asoslari
+// ─────────────────────────────────────────────────────────────
+function SectionADBasics() {
+  const lang = useLang();
+  return lang === "en" ? (
+    <section>
+      <H2 num="§1" en="What is a Windows Domain?" uz="" />
+      <P>Imagine managing a small network of 5 computers — you configure each one manually. Now imagine 157 computers across 4 offices with 320 users. Managing them individually becomes impossible.</P>
+      <P>A <Term>Windows Domain</Term> is a group of users and computers under a single business administration. The key idea is to centralise management of common components into a single repository called <Term>Active Directory (AD)</Term>. The server running Active Directory services is called a <Term>Domain Controller (DC)</Term>.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,margin:"18px 0"}}>
+        <div style={{padding:16,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>WITHOUT DOMAIN</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Each PC configured manually<br/>Separate user account per machine<br/>No central policy enforcement<br/>IT must visit each computer<br/><span style={{color:"var(--c-attack)"}}>→ Does not scale</span></div>
+        </div>
+        <div style={{padding:16,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>WITH DOMAIN (AD)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Central user &amp; policy management<br/>Single sign-on across all machines<br/>Group Policy applied from DC<br/>Remote administration<br/><span style={{color:"var(--accent)"}}>→ Scales to thousands of users</span></div>
+        </div>
+      </div>
+      <Callout color="var(--accent)" icon="info" titleEn="Real-world example" titleUz="">
+        At school or university you log in with one username/password on any campus computer. That works because authentication is forwarded to Active Directory — your credentials don't need to exist on every machine.
+      </Callout>
+
+      <H2 num="§2" en="Active Directory Domain Services (AD DS)" uz="" />
+      <P>The core of any Windows domain is <Term>Active Directory Domain Services (AD DS)</Term>. It is a directory service — a catalogue that stores data about every <Em>object</Em> on the network: users, groups, computers, printers, shared folders, and more.</P>
+      <P>AD DS is installed on the <Term>Domain Controller</Term>. All other machines in the domain trust the DC to authenticate users and enforce policies.</P>
+
+      <H2 num="§3" en="AD Objects: Users, Machines, Groups" uz="" />
+      <div style={{display:"flex",flexDirection:"column",gap:12,margin:"14px 0"}}>
+        {[
+          {title:"Users (Foydalanuvchilar)",color:"var(--accent)",body:<>The most common AD object. Users are <Term>security principals</Term> — the domain can authenticate them and assign them rights to resources. Two types:<br/><b>People</b>: employees who need network access.<br/><b>Services</b>: accounts for services like IIS or MSSQL — they have only the rights needed to run their specific service.</>},
+          {title:"Machines (Qurilmalar)",color:"var(--c-auth)",body:<>Every computer joined to the domain gets a machine object. Like users, machines are also security principals with their own account. Machine account names end with <code>$</code> — e.g. <code>DC01$</code>. Machine account passwords are auto-rotated (120 random characters) and managed by Windows.</>},
+          {title:"Security Groups (Xavfsizlik guruhlari)",color:"var(--c-warn)",body:<>Groups let you assign permissions to many users at once. A user added to a group automatically inherits all of its rights. Groups can contain users, machines, and other groups. They are also security principals — they can be granted rights to resources.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§4" en="Default Domain Groups" uz="" />
+      <P>When a domain is created, several built-in groups are automatically created with pre-defined privileges:</P>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Group","Description","Privilege level"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["Domain Admins","Full control over the entire domain","Highest — use with extreme care"],
+              ["Enterprise Admins","Full control over all domains in the forest","Forest-wide admin — rarely used"],
+              ["Schema Admins","Can modify the AD schema structure","Very high — schema changes are permanent"],
+              ["Domain Users","All domain user accounts belong to this group","Standard user access"],
+              ["Domain Computers","All domain-joined machines","Machine-level access"],
+              ["Domain Controllers","All DCs in the domain","DC management"],
+              ["Backup Operators","Can bypass file permissions for backup","Elevated — potential security risk"],
+              ["Account Operators","Can manage most user accounts","Medium — cannot manage admin accounts"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===2?i<=2?"var(--c-attack)":"var(--text-2)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <H2 num="§5" en="Active Directory Users and Computers (ADUC)" uz="" />
+      <P>To manage users, groups, and machines in Active Directory, open <Term>Active Directory Users and Computers</Term> from the Start menu on the Domain Controller (or via <code>dsa.msc</code>). This shows the full hierarchy of objects in the domain.</P>
+      <P>Objects are organised into <Term>Organisational Units (OUs)</Term> — container objects that group users and machines so policies can be applied to them. A typical domain mirrors company structure: IT, Management, Marketing, Sales each get their own OU.</P>
+      <Callout color="var(--c-auth)" icon="info" titleEn="Key point" titleUz="">
+        A user can belong to only ONE OU at a time (but many Security Groups). OUs are for applying policies; Security Groups are for assigning resource permissions.
+      </Callout>
+
+      <H2 num="§6" en="Default Containers in AD" uz="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Builtin",c:"var(--text-2)",d:"Standard groups present on every Windows host (Administrators, Backup Operators, etc.)"},
+          {t:"Computers",c:"var(--c-auth)",d:"Any machine that joins the domain lands here by default. Move to appropriate OU for policy."},
+          {t:"Domain Controllers",c:"var(--c-warn)",d:"Default OU containing all DCs in the domain."},
+          {t:"Users",c:"var(--accent)",d:"Default users and groups that apply domain-wide (e.g. Domain Admins, Domain Users)."},
+          {t:"Managed Service Accounts",c:"var(--c-system)",d:"Stores accounts used by Windows services within your domain."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§7" en="OUs vs Security Groups" uz="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,margin:"14px 0"}}>
+        <div style={{padding:16,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>ORGANISATIONAL UNITS (OUs)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Used to <b>apply policies</b> (GPO)<br/>A user can be in only 1 OU<br/>Reflects company structure<br/>Examples: IT, Sales, Management<br/><span style={{color:"var(--c-auth)"}}>→ Policy containers</span></div>
+        </div>
+        <div style={{padding:16,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>SECURITY GROUPS</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Used to <b>grant resource permissions</b><br/>A user can be in many groups<br/>Can contain users, machines, groups<br/>Examples: ShareAccess, PrinterUsers<br/><span style={{color:"var(--accent)"}}>→ Permission containers</span></div>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section>
+      <H2 num="§1" uz="Windows Domeni nima?" en="" />
+      <P>Tasavvur qiling: 5 ta kompyuter va 5 ta xodim bor — har birini qo'lda sozlash mumkin. Endi 157 ta kompyuter va 320 ta foydalanuvchi bo'lsa-chi? Ularni alohida boshqarish imkonsiz bo'lib qoladi.</P>
+      <P><Term>Windows domeni</Term> — bitta boshqaruv ostidagi foydalanuvchilar va kompyuterlar guruhi. Barcha komponentlarni markaziy boshqarish uchun <Term>Active Directory (AD)</Term> degan yagona ombordan foydalaniladi. AD xizmatlarini ishga tushiruvchi server esa <Term>Domen Kontrolleri (DC)</Term> deyiladi.</P>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,margin:"18px 0"}}>
+        <div style={{padding:16,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>DOMENSIЗ</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Har bir kompyuter qo'lda sozlanadi<br/>Har mashinada alohida hisob<br/>Markaziy siyosat yo'q<br/>IT har joyga borishi kerak<br/><span style={{color:"var(--c-attack)"}}>→ Ko'p foydalanuvchida ishlamaydi</span></div>
+        </div>
+        <div style={{padding:16,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>DOMEN BILAN (AD)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Markaziy foydalanuvchi boshqaruvi<br/>Barcha mashinalarda yagona kirish<br/>DC dan Group Policy qo'llanadi<br/>Masofadan boshqarish<br/><span style={{color:"var(--accent)"}}>→ Minglab foydalanuvchiga moslashadi</span></div>
+        </div>
+      </div>
+      <Callout color="var(--accent)" icon="info" titleUz="Haqiqiy hayot misoli" titleEn="">
+        Maktab yoki universitetda siz istalgan kampus kompyuterida bir xil login va parol bilan kirasiz. Bu Active Directory tufayli ishlaydi — hisob ma'lumotlaringiz har mashinada emas, faqat AD da saqlanadi.
+      </Callout>
+
+      <H2 num="§2" uz="Active Directory Domain Services (AD DS)" en="" />
+      <P>Har qanday Windows domenining o'zagi — <Term>Active Directory domen xizmati (AD DS)</Term>. Bu tarmoqdagi barcha <Em>ob'ektlar</Em> haqidagi ma'lumotlarni saqlaydigan katalog xizmat: foydalanuvchilar, guruhlar, kompyuterlar, printerlar, umumiy papkalar va boshqalar.</P>
+      <P>AD DS <Term>Domen Kontrollerida</Term> o'rnatiladi. Domendagi boshqa barcha mashinalar autentifikatsiya va siyosatlar uchun DC ga ishonadi.</P>
+
+      <H2 num="§3" uz="AD Ob'ektlari: Foydalanuvchilar, Qurilmalar, Guruhlar" en="" />
+      <div style={{display:"flex",flexDirection:"column",gap:12,margin:"14px 0"}}>
+        {[
+          {title:"Foydalanuvchilar (Users)",color:"var(--accent)",body:<>AD dagi eng keng tarqalgan ob'ekt turi. Foydalanuvchilar <Term>xavfsizlik sub'ektlari</Term> — domen ularni autentifikatsiya qiladi va resurslarga huquqlar beradi. Ikki tur:<br/><b>Odamlar</b>: tarmoqqa kirish kerak bo'lgan xodimlar.<br/><b>Xizmatlar</b>: IIS yoki MSSQL kabi xizmatlar uchun hisoblar — faqat o'z xizmatini ishga tushirish huquqiga ega.</>},
+          {title:"Qurilmalar (Machines)",color:"var(--c-auth)",body:<>Domenge qo'shilgan har bir kompyuter uchun qurilma ob'ekti yaratiladi. Qurilmalar ham xavfsizlik sub'ektlari — o'z hisob qaydnomasiga ega. Qurilma hisob nomi kompyuter nomidan keyin <code>$</code> belgisi bilan hosil bo'ladi: masalan <code>DC01$</code>. Parollar avtomatik yangilanadi (120 ta tasodifiy belgi).</>},
+          {title:"Xavfsizlik Guruhlari (Security Groups)",color:"var(--c-warn)",body:<>Guruhlar orqali bir vaqtda ko'plab foydalanuvchilarga ruxsat beriladi. Guruhga qo'shilgan foydalanuvchi uning barcha huquqlarini meros qilib oladi. Guruhlar foydalanuvchilarni, qurilmalarni va boshqa guruhlarni o'z ichiga olishi mumkin. Ular ham xavfsizlik sub'ektlari.</>},
+        ].map((item,i)=>(
+          <div key={i} style={{padding:"14px 16px",borderRadius:10,background:`${item.color}08`,border:`1px solid ${item.color}30`}}>
+            <div style={{fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,color:item.color,marginBottom:8}}>{item.title}</div>
+            <div style={{fontSize:13,color:"var(--text-1)",lineHeight:1.65}}>{item.body}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§4" uz="Standart Domen Guruhlari" en="" />
+      <P>Domen yaratilganda bir qator o'rnatilgan guruhlar avtomatik tarzda yaratiladi:</P>
+      <div style={{overflowX:"auto",marginTop:10}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr style={{borderBottom:"1px solid var(--border)"}}>{["Guruh","Tavsif","Imtiyoz darajasi"].map((h,i)=><th key={i} style={{textAlign:"left",padding:"8px 12px",color:"var(--text-3)",fontWeight:600,fontFamily:"var(--font-mono)",fontSize:10}}>{h}</th>)}</tr></thead>
+          <tbody>
+            {[
+              ["Domain Admins","Butun domen ustidan to'liq nazorat","Eng yuqori — ehtiyotkorlik bilan ishlating"],
+              ["Enterprise Admins","O'rmondagi barcha domenlar ustidan nazorat","O'rmon bo'ylab admin — kamdan-kam ishlatiladi"],
+              ["Schema Admins","AD sxema tuzilmasini o'zgartirish","Juda yuqori — o'zgarishlar doimiy"],
+              ["Domain Users","Barcha domen foydalanuvchi hisoblari","Standart foydalanuvchi huquqlari"],
+              ["Domain Computers","Domenge qo'shilgan barcha mashinalar","Mashina darajasida kirish"],
+              ["Domain Controllers","Domendagi barcha DC lar","DC boshqaruvi"],
+              ["Backup Operators","Zaxira uchun fayl ruxsatlarini chetlab o'tish","Yuqori — potentsial xavfsizlik xavfi"],
+              ["Account Operators","Ko'p foydalanuvchi hisoblarini boshqarish","O'rta — admin hisoblarini boshqara olmaydi"],
+            ].map((r,i)=>(
+              <tr key={i} style={{borderBottom:"1px solid rgba(255,255,255,0.04)",background:i%2===0?"transparent":"rgba(255,255,255,0.01)"}}>
+                {r.map((c,j)=><td key={j} style={{padding:"7px 12px",color:j===0?"var(--accent)":j===2?i<=2?"var(--c-attack)":"var(--text-2)":"var(--text-1)",fontFamily:j===0?"var(--font-mono)":"inherit",fontSize:j===0?11:12}}>{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <H2 num="§5" uz="Active Directory Users and Computers (ADUC)" en="" />
+      <P>AD da foydalanuvchilar, guruhlar va mashinalarni boshqarish uchun DC da <Term>Active Directory Users and Computers</Term> ni oching (boshlash menyusidan yoki <code>dsa.msc</code> orqali). Bu domendagi barcha ob'ektlarning to'liq ierarxiyasini ko'rsatadi.</P>
+      <P>Ob'ektlar <Term>Tashkiliy Bo'linmalar (TB / OU)</Term> ichida tashkil etiladi — bu konteyner ob'ektlar guruh siyosatlarini qo'llash imkonini beradi. Odatda domen kompaniya tuzilishini aks ettiradi: IT, Menejment, Marketing, Savdo — har birining o'z TB si.</P>
+      <Callout color="var(--c-auth)" icon="info" titleUz="Asosiy qoida" titleEn="">
+        Foydalanuvchi bir vaqtda faqat BITTA TB da bo'lishi mumkin (lekin ko'plab Security Group larda bo'lishi mumkin). TB lar siyosat qo'llash uchun; Security Groups ruxsat berish uchun.
+      </Callout>
+
+      <H2 num="§6" uz="AD dagi Standart Konteynerlar" en="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
+        {[
+          {t:"Builtin",c:"var(--text-2)",d:"Har bir Windows xostida mavjud standart guruhlar (Administrators, Backup Operators va boshqalar)."},
+          {t:"Computers",c:"var(--c-auth)",d:"Domenge qo'shilgan har qanday qurilma standart holda shu yerga tushadi. Kerak bo'lsa boshqa TB ga ko'chiring."},
+          {t:"Domain Controllers",c:"var(--c-warn)",d:"Domendagi barcha DC larni o'z ichiga oluvchi standart TB."},
+          {t:"Users",c:"var(--accent)",d:"Butun domen bo'ylab qo'llaniladigan standart foydalanuvchilar va guruhlar (Domain Admins, Domain Users)."},
+          {t:"Managed Service Accounts",c:"var(--c-system)",d:"Domendagi xizmatlar tomonidan ishlatiladigan hisob qaydnomalarini saqlaydi."},
+        ].map((card,i)=>(
+          <div key={i} style={{padding:14,background:`${card.c}08`,border:`1px solid ${card.c}30`,borderRadius:10}}>
+            <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:card.c,marginBottom:6}}>{card.t}</div>
+            <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.6}}>{card.d}</div>
+          </div>
+        ))}
+      </div>
+
+      <H2 num="§7" uz="TB lar va Security Groups farqi" en="" />
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,margin:"14px 0"}}>
+        <div style={{padding:16,background:"rgba(100,100,255,0.06)",border:"1px solid rgba(100,100,255,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--c-auth)",marginBottom:8}}>TASHKILIY BO'LINMALAR (TB / OU)</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Siyosatlarni <b>qo'llash</b> uchun (GPO)<br/>Foydalanuvchi faqat 1 ta TB da<br/>Kompaniya tuzilishini aks ettiradi<br/>Misol: IT, Savdo, Menejment<br/><span style={{color:"var(--c-auth)"}}>→ Siyosat konteynerlari</span></div>
+        </div>
+        <div style={{padding:16,background:"rgba(0,255,156,0.06)",border:"1px solid rgba(0,255,156,0.25)",borderRadius:10}}>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:8}}>XAVFSIZLIK GURUHLARI</div>
+          <div style={{fontSize:12,color:"var(--text-1)",lineHeight:1.7}}>Resurs <b>ruxsatlarini</b> berish uchun<br/>Foydalanuvchi ko'p guruhda bo'lishi mumkin<br/>Foydalanuvchi, mashina, guruhlar<br/>Misol: ShareAccess, PrinterUsers<br/><span style={{color:"var(--accent)"}}>→ Ruxsat konteynerlari</span></div>
+        </div>
+      </div>
     </section>
   );
 }

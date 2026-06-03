@@ -117,7 +117,9 @@ const SECTION_DATA = {
     outcomesUz: [],
     outcomesEn: [],
     tooling: ["PowerShell", "ADUC", "ADSI Edit", "BloodHound", "Mimikatz", "Impacket", "Rubeus", "Group Policy Management"],
-    lessons: [],
+    lessons: [
+      { n: "38", uz: "Active Directory asoslari", en: "Active Directory Basics", duration: 30, status: "available", icon: "shield", color: "var(--c-warn)", labs: 1, diagrams: 4 },
+    ],
   },
 };
 
