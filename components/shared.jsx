@@ -520,6 +520,18 @@ async function gradeWithAI(prompt) {
 
   if (!key) throw new Error("no_key");
 
+  // Kiro provider — Groq orqali ishlaydi, lekin alohida kalit bilan
+  if (provider === "kiro") {
+    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+      body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], max_tokens: 600, temperature: 0.3 }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || `Kiro error ${r.status}`);
+    return d.choices[0].message.content;
+  }
+
   if (provider === "openai") {
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",

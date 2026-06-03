@@ -51,7 +51,7 @@ function clearAll() {
     localStorage.removeItem("wa_lang");
     localStorage.removeItem("wa_ai_provider");
     localStorage.removeItem("wa_ai_key");
-    localStorage.removeItem("wa_ai_active_slot");
+    localStorage.removeItem("wa_ai_keys");
   } catch {}
 }
 
@@ -234,19 +234,19 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
   const lang = useLang();
   const [name, setName] = useAS(user.name);
   const [provider, setProvider] = useAS(() => localStorage.getItem("wa_ai_provider") || "");
-  const [apiKey, setApiKey]     = useAS(() => localStorage.getItem("wa_ai_key") || "");
   const [showKey, setShowKey]   = useAS(false);
   const [saved, setSaved]       = useAS(false);
-  const [activeSlot, setActiveSlot] = useAS(() => localStorage.getItem("wa_ai_active_slot") || "custom");
 
-  // Built-in API keys — foydalanuvchi o'z kalitini kiritishi shart emas
-  const BUILTIN_KEYS = [
-    { id: "slot1", provider: "groq", key: "gsk_proj_WA_builtin_slot1_2026", label: "Academy Key #1", labelEn: "Academy Key #1" },
-    { id: "slot2", provider: "groq", key: "gsk_proj_WA_builtin_slot2_2026", label: "Academy Key #2", labelEn: "Academy Key #2" },
-    { id: "slot3", provider: "gemini", key: "AIzaSyC_WA_builtin_slot3_2026", label: "Academy Key #3", labelEn: "Academy Key #3" },
-  ];
+  // Har bir provayderning kaliti alohida saqlanadi
+  const [keys, setKeys] = useAS(() => {
+    try {
+      return JSON.parse(localStorage.getItem("wa_ai_keys") || "{}");
+    } catch { return {}; }
+  });
+  const setKeyFor = (prov, val) => setKeys(prev => ({ ...prev, [prov]: val }));
 
   const PROVIDERS = [
+    { id: "kiro",      label: "Kiro",    hint: "kiro_...",   url: null,                                            free: true },
     { id: "groq",      label: "Groq",    hint: "gsk_...",    url: "https://console.groq.com/keys",               free: true },
     { id: "openai",    label: "OpenAI",  hint: "sk-...",     url: "https://platform.openai.com/api-keys",        free: false },
     { id: "anthropic", label: "Claude",  hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys", free: false },
@@ -255,17 +255,11 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
   const THEMES = ["green", "blue", "purple"];
 
   const handleSave = () => {
-    localStorage.setItem("wa_ai_active_slot", activeSlot);
-    if (activeSlot === "custom") {
-      localStorage.setItem("wa_ai_provider", provider);
-      localStorage.setItem("wa_ai_key", apiKey);
-    } else {
-      const slot = BUILTIN_KEYS.find(s => s.id === activeSlot);
-      if (slot) {
-        localStorage.setItem("wa_ai_provider", slot.provider);
-        localStorage.setItem("wa_ai_key", slot.key);
-      }
-    }
+    localStorage.setItem("wa_ai_provider", provider);
+    localStorage.setItem("wa_ai_keys", JSON.stringify(keys));
+    // Faol provayderning kalitini wa_ai_key ga yoz (gradeWithAI shu yerdan o'qiydi)
+    const activeKey = keys[provider] || "";
+    localStorage.setItem("wa_ai_key", activeKey);
     onSave({ name: name.trim() || "Dagzo" });
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
@@ -343,127 +337,55 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
           {/* AI Provider */}
           <div>
             <label style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
-              {lang === "en" ? "// AI_GRADER · API KEY" : "// AI_TEKSHIRUVCHI · API KALIT"}
+              {lang === "en" ? "// AI_GRADER · PROVIDER" : "// AI_TEKSHIRUVCHI · PROVIDER"}
             </label>
-
-            {/* Built-in keys */}
-            <div style={{ fontSize: 10.5, color: "var(--text-2)", marginBottom: 8, fontFamily: "var(--font-mono)" }}>
-              {lang === "en" ? "Built-in keys (select one):" : "O'rnatilgan kalitlar (birini tanlang):"}
+            <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+              {PROVIDERS.map(p => (
+                <button key={p.id} onClick={() => setProvider(p.id)} style={{
+                  flex: "1 1 auto", padding: "9px 8px", borderRadius: 8, cursor: "pointer", appearance: "none",
+                  border: `1.5px solid ${provider === p.id ? "var(--accent)" : "var(--border)"}`,
+                  background: provider === p.id ? "var(--accent-soft)" : "var(--bg-2)",
+                  color: provider === p.id ? "var(--accent)" : "var(--text-2)",
+                  fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700,
+                  transition: "all 150ms", display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                }}>
+                  {p.label}
+                  {p.free && <span style={{ fontSize: 9, color: "var(--accent)", opacity: 0.8, fontWeight: 900 }}>BEPUL</span>}
+                </button>
+              ))}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
-              {BUILTIN_KEYS.map(slot => {
-                const isActive = activeSlot === slot.id;
-                return (
-                  <button key={slot.id} onClick={() => setActiveSlot(slot.id)} style={{
-                    appearance: "none", cursor: "pointer",
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: "10px 14px", borderRadius: 10,
-                    border: `1.5px solid ${isActive ? "var(--accent)" : "var(--border)"}`,
-                    background: isActive ? "var(--accent-soft)" : "var(--bg-2)",
-                    color: isActive ? "var(--accent)" : "var(--text-1)",
-                    transition: "all 150ms", width: "100%", textAlign: "left",
-                  }}>
-                    <div style={{
-                      width: 18, height: 18, borderRadius: "50%",
-                      border: `2px solid ${isActive ? "var(--accent)" : "var(--border-strong)"}`,
-                      background: isActive ? "var(--accent)" : "transparent",
-                      display: "grid", placeItems: "center", flexShrink: 0,
-                      boxShadow: isActive ? "0 0 8px var(--accent-glow)" : "none",
-                    }}>
-                      {isActive && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#04060d" }} />}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, fontFamily: "var(--font-display)" }}>
-                        {lang === "en" ? slot.labelEn : slot.label}
-                      </div>
-                      <div style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "var(--font-mono)", marginTop: 1 }}>
-                        {slot.provider.toUpperCase()} · {slot.key.slice(0, 12)}···
-                      </div>
-                    </div>
-                    {isActive && <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--accent)", fontWeight: 700 }}>FAOL</span>}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Custom key option */}
-            <div style={{ fontSize: 10.5, color: "var(--text-2)", marginBottom: 6, fontFamily: "var(--font-mono)" }}>
-              {lang === "en" ? "Or use your own key:" : "Yoki o'z kalitingizni ishlating:"}
-            </div>
-            <button onClick={() => setActiveSlot("custom")} style={{
-              appearance: "none", cursor: "pointer",
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "10px 14px", borderRadius: 10, width: "100%", textAlign: "left",
-              border: `1.5px solid ${activeSlot === "custom" ? "var(--accent)" : "var(--border)"}`,
-              background: activeSlot === "custom" ? "var(--accent-soft)" : "var(--bg-2)",
-              color: activeSlot === "custom" ? "var(--accent)" : "var(--text-1)",
-              transition: "all 150ms", marginBottom: 10,
-            }}>
-              <div style={{
-                width: 18, height: 18, borderRadius: "50%",
-                border: `2px solid ${activeSlot === "custom" ? "var(--accent)" : "var(--border-strong)"}`,
-                background: activeSlot === "custom" ? "var(--accent)" : "transparent",
-                display: "grid", placeItems: "center", flexShrink: 0,
-                boxShadow: activeSlot === "custom" ? "0 0 8px var(--accent-glow)" : "none",
-              }}>
-                {activeSlot === "custom" && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#04060d" }} />}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, fontFamily: "var(--font-display)" }}>
-                  {lang === "en" ? "Custom API key" : "Shaxsiy API kalit"}
-                </div>
-                <div style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "var(--font-mono)", marginTop: 1 }}>
-                  {lang === "en" ? "Enter your own provider & key" : "O'z provayderingiz va kalitingiz"}
-                </div>
-              </div>
-              {activeSlot === "custom" && <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--accent)", fontWeight: 700 }}>FAOL</span>}
-            </button>
-
-            {activeSlot === "custom" && (
-              <>
-                <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-                  {PROVIDERS.map(p => (
-                    <button key={p.id} onClick={() => setProvider(p.id)} style={{
-                      flex: "1 1 auto", padding: "9px 8px", borderRadius: 8, cursor: "pointer", appearance: "none",
-                      border: `1.5px solid ${provider === p.id ? "var(--accent)" : "var(--border)"}`,
-                      background: provider === p.id ? "var(--accent-soft)" : "var(--bg-2)",
-                      color: provider === p.id ? "var(--accent)" : "var(--text-2)",
-                      fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700,
-                      transition: "all 150ms", display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-                    }}>
-                      {p.label}
-                      {p.free && <span style={{ fontSize: 9, color: "var(--accent)", opacity: 0.8, fontWeight: 900 }}>BEPUL</span>}
+            {provider && (() => {
+              const prov = PROVIDERS.find(p => p.id === provider);
+              const currentKey = keys[provider] || "";
+              return (
+                <div>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type={showKey ? "text" : "password"}
+                      placeholder={prov?.hint}
+                      value={currentKey}
+                      onChange={e => setKeyFor(provider, e.target.value)}
+                      style={{ width: "100%", boxSizing: "border-box", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 40px 10px 14px", fontSize: 13, fontFamily: "var(--font-mono)", color: "var(--text-0)", outline: "none" }}
+                      onFocus={e => e.target.style.borderColor = "var(--accent)"}
+                      onBlur={e => e.target.style.borderColor = "var(--border)"}
+                    />
+                    <button onClick={() => setShowKey(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: 14, padding: 0 }}>
+                      {showKey ? "🙈" : "👁"}
                     </button>
-                  ))}
-                </div>
-                {provider && (() => {
-                  const prov = PROVIDERS.find(p => p.id === provider);
-                  return (
-                    <div>
-                      <div style={{ position: "relative" }}>
-                        <input
-                          type={showKey ? "text" : "password"}
-                          placeholder={prov?.hint}
-                          value={apiKey}
-                          onChange={e => setApiKey(e.target.value)}
-                          style={{ width: "100%", boxSizing: "border-box", background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 40px 10px 14px", fontSize: 13, fontFamily: "var(--font-mono)", color: "var(--text-0)", outline: "none" }}
-                          onFocus={e => e.target.style.borderColor = "var(--accent)"}
-                          onBlur={e => e.target.style.borderColor = "var(--border)"}
-                        />
-                        <button onClick={() => setShowKey(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: 14, padding: 0 }}>
-                          {showKey ? "🙈" : "👁"}
-                        </button>
-                      </div>
-                      {prov?.url && (
-                        <a href={prov.url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", opacity: 0.8, textDecoration: "none" }}>
-                          <Icon name="arrow-right" size={10} /> {lang === "en" ? `Get ${prov.label} API key →` : `${prov.label} API kalitini olish →`}
-                        </a>
-                      )}
+                  </div>
+                  {currentKey && (
+                    <div style={{ marginTop: 6, fontSize: 10, color: "var(--accent)", fontFamily: "var(--font-mono)", display: "flex", alignItems: "center", gap: 4 }}>
+                      <Icon name="check" size={10} /> {lang === "en" ? "Key saved for " : "Kalit saqlangan: "}{prov.label}
                     </div>
-                  );
-                })()}
-              </>
-            )}
+                  )}
+                  {prov?.url && (
+                    <a href={prov.url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--accent)", opacity: 0.8, textDecoration: "none" }}>
+                      <Icon name="arrow-right" size={10} /> {lang === "en" ? `Get ${prov.label} API key →` : `${prov.label} API kalitini olish →`}
+                    </a>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Actions */}
