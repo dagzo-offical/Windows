@@ -102,6 +102,23 @@ const SECTION_DATA = {
       { n: "37", uz: "Zaxira nusxa va tiklash",    en: "Backup & Restore",           duration: 20, status: "available", icon: "database",      color: "var(--c-auth)",   labs: 1, diagrams: 4 },
     ],
   },
+  3: {
+    num: "03",
+    uz: "Active Directory",
+    en: "Active Directory",
+    descUz: "Ushbu bo'limda Microsoft Active Directory ning asoslaridan tortib ilg'or xavfsizlik mavzularigacha chuqur o'rganasiz: domenlar, ob'ektlar, autentifikatsiya, Group Policy va hujum/himoya usullari.",
+    descEn: "In this section you'll deeply explore Active Directory from fundamentals to advanced security: domains, objects, authentication, Group Policy, and attack/defense techniques.",
+    color: "var(--c-warn)",
+    duration: "~0 soat",
+    durationEn: "~0 hrs",
+    difficulty: "advanced",
+    instructorUz: "Aziz R. — Senior Red Team Operator",
+    instructorEn: "Former defender of a Fortune 500 enterprise · OSCP, CRTO, CRTP",
+    outcomesUz: [],
+    outcomesEn: [],
+    tooling: ["PowerShell", "ADUC", "ADSI Edit", "BloodHound", "Mimikatz", "Impacket", "Rubeus", "Group Policy Management"],
+    lessons: [],
+  },
 };
 
 function getTimeSpentAll() {
@@ -160,10 +177,40 @@ function SectionScreen({ setRoute, user, section = 1, onOpenAIChat, aiChatOpen, 
     }
   }
 
+  if (section === 3) {
+    const sec2Keys = Array.from({ length: 17 }, (_, i) => `s02_l${String(i + 21).padStart(2, "0")}`);
+    const sec2Done = sec2Keys.filter(k => completedLessons.includes(k)).length;
+    if (sec2Done < 17) {
+      return (
+        <div>
+          <TopNav route={{ name: "section" }} setRoute={setRoute} user={user} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen} onOpenSearch={onOpenSearch}
+            crumb={[
+              { label: lang === "en" ? "Courses" : "Kurslar", onClick: () => setRoute({ name: "dashboard" }) },
+              { label: lang === "en" ? "Section 03" : "03-bo'lim" },
+            ]}
+          />
+          <div className="page" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", textAlign: "center", gap: 16 }}>
+            <div style={{ fontSize: 56, lineHeight: 1 }}>🔒</div>
+            <h2 className="display" style={{ margin: 0, fontSize: 28 }}>{lang === "en" ? "Section 03 is locked" : "03-bo'lim qulflangan"}</h2>
+            <p style={{ color: "var(--text-2)", fontSize: 15, maxWidth: 420, lineHeight: 1.65, margin: 0 }}>
+              {lang === "en"
+                ? <>Complete all <strong>17 lessons</strong> in Section 02 to unlock this section. Progress: <strong>{sec2Done} / 17</strong></>
+                : <>02-bo'limdagi barcha <strong>17 ta darsni</strong> tugatib, testlarini topshiring. Holat: <strong>{sec2Done} / 17</strong></>}
+            </p>
+            <button className="btn btn-primary" onClick={() => setRoute({ name: "section", section: 2 })}>
+              <Icon name="arrow-left" size={14} /> {lang === "en" ? "Go to Section 02" : "02-bo'limga o'tish"}
+            </button>
+          </div>
+        </div>
+      );
+    }
+  }
+
   const timeSpentAll = getTimeSpentAll();
   const rawLessons = data.lessons.map(l => {
     const n = parseInt(l.n);
-    const key = `s${n <= 20 ? "01" : "02"}_l${String(n).padStart(2, "0")}`;
+    const sec = n <= 20 ? "01" : n <= 37 ? "02" : "03";
+    const key = `s${sec}_l${String(n).padStart(2, "0")}`;
     const isDone = completedLessons.includes(key);
     return { ...l, status: isDone ? "done" : "locked", _key: key, timeSpent: timeSpentAll[key] || 0 };
   });

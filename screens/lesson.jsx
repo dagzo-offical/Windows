@@ -96,16 +96,22 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
   const [progress, setProgress] = useLS(0);
   const [quizOpen, setQuizOpen] = useLS(false);
   const LESSON = LESSONS[lessonNum] || { num: `L${String(lessonNum).padStart(2,"0")}`, section: "01", uz: "Dars", en: "Lesson", subUz: "Tez kunda", subEn: "Coming soon" };
-  const sectionNum = lessonNum <= 20 ? 1 : 2;
-  const sectionLabel = sectionNum === 1 ? "01" : "02";
+  const sectionNum = lessonNum <= 20 ? 1 : lessonNum <= 37 ? 2 : 3;
+  const sectionLabel = sectionNum === 1 ? "01" : sectionNum === 2 ? "02" : "03";
   const lessonKey = `s${sectionLabel}_l${String(lessonNum).padStart(2,"0")}`;
   const completedLessons = user?.completedLessons || [];
   const prevLessonNum = lessonNum - 1;
-  const prevSection = prevLessonNum <= 20 ? "01" : "02";
+  const prevSection = prevLessonNum <= 20 ? "01" : prevLessonNum <= 37 ? "02" : "03";
   const prevKey = lessonNum > 1 ? `s${prevSection}_l${String(prevLessonNum).padStart(2,"0")}` : null;
   const sec1Keys = Array.from({ length: 20 }, (_, i) => `s01_l${String(i + 1).padStart(2, "0")}`);
+  const sec2Keys = Array.from({ length: 17 }, (_, i) => `s02_l${String(i + 21).padStart(2, "0")}`);
   const sec1Complete = sec1Keys.every(k => completedLessons.includes(k));
-  const isLocked = lessonNum > 1 && (lessonNum >= 21 ? !sec1Complete : !completedLessons.includes(prevKey));
+  const sec2Complete = sec2Keys.every(k => completedLessons.includes(k));
+  const isLocked = lessonNum > 1 && (
+    lessonNum >= 38 ? !sec2Complete :
+    lessonNum >= 21 ? !sec1Complete :
+    !completedLessons.includes(prevKey)
+  );
 
   // ── Session timer ─────────────────────────────────────────
   const [quizPassed, setQuizPassed] = useLS(false);

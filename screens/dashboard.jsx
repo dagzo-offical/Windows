@@ -574,10 +574,12 @@ function SectionProgress({ setRoute, user }) {
   const completed = user?.completedLessons || [];
   const s01done = completed.filter(k => k.startsWith("s01")).length;
   const s02done = completed.filter(k => k.startsWith("s02")).length;
+  const s03done = completed.filter(k => k.startsWith("s03")).length;
 
   const sections = [
     { num: "01", uz: "Windows asoslari",    en: "Windows Fundamentals",  done: s01done, total: 20, color: "var(--c-system)", state: "active" },
     { num: "02", uz: "Administratsiya",     en: "Administration",        done: s02done, total: 17, color: "var(--c-user)",   state: "active" },
+    { num: "03", uz: "Active Directory",    en: "Active Directory",      done: s03done, total: 0,  color: "var(--c-warn)",   state: s01done >= 20 && s02done >= 17 ? "active" : "locked" },
   ];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
