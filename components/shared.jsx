@@ -520,16 +520,21 @@ async function gradeWithAI(prompt) {
 
   if (!key) throw new Error("no_key");
 
-  // Kiro provider — Groq orqali ishlaydi, lekin alohida kalit bilan
+  // Kiro provider — Claude (Anthropic) API orqali ishlaydi
   if (provider === "kiro") {
-    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
-      body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], max_tokens: 600, temperature: 0.3 }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 600, messages: [{ role: "user", content: prompt }] }),
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.error?.message || `Kiro error ${r.status}`);
-    return d.choices[0].message.content;
+    if (!r.ok) throw new Error(d.error?.message || "Kiro (Claude) error");
+    return d.content[0].text;
   }
 
   if (provider === "openai") {

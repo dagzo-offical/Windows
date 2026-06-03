@@ -246,11 +246,11 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
   const setKeyFor = (prov, val) => setKeys(prev => ({ ...prev, [prov]: val }));
 
   const PROVIDERS = [
-    { id: "kiro",      label: "Kiro",    hint: "kiro_...",   url: null,                                            free: true },
-    { id: "groq",      label: "Groq",    hint: "gsk_...",    url: "https://console.groq.com/keys",               free: true },
-    { id: "openai",    label: "OpenAI",  hint: "sk-...",     url: "https://platform.openai.com/api-keys",        free: false },
-    { id: "anthropic", label: "Claude",  hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys", free: false },
-    { id: "gemini",    label: "Gemini",  hint: "AIza...",    url: "https://aistudio.google.com/api-keys",        free: false },
+    { id: "kiro",      label: "Kiro (Claude)", hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys", free: false },
+    { id: "groq",      label: "Groq",          hint: "gsk_...",    url: "https://console.groq.com/keys",               free: true },
+    { id: "openai",    label: "OpenAI",        hint: "sk-...",     url: "https://platform.openai.com/api-keys",        free: false },
+    { id: "anthropic", label: "Claude",        hint: "sk-ant-...", url: "https://console.anthropic.com/settings/keys", free: false },
+    { id: "gemini",    label: "Gemini",        hint: "AIza...",    url: "https://aistudio.google.com/api-keys",        free: false },
   ];
   const THEMES = ["green", "blue", "purple"];
 
