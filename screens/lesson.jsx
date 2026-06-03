@@ -8475,6 +8475,7 @@ function SectionADBasics() {
       <Callout color="var(--accent)" icon="info" titleEn="Real-world example" titleUz="">
         At school or university you log in with one username/password on any campus computer. That works because authentication is forwarded to Active Directory — your credentials don't need to exist on every machine.
       </Callout>
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s4_p1.png" caption="Windows Domain — users and computers managed centrally through a Domain Controller" />
 
       <H2 num="§2" en="Active Directory Domain Services (AD DS)" uz="" />
       <P>The core of any Windows domain is <Term>Active Directory Domain Services (AD DS)</Term>. It is a directory service — a catalogue that stores data about every <Em>object</Em> on the network: users, groups, computers, printers, shared folders, and more.</P>
@@ -8517,6 +8518,7 @@ function SectionADBasics() {
           </tbody>
         </table>
       </div>
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s7_p1.png" caption="Default domain groups as seen in Active Directory Users and Computers" />
 
       <H2 num="§5" en="Active Directory Users and Computers (ADUC)" uz="" />
       <P>To manage users, groups, and machines in Active Directory, open <Term>Active Directory Users and Computers</Term> from the Start menu on the Domain Controller (or via <code>dsa.msc</code>). This shows the full hierarchy of objects in the domain.</P>
@@ -8524,6 +8526,9 @@ function SectionADBasics() {
       <Callout color="var(--c-auth)" icon="info" titleEn="Key point" titleUz="">
         A user can belong to only ONE OU at a time (but many Security Groups). OUs are for applying policies; Security Groups are for assigning resource permissions.
       </Callout>
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s8_p2.png" caption="Opening Active Directory Users and Computers (ADUC) on the Domain Controller" />
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s10_p1.png" caption="ADUC showing the full OU hierarchy of the domain" />
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s11_p1.png" caption="Users list inside an Organisational Unit" />
 
       <H2 num="§6" en="Default Containers in AD" uz="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
@@ -8571,6 +8576,7 @@ function SectionADBasics() {
       <Callout color="var(--accent)" icon="info" titleUz="Haqiqiy hayot misoli" titleEn="">
         Maktab yoki universitetda siz istalgan kampus kompyuterida bir xil login va parol bilan kirasiz. Bu Active Directory tufayli ishlaydi — hisob ma'lumotlaringiz har mashinada emas, faqat AD da saqlanadi.
       </Callout>
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s4_p1.png" caption="Windows Domeni — foydalanuvchilar va kompyuterlar Domen Kontrolleri orqali markaziy boshqariladi" />
 
       <H2 num="§2" uz="Active Directory Domain Services (AD DS)" en="" />
       <P>Har qanday Windows domenining o'zagi — <Term>Active Directory domen xizmati (AD DS)</Term>. Bu tarmoqdagi barcha <Em>ob'ektlar</Em> haqidagi ma'lumotlarni saqlaydigan katalog xizmat: foydalanuvchilar, guruhlar, kompyuterlar, printerlar, umumiy papkalar va boshqalar.</P>
@@ -8613,6 +8619,7 @@ function SectionADBasics() {
           </tbody>
         </table>
       </div>
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s7_p1.png" caption="Active Directory Users and Computers da ko'rinadigan standart domen guruhlari" />
 
       <H2 num="§5" uz="Active Directory Users and Computers (ADUC)" en="" />
       <P>AD da foydalanuvchilar, guruhlar va mashinalarni boshqarish uchun DC da <Term>Active Directory Users and Computers</Term> ni oching (boshlash menyusidan yoki <code>dsa.msc</code> orqali). Bu domendagi barcha ob'ektlarning to'liq ierarxiyasini ko'rsatadi.</P>
@@ -8620,6 +8627,9 @@ function SectionADBasics() {
       <Callout color="var(--c-auth)" icon="info" titleUz="Asosiy qoida" titleEn="">
         Foydalanuvchi bir vaqtda faqat BITTA TB da bo'lishi mumkin (lekin ko'plab Security Group larda bo'lishi mumkin). TB lar siyosat qo'llash uchun; Security Groups ruxsat berish uchun.
       </Callout>
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s8_p2.png" caption="Domen Kontrollerida Active Directory Users and Computers (ADUC) ni ochish" />
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s10_p1.png" caption="ADUC da domenning to'liq OU ierarxiyasi" />
+      <SlideImg src="./assets/ad/6f8a4ad3-Active_Directory_s11_p1.png" caption="Tashkiliy Bo'linma ichidagi foydalanuvchilar ro'yxati" />
 
       <H2 num="§6" uz="AD dagi Standart Konteynerlar" en="" />
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"14px 0"}}>
@@ -8664,6 +8674,7 @@ function SectionADUsers() {
       <Callout color="var(--accent)" icon="info" titleEn="Typical first steps" titleUz="">
         Open ADUC (<code>dsa.msc</code>) → compare existing OUs to the org chart → delete obsolete OUs → create/delete users to match the chart.
       </Callout>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s2_p1.png" caption="Company org chart — the reference for aligning the AD OU structure" />
 
       <H2 num="§2" en="Deleting an OU — Accidental Deletion Protection" uz="" />
       <P>By default, OUs are protected against accidental deletion. If you right-click an OU and try to delete it, you'll see an error. To delete it:</P>
@@ -8683,6 +8694,9 @@ function SectionADUsers() {
       <Callout color="var(--c-attack)" icon="warning" titleEn="Warning" titleUz="">
         Deleting an OU permanently removes everything inside it — users, groups, sub-OUs. There is no Recycle Bin by default. Enable AD Recycle Bin from Active Directory Administrative Center before doing bulk deletions.
       </Callout>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s3_p2.png" caption="Error when attempting to delete a protected OU" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s4_p1.png" caption='Enabling "Advanced Features" from the View menu in ADUC' />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s5_p1.png" caption='Object tab — uncheck "Protect object from accidental deletion" before deleting' />
 
       <H2 num="§3" en="Creating and Deleting Users" uz="" />
       <P>To create a user: right-click an OU → New → User. Fill in first name, last name, username (<Term>User Logon Name</Term>) and set an initial password. To delete: right-click the user → Delete.</P>
@@ -8723,6 +8737,12 @@ function SectionADUsers() {
         <span style={{color:"var(--text-3)"}}># Force password change on next login</span><br/>
         <span style={{color:"var(--text-2)"}}>Set-ADUser</span> -ChangePasswordAtLogon <span style={{color:"var(--c-warn)"}}>$true</span> -Identity sophie
       </div>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s7_p1.png" caption='"Delegate Control…" option in the ADUC context menu' />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s8_p1.png" caption="Delegation wizard — adding a user to delegate to" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s9_p1.png" caption="Delegation wizard — selecting the task (reset passwords)" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s10_p1.png" caption="PowerShell commands for resetting AD account passwords" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s11_p1.png" caption="PowerShell — Set-ADAccountPassword execution result" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s11_p3.png" caption="PowerShell — Set-ADUser force password change result" />
 
       <H2 num="§5" en="Managing Computers in AD" uz="" />
       <P>By default, all domain-joined machines land in the <Term>Computers</Term> container. It's best practice to organise them into separate OUs so you can apply different policies to different device types.</P>
@@ -8738,6 +8758,7 @@ function SectionADUsers() {
           </div>
         ))}
       </div>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s12_p2.png" caption="Default Computers container in ADUC — all newly joined machines land here" />
 
       <H2 num="§6" en="Organising Computers into OUs" uz="" />
       <P>Create two new OUs directly under the domain root: <Em>Workstations</Em> and <Em>Servers</Em>. Then move machines from the default Computers container into the appropriate OU.</P>
@@ -8745,6 +8766,7 @@ function SectionADUsers() {
       <Callout color="var(--c-warn)" icon="info" titleEn="Security benefit" titleUz="">
         Separating Workstations from Servers lets you apply a stricter policy to servers: block USB drives, disable interactive login for most users, enforce different password policies, and restrict internet access.
       </Callout>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s14_p0.png" caption="Final OU structure after reorganising — Workstations and Servers OUs under the domain root" />
     </section>
   ) : (
     <section>
@@ -8753,6 +8775,7 @@ function SectionADUsers() {
       <Callout color="var(--accent)" icon="info" titleUz="Birinchi qadamlar" titleEn="">
         ADUC ni oching (<code>dsa.msc</code>) → mavjud OUlarni tashkiliy sxema bilan solishtiring → ortiqcha OUlarni o'chiring → foydalanuvchilarni yangilang.
       </Callout>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s2_p1.png" caption="Kompaniya tashkiliy sxemasi — AD OU tuzilmasini moslashtirish uchun asosiy manba" />
 
       <H2 num="§2" uz="OU ni O'chirish — Tasodifiy O'chirishdan Himoya" en="" />
       <P>Standart holda, OUlar tasodifiy o'chirishdan himoyalangan. O'ng tugma bosib o'chirmoqchi bo'lsangiz, xato xabari chiqadi. O'chirish uchun:</P>
@@ -8772,6 +8795,9 @@ function SectionADUsers() {
       <Callout color="var(--c-attack)" icon="warning" titleUz="Ogohlantirish" titleEn="">
         OUni o'chirish ichidagi hamma narsani — foydalanuvchilar, guruhlar, sub-OUlarni — butunlay o'chiradi. Standart holda Recycle Bin yo'q. Ko'p o'chirishdan oldin Active Directory Administrative Center dan AD Recycle Bin ni yoqing.
       </Callout>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s3_p2.png" caption="Himoyalangan OUni o'chirishga urinilganda xato xabari" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s4_p1.png" caption={"ADUC Ko'rish menyusidan \"Advanced Features\" ni yoqish"} />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s5_p1.png" caption={"Object yorlig'i — o'chirishdan oldin \"Protect object from accidental deletion\" katagidan belgini oling"} />
 
       <H2 num="§3" uz="Foydalanuvchilarni Yaratish va O'chirish" en="" />
       <P>Foydalanuvchi yaratish: OUga o'ng tugma → Yangi → Foydalanuvchi. Ism, familiya, login nomi (<Term>User Logon Name</Term>) kiritib dastlabki parol o'rnating. O'chirish: foydalanuvchiga o'ng tugma → Delete.</P>
@@ -8811,6 +8837,12 @@ function SectionADUsers() {
         <span style={{color:"var(--text-3)"}}># Keyingi kirishda parol o'zgartirishni majburlash</span><br/>
         <span style={{color:"var(--text-2)"}}>Set-ADUser</span> -ChangePasswordAtLogon <span style={{color:"var(--c-warn)"}}>$true</span> -Identity sophie
       </div>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s7_p1.png" caption={"ADUC kontekst menyusidagi \"Delegate Control…\" opsiyasi"} />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s8_p1.png" caption="Delegatsiya ustasi — delegatsiya qilinadigan foydalanuvchini qo'shish" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s9_p1.png" caption="Delegatsiya ustasi — vazifani tanlash (parollarni tiklash)" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s10_p1.png" caption="AD hisob parollarini tiklash uchun PowerShell buyruqlari" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s11_p1.png" caption="PowerShell — Set-ADAccountPassword bajarilishi natijasi" />
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s11_p3.png" caption="PowerShell — Set-ADUser majburiy parol o'zgartirish natijasi" />
 
       <H2 num="§5" uz="AD da Kompyuterlarni Boshqarish" en="" />
       <P>Standart holda, domenge qo'shilgan barcha mashinalar <Term>Computers</Term> konteyneriga tushadi. Turli qurilma turlari uchun turli siyosatlar qo'llash maqsadida ularni alohida OUlarga ajratish tavsiya etiladi.</P>
@@ -8826,6 +8858,7 @@ function SectionADUsers() {
           </div>
         ))}
       </div>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s12_p2.png" caption="ADUC dagi standart Computers konteyneri — yangi qo'shilgan barcha mashinalar shu yerga tushadi" />
 
       <H2 num="§6" uz="Kompyuterlarni OUlarga Joylashtirish" en="" />
       <P>Domen ildizi ostida ikkita yangi OU yarating: <Em>Workstations</Em> va <Em>Servers</Em>. Keyin mashinalari Computers konteyneridan tegishli OUga ko'chiring.</P>
@@ -8833,6 +8866,7 @@ function SectionADUsers() {
       <Callout color="var(--c-warn)" icon="info" titleUz="Xavfsizlik foydasi" titleEn="">
         Workstations va Servers ni ajratish serverlarga qattiqroq siyosat qo'llash imkonini beradi: USB qurilmalarni bloklash, interaktiv kirishni cheklash, turli parol siyosatini qo'llash va internet kirishni cheklash.
       </Callout>
+      <SlideImg src="./assets/ad/d1b29bad-Managing_users_in_AD_s14_p0.png" caption="Qayta tashkillashtirilgandan so'nggi OU tuzilmasi — domen ildizi ostida Workstations va Servers OUlari" />
     </section>
   );
 }
@@ -8840,6 +8874,14 @@ function SectionADUsers() {
 // ─────────────────────────────────────────────────────────────
 // Text helpers
 // ─────────────────────────────────────────────────────────────
+function SlideImg({ src, caption }) {
+  return (
+    <div style={{ margin: "18px 0", textAlign: "center" }}>
+      <img src={src} alt={caption || ""} style={{ maxWidth: "100%", borderRadius: 8, border: "1px solid var(--border)", display: "block", margin: "0 auto" }} />
+      {caption && <div style={{ marginTop: 7, fontSize: 11, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>{caption}</div>}
+    </div>
+  );
+}
 function H2({ num, uz, en }) {
   const lang = useLang();
   return (
