@@ -120,6 +120,9 @@ const SECTION_DATA = {
     lessons: [
       { n: "38", uz: "Active Directory asoslari", en: "Active Directory Basics", duration: 30, status: "available", icon: "shield", color: "var(--c-warn)", labs: 1, diagrams: 4 },
       { n: "39", uz: "AD da foydalanuvchi va kompyuter boshqaruvi", en: "Managing Users & Computers in AD", duration: 32, status: "available", icon: "settings", color: "var(--c-auth)", labs: 2, diagrams: 4 },
+      { n: "40", uz: "Group Policy — Kirish", en: "Group Policy — Introduction", duration: 28, status: "available", icon: "lock", color: "var(--c-auth)", labs: 1, diagrams: 3 },
+      { n: "41", uz: "GPO Sozlamalari va SYSVOL", en: "GPO Settings & SYSVOL", duration: 30, status: "available", icon: "database", color: "var(--c-system)", labs: 1, diagrams: 4 },
+      { n: "42", uz: "GPO Yaratish va Qo'llash", en: "Creating & Applying GPOs", duration: 34, status: "available", icon: "shield-check", color: "var(--accent)", labs: 2, diagrams: 5 },
     ],
   },
 };
@@ -130,7 +133,7 @@ function getTimeSpentAll() {
     if (typeof raw !== "object" || Array.isArray(raw)) return {};
     const clean = {};
     for (const [k, v] of Object.entries(raw)) {
-      if (/^s0[12]_l\d{2}$/.test(k)) {
+      if (/^s0[123]_l\d{2}$/.test(k)) {
         const n = Number(v);
         if (Number.isFinite(n) && n >= 0) clean[k] = Math.min(Math.floor(n), 14400);
       }

@@ -7,7 +7,7 @@ const { useState: useLS, useEffect: useLE, useRef: useLR } = React;
 const TIME_KEY = "wa_time_spent";
 const MAX_LESSON_SECS = 4 * 3600;   // 4h absolute cap per lesson
 const MAX_WRITE_SECS  = 15;          // max seconds per single write (10s autosave + buffer)
-const VALID_KEY = /^s0[12]_l\d{2}$/;
+const VALID_KEY = /^s0[123]_l\d{2}$/;
 
 function getTimeSpent() {
   try {
@@ -90,6 +90,9 @@ const LESSONS = {
   37: { num:"L37", section:"02", uz:"Zaxira nusxa va tiklash", en:"Backup & Restore", subUz:"Ma'lumotlarni zaxiralash va tiklash strategiyalari", subEn:"Data backup and recovery strategies" },
   38: { num:"L38", section:"03", uz:"Active Directory asoslari", en:"Active Directory Basics", subUz:"Windows domeni, AD DS va asosiy ob'ektlar", subEn:"Windows domain, AD DS and core objects" },
   39: { num:"L39", section:"03", uz:"AD da foydalanuvchi va kompyuter boshqaruvi", en:"Managing Users & Computers in AD", subUz:"OU boshqaruvi, delegatsiya va qurilmalarni tashkil etish", subEn:"OU management, delegation and organising computers" },
+  40: { num:"L40", section:"03", uz:"Group Policy — Kirish", en:"Group Policy — Introduction", subUz:"GPO nima, GPO menejment konsoli va OU ierarxiyasi", subEn:"What is GPO, management console and OU hierarchy" },
+  41: { num:"L41", section:"03", uz:"GPO Sozlamalari va SYSVOL", en:"GPO Settings & SYSVOL", subUz:"GPO sozlamalari, parol siyosati va SYSVOL tarqatish", subEn:"GPO settings, password policy and SYSVOL distribution" },
+  42: { num:"L42", section:"03", uz:"GPO Yaratish va Qo'llash", en:"Creating & Applying GPOs", subUz:"Boshqaruv paneli cheklash, avtomatik qulflash va GPO sinash", subEn:"Restrict control panel, auto-lock screen and testing GPOs" },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -240,6 +243,9 @@ function LessonScreen({ setRoute, user, markLessonComplete, onOpenProfile, onOpe
                 : lessonNum === 37 ? <><SectionBackupRestore /></>
                 : lessonNum === 38 ? <><SectionADBasics /></>
                 : lessonNum === 39 ? <><SectionADUsers /></>
+                : lessonNum === 40 ? <><SectionGPIntro /></>
+                : lessonNum === 41 ? <><SectionGPConfig /></>
+                : lessonNum === 42 ? <><SectionGPCreate /></>
                 : <ComingSoon lesson={LESSON} lessonNum={lessonNum} setRoute={setRoute} />}
                 <LessonNextNav lessonNum={lessonNum} setRoute={setRoute} onQuizStart={() => setQuizOpen(true)} sectionNum={sectionNum} quizUnlocked={quizUnlocked} totalTimeSec={totalTimeSec} quizPassed={quizPassed} />
               </>
