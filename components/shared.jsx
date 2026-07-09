@@ -105,10 +105,10 @@ function TopNav({ route, setRoute, user, crumb, onOpenProfile, onOpenAIChat, aiC
   return (
     <header className="topnav">
       <div className="topnav-l">
-        <div className="logo" onClick={nav({ name: "landing" })}>
-          <div className="logo-mark">W</div>
+        <div className="logo" onClick={nav({ name: "hub" })}>
+          <div className="logo-mark">C</div>
           <div>
-            <div style={{ fontSize: 16, lineHeight: 1 }}>Windows Academy</div>
+            <div style={{ fontSize: 16, lineHeight: 1 }}>CyberSecurity</div>
             <div className="sub">v.26 // secure_learn</div>
           </div>
         </div>
@@ -126,6 +126,7 @@ function TopNav({ route, setRoute, user, crumb, onOpenProfile, onOpenAIChat, aiC
         )}
       </div>
       <nav style={{ display: "flex", gap: 8 }}>
+        <NavLink label={lang === "en" ? "Divisions" : "Bo'limlar"} sub="Divisions" active={route.name === "hub" || route.name === "track"} onClick={nav({ name: "hub" })} />
         <NavLink label={lang === "en" ? "Dashboard" : "Boshqaruv"} sub="Dashboard" active={route.name === "dashboard"} onClick={nav({ name: "dashboard" })} />
         <NavLink label={lang === "en" ? "Courses" : "Kurslar"} sub="Courses" active={route.name === "section"} onClick={nav({ name: "section", section: 1 })} />
       </nav>

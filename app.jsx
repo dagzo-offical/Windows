@@ -34,7 +34,7 @@ function loadRoute() {
       return r;
     }
   } catch {}
-  return { name: "landing" };
+  return { name: "hub" };
 }
 
 function saveRoute(r) {
@@ -215,8 +215,8 @@ function App() {
             if (!window.confirm(lang === "en" ? "Reset all progress?" : "Barcha progressni o'chirasizmi?")) return;
             clearAll();
             _setProgress(loadProgress());
-            _setRoute({ name: "landing" });
-            saveRoute({ name: "landing" });
+            _setRoute({ name: "hub" });
+            saveRoute({ name: "hub" });
             setProfileOpen(false);
           }}
           onClose={() => setProfileOpen(false)}
@@ -388,13 +388,15 @@ function ProfileModal({ user, theme, setTheme, onSave, onReset, onClose }) {
 // ─────────────────────────────────────────────────────────────
 function RouteRender({ route, screenProps }) {
   switch (route.name) {
+    case "hub":       return <HubScreen {...screenProps} />;
     case "landing":   return <LandingScreen {...screenProps} />;
     case "dashboard": return <DashboardScreen {...screenProps} />;
     case "section":   return <SectionScreen {...screenProps} section={route.section || 1} />;
+    case "track":     return <TrackScreen {...screenProps} track={route.track || "webpentest"} />;
     case "lesson":    return <LessonScreen {...screenProps} lessonNum={route.lesson || 1} />;
     case "cooldown":  return <CooldownScreen {...screenProps} />;
     case "exam":      return <FinalExamScreen {...screenProps} />;
-    default:          return <LandingScreen {...screenProps} />;
+    default:          return <HubScreen {...screenProps} />;
   }
 }
 

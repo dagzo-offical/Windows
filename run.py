@@ -18,7 +18,7 @@ import threading
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
-ACADEMY_NAME = "Windows Academy"
+ACADEMY_NAME = "CyberSecurity"
 DEFAULT_PORT  = 8080
 
 
@@ -98,7 +98,7 @@ const files = [
   'components/ad-topology.jsx',
   'screens/landing.jsx','screens/dashboard.jsx','screens/section.jsx',
   'screens/lesson.jsx','screens/quiz.jsx','screens/cooldown.jsx',
-  'screens/final-exam.jsx',
+  'screens/final-exam.jsx','screens/ai-chat.jsx',
   'tweaks-panel.jsx','app.jsx',
 ];
 let bundle = '"use strict";\n// Windows Academy — pre-bundled\n';
