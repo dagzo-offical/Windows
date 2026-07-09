@@ -1,5 +1,22 @@
 // landing.jsx — marketing / entry page (single-lang)
 
+// ─────────────────────────────────────────────────────────────
+// CyberSecurity divisions ("Bo'limlar"). Windows is the existing
+// course; the rest are empty scaffolds ready to receive topics.
+// ─────────────────────────────────────────────────────────────
+const TRACKS = [
+  { id: "windows",    uz: "Windows",     en: "Windows",        icon: "cpu",      color: "var(--c-system)", ready: true,
+    tagUz: "Ichki tuzilma, administratsiya va Active Directory", tagEn: "Internals, administration & Active Directory", lessons: 39 },
+  { id: "webpentest", uz: "Web-Pentest", en: "Web Pentesting", icon: "globe",    color: "var(--c-attack)", ready: false,
+    tagUz: "Veb-ilovalarga hujum va himoya",                    tagEn: "Attacking & defending web applications" },
+  { id: "kali",       uz: "Kali Linux",  en: "Kali Linux",     icon: "terminal", color: "var(--accent-2)", ready: false,
+    tagUz: "Pentest distributivi va vositalari",                tagEn: "The pentest distro and its tooling" },
+  { id: "network",    uz: "Network",     en: "Networking",     icon: "graph",    color: "var(--c-auth)",   ready: false,
+    tagUz: "Protokollar, trafik tahlili va hujumlar",           tagEn: "Protocols, traffic analysis & attacks" },
+  { id: "linux",      uz: "Linux",       en: "Linux",          icon: "server",   color: "var(--c-warn)",   ready: false,
+    tagUz: "Linux ichki tuzilmasi va xavfsizligi",              tagEn: "Linux internals & security" },
+];
+
 function LandingScreen({ setRoute }) {
   const lang = useLang();
 
@@ -177,6 +194,136 @@ function LandingScreen({ setRoute }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+// CyberSecurity hub — top-level division selector (entry screen)
+// Reuses HeroVisual / sectionCardBtn / Footer for identical design.
+// ─────────────────────────────────────────────────────────────
+function HubScreen({ setRoute, user, onOpenProfile, onOpenAIChat, aiChatOpen, onOpenSearch }) {
+  const lang = useLang();
+  const openTrack = (t) =>
+    t.ready ? setRoute({ name: "dashboard" }) : setRoute({ name: "track", track: t.id });
+
+  const stats = [
+    { n: "5",   uz: "Bo'limlar",   en: "Divisions" },
+    { n: "39+", uz: "Darslar",     en: "Lessons" },
+    { n: "AI",  uz: "Tekshiruv",   en: "Validation" },
+    { n: "UZ",  uz: "Ikki tilli",  en: "Bilingual" },
+  ];
+
+  return (
+    <div>
+      <TopNav route={{ name: "hub" }} setRoute={setRoute} user={user}
+        onOpenProfile={onOpenProfile} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen} onOpenSearch={onOpenSearch} />
+
+      {/* HERO */}
+      <section style={{ position: "relative", padding: "80px 28px 40px", maxWidth: 1320, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 48, alignItems: "center" }}>
+          <div className="fade-up">
+            <div className="eyebrow" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
+              <LiveDot />
+              <span>// CYBERSECURITY · UNIFIED_TRAINING_PLATFORM</span>
+            </div>
+
+            {lang === "en" ? (
+              <h1 className="display" style={heroH1}>
+                One platform for
+                <br />
+                <span style={gradient}>CyberSecurity</span> mastery.
+              </h1>
+            ) : (
+              <h1 className="display" style={heroH1}>
+                <span style={gradient}>CyberSecurity</span>ni
+                <br />
+                egallashning yagona platformasi.
+              </h1>
+            )}
+
+            <p style={{ marginTop: 22, fontSize: 17, lineHeight: 1.55, color: "var(--text-1)", maxWidth: 580 }}>
+              {lang === "en"
+                ? "Windows, Web Pentesting, Kali, Networking and Linux — every discipline in one place, with the same deep, interactive, AI-graded learning experience."
+                : "Windows, Web-Pentest, Kali, Network va Linux — barcha yo'nalishlar bir joyda, bir xil chuqur, interaktiv va AI baholaydigan o'quv tajribasi bilan."}
+            </p>
+
+            <div style={{ display: "flex", gap: 12, marginTop: 36, alignItems: "center" }}>
+              <button className="btn btn-primary" onClick={() => setRoute({ name: "dashboard" })}>
+                <Icon name="play" size={14} /> {lang === "en" ? "Start with Windows" : "Windows'dan boshlash"}
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginTop: 48, paddingTop: 32, borderTop: "1px solid var(--border)" }}>
+              {stats.map((s, i) => (
+                <div key={i} className="stat fade-up" style={{ animationDelay: `${0.1 + i * 0.08}s` }}>
+                  <div className="stat-n">{s.n}</div>
+                  <div className="stat-l">{lang === "en" ? s.en : s.uz}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <HeroVisual />
+        </div>
+      </section>
+
+      {/* DIVISIONS GRID */}
+      <section style={{ maxWidth: 1320, margin: "0 auto", padding: "40px 28px 60px" }}>
+        <SectionH
+          eyebrow="// DIVISIONS"
+          uz="Beshta bo'lim — bittadan platformada"
+          en="Five divisions, one unified platform"
+        />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 20 }}>
+          {TRACKS.map((t) => (
+            <button key={t.id}
+              onClick={() => openTrack(t)}
+              style={sectionCardBtn}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = t.color;
+                e.currentTarget.style.transform = "translateY(-3px)";
+                e.currentTarget.style.boxShadow = `0 12px 40px ${t.color}22`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "var(--border)";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+              }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div className="mono" style={{ fontSize: 11, color: t.color, letterSpacing: 0.18, textTransform: "uppercase" }}>
+                  {lang === "en" ? "DIVISION" : "BO'LIM"}
+                </div>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: t.color + "12", border: `1px solid ${t.color}44`, display: "grid", placeItems: "center", color: t.color }}>
+                  <Icon name={t.icon} size={18} />
+                </div>
+              </div>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: 19, fontWeight: 600, margin: "16px 0 6px", letterSpacing: "-0.01em" }}>
+                {lang === "en" ? t.en : t.uz}
+              </h3>
+              <p style={{ fontSize: 12.5, color: "var(--text-1)", lineHeight: 1.5, margin: 0, minHeight: 36 }}>
+                {lang === "en" ? t.tagEn : t.tagUz}
+              </p>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
+                {t.ready ? (
+                  <span className="chip" style={{ fontSize: 9.5, color: t.color, borderColor: t.color + "44", background: t.color + "12" }}>
+                    <Icon name="check" size={10} /> &nbsp;{lang === "en" ? `${t.lessons} lessons · active` : `${t.lessons} dars · faol`}
+                  </span>
+                ) : (
+                  <span className="chip chip-gray" style={{ fontSize: 9.5 }}>
+                    <Icon name="clock" size={10} /> &nbsp;{lang === "en" ? "Coming soon" : "Tez orada"}
+                  </span>
+                )}
+                <span style={{ color: t.color, display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
+                  <Icon name="arrow-right" size={14} />
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}
+
 const heroH1 = {
   fontSize: "clamp(44px, 5.4vw, 76px)",
   lineHeight: 1.02, margin: 0,
@@ -294,7 +441,7 @@ function Footer() {
     <footer style={{ borderTop: "1px solid var(--border)", padding: "32px 28px", maxWidth: 1320, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-3)", letterSpacing: 0.1, textTransform: "uppercase" }}>
-          © 2026 Windows Academy · build 2026.05.15
+          © 2026 CyberSecurity · build 2026.07.09
         </div>
         <div style={{ display: "flex", gap: 18, fontSize: 12, color: "var(--text-2)" }}>
           <a href="#" style={footerLink}>{lang === "en" ? "Documentation" : "Hujjatlar"}</a>
@@ -309,3 +456,5 @@ function Footer() {
 const footerLink = { color: "inherit", textDecoration: "none" };
 
 window.LandingScreen = LandingScreen;
+window.HubScreen = HubScreen;
+window.TRACKS = TRACKS;

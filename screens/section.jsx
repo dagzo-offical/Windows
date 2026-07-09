@@ -431,4 +431,162 @@ function LessonRow({ l, idx, sectionNum, setRoute, completedLessons }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+// TrackScreen — overview shell for an empty division ("Bo'lim").
+// Reuses the same header block, MiniStat row and sidebar as
+// SectionScreen so every division looks identical. Lesson content
+// is intentionally empty — topics are added later by editing the
+// `lessons` array (same shape as SECTION_DATA lessons).
+// ─────────────────────────────────────────────────────────────
+const TRACK_META = {
+  webpentest: {
+    uz: "Web-Pentest", en: "Web Pentesting", color: "var(--c-attack)", icon: "globe", difficulty: "offensive",
+    descUz: "Veb-ilovalarga hujum va himoya bo'yicha bo'lim. Mavzular tez orada qo'shiladi.",
+    descEn: "Division on attacking and defending web applications. Topics are coming soon.",
+    tooling: ["Burp Suite", "OWASP ZAP", "sqlmap", "ffuf", "Nikto", "wfuzz"],
+  },
+  kali: {
+    uz: "Kali Linux", en: "Kali Linux", color: "var(--accent-2)", icon: "terminal", difficulty: "toolkit",
+    descUz: "Kali Linux distributivi va uning pentest vositalari bo'yicha bo'lim. Mavzular tez orada qo'shiladi.",
+    descEn: "Division on the Kali Linux distribution and its pentest tooling. Topics are coming soon.",
+    tooling: ["Nmap", "Metasploit", "Hydra", "John", "Aircrack-ng", "netcat"],
+  },
+  network: {
+    uz: "Network", en: "Networking", color: "var(--c-auth)", icon: "graph", difficulty: "foundational",
+    descUz: "Tarmoq protokollari, trafik tahlili va hujumlar bo'yicha bo'lim. Mavzular tez orada qo'shiladi.",
+    descEn: "Division on network protocols, traffic analysis and attacks. Topics are coming soon.",
+    tooling: ["Wireshark", "tcpdump", "Nmap", "Scapy", "Responder", "Bettercap"],
+  },
+  linux: {
+    uz: "Linux", en: "Linux", color: "var(--c-warn)", icon: "server", difficulty: "foundational",
+    descUz: "Linux ichki tuzilmasi va xavfsizligi bo'yicha bo'lim. Mavzular tez orada qo'shiladi.",
+    descEn: "Division on Linux internals and security. Topics are coming soon.",
+    tooling: ["bash", "systemd", "iptables", "SELinux", "strace", "auditd"],
+  },
+};
+
+function TrackScreen({ setRoute, user, track, onOpenAIChat, aiChatOpen, onOpenSearch }) {
+  const lang = useLang();
+  const data = TRACK_META[track] || TRACK_META.webpentest;
+
+  return (
+    <div>
+      <TopNav route={{ name: "track" }} setRoute={setRoute} user={user} onOpenAIChat={onOpenAIChat} aiChatOpen={aiChatOpen} onOpenSearch={onOpenSearch}
+        crumb={[
+          { label: lang === "en" ? "Divisions" : "Bo'limlar", onClick: () => setRoute({ name: "hub" }) },
+          { label: lang === "en" ? data.en : data.uz },
+        ]}
+      />
+
+      <div className="page">
+        {/* HEADER — identical shell to SectionScreen */}
+        <div style={{
+          position: "relative", borderRadius: 24, overflow: "hidden",
+          padding: "44px 44px 40px",
+          background: `linear-gradient(135deg, ${data.color}10, var(--bg-2) 60%)`,
+          border: `1px solid ${data.color}33`,
+          marginBottom: 32,
+        }}>
+          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at top right, ${data.color}1a, transparent 60%)`, pointerEvents: "none" }} />
+          <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 36, alignItems: "start" }}>
+            <div>
+              <div className="eyebrow" style={{ color: data.color, marginBottom: 16 }}>
+                {lang === "en" ? `// DIVISION · ${data.difficulty.toUpperCase()}` : `// BO'LIM · ${data.difficulty.toUpperCase()}`}
+              </div>
+              <h1 className="display" style={{ fontSize: 44, margin: "0 0 8px", letterSpacing: "-0.02em" }}>
+                {lang === "en" ? data.en : data.uz}
+              </h1>
+              <p style={{ color: "var(--text-1)", fontSize: 14, lineHeight: 1.65, maxWidth: 640, margin: "16px 0 0" }}>
+                {lang === "en" ? data.descEn : data.descUz}
+              </p>
+
+              <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+                <button className="btn" onClick={() => setRoute({ name: "hub" })}>
+                  <Icon name="arrow-left" size={14} /> {lang === "en" ? "All divisions" : "Barcha bo'limlar"}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <MiniStat labelUz="Darslar" labelEn="Lessons" value="0" sub={lang === "en" ? "coming soon" : "tez orada"} color={data.color} icon="book" />
+              <MiniStat labelUz="Laboratoriya" labelEn="Hands-on labs" value="0" sub={lang === "en" ? "coming soon" : "tez orada"} color="var(--c-user)" icon="terminal" />
+              <MiniStat labelUz="Diagrammalar" labelEn="Diagrams" value="0" sub="interactive" color="var(--c-system)" icon="graph" />
+              <MiniStat labelUz="Holat" labelEn="Status" value="—" sub={lang === "en" ? "in preparation" : "tayyorlanmoqda"} color="var(--c-warn)" icon="clock" />
+            </div>
+          </div>
+
+          <div style={{ position: "relative", marginTop: 28, paddingTop: 20, borderTop: `1px solid ${data.color}22` }}>
+            <Progress value={0} max={1} label={lang === "en" ? "Division progress" : "Bo'lim taraqqiyoti"} color={data.color} />
+          </div>
+        </div>
+
+        {/* BODY — empty-state placeholder + sidebar (same layout as SectionScreen) */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 24, alignItems: "start" }}>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 18 }}>
+              <div>
+                <div className="eyebrow">// LESSON_INDEX</div>
+                <h2 style={{ fontFamily: "var(--font-display)", margin: "4px 0 0", fontSize: 24 }}>
+                  {lang === "en" ? "Lesson contents" : "Darslar tarkibi"}
+                </h2>
+              </div>
+            </div>
+
+            <div className="glass" style={{
+              padding: "56px 32px", borderRadius: 16, textAlign: "center",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
+              border: `1px dashed ${data.color}44`,
+            }}>
+              <div style={{ width: 64, height: 64, borderRadius: 16, background: data.color + "12", border: `1px solid ${data.color}44`, color: data.color, display: "grid", placeItems: "center" }}>
+                <Icon name="spark" size={26} />
+              </div>
+              <h3 className="display" style={{ margin: 0, fontSize: 22 }}>
+                {lang === "en" ? "Topics coming soon" : "Mavzular tez orada qo'shiladi"}
+              </h3>
+              <p style={{ color: "var(--text-2)", fontSize: 14, lineHeight: 1.65, maxWidth: 460, margin: 0 }}>
+                {lang === "en"
+                  ? "This division's curriculum is being prepared. Lessons will appear here with the same interactive diagrams, labs and AI-graded quizzes."
+                  : "Ushbu bo'lim dasturi tayyorlanmoqda. Darslar shu yerda — o'sha interaktiv diagrammalar, laboratoriyalar va AI baholaydigan testlar bilan paydo bo'ladi."}
+              </p>
+              <button className="btn btn-primary" onClick={() => setRoute({ name: "hub" })} style={{ marginTop: 6 }}>
+                <Icon name="arrow-left" size={14} /> {lang === "en" ? "Back to divisions" : "Bo'limlarga qaytish"}
+              </button>
+            </div>
+          </div>
+
+          <aside style={{ position: "sticky", top: 90, display: "flex", flexDirection: "column", gap: 16 }}>
+            <div className="glass" style={{ padding: 20 }}>
+              <div className="eyebrow" style={{ marginBottom: 10 }}>// INSTRUCTOR</div>
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg, ${data.color}, var(--c-warn))`, color: "#04060d", fontWeight: 700, display: "grid", placeItems: "center", fontFamily: "var(--font-mono)", fontSize: 14 }}>{user?.initials || "CS"}</div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 13 }}>{lang === "en" ? "To be announced" : "E'lon qilinadi"}</div>
+                  <div style={{ fontSize: 11, color: "var(--text-3)" }}>CyberSecurity</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass" style={{ padding: 20 }}>
+              <div className="eyebrow" style={{ marginBottom: 12 }}>// YOU_WILL_LEARN</div>
+              <p style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.6, margin: 0 }}>
+                {lang === "en" ? "Outcomes will be listed once topics are added." : "Mavzular qo'shilgach, natijalar shu yerda ko'rsatiladi."}
+              </p>
+            </div>
+
+            <div className="glass" style={{ padding: 20 }}>
+              <div className="eyebrow" style={{ marginBottom: 10 }}>// TOOLING</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {data.tooling.map((t) => (
+                  <span key={t} className="chip chip-gray" style={{ fontSize: 9.5 }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 window.SectionScreen = SectionScreen;
+window.TrackScreen = TrackScreen;
