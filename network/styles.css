@@ -1,5 +1,5 @@
 /* ============================================================
-   NETWORK ACADEMY — Design tokens & global styles
+   NETWORK MODULE — Design tokens (matches Windows) & global styles
    ============================================================ */
 
 :root {
@@ -19,16 +19,16 @@
   --text-2: #6b7894;
   --text-3: #475569;
 
-  /* Theme accent — default: cyan-blue */
+  /* Theme accent (overridden by tweak) */
   --accent: #00d4ff;
   --accent-2: #4d8bff;
   --accent-glow: rgba(0, 212, 255, 0.45);
   --accent-soft: rgba(0, 212, 255, 0.12);
   --accent-border: rgba(0, 212, 255, 0.28);
 
-  /* Semantic colors */
+  /* Semantic (MITRE color code from brief) */
   --c-attack: #ff3a5e;     /* red - attack */
-  --c-defense: #00d4ff;    /* cyan - defense */
+  --c-defense: #00ff9c;    /* green - defense */
   --c-system: #4d8bff;     /* blue - system */
   --c-warn: #ffcc44;       /* yellow - warning */
   --c-auth: #b88cff;       /* purple - authentication */
@@ -42,7 +42,7 @@
   --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
   --font-uz: 'Inter', system-ui, sans-serif;
 
-  /* Spacing density */
+  /* Spacing density (overridable) */
   --pad: 1;
 
   /* Radii */
@@ -55,21 +55,12 @@
   --t: 200ms cubic-bezier(.2, .8, .2, 1);
 }
 
-/* Theme overrides */
 [data-theme="blue"] {
   --accent: #00d4ff;
   --accent-2: #4d8bff;
   --accent-glow: rgba(0, 212, 255, 0.45);
   --accent-soft: rgba(0, 212, 255, 0.12);
   --accent-border: rgba(0, 212, 255, 0.28);
-}
-
-[data-theme="green"] {
-  --accent: #00ff9c;
-  --accent-2: #00d4ff;
-  --accent-glow: rgba(0, 255, 156, 0.45);
-  --accent-soft: rgba(0, 255, 156, 0.12);
-  --accent-border: rgba(0, 255, 156, 0.28);
 }
 
 [data-theme="purple"] {
@@ -321,6 +312,12 @@ html, body {
   from { width: 0; }
   to { width: 100%; }
 }
+@keyframes packet-flow {
+  0% { offset-distance: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
 
 .fade-up { animation: fadeUp .6s var(--t) both; }
 
@@ -389,6 +386,71 @@ html, body {
 /* Lock animation icons keyframes */
 @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
 @keyframes orbit { to { transform: rotate(360deg); } }
+
+/* Mermaid container styling */
+.mermaid-wrap {
+  background: rgba(4, 6, 13, 0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 32px;
+  overflow: auto;
+}
+.mermaid-wrap svg { display: block; margin: 0 auto; max-width: 100%; }
+
+/* Mermaid polish — sharper, brighter, more legible */
+.mermaid-wrap svg .actor {
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 0 8px rgba(0, 255, 156, 0.25));
+}
+.mermaid-wrap svg .actor-line {
+  stroke: rgba(164, 177, 200, 0.4) !important;
+  stroke-width: 1.2px !important;
+  stroke-dasharray: 3 4 !important;
+}
+.mermaid-wrap svg .messageText {
+  fill: #ffffff !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+}
+.mermaid-wrap svg .messageLine0,
+.mermaid-wrap svg .messageLine1 {
+  stroke: var(--accent) !important;
+  stroke-width: 1.8px !important;
+}
+.mermaid-wrap svg .labelText, .mermaid-wrap svg .loopText, .mermaid-wrap svg .noteText {
+  fill: #ffffff !important;
+}
+.mermaid-wrap svg .actor text {
+  font-weight: 600 !important;
+  fill: #ffffff !important;
+}
+.mermaid-wrap svg rect.note {
+  fill: rgba(77, 139, 255, 0.15) !important;
+  stroke: var(--c-system) !important;
+}
+.mermaid-wrap svg .sequenceNumber {
+  fill: #04060d !important;
+  font-weight: 700 !important;
+}
+.mermaid-wrap svg .labelBox {
+  fill: rgba(0, 255, 156, 0.18) !important;
+  stroke: var(--accent) !important;
+  stroke-width: 1.6px !important;
+}
+.mermaid-wrap svg .node rect,
+.mermaid-wrap svg .node circle,
+.mermaid-wrap svg .node ellipse,
+.mermaid-wrap svg .node polygon {
+  stroke-width: 1.6px !important;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 156, 0.2));
+}
+.mermaid-wrap svg .edgePath .path {
+  stroke-width: 1.8px !important;
+  stroke: var(--accent) !important;
+}
+.mermaid-wrap svg marker path {
+  fill: var(--accent) !important;
+}
 
 /* Reduced motion */
 [data-motion="low"] *, [data-motion="off"] * {

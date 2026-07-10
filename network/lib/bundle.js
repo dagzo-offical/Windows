@@ -666,3 +666,32 @@ function App(){
 
 const root=ReactDOM.createRoot(document.getElementById("app"));
 root.render(React.createElement(App));
+
+/* ── Animated background particles (matches Windows module) ── */
+(function(){
+  function initBgParticles(){
+    var el=document.getElementById("bg-root");
+    if(!el) return;
+    el.className="bg-stage bg-grid bg-scan";
+    [].slice.call(el.querySelectorAll(".particle")).forEach(function(p){p.remove();});
+    var count=30;
+    for(var i=0;i<count;i++){
+      var p=document.createElement("div");
+      var isStar=i%5===0;
+      p.className="particle"+(isStar?" particle-star":"");
+      var s=isStar?3+Math.random()*3:1+Math.random()*2;
+      p.style.width=p.style.height=s+"px";
+      p.style.left=(Math.random()*100)+"%";
+      p.style.top=(Math.random()*100)+"%";
+      var angle=Math.random()*Math.PI*2;
+      var dist=120+Math.random()*220;
+      p.style.setProperty("--dx",(Math.cos(angle)*dist)+"px");
+      p.style.setProperty("--dy",(Math.sin(angle)*dist-80)+"px");
+      p.style.animationDuration=(isStar?20:12+Math.random()*20)+"s";
+      p.style.animationDelay=(-Math.random()*35)+"s";
+      el.appendChild(p);
+    }
+  }
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",initBgParticles);}
+  else{initBgParticles();}
+})();
