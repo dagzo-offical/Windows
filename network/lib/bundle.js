@@ -497,6 +497,14 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
     num===20?React.createElement(LessonL20):
     num===21?React.createElement(LessonL21):
     num===22?React.createElement(LessonL22):
+    num===23?React.createElement(LessonL23):
+    num===24?React.createElement(LessonL24):
+    num===25?React.createElement(LessonL25):
+    num===26?React.createElement(LessonL26):
+    num===27?React.createElement(LessonL27):
+    num===28?React.createElement(LessonL28):
+    num===29?React.createElement(LessonL29):
+    num===30?React.createElement(LessonL30):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:800,margin:"0 auto",padding:"24px 16px"}},
@@ -511,7 +519,7 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
       React.createElement("div",{style:{fontSize:12,color:"var(--text-2)"}},lesson.sub)
     ),
     content,
-    !alreadyDone&&!done&&num<=3&&React.createElement("button",{
+    !alreadyDone&&!done&&num<=30&&React.createElement("button",{
       onClick:()=>{markComplete&&markComplete(lessonKey);setDone(true);},
       style:{marginTop:24,padding:"12px 28px",borderRadius:10,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,boxShadow:"0 0 20px var(--accent-glow)"}
     },t(lang,"Darsni yakunlash ✓","Complete Lesson ✓")),
@@ -1442,6 +1450,302 @@ function LessonL21(){
       opts:[{uz:"Ichkaridagi hammaga ishon",en:"Trust everyone inside"},{uz:"Hech kimga ishonma, doim tekshir",en:"Never trust, always verify"},{uz:"Faqat parolga ishon",en:"Trust only the password"},{uz:"Devor yetarli",en:"A wall is enough"}],
       correct:1,
       exp:{uz:"Zero Trust \"hech kimga ishonma, doim tekshir\" tamoyiliga asoslanadi — har bir so'rov, ichkaridan bo'lsa ham, tasdiqlanadi.",en:"Zero Trust is based on \"never trust, always verify\" — every request, even from inside, is confirmed."}
+    })
+  );
+}
+
+
+// ── L23: Network Enumeration ──────────────────────────────────
+function LessonL23(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Enumeratsiya nima?","What is enumeration?")),
+    React.createElement(P,null,t(lang,
+      "Enumeratsiya — nishon tarmoq haqida iloji boricha ko'proq ma'lumot to'plash bosqichi: qaysi qurilmalar bor, qaysi xizmatlar ishlayapti, qaysi foydalanuvchilar mavjud. Bu bosqindan oldin binoning rejasini o'rganishga o'xshaydi. Port skanerlash (L22) undan bir qadam keyingisi — enumeratsiya chuqurroq \"kim, nima, qayerda\" ni aniqlaydi.",
+      "Enumeration is the phase of gathering as much information as possible about a target network: which devices exist, which services run, which users are present. It's like studying a building's floor plan before entering. Port scanning (L22) is one step before it — enumeration digs deeper into the \"who, what, where\"."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Nimalar aniqlanadi?","What gets discovered?")),
+    React.createElement("div",{style:{margin:"8px 0 14px"}},
+      [[t(lang,"Xostlar","Hosts"),t(lang,"Tarmoqdagi tirik qurilmalar va ularning IP lari","Live devices on the network and their IPs")],
+       [t(lang,"Xizmatlar","Services"),t(lang,"Ochiq portlardagi dasturlar va versiyalar","Programs and versions on open ports")],
+       [t(lang,"Ulashmalar","Shares"),t(lang,"Ochiq fayl papkalari (SMB, NFS)","Open file folders (SMB, NFS)")],
+       [t(lang,"Foydalanuvchilar","Users"),t(lang,"Hisob nomlari va guruhlar","Account names and groups")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
+          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:110}},x[0]),
+          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
+    React.createElement(H2,{num:"§3"},t(lang,"Asosiy vositalar","Core tools")),
+    React.createElement(Terminal,null,
+`# Xizmat va versiyalarni chuqur aniqlash\nnmap -sV -sC 10.0.0.5\n\n# SMB ulashmalarini sanash\nsmbclient -L //10.0.0.5 -N\nnmap --script smb-enum-shares -p445 10.0.0.5\n\n# Tarmoqdagi tirik xostlar\nnmap -sn 10.0.0.0/24`),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Enumeratsiya faqat sizga tegishli yoki yozma ruxsat berilgan tarmoqlarda o'tkazilishi kerak. Boshqa birovning tarmog'ini ruxsatsiz skanerlash ko'p mamlakatlarda qonunga zid.",
+        "Enumeration must only be performed on networks you own or have written authorization to test. Scanning someone else's network without permission is illegal in many countries.")),
+    React.createElement(Quiz,{
+      q:{uz:"Enumeratsiya bosqichining asosiy maqsadi nima?",en:"What is the main goal of the enumeration phase?"},
+      opts:[{uz:"Ma'lumotni shifrlash",en:"Encrypting data"},{uz:"Nishon haqida iloji boricha ko'proq ma'lumot to'plash",en:"Gathering as much information about the target as possible"},{uz:"Faylni o'chirish",en:"Deleting a file"},{uz:"IP berish",en:"Handing out IPs"}],
+      correct:1,
+      exp:{uz:"Enumeratsiya — nishon tarmoq haqida (xostlar, xizmatlar, foydalanuvchilar) chuqur ma'lumot to'plash bosqichi, keyingi qadamlarga tayyorgarlik.",en:"Enumeration is the phase of gathering deep information about the target (hosts, services, users), preparing for later steps."}
+    })
+  );
+}
+
+// ── L24: ARP Spoofing ─────────────────────────────────────────
+function LessonL24(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"ARP spoofing nima?","What is ARP spoofing?")),
+    React.createElement(P,null,t(lang,
+      "ARP spoofing (ARP zaharlash) — hujumchi soxta ARP javoblari yuborib, o'zini boshqa qurilma (masalan router) qilib ko'rsatadi. Esingizdami, ARP javobni tekshirmaydi (L06)? Hujumchi shundan foydalanadi: \"router MAC si — bu men\" deb yolg'on aytadi, natijada qurbon trafigi hujumchi orqali oqa boshlaydi.",
+      "ARP spoofing (ARP poisoning) is when an attacker sends fake ARP replies to impersonate another device (e.g. the router). Remember ARP doesn't verify replies (L06)? The attacker exploits that: it lies \"the router's MAC is me\", so the victim's traffic starts flowing through the attacker."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Qanday ishlaydi","How it works")),
+    React.createElement(Terminal,null,
+`Oddiy holat:   Qurbon ──► Router ──► Internet
+
+ARP spoofingdan keyin:
+   Qurbon ──► HUJUMCHI ──► Router ──► Internet
+             (hammasini ko'radi)
+
+Hujumchi qurbonga: "Router MAC = mening MAC im"
+Hujumchi routerga: "Qurbon MAC = mening MAC im"`),
+    React.createElement(P,null,t(lang,
+      "Bu \"O'rtadagi odam\" (MITM) hujumining asosidir. Hujumchi endi qurbonning barcha shifrlanmagan trafigini ko'ra oladi — parollar, xabarlar. Shu sababli HTTPS (shifrlash) juda muhim: u ARP spoofing bo'lsa ham mazmunni yashiradi.",
+      "This is the basis of a \"Man-in-the-Middle\" (MITM) attack. The attacker can now see all of the victim's unencrypted traffic — passwords, messages. This is why HTTPS (encryption) matters so much: it hides the content even during ARP spoofing."
+    )),
+    React.createElement(H2,{num:"§3"},t(lang,"Himoya","Defense")),
+    React.createElement("div",{style:{margin:"8px 0 12px"}},
+      [t(lang,"Dynamic ARP Inspection (DAI) — switch soxta ARP ni bloklaydi","Dynamic ARP Inspection (DAI) — the switch blocks fake ARP"),
+       t(lang,"Statik ARP yozuvlari — muhim qurilmalar uchun qat'iy belgilash","Static ARP entries — fix them for critical devices"),
+       t(lang,"HTTPS/VPN — mazmun shifrlansa, ko'rilса ham foydasiz","HTTPS/VPN — if content is encrypted, seeing it is useless")].map((x,i)=>
+        React.createElement("div",{key:i,style:{fontSize:12.5,color:"var(--text-1)",padding:"6px 0",borderBottom:"1px solid var(--border)"}},"• "+x))),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"ARP spoofing faqat o'zingizga tegishli laboratoriya yoki yozma ruxsat berilgan pentestda sinalishi kerak. Boshqa tarmoqda uni qo'llash jinoyat hisoblanadi.",
+        "ARP spoofing must only be tested in your own lab or in a written-authorized pentest. Using it on another network is a crime.")),
+    React.createElement(Quiz,{
+      q:{uz:"ARP spoofing ARP protokolining qaysi zaifligidan foydalanadi?",en:"Which weakness of ARP does ARP spoofing exploit?"},
+      opts:[{uz:"ARP juda sekin",en:"ARP is very slow"},{uz:"ARP javobning haqiqiyligini tekshirmaydi",en:"ARP doesn't verify that a reply is genuine"},{uz:"ARP shifrlangan",en:"ARP is encrypted"},{uz:"ARP faqat WiFi da",en:"ARP is WiFi-only"}],
+      correct:1,
+      exp:{uz:"ARP javobni tekshirmaydi — shuning uchun hujumchi soxta javob yuborib, o'zini router qilib ko'rsatishi va trafikni o'g'irlashi mumkin.",en:"ARP doesn't verify replies — so an attacker can send a fake reply, impersonate the router and steal traffic."}
+    })
+  );
+}
+
+// ── L25: MITM Attacks ─────────────────────────────────────────
+function LessonL25(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"MITM hujumi nima?","What is a MITM attack?")),
+    React.createElement(P,null,t(lang,
+      "MITM (Man-in-the-Middle, O'rtadagi odam) — hujumchi ikki tomon o'rtasidagi aloqaga yashirin kirib, uni tinglaydi yoki o'zgartiradi. Ikki tomon bir-biri bilan to'g'ridan-to'g'ri gaplashyapti deb o'ylaydi, aslida hamma narsa hujumchi orqali o'tadi. Bu ikki kishi o'rtasidagi xatlarni yashirincha o'qib, ba'zan o'zgartirib qaytadan yuboradigan pochtachiga o'xshaydi.",
+      "MITM (Man-in-the-Middle) is when an attacker secretly inserts themselves into the communication between two parties to eavesdrop or alter it. The two parties think they're talking directly, but everything passes through the attacker. It's like a mail carrier who secretly reads letters between two people and sometimes changes them before resending."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Keng tarqalgan usullar","Common techniques")),
+    React.createElement("div",{style:{margin:"8px 0 14px"}},
+      [["ARP Spoofing",t(lang,"Lokal tarmoqda trafikni o'ziga yo'naltirish (L24)","Redirecting traffic to itself on a LAN (L24)")],
+       ["DNS Spoofing",t(lang,"Soxta IP berib, qurbonni soxta saytga yuborish","Sending the victim to a fake site with a fake IP")],
+       ["Evil Twin",t(lang,"Soxta WiFi nuqtasi yaratib, ulanganlarni tinglash","A fake WiFi hotspot to eavesdrop on those who join")],
+       ["SSL Strip",t(lang,"HTTPS ni HTTP ga tushirib, shifrlashni yo'qotish","Downgrading HTTPS to HTTP to remove encryption")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
+          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:110}},x[0]),
+          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
+    React.createElement(H2,{num:"§3"},t(lang,"Qanday himoyalanish","How to defend")),
+    React.createElement(Terminal,null,
+`✓ HTTPS ishlating — qulf belgisini tekshiring
+✓ Ochiq WiFi da VPN yoqing
+✓ Sertifikat ogohlantirishini e'tiborsiz qoldirmang
+✓ HSTS — sayt doim HTTPS ni majburlaydi
+✓ Muhim ishlarni ishonchsiz tarmoqda qilmang`),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"MITM texnikalari faqat ta'lim va ruxsat berilgan sinov muhitida o'rganilishi kerak. Real odamlarning aloqasini ruxsatsiz tinglash jiddiy jinoyatdir.",
+        "MITM techniques must only be studied in education and authorized test environments. Eavesdropping on real people's communication without permission is a serious crime.")),
+    React.createElement(Quiz,{
+      q:{uz:"HTTPS MITM hujumida qanday yordam beradi?",en:"How does HTTPS help against a MITM attack?"},
+      opts:[{uz:"Trafikni tezlashtiradi",en:"Speeds up traffic"},{uz:"Mazmunni shifrlaydi — hujumchi ko'rsa ham o'qiy olmaydi",en:"Encrypts the content — even if intercepted, it can't be read"},{uz:"IP ni yashiradi",en:"Hides the IP"},{uz:"Hech qanday yordam bermaydi",en:"It doesn't help at all"}],
+      correct:1,
+      exp:{uz:"HTTPS mazmunni shifrlaydi. Hujumchi trafikni ushlasa ham, u faqat tushunarsiz shifrlangan ma'lumotni ko'radi.",en:"HTTPS encrypts the content. Even if the attacker intercepts the traffic, they only see unintelligible encrypted data."}
+    })
+  );
+}
+
+// ── L26: DNS Spoofing ─────────────────────────────────────────
+function LessonL26(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"DNS spoofing nima?","What is DNS spoofing?")),
+    React.createElement(P,null,t(lang,
+      "DNS spoofing (DNS zaharlash) — hujumchi soxta DNS javob berib, qurbonni noto'g'ri IP manzilga yo'naltiradi. Qurbon bank.com yozadi, lekin DNS unga hujumchining soxta serverini ko'rsatadi. Bu telefon kitobidagi raqamni yashirincha almashtirib qo'yganga o'xshaydi — to'g'ri ismni terasiz, lekin noto'g'ri odamga tushasiz.",
+      "DNS spoofing (DNS poisoning) is when an attacker returns a fake DNS reply to redirect the victim to the wrong IP address. The victim types bank.com, but DNS points them to the attacker's fake server. It's like secretly swapping a number in a phone book — you dial the right name but reach the wrong person."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Nima uchun xavfli","Why it's dangerous")),
+    React.createElement(Terminal,null,
+`Oddiy:    bank.com  ──DNS──►  142.250.x.x (haqiqiy)
+
+Spoofing: bank.com  ──DNS──►  6.6.6.6 (hujumchi soxta sayti)
+          Qurbon haqiqiy manzil deb ishonadi,
+          lekin soxta saytga parolini kiritadi`),
+    React.createElement(P,null,t(lang,
+      "DNS spoofing fishing (phishing) bilan birga ishlaydi: qurbon haqiqiy manzilni yozgani uchun soxta saytga shubha qilmaydi va login/parolini kiritadi. Hujumchi esa ularni o'g'irlaydi.",
+      "DNS spoofing works together with phishing: because the victim typed the real address, they don't suspect the fake site and enter their credentials. The attacker steals them."
+    )),
+    React.createElement(H2,{num:"§3"},t(lang,"Himoya — DNSSEC","Defense — DNSSEC")),
+    React.createElement(P,null,t(lang,
+      "DNSSEC (DNS Security Extensions) DNS javoblarini raqamli imzolaydi — shunda qurilma javob haqiqiy va o'zgartirilmaganini tekshira oladi. Bu soxta javoblarni fosh qiladi. Qo'shimcha himoya: HTTPS (sertifikat mos kelmasa brauzer ogohlantiradi) va ishonchli DNS (masalan DoH — DNS over HTTPS).",
+      "DNSSEC (DNS Security Extensions) digitally signs DNS replies — so a device can verify a reply is genuine and unaltered. This exposes fake replies. Extra protection: HTTPS (the browser warns if the certificate doesn't match) and trusted DNS (e.g. DoH — DNS over HTTPS)."
+    )),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"DNS spoofing faqat nazorat qilinadigan laboratoriya yoki ruxsat berilgan sinovda o'rganilishi kerak. Real foydalanuvchilarni soxta saytga yo'naltirish jinoyatdir.",
+        "DNS spoofing must only be studied in a controlled lab or authorized test. Redirecting real users to a fake site is a crime.")),
+    React.createElement(Quiz,{
+      q:{uz:"DNS spoofing hujumchiga nima imkonini beradi?",en:"What does DNS spoofing let an attacker do?"},
+      opts:[{uz:"Faylni shifrlash",en:"Encrypt a file"},{uz:"Qurbonni to'g'ri nom yozsa ham soxta saytga yo'naltirish",en:"Redirect the victim to a fake site even when they type the correct name"},{uz:"WiFi parolini o'zgartirish",en:"Change the WiFi password"},{uz:"Tarmoqni tezlashtirish",en:"Speed up the network"}],
+      correct:1,
+      exp:{uz:"DNS spoofing soxta DNS javob beradi — qurbon to'g'ri nom (bank.com) yozsa ham, hujumchining soxta saytiga tushadi.",en:"DNS spoofing returns a fake DNS reply — even typing the correct name (bank.com), the victim lands on the attacker's fake site."}
+    })
+  );
+}
+
+// ── L27: DoS/DDoS ─────────────────────────────────────────────
+function LessonL27(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"DoS va DDoS nima?","What are DoS and DDoS?")),
+    React.createElement(P,null,t(lang,
+      "DoS (Denial of Service) — xizmatni ishdan chiqarish uchun serverni haddan tashqari so'rov bilan to'ldirish. Server band bo'lib qoladi va haqiqiy foydalanuvchilarga javob bera olmaydi. DDoS (Distributed DoS) — xuddi shu, lekin minglab qurilmadan (botnet) bir vaqtda. Bu do'kon eshigini soxta mijozlar bilan to'ldirib, haqiqiy xaridorlarni kirita olmaslikka o'xshaydi.",
+      "DoS (Denial of Service) means overwhelming a server with excessive requests to knock the service offline. The server gets busy and can't answer real users. DDoS (Distributed DoS) is the same, but from thousands of devices (a botnet) at once. It's like jamming a shop's doorway with fake customers so real shoppers can't get in."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Hujum turlari","Attack types")),
+    React.createElement("div",{style:{margin:"8px 0 14px"}},
+      [[t(lang,"Volumetrik","Volumetric"),t(lang,"Tarmoq kanalini ulkan trafik bilan to'ldiradi (masalan UDP flood)","Floods the network link with huge traffic (e.g. UDP flood)")],
+       [t(lang,"Protokol","Protocol"),t(lang,"Server resurslarini tugatadi (masalan SYN flood)","Exhausts server resources (e.g. SYN flood)")],
+       [t(lang,"Ilova qatlami","Application"),t(lang,"Og'ir so'rovlar bilan dasturni charchatadi (masalan HTTP flood)","Tires the app with heavy requests (e.g. HTTP flood)")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
+          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:120}},x[0]),
+          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
+    React.createElement(H2,{num:"§3"},t(lang,"Himoya","Mitigation")),
+    React.createElement(Terminal,null,
+`✓ Rate limiting — bir IP dan so'rovlarni cheklash
+✓ CDN / DDoS himoya (Cloudflare, Akamai)
+✓ Firewall va trafik filtrlash
+✓ Anycast — yukni ko'p serverga taqsimlash
+✓ Monitoring — anomal trafikni erta sezish`),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"DoS/DDoS hujumini boshqa birovning tizimiga uyushtirish jiddiy jinoyat — hatto \"sinab ko'rish\" uchun ham. Bu mavzu faqat himoya (blue team) va ruxsat berilgan sinov nuqtai nazaridan o'rganiladi.",
+        "Launching a DoS/DDoS attack against someone else's system is a serious crime — even \"just to try\". This topic is studied only from a defensive (blue team) and authorized-testing perspective.")),
+    React.createElement(Quiz,{
+      q:{uz:"DDoS ni oddiy DoS dan farqlovchi asosiy narsa nima?",en:"What mainly distinguishes DDoS from a plain DoS?"},
+      opts:[{uz:"DDoS shifrlangan",en:"DDoS is encrypted"},{uz:"DDoS ko'plab qurilmadan (botnet) bir vaqtda keladi",en:"DDoS comes from many devices (a botnet) at once"},{uz:"DDoS sekinroq",en:"DDoS is slower"},{uz:"Farqi yo'q",en:"No difference"}],
+      correct:1,
+      exp:{uz:"DDoS — taqsimlangan DoS: hujum bitta emas, minglab qurilmadan (botnet) bir vaqtda keladi, shuning uchun to'sish qiyinroq.",en:"DDoS is distributed DoS: the attack comes from thousands of devices (a botnet) at once, making it harder to block."}
+    })
+  );
+}
+
+// ── L28: Wireshark ────────────────────────────────────────────
+function LessonL28(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Wireshark nima?","What is Wireshark?")),
+    React.createElement(P,null,t(lang,
+      "Wireshark — tarmoqdan o'tayotgan paketlarni real vaqtda ushlab, batafsil ko'rsatuvchi eng mashhur vosita. U tarmoqni \"rentgen\" qilib ko'rsatadi: har bir paket ichida nima borligini qatlam-qatlam ochib beradi. Muammolarni topish, o'rganish va xavfsizlik tahlili uchun ishlatiladi.",
+      "Wireshark is the most popular tool for capturing packets crossing the network in real time and displaying them in detail. It gives an \"X-ray\" of the network: it opens up what's inside each packet, layer by layer. Used for troubleshooting, learning and security analysis."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Filtrlar","Filters")),
+    React.createElement(P,null,t(lang,
+      "Tarmoqda minglab paket bo'ladi — filtrlar kerakligini topishga yordam beradi. Ko'rsatish filtri (display filter) allaqachon ushlangan paketlardan faqat kerakligini ko'rsatadi:",
+      "There are thousands of packets on a network — filters help you find what you need. A display filter shows only the relevant packets from those already captured:"
+    )),
+    React.createElement(Terminal,null,
+`ip.addr == 10.0.0.5        # muayyan IP\ntcp.port == 80             # HTTP trafigi\nhttp                       # faqat HTTP\ndns                        # faqat DNS\nhttp.request.method=="POST"  # POST so'rovlar`),
+    React.createElement(H2,{num:"§3"},t(lang,"Oqimni kuzatish","Following a stream")),
+    React.createElement(P,null,t(lang,
+      "Paketga o'ng tugma bosib \"Follow > TCP Stream\" ni tanlasangiz, bitta ulanishning butun suhbatini bir oynada ko'rasiz. Shifrlanmagan protokollarda (HTTP, FTP) bu login va parollarni ochib berishi mumkin — aynan shuning uchun shifrlash (HTTPS) muhim.",
+      "Right-click a packet and choose \"Follow > TCP Stream\" to see an entire conversation of one connection in a single window. On unencrypted protocols (HTTP, FTP) this can reveal logins and passwords — which is exactly why encryption (HTTPS) matters."
+    )),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Wireshark bilan boshqalarning trafigini ruxsatsiz ushlash maxfiylikni buzish va ko'p joyda qonunga zid. Faqat o'z tarmog'ingiz yoki ruxsat berilgan muhitda ishlating.",
+        "Capturing others' traffic with Wireshark without permission violates privacy and is illegal in many places. Use it only on your own network or an authorized environment.")),
+    React.createElement(Quiz,{
+      q:{uz:"Wireshark da allaqachon ushlangan paketlardan faqat kerakligini ko'rsatish uchun nima ishlatiladi?",en:"In Wireshark, what shows only the relevant packets from those already captured?"},
+      opts:[{uz:"Display filter (ko'rsatish filtri)",en:"A display filter"},{uz:"Firewall qoidasi",en:"A firewall rule"},{uz:"DNS yozuvi",en:"A DNS record"},{uz:"VPN tunnel",en:"A VPN tunnel"}],
+      correct:0,
+      exp:{uz:"Ko'rsatish filtri (masalan http yoki ip.addr==...) minglab paketdan faqat sizga kerakligini ajratib ko'rsatadi.",en:"A display filter (e.g. http or ip.addr==...) narrows thousands of packets down to just the ones you need."}
+    })
+  );
+}
+
+// ── L29: Wireless Attacks ─────────────────────────────────────
+function LessonL29(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Simsiz hujumlar nima?","What are wireless attacks?")),
+    React.createElement(P,null,t(lang,
+      "WiFi havo orqali uzatgani uchun kabel tarmoqdan ko'ra ko'proq hujumga ochiq — signalni radiusdagi har kim \"eshitishi\" mumkin. Simsiz hujumlar shu xususiyatdan foydalanadi. Ularni bilish — o'z tarmog'ingizni himoya qilish uchun zarur.",
+      "Because WiFi transmits through the air, it is more exposed to attacks than wired networks — anyone within range can \"hear\" the signal. Wireless attacks exploit this property. Knowing them is essential to protecting your own network."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Keng tarqalgan hujumlar","Common attacks")),
+    React.createElement("div",{style:{margin:"8px 0 14px"}},
+      [[t(lang,"Deauth (uzish)","Deauth"),t(lang,"Qurilmani WiFi dan majburan uzadi — keyin qayta ulanishni ushlash uchun","Forcibly disconnects a device from WiFi — to capture the reconnection")],
+       ["Evil Twin",t(lang,"Haqiqiy WiFi nomini ko'chiruvchi soxta nuqta — ulanganlarni tinglaydi","A fake AP cloning the real WiFi name — eavesdrops on those who join")],
+       [t(lang,"Handshake capture","Handshake capture"),t(lang,"WPA2 qo'l berishini ushlab, keyin parolni oflayn buzishga urinish","Capturing the WPA2 handshake to crack the password offline later")],
+       [t(lang,"WPS hujumi","WPS attack"),t(lang,"WPS PIN zaifligidan foydalanish (ko'p routerda yoqilgan)","Exploiting the WPS PIN weakness (enabled on many routers)")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
+          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:140}},x[0]),
+          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
+    React.createElement(H2,{num:"§3"},t(lang,"Himoya","Defense")),
+    React.createElement(Terminal,null,
+`✓ WPA3 yoki kamida WPA2 ishlating (WEP emas!)
+✓ Uzun, murakkab WiFi parol (12+ belgi)
+✓ WPS ni o'chiring
+✓ SSID ni yashirish qo'shimcha (lekin yetarli emas)
+✓ Mehmonlar uchun alohida tarmoq`),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Simsiz hujum vositalarini (Aircrack-ng va h.k.) faqat o'z tarmog'ingizda yoki yozma ruxsat bilan sinang. Birovning WiFi siga ruxsatsiz kirish jinoyatdir.",
+        "Test wireless attack tools (Aircrack-ng, etc.) only on your own network or with written permission. Unauthorized access to someone's WiFi is a crime.")),
+    React.createElement(Quiz,{
+      q:{uz:"WPA2 \"handshake capture\" hujumidan keyin hujumchi odatda nima qiladi?",en:"After a WPA2 \"handshake capture\", what does the attacker typically do?"},
+      opts:[{uz:"Parolni oflayn buzishga urinadi",en:"Tries to crack the password offline"},{uz:"Routerni o'chiradi",en:"Turns off the router"},{uz:"IP beradi",en:"Hands out IPs"},{uz:"DNS ni tuzatadi",en:"Fixes DNS"}],
+      correct:0,
+      exp:{uz:"Ushlangan handshake parolning shifrlangan izini o'z ichiga oladi — hujumchi uni oflayn (lug'at yoki brute-force) buzishga urinadi. Uzun parol buni deyarli imkonsiz qiladi.",en:"The captured handshake contains an encrypted trace of the password — the attacker tries to crack it offline (dictionary or brute-force). A long password makes this nearly impossible."}
+    })
+  );
+}
+
+// ── L30: Network Forensics ────────────────────────────────────
+function LessonL30(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Tarmoq forensikasi nima?","What is network forensics?")),
+    React.createElement(P,null,t(lang,
+      "Tarmoq forensikasi — hodisa (masalan hujum yoki buzilish) sodir bo'lgandan keyin tarmoq ma'lumotlarini tekshirib, nima bo'lganini aniqlash. Bu detektiv ishi kabi: paketlar, loglar va izlarni yig'ib, \"kim, qachon, qanday\" savoliga javob topiladi. Bu himoya (blue team) va incident response ning muhim qismi.",
+      "Network forensics is examining network data after an incident (such as an attack or breach) to determine what happened. It's like detective work: collecting packets, logs and traces to answer \"who, when, how\". It's a key part of defense (blue team) and incident response."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Ma'lumot manbalari","Sources of evidence")),
+    React.createElement("div",{style:{margin:"8px 0 14px"}},
+      [[t(lang,"Paket yozuvlari","Packet captures"),t(lang,"PCAP fayllar — aynan nima uzatilganini ko'rsatadi","PCAP files — show exactly what was transmitted")],
+       [t(lang,"Firewall/IDS loglari","Firewall/IDS logs"),t(lang,"Bloklangan va ruxsat berilgan ulanishlar","Blocked and allowed connections")],
+       [t(lang,"Server loglari","Server logs"),t(lang,"Kirish urinishlari, so'rovlar, xatolar","Login attempts, requests, errors")],
+       [t(lang,"NetFlow","NetFlow"),t(lang,"Kim kim bilan, qancha ma'lumot almashgani","Who talked to whom and how much data")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
+          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:140}},x[0]),
+          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
+    React.createElement(H2,{num:"§3"},t(lang,"Jarayon va vositalar","Process and tools")),
+    React.createElement(Terminal,null,
+`# PCAP faylni tahlil qilish\nwireshark capture.pcap\ntshark -r capture.pcap -Y "http.request"\n\n# Muhim tamoyil: dalil zanjiri (chain of custody)\n# — dalilni o'zgartirmasdan, kim qachon ko'rganini qayd etish`),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Dalil zanjiri: ","Chain of custody: ")),
+      t(lang,"Forensikada dalil o'zgartirilmagani va kim unga tekkanligi hujjatlanishi shart — aks holda dalil sudda kuchini yo'qotadi. Doim asl nusxadan ish nusxasi (copy) olib ishlanadi.",
+        "In forensics, evidence must be documented as unaltered and it must be recorded who handled it — otherwise the evidence loses its value in court. Always work on a copy, never the original.")),
+    React.createElement(Quiz,{
+      q:{uz:"\"Dalil zanjiri\" (chain of custody) nima uchun muhim?",en:"Why is \"chain of custody\" important?"},
+      opts:[{uz:"Tarmoqni tezlashtiradi",en:"It speeds up the network"},{uz:"Dalil o'zgartirilmagani va ishonchli ekanini isbotlaydi",en:"It proves the evidence is unaltered and trustworthy"},{uz:"Parolni shifrlaydi",en:"It encrypts the password"},{uz:"IP beradi",en:"It hands out IPs"}],
+      correct:1,
+      exp:{uz:"Dalil zanjiri dalil o'zgartirilmaganini va kim unga tekkanini hujjatlaydi — bu dalilning ishonchliligi va sud kuchini ta'minlaydi.",en:"Chain of custody documents that evidence is unaltered and who handled it — ensuring the evidence is trustworthy and admissible."}
     })
   );
 }
