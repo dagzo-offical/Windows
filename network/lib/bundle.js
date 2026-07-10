@@ -138,105 +138,150 @@ function Quiz({q,opts,correct,exp}){
   );
 }
 
+// ── Animated-diagram engine (shared) ──────────────────────────
+function NetAnimStyle(){
+  return React.createElement("style",null,
+`@keyframes na-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes na-glow{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes na-flow{0%{left:1%;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:95%;opacity:0}}
+@keyframes na-dash{to{stroke-dashoffset:-18}}
+@keyframes na-blink{0%,100%{opacity:1}50%{opacity:.3}}
+.na-rise{animation:na-rise .5s cubic-bezier(.2,.8,.2,1) both}
+.na-card{transition:transform .2s ease,border-color .2s ease}
+.na-card:hover{transform:translateY(-3px)}
+.na-step{transition:all .4s ease;opacity:.4}
+.na-step.lit{opacity:1}
+.na-dot{width:8px;height:8px;border-radius:50%;animation:na-glow 1s infinite}
+.na-wire{position:relative;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);border-radius:2px}
+.na-pkt{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);animation:na-flow 2.4s linear infinite}
+@media (prefers-reduced-motion:reduce){.na-rise,.na-pkt,.na-dot,.na-card{animation:none!important}.na-pkt{left:47%}}`);
+}
+
+// color-coded vertical layer stack (generalized OSI visual)
+function LayerStack({layers}){
+  const lang=useLang();
+  return React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8,margin:"6px 0 4px"}},
+    layers.map((l,i)=>React.createElement("div",{key:l.n,className:"na-rise na-card",
+      style:{display:"flex",gap:12,alignItems:"flex-start",padding:"11px 14px",background:"var(--surface)",border:`1px solid ${l.color}44`,borderLeft:`3px solid ${l.color}`,borderRadius:11,animationDelay:(i*0.06)+"s"}},
+      React.createElement("div",{style:{flexShrink:0,width:30,height:30,borderRadius:8,display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontWeight:900,fontSize:13,color:l.color,background:l.color+"22",border:`1.5px solid ${l.color}`}},l.n),
+      React.createElement("div",{style:{flex:1}},
+        React.createElement("div",{style:{fontWeight:700,fontSize:13.5,color:"var(--text-0)"}},l.name,l.uz&&React.createElement("span",{style:{fontWeight:400,fontSize:11.5,color:"var(--text-2)",marginLeft:8}},l.uz)),
+        l.desc&&React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",margin:"3px 0 4px",lineHeight:1.5}},t(lang,l.desc.uz,l.desc.en)),
+        l.proto&&React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10.5,color:l.color,opacity:.9}},l.proto)))));
+}
+
+// interactive step-through flow (Play / Reset)
+function FlowSteps({title,steps,color}){
+  const lang=useLang();
+  const c=color||"var(--accent)";
+  const [step,setStep]=useState(-1);
+  const [playing,setPlaying]=useState(false);
+  useEffect(()=>{
+    if(!playing)return;
+    if(step>=steps.length-1){setPlaying(false);return;}
+    const id=setTimeout(()=>setStep(s=>s+1),1050);
+    return()=>clearTimeout(id);
+  },[playing,step,steps.length]);
+  const tx=x=>x==null?"":typeof x==="string"?x:t(lang,x.uz,x.en);
+  const showAll=step<0;
+  return React.createElement("div",{style:{background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:14,padding:16,margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,gap:8,flexWrap:"wrap"}},
+      React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--text-0)"}},tx(title)),
+      React.createElement("div",{style:{display:"flex",gap:6}},
+        React.createElement("button",{onClick:()=>{setStep(0);setPlaying(true);},style:{padding:"5px 13px",background:c,color:"#04060d",border:"none",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}},t(lang,"▶ Ishga tushir","▶ Play")),
+        React.createElement("button",{onClick:()=>{setStep(-1);setPlaying(false);},style:{padding:"5px 12px",background:"var(--bg-2)",color:"var(--text-1)",border:"1px solid var(--border)",borderRadius:8,fontSize:12,cursor:"pointer"}},"↺"))),
+    React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:7}},
+      steps.map((s,i)=>{
+        const lit=showAll||i<=step, cur=i===step;
+        return React.createElement("div",{key:i,className:"na-step"+(lit?" lit":""),
+          style:{display:"flex",alignItems:"center",gap:11,padding:"9px 13px",borderRadius:10,
+            background:lit?(cur?c+"14":"rgba(255,255,255,.02)"):"transparent",
+            border:`1px solid ${lit?(cur?c+"66":"var(--border)"):"rgba(255,255,255,.05)"}`}},
+          React.createElement("div",{style:{flexShrink:0,width:30,height:30,borderRadius:"50%",display:"grid",placeItems:"center",fontSize:15,color:lit?c:"var(--text-2)",background:lit?c+"18":"rgba(255,255,255,.03)",border:`1px solid ${lit?c+"55":"var(--border)"}`}},s.icon||(i+1)),
+          React.createElement("div",{style:{flex:1}},
+            React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:9.5,letterSpacing:".08em",color:lit?c:"var(--text-2)",marginBottom:1}},"STEP "+(i+1)),
+            React.createElement("div",{style:{fontSize:12.5,color:lit?"var(--text-0)":"var(--text-2)",lineHeight:1.45}},tx(s.text))),
+          cur&&React.createElement("div",{className:"na-dot",style:{background:c}}));
+      })));
+}
+
+// animated packet gliding along a wire between two nodes
+function PacketFlow({from,to,label,color}){
+  const lang=useLang();const c=color||"var(--accent)";
+  const tx=x=>typeof x==="string"?x:t(lang,x.uz,x.en);
+  return React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,margin:"12px 0",padding:"14px 12px",background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:12}},
+    React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--text-0)",textAlign:"center",minWidth:60}},tx(from)),
+    React.createElement("div",{style:{flex:1,position:"relative"}},
+      label&&React.createElement("div",{style:{textAlign:"center",fontFamily:"var(--font-mono)",fontSize:10,color:c,marginBottom:6}},tx(label)),
+      React.createElement("div",{className:"na-wire"},React.createElement("div",{className:"na-pkt",style:{background:c,boxShadow:`0 0 8px ${c}`}}))),
+    React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--text-0)",textAlign:"center",minWidth:60}},tx(to)));
+}
+
+// animated two-column comparison
+function CompareCols({left,right}){
+  const lang=useLang();
+  const tx=x=>typeof x==="string"?x:t(lang,x.uz,x.en);
+  const col=d=>React.createElement("div",{className:"na-rise",style:{padding:14,borderRadius:12,background:d.color+"0d",border:`1px solid ${d.color}33`}},
+    React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:11,fontWeight:700,color:d.color,marginBottom:9}},tx(d.title)),
+    d.rows.map((r,i)=>React.createElement("div",{key:i,style:{fontSize:12,color:"var(--text-1)",padding:"5px 0",borderBottom:i<d.rows.length-1?"1px solid var(--border)":"none",lineHeight:1.5}},tx(r))));
+  return React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"12px 0"}},col(left),col(right));
+}
+
+// topology diagram — nodes + animated dashed links (SVG)
+function NodeMap({nodes,links,color,label}){
+  const lang=useLang();const c=color||"var(--accent)";
+  return React.createElement("div",{style:{margin:"12px 0",padding:"14px",background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:12}},
+    label&&React.createElement("div",{style:{textAlign:"center",fontFamily:"var(--font-mono)",fontSize:11,color:c,marginBottom:8,fontWeight:700}},typeof label==="string"?label:t(lang,label.uz,label.en)),
+    React.createElement("svg",{viewBox:"0 0 280 160",style:{width:"100%",maxWidth:300,display:"block",margin:"0 auto"}},
+      links.map((lk,i)=>React.createElement("line",{key:"l"+i,x1:nodes[lk[0]][0],y1:nodes[lk[0]][1],x2:nodes[lk[1]][0],y2:nodes[lk[1]][1],stroke:c,strokeWidth:1.7,strokeDasharray:"5 4",style:{animation:"na-dash 1s linear infinite",opacity:.75}})),
+      nodes.map((n,i)=>React.createElement("g",{key:"n"+i},
+        React.createElement("circle",{cx:n[0],cy:n[1],r:10,fill:c+"22",stroke:c,strokeWidth:1.9}),
+        n[2]&&React.createElement("text",{x:n[0],y:n[1]+22,fill:"var(--text-2)",fontSize:8,textAnchor:"middle",fontFamily:"var(--font-mono)"},n[2])))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
-    {n:7,name:"Application",uz:"Ilova qatlami",proto:"HTTP, FTP, SMTP, DNS, SNMP",desc:"Foydalanuvchi ilovalari bilan to'g'ridan-to'g'ri ishlaydi",color:"#ff6b6b"},
-    {n:6,name:"Presentation",uz:"Taqdimot qatlami",proto:"SSL/TLS, JPEG, MP4, ASCII",desc:"Ma'lumotlarni formatlash, shifrlash va siqish",color:"#ffa94d"},
-    {n:5,name:"Session",uz:"Sessiya qatlami",proto:"NetBIOS, RPC, SQL",desc:"Ulanishlarni o'rnatish, boshqarish va tugatish",color:"#ffd43b"},
-    {n:4,name:"Transport",uz:"Transport qatlami",proto:"TCP, UDP",desc:"End-to-end ulanish, portlar, oqim nazorati",color:"#69db7c"},
-    {n:3,name:"Network",uz:"Tarmoq qatlami",proto:"IP, ICMP, OSPF, BGP",desc:"IP manzillash va paketlarni yo'naltirish",color:"#4dabf7"},
-    {n:2,name:"Data Link",uz:"Ma'lumotlar havolasi",proto:"Ethernet, WiFi, PPP, ARP",desc:"MAC manzillash, kadrlar va fizik ulanish xatolarini tuzatish",color:"#9775fa"},
-    {n:1,name:"Physical",uz:"Fizik qatlam",proto:"Ethernet kabeli, Optik, Radio",desc:"Bitlarni fizik signal sifatida uzatish",color:"#f783ac"},
+    {n:7,name:"Application",uz:"Ilova",proto:"HTTP · FTP · SMTP · DNS",desc:{uz:"Foydalanuvchi ilovalari bilan bevosita ishlaydi.",en:"Works directly with user applications."},color:"#ff6b6b"},
+    {n:6,name:"Presentation",uz:"Taqdimot",proto:"SSL/TLS · JPEG · MP4",desc:{uz:"Ma'lumotni formatlash, shifrlash va siqish.",en:"Formats, encrypts and compresses data."},color:"#ffa94d"},
+    {n:5,name:"Session",uz:"Sessiya",proto:"NetBIOS · RPC · SQL",desc:{uz:"Ulanishni o'rnatish, boshqarish va tugatish.",en:"Sets up, manages and ends connections."},color:"#ffd43b"},
+    {n:4,name:"Transport",uz:"Transport",proto:"TCP · UDP",desc:{uz:"End-to-end ulanish, portlar, oqim nazorati.",en:"End-to-end delivery, ports, flow control."},color:"#69db7c"},
+    {n:3,name:"Network",uz:"Tarmoq",proto:"IP · ICMP · OSPF · BGP",desc:{uz:"IP manzillash va paketlarni yo'naltirish.",en:"IP addressing and packet routing."},color:"#4dabf7"},
+    {n:2,name:"Data Link",uz:"Ma'lumot havolasi",proto:"Ethernet · WiFi · ARP",desc:{uz:"MAC manzillash va kadrlar (frames).",en:"MAC addressing and frames."},color:"#9775fa"},
+    {n:1,name:"Physical",uz:"Fizik",proto:"Kabel · Optik · Radio",desc:{uz:"Bitlarni fizik signal sifatida uzatish.",en:"Transmits bits as physical signals."},color:"#f783ac"},
   ];
+  const words=["All ","People ","Seem ","To ","Need ","Data ","Processing"];
+  const wcol=["#ff6b6b","#ffa94d","#ffd43b","#69db7c","#4dabf7","#9775fa","#ff6b6b"];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"OSI modeli nima?","What is the OSI Model?")),
-    React.createElement(P,null,t(lang,
-      "OSI (Open Systems Interconnection) modeli — tarmoq aloqasini 7 ta mantiqiy qatlamga bo'lib tushuntiruvchi konseptual freymvork. Bu model turli ishlab chiqaruvchilar va protokollar o'rtasida muloqotni standartlashtirish uchun ISO tomonidan 1984 yilda yaratilgan.",
-      "The OSI (Open Systems Interconnection) model is a conceptual framework that divides network communication into 7 logical layers. Created by ISO in 1984, it standardizes communication between different vendors and protocols."
-    )),
+    React.createElement(P,null,t(lang,"OSI (Open Systems Interconnection) modeli — tarmoq aloqasini 7 ta mantiqiy qatlamga bo'lib tushuntiruvchi konseptual freymvork. ISO tomonidan 1984-yilda turli ishlab chiqaruvchilar va protokollarni standartlashtirish uchun yaratilgan.","The OSI (Open Systems Interconnection) model is a conceptual framework that splits network communication into 7 logical layers. Created by ISO in 1984 to standardize different vendors and protocols.")),
     React.createElement(InfoBox,{color:"var(--accent)"},
-      t(lang,"Eslab qolish uchun:","Mnemonic to remember layers:"),
-      React.createElement("br",null),
-      React.createElement("strong",null,"\""),
-      React.createElement("span",{style:{color:"#ff6b6b"}},"A"),
-      React.createElement("span",{style:{color:"#ffa94d"}},"ll"),
-      " ",
-      React.createElement("span",{style:{color:"#ffd43b"}},"P"),
-      React.createElement("span",{style:{color:"#ffd43b"}},"eople"),
-      " ",
-      React.createElement("span",{style:{color:"#69db7c"}},"S"),
-      React.createElement("span",{style:{color:"#69db7c"}},"eem"),
-      " ",
-      React.createElement("span",{style:{color:"#4dabf7"}},"T"),
-      React.createElement("span",{style:{color:"#4dabf7"}},"o"),
-      " ",
-      React.createElement("span",{style:{color:"#9775fa"}},"N"),
-      React.createElement("span",{style:{color:"#9775fa"}},"eed"),
-      " ",
-      React.createElement("span",{style:{color:"#f783ac"}},"D"),
-      React.createElement("span",{style:{color:"#f783ac"}},"ata"),
-      " ",
-      React.createElement("span",{style:{color:"#ff6b6b"}},"P"),
-      React.createElement("span",{style:{color:"#ff6b6b"}},"rocessing\""),
-      React.createElement("br",null),
-      React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:11,opacity:0.7}},
-        t(lang,"(7→1: Application, Presentation, Session, Transport, Network, Data Link, Physical)","(7→1: Application, Presentation, Session, Transport, Network, Data Link, Physical)"))
-    ),
+      t(lang,"Eslab qolish uchun (7→1):","Mnemonic to remember (7→1):"),React.createElement("br",null),
+      words.map(function(w,i){return React.createElement("span",{key:i,style:{color:wcol[i],fontWeight:800}},w);})),
     React.createElement(H2,{num:"§2"},t(lang,"7 ta qatlam","The 7 Layers")),
-    layers.map(l=>React.createElement("div",{key:l.n,style:{display:"flex",gap:12,marginBottom:8,padding:"10px 14px",background:"var(--surface)",border:`1px solid ${l.color}33`,borderRadius:10,alignItems:"flex-start"}},
-      React.createElement("div",{style:{width:28,height:28,borderRadius:8,background:l.color+"22",border:`1.5px solid ${l.color}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:"var(--font-mono)",fontSize:11,fontWeight:900,color:l.color}},l.n),
-      React.createElement("div",{style:{flex:1}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:13,color:"var(--text-0)",marginBottom:2}},
-          `${l.name}`,React.createElement("span",{style:{fontSize:11,color:"var(--text-2)",marginLeft:8,fontWeight:400}},l.uz)),
-        React.createElement("div",{style:{fontSize:11.5,color:"var(--text-2)",marginBottom:3}},l.desc),
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:l.color,opacity:0.85}},l.proto)
-      )
-    )),
-    React.createElement(H2,{num:"§3"},t(lang,"Ma'lumot qanday harakatlanadi?","How data travels?")),
-    React.createElement(P,null,t(lang,
-      "Yuboruvchi tomonida ma'lumot 7-qatlamdan 1-qatlamga qarab har bir qatlamda sarlavha (header) qo'shiladi — bu encapsulation deyiladi. Qabul qiluvchi tomonida esa 1-qatlamdan 7-qatlamga qarab har bir sarlavha olib tashlanadi — bu decapsulation.",
-      "On the sender side, data travels from layer 7 to layer 1, with each layer adding a header — this is called encapsulation. On the receiver side, it travels from layer 1 to layer 7, with each layer removing its header — this is decapsulation."
-    )),
-    React.createElement(Terminal,null,
-`Yuboruvchi (Sender)          Qabul qiluvchi (Receiver)
-┌─────────────────┐          ┌─────────────────┐
-│  7. Application │ ──data─► │  7. Application │
-│  6. Presentation│          │  6. Presentation│
-│  5. Session     │          │  5. Session     │
-│  4. Transport   │          │  4. Transport   │
-│  3. Network     │          │  3. Network     │
-│  2. Data Link   │          │  2. Data Link   │
-│  1. Physical    │ ══════►  │  1. Physical    │
-└─────────────────┘   Kabel  └─────────────────┘`
-    ),
+    React.createElement(LayerStack,{layers:layers}),
+    React.createElement(H2,{num:"§3"},t(lang,"Ma'lumot qanday harakatlanadi?","How does data travel?")),
+    React.createElement(P,null,t(lang,"Yuboruvchida ma'lumot 7→1 qatlamga tushib, har qatlamda sarlavha (header) qo'shiladi — encapsulation. Qabul qiluvchida 1→7 ga chiqib, har sarlavha olib tashlanadi — decapsulation. \"Ishga tushir\" ni bosib kuzating:","On the sender, data goes 7→1, each layer adding a header — encapsulation. On the receiver it goes 1→7, each header removed — decapsulation. Press Play to watch:")),
+    React.createElement(FlowSteps,{title:{uz:"Encapsulation — yuboruvchi (7→1)",en:"Encapsulation — sender (7→1)"},steps:[
+      {icon:"📄",text:{uz:"7 Application — ma'lumot yaratiladi",en:"7 Application — data is created"}},
+      {icon:"🔌",text:{uz:"4 Transport — port + TCP/UDP sarlavha qo'shiladi",en:"4 Transport — port + TCP/UDP header added"}},
+      {icon:"🌐",text:{uz:"3 Network — IP manzil sarlavhasi qo'shiladi",en:"3 Network — IP address header added"}},
+      {icon:"🔗",text:{uz:"2 Data Link — MAC manzil (kadr) qo'shiladi",en:"2 Data Link — MAC address (frame) added"}},
+      {icon:"📡",text:{uz:"1 Physical — bitlar kabel orqali uzatiladi",en:"1 Physical — bits sent over the cable"}},
+    ]}),
     React.createElement(H2,{num:"§4"},t(lang,"TCP/IP vs OSI","TCP/IP vs OSI")),
-    React.createElement(P,null,t(lang,
-      "Amalda internet TCP/IP modelini ishlatadi — u OSI ning 7 qatlamini 4 qatlamga soddalashtirgan:",
-      "In practice, the internet uses the TCP/IP model — it simplifies OSI's 7 layers into 4 layers:"
-    )),
-    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"12px 0"}},
-      React.createElement("div",{style:{padding:14,background:"rgba(0,212,255,0.06)",border:"1px solid rgba(0,212,255,0.2)",borderRadius:10}},
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:"var(--accent)",marginBottom:8,fontWeight:700}},"OSI MODEL (7 layers)"),
-        ["7. Application","6. Presentation","5. Session","4. Transport","3. Network","2. Data Link","1. Physical"].map((l,i)=>
-          React.createElement("div",{key:i,style:{fontSize:11.5,padding:"3px 0",color:"var(--text-1)",borderBottom:"1px solid var(--border)"}},l))
-      ),
-      React.createElement("div",{style:{padding:14,background:"rgba(100,255,100,0.06)",border:"1px solid rgba(100,255,100,0.2)",borderRadius:10}},
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:"#69db7c",marginBottom:8,fontWeight:700}},"TCP/IP MODEL (4 layers)"),
-        [
-          {l:"4. Application",sub:"→ OSI 5,6,7"},
-          {l:"3. Transport",sub:"→ OSI 4"},
-          {l:"2. Internet",sub:"→ OSI 3"},
-          {l:"1. Network Access",sub:"→ OSI 1,2"},
-        ].map(({l,sub},i)=>
-          React.createElement("div",{key:i,style:{fontSize:11.5,padding:"3px 0",color:"var(--text-1)",borderBottom:"1px solid var(--border)"}},
-            l,React.createElement("span",{style:{fontSize:10,color:"#69db7c",marginLeft:6,opacity:0.7}},sub)))
-      )
-    )
+    React.createElement(P,null,t(lang,"Amalda internet TCP/IP modelini ishlatadi — u OSI ning 7 qatlamini 4 qatlamga soddalashtirgan:","In practice the internet uses the TCP/IP model — it simplifies OSI's 7 layers into 4:")),
+    React.createElement(CompareCols,{
+      left:{title:"OSI · 7 qatlam",color:"#4dabf7",rows:["7 Application","6 Presentation","5 Session","4 Transport","3 Network","2 Data Link","1 Physical"]},
+      right:{title:"TCP/IP · 4 qatlam",color:"#69db7c",rows:["4 Application → OSI 5,6,7","3 Transport → OSI 4","2 Internet → OSI 3","1 Network Access → OSI 1,2"]}}),
+    React.createElement(Quiz,{
+      q:{uz:"OSI modelida IP manzillash va paketlarni yo'naltirish qaysi qatlamda bajariladi?",en:"In the OSI model, which layer handles IP addressing and packet routing?"},
+      opts:[{uz:"7 — Application",en:"7 — Application"},{uz:"4 — Transport",en:"4 — Transport"},{uz:"3 — Network",en:"3 — Network"},{uz:"1 — Physical",en:"1 — Physical"}],
+      correct:2,
+      exp:{uz:"3-qatlam (Network) IP manzillash va marshrutlash bilan shug'ullanadi — IP, ICMP, OSPF shu yerda.",en:"Layer 3 (Network) handles IP addressing and routing — IP, ICMP and OSPF live here."}})
   );
 }
-
-// ── Lesson L13: Firewall ──────────────────────────────────────
 function LessonL13(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -723,460 +768,252 @@ function App(){
 // ── L02: TCP/IP Protocol ──────────────────────────────────────
 function LessonL02(){
   const lang=useLang();
+  const layers=[
+    {n:4,name:"Application",uz:"Ilova",proto:"HTTP · DNS · FTP · SMTP",desc:{uz:"Foydalanuvchi ko'radigan dasturlar (OSI 5,6,7).",en:"The apps a user sees (OSI 5,6,7)."},color:"#ff6b6b"},
+    {n:3,name:"Transport",uz:"Transport",proto:"TCP · UDP",desc:{uz:"Ishonchli yetkazish va portlar (OSI 4).",en:"Reliable delivery and ports (OSI 4)."},color:"#69db7c"},
+    {n:2,name:"Internet",uz:"Internet",proto:"IP · ICMP",desc:{uz:"IP manzillash va yo'naltirish (OSI 3).",en:"IP addressing and routing (OSI 3)."},color:"#4dabf7"},
+    {n:1,name:"Network Access",uz:"Tarmoq kirishi",proto:"Ethernet · WiFi · ARP",desc:{uz:"Fizik uzatish va MAC manzillar (OSI 1,2).",en:"Physical transmission and MAC (OSI 1,2)."},color:"#9775fa"},
+  ];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"TCP/IP nima?","What is TCP/IP?")),
-    React.createElement(P,null,t(lang,
-      "TCP/IP — internet ishlashining asosi bo'lgan protokollar to'plami. Uni pochta tizimiga o'xshating: xat (ma'lumot) konvertga solinadi, manzil yoziladi, pochta bo'limlari orqali o'tadi va oxirida yetkaziladi. TCP/IP xuddi shunday qoidalar to'plami bo'lib, dunyodagi har qanday ikki qurilma bir-biri bilan gaplasha olishini ta'minlaydi.",
-      "TCP/IP is the suite of protocols that the internet runs on. Think of it like the postal system: a letter (data) goes in an envelope, gets an address, passes through post offices, and is delivered at the end. TCP/IP is that same set of rules, letting any two devices in the world talk to each other."
-    )),
+    React.createElement(P,null,t(lang,"TCP/IP — internet ishlashining asosi bo'lgan protokollar to'plami. Uni pochta tizimiga o'xshating: xat (ma'lumot) konvertga solinadi, manzil yoziladi, pochta bo'limlari orqali o'tib yetkaziladi. TCP/IP shu qoidalar to'plami bo'lib, dunyodagi har qanday ikki qurilma bir-biri bilan gaplasha olishini ta'minlaydi.","TCP/IP is the suite of protocols the internet runs on. Think of the postal system: a letter (data) goes in an envelope, gets an address, passes through post offices and is delivered. TCP/IP is that set of rules, letting any two devices talk.")),
     React.createElement(H2,{num:"§2"},t(lang,"4 qatlamli model","The 4-layer model")),
-    React.createElement(P,null,t(lang,
-      "TCP/IP OSI ning 7 qatlamini 4 ta amaliy qatlamga soddalashtiradi. Har bir qatlam o'z vazifasiga ega:",
-      "TCP/IP simplifies OSI's 7 layers into 4 practical layers. Each layer has its own job:"
-    )),
-    [["Application",t(lang,"Ilova","Application"),"HTTP, DNS, FTP, SMTP",t(lang,"Foydalanuvchi ko'radigan dasturlar shu yerda","The apps a user sees live here"),"#ff6b6b"],
-     ["Transport",t(lang,"Transport","Transport"),"TCP, UDP",t(lang,"Ma'lumotni ishonchli yetkazish, portlar","Reliable delivery, ports"),"#69db7c"],
-     ["Internet",t(lang,"Internet","Internet"),"IP, ICMP",t(lang,"IP manzillash va yo'naltirish","IP addressing and routing"),"#4dabf7"],
-     ["Network Access",t(lang,"Tarmoq kirishi","Network Access"),"Ethernet, WiFi, ARP",t(lang,"Fizik uzatish va MAC manzillar","Physical transmission and MAC"),"#9775fa"]].map((l,i)=>
-      React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"10px 14px",background:"var(--surface)",border:`1px solid ${l[4]}33`,borderRadius:10,alignItems:"flex-start"}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:13,color:"var(--text-0)",minWidth:120}},l[1]),
-        React.createElement("div",{style:{flex:1}},
-          React.createElement("div",{style:{fontSize:11.5,color:"var(--text-2)",marginBottom:3}},l[3]),
-          React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:l[4]}},l[2])))),
+    React.createElement(P,null,t(lang,"TCP/IP OSI ning 7 qatlamini 4 ta amaliy qatlamga soddalashtiradi:","TCP/IP simplifies OSI's 7 layers into 4 practical layers:")),
+    React.createElement(LayerStack,{layers:layers}),
     React.createElement(H2,{num:"§3"},t(lang,"TCP va UDP farqi","TCP vs UDP")),
-    React.createElement(P,null,t(lang,
-      "Transport qatlamida ikkita asosiy protokol bor. TCP — ishonchli: har bir paket yetganini tasdiqlaydi, xuddi buyurtma qilingan pochta kabi. UDP — tez, ammo tasdiqlamaydi, xuddi oddiy xat tashlagandek — tez, lekin yetgani kafolatlanmaydi.",
-      "The transport layer has two main protocols. TCP is reliable: it confirms every packet arrived, like registered mail. UDP is fast but does not confirm, like dropping a postcard in a box — quick, but delivery isn't guaranteed."
-    )),
-    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"12px 0"}},
-      React.createElement("div",{style:{padding:14,background:"rgba(105,219,124,0.06)",border:"1px solid rgba(105,219,124,0.2)",borderRadius:10}},
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"#69db7c",fontWeight:700,marginBottom:8}},"TCP"),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.7}},t(lang,"✓ Ishonchli\n✓ Tartibli yetkazish\n✓ Xatolarni tuzatish\n✗ Sekinroq\nMisol: veb, email, fayl","✓ Reliable\n✓ Ordered delivery\n✓ Error correction\n✗ Slower\nUse: web, email, files").split("\n").map((x,i)=>React.createElement("div",{key:i},x)))),
-      React.createElement("div",{style:{padding:14,background:"rgba(77,171,247,0.06)",border:"1px solid rgba(77,171,247,0.2)",borderRadius:10}},
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"#4dabf7",fontWeight:700,marginBottom:8}},"UDP"),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.7}},t(lang,"✓ Juda tez\n✓ Kam yuk\n✗ Tasdiqlamaydi\n✗ Paket yo'qolishi mumkin\nMisol: video, o'yin, DNS","✓ Very fast\n✓ Low overhead\n✗ No confirmation\n✗ Packets may drop\nUse: video, games, DNS").split("\n").map((x,i)=>React.createElement("div",{key:i},x))))),
+    React.createElement(P,null,t(lang,"Transport qatlamida ikkita protokol bor. TCP — ishonchli (buyurtma qilingan pochta kabi: yetgani tasdiqlanadi). UDP — tez, ammo tasdiqlamaydi (oddiy xat tashlagandek).","The transport layer has two protocols. TCP is reliable (like registered mail: delivery is confirmed). UDP is fast but unconfirmed (like dropping a postcard).")),
+    React.createElement(CompareCols,{
+      left:{title:"TCP",color:"#69db7c",rows:[{uz:"✓ Ishonchli",en:"✓ Reliable"},{uz:"✓ Tartibli yetkazish",en:"✓ Ordered delivery"},{uz:"✓ Xatolarni tuzatish",en:"✓ Error correction"},{uz:"✗ Sekinroq",en:"✗ Slower"},{uz:"Veb, email, fayl",en:"Web, email, files"}]},
+      right:{title:"UDP",color:"#4dabf7",rows:[{uz:"✓ Juda tez",en:"✓ Very fast"},{uz:"✓ Kam yuk",en:"✓ Low overhead"},{uz:"✗ Tasdiqlamaydi",en:"✗ No confirmation"},{uz:"✗ Paket yo'qolishi mumkin",en:"✗ Packets may drop"},{uz:"Video, o'yin, DNS",en:"Video, games, DNS"}]}}),
     React.createElement(H2,{num:"§4"},t(lang,"3 bosqichli qo'l berish (Handshake)","The 3-way handshake")),
-    React.createElement(P,null,t(lang,
-      "TCP ulanishni boshlashdan oldin ikki qurilma \"qo'l beradi\" — bir-birini tayyor ekanini tasdiqlaydi. Bu suhbatni boshlashdan oldingi \"Salom — Salom, eshityapman — Yaxshi, boshladik\" kabi:",
-      "Before TCP starts a connection, the two devices \"shake hands\" — confirming each is ready. It's like \"Hi — Hi, I hear you — Great, let's begin\" before a conversation:"
-    )),
-    React.createElement(Terminal,null,
-`Client                         Server
-  │   ── SYN ─────────────────►  │   1. "Ulanamizmi?"
-  │   ◄──────── SYN-ACK ───────  │   2. "Ha, ulanamiz"
-  │   ── ACK ─────────────────►  │   3. "Kelishdik!"
-  │                              │
-  │   ═══ Ma'lumot uzatish ════  │   Ulanish tayyor`),
+    React.createElement(P,null,t(lang,"TCP ulanishdan oldin ikki qurilma \"qo'l beradi\" — bir-birini tayyor ekanini tasdiqlaydi. \"Ishga tushir\" ni bosing:","Before TCP connects, the two devices \"shake hands\" — confirming each is ready. Press Play:")),
+    React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"TCP 3-way handshake",en:"TCP 3-way handshake"},steps:[
+      {icon:"→",text:{uz:"Client → Server:  SYN  (\"ulanamizmi?\")",en:"Client → Server:  SYN  (\"shall we connect?\")"}},
+      {icon:"←",text:{uz:"Server → Client:  SYN-ACK  (\"ha, ulanamiz\")",en:"Server → Client:  SYN-ACK  (\"yes, let's\")"}},
+      {icon:"→",text:{uz:"Client → Server:  ACK  (\"kelishdik!\")",en:"Client → Server:  ACK  (\"agreed!\")"}},
+      {icon:"✓",text:{uz:"Ulanish tayyor — ma'lumot uzatiladi",en:"Connection ready — data flows"}},
+    ]}),
     React.createElement(Quiz,{
       q:{uz:"Qaysi protokol video oqim (streaming) uchun ko'proq mos, chunki tezlik ishonchlilikdan muhimroq?",en:"Which protocol suits video streaming better, where speed matters more than reliability?"},
       opts:[{uz:"TCP",en:"TCP"},{uz:"UDP",en:"UDP"},{uz:"HTTP",en:"HTTP"},{uz:"ARP",en:"ARP"}],
       correct:1,
-      exp:{uz:"UDP tasdiqlashsiz tez uzatadi — video/o'yin uchun bir-ikki paket yo'qolsa ham davom etaverish tezlik uchun afzalroq.",en:"UDP transmits fast without confirmation — for video/games, continuing even if a packet or two drops is preferable for speed."}
-    })
+      exp:{uz:"UDP tasdiqlashsiz tez uzatadi — video/o'yin uchun bir-ikki paket yo'qolsa ham davom etaverish afzal.",en:"UDP transmits fast without confirmation — for video/games, continuing even if a packet drops is preferable."}})
   );
 }
-
-// ── L03: IP Addressing ────────────────────────────────────────
 function LessonL03(){
   const lang=useLang();
+  const ranges=[["10.0.0.0/8","10.x.x.x",{uz:"Katta tarmoqlar",en:"Large networks"},"#69db7c"],
+    ["172.16.0.0/12","172.16–31.x.x",{uz:"O'rta tarmoqlar",en:"Medium networks"},"#4dabf7"],
+    ["192.168.0.0/16","192.168.x.x",{uz:"Uy / kichik ofis",en:"Home / small office"},"#9775fa"]];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"IP manzil nima?","What is an IP address?")),
-    React.createElement(P,null,t(lang,
-      "IP manzil — tarmoqdagi har bir qurilmaning yagona \"uy manzili\". Xuddi pochta xatni to'g'ri uyga yetkazish uchun manzilga muhtoj bo'lgani kabi, tarmoq ham ma'lumotni to'g'ri qurilmaga yetkazish uchun IP manzildan foydalanadi.",
-      "An IP address is the unique \"home address\" of every device on a network. Just as the post office needs an address to deliver a letter to the right house, the network uses an IP address to deliver data to the right device."
-    )),
+    React.createElement(P,null,t(lang,"IP manzil — tarmoqdagi har bir qurilmaning yagona \"uy manzili\". Pochta xatni to'g'ri uyga yetkazish uchun manzilga muhtoj bo'lgani kabi, tarmoq ham ma'lumotni to'g'ri qurilmaga yetkazish uchun IP manzildan foydalanadi.","An IP address is the unique \"home address\" of every device on a network. Just as the post office needs an address to deliver to the right house, the network uses an IP to reach the right device.")),
     React.createElement(H2,{num:"§2"},t(lang,"IPv4 tuzilishi","IPv4 structure")),
-    React.createElement(P,null,t(lang,
-      "IPv4 manzil nuqta bilan ajratilgan 4 ta sondan iborat (masalan 192.168.1.10). Har bir son 0 dan 255 gacha bo'ladi. Bu jami ~4.3 milliard manzil beradi — bu ko'p tuyulsa-da, dunyoda qurilmalar undan ko'p!",
-      "An IPv4 address is 4 numbers separated by dots (e.g. 192.168.1.10). Each number ranges from 0 to 255. This gives ~4.3 billion addresses — which sounds like a lot, but there are more devices in the world than that!"
-    )),
-    React.createElement(Terminal,null,
-`192  .  168  .  1  .  10
-└────────┬────────┘  └─┬─┘
-   Tarmoq qismi      Xost qismi
-  (Network part)    (Host part)
-
-Har bir son = 8 bit (bayt) = 0–255
-Jami = 32 bit`),
+    React.createElement("div",{className:"na-rise",style:{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",margin:"10px 0 14px"}},
+      [["192","",false],["168","",false],["1","",true],["10","",true]].map(function(o,i){return React.createElement("div",{key:i,style:{textAlign:"center"}},
+        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontWeight:800,fontSize:20,color:o[2]?"#ffd43b":"#4dabf7",background:(o[2]?"#ffd43b":"#4dabf7")+"18",border:"1px solid "+(o[2]?"#ffd43b":"#4dabf7")+"55",borderRadius:8,padding:"8px 14px",minWidth:52}},o[0]),
+        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:9,color:"var(--text-2)",marginTop:4}},"8 bit"));})),
+    React.createElement("div",{style:{textAlign:"center",fontSize:12,color:"var(--text-2)",marginBottom:14}},
+      React.createElement("span",{style:{color:"#4dabf7"}},t(lang,"■ Tarmoq qismi","■ Network part"))," · ",
+      React.createElement("span",{style:{color:"#ffd43b"}},t(lang,"■ Xost qismi","■ Host part"))," · ",t(lang,"jami 32 bit, har son 0–255","32 bits total, each 0–255")),
     React.createElement(H2,{num:"§3"},t(lang,"Xususiy va ommaviy manzillar","Private and public addresses")),
-    React.createElement(P,null,t(lang,
-      "Ba'zi manzillar diapazoni \"xususiy\" — ular faqat ichki tarmoqda (uyingiz yoki ofisingizda) ishlatiladi va internetda ko'rinmaydi. Bu uy ichidagi xona raqamlari kabi — tashqi olam ularni bilmaydi.",
-      "Some address ranges are \"private\" — used only inside a local network (your home or office) and never seen on the internet. It's like room numbers inside a house — the outside world doesn't know them."
-    )),
-    React.createElement("div",{style:{margin:"8px 0 14px"}},
-      [["10.0.0.0 – 10.255.255.255","10.0.0.0/8",t(lang,"Katta tarmoqlar","Large networks")],
-       ["172.16.0.0 – 172.31.255.255","172.16.0.0/12",t(lang,"O'rta tarmoqlar","Medium networks")],
-       ["192.168.0.0 – 192.168.255.255","192.168.0.0/16",t(lang,"Uy/kichik ofis","Home/small office")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"center"}},
-          React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11.5,color:"var(--accent)",flex:1}},x[0]),
-          React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--text-2)"}},x[1]),
-          React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},x[2])))),
-    React.createElement(H2,{num:"§4"},t(lang,"CIDR va subnetting","CIDR and subnetting")),
-    React.createElement(P,null,t(lang,
-      "CIDR yozuvi (masalan /24) manzilning qancha qismi \"tarmoq\", qanchasi \"xost\" ekanini bildiradi. /24 — birinchi 24 bit tarmoq, qolgan 8 bit xostlar uchun (256 ta manzil). Subnetting — katta tarmoqni kichik bo'laklarga bo'lish, xuddi katta binoni qavatlarga bo'lgandek.",
-      "CIDR notation (e.g. /24) tells how much of an address is \"network\" and how much is \"host\". /24 means the first 24 bits are network, the remaining 8 bits are for hosts (256 addresses). Subnetting splits a big network into smaller pieces, like dividing a large building into floors."
-    )),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,"IPv6: "),
-      t(lang,"IPv4 manzillar tugab borgani uchun IPv6 yaratildi — u 128 bitli va deyarli cheksiz manzil beradi (masalan 2001:0db8:85a3::8a2e:0370:7334). Kelajak IPv6 da.",
-        "Because IPv4 addresses are running out, IPv6 was created — it is 128-bit and provides almost unlimited addresses (e.g. 2001:0db8:85a3::8a2e:0370:7334). The future is IPv6.")),
-    React.createElement(Quiz,{
-      q:{uz:"192.168.1.10 manzili qanday manzil hisoblanadi?",en:"What kind of address is 192.168.1.10?"},
-      opts:[{uz:"Ommaviy (public) internet manzili",en:"A public internet address"},{uz:"Xususiy (private) ichki tarmoq manzili",en:"A private internal network address"},{uz:"IPv6 manzili",en:"An IPv6 address"},{uz:"MAC manzili",en:"A MAC address"}],
-      correct:1,
-      exp:{uz:"192.168.0.0/16 diapazoni xususiy — u uy va kichik ofis tarmoqlarida ishlatiladi va to'g'ridan-to'g'ri internetda ko'rinmaydi.",en:"The 192.168.0.0/16 range is private — used in home and small-office networks and not directly visible on the internet."}
-    })
-  );
+    React.createElement(P,null,t(lang,"Ba'zi diapazonlar \"xususiy\" — faqat ichki tarmoqda ishlaydi va internetda ko'rinmaydi (uy ichidagi xona raqamlari kabi).","Some ranges are \"private\" — used only inside a local network and never seen on the internet (like room numbers inside a house).")),
+    ranges.map(function(r,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+r[3]+"44",borderLeft:"3px solid "+r[3],borderRadius:10,animationDelay:(i*0.07)+"s"}},
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:r[3],minWidth:120}},r[0]),
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--text-2)",flex:1}},r[1]),
+      React.createElement("span",{style:{fontSize:11.5,color:"var(--text-1)"}},t(lang,r[2].uz,r[2].en)));}),
+    React.createElement(H2,{num:"§4"},t(lang,"CIDR, subnetting va IPv6","CIDR, subnetting and IPv6")),
+    React.createElement(P,null,t(lang,"CIDR yozuvi (masalan /24) manzilning qancha qismi \"tarmoq\", qanchasi \"xost\" ekanini bildiradi. /24 = birinchi 24 bit tarmoq, qolgan 8 bit xostlar uchun (256 manzil). Subnetting — katta tarmoqni kichik bo'laklarga bo'lish.","CIDR notation (e.g. /24) tells how much of an address is \"network\" vs \"host\". /24 = first 24 bits network, last 8 bits for hosts (256 addresses). Subnetting splits a big network into smaller pieces.")),
+    React.createElement(CompareCols,{
+      left:{title:"IPv4",color:"#4dabf7",rows:[{uz:"32 bit · ~4.3 mlrd manzil",en:"32-bit · ~4.3 billion addresses"},"192.168.1.10",{uz:"Manzillar tugab bormoqda",en:"Addresses are running out"}]},
+      right:{title:"IPv6",color:"#69db7c",rows:[{uz:"128 bit · deyarli cheksiz",en:"128-bit · almost unlimited"},"2001:db8::8a2e:370:7334",{uz:"Kelajak IPv6 da",en:"The future is IPv6"}]}}),
+    React.createElement(Quiz,{q:{uz:"192.168.1.10 qanday manzil?",en:"What kind of address is 192.168.1.10?"},opts:[{uz:"Ommaviy (public)",en:"Public"},{uz:"Xususiy (private) ichki tarmoq",en:"Private internal network"},{uz:"IPv6",en:"IPv6"},{uz:"MAC",en:"MAC"}],correct:1,exp:{uz:"192.168.0.0/16 xususiy diapazon — uy va kichik ofis tarmoqlarida ishlatiladi, internetda to'g'ridan-to'g'ri ko'rinmaydi.",en:"192.168.0.0/16 is private — used in home/small-office networks, not directly visible on the internet."}}));
 }
-
-// ── L04: DNS ──────────────────────────────────────────────────
 function LessonL04(){
   const lang=useLang();
+  const recs=[["A",{uz:"Nomni IPv4 ga bog'laydi",en:"Maps a name to IPv4"}],["AAAA",{uz:"Nomni IPv6 ga bog'laydi",en:"Maps a name to IPv6"}],["MX",{uz:"Pochta serverini ko'rsatadi",en:"Points to the mail server"}],["CNAME",{uz:"Taxallus (alias)",en:"Alias to another name"}],["NS",{uz:"Nom serverlari",en:"Name servers"}],["TXT",{uz:"Matn (SPF, DKIM)",en:"Text (SPF, DKIM)"}]];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"DNS nima?","What is DNS?")),
-    React.createElement(P,null,t(lang,
-      "DNS (Domain Name System) — internetning telefon kitobi. Odamlar nomlarni eslaydi (google.com), lekin kompyuterlar IP manzillar bilan ishlaydi (142.250.187.206). DNS nomni IP manzilga aylantiradi, xuddi telefon kitobida ism bo'yicha raqam topgandek.",
-      "DNS (Domain Name System) is the internet's phone book. People remember names (google.com), but computers work with IP addresses (142.250.187.206). DNS translates a name into an IP address, like looking up a number by a person's name in a phone book."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"DNS qanday ishlaydi","How DNS works")),
-    React.createElement(P,null,t(lang,
-      "Brauzerga google.com yozganingizda, kompyuteringiz bir necha serverdan so'raydi, toki IP manzilni topguncha. Bu jarayon bir necha bosqichdan iborat:",
-      "When you type google.com into a browser, your computer asks several servers until it finds the IP address. This process has several steps:"
-    )),
-    React.createElement(Terminal,null,
-`1. Kompyuter ──► Recursive resolver: "google.com IP si?"
-2. Resolver  ──► Root server:        ".com qayerda?"
-3. Resolver  ──► TLD server (.com):  "google.com qayerda?"
-4. Resolver  ──► Authoritative:      "IP = 142.250.187.206"
-5. Resolver  ──► Kompyuter:          "Mana IP!"
-
-Keyingi safar javob keshdan (cache) tez olinadi`),
+    React.createElement(P,null,t(lang,"DNS — internetning telefon kitobi. Odamlar nomlarni eslaydi (google.com), kompyuterlar esa IP manzillar bilan ishlaydi (142.250.187.206). DNS nomni IP ga aylantiradi.","DNS is the internet's phone book. People remember names (google.com), computers work with IPs (142.250.187.206). DNS translates a name into an IP.")),
+    React.createElement(H2,{num:"§2"},t(lang,"So'rov qanday hal bo'ladi?","How a query is resolved")),
+    React.createElement(P,null,t(lang,"Brauzerga google.com yozsangiz, kompyuter bir necha serverdan so'raydi, IP topilguncha. \"Ishga tushir\":","When you type google.com, your computer asks several servers until it finds the IP. Press Play:")),
+    React.createElement(FlowSteps,{title:{uz:"DNS so'rovi",en:"DNS resolution"},steps:[
+      {icon:"💻",text:{uz:"Kompyuter → Resolver:  \"google.com IP si?\"",en:"Computer → Resolver:  \"IP of google.com?\""}},
+      {icon:"🌍",text:{uz:"Resolver → Root:  \".com qayerda?\"",en:"Resolver → Root:  \"where is .com?\""}},
+      {icon:"🏛",text:{uz:"Resolver → TLD (.com):  \"google.com qayerda?\"",en:"Resolver → TLD (.com):  \"where is google.com?\""}},
+      {icon:"📍",text:{uz:"Resolver → Authoritative:  \"IP = 142.250.187.206\"",en:"Resolver → Authoritative:  \"IP = 142.250.187.206\""}},
+      {icon:"✓",text:{uz:"Resolver → Kompyuter:  IP qaytariladi (keshlanadi)",en:"Resolver → Computer:  IP returned (cached)"}},
+    ]}),
     React.createElement(H2,{num:"§3"},t(lang,"DNS yozuv turlari","DNS record types")),
-    React.createElement("div",{style:{margin:"8px 0 14px"}},
-      [["A",t(lang,"Nomni IPv4 manzilga bog'laydi","Maps a name to an IPv4 address")],
-       ["AAAA",t(lang,"Nomni IPv6 manzilga bog'laydi","Maps a name to an IPv6 address")],
-       ["MX",t(lang,"Pochta serverini ko'rsatadi","Points to the mail server")],
-       ["CNAME",t(lang,"Bir nomni boshqasiga taxallus qiladi","Aliases one name to another")],
-       ["NS",t(lang,"Domenning nom serverlarini bildiradi","Lists the domain's name servers")],
-       ["TXT",t(lang,"Matn (ko'pincha xavfsizlik: SPF, DKIM)","Text (often security: SPF, DKIM)")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"center"}},
-          React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",minWidth:56}},x[0]),
-          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
-    React.createElement(H2,{num:"§4"},t(lang,"DNS ni sinab ko'rish","Trying DNS yourself")),
-    React.createElement(Terminal,null,
-`# Nomni IP ga aylantirish\nnslookup google.com\ndig google.com A\n\n# Pochta serverini ko'rish\ndig google.com MX\n\n# Batafsil so'rov izi\ndig +trace google.com`),
-    React.createElement(Quiz,{
-      q:{uz:"DNS ning asosiy vazifasi nima?",en:"What is the main job of DNS?"},
-      opts:[{uz:"Ma'lumotni shifrlash",en:"Encrypting data"},{uz:"Domen nomini IP manzilga aylantirish",en:"Translating a domain name into an IP address"},{uz:"Paketlarni yo'naltirish",en:"Routing packets"},{uz:"Parollarni saqlash",en:"Storing passwords"}],
-      correct:1,
-      exp:{uz:"DNS internetning telefon kitobi — u odamlar eslaydigan nomlarni (google.com) kompyuterlar ishlatadigan IP manzillarga aylantiradi.",en:"DNS is the internet's phone book — it translates human-friendly names (google.com) into the IP addresses computers use."}
-    })
-  );
+    recs.map(function(r,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.05)+"s"}},
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",minWidth:56}},r[0]),
+      React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,r[1].uz,r[1].en)));}),
+    React.createElement(H2,{num:"§4"},t(lang,"Sinab ko'ring","Try it")),
+    React.createElement(Terminal,null,"nslookup google.com\ndig google.com A\ndig google.com MX\ndig +trace google.com"),
+    React.createElement(Quiz,{q:{uz:"DNS ning asosiy vazifasi nima?",en:"What is the main job of DNS?"},opts:[{uz:"Ma'lumotni shifrlash",en:"Encrypting data"},{uz:"Domen nomini IP ga aylantirish",en:"Translating a domain name into an IP"},{uz:"Paketlarni yo'naltirish",en:"Routing packets"},{uz:"Parol saqlash",en:"Storing passwords"}],correct:1,exp:{uz:"DNS internetning telefon kitobi — nomlarni (google.com) IP manzillarga aylantiradi.",en:"DNS is the internet's phone book — it translates names (google.com) into IP addresses."}}));
 }
-
-// ── L05: HTTP/HTTPS ───────────────────────────────────────────
 function LessonL05(){
   const lang=useLang();
+  const methods=[["GET",{uz:"Ma'lumot olish",en:"Retrieve data"}],["POST",{uz:"Ma'lumot yuborish",en:"Send data"}],["PUT",{uz:"Yangilash",en:"Update"}],["DELETE",{uz:"O'chirish",en:"Delete"}]];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"HTTP nima?","What is HTTP?")),
-    React.createElement(P,null,t(lang,
-      "HTTP (HyperText Transfer Protocol) — brauzer va veb-server o'rtasidagi \"til\". Siz saytga kirganingizda brauzer HTTP so'rov yuboradi (\"menga bu sahifani ber\"), server esa HTTP javob qaytaradi (sahifa mazmuni). Bu restoranda ovqat buyurtma qilib, keyin uni olishga o'xshaydi.",
-      "HTTP (HyperText Transfer Protocol) is the \"language\" between a browser and a web server. When you visit a site, the browser sends an HTTP request (\"give me this page\") and the server returns an HTTP response (the page content). It's like ordering food at a restaurant and then receiving it."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"So'rov metodlari","Request methods")),
-    React.createElement("div",{style:{margin:"8px 0 14px"}},
-      [["GET",t(lang,"Ma'lumot olish (sahifa ochish)","Retrieve data (open a page)")],
-       ["POST",t(lang,"Ma'lumot yuborish (forma to'ldirish)","Send data (submit a form)")],
-       ["PUT",t(lang,"Mavjud narsani yangilash","Update an existing resource")],
-       ["DELETE",t(lang,"Narsani o'chirish","Delete a resource")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"center"}},
-          React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",minWidth:70}},x[0]),
-          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
-    React.createElement(H2,{num:"§3"},t(lang,"Holat kodlari (Status codes)","Status codes")),
-    React.createElement(P,null,t(lang,
-      "Server har javobda uch xonali kod yuboradi — so'rov qanday tugaganini bildiradi:",
-      "The server sends a three-digit code with each response — telling how the request ended:"
-    )),
-    React.createElement(Terminal,null,
-`2xx — Muvaffaqiyat:   200 OK
-3xx — Yo'naltirish:   301 Moved, 302 Found
-4xx — Mijoz xatosi:   404 Not Found, 403 Forbidden
-5xx — Server xatosi:  500 Internal, 503 Unavailable`),
+    React.createElement(P,null,t(lang,"HTTP — brauzer va veb-server o'rtasidagi \"til\". Brauzer so'rov yuboradi (\"bu sahifani ber\"), server javob qaytaradi (sahifa). Restoranda ovqat buyurtma qilib, keyin olishga o'xshaydi.","HTTP is the \"language\" between a browser and a web server. The browser sends a request (\"give me this page\"), the server returns a response (the page). Like ordering food at a restaurant then receiving it.")),
+    React.createElement(H2,{num:"§2"},t(lang,"So'rov–javob tsikli","The request–response cycle")),
+    React.createElement(FlowSteps,{title:{uz:"HTTP so'rov–javob",en:"HTTP request–response"},steps:[
+      {icon:"🌐",text:{uz:"Brauzer → Server:  GET /index.html",en:"Browser → Server:  GET /index.html"}},
+      {icon:"⚙",text:{uz:"Server so'rovni qayta ishlaydi",en:"Server processes the request"}},
+      {icon:"📦",text:{uz:"Server → Brauzer:  200 OK + sahifa",en:"Server → Browser:  200 OK + page"}},
+      {icon:"🖥",text:{uz:"Brauzer sahifani ko'rsatadi",en:"Browser renders the page"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Metodlar va holat kodlari","Methods and status codes")),
+    React.createElement("div",{style:{display:"flex",gap:8,flexWrap:"wrap",margin:"6px 0 12px"}},
+      methods.map(function(m,i){return React.createElement("div",{key:i,className:"na-rise",style:{flex:"1 1 120px",padding:"9px 12px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.05)+"s"}},
+        React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:"var(--accent)",fontSize:12}},m[0]),
+        React.createElement("div",{style:{fontSize:11,color:"var(--text-2)",marginTop:2}},t(lang,m[1].uz,m[1].en)));})),
+    React.createElement(Terminal,null,"2xx OK      — 200 OK\n3xx Redirect — 301, 302\n4xx Client  — 404 Not Found, 403 Forbidden\n5xx Server  — 500, 503"),
     React.createElement(H2,{num:"§4"},t(lang,"HTTP vs HTTPS","HTTP vs HTTPS")),
-    React.createElement(P,null,t(lang,
-      "HTTP ma'lumotni ochiq matn ko'rinishida yuboradi — kim eshitsa, o'qiy oladi (masalan parollaringizni!). HTTPS esa TLS shifrlash qo'shadi — ma'lumot maxfiy konvertga solingandek bo'ladi. Brauzerdagi qulf belgisi HTTPS ishlayotganini bildiradi.",
-      "HTTP sends data as plain text — anyone listening can read it (including your passwords!). HTTPS adds TLS encryption — the data is like being sealed in a private envelope. The padlock icon in the browser means HTTPS is active."
-    )),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"Ochiq WiFi da HTTP saytga parol kiritmang — u shifrlanmagan holda uzatiladi va oson ushlanadi. Doim HTTPS (qulf belgisi) borligini tekshiring.",
-        "Never enter a password on an HTTP site over public WiFi — it travels unencrypted and is easily captured. Always check for HTTPS (the padlock icon).")),
-    React.createElement(Quiz,{
-      q:{uz:"HTTPS ni HTTP dan farqlovchi asosiy narsa nima?",en:"What mainly sets HTTPS apart from HTTP?"},
-      opts:[{uz:"U tezroq",en:"It is faster"},{uz:"U TLS bilan ma'lumotni shifrlaydi",en:"It encrypts data with TLS"},{uz:"U rasmlarni yaxshiroq ko'rsatadi",en:"It shows images better"},{uz:"U faqat mobil qurilmalarda ishlaydi",en:"It only works on mobile"}],
-      correct:1,
-      exp:{uz:"HTTPS = HTTP + TLS shifrlash. Ma'lumot maxfiy konvertga solingandek — yo'lda kim eshitsa ham o'qiy olmaydi.",en:"HTTPS = HTTP + TLS encryption. Data is sealed like a private envelope — anyone listening in transit can't read it."}
-    })
-  );
+    React.createElement(CompareCols,{
+      left:{title:"HTTP",color:"#ff6b6b",rows:[{uz:"✗ Ochiq matn",en:"✗ Plain text"},{uz:"✗ Kim eshitsa o'qiydi",en:"✗ Anyone can read it"},{uz:"Parollar xavf ostida",en:"Passwords at risk"}]},
+      right:{title:"HTTPS",color:"#69db7c",rows:[{uz:"✓ TLS bilan shifrlangan",en:"✓ Encrypted with TLS"},{uz:"✓ Qulf belgisi 🔒",en:"✓ Padlock icon 🔒"},{uz:"Maxfiy konvert kabi",en:"Like a sealed envelope"}]}}),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Ochiq WiFi da HTTP saytga parol kiritmang — u shifrlanmagan uzatiladi. Doim HTTPS (🔒) borligini tekshiring.","Never enter a password on an HTTP site over public WiFi — it travels unencrypted. Always check for HTTPS (🔒).")),
+    React.createElement(Quiz,{q:{uz:"HTTPS ni HTTP dan farqlovchi asosiy narsa nima?",en:"What mainly sets HTTPS apart from HTTP?"},opts:[{uz:"Tezroq",en:"Faster"},{uz:"TLS bilan shifrlaydi",en:"Encrypts with TLS"},{uz:"Rasmlarni yaxshi ko'rsatadi",en:"Shows images better"},{uz:"Faqat mobil",en:"Mobile only"}],correct:1,exp:{uz:"HTTPS = HTTP + TLS shifrlash — yo'lda kim eshitsa ham mazmunni o'qiy olmaydi.",en:"HTTPS = HTTP + TLS encryption — anyone listening in transit can't read the content."}}));
 }
-
-// ── L06: ARP ──────────────────────────────────────────────────
 function LessonL06(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"ARP nima?","What is ARP?")),
-    React.createElement(P,null,t(lang,
-      "ARP (Address Resolution Protocol) IP manzilni fizik MAC manzilga bog'laydi. IP manzil — mantiqiy \"uy manzili\", MAC manzil esa qurilmaning ishlab chiqarishda berilgan doimiy \"pasport raqami\". Lokal tarmoqda ma'lumot yetkazish uchun MAC manzil kerak, ARP esa uni topadi.",
-      "ARP (Address Resolution Protocol) links an IP address to a physical MAC address. An IP address is a logical \"home address\", while a MAC address is the device's permanent \"passport number\" set at manufacture. To deliver data on a local network you need the MAC address, and ARP finds it."
-    )),
+    React.createElement(P,null,t(lang,"ARP IP manzilni fizik MAC manzilga bog'laydi. IP — mantiqiy \"uy manzili\", MAC — qurilmaning doimiy \"pasport raqami\". Lokal tarmoqda yetkazish uchun MAC kerak, ARP uni topadi.","ARP links an IP address to a physical MAC address. IP is the logical \"home address\", MAC is the device's permanent \"passport number\". Local delivery needs the MAC, and ARP finds it.")),
     React.createElement(H2,{num:"§2"},t(lang,"ARP qanday ishlaydi","How ARP works")),
-    React.createElement(P,null,t(lang,
-      "Qurilma boshqasiga xabar yubormoqchi bo'lsa-yu, faqat IP sini bilsa, u butun tarmoqqa baqiradi: \"192.168.1.5 kimda? MAC ingni ber!\" — egasi javob beradi. Bu bir xonada \"Aziz kim?\" deb baqirib, Aziz qo'l ko'targanidek:",
-      "When a device wants to message another but only knows its IP, it shouts to the whole network: \"Who has 192.168.1.5? Send me your MAC!\" — the owner replies. It's like shouting \"Who is Aziz?\" in a room and Aziz raising his hand:"
-    )),
-    React.createElement(Terminal,null,
-`Kompyuter A (192.168.1.2)          Butun tarmoq
-  │                                     │
-  │ ── ARP so'rov (broadcast) ────────► │ "192.168.1.5 kimda?"
-  │                                     │
-  │ ◄── ARP javob (unicast) ─────────── │ B: "Bu men! MAC=aa:bb:cc..."
-  │                                     │
-  Endi A, B ga to'g'ridan yubora oladi`),
+    React.createElement(P,null,t(lang,"Qurilma faqat IP ni bilsa, butun tarmoqqa baqiradi: \"192.168.1.5 kimda?\" — egasi javob beradi. Bir xonada \"Aziz kim?\" deb baqirib, Aziz qo'l ko'targandek. \"Ishga tushir\":","If a device only knows the IP, it shouts to the whole network: \"who has 192.168.1.5?\" — the owner replies. Like shouting \"who is Aziz?\" and Aziz raising his hand. Press Play:")),
+    React.createElement(FlowSteps,{title:{uz:"ARP so'rov–javob",en:"ARP request–reply"},steps:[
+      {icon:"📢",text:{uz:"A → HAMMA (broadcast):  \"192.168.1.5 kimda? MAC ingni ber\"",en:"A → EVERYONE (broadcast):  \"who has 192.168.1.5? send your MAC\""}},
+      {icon:"🙋",text:{uz:"B → A (unicast):  \"Bu men! MAC = aa:bb:cc:dd:ee:ff\"",en:"B → A (unicast):  \"That's me! MAC = aa:bb:cc:dd:ee:ff\""}},
+      {icon:"🧠",text:{uz:"A ARP jadvaliga IP↔MAC ni eslab qoladi",en:"A caches IP↔MAC in its ARP table"}},
+      {icon:"✓",text:{uz:"Endi A to'g'ridan-to'g'ri B ga yuboradi",en:"Now A sends directly to B"}},
+    ]}),
+    React.createElement(PacketFlow,{from:{uz:"A · 192.168.1.2",en:"A · 192.168.1.2"},to:{uz:"B · 192.168.1.5",en:"B · 192.168.1.5"},label:"ARP"}),
     React.createElement(H2,{num:"§3"},t(lang,"ARP jadvalini ko'rish","Viewing the ARP table")),
-    React.createElement(Terminal,null,
-`# Kompyuter eslab qolgan IP↔MAC juftliklari\narp -a\n\n# Natija:\n# 192.168.1.1   00:11:22:33:44:55   dynamic\n# 192.168.1.5   aa:bb:cc:dd:ee:ff   dynamic`),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"ARP ishonchga asoslanadi — u javob haqiqiy ekanini tekshirmaydi. Shu sababli \"ARP spoofing\" hujumi mumkin (L24 da o'rganamiz), unda hujumchi soxta javob yuborib trafikni o'g'irlaydi.",
-        "ARP is trust-based — it doesn't verify that a reply is genuine. This makes \"ARP spoofing\" attacks possible (covered in L24), where an attacker sends a fake reply to steal traffic.")),
-    React.createElement(Quiz,{
-      q:{uz:"ARP nimani nimaga bog'laydi?",en:"What does ARP link to what?"},
-      opts:[{uz:"Domen nomini IP ga",en:"A domain name to an IP"},{uz:"IP manzilni MAC manzilga",en:"An IP address to a MAC address"},{uz:"Portni protokolga",en:"A port to a protocol"},{uz:"Parolni foydalanuvchiga",en:"A password to a user"}],
-      correct:1,
-      exp:{uz:"ARP mantiqiy IP manzilni fizik MAC manzilga bog'laydi — lokal tarmoqda ma'lumotni to'g'ri qurilmaga yetkazish uchun.",en:"ARP links a logical IP address to a physical MAC address — so data reaches the right device on the local network."}
-    })
-  );
+    React.createElement(Terminal,null,"arp -a\n# 192.168.1.1   00:11:22:33:44:55   dynamic\n# 192.168.1.5   aa:bb:cc:dd:ee:ff   dynamic"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"ARP javobni tekshirmaydi — shu sababli \"ARP spoofing\" hujumi mumkin (L24). Hujumchi soxta javob yuborib trafikni o'g'irlaydi.","ARP doesn't verify replies — enabling \"ARP spoofing\" attacks (L24). An attacker sends a fake reply to steal traffic.")),
+    React.createElement(Quiz,{q:{uz:"ARP nimani nimaga bog'laydi?",en:"What does ARP link to what?"},opts:[{uz:"Domen nomini IP ga",en:"A domain name to an IP"},{uz:"IP manzilni MAC ga",en:"An IP address to a MAC"},{uz:"Portni protokolga",en:"A port to a protocol"},{uz:"Parolni foydalanuvchiga",en:"A password to a user"}],correct:1,exp:{uz:"ARP mantiqiy IP manzilni fizik MAC manzilga bog'laydi.",en:"ARP links a logical IP address to a physical MAC address."}}));
 }
-
-// ── L07: DHCP ─────────────────────────────────────────────────
 function LessonL07(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"DHCP nima?","What is DHCP?")),
-    React.createElement(P,null,t(lang,
-      "DHCP (Dynamic Host Configuration Protocol) qurilmalarga IP manzilni avtomatik beradi. Usiz har bir telefon, noutbuk uchun IP ni qo'lda kiritishga to'g'ri kelardi. DHCP — bu mehmonxona qabulxonasi kabi: kelasiz, u sizga xona (IP) va yo'l-yo'riq (gateway, DNS) beradi.",
-      "DHCP (Dynamic Host Configuration Protocol) automatically hands devices an IP address. Without it you'd have to type an IP by hand for every phone and laptop. DHCP is like a hotel front desk: you arrive, and it gives you a room (IP) and directions (gateway, DNS)."
-    )),
+    React.createElement(P,null,t(lang,"DHCP qurilmalarga IP manzilni avtomatik beradi. Usiz har bir qurilma uchun IP ni qo'lda kiritishga to'g'ri kelardi. DHCP — mehmonxona qabulxonasi kabi: kelasiz, u sizga xona (IP) va yo'l-yo'riq (gateway, DNS) beradi.","DHCP hands devices an IP automatically. Without it you'd type an IP by hand for every device. DHCP is like a hotel front desk: you arrive and it gives you a room (IP) and directions (gateway, DNS).")),
     React.createElement(H2,{num:"§2"},t(lang,"DORA jarayoni","The DORA process")),
-    React.createElement(P,null,t(lang,
-      "Qurilma tarmoqqa ulanganda 4 bosqichli \"DORA\" suhbati kechadi:",
-      "When a device joins a network, a 4-step \"DORA\" conversation happens:"
-    )),
-    React.createElement(Terminal,null,
-`D — Discover:  Qurilma "Menga IP kerak!" deb baqiradi
-O — Offer:     DHCP server "Mana, 192.168.1.50 ni ol"
-R — Request:   Qurilma "Roziman, shuni olaman"
-A — Acknowledge: Server "Kelishdik, u sizniki (24 soat)"
-
-Discover → Offer → Request → Acknowledge`),
-    React.createElement(H2,{num:"§3"},t(lang,"Ijara (lease) tushunchasi","The lease concept")),
-    React.createElement(P,null,t(lang,
-      "DHCP bergan IP abadiy emas — u \"ijaraga\" (lease) beriladi, masalan 24 soatga. Muddat tugashidan oldin qurilma uni yangilaydi. Bu manzillarni tejaydi — ketgan mehmonning xonasi bo'shab, boshqasiga beriladi.",
-      "The IP DHCP gives isn't forever — it's a \"lease\", say 24 hours. Before it expires the device renews it. This saves addresses — a departed guest's room frees up for someone else."
-    )),
-    React.createElement(Terminal,null,
-`# Linux da yangi IP so'rash\nsudo dhclient -r    # eskisini qaytarish\nsudo dhclient       # yangisini olish\n\n# Windows da\nipconfig /release\nipconfig /renew`),
-    React.createElement(Quiz,{
-      q:{uz:"DHCP DORA jarayonining to'g'ri tartibi qanday?",en:"What is the correct order of the DHCP DORA process?"},
-      opts:[{uz:"Discover → Offer → Request → Acknowledge",en:"Discover → Offer → Request → Acknowledge"},{uz:"Offer → Discover → Acknowledge → Request",en:"Offer → Discover → Acknowledge → Request"},{uz:"Request → Discover → Offer → Acknowledge",en:"Request → Discover → Offer → Acknowledge"},{uz:"Acknowledge → Request → Offer → Discover",en:"Acknowledge → Request → Offer → Discover"}],
-      correct:0,
-      exp:{uz:"DORA: qurilma Discover bilan so'raydi, server Offer beradi, qurilma Request bilan tasdiqlaydi, server Acknowledge bilan yakunlaydi.",en:"DORA: the device asks with Discover, the server Offers, the device confirms with Request, the server finalizes with Acknowledge."}
-    })
-  );
+    React.createElement(P,null,t(lang,"Qurilma tarmoqqa ulanganda 4 bosqichli \"DORA\" suhbati kechadi. \"Ishga tushir\":","When a device joins, a 4-step \"DORA\" exchange happens. Press Play:")),
+    React.createElement(FlowSteps,{title:{uz:"DHCP · DORA",en:"DHCP · DORA"},steps:[
+      {icon:"D",text:{uz:"Discover:  qurilma \"menga IP kerak!\" deb baqiradi",en:"Discover:  device shouts \"I need an IP!\""}},
+      {icon:"O",text:{uz:"Offer:  DHCP server \"mana, 192.168.1.50\"",en:"Offer:  DHCP server \"here, 192.168.1.50\""}},
+      {icon:"R",text:{uz:"Request:  qurilma \"roziman, shuni olaman\"",en:"Request:  device \"agreed, I'll take it\""}},
+      {icon:"A",text:{uz:"Acknowledge:  server \"kelishdik, u sizniki (24 soat)\"",en:"Acknowledge:  server \"done, it's yours (24h)\""}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Ijara (lease)","The lease")),
+    React.createElement(P,null,t(lang,"Berilgan IP abadiy emas — u \"ijaraga\" beriladi (masalan 24 soat). Muddat tugashidan oldin qurilma uni yangilaydi — bu manzillarni tejaydi.","The IP isn't forever — it's a \"lease\" (e.g. 24h). The device renews it before it expires — saving addresses.")),
+    React.createElement(Terminal,null,"# Linux\nsudo dhclient -r   # eskisini qaytarish\nsudo dhclient      # yangisini olish\n# Windows\nipconfig /release\nipconfig /renew"),
+    React.createElement(Quiz,{q:{uz:"DHCP DORA jarayonining to'g'ri tartibi?",en:"Correct order of the DHCP DORA process?"},opts:[{uz:"Discover → Offer → Request → Acknowledge",en:"Discover → Offer → Request → Acknowledge"},{uz:"Offer → Discover → Acknowledge → Request",en:"Offer → Discover → Acknowledge → Request"},{uz:"Request → Discover → Offer → Acknowledge",en:"Request → Discover → Offer → Acknowledge"},{uz:"Acknowledge → Request → Offer → Discover",en:"Acknowledge → Request → Offer → Discover"}],correct:0,exp:{uz:"DORA: Discover (so'rov) → Offer (taklif) → Request (tasdiq) → Acknowledge (yakun).",en:"DORA: Discover → Offer → Request → Acknowledge."}}));
 }
-
-// ── L08: Routing ──────────────────────────────────────────────
 function LessonL08(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Routing nima?","What is routing?")),
-    React.createElement(P,null,t(lang,
-      "Routing — paketlarni bir tarmoqdan boshqasiga yo'naltirish jarayoni. Router — tarmoqlararo \"chorraha politsiyachisi\": har bir paketning manzilini ko'rib, uni to'g'ri yo'nalishga jo'natadi. Internet — millionlab routerlar orqali bog'langan tarmoqlar to'ri.",
-      "Routing is the process of directing packets from one network to another. A router is the \"traffic officer\" between networks: it reads each packet's destination and sends it down the right path. The internet is a web of networks connected by millions of routers."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Marshrutlash jadvali","The routing table")),
-    React.createElement(P,null,t(lang,
-      "Har bir router \"jadval\" saqlaydi — qaysi manzilga qaysi yo'l orqali borishni ko'rsatadi. Bu navigatordagi yo'l xaritasiga o'xshaydi. Agar aniq yo'l bo'lmasa, paket \"default gateway\" (asosiy chiqish) ga yuboriladi.",
-      "Every router keeps a \"table\" — showing which path leads to which destination. It's like the road map in a GPS. If there's no specific route, the packet is sent to the \"default gateway\" (the main exit)."
-    )),
-    React.createElement(Terminal,null,
-`# Marshrutlash jadvalini ko'rish\nip route\n\n# Natija:\n# default via 192.168.1.1 dev eth0   ← asosiy chiqish\n# 192.168.1.0/24 dev eth0            ← lokal tarmoq\n\n# Paket qaysi yo'ldan ketishini kuzatish\ntraceroute google.com`),
-    React.createElement(H2,{num:"§3"},t(lang,"Statik va dinamik marshrutlash","Static vs dynamic routing")),
-    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"12px 0"}},
-      React.createElement("div",{style:{padding:14,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:12.5,color:"var(--accent)",marginBottom:6}},t(lang,"Statik","Static")),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.6}},t(lang,"Administrator yo'llarni qo'lda kiritadi. Kichik tarmoqlar uchun sodda, lekin o'zgarishga moslashmaydi.","An admin enters routes by hand. Simple for small networks, but doesn't adapt to change."))),
-      React.createElement("div",{style:{padding:14,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:12.5,color:"var(--accent)",marginBottom:6}},t(lang,"Dinamik","Dynamic")),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.6}},t(lang,"Routerlar o'zaro gaplashib yo'llarni avtomatik o'rganadi (OSPF, BGP). Katta tarmoqlar uchun.","Routers talk to each other and learn routes automatically (OSPF, BGP). For large networks.")))),
-    React.createElement(Quiz,{
-      q:{uz:"Agar routerda paket manzili uchun aniq yo'l bo'lmasa, paket qayerga yuboriladi?",en:"If a router has no specific route for a packet's destination, where is the packet sent?"},
-      opts:[{uz:"O'chiriladi",en:"It is dropped immediately"},{uz:"Default gateway ga",en:"To the default gateway"},{uz:"Orqaga qaytariladi",en:"Back to the sender"},{uz:"DNS serverga",en:"To the DNS server"}],
-      correct:1,
-      exp:{uz:"Aniq yo'l bo'lmasa, paket \"default gateway\" (asosiy chiqish) ga yuboriladi — bu tarmoqning tashqi olamga eshigi.",en:"With no specific route, the packet goes to the \"default gateway\" (the main exit) — the network's door to the outside world."}
-    })
-  );
+    React.createElement(P,null,t(lang,"Routing — paketlarni bir tarmoqdan boshqasiga yo'naltirish. Router — tarmoqlararo \"chorraha politsiyachisi\": har paketning manzilini ko'rib, to'g'ri yo'nalishga jo'natadi. Internet — millionlab routerlar orqali bog'langan tarmoqlar to'ri.","Routing directs packets from one network to another. A router is the \"traffic officer\" between networks: it reads each packet's destination and sends it the right way. The internet is a web of networks joined by millions of routers.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Paket qanday sayohat qiladi","How a packet travels")),
+    React.createElement(P,null,t(lang,"Paket manzilга yetguncha bir necha router (hop) dan o'tadi. \"Ishga tushir\":","A packet passes through several routers (hops) to reach its destination. Press Play:")),
+    React.createElement(FlowSteps,{title:{uz:"Paket yo'li (hops)",en:"Packet path (hops)"},steps:[
+      {icon:"💻",text:{uz:"Kompyuter → default gateway (uy routeri)",en:"Computer → default gateway (home router)"}},
+      {icon:"🌐",text:{uz:"ISP routeri → magistral routerlar",en:"ISP router → backbone routers"}},
+      {icon:"🔀",text:{uz:"Har router jadvaldan keyingi hop ni tanlaydi",en:"Each router picks the next hop from its table"}},
+      {icon:"🎯",text:{uz:"Oxirgi router → manzil server",en:"Final router → destination server"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Marshrutlash jadvali","The routing table")),
+    React.createElement(Terminal,null,"ip route\n# default via 192.168.1.1 dev eth0   ← asosiy chiqish\n# 192.168.1.0/24 dev eth0            ← lokal tarmoq\ntraceroute google.com"),
+    React.createElement(P,null,t(lang,"Agar aniq yo'l bo'lmasa, paket \"default gateway\" ga yuboriladi — tarmoqning tashqi olamga eshigi.","With no specific route, the packet goes to the \"default gateway\" — the network's door to the outside world.")),
+    React.createElement(CompareCols,{
+      left:{title:{uz:"Statik",en:"Static"},color:"#4dabf7",rows:[{uz:"Administrator qo'lda kiritadi",en:"Admin enters routes by hand"},{uz:"Kichik tarmoqlar uchun",en:"For small networks"},{uz:"O'zgarishga moslashmaydi",en:"Doesn't adapt to change"}]},
+      right:{title:{uz:"Dinamik",en:"Dynamic"},color:"#69db7c",rows:[{uz:"Routerlar avtomatik o'rganadi",en:"Routers learn automatically"},"OSPF · BGP",{uz:"Katta tarmoqlar uchun",en:"For large networks"}]}}),
+    React.createElement(Quiz,{q:{uz:"Router aniq yo'l topmasa, paketni qayerga yuboradi?",en:"With no specific route, where does a router send the packet?"},opts:[{uz:"O'chiradi",en:"Drops it"},{uz:"Default gateway ga",en:"To the default gateway"},{uz:"Orqaga qaytaradi",en:"Back to sender"},{uz:"DNS ga",en:"To DNS"}],correct:1,exp:{uz:"Aniq yo'l bo'lmasa, paket default gateway (asosiy chiqish) ga yuboriladi.",en:"With no specific route, the packet goes to the default gateway (main exit)."}}));
 }
-
-// ── L09: Switching & VLAN ─────────────────────────────────────
 function LessonL09(){
   const lang=useLang();
+  const vlans=[["VLAN 10",{uz:"Buxgalteriya",en:"Accounting"},"10.0.10.0/24","#ff6b6b"],["VLAN 20",{uz:"IT bo'limi",en:"IT dept"},"10.0.20.0/24","#4dabf7"],["VLAN 30",{uz:"Mehmonlar",en:"Guests"},"10.0.30.0/24","#69db7c"]];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Switch nima?","What is a switch?")),
-    React.createElement(P,null,t(lang,
-      "Switch (kommutator) — lokal tarmoqdagi qurilmalarni bog'lovchi \"aqlli tarqatgich\". U MAC manzillar jadvalini saqlaydi va ma'lumotni faqat kerakli qurilmaga yuboradi. Eski \"hub\" esa ma'lumotni hammaga yuborardi — xuddi butun sinfga baqirgandek. Switch esa aniq odamga pichirlaydi.",
-      "A switch is the \"smart distributor\" that connects devices on a local network. It keeps a MAC address table and sends data only to the right device. An old \"hub\" sent data to everyone — like shouting to the whole class. A switch whispers to the exact person."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"MAC jadvali","The MAC table")),
-    React.createElement(P,null,t(lang,
-      "Switch har bir portga qaysi qurilma ulanganini o'rganadi va eslab qoladi. Paket kelganda, u manzil MAC ini jadvaldan topib, faqat o'sha portga jo'natadi — bu tarmoqni tez va xavfsizroq qiladi.",
-      "A switch learns and remembers which device is connected to each port. When a packet arrives, it looks up the destination MAC in the table and forwards only to that port — making the network faster and more secure."
-    )),
-    React.createElement(H2,{num:"§3"},t(lang,"VLAN nima?","What is a VLAN?")),
-    React.createElement(P,null,t(lang,
-      "VLAN (Virtual LAN) bitta fizik switchni bir necha mantiqiy tarmoqqa bo'ladi. Bu bitta katta ofisni devorlar bilan alohida xonalarga bo'lgandek — bir switchga ulangan bo'lsa ham, buxgalteriya va IT bo'limi bir-birini ko'rmaydi. Bu xavfsizlik va tartib beradi.",
-      "A VLAN (Virtual LAN) splits one physical switch into several logical networks. It's like dividing one big office into separate rooms with walls — even connected to the same switch, the accounting and IT departments can't see each other. This gives security and order."
-    )),
-    React.createElement(Terminal,null,
-`Fizik switch (1 dona)
-├── VLAN 10  →  Buxgalteriya  (10.0.10.0/24)
-├── VLAN 20  →  IT bo'limi     (10.0.20.0/24)
-└── VLAN 30  →  Mehmonlar      (10.0.30.0/24)
-
-Har bir VLAN alohida tarmoq kabi ishlaydi`),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,"Trunk: "),
-      t(lang,"VLAN lar o'rtasida yoki switchlar orasida trafikni tashiydigan maxsus port \"trunk\" deyiladi — u bir necha VLAN ma'lumotini teglar (802.1Q) bilan belgilab tashiydi.",
-        "A special port that carries traffic between VLANs or between switches is called a \"trunk\" — it carries several VLANs' data, tagging each (802.1Q).")),
-    React.createElement(Quiz,{
-      q:{uz:"VLAN nima uchun ishlatiladi?",en:"What is a VLAN used for?"},
-      opts:[{uz:"Internet tezligini oshirish",en:"Boosting internet speed"},{uz:"Bitta switchni mantiqan alohida tarmoqlarga bo'lish",en:"Logically splitting one switch into separate networks"},{uz:"Parollarni saqlash",en:"Storing passwords"},{uz:"IP manzil berish",en:"Handing out IP addresses"}],
-      correct:1,
-      exp:{uz:"VLAN bitta fizik switchni bir necha mantiqiy tarmoqqa bo'ladi — bo'limlarni ajratib, xavfsizlik va tartib beradi.",en:"A VLAN splits one physical switch into several logical networks — separating departments for security and order."}
-    })
-  );
+    React.createElement(P,null,t(lang,"Switch — lokal tarmoqdagi qurilmalarni bog'lovchi \"aqlli tarqatgich\". U MAC jadvalini saqlaydi va ma'lumotni faqat kerakli qurilmaga yuboradi. Eski \"hub\" hammaga yuborardi (butun sinfga baqirgandek); switch aniq odamga pichirlaydi.","A switch is the \"smart distributor\" connecting devices on a LAN. It keeps a MAC table and sends data only to the right device. An old \"hub\" sent to everyone (shouting to the class); a switch whispers to the exact person.")),
+    React.createElement(NodeMap,{label:{uz:"Yulduz (star): hamma switchga ulanadi",en:"Star: everyone connects to the switch"},nodes:[[140,80,"SW"],[140,25],[205,50],[205,110],[140,135],[75,110],[75,50]],links:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6]]}),
+    React.createElement(H2,{num:"§2"},t(lang,"VLAN nima?","What is a VLAN?")),
+    React.createElement(P,null,t(lang,"VLAN bitta fizik switchni bir necha mantiqiy tarmoqqa bo'ladi — katta ofisni devorlar bilan alohida xonalarga bo'lgandek. Bir switchга ulangan bo'lsa ham, bo'limlar bir-birini ko'rmaydi.","A VLAN splits one physical switch into several logical networks — like dividing an office into separate rooms with walls. Even on the same switch, departments can't see each other.")),
+    vlans.map(function(v,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+v[3]+"44",borderLeft:"3px solid "+v[3],borderRadius:10,animationDelay:(i*0.07)+"s"}},
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:v[3],fontSize:12,minWidth:70}},v[0]),
+      React.createElement("span",{style:{flex:1,fontSize:12.5,color:"var(--text-0)"}},t(lang,v[1].uz,v[1].en)),
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--text-2)"}},v[2]));}),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,"Trunk: "),t(lang,"VLAN lar orasida trafikni tashiydigan maxsus port \"trunk\" deyiladi — u bir necha VLAN ni teglar (802.1Q) bilan tashiydi.","A special port carrying traffic between VLANs is a \"trunk\" — it carries several VLANs, tagging each (802.1Q).")),
+    React.createElement(Quiz,{q:{uz:"VLAN nima uchun ishlatiladi?",en:"What is a VLAN used for?"},opts:[{uz:"Internet tezligini oshirish",en:"Boosting internet speed"},{uz:"Bitta switchni mantiqan alohida tarmoqlarga bo'lish",en:"Logically splitting one switch into separate networks"},{uz:"Parol saqlash",en:"Storing passwords"},{uz:"IP berish",en:"Handing out IPs"}],correct:1,exp:{uz:"VLAN bitta fizik switchni bir necha mantiqiy tarmoqqa bo'ladi — bo'limlarni ajratib xavfsizlik beradi.",en:"A VLAN splits one physical switch into several logical networks — separating departments for security."}}));
 }
-
-// ── L10: NAT/PAT ──────────────────────────────────────────────
 function LessonL10(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"NAT nima?","What is NAT?")),
-    React.createElement(P,null,t(lang,
-      "NAT (Network Address Translation) ko'plab xususiy IP manzillarni bitta ommaviy IP manzilga aylantiradi. Uyingizdagi barcha qurilmalar (telefon, TV, noutbuk) internetga bitta ommaviy IP orqali chiqadi. Bu ofis kommutatori kabi — tashqaridan bitta raqam ko'rinadi, ichkarida esa ko'p ichki raqamlar bor.",
-      "NAT (Network Address Translation) turns many private IP addresses into one public IP address. All the devices in your home (phone, TV, laptop) reach the internet through a single public IP. It's like an office switchboard — outside there's one number, inside there are many extensions."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Nega NAT kerak?","Why do we need NAT?")),
-    React.createElement(P,null,t(lang,
-      "IPv4 manzillar kam (~4.3 mlrd), qurilmalar esa milliardlab. NAT bitta ommaviy IP ni ko'p qurilma bilan ulashishga imkon beradi — manzillarni tejaydi. Bundan tashqari, ichki qurilmalar internetdan to'g'ridan-to'g'ri ko'rinmaydi — bu qo'shimcha xavfsizlik.",
-      "IPv4 addresses are scarce (~4.3 billion), but devices number in the billions. NAT lets one public IP be shared by many devices — saving addresses. It also hides internal devices from being directly visible on the internet — extra security."
-    )),
+    React.createElement(P,null,t(lang,"NAT ko'plab xususiy IP ni bitta ommaviy IP ga aylantiradi. Uydagi barcha qurilma internetga bitta ommaviy IP orqali chiqadi — ofis kommutatori kabi: tashqaridan bitta raqam, ichkarida ko'p ichki raqam.","NAT turns many private IPs into one public IP. All your home devices reach the internet through a single public IP — like an office switchboard: one number outside, many extensions inside.")),
+    React.createElement(PacketFlow,{from:{uz:"Uy qurilmalari",en:"Home devices"},to:{uz:"Internet",en:"Internet"},label:{uz:"NAT (bitta ommaviy IP)",en:"NAT (one public IP)"}}),
+    React.createElement(H2,{num:"§2"},t(lang,"Nega NAT kerak?","Why NAT?")),
+    React.createElement(P,null,t(lang,"IPv4 manzillar kam (~4.3 mlrd), qurilmalar milliardlab. NAT bitta ommaviy IP ni ko'p qurilma bilan ulashadi — manzillarni tejaydi. Ichki qurilmalar internetdan to'g'ridan-to'g'ri ko'rinmaydi — qo'shimcha xavfsizlik.","IPv4 addresses are scarce (~4.3B), devices number in the billions. NAT shares one public IP among many devices — saving addresses. Internal devices aren't directly visible — extra security.")),
     React.createElement(H2,{num:"§3"},t(lang,"PAT — portlar bilan","PAT — using ports")),
-    React.createElement(P,null,t(lang,
-      "PAT (Port Address Translation) — NAT ning eng keng tarqalgan turi. Router har bir ichki ulanishga alohida port raqami beradi, shunda qaysi javob qaysi qurilmaga tegishli ekanini biladi. Bu pochta bo'limi har bir kishiga alohida qutича raqami bergandek.",
-      "PAT (Port Address Translation) is the most common form of NAT. The router assigns each internal connection a unique port number, so it knows which reply belongs to which device. It's like a post office giving each person a separate box number."
-    )),
-    React.createElement(Terminal,null,
-`Ichki qurilma        Router NAT jadvali         Internet
-192.168.1.5:52001 ──► 203.0.113.7:40001 ──────► server
-192.168.1.6:49500 ──► 203.0.113.7:40002 ──────► server
-
-Bitta ommaviy IP (203.0.113.7), ko'p port`),
-    React.createElement(Quiz,{
-      q:{uz:"NAT ning asosiy foydasi nima?",en:"What is the main benefit of NAT?"},
-      opts:[{uz:"Ma'lumotni shifrlaydi",en:"It encrypts data"},{uz:"Ko'p qurilmaga bitta ommaviy IP ni ulashadi",en:"It shares one public IP among many devices"},{uz:"DNS ni tezlashtiradi",en:"It speeds up DNS"},{uz:"Parollarni tekshiradi",en:"It checks passwords"}],
-      correct:1,
-      exp:{uz:"NAT ko'plab xususiy manzilni bitta ommaviy IP ga aylantiradi — kam IPv4 manzilni tejaydi va ichki qurilmalarni yashiradi.",en:"NAT maps many private addresses to one public IP — saving scarce IPv4 addresses and hiding internal devices."}
-    })
-  );
+    React.createElement(P,null,t(lang,"PAT — NAT ning eng keng tarqalgan turi. Router har ichki ulanishga alohida port beradi, shunda qaysi javob qaysi qurilmaga tegishli ekanini biladi (har kishiga alohida quti raqami bergandek).","PAT is the most common NAT. The router gives each internal connection a unique port, so it knows which reply belongs to which device (like giving each person a box number).")),
+    React.createElement(Terminal,null,"192.168.1.5:52001 → 203.0.113.7:40001 → server\n192.168.1.6:49500 → 203.0.113.7:40002 → server\n# bitta ommaviy IP (203.0.113.7), ko'p port"),
+    React.createElement(Quiz,{q:{uz:"NAT ning asosiy foydasi nima?",en:"What is the main benefit of NAT?"},opts:[{uz:"Ma'lumotni shifrlaydi",en:"Encrypts data"},{uz:"Ko'p qurilmaga bitta ommaviy IP ni ulashadi",en:"Shares one public IP among many devices"},{uz:"DNS ni tezlashtiradi",en:"Speeds up DNS"},{uz:"Parolni tekshiradi",en:"Checks passwords"}],correct:1,exp:{uz:"NAT ko'plab xususiy manzilni bitta ommaviy IP ga aylantiradi — kam IPv4 ni tejaydi va ichki qurilmalarni yashiradi.",en:"NAT maps many private addresses to one public IP — saving scarce IPv4 and hiding internal devices."}}));
 }
-
-// ── L11: Network Topologies ───────────────────────────────────
 function LessonL11(){
   const lang=useLang();
-  const topos=[
-    {n:t(lang,"Bus (shina)","Bus"),d:t(lang,"Hamma bitta umumiy kabelga ulanadi. Arzon, lekin kabel uzilsa hamma to'xtaydi.","Everyone connects to one shared cable. Cheap, but if the cable breaks everyone stops."),c:"#ff6b6b"},
-    {n:t(lang,"Star (yulduz)","Star"),d:t(lang,"Hamma markaziy switchga ulanadi. Eng keng tarqalgan. Bitta qurilma uzilsa boshqalar ishlayveradi.","Everyone connects to a central switch. Most common. If one device fails, others keep working."),c:"#69db7c"},
-    {n:t(lang,"Ring (halqa)","Ring"),d:t(lang,"Qurilmalar halqa bo'lib ulanadi, ma'lumot aylanadi. Bir uzilish butun halqani buzishi mumkin.","Devices connect in a loop, data circulates. One break can disrupt the whole ring."),c:"#ffd43b"},
-    {n:t(lang,"Mesh (to'r)","Mesh"),d:t(lang,"Har bir qurilma ko'plariga ulanadi. Juda ishonchli (ko'p yo'l), lekin qimmat.","Each device connects to many others. Very reliable (many paths), but expensive."),c:"#4dabf7"},
-    {n:t(lang,"Hybrid (aralash)","Hybrid"),d:t(lang,"Yuqoridagilarning kombinatsiyasi — katta tarmoqlarda ishlatiladi.","A combination of the above — used in large networks."),c:"#9775fa"},
+  const maps=[
+    {k:"star",label:{uz:"Star (yulduz) — eng keng tarqalgan",en:"Star — most common"},color:"#69db7c",nodes:[[140,80,"HUB"],[140,25],[205,50],[205,110],[140,135],[75,110],[75,50]],links:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6]]},
+    {k:"bus",label:{uz:"Bus (shina) — bitta umumiy kabel",en:"Bus — one shared cable"},color:"#ff6b6b",nodes:[[40,80],[105,80],[175,80],[240,80]],links:[[0,1],[1,2],[2,3]]},
+    {k:"ring",label:{uz:"Ring (halqa) — ma'lumot aylanadi",en:"Ring — data circulates"},color:"#ffd43b",nodes:[[140,25],[210,70],[185,140],[95,140],[70,70]],links:[[0,1],[1,2],[2,3],[3,4],[4,0]]},
+    {k:"mesh",label:{uz:"Mesh (to'r) — ko'p yo'l, juda ishonchli",en:"Mesh — many paths, very reliable"},color:"#4dabf7",nodes:[[70,45],[210,45],[210,125],[70,125]],links:[[0,1],[1,2],[2,3],[3,0],[0,2],[1,3]]},
   ];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Topologiya nima?","What is a topology?")),
-    React.createElement(P,null,t(lang,
-      "Tarmoq topologiyasi — qurilmalar bir-biriga qanday ulanganining \"shakli\". Xuddi shahar ko'chalarini turlicha rejalashtirish mumkin bo'lgani kabi, tarmoqni ham turli shakllarda qurish mumkin. Har birining afzallik va kamchiligi bor.",
-      "A network topology is the \"shape\" of how devices connect to each other. Just as a city's streets can be laid out in different ways, a network can be built in different shapes. Each has its pros and cons."
-    )),
+    React.createElement(P,null,t(lang,"Tarmoq topologiyasi — qurilmalar bir-biriga qanday ulanganining \"shakli\". Shahar ko'chalarini turlicha rejalashtirish mumkin bo'lgani kabi, tarmoqni ham turli shakllarda qurish mumkin. Har birining afzallik va kamchiligi bor.","A network topology is the \"shape\" of how devices connect. Like a city's streets can be laid out differently, a network can be built in different shapes. Each has pros and cons.")),
     React.createElement(H2,{num:"§2"},t(lang,"Asosiy topologiyalar","Main topologies")),
-    topos.map((x,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:`1px solid ${x.c}33`,borderRadius:10,alignItems:"flex-start"}},
-      React.createElement("div",{style:{fontWeight:700,fontSize:13,color:x.c,minWidth:100}},x.n),
-      React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.55,flex:1}},x.d))),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Amalda: ","In practice: ")),
-      t(lang,"Zamonaviy tarmoqlarning aksariyati Star (yulduz) topologiyasidan foydalanadi — har bir qurilma markaziy switchga ulanadi. Bu boshqarish va nosozlikni topishni osonlashtiradi.",
-        "Most modern networks use the Star topology — each device connects to a central switch. This makes management and troubleshooting easier.")),
-    React.createElement(Quiz,{
-      q:{uz:"Qaysi topologiyada bitta qurilma uzilsa ham qolganlari ishlayveradi va u eng keng tarqalgan?",en:"In which topology do the rest keep working if one device fails, and which is the most common?"},
-      opts:[{uz:"Bus",en:"Bus"},{uz:"Star (yulduz)",en:"Star"},{uz:"Ring (halqa)",en:"Ring"},{uz:"Hech qaysi",en:"None"}],
-      correct:1,
-      exp:{uz:"Star topologiyasida hamma markaziy switchga ulanadi — bitta qurilma uzilsa, boshqalarga ta'sir qilmaydi. Shu sababli u eng keng tarqalgan.",en:"In a Star topology everyone connects to a central switch — if one device fails, others are unaffected. That's why it's the most common."}
-    })
-  );
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12}},
+      maps.map(function(m,i){return React.createElement(NodeMap,{key:i,label:m.label,color:m.color,nodes:m.nodes,links:m.links});})),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Amalda: ","In practice: ")),t(lang,"zamonaviy tarmoqlar aksariyat Star topologiyasidan foydalanadi — har qurilma markaziy switchга ulanadi. Bitta qurilma uzilsa, boshqalar ishlayveradi.","most modern networks use the Star topology — each device connects to a central switch. If one device fails, the others keep working.")),
+    React.createElement(Quiz,{q:{uz:"Qaysi topologiyada bitta qurilma uzilsa ham qolganlari ishlayveradi va u eng keng tarqalgan?",en:"In which topology do the rest keep working if one device fails, and which is most common?"},opts:[{uz:"Bus",en:"Bus"},{uz:"Star (yulduz)",en:"Star"},{uz:"Ring (halqa)",en:"Ring"},{uz:"Hech qaysi",en:"None"}],correct:1,exp:{uz:"Star da hamma markaziy switchга ulanadi — bitta uzilса boshqalarga ta'sir qilmaydi. Shu sababli eng keng tarqalgan.",en:"In Star everyone connects to a central switch — one failure doesn't affect others. That's why it's most common."}}));
 }
-
-// ── L12: Wireless Networks ────────────────────────────────────
 function LessonL12(){
   const lang=useLang();
+  const std=[["802.11n","WiFi 4","600 Mbps"],["802.11ac","WiFi 5",{uz:"bir necha Gbps",en:"several Gbps"}],["802.11ax","WiFi 6",{uz:"gavjum joyda yaxshi",en:"better in crowds"}]];
+  const sec=[["WEP","#ff3a5e",{uz:"Buzilgan — ISHLATMANG",en:"Broken — DON'T USE"}],["WPA","#ff9145",{uz:"Eskirgan",en:"Outdated"}],["WPA2","#ffd43b",{uz:"Uzoq vaqt standart",en:"Long-time standard"}],["WPA3","#69db7c",{uz:"Eng yangi va xavfsiz",en:"Newest and safest"}]];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Simsiz tarmoq nima?","What is a wireless network?")),
-    React.createElement(P,null,t(lang,
-      "WiFi — kabel o'rniga radio to'lqinlari orqali ma'lumot uzatuvchi tarmoq texnologiyasi. Qurilmangiz simsiz nuqta (access point / router) bilan radio orqali gaplashadi. Bu suhbatni simli telefon o'rniga radio bilan qilgandek — qulay, lekin havoda hamma \"eshitishi\" mumkin, shuning uchun shifrlash muhim.",
-      "WiFi is a network technology that sends data over radio waves instead of cables. Your device talks to an access point (router) via radio. It's like having a conversation over radio instead of a wired phone — convenient, but anyone in the air can \"hear\", so encryption matters."
-    )),
+    React.createElement(P,null,t(lang,"WiFi — kabel o'rniga radio to'lqinlari orqali ma'lumot uzatadi. Qurilmangiz access point (router) bilan radio orqali gaplashadi. Havoda hamma \"eshitishi\" mumkin, shuning uchun shifrlash muhim.","WiFi sends data over radio waves instead of cables. Your device talks to an access point (router) by radio. Anyone in the air can \"hear\", so encryption matters.")),
+    React.createElement(PacketFlow,{from:{uz:"Qurilma",en:"Device"},to:{uz:"Access Point",en:"Access Point"},label:{uz:"radio to'lqin",en:"radio waves"}}),
     React.createElement(H2,{num:"§2"},t(lang,"WiFi standartlari","WiFi standards")),
-    React.createElement("div",{style:{margin:"8px 0 14px"}},
-      [["802.11n","WiFi 4",t(lang,"2.4/5 GHz, 600 Mbps gacha","2.4/5 GHz, up to 600 Mbps")],
-       ["802.11ac","WiFi 5",t(lang,"5 GHz, bir necha Gbps","5 GHz, several Gbps")],
-       ["802.11ax","WiFi 6",t(lang,"Tezroq, gavjum joylarda yaxshi","Faster, better in crowds")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"center"}},
-          React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11.5,fontWeight:700,color:"var(--accent)",minWidth:80}},x[0]),
-          React.createElement("span",{style:{fontSize:12,fontWeight:600,color:"var(--text-0)",minWidth:60}},x[1]),
-          React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},x[2])))),
+    std.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:"var(--accent)",fontSize:11.5,minWidth:80}},s[0]),
+      React.createElement("span",{style:{fontSize:12,fontWeight:600,color:"var(--text-0)",minWidth:56}},s[1]),
+      React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},typeof s[2]==="string"?s[2]:t(lang,s[2].uz,s[2].en)));}),
     React.createElement(H2,{num:"§3"},t(lang,"WiFi xavfsizligi","WiFi security")),
-    React.createElement(P,null,t(lang,
-      "Simsiz tarmoq havo orqali uzatgani uchun shifrlash juda muhim. Xavfsizlik standartlari yillar davomida kuchaydi:",
-      "Because a wireless network transmits through the air, encryption is critical. Security standards have strengthened over the years:"
-    )),
-    React.createElement(Terminal,null,
-`WEP   — Eski, buzilgan. ISHLATMANG!
-WPA   — WEP dan yaxshi, lekin eskirgan
-WPA2  — Uzoq vaqt standart. Hali keng qo'llanadi
-WPA3  — Eng yangi va eng xavfsiz (tavsiya)`),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"WEP shifrlashini hech qachon ishlatmang — u bir necha daqiqada buziladi. Uy tarmog'ingizda kamida WPA2, imkon bo'lsa WPA3 dan foydalaning va kuchli parol qo'ying.",
-        "Never use WEP encryption — it can be cracked in minutes. Use at least WPA2, ideally WPA3, on your home network, and set a strong password.")),
-    React.createElement(Quiz,{
-      q:{uz:"Uy WiFi tarmog'i uchun bugungi kunda qaysi shifrlash tavsiya etiladi?",en:"Which encryption is recommended today for a home WiFi network?"},
-      opts:[{uz:"WEP",en:"WEP"},{uz:"Ochiq (shifrsiz)",en:"Open (no encryption)"},{uz:"WPA2 yoki WPA3",en:"WPA2 or WPA3"},{uz:"HTTP",en:"HTTP"}],
-      correct:2,
-      exp:{uz:"WPA2 (yoki yangiroq WPA3) zamonaviy va xavfsiz. WEP buzilgan va ishlatilmasligi kerak.",en:"WPA2 (or the newer WPA3) is modern and secure. WEP is broken and should not be used."}
-    })
-  );
+    React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,margin:"6px 0 12px"}},
+      sec.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",background:s[1]+"0d",border:"1px solid "+s[1]+"44",borderRadius:9,animationDelay:(i*0.06)+"s"}},
+        React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:s[1],fontSize:12,minWidth:56}},s[0]),
+        React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,s[2].uz,s[2].en)));})),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"WEP ni hech qachon ishlatmang — bir necha daqiqada buziladi. Kamida WPA2, imkon bo'lsa WPA3 va kuchli parol qo'ying.","Never use WEP — it cracks in minutes. Use at least WPA2, ideally WPA3, with a strong password.")),
+    React.createElement(Quiz,{q:{uz:"Uy WiFi uchun bugun qaysi shifrlash tavsiya etiladi?",en:"Which encryption is recommended for home WiFi today?"},opts:[{uz:"WEP",en:"WEP"},{uz:"Ochiq (shifrsiz)",en:"Open (none)"},{uz:"WPA2 yoki WPA3",en:"WPA2 or WPA3"},{uz:"HTTP",en:"HTTP"}],correct:2,exp:{uz:"WPA2 (yoki yangiroq WPA3) zamonaviy va xavfsiz. WEP buzilgan.",en:"WPA2 (or newer WPA3) is modern and secure. WEP is broken."}}));
 }
-
-
-// ── L14: VPN ──────────────────────────────────────────────────
 function LessonL14(){
   const lang=useLang();
   return React.createElement("section",null,
