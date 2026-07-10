@@ -3,31 +3,124 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Windows Academy — Cyber Security Platform</title>
-
-<!-- Google Fonts (falls back to system fonts if offline) -->
+<title>CyberSecurity — O'quv Platformasi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
 <link rel="stylesheet" href="styles.css" />
-
-<!-- All dependencies bundled locally — no CDN required -->
-<script defer src="lib/mermaid.js"></script>
-<script defer src="lib/react.js"></script>
-<script defer src="lib/react-dom.js"></script>
-
-<!-- Pre-transpiled app bundle (JSX already compiled to plain JS) -->
-<script defer src="lib/bundle.js"></script>
-
 </head>
 <body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
 
-<!-- Animated background -->
-<div id="bg-root" class="bg-stage bg-grid bg-scan"></div>
+<header class="hero">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+    </div>
+    <div class="lang-switch">
+      <button id="langBtn" type="button">EN</button>
+    </div>
+  </div>
+  <div class="badge"><span class="dot"></span><span data-uz="4 modul · O'zbek tilida · AI yordamchi" data-en="4 modules · Uzbek & English · AI assistant">4 modul · O'zbek tilida · AI yordamchi</span></div>
+  <h1 class="title">Cyber<span class="accent">Security</span></h1>
+  <p class="subtitle" data-uz="Windows ichki tuzilishidan tortib Kali Linux, tarmoq xavfsizligi va veb penetratsion testgacha — barchasi bitta platformada. Modulni tanlab, o'rganishni boshlang."
+     data-en="From Windows internals to Kali Linux, network security and web penetration testing — all on one platform. Pick a module and start learning.">
+     Windows ichki tuzilishidan tortib Kali Linux, tarmoq xavfsizligi va veb penetratsion testgacha — barchasi bitta platformada. Modulni tanlab, o'rganishni boshlang.
+  </p>
+  <div class="stat-row" id="statRow"></div>
+</header>
 
-<!-- App mount -->
-<div id="app"></div>
+<main class="grid" id="grid"></main>
 
+<footer class="foot">
+  <span data-uz="Ta'lim maqsadida — faqat ruxsat berilgan tizimlarda amaliyot qiling." data-en="For educational use — only practice on systems you are authorized to test.">Ta'lim maqsadida — faqat ruxsat berilgan tizimlarda amaliyot qiling.</span>
+</footer>
+
+<script>
+const MODULES = [
+  { id:"windows", href:"windows/index.html", key:"wa_progress", total:43, accent:"#4d8bff",
+    uz:"Windows", en:"Windows",
+    dUz:"Windows ichki tuzilishi, kernel, jarayonlar, Active Directory va tizim xavfsizligi.",
+    dEn:"Windows internals, kernel, processes, Active Directory and system security.",
+    tagUz:"Ichki tuzilma & Xavfsizlik", tagEn:"Internals & Security",
+    icon:'<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>' },
+  { id:"kali", href:"kali/index.html", key:"ka_progress", total:30, accent:"#a855f7",
+    uz:"Kali Linux", en:"Kali Linux",
+    dUz:"Kali Linux asoslari, buyruqlar qatori va pentest vositalari — Nmap, Metasploit, Hydra.",
+    dEn:"Kali Linux basics, command line and pentest tools — Nmap, Metasploit, Hydra.",
+    tagUz:"Pentest Distributivi", tagEn:"Pentest Distro",
+    icon:'<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>' },
+  { id:"network", href:"network/index.html", key:"na_progress", total:30, accent:"#00d4ff",
+    uz:"Network", en:"Network",
+    dUz:"OSI modeli, TCP/IP, firewall, VPN va tarmoq hujumlari hamda himoyasi.",
+    dEn:"OSI model, TCP/IP, firewalls, VPN and network attacks & defense.",
+    tagUz:"Tarmoq Xavfsizligi", tagEn:"Network Security",
+    icon:'<circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="12" y2="11"/><path d="M12 11 5 17"/><path d="m12 11 7 6"/>' },
+  { id:"web-pentest", href:"web-pentest/index.html", key:"wp_progress", total:28, accent:"#ff4444",
+    uz:"Web-Pentest", en:"Web-Pentest",
+    dUz:"HTTP, OWASP Top 10, SQL Injection, XSS va Burp Suite bilan veb ilovalarni test qilish.",
+    dEn:"HTTP, OWASP Top 10, SQL Injection, XSS and testing web apps with Burp Suite.",
+    tagUz:"Veb Xavfsizligi", tagEn:"Web Security",
+    icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/>' },
+];
+
+let lang = localStorage.getItem("cs_lang") || "uz";
+
+function doneCount(key){
+  try{ const p = JSON.parse(localStorage.getItem(key)||"{}");
+    return Array.isArray(p.completedLessons) ? p.completedLessons.length : 0; }
+  catch(e){ return 0; }
+}
+
+function render(){
+  document.documentElement.lang = lang;
+  document.getElementById("langBtn").textContent = lang==="uz" ? "EN" : "UZ";
+  document.querySelectorAll("[data-uz]").forEach(el=>{
+    el.textContent = lang==="uz" ? el.getAttribute("data-uz") : el.getAttribute("data-en");
+  });
+
+  // stats
+  let totalLessons=0, totalDone=0;
+  MODULES.forEach(m=>{ totalLessons+=m.total; totalDone+=Math.min(doneCount(m.key), m.total); });
+  const sr = document.getElementById("statRow");
+  sr.innerHTML = `
+    <div class="stat"><div class="stat-n">${MODULES.length}</div><div class="stat-l">${lang==="uz"?"modul":"modules"}</div></div>
+    <div class="stat"><div class="stat-n">${totalLessons}</div><div class="stat-l">${lang==="uz"?"dars":"lessons"}</div></div>
+    <div class="stat"><div class="stat-n">${totalDone}</div><div class="stat-l">${lang==="uz"?"tugatilgan":"completed"}</div></div>`;
+
+  // cards
+  const grid = document.getElementById("grid");
+  grid.innerHTML = MODULES.map(m=>{
+    const done = Math.min(doneCount(m.key), m.total);
+    const pct = m.total ? Math.round(done/m.total*100) : 0;
+    return `
+    <a class="card" href="${m.href}" style="--c:${m.accent}">
+      <div class="card-top">
+        <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${m.icon}</svg></div>
+        <span class="card-tag">${lang==="uz"?m.tagUz:m.tagEn}</span>
+      </div>
+      <h3 class="card-title">${lang==="uz"?m.uz:m.en}</h3>
+      <p class="card-desc">${lang==="uz"?m.dUz:m.dEn}</p>
+      <div class="card-prog">
+        <div class="card-prog-head">
+          <span>${done}/${m.total} ${lang==="uz"?"dars":"lessons"}</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="card-go">${lang==="uz"?"Kirish":"Enter"} <span class="arrow">→</span></div>
+    </a>`;
+  }).join("");
+}
+
+document.getElementById("langBtn").addEventListener("click", ()=>{
+  lang = lang==="uz" ? "en" : "uz";
+  localStorage.setItem("cs_lang", lang);
+  render();
+});
+
+render();
+</script>
 </body>
 </html>

