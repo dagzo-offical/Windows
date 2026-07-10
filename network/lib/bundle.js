@@ -284,39 +284,25 @@ function LessonL01(){
 }
 function LessonL13(){
   const lang=useLang();
+  const types=[["Packet Filter",{uz:"IP/port bo'yicha filtrlaydi (sodda, tez)",en:"Filters by IP/port (simple, fast)"},"#4dabf7"],["Stateful",{uz:"Ulanish holatini eslaydi (aqlliroq)",en:"Remembers connection state (smarter)"},"#69db7c"],["Application / WAF",{uz:"Ilova mazmunini tekshiradi (chuqur)",en:"Inspects app-layer content (deep)"},"#9775fa"],["Next-Gen (NGFW)",{uz:"IPS + ilova + tahdid razvedkasi",en:"IPS + app + threat intel"},"#ff9145"]];
   return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"Firewall nima?","What is a Firewall?")),
-    React.createElement(P,null,t(lang,
-      "Firewall — tarmoq trafigini oldindan belgilangan qoidalar asosida filtrlash orqali ruxsatsiz kirishni bloklaydi. U ichki tarmoq bilan tashqi tarmoq o'rtasida xavfsizlik devori vazifasini bajaradi.",
-      "A firewall is a network security device that monitors and filters incoming and outgoing network traffic based on pre-established security rules, acting as a barrier between internal and external networks."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Firewall turlari","Types of Firewalls")),
-    [
-      {name:"Packet Filter",uz:"Eng oddiy tur. IP, port va protokol asosida qaror qiladi. Stateless — har paketni alohida ko'radi.",en:"Simplest type. Decides based on IP, port and protocol. Stateless — sees each packet independently."},
-      {name:"Stateful Inspection",uz:"Ulanish holatini kuzatadi. TCP握手 sessiyalarini tushunadi. Ko'pchilik zamonaviy firewalllar shu turda.",en:"Tracks connection state. Understands TCP handshake sessions. Most modern firewalls use this."},
-      {name:"Application Layer (L7)",uz:"HTTP, DNS, FTP protokollarini chuqur tekshiradi. WAF (Web Application Firewall) shu turda.",en:"Deep inspection of HTTP, DNS, FTP protocols. WAF (Web Application Firewall) is this type."},
-      {name:"Next-Gen (NGFW)",uz:"IDS/IPS, DPI, SSL inspection va application awareness ni birlashtiradi.",en:"Combines IDS/IPS, DPI, SSL inspection and application awareness."},
-    ].map((f,i)=>React.createElement("div",{key:i,style:{marginBottom:8,padding:"12px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-      React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",marginBottom:4,fontWeight:700}},f.name),
-      React.createElement("div",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.6}},t(lang,f.uz,f.en))
-    )),
-    React.createElement(H2,{num:"§3"},t(lang,"iptables misoli (Linux)","iptables Example (Linux)")),
-    React.createElement(Terminal,null,
-`# Barcha trafikni ko'rish
-sudo iptables -L -v
-
-# 22 (SSH) portni ochish
-sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
-
-# 80 (HTTP) portni ochish
-sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
-
-# Qolgan barcha kirishni bloklash
-sudo iptables -A INPUT -j DROP`)
-  );
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Firewall nima?","What is a firewall?")),
+    React.createElement(P,null,t(lang,"Firewall — tarmoq va tashqi olam o'rtasidagi \"qorovul devor\". U har bir paketni qoidalar asosida tekshirib, o'tkazadi yoki bloklaydi — chegaradagi bojxona kabi.","A firewall is the \"guarded wall\" between a network and the outside. It checks each packet against rules and allows or blocks it — like customs at a border.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Paketni tekshirish","Inspecting a packet")),
+    React.createElement(P,null,t(lang,"Firewall qoidalarni yuqoridan pastga tekshiradi va birinchi mos kelganida to'xtaydi. \"Ishga tushir\":","A firewall checks rules top-to-bottom and stops at the first match. Press Play:")),
+    React.createElement(FlowSteps,{title:{uz:"Firewall qarori",en:"Firewall decision"},steps:[
+      {icon:"📦",text:{uz:"Paket keladi (manba IP, port, protokol)",en:"Packet arrives (source IP, port, protocol)"}},
+      {icon:"📋",text:{uz:"Qoidalar ro'yxati bilan solishtiriladi",en:"Compared against the rule list"}},
+      {icon:"✅",text:{uz:"Mos ALLOW qoidasi → o'tkaziladi",en:"Matching ALLOW rule → forwarded"}},
+      {icon:"⛔",text:{uz:"Aks holda → DROP (bloklanadi)",en:"Otherwise → DROP (blocked)"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Firewall turlari","Firewall types")),
+    types.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+x[2]+"44",borderLeft:"3px solid "+x[2],borderRadius:10,animationDelay:(i*0.06)+"s"}},
+      React.createElement("span",{style:{fontWeight:700,fontSize:12.5,color:x[2],minWidth:130}},x[0]),
+      React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
+    React.createElement(Quiz,{q:{uz:"Firewall qoidalarni qanday tartibda tekshiradi?",en:"In what order does a firewall check rules?"},opts:[{uz:"Tasodifiy",en:"Randomly"},{uz:"Yuqoridan pastga, birinchi moslikda to'xtaydi",en:"Top-to-bottom, stops at first match"},{uz:"Pastdan yuqoriga",en:"Bottom-to-top"},{uz:"Alifbo bo'yicha",en:"Alphabetically"}],correct:1,exp:{uz:"Firewall qoidalarni yuqoridan pastga tekshiradi va birinchi mos qoidada to'xtaydi — shu sababli aniq ALLOW qoidalari umumiy DROP dan oldin turishi kerak.",en:"A firewall checks rules top-to-bottom and stops at the first match — so specific ALLOW rules must precede a general DROP."}}));
 }
-
-// ── Lesson L22: Port Scanning ─────────────────────────────────
 function LessonL22(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1017,282 +1003,142 @@ function LessonL12(){
 function LessonL14(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"VPN nima?","What is a VPN?")),
-    React.createElement(P,null,t(lang,
-      "VPN (Virtual Private Network) internet ustidan xavfsiz, shifrlangan \"tunnel\" quradi. Ma'lumotingiz ochiq internetdan o'tsa ham, u shifrlangan quvur ichida ketadi — tashqaridan hech kim ichini ko'ra olmaydi. Bu ochiq maydondan o'tayotgan yashirin yer osti yo'li kabi.",
-      "A VPN (Virtual Private Network) builds a secure, encrypted \"tunnel\" over the internet. Even though your data crosses the public internet, it travels inside an encrypted pipe — no one outside can see inside. It's like a hidden underground tunnel crossing an open field."
-    )),
+    React.createElement(P,null,t(lang,"VPN internet ustidan xavfsiz, shifrlangan \"tunnel\" quradi. Ma'lumotingiz ochiq internetdan o'tsa ham, shifrlangan quvur ichida ketadi — ochiq maydondan o'tayotgan yashirin yer osti yo'li kabi.","A VPN builds a secure, encrypted \"tunnel\" over the internet. Even crossing the public internet, your data travels inside an encrypted pipe — like a hidden tunnel across an open field.")),
+    React.createElement(PacketFlow,{from:{uz:"Siz",en:"You"},to:{uz:"Ofis / Internet",en:"Office / Internet"},label:{uz:"🔒 shifrlangan tunnel",en:"🔒 encrypted tunnel"},color:"#69db7c"}),
     React.createElement(H2,{num:"§2"},t(lang,"VPN nima uchun kerak?","Why use a VPN?")),
-    React.createElement("div",{style:{margin:"8px 0 14px"}},
-      [[t(lang,"Maxfiylik","Privacy"),t(lang,"Internet-provayder va tarmoqdagilar trafikingizni ko'ra olmaydi","Your ISP and others on the network can't see your traffic")],
-       [t(lang,"Ochiq WiFi himoyasi","Public WiFi safety"),t(lang,"Kafe/aeroport WiFi da ma'lumotingiz shifrlanadi","Your data is encrypted on café/airport WiFi")],
-       [t(lang,"Masofaviy ish","Remote work"),t(lang,"Uydan ofis tarmog'iga xavfsiz ulanish","Securely connect to the office network from home")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
-          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:120}},x[0]),
-          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
-    React.createElement(H2,{num:"§3"},t(lang,"VPN turlari va protokollar","VPN types and protocols")),
-    React.createElement(Terminal,null,
-`Turlari:
-  Site-to-Site  — ikki ofis tarmog'ini bog'laydi
-  Remote Access — bitta foydalanuvchi tarmoqqa ulanadi
-
-Protokollar:
-  IPsec      — korporativ standart
-  OpenVPN    — ochiq kodli, moslashuvchan
-  WireGuard  — yangi, tez va sodda`),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"VPN sizni to'liq \"ko'rinmas\" qilmaydi — u faqat trafikni shifrlaydi. VPN provayderiga ishonishingiz kerak, chunki u sizning trafikingizni ko'radi. Bepul VPN lar ko'pincha ma'lumotingizni sotadi.",
-        "A VPN doesn't make you fully \"invisible\" — it only encrypts traffic. You must trust the VPN provider, because it sees your traffic. Free VPNs often sell your data.")),
-    React.createElement(Quiz,{
-      q:{uz:"VPN ma'lumotingiz bilan asosan nima qiladi?",en:"What does a VPN mainly do with your data?"},
-      opts:[{uz:"Uni tezlashtiradi",en:"Speeds it up"},{uz:"Shifrlangan tunnel ichida uzatadi",en:"Sends it through an encrypted tunnel"},{uz:"O'chirib tashlaydi",en:"Deletes it"},{uz:"Rasmga aylantiradi",en:"Turns it into an image"}],
-      correct:1,
-      exp:{uz:"VPN internet ustidan shifrlangan tunnel quradi — ma'lumotingiz ochiq tarmoqdan o'tsa ham, ichini tashqaridan ko'rib bo'lmaydi.",en:"A VPN builds an encrypted tunnel over the internet — even crossing a public network, the contents can't be seen from outside."}
-    })
-  );
+    React.createElement("div",{style:{margin:"6px 0 12px"}},
+      [[{uz:"Maxfiylik",en:"Privacy"},{uz:"Provayder trafikingizni ko'ra olmaydi",en:"Your ISP can't see your traffic"}],
+       [{uz:"Ochiq WiFi himoyasi",en:"Public WiFi safety"},{uz:"Kafe/aeroport WiFi da shifrlanadi",en:"Encrypted on café/airport WiFi"}],
+       [{uz:"Masofaviy ish",en:"Remote work"},{uz:"Uydan ofis tarmog'iga xavfsiz ulanish",en:"Securely reach the office from home"}]].map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
+        React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:120}},t(lang,x[0].uz,x[0].en)),
+        React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));})),
+    React.createElement(H2,{num:"§3"},t(lang,"Turlari va protokollar","Types and protocols")),
+    React.createElement(Terminal,null,"Turlari:\n  Site-to-Site  — ikki ofis tarmog'ini bog'laydi\n  Remote Access — bitta foydalanuvchi ulanadi\nProtokollar:  IPsec · OpenVPN · WireGuard"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"VPN sizni to'liq \"ko'rinmas\" qilmaydi — u faqat trafikni shifrlaydi. VPN provayderiga ishonishingiz kerak. Bepul VPN lar ko'pincha ma'lumotingizni sotadi.","A VPN doesn't make you fully \"invisible\" — it only encrypts traffic. You must trust the provider. Free VPNs often sell your data.")),
+    React.createElement(Quiz,{q:{uz:"VPN ma'lumotingiz bilan asosan nima qiladi?",en:"What does a VPN mainly do with your data?"},opts:[{uz:"Tezlashtiradi",en:"Speeds it up"},{uz:"Shifrlangan tunnel ichida uzatadi",en:"Sends it through an encrypted tunnel"},{uz:"O'chiradi",en:"Deletes it"},{uz:"Rasmga aylantiradi",en:"Turns it into an image"}],correct:1,exp:{uz:"VPN internet ustidan shifrlangan tunnel quradi — ma'lumot ochiq tarmoqdan o'tsa ham ichi ko'rinmaydi.",en:"A VPN builds an encrypted tunnel over the internet — the contents can't be seen even on a public network."}}));
 }
-
-// ── L15: SSL/TLS ──────────────────────────────────────────────
 function LessonL15(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"SSL/TLS nima?","What is SSL/TLS?")),
-    React.createElement(P,null,t(lang,
-      "TLS (Transport Layer Security) — internetda ma'lumotni shifrlaydigan protokol. U HTTPS ning \"S\" harfi. SSL — TLS ning eski nomi. TLS ikki narsani ta'minlaydi: maxfiylik (hech kim o'qiy olmaydi) va ishonch (siz haqiqiy sayt bilan gaplashyapsiz, soxtasi bilan emas).",
-      "TLS (Transport Layer Security) is the protocol that encrypts data on the internet. It's the \"S\" in HTTPS. SSL is the old name for TLS. TLS ensures two things: confidentiality (no one can read it) and trust (you're talking to the real site, not a fake)."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Sertifikat va CA","Certificates and CAs")),
-    React.createElement(P,null,t(lang,
-      "Sayt o'zining haqiqiyligini \"sertifikat\" bilan isbotlaydi — bu raqamli pasport kabi. Sertifikatni ishonchli tashkilot (CA — Certificate Authority) imzolaydi. Brauzer CA ro'yxatini biladi, shuning uchun soxta sertifikatni darhol aniqlaydi va ogohlantiradi.",
-      "A site proves it's genuine with a \"certificate\" — like a digital passport. The certificate is signed by a trusted organization (a CA — Certificate Authority). The browser knows the list of CAs, so it instantly detects a fake certificate and warns you."
-    )),
-    React.createElement(H2,{num:"§3"},t(lang,"TLS qo'l berishi","The TLS handshake")),
-    React.createElement(Terminal,null,
-`1. Client:  "Salom, qaysi shifrlarni bilasan?"
-2. Server:  "Manavilarni. Mana sertifikatim"
-3. Client:  sertifikatni tekshiradi (CA imzosi?)
-4. Ikkalasi: umumiy maxfiy kalitni kelishadi
-5. ═══ Endi hamma narsa shifrlanadi ═══`),
-    React.createElement(P,null,t(lang,
-      "TLS ikki xil shifrlashni birlashtiradi: asimmetrik (ikki kalit — ochiq va yashirin) kalitni xavfsiz kelishish uchun, keyin simmetrik (bir kalit) tez shifrlash uchun. Bu qulfni ochish uchun maxsus kalit, keyin tezkor ish uchun oddiy kalitdan foydalangandek.",
-      "TLS combines two kinds of encryption: asymmetric (two keys — public and private) to safely agree on a key, then symmetric (one key) for fast encryption. It's like using a special key to unlock the door, then a simple key for the fast everyday work."
-    )),
-    React.createElement(Quiz,{
-      q:{uz:"TLS sertifikatini kim imzolaydi, shunda brauzer unga ishonadi?",en:"Who signs a TLS certificate so the browser trusts it?"},
-      opts:[{uz:"Foydalanuvchi",en:"The user"},{uz:"Certificate Authority (CA)",en:"A Certificate Authority (CA)"},{uz:"Internet-provayder",en:"The ISP"},{uz:"DNS server",en:"The DNS server"}],
-      correct:1,
-      exp:{uz:"Ishonchli CA sertifikatni imzolaydi. Brauzer CA lar ro'yxatini biladi, shuning uchun haqiqiy va soxta sertifikatni ajrata oladi.",en:"A trusted CA signs the certificate. The browser knows the list of CAs, so it can tell a real certificate from a fake one."}
-    })
-  );
+    React.createElement(P,null,t(lang,"TLS — internetda ma'lumotni shifrlaydigan protokol, HTTPS ning \"S\" harfi (SSL — eski nomi). U ikki narsani beradi: maxfiylik (hech kim o'qiy olmaydi) va ishonch (haqiqiy sayt bilan gaplashyapsiz).","TLS is the protocol that encrypts data on the internet — the \"S\" in HTTPS (SSL is the old name). It provides two things: confidentiality (no one can read it) and trust (you're talking to the real site).")),
+    React.createElement(H2,{num:"§2"},t(lang,"TLS qo'l berishi","The TLS handshake")),
+    React.createElement(P,null,t(lang,"Ulanishdan oldin client va server shifrni kelishadi va serverning haqiqiyligini tekshiradi. \"Ishga tushir\":","Before connecting, client and server agree on encryption and verify the server's identity. Press Play:")),
+    React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"TLS handshake",en:"TLS handshake"},steps:[
+      {icon:"👋",text:{uz:"Client → Server:  \"salom, qaysi shifrlarni bilasan?\"",en:"Client → Server:  \"hello, which ciphers do you support?\""}},
+      {icon:"📜",text:{uz:"Server → Client:  shifr + sertifikat",en:"Server → Client:  cipher + certificate"}},
+      {icon:"🔍",text:{uz:"Client sertifikatni tekshiradi (CA imzosi?)",en:"Client verifies the certificate (CA signature?)"}},
+      {icon:"🔑",text:{uz:"Ikkalasi umumiy maxfiy kalitni kelishadi",en:"Both agree on a shared secret key"}},
+      {icon:"🔒",text:{uz:"Endi hamma narsa shifrlanadi",en:"Everything is now encrypted"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Sertifikat va CA","Certificates and CAs")),
+    React.createElement(P,null,t(lang,"Sayt haqiqiyligini \"sertifikat\" bilan isbotlaydi (raqamli pasport). Uni ishonchli tashkilot (CA) imzolaydi. Brauzer CA ro'yxatini biladi, shuning uchun soxta sertifikatni darhol aniqlaydi.","A site proves it's genuine with a \"certificate\" (a digital passport), signed by a trusted CA. The browser knows the CA list, so it instantly detects a fake certificate.")),
+    React.createElement(Quiz,{q:{uz:"TLS sertifikatini kim imzolaydi, shunda brauzer ishonadi?",en:"Who signs a TLS certificate so the browser trusts it?"},opts:[{uz:"Foydalanuvchi",en:"The user"},{uz:"Certificate Authority (CA)",en:"A Certificate Authority (CA)"},{uz:"Provayder",en:"The ISP"},{uz:"DNS server",en:"The DNS server"}],correct:1,exp:{uz:"Ishonchli CA sertifikatni imzolaydi. Brauzer CA lar ro'yxatini biladi — haqiqiy va soxta sertifikatni ajratadi.",en:"A trusted CA signs the certificate. The browser knows the CA list — telling real from fake."}}));
 }
-
-// ── L16: IDS/IPS ──────────────────────────────────────────────
 function LessonL16(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"IDS va IPS nima?","What are IDS and IPS?")),
-    React.createElement(P,null,t(lang,
-      "IDS (Intrusion Detection System) — tarmoqni kuzatib, shubhali harakatni aniqlaydi va ogohlantiradi. IPS (Intrusion Prevention System) esa bir qadam oldinga o'tadi — u nafaqat aniqlaydi, balki hujumni bloklaydi. IDS — signalizatsiya (\"o'g'ri kirdi!\" deb baqiradi), IPS — qulflab qo'yadigan qorovul.",
-      "An IDS (Intrusion Detection System) watches the network, detects suspicious activity and raises an alert. An IPS (Intrusion Prevention System) goes one step further — it not only detects but blocks the attack. An IDS is an alarm (it shouts \"a burglar!\"), an IPS is a guard that locks the door."
-    )),
-    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"12px 0"}},
-      React.createElement("div",{style:{padding:14,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:12.5,color:"var(--accent)",marginBottom:6}},"IDS"),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.6}},t(lang,"Aniqlaydi + ogohlantiradi.\nTrafik nusxasini ko'radi (passiv).\nHujumni to'xtatmaydi.","Detects + alerts.\nSees a copy of traffic (passive).\nDoesn't stop the attack."))),
-      React.createElement("div",{style:{padding:14,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:12.5,color:"var(--accent)",marginBottom:6}},"IPS"),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.6}},t(lang,"Aniqlaydi + bloklaydi.\nTrafik ichidan o'tadi (inline).\nHujumni real vaqtda to'xtatadi.","Detects + blocks.\nSits inline in the traffic path.\nStops the attack in real time.")))),
-    React.createElement(H2,{num:"§2"},t(lang,"Aniqlash usullari","Detection methods")),
-    React.createElement(P,null,t(lang,
-      "Ikki asosiy usul bor. Signature-based (imzoga asoslangan) — ma'lum hujumlarning \"barmoq izlari\" bilan solishtiradi (antivirus kabi). Anomaly-based (anomaliyaga asoslangan) — normal xatti-harakatni o'rganib, undan chetlanishni topadi (odatiy bo'lmagan narsani sezadi).",
-      "There are two main methods. Signature-based compares against \"fingerprints\" of known attacks (like antivirus). Anomaly-based learns normal behavior and flags deviations from it (senses something unusual)."
-    )),
-    React.createElement(Terminal,null,
-`# Snort — mashhur ochiq kodli IDS/IPS\n# Qoida misoli (soddalashtirilgan):\nalert tcp any any -> 10.0.0.0/24 22 (msg:"SSH urinishi";)\n\n# = "Har qanday manbadan 22-portga (SSH) urinish bo'lsa,\n#    ogohlantirish ber"`),
-    React.createElement(Quiz,{
-      q:{uz:"IDS va IPS o'rtasidagi asosiy farq nima?",en:"What is the key difference between an IDS and an IPS?"},
-      opts:[{uz:"IDS tezroq",en:"IDS is faster"},{uz:"IPS hujumni bloklaydi, IDS faqat ogohlantiradi",en:"IPS blocks the attack, IDS only alerts"},{uz:"IDS faqat WiFi da ishlaydi",en:"IDS only works on WiFi"},{uz:"Hech qanday farq yo'q",en:"There is no difference"}],
-      correct:1,
-      exp:{uz:"IDS aniqlaydi va ogohlantiradi (signalizatsiya), IPS esa aniqlaydi va hujumni real vaqtda bloklaydi (qulflaydigan qorovul).",en:"An IDS detects and alerts (an alarm), while an IPS detects and blocks the attack in real time (a guard that locks the door)."}
-    })
-  );
+    React.createElement(P,null,t(lang,"IDS tarmoqni kuzatib, shubhali harakatni aniqlaydi va ogohlantiradi. IPS bir qadam oldinga o'tadi — hujumni bloklaydi ham. IDS — signalizatsiya (\"o'g'ri kirdi!\"), IPS — qulflaydigan qorovul.","An IDS watches the network and alerts on suspicious activity. An IPS goes further — it also blocks the attack. IDS is an alarm (\"a burglar!\"), IPS is a guard that locks the door.")),
+    React.createElement(CompareCols,{
+      left:{title:"IDS",color:"#ffd43b",rows:[{uz:"Aniqlaydi + ogohlantiradi",en:"Detects + alerts"},{uz:"Trafik nusxasini ko'radi (passiv)",en:"Sees a copy of traffic (passive)"},{uz:"Hujumni to'xtatmaydi",en:"Doesn't stop the attack"}]},
+      right:{title:"IPS",color:"#ff3a5e",rows:[{uz:"Aniqlaydi + bloklaydi",en:"Detects + blocks"},{uz:"Trafik ichidan o'tadi (inline)",en:"Sits inline in the traffic path"},{uz:"Real vaqtda to'xtatadi",en:"Stops it in real time"}]}}),
+    React.createElement(H2,{num:"§2"},t(lang,"Qanday ishlaydi","How it works")),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"IPS oqimi",en:"IPS flow"},steps:[
+      {icon:"👁",text:{uz:"Trafik kuzatiladi",en:"Traffic is monitored"}},
+      {icon:"🔎",text:{uz:"Signature (ma'lum hujum) yoki anomaliya topiladi",en:"Signature (known attack) or anomaly detected"}},
+      {icon:"🚨",text:{uz:"Ogohlantirish yaratiladi",en:"An alert is raised"}},
+      {icon:"⛔",text:{uz:"IPS: zararli paket bloklanadi",en:"IPS: the malicious packet is blocked"}},
+    ]}),
+    React.createElement(Terminal,null,"# Snort qoida misoli (soddalashtirilgan):\nalert tcp any any -> 10.0.0.0/24 22 (msg:\"SSH urinishi\";)"),
+    React.createElement(Quiz,{q:{uz:"IDS va IPS o'rtasidagi asosiy farq nima?",en:"Key difference between IDS and IPS?"},opts:[{uz:"IDS tezroq",en:"IDS is faster"},{uz:"IPS hujumni bloklaydi, IDS faqat ogohlantiradi",en:"IPS blocks the attack, IDS only alerts"},{uz:"IDS faqat WiFi da",en:"IDS is WiFi-only"},{uz:"Farqi yo'q",en:"No difference"}],correct:1,exp:{uz:"IDS aniqlaydi va ogohlantiradi; IPS aniqlaydi va real vaqtda bloklaydi.",en:"IDS detects and alerts; IPS detects and blocks in real time."}}));
 }
-
-// ── L17: DMZ ──────────────────────────────────────────────────
 function LessonL17(){
   const lang=useLang();
+  const zones=[["🌍 INTERNET",{uz:"Tashqi olam",en:"Outside world"},"#ff3a5e"],["🧱 Firewall 1",{uz:"Tashqi devor",en:"Outer wall"},"#ff9145"],["🖥 DMZ",{uz:"Veb/email server — internetdan ko'rinadi",en:"Web/email server — internet-facing"},"#ffd43b"],["🧱 Firewall 2",{uz:"Ichki devor (qat'iyroq)",en:"Inner wall (stricter)"},"#ff9145"],["🔒 ICHKI TARMOQ",{uz:"Maxfiy ma'lumot",en:"Sensitive data"},"#69db7c"]];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"DMZ nima?","What is a DMZ?")),
-    React.createElement(P,null,t(lang,
-      "DMZ (Demilitarized Zone) — ichki tarmoq va internet o'rtasidagi \"neytral zona\". Internetdan ko'rinishi kerak bo'lgan serverlar (veb-sayt, email) shu yerda joylashtiriladi. Agar hujumchi DMZ dagi serverni buzsa ham, u to'g'ridan-to'g'ri ichki maxfiy tarmoqqa kira olmaydi. Bu uy oldidagi mehmonlar zali kabi — mehmonlar u yerda, lekin yotoqxonangizga kira olmaydi.",
-      "A DMZ (Demilitarized Zone) is a \"neutral zone\" between the internal network and the internet. Servers that must be reachable from the internet (website, email) are placed there. Even if an attacker breaks a server in the DMZ, they can't directly reach the sensitive internal network. It's like a reception hall in front of your house — guests are there, but they can't get into your bedroom."
-    )),
+    React.createElement(P,null,t(lang,"DMZ — ichki tarmoq va internet o'rtasidagi \"neytral zona\". Internetdan ko'rinishi kerak bo'lgan serverlar shu yerda turadi. Hujumchi DMZ dagi serverni buzsa ham, ichki maxfiy tarmoqqa kira olmaydi (uy oldidagi mehmonlar zali kabi).","A DMZ is a \"neutral zone\" between the internal network and the internet. Internet-facing servers live here. Even if an attacker breaks a DMZ server, they can't reach the sensitive internal network (like a reception hall in front of your house).")),
     React.createElement(H2,{num:"§2"},t(lang,"DMZ arxitekturasi","DMZ architecture")),
-    React.createElement(Terminal,null,
-`  INTERNET
-     │
-  [Firewall 1]  ← tashqi devor
-     │
-   ┌─ DMZ ──────────────┐
-   │  Veb-server        │  ← internetdan ko'rinadi
-   │  Email server      │
-   └────────────────────┘
-     │
-  [Firewall 2]  ← ichki devor (qat'iyroq)
-     │
-   ICHKI TARMOQ (maxfiy ma'lumot)`),
-    React.createElement(P,null,t(lang,
-      "DMZ ikki devor (firewall) o'rtasida joylashadi. Tashqi devor internetdan DMZ ga cheklangan kirishga ruxsat beradi. Ichki devor esa DMZ dan ichki tarmoqqa deyarli hech narsa o'tkazmaydi. Shunday qilib, ochiq serverlar buzilса ham, asosiy tarmoq himoyalangan qoladi.",
-      "The DMZ sits between two firewalls. The outer firewall allows limited access from the internet to the DMZ. The inner firewall passes almost nothing from the DMZ into the internal network. So even if the public servers are breached, the core network stays protected."
-    )),
-    React.createElement(Quiz,{
-      q:{uz:"Veb-server odatda qayerga joylashtiriladi va nima uchun?",en:"Where is a web server usually placed, and why?"},
-      opts:[{uz:"Ichki tarmoqda, xavfsizroq bo'lishi uchun",en:"In the internal network, to be safer"},{uz:"DMZ da — buzilса ham ichki tarmoq himoyalanadi",en:"In the DMZ — so even if breached, the internal network stays protected"},{uz:"Routerda",en:"On the router"},{uz:"Umuman tarmoqsiz",en:"With no network at all"}],
-      correct:1,
-      exp:{uz:"Internetdan ko'rinadigan serverlar DMZ ga qo'yiladi. Hujumchi uni buzsa ham, ikkinchi (ichki) firewall tufayli maxfiy tarmoqqa o'ta olmaydi.",en:"Internet-facing servers go in the DMZ. Even if an attacker breaches one, the second (inner) firewall stops them from reaching the sensitive network."}
-    })
-  );
+    React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,margin:"8px 0"}},
+      zones.map(function(z,i){return React.createElement("div",{key:i,className:"na-rise",style:{textAlign:"center",padding:"10px 14px",background:z[2]+"12",border:"1px solid "+z[2]+"55",borderRadius:10,animationDelay:(i*0.09)+"s"}},
+        React.createElement("div",{style:{fontWeight:700,fontSize:13,color:z[2]}},z[0]),
+        React.createElement("div",{style:{fontSize:11,color:"var(--text-2)",marginTop:2}},t(lang,z[1].uz,z[1].en)));})),
+    React.createElement(P,null,t(lang,"DMZ ikki devor orasida joylashadi. Tashqi devor internetdan DMZ ga cheklangan kirishga ruxsat beradi; ichki devor DMZ dan ichki tarmoqqa deyarli hech narsa o'tkazmaydi.","The DMZ sits between two firewalls. The outer allows limited access to the DMZ; the inner passes almost nothing from DMZ into the internal network.")),
+    React.createElement(Quiz,{q:{uz:"Veb-server odatda qayerga joylashtiriladi va nima uchun?",en:"Where is a web server usually placed, and why?"},opts:[{uz:"Ichki tarmoqda",en:"In the internal network"},{uz:"DMZ da — buzilса ham ichki tarmoq himoyalanadi",en:"In the DMZ — so a breach doesn't reach the internal network"},{uz:"Routerda",en:"On the router"},{uz:"Tarmoqsiz",en:"With no network"}],correct:1,exp:{uz:"Internetdan ko'rinadigan serverlar DMZ ga qo'yiladi. Buzilса ham, ikkinchi (ichki) firewall maxfiy tarmoqni himoya qiladi.",en:"Internet-facing servers go in the DMZ. Even if breached, the inner firewall protects the sensitive network."}}));
 }
-
-// ── L18: 802.1X NAC ───────────────────────────────────────────
 function LessonL18(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"802.1X va NAC nima?","What are 802.1X and NAC?")),
-    React.createElement(P,null,t(lang,
-      "802.1X — tarmoqqa kirishni nazorat qiluvchi standart. U qurilma tarmoq portiga ulanganda \"kim sen?\" deb so'raydi va faqat tasdiqlangan qurilmalarni kiritadi. NAC (Network Access Control) — shu g'oyaning kengroq nomi. Bu ofis eshigidagi qorovul kabi — bejizga kirmaysiz, avval propuskingizni ko'rsatasiz.",
-      "802.1X is a standard that controls access to a network. When a device connects to a network port, it asks \"who are you?\" and lets in only verified devices. NAC (Network Access Control) is the broader name for this idea. It's like a guard at the office door — you don't just walk in, you show your badge first."
-    )),
+    React.createElement(P,null,t(lang,"802.1X — tarmoqqa kirishni nazorat qiluvchi standart. Qurilma portga ulanganda \"kim sen?\" deb so'raydi va faqat tasdiqlanganlarni kiritadi. NAC — shu g'oyaning kengroq nomi. Ofis eshigidagi qorovul kabi — propuskingizni ko'rsatasiz.","802.1X is a standard that controls network access. When a device connects, it asks \"who are you?\" and admits only verified devices. NAC is the broader name. Like a guard at the office door — you show your badge.")),
     React.createElement(H2,{num:"§2"},t(lang,"Uch ishtirokchi","Three players")),
-    React.createElement("div",{style:{margin:"8px 0 14px"}},
-      [[t(lang,"Supplicant","Supplicant"),t(lang,"Ulanmoqchi bo'lgan qurilma (noutbuk, telefon)","The device wanting to connect (laptop, phone)")],
-       [t(lang,"Authenticator","Authenticator"),t(lang,"Switch yoki access point — \"eshik\" vazifasini bajaradi","The switch or access point — acts as the \"door\"")],
-       [t(lang,"Auth Server","Auth Server"),t(lang,"RADIUS server — haqiqiy tekshiruvni bajaradi","The RADIUS server — does the actual verification")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
-          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:120}},x[0]),
-          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
-    React.createElement(Terminal,null,
-`Qurilma ──► Switch ──► RADIUS server
-"Ulanaman"   "Kim u?"    "Login/parolni tekshir"
-                         ✓ To'g'ri → port ochiladi
-                         ✗ Xato   → port bloklanadi`),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,"RADIUS: "),
-      t(lang,"RADIUS — markazlashtirilgan autentifikatsiya serveri. U foydalanuvchi ma'lumotlarini tekshiradi va tarmoqqa kirishga ruxsat beradi yoki rad etadi. Yirik tashkilotlarda keng qo'llanadi.",
-        "RADIUS is a centralized authentication server. It checks user credentials and grants or denies network access. Widely used in large organizations.")),
-    React.createElement(Quiz,{
-      q:{uz:"802.1X da qurilmani haqiqiy tekshiruvdan o'tkazadigan qism qaysi?",en:"In 802.1X, which part performs the actual verification of a device?"},
-      opts:[{uz:"Supplicant (qurilma)",en:"The supplicant (device)"},{uz:"Authenticator (switch)",en:"The authenticator (switch)"},{uz:"Auth server (RADIUS)",en:"The auth server (RADIUS)"},{uz:"DNS server",en:"The DNS server"}],
-      correct:2,
-      exp:{uz:"RADIUS auth server login/parolni tekshiradi. Switch (authenticator) faqat \"eshik\", qurilma esa supplicant.",en:"The RADIUS auth server checks the credentials. The switch (authenticator) is just the \"door\", and the device is the supplicant."}
-    })
-  );
+    React.createElement(FlowSteps,{title:{uz:"802.1X autentifikatsiya",en:"802.1X authentication"},steps:[
+      {icon:"💻",text:{uz:"Supplicant (qurilma) → Switch:  \"ulanaman\"",en:"Supplicant (device) → Switch:  \"I want to connect\""}},
+      {icon:"🚪",text:{uz:"Authenticator (switch) → RADIUS:  \"kim u?\"",en:"Authenticator (switch) → RADIUS:  \"who is this?\""}},
+      {icon:"🛂",text:{uz:"RADIUS server login/parolni tekshiradi",en:"RADIUS server checks the credentials"}},
+      {icon:"✅",text:{uz:"To'g'ri → port ochiladi  |  ✗ Xato → bloklanadi",en:"OK → port opens  |  ✗ Wrong → blocked"}},
+    ]}),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,"RADIUS: "),t(lang,"markazlashtirilgan autentifikatsiya serveri — foydalanuvchi ma'lumotlarini tekshiradi va kirishga ruxsat beradi yoki rad etadi. Yirik tashkilotlarda keng qo'llanadi.","a centralized authentication server — checks credentials and grants or denies access. Widely used in large organizations.")),
+    React.createElement(Quiz,{q:{uz:"802.1X da qurilmani haqiqiy tekshiruvdan o'tkazadigan qism qaysi?",en:"In 802.1X, which part performs the actual verification?"},opts:[{uz:"Supplicant (qurilma)",en:"The supplicant (device)"},{uz:"Authenticator (switch)",en:"The authenticator (switch)"},{uz:"Auth server (RADIUS)",en:"The auth server (RADIUS)"},{uz:"DNS server",en:"The DNS server"}],correct:2,exp:{uz:"RADIUS auth server login/parolni tekshiradi. Switch faqat \"eshik\", qurilma esa supplicant.",en:"The RADIUS auth server checks the credentials. The switch is just the \"door\", the device is the supplicant."}}));
 }
-
-// ── L19: Packet Filtering ─────────────────────────────────────
 function LessonL19(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Paket filtrlash nima?","What is packet filtering?")),
-    React.createElement(P,null,t(lang,
-      "Paket filtrlash — har bir tarmoq paketini ko'rib, qoidalar asosida o'tkazish yoki bloklash. Firewall shu tamoyilda ishlaydi. Har bir paketning manba/manzil IP si, porti va protokoli tekshiriladi. Bu chegaradagi bojxona kabi — har bir yukni ko'rib, ruxsat berish yoki qaytarish.",
-      "Packet filtering means inspecting each network packet and allowing or blocking it based on rules. A firewall works on this principle. Each packet's source/destination IP, port and protocol are checked. It's like customs at a border — inspecting each shipment and either allowing or turning it back."
-    )),
+    React.createElement(P,null,t(lang,"Paket filtrlash — har paketni ko'rib, qoidalar asosida o'tkazish yoki bloklash. Har paketning manba/manzil IP si, porti va protokoli tekshiriladi — chegaradagi bojxona kabi.","Packet filtering inspects each packet and allows or blocks it by rules. Each packet's source/destination IP, port and protocol are checked — like customs at a border.")),
     React.createElement(H2,{num:"§2"},t(lang,"Stateless va Stateful","Stateless vs stateful")),
-    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"12px 0"}},
-      React.createElement("div",{style:{padding:14,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:12.5,color:"var(--accent)",marginBottom:6}},t(lang,"Stateless (holatsiz)","Stateless")),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.6}},t(lang,"Har paketni alohida ko'radi, kontekstsiz. Tez, lekin sodda.","Judges each packet alone, no context. Fast but simple."))),
-      React.createElement("div",{style:{padding:14,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:12.5,color:"var(--accent)",marginBottom:6}},t(lang,"Stateful (holatli)","Stateful")),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",lineHeight:1.6}},t(lang,"Ulanish holatini eslaydi — javob paketlarini taniydi. Aqlliroq.","Remembers connection state — recognizes reply packets. Smarter.")))),
+    React.createElement(CompareCols,{
+      left:{title:{uz:"Stateless (holatsiz)",en:"Stateless"},color:"#4dabf7",rows:[{uz:"Har paketni alohida ko'radi",en:"Judges each packet alone"},{uz:"Kontekstsiz",en:"No context"},{uz:"Tez, lekin sodda",en:"Fast but simple"}]},
+      right:{title:{uz:"Stateful (holatli)",en:"Stateful"},color:"#69db7c",rows:[{uz:"Ulanish holatini eslaydi",en:"Remembers connection state"},{uz:"Javob paketlarini taniydi",en:"Recognizes reply packets"},{uz:"Aqlliroq, xavfsizroq",en:"Smarter, safer"}]}}),
     React.createElement(H2,{num:"§3"},t(lang,"iptables misoli","An iptables example")),
-    React.createElement(Terminal,null,
-`# 22-portga (SSH) faqat bitta IP dan ruxsat\nsudo iptables -A INPUT -p tcp -s 10.0.0.5 --dport 22 -j ACCEPT\n\n# Boshqa hamma SSH urinishini bloklash\nsudo iptables -A INPUT -p tcp --dport 22 -j DROP\n\n# Joriy qoidalarni ko'rish\nsudo iptables -L -n`),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Qoidalar tartibi muhim: ","Rule order matters: ")),
-      t(lang,"Firewall qoidalarni yuqoridan pastga tekshiradi va birinchi mos kelganida to'xtaydi. Shuning uchun aniqroq ruxsat qoidalari umumiy bloklashdan oldin turishi kerak.",
-        "A firewall checks rules top to bottom and stops at the first match. So specific allow rules must come before a general block.")),
-    React.createElement(Quiz,{
-      q:{uz:"Stateful firewall stateless dan qanday afzalligi bor?",en:"What advantage does a stateful firewall have over stateless?"},
-      opts:[{uz:"U tezroq va soddaroq",en:"It is faster and simpler"},{uz:"U ulanish holatini eslaydi va javob paketlarini taniydi",en:"It remembers connection state and recognizes reply packets"},{uz:"U shifrlaydi",en:"It encrypts"},{uz:"U IP bermaydi",en:"It doesn't hand out IPs"}],
-      correct:1,
-      exp:{uz:"Stateful firewall ulanish kontekstini eslaydi, shuning uchun qonuniy javob paketlarini taniydi — bu uni stateless dan aqlliroq va xavfsizroq qiladi.",en:"A stateful firewall remembers connection context, so it recognizes legitimate reply packets — making it smarter and safer than stateless."}
-    })
-  );
+    React.createElement(Terminal,null,"# 22-portga faqat bitta IP dan ruxsat\nsudo iptables -A INPUT -p tcp -s 10.0.0.5 --dport 22 -j ACCEPT\n# Boshqa hamma SSH urinishini bloklash\nsudo iptables -A INPUT -p tcp --dport 22 -j DROP"),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Qoidalar tartibi muhim: ","Rule order matters: ")),t(lang,"birinchi mos kelgan qoida ishlaydi — aniq ALLOW umumiy DROP dan oldin turishi kerak.","the first matching rule wins — specific ALLOW must come before a general DROP.")),
+    React.createElement(Quiz,{q:{uz:"Stateful firewall ning afzalligi nima?",en:"What advantage does a stateful firewall have?"},opts:[{uz:"Tezroq va soddaroq",en:"Faster and simpler"},{uz:"Ulanish holatini eslaydi va javob paketlarini taniydi",en:"Remembers connection state and recognizes replies"},{uz:"Shifrlaydi",en:"Encrypts"},{uz:"IP bermaydi",en:"Doesn't hand out IPs"}],correct:1,exp:{uz:"Stateful firewall ulanish kontekstini eslaydi — qonuniy javob paketlarini taniydi, bu uni xavfsizroq qiladi.",en:"A stateful firewall remembers connection context — recognizing legitimate replies, making it safer."}}));
 }
-
-// ── L20: Proxy Servers ────────────────────────────────────────
 function LessonL20(){
   const lang=useLang();
+  const types=[["Forward",{uz:"Foydalanuvchilar nomidan internetga chiqadi (filtr, kesh, anonimlik)",en:"Goes out for users (filter, cache, anonymity)"},"#4dabf7"],["Reverse",{uz:"Serverlar oldida turadi (yukni taqsimlash, himoya, kesh)",en:"Sits in front of servers (load balancing, protection, cache)"},"#69db7c"],["Transparent",{uz:"Foydalanuvchi sezmaydi — tarmoq avtomatik yo'naltiradi",en:"User doesn't notice — network redirects automatically"},"#9775fa"]];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Proxy nima?","What is a proxy?")),
-    React.createElement(P,null,t(lang,
-      "Proxy server — siz va internet o'rtasidagi \"vositachi\". So'rovingiz avval proxy ga boradi, u esa sizning nomingizdan serverга murojaat qiladi va javobni sizga qaytaradi. Bu kimdandir sizning o'rningizga xarid qilishni so'raganingizga o'xshaydi — do'kon sizni emas, vositachini ko'radi.",
-      "A proxy server is a \"middleman\" between you and the internet. Your request goes to the proxy first, which then contacts the server on your behalf and returns the reply to you. It's like asking someone to shop for you — the store sees the middleman, not you."
-    )),
+    React.createElement(P,null,t(lang,"Proxy server — siz va internet o'rtasidagi \"vositachi\". So'rovingiz avval proxy ga boradi, u sizning nomingizdan serverга murojaat qiladi va javobni qaytaradi (kimdandir sizning o'rningizga xarid qilishni so'raganingizdek).","A proxy server is a \"middleman\" between you and the internet. Your request goes to the proxy first, which contacts the server on your behalf and returns the reply (like asking someone to shop for you).")),
+    React.createElement(PacketFlow,{from:{uz:"Siz",en:"You"},to:{uz:"Server",en:"Server"},label:{uz:"Proxy (vositachi)",en:"Proxy (middleman)"}}),
     React.createElement(H2,{num:"§2"},t(lang,"Proxy turlari","Types of proxy")),
-    React.createElement("div",{style:{margin:"8px 0 14px"}},
-      [[t(lang,"Forward (oldinga)","Forward"),t(lang,"Foydalanuvchilar nomidan internetga chiqadi. Filtrlash, kesh, anonimlik.","Goes out to the internet for users. Filtering, caching, anonymity.")],
-       [t(lang,"Reverse (teskari)","Reverse"),t(lang,"Serverlar oldida turadi. Yukni taqsimlash, himoya, kesh.","Sits in front of servers. Load balancing, protection, caching.")],
-       [t(lang,"Transparent","Transparent"),t(lang,"Foydalanuvchi sezmaydi — tarmoq avtomatik yo'naltiradi.","The user doesn't notice — the network redirects automatically.")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
-          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:120}},x[0]),
-          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
-    React.createElement(H2,{num:"§3"},t(lang,"Proxy nima uchun ishlatiladi?","Why proxies are used")),
-    React.createElement(Terminal,null,
-`Forward proxy foydasi:
-  • Kesh — tez-tez so'ralgan sahifani saqlab, tezlashtiradi
-  • Filtrlash — ba'zi saytlarni bloklaydi (maktab/ofis)
-  • Anonimlik — server sizning haqiqiy IP ingizni ko'rmaydi
-  • Kuzatuv — trafik jurnalini yuritadi`),
-    React.createElement(P,null,t(lang,
-      "Reverse proxy esa serverlarni himoya qiladi: u haqiqiy serverlarni yashiradi, hujumlarni to'sadi va bir necha server o'rtasida yukni taqsimlaydi (load balancing). Nginx va Cloudflare bunga misol.",
-      "A reverse proxy protects servers: it hides the real servers, absorbs attacks and distributes load across several servers (load balancing). Nginx and Cloudflare are examples."
-    )),
-    React.createElement(Quiz,{
-      q:{uz:"Reverse proxy asosan kimni himoya qiladi?",en:"What does a reverse proxy mainly protect?"},
-      opts:[{uz:"Foydalanuvchilarni",en:"The users"},{uz:"Orqadagi serverlarni (yashiradi, yukni taqsimlaydi)",en:"The backend servers (hides them, balances load)"},{uz:"DNS ni",en:"DNS"},{uz:"Hech kimni",en:"No one"}],
-      correct:1,
-      exp:{uz:"Reverse proxy serverlar oldida turadi — ularni yashiradi, hujumlarni to'sadi va yukni bir necha server o'rtasida taqsimlaydi.",en:"A reverse proxy sits in front of servers — hiding them, absorbing attacks and balancing load across several servers."}
-    })
-  );
+    types.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+x[2]+"44",borderLeft:"3px solid "+x[2],borderRadius:10,animationDelay:(i*0.06)+"s"}},
+      React.createElement("span",{style:{fontWeight:700,fontSize:12.5,color:x[2],minWidth:100}},x[0]),
+      React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
+    React.createElement(P,null,t(lang,"Reverse proxy serverlarni himoya qiladi: haqiqiy serverlarni yashiradi, hujumlarni to'sadi va yukni taqsimlaydi (Nginx, Cloudflare).","A reverse proxy protects servers: hides them, absorbs attacks and balances load (Nginx, Cloudflare).")),
+    React.createElement(Quiz,{q:{uz:"Reverse proxy asosan kimni himoya qiladi?",en:"What does a reverse proxy mainly protect?"},opts:[{uz:"Foydalanuvchilarni",en:"The users"},{uz:"Orqadagi serverlarni",en:"The backend servers"},{uz:"DNS ni",en:"DNS"},{uz:"Hech kimni",en:"No one"}],correct:1,exp:{uz:"Reverse proxy serverlar oldida turadi — ularni yashiradi, hujumlarni to'sadi va yukni taqsimlaydi.",en:"A reverse proxy sits in front of servers — hiding them, absorbing attacks and balancing load."}}));
 }
-
-// ── L21: Zero Trust ───────────────────────────────────────────
 function LessonL21(){
   const lang=useLang();
+  const pr=[[{uz:"Doim tekshir",en:"Always verify"},{uz:"Har kirish har safar tasdiqlanadi",en:"Every access is confirmed each time"}],[{uz:"Minimal huquq",en:"Least privilege"},{uz:"Har kim faqat kerakli narsaga kiradi",en:"Everyone gets only what they need"}],[{uz:"Buzilishni faraz qil",en:"Assume breach"},{uz:"Hujumchi allaqachon ichkarida deb himoyalan",en:"Defend as if an attacker is already inside"}],[{uz:"Mikrosegmentatsiya",en:"Microsegmentation"},{uz:"Tarmoq kichik zonalarga bo'linadi",en:"The network is split into small zones"}]];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Zero Trust nima?","What is Zero Trust?")),
-    React.createElement(P,null,t(lang,
-      "Zero Trust — \"hech kimga ishonma, doim tekshir\" tamoyiliga asoslangan xavfsizlik yondashuvi. Eski model tarmoq ichidagini avtomatik ishonchli deb hisoblardi (qal'a devori kabi). Zero Trust esa har bir so'rovni — ichkaridan bo'lsa ham — tekshiradi. Chunki devor buzilsa, ichkaridagi hamma narsa ochiq qolardi.",
-      "Zero Trust is a security approach based on \"never trust, always verify\". The old model automatically trusted anything inside the network (like a castle wall). Zero Trust verifies every request — even from inside. Because once the wall is breached, everything inside would be exposed."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Asosiy tamoyillar","Core principles")),
-    React.createElement("div",{style:{margin:"8px 0 14px"}},
-      [[t(lang,"Doim tekshir","Always verify"),t(lang,"Har bir kirish har safar tasdiqlanadi (kim, qanday qurilma, qayerdan)","Every access is confirmed each time (who, what device, from where)")],
-       [t(lang,"Minimal huquq","Least privilege"),t(lang,"Har kim faqat kerakli narsaga kirish oladi, ortiq emas","Everyone gets access only to what they need, no more")],
-       [t(lang,"Buzilishni faraz qil","Assume breach"),t(lang,"Hujumchi allaqachon ichkarida deb faraz qilib himoyalanadi","Defend as if an attacker is already inside")],
-       [t(lang,"Mikrosegmentatsiya","Microsegmentation"),t(lang,"Tarmoq kichik zonalarga bo'linadi — bir zona buzilса, boshqasi himoyalanadi","The network is split into small zones — a breach in one is contained")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:6,padding:"9px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,alignItems:"flex-start"}},
-          React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:150}},x[0]),
-          React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},x[1])))),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Oddiy misol: ","Simple example: ")),
-      t(lang,"Eski model: ofisga kirsangiz, hamma xonaga kira olasiz. Zero Trust: har bir xona eshigi alohida propuskingizni tekshiradi — bittasini olsangiz ham, qolganlari yopiq.",
-        "Old model: once in the office, you can enter any room. Zero Trust: each room's door checks your badge separately — even if you get into one, the rest stay locked.")),
-    React.createElement(Quiz,{
-      q:{uz:"Zero Trust ning asosiy shiori qanday?",en:"What is the core motto of Zero Trust?"},
-      opts:[{uz:"Ichkaridagi hammaga ishon",en:"Trust everyone inside"},{uz:"Hech kimga ishonma, doim tekshir",en:"Never trust, always verify"},{uz:"Faqat parolga ishon",en:"Trust only the password"},{uz:"Devor yetarli",en:"A wall is enough"}],
-      correct:1,
-      exp:{uz:"Zero Trust \"hech kimga ishonma, doim tekshir\" tamoyiliga asoslanadi — har bir so'rov, ichkaridan bo'lsa ham, tasdiqlanadi.",en:"Zero Trust is based on \"never trust, always verify\" — every request, even from inside, is confirmed."}
-    })
-  );
+    React.createElement(P,null,t(lang,"Zero Trust — \"hech kimga ishonma, doim tekshir\" tamoyili. Eski model tarmoq ichidagini avtomatik ishonchli deb bilardi (qal'a devori kabi). Zero Trust esa har bir so'rovni — ichkaridan bo'lsa ham — tekshiradi.","Zero Trust means \"never trust, always verify\". The old model auto-trusted anything inside the network (like a castle wall). Zero Trust verifies every request — even from inside.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Har so'rov tekshiriladi","Every request is checked")),
+    React.createElement(FlowSteps,{title:{uz:"Zero Trust tekshiruvi",en:"Zero Trust check"},steps:[
+      {icon:"👤",text:{uz:"Kim? — foydalanuvchi shaxsi tasdiqlanadi (MFA)",en:"Who? — user identity verified (MFA)"}},
+      {icon:"💻",text:{uz:"Qanday qurilma? — holati tekshiriladi",en:"What device? — its posture is checked"}},
+      {icon:"📍",text:{uz:"Qayerdan? — kontekst (joy, vaqt)",en:"From where? — context (location, time)"}},
+      {icon:"🔑",text:{uz:"Faqat kerakli resursga minimal ruxsat beriladi",en:"Minimal access granted to just the needed resource"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Asosiy tamoyillar","Core principles")),
+    pr.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
+      React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:150}},t(lang,x[0].uz,x[0].en)),
+      React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Oddiy misol: ","Simple example: ")),t(lang,"eski model: ofisga kirsangiz hamma xonaga kirasiz. Zero Trust: har xona eshigi alohida propuskingizni tekshiradi.","old model: once in the office you can enter any room. Zero Trust: each room's door checks your badge separately.")),
+    React.createElement(Quiz,{q:{uz:"Zero Trust ning asosiy shiori qanday?",en:"What is the core motto of Zero Trust?"},opts:[{uz:"Ichkaridagi hammaga ishon",en:"Trust everyone inside"},{uz:"Hech kimga ishonma, doim tekshir",en:"Never trust, always verify"},{uz:"Faqat parolga ishon",en:"Trust only the password"},{uz:"Devor yetarli",en:"A wall is enough"}],correct:1,exp:{uz:"Zero Trust \"hech kimga ishonma, doim tekshir\" — har so'rov, ichkaridan bo'lsa ham, tasdiqlanadi.",en:"Zero Trust is \"never trust, always verify\" — every request, even from inside, is confirmed."}}));
 }
-
-
-// ── L23: Network Enumeration ──────────────────────────────────
 function LessonL23(){
   const lang=useLang();
   return React.createElement("section",null,
