@@ -539,8 +539,16 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
   const sec=SECTIONS[lesson.sec];
 
   const content=num===1?React.createElement(LessonL01):
+    num===3?React.createElement(LessonL03):
+    num===6?React.createElement(LessonL06):
     num===11?React.createElement(LessonL11):
+    num===14?React.createElement(LessonL14):
+    num===16?React.createElement(LessonL16):
+    num===20?React.createElement(LessonL20):
     num===21?React.createElement(LessonL21):
+    num===24?React.createElement(LessonL24):
+    num===25?React.createElement(LessonL25):
+    num===27?React.createElement(LessonL27):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:800,margin:"0 auto",padding:"24px 16px"}},
@@ -752,6 +760,306 @@ function App(){
       profileOpen&&React.createElement(ProfileModal,{user,theme,setTheme,lang,onClose:()=>setProfileOpen(false),onSave:patch=>{updateProgress({name:patch.name});setProfileOpen(false);}}),
       React.createElement(AIChat,{open:aiOpen,onClose:()=>setAiOpen(false),lang})
     )
+  );
+}
+
+
+// ── L03: Command line basics ──────────────────────────────────
+function LessonL03(){
+  const lang=useLang();
+  const cmds=[
+    {c:"pwd",uz:"Hozirgi joylashuvni (katalogni) ko'rsatadi.",en:"Prints the current working directory."},
+    {c:"ls -la",uz:"Barcha fayllarni (yashirin ham) batafsil ro'yxatlaydi.",en:"Lists all files (including hidden) in long format."},
+    {c:"cd /etc",uz:"Ko'rsatilgan katalogga o'tadi.",en:"Changes into the given directory."},
+    {c:"cp a b",uz:"a faylini b ga nusxalaydi.",en:"Copies file a to b."},
+    {c:"mv a b",uz:"a ni b ga ko'chiradi yoki nomini o'zgartiradi.",en:"Moves or renames a to b."},
+    {c:"rm -rf dir",uz:"Katalogni ichidagi hamma narsa bilan o'chiradi (ehtiyot bo'ling!).",en:"Deletes a directory and everything in it (be careful!)."},
+    {c:"mkdir loot",uz:"Yangi katalog yaratadi.",en:"Creates a new directory."},
+    {c:"cat file",uz:"Fayl mazmunini ekranga chiqaradi.",en:"Prints file contents to the screen."},
+  ];
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Nega buyruq qatori?","Why the command line?")),
+    React.createElement(P,null,t(lang,
+      "Kali'da ishning 90% terminalda bajariladi. Buyruq qatori (CLI) grafik interfeysdan tezroq, avtomatlashtirishga qulay va masofaviy serverlarda yagona imkoniyat bo'ladi. Pentester uchun bash'ni bilish — asosiy ko'nikma.",
+      "About 90% of the work in Kali happens in the terminal. The command line (CLI) is faster than a GUI, easy to automate, and often the only option on remote servers. For a pentester, knowing bash is a core skill."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy buyruqlar","Essential commands")),
+    cmds.map((x,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start"}},
+      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",minWidth:90}},x.c),
+      React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.55}},t(lang,x.uz,x.en))
+    )),
+    React.createElement(H2,{num:"§3"},t(lang,"Quvur (pipe) va yo'naltirish","Pipes and redirection")),
+    React.createElement(P,null,t(lang,
+      "Buyruqlarning kuchi ularni birlashtirishda. Quvur (|) bir buyruq chiqishini boshqasiga uzatadi; > chiqishni faylga yozadi; >> faylga qo'shadi.",
+      "The power of commands is in combining them. A pipe (|) sends one command's output into another; > writes output to a file; >> appends to a file."
+    )),
+    React.createElement(Terminal,null,
+      "# Ochiq portlarni sanab, faylga yozish\ncat scan.txt | grep open | wc -l\n\n# Natijani faylga yo'naltirish\nnmap 10.0.0.1 > result.txt\n\n# Foydalanuvchilarni topish\ncat /etc/passwd | grep -v nologin | cut -d: -f1"
+    ),
+    React.createElement(H2,{num:"§4"},t(lang,"Qidirish: grep va find","Searching: grep and find")),
+    React.createElement(Terminal,null,
+      "# Matn ichidan qidirish (rekursiv, satr raqami bilan)\ngrep -rn \"password\" /var/www/\n\n# Fayl nomi bo'yicha qidirish\nfind / -name \"*.conf\" 2>/dev/null\n\n# SUID bit o'rnatilgan fayllarni topish (privesc uchun)\nfind / -perm -4000 2>/dev/null"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Maslahat: ","Tip: ")),
+      t(lang,"Tab tugmasi buyruq va fayl nomlarini avtomatik to'ldiradi. Yuqoriga strelka oldingi buyruqlarni chaqiradi. history buyrug'i barcha kiritilgan buyruqlarni ko'rsatadi.",
+        "The Tab key auto-completes commands and file names. The up arrow recalls previous commands. The history command shows everything you've typed.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Qaysi belgi bir buyruq chiqishini ikkinchi buyruqqa uzatadi?",en:"Which symbol sends one command's output into another command?"},
+      opts:[{uz:"> (yo'naltirish)",en:"> (redirect)"},{uz:"| (quvur)",en:"| (pipe)"},{uz:"& (fon)",en:"& (background)"},{uz:"# (izoh)",en:"# (comment)"}],
+      correct:1,
+      exp:{uz:"Quvur (|) birinchi buyruqning standart chiqishini ikkinchi buyruqning standart kirishiga uzatadi.",en:"The pipe (|) connects the standard output of the first command to the standard input of the second."}
+    })
+  );
+}
+
+// ── L06: apt package management ───────────────────────────────
+function LessonL06(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"apt nima?","What is apt?")),
+    React.createElement(P,null,t(lang,
+      "Kali Debian asosida qurilgani uchun dasturlarni apt (Advanced Package Tool) orqali o'rnatadi. apt paketlarni yuklab olish, o'rnatish, yangilash va o'chirishni, shuningdek bog'liqliklarni (dependencies) avtomatik hal qilishni boshqaradi.",
+      "Because Kali is built on Debian, it installs software via apt (Advanced Package Tool). apt handles downloading, installing, upgrading and removing packages, and automatically resolves dependencies."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Kundalik buyruqlar","Everyday commands")),
+    React.createElement(Terminal,null,
+      "# Paket ro'yxatini yangilash (har doim avval bajaring)\nsudo apt update\n\n# O'rnatilgan paketlarni yangilash\nsudo apt upgrade -y\n\n# Yangi dastur o'rnatish\nsudo apt install gobuster\n\n# Dasturni o'chirish\nsudo apt remove gobuster\n\n# Dasturni sozlamalari bilan to'liq o'chirish\nsudo apt purge gobuster\n\n# Keraksiz bog'liqliklarni tozalash\nsudo apt autoremove"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Qidirish va ma'lumot","Searching and info")),
+    React.createElement(Terminal,null,
+      "# Paketni nomi bo'yicha qidirish\napt search wordlist\n\n# Paket haqida batafsil ma'lumot\napt show nmap\n\n# O'rnatilgan paketlarni ro'yxatlash\napt list --installed | grep hydra"
+    ),
+    React.createElement(H2,{num:"§4"},t(lang,"Manbalar (sources)","Package sources")),
+    React.createElement(P,null,t(lang,
+      "apt qayerdan paket olishini /etc/apt/sources.list fayli belgilaydi. Kali uchun faqat rasmiy Kali omborlaridan foydalaning — noma'lum manbalar tizimni xavf ostiga qo'yadi.",
+      "Where apt gets packages from is defined in /etc/apt/sources.list. For Kali, use only the official Kali repositories — unknown sources put your system at risk."
+    )),
+    React.createElement(Terminal,null,
+      "# Rasmiy Kali ombori\ndeb http://http.kali.org/kali kali-rolling main contrib non-free non-free-firmware"
+    ),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"apt upgrade dan oldin doim apt update bajaring. Aks holda apt eski ombor ro'yxatidan foydalanadi va yangilanishlarni topa olmaydi.",
+        "Always run apt update before apt upgrade. Otherwise apt uses a stale package list and won't find the updates.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"O'rnatilgan dasturni sozlama fayllari bilan birga to'liq o'chirish uchun qaysi buyruq ishlatiladi?",en:"Which command fully removes an installed program along with its config files?"},
+      opts:[{uz:"apt remove",en:"apt remove"},{uz:"apt purge",en:"apt purge"},{uz:"apt clean",en:"apt clean"},{uz:"apt autoremove",en:"apt autoremove"}],
+      correct:1,
+      exp:{uz:"apt purge paketni va uning konfiguratsiya fayllarini o'chiradi; apt remove esa faqat paketni o'chirib, sozlamalarni qoldiradi.",en:"apt purge removes the package and its configuration files; apt remove deletes only the package and leaves configs behind."}
+    })
+  );
+}
+
+// ── L14: DNS enumeration ──────────────────────────────────────
+function LessonL14(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"DNS enumeratsiya nima uchun?","Why DNS enumeration?")),
+    React.createElement(P,null,t(lang,
+      "DNS — internetning telefon kitobi. Enumeratsiya jarayonida biz nishon domenning subdomenlarini, pochta serverlarini (MX), nom serverlarini (NS) va IP manzillarini to'playmiz. Bu ma'lumotlar hujum yuzasini (attack surface) kengaytiradi.",
+      "DNS is the phone book of the internet. During enumeration we collect a target domain's subdomains, mail servers (MX), name servers (NS) and IP addresses. This information expands the attack surface."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy vositalar","Core tools")),
+    React.createElement(Terminal,null,
+      "# dig — moslashuvchan DNS so'rov vositasi\ndig example.com A\ndig example.com MX\ndig example.com NS\n\n# host — sodda va tez\nhost -t mx example.com\n\n# nslookup — interaktiv rejim ham bor\nnslookup example.com"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Zona transferi (AXFR)","Zone transfer (AXFR)")),
+    React.createElement(P,null,t(lang,
+      "Noto'g'ri sozlangan DNS serverlar butun zonani (barcha yozuvlarni) so'ralganda beradi. Bu — jiddiy noto'g'ri konfiguratsiya va pentestda oltin ma'lumot manbasi.",
+      "Misconfigured DNS servers hand over the entire zone (all records) on request. This is a serious misconfiguration and a goldmine of information in a pentest."
+    )),
+    React.createElement(Terminal,null,
+      "# Zona transferini sinash\ndig axfr @ns1.example.com example.com\n\n# dnsenum bilan avtomatik\ndnsenum example.com\n\n# dnsrecon bilan (brute-force subdomen)\ndnsrecon -d example.com -t brt -D /usr/share/wordlists/subdomains.txt"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"Yozuv turlari: ","Record types: ")),
+      t(lang,"A (IPv4), AAAA (IPv6), MX (pochta), NS (nom serveri), CNAME (taxallus), TXT (matn, ko'pincha SPF/DKIM), SOA (zona boshi).",
+        "A (IPv4), AAAA (IPv6), MX (mail), NS (name server), CNAME (alias), TXT (text, often SPF/DKIM), SOA (start of authority).")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Noto'g'ri sozlangan DNS serverdan butun zona yozuvlarini olish urinishi qanday ataladi?",en:"What is the attempt to pull all zone records from a misconfigured DNS server called?"},
+      opts:[{uz:"Zona transferi (AXFR)",en:"Zone transfer (AXFR)"},{uz:"Reverse lookup",en:"Reverse lookup"},{uz:"Cache poisoning",en:"Cache poisoning"},{uz:"DNS tunneling",en:"DNS tunneling"}],
+      correct:0,
+      exp:{uz:"Zona transferi (AXFR) — bu domenning barcha DNS yozuvlarini bir so'rovda olish; ochiq qolgan AXFR jiddiy zaiflik hisoblanadi.",en:"A zone transfer (AXFR) retrieves all of a domain's DNS records in one request; an open AXFR is a serious vulnerability."}
+    })
+  );
+}
+
+// ── L16: Nikto ────────────────────────────────────────────────
+function LessonL16(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Nikto nima?","What is Nikto?")),
+    React.createElement(P,null,t(lang,
+      "Nikto — ochiq kodli veb-server skaneri. U 6700+ potentsial xavfli fayl va dasturni, eskirgan server versiyalarini va konfiguratsiya muammolarini tekshiradi. Tez, lekin \"shovqinli\" — IDS/IPS uni oson aniqlaydi.",
+      "Nikto is an open-source web server scanner. It checks for 6700+ potentially dangerous files and programs, outdated server versions and configuration issues. It is fast but 'noisy' — IDS/IPS detect it easily."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy foydalanish","Basic usage")),
+    React.createElement(Terminal,null,
+      "# Oddiy skan\nnikto -h http://target.com\n\n# Muayyan portda\nnikto -h target.com -p 8080\n\n# HTTPS bilan\nnikto -h https://target.com -ssl\n\n# Natijani HTML faylga saqlash\nnikto -h target.com -o report.html -Format htm"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Foydali sozlamalar","Useful options")),
+    React.createElement(Terminal,null,
+      "# Faqat muayyan sinov turlarini ishga tushirish (Tuning)\n# 1=fayllar, 2=noto'g'ri konfig, 9=SQLi, x=teskari\nnikto -h target.com -Tuning 1234\n\n# Proksi orqali (Burp bilan tahlil uchun)\nnikto -h target.com -useproxy http://127.0.0.1:8080"
+    ),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Nikto faqat sizga tegishli yoki yozma ruxsat berilgan tizimlarda ishlatilishi kerak. Ruxsatsiz skanerlash ko'p mamlakatlarda qonunga zid.",
+        "Nikto must only be used on systems you own or have written authorization to test. Unauthorized scanning is illegal in many countries.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Nikto haqida qaysi tavsif to'g'ri?",en:"Which description of Nikto is correct?"},
+      opts:[{uz:"Yashirin (stealth) parol buzuvchi",en:"A stealthy password cracker"},{uz:"Shovqinli veb-server zaiflik skaneri",en:"A noisy web server vulnerability scanner"},{uz:"Tarmoq snifferi",en:"A network sniffer"},{uz:"Ekspluatatsiya frameworki",en:"An exploitation framework"}],
+      correct:1,
+      exp:{uz:"Nikto — veb-serverlardagi ma'lum zaifliklar va noto'g'ri konfiguratsiyalarni tekshiruvchi skaner; u shovqinli, ya'ni himoya tizimlari uni oson aniqlaydi.",en:"Nikto is a scanner that checks web servers for known vulnerabilities and misconfigurations; it is noisy, meaning defenses detect it easily."}
+    })
+  );
+}
+
+// ── L20: Wireshark ────────────────────────────────────────────
+function LessonL20(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Wireshark nima?","What is Wireshark?")),
+    React.createElement(P,null,t(lang,
+      "Wireshark — dunyodagi eng mashhur tarmoq protokoli analizatori. U tarmoqdan o'tayotgan paketlarni real vaqtda ushlaydi va ularni batafsil, qatlam-qatlam ko'rsatadi. Muammolarni tuzatish, o'rganish va shifrlanmagan ma'lumotlarni tahlil qilish uchun ishlatiladi.",
+      "Wireshark is the world's most popular network protocol analyzer. It captures packets crossing the network in real time and displays them in detail, layer by layer. It is used for troubleshooting, learning and analyzing unencrypted data."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Ushlash va filtrlar","Capture and filters")),
+    React.createElement(P,null,t(lang,
+      "Wireshark ikki xil filtrga ega: ushlash filtri (capture filter) — nimani yozib olishni cheklaydi; ko'rsatish filtri (display filter) — yozilganidan nimani ko'rsatishni cheklaydi. Ko'rsatish filtrlari ancha kuchli.",
+      "Wireshark has two kinds of filters: capture filters limit what gets recorded; display filters limit what is shown from what was recorded. Display filters are far more powerful."
+    )),
+    React.createElement(Terminal,null,
+      "# Keng tarqalgan ko'rsatish filtrlari:\nip.addr == 10.0.0.5          # muayyan IP\ntcp.port == 80               # HTTP trafigi\nhttp                         # faqat HTTP\ndns                          # faqat DNS so'rovlar\ntcp.flags.syn == 1           # SYN paketlar\nhttp.request.method == \"POST\"  # POST so'rovlar"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Oqimni kuzatish (Follow Stream)","Follow Stream")),
+    React.createElement(P,null,t(lang,
+      "Paketga o'ng tugma bosib \"Follow > TCP Stream\" ni tanlang — bu bitta ulanishning butun suhbatini bir oynada ko'rsatadi. Shifrlanmagan protokollarda (HTTP, FTP, Telnet) bu login va parollarni ochib berishi mumkin.",
+      "Right-click a packet and choose 'Follow > TCP Stream' to see an entire conversation of a single connection in one window. On unencrypted protocols (HTTP, FTP, Telnet) this can reveal logins and passwords."
+    )),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"tshark: ","tshark: ")),
+      t(lang,"Wireshark'ning terminal versiyasi. Skriptlar va masofaviy serverlar uchun qulay: tshark -i eth0 -f \"port 80\"",
+        "The terminal version of Wireshark. Handy for scripts and remote servers: tshark -i eth0 -f \"port 80\"")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Yozib olingan paketlardan faqat kerakligini ko'rsatish uchun qaysi filtr ishlatiladi?",en:"Which filter is used to show only relevant packets from those already captured?"},
+      opts:[{uz:"Capture filter (ushlash filtri)",en:"Capture filter"},{uz:"Display filter (ko'rsatish filtri)",en:"Display filter"},{uz:"Firewall qoidasi",en:"Firewall rule"},{uz:"NAT jadvali",en:"NAT table"}],
+      correct:1,
+      exp:{uz:"Ko'rsatish filtri (display filter) allaqachon ushlangan paketlardan nimani ko'rsatishni belgilaydi va ancha moslashuvchan.",en:"The display filter defines what to show from already-captured packets and is much more flexible."}
+    })
+  );
+}
+
+// ── L24: Hydra ────────────────────────────────────────────────
+function LessonL24(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Hydra nima?","What is Hydra?")),
+    React.createElement(P,null,t(lang,
+      "Hydra (THC-Hydra) — tezkor va parallel ishlaydigan onlayn parol buzish vositasi. U SSH, FTP, RDP, HTTP forma, SMB va o'nlab boshqa protokollarga qarshi lug'at (dictionary) hujumini amalga oshiradi. \"Onlayn\" degani — u to'g'ridan-to'g'ri jonli xizmatga urinadi.",
+      "Hydra (THC-Hydra) is a fast, parallelized online password-cracking tool. It performs dictionary attacks against SSH, FTP, RDP, HTTP forms, SMB and dozens of other protocols. 'Online' means it attacks a live service directly."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Sintaksis va misollar","Syntax and examples")),
+    React.createElement(Terminal,null,
+      "# Umumiy shakl:\n# hydra -l USER -P WORDLIST target service\n\n# SSH ga qarshi (bitta foydalanuvchi)\nhydra -l admin -P rockyou.txt ssh://10.0.0.5\n\n# FTP (foydalanuvchilar ro'yxati bilan)\nhydra -L users.txt -P pass.txt ftp://10.0.0.5\n\n# RDP\nhydra -l administrator -P pass.txt rdp://10.0.0.5"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"HTTP forma hujumi","HTTP form attack")),
+    React.createElement(P,null,t(lang,
+      "Veb login formalari uchun http-post-form modulidan foydalaniladi. Muvaffaqiyatsizlikni bildiruvchi matnni (F=...) ko'rsatish kerak.",
+      "For web login forms, use the http-post-form module. You must specify the text that indicates failure (F=...)."
+    )),
+    React.createElement(Terminal,null,
+      "hydra -l admin -P rockyou.txt 10.0.0.5 http-post-form \\\n  \"/login.php:user=^USER^&pass=^PASS^:F=Invalid credentials\""
+    ),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Brute-force hujumlari faqat yozma ruxsat berilgan tizimlarda, masalan CTF yoki shartnomali pentestda o'tkazilishi kerak. Ruxsatsiz urinish jinoyat hisoblanadi va akkauntlarni bloklashi mumkin.",
+        "Brute-force attacks must only be run on systems with written authorization, such as CTFs or contracted pentests. Unauthorized attempts are a crime and can lock out accounts.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Hydra qanday turdagi parol hujumini amalga oshiradi?",en:"What type of password attack does Hydra perform?"},
+      opts:[{uz:"Oflayn hash buzish",en:"Offline hash cracking"},{uz:"Onlayn (jonli xizmatga) lug'at hujumi",en:"Online (against a live service) dictionary attack"},{uz:"Rainbow table",en:"Rainbow table lookup"},{uz:"Phishing",en:"Phishing"}],
+      correct:1,
+      exp:{uz:"Hydra onlayn hujum vositasi — u parollarni to'g'ridan-to'g'ri jonli xizmatga (SSH, FTP va h.k.) urinib sinaydi. Hashni oflayn buzish uchun John yoki Hashcat ishlatiladi.",en:"Hydra is an online attack tool — it tries passwords directly against a live service (SSH, FTP, etc.). For offline hash cracking you use John or Hashcat."}
+    })
+  );
+}
+
+// ── L25: John the Ripper ──────────────────────────────────────
+function LessonL25(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"John the Ripper nima?","What is John the Ripper?")),
+    React.createElement(P,null,t(lang,
+      "John the Ripper (JtR) — mashhur oflayn parol hash buzish vositasi. \"Oflayn\" degani — u sizda mavjud hashlar bilan ishlaydi va nishon tizimga ulanmaydi. U yuzlab hash turlarini (MD5, SHA, NTLM, bcrypt va h.k.) qo'llab-quvvatlaydi.",
+      "John the Ripper (JtR) is a popular offline password-hash cracker. 'Offline' means it works on hashes you already have and never touches the target system. It supports hundreds of hash types (MD5, SHA, NTLM, bcrypt, etc.)."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Ish jarayoni","Workflow")),
+    React.createElement(Terminal,null,
+      "# 1. Linux hashlarini birlashtirish (root kerak)\nunshadow /etc/passwd /etc/shadow > hashes.txt\n\n# 2. Lug'at rejimida buzish\njohn --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt\n\n# 3. Buzilgan parollarni ko'rish\njohn --show hashes.txt"
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Rejimlar va formatlar","Modes and formats")),
+    React.createElement(Terminal,null,
+      "# Hash turini aniq ko'rsatish\njohn --format=raw-md5 hashes.txt\n\n# Incremental (brute-force) rejim\njohn --incremental hashes.txt\n\n# Qoidalar bilan (parollarni o'zgartirish)\njohn --wordlist=rockyou.txt --rules hashes.txt"
+    ),
+    React.createElement(InfoBox,{color:"var(--accent)"},
+      React.createElement("strong",null,t(lang,"John vs Hashcat: ","John vs Hashcat: ")),
+      t(lang,"John CPU'da moslashuvchan va formatlarni avtomatik aniqlaydi; Hashcat esa GPU tezligida ancha tez ishlaydi. Katta hajmdagi ishlar uchun Hashcat afzal.",
+        "John is flexible on the CPU and auto-detects formats; Hashcat runs much faster at GPU speed. For large jobs Hashcat is preferred.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"John the Ripper \"oflayn\" vosita deganda nima nazarda tutiladi?",en:"What does it mean that John the Ripper is an 'offline' tool?"},
+      opts:[{uz:"Internet talab qilmaydi",en:"It requires no internet"},{uz:"U nishon tizimga ulanmasdan, mavjud hashlarni buzadi",en:"It cracks existing hashes without connecting to the target"},{uz:"Faqat kechasi ishlaydi",en:"It only runs at night"},{uz:"Faqat Windows'da ishlaydi",en:"It only runs on Windows"}],
+      correct:1,
+      exp:{uz:"Oflayn buzish — bu qo'lga kiritilgan hashlarni mahalliy ravishda, nishon xizmatiga hech qanday so'rov yubormasdan sindirish.",en:"Offline cracking means breaking captured hashes locally, sending no requests to the target service."}
+    })
+  );
+}
+
+// ── L27: Burp Suite ───────────────────────────────────────────
+function LessonL27(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(H2,{num:"§1"},t(lang,"Burp Suite nima?","What is Burp Suite?")),
+    React.createElement(P,null,t(lang,
+      "Burp Suite — veb-ilovalarni test qilishning sanoat standarti. U brauzer va server o'rtasida proksi sifatida o'tirib, HTTP so'rovlarni ushlash, o'zgartirish va qayta yuborish imkonini beradi. Kali'da Community versiyasi oldindan o'rnatilgan.",
+      "Burp Suite is the industry standard for testing web applications. It sits as a proxy between the browser and server, letting you intercept, modify and replay HTTP requests. The Community edition comes pre-installed on Kali."
+    )),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy komponentlar","Core components")),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:10,margin:"12px 0 18px"}},
+      [["Proxy",t(lang,"So'rovlarni ushlab o'zgartirish","Intercept & modify requests")],
+       ["Repeater",t(lang,"So'rovni qo'lda qayta yuborish","Manually resend a request")],
+       ["Intruder",t(lang,"Avtomatlashtirilgan fuzzing/brute","Automated fuzzing / brute force")],
+       ["Decoder",t(lang,"Kodlash/dekodlash (base64, URL)","Encode/decode (base64, URL)")]].map((x,i)=>
+        React.createElement("div",{key:i,style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"12px 14px"}},
+          React.createElement("div",{style:{fontWeight:700,fontSize:13,color:"var(--accent)",marginBottom:4}},x[0]),
+          React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",lineHeight:1.5}},x[1])))
+    ),
+    React.createElement(H2,{num:"§3"},t(lang,"Proksi sozlash","Setting up the proxy")),
+    React.createElement(Terminal,null,
+      "# 1. Burp'da: Proxy > Intercept > Intercept is ON\n# 2. Brauzer proksi: 127.0.0.1:8080\n# 3. Burp CA sertifikatini o'rnatish:\n#    http://burp > Download CA Certificate\n#    Brauzer > Certificates > Import\n\n# FoxyProxy (brauzer kengaytmasi) almashtirishni osonlashtiradi"
+    ),
+    React.createElement(H2,{num:"§4"},t(lang,"Repeater bilan test","Testing with Repeater")),
+    React.createElement(P,null,t(lang,
+      "So'rovni ushlaganingizdan so'ng, unga o'ng tugma bosib \"Send to Repeater\" ni tanlang (yoki Ctrl+R). Repeater'da so'rovni istalgancha o'zgartirib qayta yuborishingiz va javobni tahlil qilishingiz mumkin — SQLi, XSS va boshqa zaifliklarni sinash uchun ideal.",
+      "After intercepting a request, right-click it and choose 'Send to Repeater' (or Ctrl+R). In Repeater you can modify and resend the request as many times as you like and analyze the response — ideal for testing SQLi, XSS and other vulnerabilities."
+    )),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},
+      React.createElement("strong",null,"⚠ "),
+      t(lang,"Burp Suite'ni faqat sizga tegishli yoki test qilishga ruxsat berilgan veb-ilovalarda ishlating. PortSwigger'ning Web Security Academy'sida bepul amaliy laboratoriyalar mavjud.",
+        "Only use Burp Suite on web apps you own or are authorized to test. PortSwigger's Web Security Academy offers free hands-on labs.")
+    ),
+    React.createElement(Quiz,{
+      q:{uz:"Burp Suite'ning qaysi qismi bitta so'rovni qo'lda o'zgartirib qayta-qayta yuborish uchun mo'ljallangan?",en:"Which part of Burp Suite is meant for manually modifying and resending a single request repeatedly?"},
+      opts:[{uz:"Proxy",en:"Proxy"},{uz:"Repeater",en:"Repeater"},{uz:"Decoder",en:"Decoder"},{uz:"Comparer",en:"Comparer"}],
+      correct:1,
+      exp:{uz:"Repeater bitta so'rovni qo'lda o'zgartirib, qayta yuborish va javoblarni solishtirish uchun ishlatiladi.",en:"Repeater is used to manually tweak a single request, resend it and compare the responses."}
+    })
   );
 }
 
