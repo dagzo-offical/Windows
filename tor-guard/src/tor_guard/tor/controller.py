@@ -47,7 +47,7 @@ class _SocketConnection:
         while b"\r\n" not in self._buf:
             chunk = self._sock.recv(4096)
             if not chunk:
-                raise TorError("control connection closed unexpectedly")
+                raise TorError("boshqaruv ulanishi kutilmaganda yopildi")
             self._buf += chunk
         line, _, self._buf = self._buf.partition(b"\r\n")
         return line.decode("ascii", errors="replace")
@@ -58,7 +58,7 @@ class _SocketConnection:
         while True:
             raw = self._readline()
             if len(raw) < 4:
-                raise TorError(f"malformed control reply: {raw!r}")
+                raise TorError(f"noto‘g‘ri boshqaruv javobi: {raw!r}")
             code = int(raw[:3])
             separator = raw[3]
             lines.append(raw[4:])
@@ -102,26 +102,31 @@ class TorController:
             return self._factory(self._host, self._port, self._timeout)
         except OSError as exc:
             raise TorError(
-                f"cannot reach Tor ControlPort {self._host}:{self._port}: {exc}"
+                f"Tor ControlPort {self._host}:{self._port} ga ulanib bo‘lmadi: {exc}"
             ) from exc
 
     def authenticate(self) -> None:
         cookie_path = find_cookie(self._cookie_paths)
         if cookie_path is None:
             raise TorError(
-                "Tor control auth cookie not found",
-                hint="ensure torrc has 'CookieAuthentication 1' and Tor is running",
+                "Tor boshqaruv autentifikatsiya cookie fayli topilmadi",
+                hint=(
+                    "torrc’da 'CookieAuthentication 1' borligiga "
+                    "va Tor ishlayotganiga ishonch hosil qiling"
+                ),
             )
         try:
             cookie = cookie_path.read_bytes()
         except OSError as exc:
-            raise TorError(f"cannot read control cookie {cookie_path}: {exc}") from exc
+            raise TorError(f"boshqaruv cookie faylini o‘qib bo‘lmadi {cookie_path}: {exc}") from exc
         conn = self._connect()
         self._conn = conn
         conn.sendline(f"AUTHENTICATE {cookie.hex()}")
         code, lines = conn.recv_reply()
         if code != 250:
-            raise TorError(f"Tor control authentication failed ({code}): {' '.join(lines)}")
+            raise TorError(
+                f"Tor boshqaruv autentifikatsiyasi muvaffaqiyatsiz ({code}): {' '.join(lines)}"
+            )
         _log.debug("authenticated to Tor control port")
 
     def getinfo(self, key: str) -> str:
@@ -131,7 +136,7 @@ class TorController:
         self._conn.sendline(f"GETINFO {key}")
         code, lines = self._conn.recv_reply()
         if code != 250:
-            raise TorError(f"GETINFO {key} failed ({code}): {' '.join(lines)}")
+            raise TorError(f"GETINFO {key} muvaffaqiyatsiz ({code}): {' '.join(lines)}")
         for line in lines:
             if line.startswith(f"{key}="):
                 return line[len(key) + 1 :]

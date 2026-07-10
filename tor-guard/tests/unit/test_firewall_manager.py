@@ -46,7 +46,7 @@ def test_apply_rejected_when_validation_fails(tmp_path):
 
     runner.handler = handler
     mgr = _manager(tmp_path, runner)
-    with pytest.raises(FirewallError, match="rejected"):
+    with pytest.raises(FirewallError, match="rad etildi"):
         mgr.apply_protected(PARAMS)
     # never reached apply
     assert not [c for c in runner.calls if "-f" in c and "-c" not in c]
@@ -64,7 +64,7 @@ def test_apply_failure_raises(tmp_path):
 
     runner = FakeRunner(handler=handler)
     mgr = _manager(tmp_path, runner)
-    with pytest.raises(FirewallError, match="failed to apply"):
+    with pytest.raises(FirewallError, match="qo‘llab bo‘lmadi"):
         mgr.apply_protected(PARAMS)
 
 
@@ -96,5 +96,5 @@ def test_remove_tables_only_targets_our_tables(tmp_path):
 
 def test_restore_missing_backup_raises(tmp_path):
     mgr = _manager(tmp_path, FakeRunner())
-    with pytest.raises(FirewallError, match="backup not found"):
+    with pytest.raises(FirewallError, match="zaxira nusxa topilmadi"):
         mgr.restore_from_backup(tmp_path / "nope.nft")

@@ -118,23 +118,25 @@ class LeakTester:
         result = self._verifier.verify()
         if result.state is VerifyState.CONFIRMED_TOR:
             return LeakTestResult(
-                "tor-connectivity", True, Severity.CRITICAL, "exit confirmed via Tor"
+                "tor-connectivity", True, Severity.CRITICAL, "chiqish Tor orqali tasdiqlandi"
             )
         if result.state is VerifyState.LEAK_DETECTED:
             return LeakTestResult(
-                "tor-connectivity", False, Severity.CRITICAL, "traffic NOT via Tor"
+                "tor-connectivity", False, Severity.CRITICAL, "trafik Tor orqali EMAS"
             )
         return LeakTestResult(
-            "tor-connectivity", True, Severity.INFO, "verification unavailable (not a leak)"
+            "tor-connectivity", True, Severity.INFO, "tekshiruv mavjud emas (sizib chiqish emas)"
         )
 
     def _expect_blocked_tcp(self, name: str, family: int, host: str, port: int) -> LeakTestResult:
         try:
             sock = self._tcp(family, host, port, self._timeout)
             sock.close()
-            return LeakTestResult(name, False, Severity.CRITICAL, f"connected directly to {host}")
+            return LeakTestResult(
+                name, False, Severity.CRITICAL, f"to‘g‘ridan-to‘g‘ri {host} ga ulandi"
+            )
         except OSError:
-            return LeakTestResult(name, True, Severity.CRITICAL, "blocked as expected")
+            return LeakTestResult(name, True, Severity.CRITICAL, "kutilganidek bloklandi")
 
     def _expect_blocked_udp(
         self, name: str, payload: bytes, host: str, port: int
@@ -142,10 +144,10 @@ class LeakTester:
         try:
             self._udp(payload, host, port, self._timeout)
             return LeakTestResult(
-                name, False, Severity.CRITICAL, f"got UDP reply from {host}:{port}"
+                name, False, Severity.CRITICAL, f"{host}:{port} dan UDP javob keldi"
             )
         except OSError:
-            return LeakTestResult(name, True, Severity.CRITICAL, "blocked as expected")
+            return LeakTestResult(name, True, Severity.CRITICAL, "kutilganidek bloklandi")
 
     def probe_ipv6_tcp(self) -> LeakTestResult:
         host, port = self._ipv6_target
@@ -176,8 +178,10 @@ class LeakTester:
     def probe_tor_dns_resolves(self) -> LeakTestResult:
         result = self._dns.validate_tor_dns(self._dns_port)
         if result.ok:
-            return LeakTestResult("tor-dns", True, Severity.HIGH, "Tor DNSPort resolves names")
-        return LeakTestResult("tor-dns", False, Severity.HIGH, f"Tor DNS failed: {result.detail}")
+            return LeakTestResult("tor-dns", True, Severity.HIGH, "Tor DNSPort nomlarni aniqlaydi")
+        return LeakTestResult(
+            "tor-dns", False, Severity.HIGH, f"Tor DNS muvaffaqiyatsiz: {result.detail}"
+        )
 
     # -- suite ---------------------------------------------------------------
     def run_all(self) -> LeakTestReport:
@@ -195,7 +199,7 @@ class LeakTester:
                 report.add(probe())
             except Exception as exc:
                 report.add(
-                    LeakTestResult(probe.__name__, False, Severity.HIGH, f"probe error: {exc}")
+                    LeakTestResult(probe.__name__, False, Severity.HIGH, f"tekshiruv xatosi: {exc}")
                 )
         return report
 

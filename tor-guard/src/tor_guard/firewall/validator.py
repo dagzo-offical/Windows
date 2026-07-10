@@ -43,15 +43,17 @@ class RulesetValidator:
             except OSError:
                 pass
         if result.ok:
-            return ValidationResult(True, "ruleset syntactically and semantically valid")
-        msg = result.stderr.strip() or result.stdout.strip() or "unknown nft error"
-        _log.error("ruleset validation failed: %s", msg)
+            return ValidationResult(
+                True, "qoidalar to‘plami sintaktik va semantik jihatdan to‘g‘ri"
+            )
+        msg = result.stderr.strip() or result.stdout.strip() or "noma’lum nft xatosi"
+        _log.error("qoidalar to‘plamini tekshirish muvaffaqiyatsiz: %s", msg)
         return ValidationResult(False, msg)
 
     def validate_or_raise(self, ruleset: str) -> None:
         outcome = self.validate_text(ruleset)
         if not outcome.ok:
-            raise FirewallError(f"nftables ruleset rejected: {outcome.message}")
+            raise FirewallError(f"nftables qoidalar to‘plami rad etildi: {outcome.message}")
 
 
 __all__ = ["RulesetValidator", "ValidationResult"]

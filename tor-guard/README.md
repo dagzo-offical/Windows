@@ -1,121 +1,127 @@
 # Tor Guard
 
-**Fail-closed, system-wide Tor transparent-proxy kill switch for Linux workstations.**
+**Linux ish stansiyalari uchun fail-closed, butun tizim bo‘ylab Tor transparent-proxy kill switch.**
 
-Tor Guard forces all supported outbound TCP through Tor, routes DNS through
-Tor, and blocks everything that cannot be routed through Tor. If Tor stops,
-crashes, fails validation, or the firewall is tampered with, outbound Internet
-connectivity **stays blocked** — traffic never silently falls back to your real
-network.
+Tor Guard barcha qo‘llab-quvvatlanadigan chiquvchi TCP trafigini Tor orqali
+majburlaydi, DNS’ni Tor orqali yo‘naltiradi va Tor orqali yo‘naltirib
+bo‘lmaydigan hamma narsani bloklaydi. Agar Tor to‘xtasa, ishdan chiqsa,
+tekshiruvdan o‘tmasa yoki firewall buzib o‘zgartirilsa, chiquvchi internet
+ulanishi **bloklangan holatda qoladi** — trafik hech qachon jimgina sizning
+haqiqiy tarmog‘ingizga qaytmaydi.
 
-> ## ⚠️ Anonymity disclaimer — read this first
+> ## ⚠️ Anonimlik haqida ogohlantirish — avval buni o‘qing
 >
-> Tor Guard reduces **accidental** exposure of your real IP address and DNS
-> queries. It is **not** an anonymity guarantee. It **cannot** protect you
-> against a compromised host or kernel, a root-level attacker on the machine,
-> global passive adversaries, traffic-correlation attacks, browser/TLS
-> fingerprinting, malicious documents, malware, endpoint telemetry, logging
-> into personal accounts, or other operational-security mistakes. For browsing,
-> use the Tor Browser. See [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) and
+> Tor Guard haqiqiy IP manzilingiz va DNS so‘rovlaringizning **tasodifiy**
+> oshkor bo‘lishini kamaytiradi. Bu anonimlik **kafolati EMAS**. U sizni
+> buzilgan host yoki yadro, mashinada root darajasidagi hujumchi, global passiv
+> raqiblar, trafik korrelyatsiyasi hujumlari, brauzer/TLS barmoq izlari, zararli
+> hujjatlar, zararli dasturlar, endpoint telemetriyasi, shaxsiy hisoblarga
+> kirish yoki boshqa operatsion-xavfsizlik xatolaridan himoya qila **olmaydi**.
+> Internetni ko‘rish uchun Tor Browser’dan foydalaning. Qarang:
+> [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) va
 > [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 
-## Supported systems
+## Qo‘llab-quvvatlanadigan tizimlar
 
-- Ubuntu 24.04 LTS, Ubuntu 22.04 LTS, Debian 12, current Kali (Debian-based)
-- Init: **systemd** · Firewall: **nftables only** · Python **3.11+**
+- Ubuntu 24.04 LTS, Ubuntu 22.04 LTS, Debian 12, joriy Kali (Debian asosidagi)
+- Init: **systemd** · Firewall: **faqat nftables** · Python **3.11+**
 
-The installer refuses to run on anything else, leaving the host unchanged.
+O‘rnatuvchi boshqa har qanday tizimda ishlashdan bosh tortadi va host’ni
+o‘zgarishsiz qoldiradi.
 
-## Architecture at a glance
+## Arxitektura umumiy ko‘rinishda
 
 ```
  user apps ──┬─ TCP ───▶ nftables NAT ─redirect─▶ Tor TransPort (127.0.0.1:9040) ─▶ Tor ─▶ Internet
              └─ DNS ───▶ nftables NAT ─redirect─▶ Tor DNSPort  (127.0.0.1:5353)
- everything else (IPv6, UDP/QUIC, direct TCP, direct DNS) ─────▶ DROP  (default-deny)
- only the dedicated tor uid may egress directly (to reach relays)
+ boshqa hamma narsa (IPv6, UDP/QUIC, to‘g‘ridan-to‘g‘ri TCP, to‘g‘ridan-to‘g‘ri DNS) ─────▶ DROP  (default-deny)
+ faqat maxsus tor uid to‘g‘ridan-to‘g‘ri chiqishi mumkin (relaylarga ulanish uchun)
 ```
 
-The kill switch is a dedicated set of nftables tables applied atomically. A
-monitor daemon re-asserts the ruleset if it is tampered with and restarts Tor if
-it dies — but it **never** restores clearnet. Full design:
+Kill switch — atomik tarzda qo‘llaniladigan maxsus nftables jadvallari to‘plami.
+Monitor xizmati qoidalar to‘plami buzib o‘zgartirilsa uni qayta o‘rnatadi va Tor
+ishdan chiqsa uni qayta ishga tushiradi — lekin **hech qachon** oddiy internetni
+tiklamaydi. To‘liq dizayn:
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md),
 [`docs/SECURITY_INVARIANTS.md`](docs/SECURITY_INVARIANTS.md).
 
-## Installation
+## O‘rnatish
 
 ```bash
-sudo bash scripts/install.sh          # installs deps + package + files
-sudoedit /etc/tor-guard/tor-guard.yml # review configuration
-sudo tor-guard start                  # apply kill switch, start Tor, verify
-sudo tor-guard enable                 # persist across reboot (fail-closed at boot)
+sudo bash scripts/install.sh          # dependency’lar + paket + fayllarni o‘rnatadi
+sudoedit /etc/tor-guard/tor-guard.yml # sozlamalarni ko‘rib chiqing
+sudo tor-guard start                  # kill switchni qo‘llaydi, Tor’ni ishga tushiradi, tekshiradi
+sudo tor-guard enable                 # qayta yuklashda ham saqlanadi (yuklanishda fail-closed)
 ```
 
-Full guide: [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
+To‘liq qo‘llanma: [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
 
-## Basic usage
+## Asosiy foydalanish
 
 ```bash
-tor-guard status            # protection state and mode
-tor-guard doctor            # non-destructive health check
-tor-guard verify            # confirm protection is intact
-tor-guard test-leaks --i-understand   # active leak probes (disposable VM)
-sudo tor-guard restart      # re-apply firewall + Tor with no open window
-sudo tor-guard stop         # stop services — CLEARNET STAYS BLOCKED
-sudo tor-guard emergency-lock         # most-restrictive lockdown (no Tor needed)
-sudo tor-guard unlock-clearnet        # explicit, audited restore of clearnet
+tor-guard status            # himoya holati va rejim
+tor-guard doctor            # buzmaydigan holat tekshiruvi
+tor-guard verify            # himoya butunligini tasdiqlaydi
+tor-guard test-leaks --i-understand   # faol sizib chiqish tekshiruvlari (disposable VM)
+sudo tor-guard restart      # firewall + Tor’ni ochiq oyna qoldirmasdan qayta qo‘llaydi
+sudo tor-guard stop         # xizmatlarni to‘xtatadi — ODDIY INTERNET BLOKLANGAN HOLATDA QOLADI
+sudo tor-guard emergency-lock         # eng cheklovchi bloklash (Tor kerak emas)
+sudo tor-guard unlock-clearnet        # oddiy internetni aniq, audit qilinadigan tiklash
 ```
 
-### Protected vs Locked vs Unlocked
+### Himoyalangan / Bloklangan / Ochilgan holatlar
 
-| State       | Meaning                                                           |
-|-------------|------------------------------------------------------------------|
-| `PROTECTED` | Firewall active, Tor healthy, exit confirmed via Tor.            |
-| `LOCKED`    | Firewall active, Tor unhealthy/absent — **all egress blocked**. |
-| `DEGRADED`  | Firewall active, Tor up, but a non-fatal check failed.          |
-| `UNLOCKED`  | Kill switch removed by explicit admin action — clearnet allowed. |
+| Holat       | Ma’nosi                                                             |
+|-------------|--------------------------------------------------------------------|
+| `PROTECTED` | Firewall faol, Tor sog‘lom, chiqish Tor orqali tasdiqlangan.       |
+| `LOCKED`    | Firewall faol, Tor nosog‘lom/yo‘q — **barcha chiquvchi trafik bloklangan**. |
+| `DEGRADED`  | Firewall faol, Tor ishlayapti, lekin halokatsiz tekshiruv muvaffaqiyatsiz. |
+| `UNLOCKED`  | Kill switch aniq administrator amali bilan olib tashlangan — oddiy internetga ruxsat. |
 
-Stopping Tor Guard or Tor leaves you in `LOCKED`, not `UNLOCKED`. Only
-`unlock-clearnet` restores direct networking.
+Tor Guard yoki Tor’ni to‘xtatish sizni `UNLOCKED` emas, `LOCKED` holatida
+qoldiradi. To‘g‘ridan-to‘g‘ri tarmoqni faqat `unlock-clearnet` tiklaydi.
 
-## Operating modes
+## Ish rejimlari
 
-- **STRICT** (default, recommended): Internet only via Tor; LAN, link-local,
-  multicast, broadcast, and IPv6 all blocked.
-- **LAN-COMPATIBLE**: same, but explicitly configured `allowed_lan_cidrs` may be
-  reached directly. No implicit LAN allowance; public CIDRs are rejected.
+- **STRICT** (standart, tavsiya etiladi): internet faqat Tor orqali; LAN,
+  link-local, multicast, broadcast va IPv6 — barchasi bloklangan.
+- **LAN-COMPATIBLE**: xuddi shunday, lekin aniq sozlangan `allowed_lan_cidrs`
+  to‘g‘ridan-to‘g‘ri ochilishi mumkin. Yashirin LAN ruxsati yo‘q; ommaviy
+  (public) CIDR’lar rad etiladi.
 
-See [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md).
+Qarang: [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md).
 
-## If networking breaks (recovery)
+## Agar tarmoq buzilsa (tiklash)
 
-From a local console:
+Mahalliy konsoldan:
 
 ```bash
-sudo bash scripts/emergency-recover.sh        # removes only Tor Guard's tables
+sudo bash scripts/emergency-recover.sh        # faqat Tor Guard jadvallarini olib tashlaydi
 ```
 
-It never runs `nft flush ruleset`, so your other firewall rules survive. Full
-procedure: [`docs/RECOVERY.md`](docs/RECOVERY.md).
+U hech qachon `nft flush ruleset` bajarmaydi, shuning uchun boshqa firewall
+qoidalaringiz saqlanib qoladi. To‘liq tartib:
+[`docs/RECOVERY.md`](docs/RECOVERY.md).
 
-## Testing
+## Testlash
 
 ```bash
-make test          # unit tests (no root/network needed)
-make all           # ruff + mypy(strict) + bandit + shellcheck + tests
-make nft-check     # generate and validate the ruleset with `nft -c`
+make test          # birlik (unit) testlar (root/tarmoq kerak emas)
+make all           # ruff + mypy(strict) + bandit + shellcheck + testlar
+make nft-check     # qoidalar to‘plamini yaratadi va `nft -c` bilan tekshiradi
 ```
 
-Destructive integration and leak tests run only in disposable VMs
-(`vm-tests/`), gated by `TOR_GUARD_DISPOSABLE_VM=1`. See
+Destruktiv integratsiya va sizib chiqish testlari faqat disposable VM’larda
+(`vm-tests/`), `TOR_GUARD_DISPOSABLE_VM=1` bilan ishlaydi. Qarang:
 [`docs/TESTING.md`](docs/TESTING.md).
 
-## Known limitations
+## Ma’lum cheklovlar
 
-Application-level DoH/DoT (encrypted DNS to :443/:853) is redirected through Tor
-rather than blocked; root on the host can remove Tor Guard; QUIC is blocked as
-generic UDP (browsers fall back to TCP). Full list:
+Ilova darajasidagi DoH/DoT (shifrlangan DNS :443/:853 ga) bloklanmaydi, balki
+Tor orqali yo‘naltiriladi; host’dagi root Tor Guard’ni olib tashlashi mumkin;
+QUIC umumiy UDP sifatida bloklanadi (brauzerlar TCP’ga qaytadi). To‘liq ro‘yxat:
 [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md).
 
-## License
+## Litsenziya
 
-MIT — see [`LICENSE`](LICENSE).
+MIT — [`LICENSE`](LICENSE) ga qarang.

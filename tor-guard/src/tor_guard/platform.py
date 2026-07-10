@@ -48,8 +48,8 @@ def detect_platform(os_release_path: Path = _OS_RELEASE) -> PlatformInfo:
         text = os_release_path.read_text(encoding="utf-8")
     except OSError as exc:
         raise PlatformError(
-            f"cannot read {os_release_path}: {exc}",
-            hint="Tor Guard supports systemd-based Ubuntu/Debian/Kali only",
+            f"{os_release_path} faylini o‘qib bo‘lmadi: {exc}",
+            hint="Tor Guard faqat systemd asosidagi Ubuntu/Debian/Kali’ni qo‘llab-quvvatlaydi",
         ) from exc
     data = _parse_os_release(text)
     return PlatformInfo(
@@ -81,19 +81,20 @@ def ensure_supported(info: PlatformInfo | None = None) -> PlatformInfo:
     """Raise :class:`PlatformError` unless OS + systemd + nftables are present."""
     info = info or detect_platform()
     if not info.is_linux:
-        raise PlatformError(f"Tor Guard requires Linux, found {info.kernel}")
+        raise PlatformError(f"Tor Guard Linux talab qiladi, topildi: {info.kernel}")
     if not is_supported(info):
         supported = ", ".join(f"{d} {v or '(any)'}" for d, v in SUPPORTED_DISTROS)
         raise PlatformError(
-            f"unsupported OS: {info.pretty_name} ({info.distro_id} {info.version_id})",
-            hint=f"supported: {supported}",
+            f"qo‘llab-quvvatlanmaydigan OS: {info.pretty_name} "
+            f"({info.distro_id} {info.version_id})",
+            hint=f"qo‘llab-quvvatlanadi: {supported}",
         )
     if not has_systemd():
-        raise PlatformError("systemd not detected; Tor Guard requires systemd")
+        raise PlatformError("systemd aniqlanmadi; Tor Guard systemd talab qiladi")
     if not has_nftables():
         raise PlatformError(
-            "nftables (nft) not found",
-            hint="install the 'nftables' package",
+            "nftables (nft) topilmadi",
+            hint="'nftables' paketini o‘rnating",
         )
     return info
 

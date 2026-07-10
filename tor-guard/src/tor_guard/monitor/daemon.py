@@ -55,7 +55,9 @@ class MonitorDaemon:
         signal.signal(signal.SIGINT, self._handle_stop)
 
     def _handle_stop(self, *_: object) -> None:
-        _log.info("monitor received stop signal; exiting (firewall stays locked)")
+        _log.info(
+            "monitor to‘xtatish signalini oldi; chiqilmoqda (firewall bloklangan holatda qoladi)"
+        )
         self._running = False
 
     def tick(self) -> HealthSnapshot:
@@ -65,23 +67,26 @@ class MonitorDaemon:
         # --- Priority 1: firewall integrity (re-lock, never unlock) ----------
         if not snapshot.firewall_intact:
             _log.error(
-                "integrity lost: %s — re-applying locked ruleset", snapshot.integrity.summary
+                "butunlik yo‘qoldi: %s — bloklovchi qoidalar qayta qo‘llanmoqda",
+                snapshot.integrity.summary,
             )
             audit("integrity_restore", detail=snapshot.integrity.summary)
             try:
                 self._firewall.apply_protected(self._params)
             except Exception as exc:
-                _log.critical("re-apply failed (%s); engaging emergency lock", exc)
+                _log.critical(
+                    "qayta qo‘llash muvaffaqiyatsiz (%s); favqulodda bloklash yoqilmoqda", exc
+                )
                 self._firewall.emergency_lock()
 
         # --- Priority 2: Tor health (restart only; never open clearnet) ------
         if not snapshot.tor_healthy and self._config.auto_restart_tor:
-            _log.warning("Tor unhealthy; restarting Tor (firewall untouched)")
-            audit("tor_restart", detail="monitor detected unhealthy Tor")
+            _log.warning("Tor nosog‘lom; Tor qayta ishga tushirilmoqda (firewall tegilmaydi)")
+            audit("tor_restart", detail="monitor Tor nosog‘lomligini aniqladi")
             try:
                 self._restart_tor()
             except Exception as exc:
-                _log.error("Tor restart failed: %s", exc)
+                _log.error("Tor qayta ishga tushirilmadi: %s", exc)
 
         self._persist_state(snapshot)
         return snapshot
@@ -104,14 +109,14 @@ class MonitorDaemon:
 
     def run(self) -> None:
         self._running = True
-        _log.info("monitor daemon started (interval=%ds)", self._config.monitor_interval)
+        _log.info("monitor xizmati ishga tushdi (interval=%ds)", self._config.monitor_interval)
         while self._running:
             try:
                 self.tick()
             except Exception as exc:
-                _log.error("monitor tick error: %s", exc)
+                _log.error("monitor sikli xatosi: %s", exc)
             self._sleep(self._config.monitor_interval)
-        _log.info("monitor daemon stopped")
+        _log.info("monitor xizmati to‘xtadi")
 
 
 __all__ = ["MonitorDaemon"]

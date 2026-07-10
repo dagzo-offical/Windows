@@ -65,12 +65,12 @@ def wait_for_bootstrap(
             last = status
             _log.debug("bootstrap %d%% %s", status.percent, status.summary)
             if status.complete:
-                _log.info("Tor bootstrap complete (100%%)")
+                _log.info("Tor ulanish bosqichi yakunlandi (100%%)")
                 return status
         sleep(interval)
     raise BootstrapTimeout(
-        f"Tor did not finish bootstrapping within {timeout}s "
-        f"(last: {last.percent}% {last.summary})"
+        f"Tor {timeout}s ichida ulanish bosqichini yakunlamadi "
+        f"(oxirgi: {last.percent}% {last.summary})"
     )
 
 

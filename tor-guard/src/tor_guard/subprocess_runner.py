@@ -64,7 +64,7 @@ class SubprocessRunner:
         input_text: str | None = None,
     ) -> CommandResult:
         if not argv:
-            raise SubprocessError("empty command")
+            raise SubprocessError("bo‘sh buyruq")
         args = [str(a) for a in argv]
 
         program = args[0]
@@ -73,8 +73,8 @@ class SubprocessRunner:
         resolved = program if "/" in program else shutil.which(program)
         if resolved is None:
             raise DependencyError(
-                f"required program not found: {program}",
-                hint=f"install the package that provides '{program}'",
+                f"kerakli dastur topilmadi: {program}",
+                hint=f"'{program}' ni ta’minlaydigan paketni o‘rnating",
             )
         args[0] = resolved
 
@@ -89,9 +89,11 @@ class SubprocessRunner:
                 check=False,
             )
         except subprocess.TimeoutExpired as exc:
-            raise SubprocessError(f"command timed out after {timeout}s: {redact(program)}") from exc
+            raise SubprocessError(
+                f"buyruq {timeout}s dan keyin vaqt tugadi: {redact(program)}"
+            ) from exc
         except OSError as exc:
-            raise SubprocessError(f"failed to execute {redact(program)}: {exc}") from exc
+            raise SubprocessError(f"bajarib bo‘lmadi {redact(program)}: {exc}") from exc
 
         result = CommandResult(
             argv=tuple(args),
@@ -101,8 +103,8 @@ class SubprocessRunner:
         )
         if check and not result.ok:
             raise SubprocessError(
-                f"command failed ({result.returncode}): {redact(program)}: "
-                f"{redact(result.stderr.strip()) or '<no stderr>'}"
+                f"buyruq muvaffaqiyatsiz ({result.returncode}): {redact(program)}: "
+                f"{redact(result.stderr.strip()) or '<stderr yo‘q>'}"
             )
         return result
 

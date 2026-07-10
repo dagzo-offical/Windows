@@ -60,7 +60,7 @@ class FirewallManager:
             path.chmod(FILE_MODE)
         except OSError:
             pass
-        _log.info("backed up current ruleset to %s (%d bytes)", path, len(content))
+        _log.info("joriy qoidalar to‘plami zaxiralandi: %s (%d bayt)", path, len(content))
         return path
 
     def _apply_text(self, text: str, *, description: str) -> None:
@@ -74,8 +74,8 @@ class FirewallManager:
             result = self._runner.run([self._nft, "-f", str(tmp)], check=False)
             if not result.ok:
                 raise FirewallError(
-                    f"failed to apply {description}: "
-                    f"{result.stderr.strip() or 'nft returned non-zero'}"
+                    f"{description} qo‘llab bo‘lmadi: "
+                    f"{result.stderr.strip() or 'nft nolga teng bo‘lmagan qiymat qaytardi'}"
                 )
         finally:
             try:
@@ -90,12 +90,14 @@ class FirewallManager:
             self._live_path.chmod(FILE_MODE)
         except OSError:
             pass
-        _log.info("applied %s atomically", description)
+        _log.info("%s atomik tarzda qo‘llandi", description)
 
     # ---- protected mode ----------------------------------------------------
     def apply_protected(self, params: RulesetParams) -> GeneratedRuleset:
         ruleset = generate_protected(params)
-        self._apply_text(ruleset.text, description=f"protected ruleset ({params.mode.value})")
+        self._apply_text(
+            ruleset.text, description=f"himoyalangan qoidalar to‘plami ({params.mode.value})"
+        )
         audit("firewall_applied", detail=f"protected/{params.mode.value} sha={ruleset.sha256[:12]}")
         return ruleset
 
@@ -103,9 +105,11 @@ class FirewallManager:
     def emergency_lock(self) -> GeneratedRuleset:
         """Apply the most restrictive ruleset. Works without Tor (invariant I13)."""
         ruleset = generate_emergency()
-        self._apply_text(ruleset.text, description="EMERGENCY lockdown")
+        self._apply_text(ruleset.text, description="FAVQULODDA bloklash")
         audit("emergency_lock", detail=f"sha={ruleset.sha256[:12]}")
-        _log.warning("EMERGENCY lock engaged: all egress dropped except loopback")
+        _log.warning(
+            "FAVQULODDA bloklash yoqildi: loopback’dan tashqari barcha chiquvchi trafik bloklandi"
+        )
         return ruleset
 
     # ---- clearnet restore (explicit, audited) ------------------------------
@@ -116,14 +120,14 @@ class FirewallManager:
         backup content. We never blindly ``flush ruleset``.
         """
         if not backup_path.is_file():
-            raise FirewallError(f"backup not found: {backup_path}")
+            raise FirewallError(f"zaxira nusxa topilmadi: {backup_path}")
         content = backup_path.read_text(encoding="utf-8")
         # Remove Tor Guard tables first so a stale kill switch cannot linger.
         self.remove_tor_guard_tables()
         if content.strip():
-            self._apply_text(content, description=f"restored backup {backup_path.name}")
+            self._apply_text(content, description=f"tiklangan zaxira {backup_path.name}")
         audit("clearnet_restored", actor="admin", detail=str(backup_path))
-        _log.warning("clearnet restored from backup %s", backup_path)
+        _log.warning("oddiy internet zaxiradan tiklandi: %s", backup_path)
 
     def remove_tor_guard_tables(self) -> None:
         """Delete only Tor Guard's tables (never the admin's other tables)."""
@@ -137,9 +141,9 @@ class FirewallManager:
                 result = self._runner.run([self._nft, "delete", "table", family, name], check=False)
                 if not result.ok:
                     _log.warning(
-                        "could not delete table %s %s: %s", family, name, result.stderr.strip()
+                        "jadvalni o‘chirib bo‘lmadi %s %s: %s", family, name, result.stderr.strip()
                     )
-        _log.info("removed Tor Guard tables")
+        _log.info("Tor Guard jadvallari o‘chirildi")
 
 
 __all__ = ["FirewallManager"]

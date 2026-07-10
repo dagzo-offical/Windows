@@ -79,7 +79,7 @@ class SystemdManager:
 
     def ensure_active(self, unit: str) -> None:
         if not self.is_active(unit):
-            raise TorGuardError(f"systemd unit not active: {unit}")
+            raise TorGuardError(f"systemd birligi faol emas: {unit}")
 
 
 __all__ = ["SystemdManager", "UnitStatus"]

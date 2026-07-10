@@ -91,17 +91,19 @@ class DnsValidator:
         try:
             response = self._query(payload, host, port, self._timeout)
         except OSError as exc:
-            return DnsResult(False, (), f"query failed: {exc}")
+            return DnsResult(False, (), f"so‘rov muvaffaqiyatsiz: {exc}")
         addrs = parse_answers(response)
-        return DnsResult(bool(addrs), tuple(addrs), "" if addrs else "no answers")
+        return DnsResult(bool(addrs), tuple(addrs), "" if addrs else "javob yo‘q")
 
     def validate_tor_dns(self, dns_port: int, *, name: str = "check.torproject.org") -> DnsResult:
         """Positive check: Tor's DNSPort resolves *name*."""
         result = self.resolve_via(name, LOOPBACK4, dns_port)
         if result.ok:
-            _log.info("Tor DNSPort resolved a name successfully (%d addr)", len(result.addresses))
+            _log.info(
+                "Tor DNSPort nomni muvaffaqiyatli aniqladi (%d ta manzil)", len(result.addresses)
+            )
         else:
-            _log.warning("Tor DNSPort failed to resolve: %s", result.detail)
+            _log.warning("Tor DNSPort nomni aniqlay olmadi: %s", result.detail)
         return result
 
 

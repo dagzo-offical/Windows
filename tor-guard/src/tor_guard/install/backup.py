@@ -49,7 +49,7 @@ class BackupManager:
         ensure_secure_dir(self._root, DIR_MODE)
         usage = shutil.disk_usage(self._root)
         if usage.free < max(_MIN_FREE_BYTES, needed * 2):
-            raise TorGuardError(f"insufficient disk space for backup: {usage.free} bytes free")
+            raise TorGuardError(f"zaxira uchun disk maydoni yetarli emas: {usage.free} bayt bo‘sh")
 
     def back_up(self, paths: list[Path]) -> list[BackupRecord]:
         session = self._session_dir()
@@ -61,7 +61,7 @@ class BackupManager:
         (session / "backup-index.json").write_text(
             json.dumps([r.__dict__ for r in records], indent=2), encoding="utf-8"
         )
-        _log.info("backed up %d file(s) to %s", len(records), session)
+        _log.info("%d ta fayl zaxiralandi: %s", len(records), session)
         return records
 
     def _back_up_one(self, path: Path, session: Path) -> BackupRecord:
@@ -98,7 +98,7 @@ class BackupManager:
             original.chmod(record.mode)
             os.chown(original, record.uid, record.gid)
         except OSError as exc:
-            _log.warning("could not fully restore perms on %s: %s", original, exc)
+            _log.warning("%s uchun ruxsatlarni to‘liq tiklab bo‘lmadi: %s", original, exc)
 
 
 def _hash(path: Path) -> str:

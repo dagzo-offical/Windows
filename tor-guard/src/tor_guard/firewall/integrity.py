@@ -38,13 +38,13 @@ class IntegrityReport:
     @property
     def summary(self) -> str:
         if self.ok:
-            return "firewall integrity intact"
+            return "firewall butunligi saqlangan"
         parts = []
         if self.missing_tables:
-            parts.append(f"missing tables: {', '.join(self.missing_tables)}")
+            parts.append(f"yo‘q jadvallar: {', '.join(self.missing_tables)}")
         if self.weak_policies:
-            parts.append(f"non-drop policies: {', '.join(self.weak_policies)}")
-        return "; ".join(parts) or self.detail or "integrity lost"
+            parts.append(f"drop bo‘lmagan siyosatlar: {', '.join(self.weak_policies)}")
+        return "; ".join(parts) or self.detail or "butunlik yo‘qolgan"
 
 
 class IntegrityChecker:
@@ -79,7 +79,7 @@ class IntegrityChecker:
         ok = not missing and not weak
         report = IntegrityReport(ok=ok, missing_tables=tuple(missing), weak_policies=tuple(weak))
         if not ok:
-            _log.error("integrity check failed: %s", report.summary)
+            _log.error("butunlik tekshiruvi muvaffaqiyatsiz: %s", report.summary)
         return report
 
 

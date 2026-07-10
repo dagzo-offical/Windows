@@ -72,6 +72,10 @@ ignore = [
               #           which the CLI/tests rely on; StrEnum would change str() output.
     "SIM105", # accepted: explicit try/except/pass on best-effort chmod/unlink reads
               #           clearer than contextlib.suppress at these call sites.
+    "RUF001", # accepted: user-facing strings are localized to Uzbek (Latin script);
+              #           the letters "oʻ"/"gʻ" and typographic quotes use U+2018/U+2019
+    "RUF002", # accepted: same Uzbek localization applies to docstrings.
+    "RUF003", # accepted: same Uzbek localization applies to comments.
 ]
 
 [tool.ruff.lint.per-file-ignores]

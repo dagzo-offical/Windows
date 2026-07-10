@@ -35,7 +35,7 @@ def _runner(filter_dump=_GOOD_FILTER, ip6_dump=_GOOD_IP6, nat_dump=_GOOD_NAT):
 def test_intact_when_all_present_and_drop():
     report = IntegrityChecker(_runner()).check()
     assert report.ok
-    assert "intact" in report.summary
+    assert "butunligi saqlangan" in report.summary
 
 
 def test_missing_filter_table_detected():

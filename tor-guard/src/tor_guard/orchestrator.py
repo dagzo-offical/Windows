@@ -91,7 +91,7 @@ class Orchestrator:
             report.add("dependencies", StepStatus.OK, f"tor uid={tor_uid}")
         except DependencyError as exc:
             report.add("dependencies", StepStatus.FAIL, exc.message)
-            return self._lock_and_return(report, "dependency missing")
+            return self._lock_and_return(report, "kerakli dependency mavjud emas")
 
         params = ctx.ruleset_params()
 
@@ -101,15 +101,15 @@ class Orchestrator:
             report.add("backup", StepStatus.OK, str(backup))
         except TorGuardError as exc:
             report.add("backup", StepStatus.FAIL, exc.message)
-            return self._lock_and_return(report, "backup failed")
+            return self._lock_and_return(report, "zaxira nusxa muvaffaqiyatsiz")
 
         # 6-7: validate + atomically apply the kill switch BEFORE Tor
         try:
             ctx.firewall.apply_protected(params)
-            report.add("firewall", StepStatus.OK, "locked ruleset applied")
+            report.add("firewall", StepStatus.OK, "bloklovchi qoidalar to‘plami qo‘llandi")
         except TorGuardError as exc:
             report.add("firewall", StepStatus.FAIL, exc.message)
-            return self._lock_and_return(report, "firewall apply failed")
+            return self._lock_and_return(report, "firewall qo‘llash muvaffaqiyatsiz")
 
         # 8: (re)start Tor now that egress is locked down
         try:
@@ -118,7 +118,7 @@ class Orchestrator:
             report.add("tor-start", StepStatus.OK)
         except TorGuardError as exc:
             report.add("tor-start", StepStatus.FAIL, exc.message)
-            return self._lock_and_return(report, "Tor failed to start")
+            return self._lock_and_return(report, "Tor ishga tushmadi")
 
         # 9: wait for bootstrap == 100%
         try:
@@ -126,7 +126,7 @@ class Orchestrator:
             report.add("bootstrap", StepStatus.OK, "100%")
         except (BootstrapTimeout, TorError) as exc:
             report.add("bootstrap", StepStatus.FAIL, str(exc))
-            return self._lock_and_return(report, "Tor did not bootstrap")
+            return self._lock_and_return(report, "Tor ulanish bosqichini yakunlamadi")
 
         # 10: validate listeners
         health = ctx.tor_health.check(
@@ -148,23 +148,23 @@ class Orchestrator:
             health.socks.detail,
         )
         if not (health.trans.reachable and health.dns.reachable):
-            return self._lock_and_return(report, "required Tor listeners unavailable")
+            return self._lock_and_return(report, "kerakli Tor portlari mavjud emas")
 
         # 11: confirm Tor-routed external connectivity (tri-state)
         verify = ctx.verifier.verify()
         if verify.state is VerifyState.CONFIRMED_TOR:
-            report.add("external-connectivity", StepStatus.OK, "exit via Tor")
+            report.add("external-connectivity", StepStatus.OK, "chiqish Tor orqali")
         elif verify.state is VerifyState.LEAK_DETECTED:
-            report.add("external-connectivity", StepStatus.FAIL, "traffic NOT via Tor")
-            return self._lock_and_return(report, "leak detected")
+            report.add("external-connectivity", StepStatus.FAIL, "trafik Tor orqali EMAS")
+            return self._lock_and_return(report, "sizib chiqish aniqlandi")
         else:
-            report.add("external-connectivity", StepStatus.INFO, "verification unavailable")
+            report.add("external-connectivity", StepStatus.INFO, "tekshiruv mavjud emas")
 
         # 12-14: confirm direct/IPv6/UDP blocked (leak probes)
         if run_leak_checks and not cfg.test_mode:
             self._run_block_checks(report)
             if report.failed_steps:
-                return self._lock_and_return(report, "leak-check failure")
+                return self._lock_and_return(report, "sizib chiqish tekshiruvi muvaffaqiyatsiz")
 
         # 15: mark protected
         if verify.state is VerifyState.CONFIRMED_TOR:
@@ -233,13 +233,13 @@ class Orchestrator:
 
     def _lock_and_return(self, report: StartReport, reason: str) -> StartReport:
         """Ensure the host is locked and record the failure."""
-        _log.error("start aborted: %s (host remains locked)", reason)
+        _log.error("ishga tushirish bekor qilindi: %s (host bloklangan holatda qoladi)", reason)
         try:
             # Guarantee at least the emergency lock is present.
             if not self._ctx.firewall.table_exists("inet", "tor_guard_filter"):
                 self._ctx.firewall.emergency_lock()
         except TorGuardError as exc:
-            _log.critical("could not ensure lock: %s", exc)
+            _log.critical("blokni ta’minlab bo‘lmadi: %s", exc)
         state = self._ctx.state_store.load()
         state.last_error = reason
         self._ctx.state_store.transition(state, ProtectionState.LOCKED, reason=reason)
@@ -257,7 +257,7 @@ class Orchestrator:
         state = self._ctx.state_store.load()
         if state.protection is not ProtectionState.UNLOCKED:
             self._ctx.state_store.transition(state, ProtectionState.LOCKED, reason="stop")
-        audit("stop", detail="services stopped; firewall remains locked")
+        audit("stop", detail="xizmatlar to‘xtatildi; firewall bloklangan holatda qoladi")
 
     # -- VERIFY --------------------------------------------------------------
     def verify(self) -> StartReport:
@@ -279,11 +279,11 @@ class Orchestrator:
         report.add("dns-port", StepStatus.OK if health.dns.reachable else StepStatus.FAIL)
         verify = ctx.verifier.verify()
         if verify.state is VerifyState.CONFIRMED_TOR:
-            report.add("external-verify", StepStatus.OK, "exit via Tor")
+            report.add("external-verify", StepStatus.OK, "chiqish Tor orqali")
         elif verify.state is VerifyState.LEAK_DETECTED:
-            report.add("external-verify", StepStatus.FAIL, "leak")
+            report.add("external-verify", StepStatus.FAIL, "sizib chiqish")
         else:
-            report.add("external-verify", StepStatus.INFO, "unavailable")
+            report.add("external-verify", StepStatus.INFO, "mavjud emas")
         report.protected = integrity.ok and health.all_ports_ok
         return report
 

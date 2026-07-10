@@ -66,14 +66,14 @@ class Doctor:
         if is_supported(info):
             report.add("platform", Status.OK, info.pretty_name)
         else:
-            report.add("platform", Status.FAIL, f"unsupported: {info.pretty_name}")
+            report.add("platform", Status.FAIL, f"qo‘llab-quvvatlanmaydi: {info.pretty_name}")
 
         # dependencies
         for cmd in ("nft", "tor", "systemctl"):
             report.add(
                 f"dependency:{cmd}",
                 Status.OK if which(cmd) else Status.FAIL,
-                "present" if which(cmd) else "missing",
+                "mavjud" if which(cmd) else "mavjud emas",
             )
 
         # firewall integrity
@@ -106,7 +106,7 @@ class Doctor:
         report.add(
             "tor:circuit",
             Status.OK if tor.circuit_established else Status.WARN,
-            "established" if tor.circuit_established else "no circuit / control unavailable",
+            "o‘rnatilgan" if tor.circuit_established else "kanal yo‘q / boshqaruv mavjud emas",
         )
 
         # external verification (tri-state)
@@ -116,14 +116,14 @@ class Doctor:
             )
             result = verifier.verify()
             if result.state is VerifyState.CONFIRMED_TOR:
-                report.add("external-verify", Status.OK, "exit confirmed via Tor")
+                report.add("external-verify", Status.OK, "chiqish Tor orqali tasdiqlandi")
             elif result.state is VerifyState.LEAK_DETECTED:
-                report.add("external-verify", Status.FAIL, "traffic NOT via Tor (leak)")
+                report.add("external-verify", Status.FAIL, "trafik Tor orqali EMAS (sizib chiqish)")
             else:
                 report.add(
                     "external-verify",
                     Status.INFO,
-                    "verification unavailable (not proof of leak or breakage)",
+                    "tekshiruv mavjud emas (bu sizib chiqish yoki nosozlik dalili emas)",
                 )
 
         return report

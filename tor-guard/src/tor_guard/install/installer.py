@@ -83,7 +83,7 @@ class Installer:
         missing = [cmd for cmd in _REQUIRED_COMMANDS if which(cmd) is None]
         if missing:
             raise DependencyError(
-                f"missing required command(s): {', '.join(missing)}",
+                f"kerakli buyruq(lar) topilmadi: {', '.join(missing)}",
                 hint="apt-get install nftables tor systemd",
             )
 
@@ -100,14 +100,15 @@ class Installer:
             for directory in (ETC_DIR, STATE_DIR, LOG_DIR):
                 ensure_secure_dir(directory, DIR_MODE)
                 journal.record(
-                    f"remove dir {directory}", functools.partial(_rmdir_if_empty, directory)
+                    f"papkani o‘chirish {directory}",
+                    functools.partial(_rmdir_if_empty, directory),
                 )
 
             # 2. back up files we might modify
             backups = self._backup.back_up([self._config_path, Path("/etc/tor/torrc")])
             for record in backups:
                 journal.record(
-                    f"restore {record.original_path}",
+                    f"tiklash {record.original_path}",
                     functools.partial(BackupManager.restore, record),
                 )
 
@@ -118,40 +119,48 @@ class Installer:
                 ensure_secure_file(self._config_path, CONFIG_MODE)
                 installed.append(str(self._config_path))
                 manifest.record(self._config_path, owned=True)
-                journal.record(f"remove {self._config_path}", lambda: _unlink(self._config_path))
+                journal.record(f"o‘chirish {self._config_path}", lambda: _unlink(self._config_path))
 
             # 4. torrc drop-in
             tor_manager = TorManager(self._config)
             dropin = tor_manager.write_config()
             installed.append(str(dropin))
             manifest.record(dropin, owned=True)
-            journal.record(f"remove {dropin}", lambda: _unlink(dropin))
+            journal.record(f"o‘chirish {dropin}", lambda: _unlink(dropin))
 
             # 5. systemd units
             for unit in _UNIT_FILES:
                 dst = self._install_unit(unit)
                 installed.append(str(dst))
                 manifest.record(dst, owned=True)
-                journal.record(f"remove {dst}", functools.partial(_unlink, dst))
+                journal.record(f"o‘chirish {dst}", functools.partial(_unlink, dst))
 
             self._systemd.daemon_reload()
 
             # 6. manifest
             manifest.save()
-            audit("install", actor="admin", detail=f"{len(installed)} files")
+            audit("install", actor="admin", detail=f"{len(installed)} ta fayl")
             journal.commit()
-            return InstallResult(tuple(installed), str(CONFIG_PATH), message="install complete")
+            return InstallResult(tuple(installed), str(CONFIG_PATH), message="o‘rnatish yakunlandi")
 
         except Exception as exc:
-            _log.error("install failed: %s — rolling back", exc)
+            _log.error("o‘rnatish muvaffaqiyatsiz: %s — oldingi holatga qaytarilmoqda", exc)
             failures = journal.rollback()
             if failures:
-                _log.critical("rollback incomplete (%s); engaging emergency lock", failures)
+                _log.critical(
+                    "oldingi holatga qaytarish tugallanmadi (%s); favqulodda bloklash yoqilmoqda",
+                    failures,
+                )
                 try:
                     self._firewall.emergency_lock()
                 except Exception:
-                    _log.critical("emergency lock also failed; host may need offline recovery")
-            raise TorGuardError(f"installation failed and was rolled back: {exc}") from exc
+                    _log.critical(
+                        "favqulodda bloklash ham muvaffaqiyatsiz; "
+                        "host oflayn tiklashni talab qilishi mumkin"
+                    )
+            raise TorGuardError(
+                f"o‘rnatish muvaffaqiyatsiz va oldingi holatga qaytarildi: {exc}"
+            ) from exc
 
     def _install_unit(self, unit: str) -> Path:
         src = self._resources / "systemd" / unit
@@ -180,7 +189,9 @@ class Installer:
                     _unlink(path)
                     removed.append(entry.path)
         else:
-            _log.warning("no manifest found; not removing files to avoid collateral damage")
+            _log.warning(
+                "manifest topilmadi; keraksiz zararning oldini olish uchun fayllar o‘chirilmadi"
+            )
 
         self._systemd.daemon_reload()
 
@@ -189,9 +200,12 @@ class Installer:
             audit("uninstall_remove_firewall", actor="admin")
             self._firewall.remove_tor_guard_tables()
         else:
-            _log.warning("firewall left in place; run 'tor-guard unlock-clearnet' to restore net")
+            _log.warning(
+                "firewall joyida qoldirildi; tarmoqni tiklash uchun "
+                "'tor-guard unlock-clearnet' buyrug‘ini bajaring"
+            )
 
-        audit("uninstall", actor="admin", detail=f"{len(removed)} files removed")
+        audit("uninstall", actor="admin", detail=f"{len(removed)} ta fayl o‘chirildi")
         return removed
 
 
@@ -199,7 +213,7 @@ def _unlink(path: Path) -> None:
     try:
         path.unlink(missing_ok=True)
     except OSError as exc:
-        _log.warning("could not remove %s: %s", path, exc)
+        _log.warning("o‘chirib bo‘lmadi %s: %s", path, exc)
 
 
 def _rmdir_if_empty(path: Path) -> None:

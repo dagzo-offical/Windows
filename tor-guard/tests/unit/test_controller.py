@@ -48,11 +48,11 @@ def test_auth_failure_raises(tmp_path):
     controller = TorController(
         cookie_paths=(cookie,), connection_factory=_factory([(515, ["Bad auth"])])
     )
-    with pytest.raises(TorError, match="authentication failed"):
+    with pytest.raises(TorError, match="autentifikatsiyasi muvaffaqiyatsiz"):
         controller.authenticate()
 
 
 def test_missing_cookie_raises(tmp_path):
     controller = TorController(cookie_paths=(tmp_path / "absent",))
-    with pytest.raises(TorError, match="cookie not found"):
+    with pytest.raises(TorError, match="cookie fayli topilmadi"):
         controller.authenticate()

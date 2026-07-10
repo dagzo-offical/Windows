@@ -81,7 +81,7 @@ class TorManager:
         """
         if which("tor") is None:
             raise DependencyError(
-                "Tor daemon not installed",
+                "Tor xizmati o‘rnatilmagan",
                 hint="apt-get install tor",
             )
         return resolve_uid(self._config.tor_user)
@@ -96,7 +96,7 @@ class TorManager:
         except OSError:
             pass
         self._ensure_included()
-        _log.info("wrote Tor drop-in config %s", self._dropin)
+        _log.info("Tor drop-in sozlamasi yozildi: %s", self._dropin)
         return self._dropin
 
     def _ensure_included(self) -> None:
@@ -112,14 +112,16 @@ class TorManager:
             with self._main.open("a", encoding="utf-8") as handle:
                 handle.write(f"\n{include_line}\n")
         except OSError as exc:
-            _log.warning("could not update %s to include drop-in: %s", self._main, exc)
+            _log.warning(
+                "%s faylini drop-in’ni qo‘shish uchun yangilab bo‘lmadi: %s", self._main, exc
+            )
 
     def verify_config(self) -> None:
         """Run ``tor --verify-config`` to reject a broken torrc before start."""
         result = self._runner.run(["tor", "--verify-config"], check=False)
         if not result.ok:
             raise TorError(
-                f"tor rejected its configuration: {result.stderr.strip() or result.stdout.strip()}"
+                f"tor o‘z sozlamalarini rad etdi: {result.stderr.strip() or result.stdout.strip()}"
             )
 
     def restart(self) -> None:

@@ -94,18 +94,18 @@ class ExternalIPVerifier:
                 body = self._fetch(endpoint, self._timeout)
             except (urllib.error.URLError, OSError, ValueError) as exc:
                 last_error = str(exc)
-                _log.info("verification endpoint unreachable: %s", endpoint)
+                _log.info("tekshiruv endpointiga ulanib bo‘lmadi: %s", endpoint)
                 continue
             verdict = _interpret_torproject(body)
             if verdict is True:
                 return VerifyResult(VerifyState.CONFIRMED_TOR, endpoint)
             if verdict is False:
                 # LEAK: do not log or store the real IP.
-                _log.error("LEAK: external check reports traffic is NOT via Tor")
+                _log.error("SIZIB CHIQISH: tashqi tekshiruv trafik Tor orqali EMASligini bildirdi")
                 return VerifyResult(
-                    VerifyState.LEAK_DETECTED, endpoint, "endpoint reports non-Tor exit"
+                    VerifyState.LEAK_DETECTED, endpoint, "endpoint Tor bo‘lmagan chiqishni bildirdi"
                 )
-            last_error = "unrecognised response"
+            last_error = "javob tanilmadi"
         return VerifyResult(VerifyState.UNAVAILABLE, self._endpoints[0], last_error)
 
 

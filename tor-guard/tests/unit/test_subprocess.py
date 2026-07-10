@@ -37,5 +37,5 @@ def test_empty_argv_rejected():
 
 
 def test_timeout(monkeypatch):
-    with pytest.raises(SubprocessError, match="timed out"):
+    with pytest.raises(SubprocessError, match="vaqt tugadi"):
         SubprocessRunner().run(["sleep", "5"], timeout=0.1)

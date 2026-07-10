@@ -70,7 +70,7 @@ class TorHealthChecker:
             sock.close()
             return PortHealth(name, port, True)
         except OSError as exc:
-            _log.warning("Tor %s port %d unreachable: %s", name, port, exc)
+            _log.warning("Tor %s porti %d ga ulanib bo‘lmadi: %s", name, port, exc)
             return PortHealth(name, port, False, str(exc))
 
     def check(self, *, socks_port: int, trans_port: int, dns_port: int) -> TorHealth:
@@ -88,7 +88,7 @@ class TorHealthChecker:
                 circuit = controller.circuit_established()
                 controller.close()
             except Exception as exc:
-                _log.warning("Tor control health check failed: %s", exc)
+                _log.warning("Tor boshqaruv holat tekshiruvi muvaffaqiyatsiz: %s", exc)
 
         return TorHealth(
             socks=socks,

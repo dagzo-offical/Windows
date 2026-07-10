@@ -44,11 +44,11 @@ class RollbackJournal:
         failures: list[str] = []
         for action in reversed(self.actions):
             try:
-                _log.info("rolling back: %s", action.description)
+                _log.info("oldingi holatga qaytarilmoqda: %s", action.description)
                 action.undo()
             except Exception as exc:
                 failures.append(f"{action.description}: {exc}")
-                _log.error("rollback step failed: %s", exc)
+                _log.error("oldingi holatga qaytarish bosqichi muvaffaqiyatsiz: %s", exc)
         self.actions.clear()
         return failures
 

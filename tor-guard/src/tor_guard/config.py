@@ -62,9 +62,9 @@ _KNOWN_KEYS = {
 
 def _validate_port(value: Any, name: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
-        raise ConfigError(f"{name} must be an integer, got {value!r}")
+        raise ConfigError(f"{name} butun son bo‘lishi kerak, berilgan: {value!r}")
     if not (1 <= value <= 65535):
-        raise ConfigError(f"{name} out of range (1-65535): {value}")
+        raise ConfigError(f"{name} ruxsat etilgan oraliqdan tashqarida (1-65535): {value}")
     return int(value)
 
 
@@ -72,20 +72,20 @@ def _validate_cidrs(value: Any) -> tuple[str, ...]:
     if value is None:
         return ()
     if not isinstance(value, list):
-        raise ConfigError("allowed_lan_cidrs must be a list")
+        raise ConfigError("allowed_lan_cidrs ro‘yxat bo‘lishi kerak")
     out: list[str] = []
     for item in value:
         if not isinstance(item, str):
-            raise ConfigError(f"CIDR must be a string, got {item!r}")
+            raise ConfigError(f"CIDR satr bo‘lishi kerak, berilgan: {item!r}")
         try:
             network = ipaddress.ip_network(item, strict=False)
         except ValueError as exc:
-            raise ConfigError(f"invalid CIDR '{item}': {exc}") from exc
+            raise ConfigError(f"noto‘g‘ri CIDR '{item}': {exc}") from exc
         if network.version != 4:
-            raise ConfigError(f"only IPv4 LAN CIDRs are allowed (IPv6 is blocked): {item}")
+            raise ConfigError(f"faqat IPv4 LAN CIDR ruxsat etiladi (IPv6 bloklangan): {item}")
         if network.is_global:
             raise ConfigError(
-                f"refusing public CIDR in allowed_lan_cidrs (would bypass Tor): {item}"
+                f"allowed_lan_cidrs’da public CIDR rad etildi " f"(Tor’ni chetlab o‘tardi): {item}"
             )
         out.append(str(network))
     return tuple(out)
@@ -95,10 +95,10 @@ def _validate_interfaces(value: Any) -> tuple[str, ...]:
     if value is None:
         return ()
     if not isinstance(value, list) or not all(isinstance(i, str) and i for i in value):
-        raise ConfigError("interfaces must be a list of non-empty strings")
+        raise ConfigError("interfaces bo‘sh bo‘lmagan satrlar ro‘yxati bo‘lishi kerak")
     for name in value:
         if len(name) > 15 or not all(c.isalnum() or c in "._-@" for c in name):
-            raise ConfigError(f"invalid interface name: {name!r}")
+            raise ConfigError(f"noto‘g‘ri interfeys nomi: {name!r}")
     return tuple(value)
 
 
@@ -107,16 +107,16 @@ def _validate_endpoints(value: Any) -> tuple[str, ...]:
     if value is None:
         return default
     if not isinstance(value, list) or not all(isinstance(i, str) for i in value):
-        raise ConfigError("external_ip_endpoints must be a list of URLs")
+        raise ConfigError("external_ip_endpoints URL manzillar ro‘yxati bo‘lishi kerak")
     for url in value:
         if not url.startswith("https://"):
-            raise ConfigError(f"external_ip_endpoints must be https URLs: {url}")
+            raise ConfigError(f"external_ip_endpoints https URL bo‘lishi kerak: {url}")
     return tuple(value) or default
 
 
 def _positive_int(value: Any, name: str, *, minimum: int = 1) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
-        raise ConfigError(f"{name} must be an integer >= {minimum}, got {value!r}")
+        raise ConfigError(f"{name} butun son bo‘lishi kerak (>= {minimum}), berilgan: {value!r}")
     return int(value)
 
 
@@ -150,30 +150,33 @@ class Config:
             "control_port": self.control_port,
         }
         if len(set(ports.values())) != len(ports):
-            raise ConfigError(f"Tor ports must be distinct: {ports}")
+            raise ConfigError(f"Tor portlari bir-biridan farqli bo‘lishi kerak: {ports}")
         if self.mode is Mode.LAN_COMPATIBLE and not self.allowed_lan_cidrs:
             raise ConfigError(
-                "lan-compatible mode requires at least one entry in allowed_lan_cidrs",
-                hint="specify the subnets you trust, e.g. ['192.168.1.0/24']",
+                "lan-compatible rejimi allowed_lan_cidrs’da kamida bitta yozuvni talab qiladi",
+                hint="ishonchli quyi tarmoqlarni ko‘rsating, masalan ['192.168.1.0/24']",
             )
         if self.mode is Mode.STRICT and self.allowed_lan_cidrs:
             raise ConfigError(
-                "allowed_lan_cidrs must be empty in strict mode",
-                hint="switch mode to 'lan-compatible' to permit local subnets",
+                "strict rejimida allowed_lan_cidrs bo‘sh bo‘lishi kerak",
+                hint=(
+                    "mahalliy quyi tarmoqlarga ruxsat berish uchun "
+                    "rejimni 'lan-compatible'ga o‘zgartiring"
+                ),
             )
 
 
 def _from_mapping(raw: dict[str, Any]) -> Config:
     unknown = set(raw) - _KNOWN_KEYS
     if unknown:
-        raise ConfigError(f"unknown configuration keys: {sorted(unknown)}")
+        raise ConfigError(f"noma’lum sozlama kalitlari: {sorted(unknown)}")
 
     mode_raw = raw.get("mode", "strict")
     try:
         mode = Mode(str(mode_raw).lower())
     except ValueError as exc:
         raise ConfigError(
-            f"invalid mode '{mode_raw}' (expected 'strict' or 'lan-compatible')"
+            f"noto‘g‘ri rejim '{mode_raw}' ('strict' yoki 'lan-compatible' kutilgan)"
         ) from exc
 
     tor_user = raw.get("tor_user", DEFAULT_TOR_USER)
@@ -182,18 +185,21 @@ def _from_mapping(raw: dict[str, Any]) -> Config:
         or not tor_user
         or not all(c.isalnum() or c in "._-" for c in tor_user)
     ):
-        raise ConfigError(f"invalid tor_user: {tor_user!r}")
+        raise ConfigError(f"noto‘g‘ri tor_user: {tor_user!r}")
 
     log_level = str(raw.get("log_level", "INFO")).upper()
     if log_level not in _VALID_LOG_LEVELS:
-        raise ConfigError(f"invalid log_level '{log_level}'; expected one of {_VALID_LOG_LEVELS}")
+        raise ConfigError(
+            f"noto‘g‘ri log_level '{log_level}'; "
+            f"quyidagilardan biri kutilgan {_VALID_LOG_LEVELS}"
+        )
 
     auto_restart = raw.get("auto_restart_tor", True)
     if not isinstance(auto_restart, bool):
-        raise ConfigError("auto_restart_tor must be a boolean")
+        raise ConfigError("auto_restart_tor mantiqiy (boolean) qiymat bo‘lishi kerak")
     test_mode = raw.get("test_mode", False)
     if not isinstance(test_mode, bool):
-        raise ConfigError("test_mode must be a boolean")
+        raise ConfigError("test_mode mantiqiy (boolean) qiymat bo‘lishi kerak")
 
     return Config(
         mode=mode,
@@ -229,11 +235,11 @@ def load_config(path: Path = CONFIG_PATH) -> Config:
         text = path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
         raise ConfigError(
-            f"configuration not found: {path}",
-            hint="run 'tor-guard install' or copy config/tor-guard.example.yml",
+            f"sozlama fayli topilmadi: {path}",
+            hint="'tor-guard install' ni bajaring yoki config/tor-guard.example.yml ni nusxalang",
         ) from exc
     except OSError as exc:
-        raise ConfigError(f"cannot read config {path}: {exc}") from exc
+        raise ConfigError(f"sozlama faylini o‘qib bo‘lmadi {path}: {exc}") from exc
     return parse_config(text)
 
 
@@ -242,11 +248,11 @@ def parse_config(text: str) -> Config:
     try:
         raw = yaml.safe_load(text)
     except yaml.YAMLError as exc:
-        raise ConfigError(f"malformed YAML: {exc}") from exc
+        raise ConfigError(f"noto‘g‘ri YAML: {exc}") from exc
     if raw is None:
         raw = {}
     if not isinstance(raw, dict):
-        raise ConfigError("configuration root must be a mapping")
+        raise ConfigError("sozlama ildizi (root) mapping bo‘lishi kerak")
     return _from_mapping(raw)
 
 

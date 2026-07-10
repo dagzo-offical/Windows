@@ -25,8 +25,8 @@ def require_root(action: str) -> None:
     """Raise :class:`PrivilegeError` if not effectively root."""
     if not is_root():
         raise PrivilegeError(
-            f"'{action}' requires root privileges",
-            hint=f"run: sudo tor-guard {action}",
+            f"'{action}' root huquqlarini talab qiladi",
+            hint=f"bajaring: sudo tor-guard {action}",
         )
 
 
@@ -40,8 +40,8 @@ def resolve_uid(username: str) -> int:
         return pwd.getpwnam(username).pw_uid
     except KeyError as exc:
         raise DependencyError(
-            f"service account '{username}' does not exist",
-            hint="install 'tor', which creates the debian-tor user",
+            f"'{username}' xizmat hisobi mavjud emas",
+            hint="'tor' ni o‘rnating, u debian-tor foydalanuvchisini yaratadi",
         ) from exc
 
 
@@ -53,7 +53,7 @@ def assert_not_world_writable(path: Path) -> None:
         return
     if mode & WORLD_WRITABLE:
         raise PrivilegeError(
-            f"refusing to use world-writable path: {path}",
+            f"hamma yozishi mumkin bo‘lgan (world-writable) yo‘ldan foydalanish rad etildi: {path}",
             hint=f"chmod o-w {path}",
         )
 

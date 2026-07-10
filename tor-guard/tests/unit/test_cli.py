@@ -18,7 +18,7 @@ def test_config_validate_ok(tmp_path):
     cfg.write_text("mode: strict\n")
     result = runner.invoke(app, ["config", "validate", "-c", str(cfg)])
     assert result.exit_code == 0
-    assert "valid" in result.stdout
+    assert "sozlamalar" in result.stdout
 
 
 def test_config_validate_bad(tmp_path):
