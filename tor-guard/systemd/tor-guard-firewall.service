@@ -1,0 +1,42 @@
+[Unit]
+Description=Tor Guard fail-closed firewall (kill switch)
+Documentation=https://github.com/dagzo-offical/windows/tree/main/tor-guard
+DefaultDependencies=no
+# The kill switch must exist BEFORE the network stack brings interfaces up, so
+# there is never a clearnet window at boot (invariant I2).
+Before=network-pre.target tor.service
+Wants=network-pre.target
+After=nftables.service
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Apply the locked protected ruleset. On failure, engage the emergency lock so
+# the host is LOCKED, never open.
+ExecStart=/usr/bin/tor-guard reload
+ExecStartPre=/usr/bin/tor-guard config validate
+# NOTE: intentionally NO ExecStop that flushes rules — stopping this unit must
+# NOT restore clearnet (invariants I3, I4). Teardown is a separate admin action.
+ExecStop=/bin/true
+
+# --- Hardening (must not break nft/systemctl/logging) ---
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/tor-guard /var/log/tor-guard /etc/tor/torrc.d /run
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+# nftables needs NET_ADMIN; reloading Tor config touches files only.
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_DAC_OVERRIDE CAP_CHOWN CAP_FOWNER
+AmbientCapabilities=CAP_NET_ADMIN
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+
+[Install]
+WantedBy=tor-guard.target

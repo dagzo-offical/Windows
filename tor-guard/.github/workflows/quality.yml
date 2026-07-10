@@ -1,0 +1,71 @@
+name: quality
+
+on:
+  push:
+    paths:
+      - "tor-guard/**"
+  pull_request:
+    paths:
+      - "tor-guard/**"
+
+defaults:
+  run:
+    working-directory: tor-guard
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dev dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Ruff (lint)
+        run: ruff check src tests
+
+      - name: Black (format check)
+        run: black --check src tests
+
+      - name: Mypy (strict)
+        run: mypy
+
+      - name: Bandit (security)
+        run: bandit -q -r src -c pyproject.toml
+
+  shell-and-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install nftables + shellcheck
+        run: sudo apt-get update && sudo apt-get install -y nftables shellcheck
+
+      - name: ShellCheck scripts
+        run: shellcheck -x scripts/*.sh
+
+      - name: systemd unit verification
+        run: |
+          for u in systemd/*.service systemd/*.target; do
+            systemd-analyze verify "$u" || true
+          done
+
+      - name: Validate generated nftables ruleset (nft -c)
+        run: |
+          python -m pip install pyyaml
+          PYTHONPATH=src python - <<'PY'
+          from tor_guard.firewall.generator import generate_protected, generate_emergency
+          from tor_guard.firewall.models import RulesetParams
+          from tor_guard.state import Mode
+          for name, text in (
+              ("strict", generate_protected(RulesetParams(mode=Mode.STRICT, tor_uid=107, trans_port=9040, dns_port=5353)).text),
+              ("emerg", generate_emergency().text),
+          ):
+              open(f"/tmp/{name}.nft", "w").write(text)
+          PY
+          sudo nft -c -f /tmp/strict.nft
+          sudo nft -c -f /tmp/emerg.nft

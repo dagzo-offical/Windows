@@ -1,0 +1,52 @@
+# Tor Guard configuration.
+# Copy to /etc/tor-guard/tor-guard.yml (mode 0600, root:root).
+# Every field is validated strictly; unknown keys are rejected.
+
+# Operating mode: "strict" (recommended) or "lan-compatible".
+#   strict          -> Internet only via Tor; all LAN/link-local/multicast blocked.
+#   lan-compatible  -> also allow the explicitly listed allowed_lan_cidrs directly.
+mode: strict
+
+# Dedicated Tor service account. On Debian/Ubuntu/Kali this is "debian-tor".
+# Its UID is the ONLY identity permitted direct egress (never a PID).
+tor_user: debian-tor
+
+# Tor loopback listeners. Must be distinct.
+socks_port: 9050
+trans_port: 9040
+dns_port: 5353
+control_port: 9051
+
+# LAN subnets permitted direct access in lan-compatible mode.
+# MUST be empty in strict mode. Public/global CIDRs are rejected.
+allowed_lan_cidrs: []
+#   Example for lan-compatible:
+#   allowed_lan_cidrs:
+#     - 192.168.1.0/24
+
+# Optional explicit interface allow-list (advisory; empty = all).
+interfaces: []
+
+# Monitoring and health tuning (seconds).
+monitor_interval: 10
+health_timeout: 15
+bootstrap_timeout: 120
+
+# External verification endpoints (https only). Reachability is tri-state:
+# unreachable = "verification unavailable", never treated as proof of leak.
+external_ip_endpoints:
+  - https://check.torproject.org/api/ip
+
+# Logging: DEBUG | INFO | WARNING | ERROR | CRITICAL
+log_level: INFO
+
+# Let the monitor restart Tor automatically (it NEVER restores clearnet).
+auto_restart_tor: true
+
+# Paths (defaults are secure; override only if you know why).
+backup_dir: /var/lib/tor-guard/backups
+state_dir: /var/lib/tor-guard
+lock_file: /run/tor-guard.lock
+
+# Test mode skips active leak probes during start (for CI/dev only).
+test_mode: false

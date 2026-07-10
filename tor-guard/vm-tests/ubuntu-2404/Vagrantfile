@@ -1,0 +1,15 @@
+# Disposable VM for Tor Guard integration + leak testing on ubuntu-2404.
+# Usage:  cd vm-tests/ubuntu-2404 && vagrant up && vagrant destroy -f
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-24.04"
+  config.vm.hostname = "torguard-ubuntu-2404"
+  config.vm.synced_folder "../../..", "/vagrant", type: "rsync"
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 2048
+    vb.cpus = 2
+  end
+  config.vm.provision "shell", inline: <<-SHELL
+    set -e
+    bash /vagrant/tor-guard/vm-tests/provision.sh /vagrant /vagrant/tor-guard/vm-tests/ubuntu-2404/results
+  SHELL
+end

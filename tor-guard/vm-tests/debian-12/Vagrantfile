@@ -1,0 +1,15 @@
+# Disposable VM for Tor Guard integration + leak testing on debian-12.
+# Usage:  cd vm-tests/debian-12 && vagrant up && vagrant destroy -f
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/bookworm64"
+  config.vm.hostname = "torguard-debian-12"
+  config.vm.synced_folder "../../..", "/vagrant", type: "rsync"
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 2048
+    vb.cpus = 2
+  end
+  config.vm.provision "shell", inline: <<-SHELL
+    set -e
+    bash /vagrant/tor-guard/vm-tests/provision.sh /vagrant /vagrant/tor-guard/vm-tests/debian-12/results
+  SHELL
+end

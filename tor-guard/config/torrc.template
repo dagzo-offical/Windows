@@ -1,0 +1,21 @@
+# Tor Guard torrc reference (the live drop-in is generated at
+# /etc/tor/torrc.d/10-tor-guard.conf by `tor-guard install`/`reload`).
+# Values in {curly braces} are substituted from tor-guard.yml.
+
+User {tor_user}
+
+# Loopback-only listeners.
+SocksPort 127.0.0.1:{socks_port}
+TransPort 127.0.0.1:{trans_port} IsolateClientAddr IsolateClientProtocol
+DNSPort 127.0.0.1:{dns_port}
+ControlPort 127.0.0.1:{control_port}
+
+# Control authentication via cookie (no plaintext secrets).
+CookieAuthentication 1
+CookieAuthFileGroupReadable 1
+
+# Transparent-proxy DNS mapping.
+AutomapHostsOnResolve 1
+VirtualAddrNetworkIPv4 10.192.0.0/10
+
+AvoidDiskWrites 1
