@@ -1,85 +1,89 @@
-# Developer guide
+# Dasturchi qo‘llanmasi
 
-## Layout
+## Tuzilma
 
 ```
 src/tor_guard/
-  cli.py            Typer CLI (thin presentation layer)
-  context.py        dependency-injection container (build_context)
-  orchestrator.py   start/stop/verify sequences (testable, fail-closed)
-  config.py         validated YAML -> frozen Config
-  constants.py      paths, table names, defaults, exit codes
-  exceptions.py     exception hierarchy (all -> stay locked)
-  logging_config.py structured logs + secret/IP redaction + audit log
-  platform.py       OS/init/firewall support checks
-  privileges.py     root checks, uid resolution, permission guards
+  cli.py            Typer CLI (yupqa taqdimot qatlami)
+  context.py        dependency-injection konteyneri (build_context)
+  orchestrator.py   start/stop/verify ketma-ketliklari (testlanadigan, fail-closed)
+  config.py         tekshirilgan YAML -> muzlatilgan Config
+  constants.py      yo'llar, jadval nomlari, standartlar, exit code'lar
+  exceptions.py     istisno ierarxiyasi (barchasi -> bloklangan qoladi)
+  logging_config.py strukturali loglar + sir/IP yashirish + audit log
+  platform.py       OS/init/firewall qo'llab-quvvatlash tekshiruvlari
+  privileges.py     root tekshiruvlari, uid aniqlash, ruxsat himoyalari
   services.py       systemctl wrapper
-  state.py          persisted protection state + legal transitions
-  subprocess_runner.py  single guarded subprocess gateway
+  state.py          saqlanadigan himoya holati + ruxsat etilgan o'tishlar
+  subprocess_runner.py  yagona himoyalangan subprocess darvozasi
   firewall/  generator, validator, manager, integrity, models
   tor/       manager, controller (cookie auth), bootstrap, health
-  network/   dns, routes (tri-state verify), leak_tests, interfaces
-  monitor/   daemon, checks, run (systemd entrypoint)
+  network/   dns, routes (uch holatli verify), leak_tests, interfaces
+  monitor/   daemon, checks, run (systemd kirish nuqtasi)
   install/   installer, backup, rollback, manifest
   diagnostics/ doctor, report
 ```
 
-### Deviations from the reference layout
+### Ma’lumotnoma tuzilmasidan chetlanishlar
 
-- `services.py` — shared systemd wrapper used by `tor.manager` and
-  `install.installer` (keeps systemd calls in one place).
-- `context.py` + `orchestrator.py` — added so the CLI stays thin and the
-  security-critical start/stop logic is unit-testable with injected fakes.
+- `services.py` — `tor.manager` va `install.installer` tomonidan ishlatiladigan
+  umumiy systemd wrapper (systemd chaqiruvlarini bitta joyda saqlaydi).
+- `context.py` + `orchestrator.py` — CLI yupqa qolishi va xavfsizlik uchun kritik
+  start/stop mantig‘i in’ektsiya qilingan soxtalar bilan testlanishi uchun
+  qo‘shilgan.
 
 ## Dependency injection
 
-Every collaborator that touches the outside world (subprocess, sockets, HTTP,
-systemd) is injectable. `context.build_context(config)` wires the production
-implementations; tests build an `AppContext` (or pass fakes directly) to drive
-fail-closed paths without root/Tor/network. See `tests/unit/test_orchestrator.py`
-and `tests/conftest.py`'s `FakeRunner`.
+Tashqi dunyoga tegadigan har bir hamkor (subprocess, soketlar, HTTP, systemd)
+in’ektsiya qilinadigan. `context.build_context(config)` ishlab chiqarish
+implementatsiyalarini bog‘laydi; testlar root/Tor/tarmoqsiz fail-closed yo‘llarni
+boshqarish uchun `AppContext` quradi (yoki soxtalarni to‘g‘ridan-to‘g‘ri uzatadi).
+Qarang: `tests/unit/test_orchestrator.py` va `tests/conftest.py`ning `FakeRunner`i.
 
-## Subprocess rules (enforced in one place)
+## Subprocess qoidalari (bitta joyda ta’minlanadi)
 
-All external commands go through `subprocess_runner.SubprocessRunner`:
-no `shell=True`, argv lists only, mandatory timeouts, captured output, checked
-return codes, missing-binary → `DependencyError`, redacted logging. Do not call
-`subprocess` anywhere else.
+Barcha tashqi buyruqlar `subprocess_runner.SubprocessRunner` orqali o‘tadi:
+`shell=True` yo‘q, faqat argv ro‘yxatlari, majburiy vaqt chegaralari, ushlangan
+chiqish, tekshirilgan qaytish kodlari, yo‘q binar → `DependencyError`, yashirilgan
+loglash. Boshqa hech qayerda `subprocess` chaqirmang.
 
-## Adding a firewall rule
+## Firewall qoidasini qo‘shish
 
-1. Change `firewall/generator.py` (pure function of `RulesetParams`).
-2. Add/adjust a unit test in `tests/unit/test_generator.py`, including the live
-   `nft -c` assertion.
-3. Run `make nft-check` and `make test`.
-4. If it introduces a new table/chain that must stay `drop`, add it to
-   `firewall/integrity.py`'s `_REQUIRED` and to `manager.remove_tor_guard_tables`.
+1. `firewall/generator.py`’ni o‘zgartiring (`RulesetParams`ning sof funksiyasi).
+2. `tests/unit/test_generator.py`da birlik testini qo‘shing/moslang, jonli
+   `nft -c` tasdig‘i bilan birga.
+3. `make nft-check` va `make test`ni ishga tushiring.
+4. Agar u `drop` bo‘lib qolishi kerak yangi jadval/zanjir kiritsa, uni
+   `firewall/integrity.py`ning `_REQUIRED`iga va
+   `manager.remove_tor_guard_tables`ga qo‘shing.
 
-## Local quality loop
+## Mahalliy sifat sikli
 
 ```bash
 make format      # black + ruff --fix
-make all         # ruff + mypy(strict) + bandit + shellcheck + unit tests
-make nft-check   # validate the generated ruleset
+make all         # ruff + mypy(strict) + bandit + shellcheck + unit testlar
+make nft-check   # yaratilgan qoidalar to‘plamini tekshirish
 ```
 
-Targets: no ruff errors, black-clean, mypy-strict clean, no high-severity
-Bandit, shellcheck-clean, all unit tests passing. Accepted lint findings are
-documented in `pyproject.toml` (`UP042`, `SIM105`, Bandit `B404`/`B603`, and
-inline `# noqa`/`# nosec` with justification).
+Maqsadlar: ruff xatolari yo‘q, black-toza, mypy-strict toza, yuqori-jiddiylikdagi
+Bandit yo‘q, shellcheck-toza, barcha unit testlar o‘tadi. Qabul qilingan lint
+topilmalari `pyproject.toml`da hujjatlashtirilgan (`UP042`, `SIM105`,
+`RUF001`/`RUF002`/`RUF003` — o‘zbek lotin yozuvi uchun, Bandit `B404`/`B603` va
+izohli inline `# noqa`/`# nosec`).
 
-## Coding conventions
+## Kodlash qoidalari
 
-- Type-annotate everything (mypy strict).
-- Prefer frozen dataclasses for value objects.
-- Errors mean "stay locked" — never add a code path that opens clearnet on
-  failure.
-- Never log the real public IP; route user-facing text through the redactor
-  where secrets may appear.
+- Hamma narsani tip bilan izohlang (mypy strict).
+- Qiymat obyektlari uchun muzlatilgan dataclass’larni afzal ko‘ring.
+- Xatolar "bloklangan qoladi" degani — hech qachon nosozlikda oddiy internetni
+  ochadigan kod yo‘lini qo‘shmang.
+- Haqiqiy ommaviy IP’ni hech qachon loglamang; sirlar paydo bo‘lishi mumkin
+  bo‘lgan foydalanuvchiga ko‘rinadigan matnni redactor orqali o‘tkazing.
 
-## Releasing
+## Nashr qilish
 
-1. `make all` green; `make nft-check` green.
-2. Run the VM matrix (`vm-tests/`) on each supported distro; archive results.
-3. Update `docs/CHANGELOG.md`.
-4. Tag; CI runs the static + unit + integration jobs.
+1. `make all` yashil; `make nft-check` yashil.
+2. Har bir qo‘llab-quvvatlanadigan distributivda VM matritsasini (`vm-tests/`)
+   ishga tushiring; natijalarni arxivlang.
+3. `docs/CHANGELOG.md`’ni yangilang.
+4. Teg qo‘ying; CI statik + unit + integratsiya ishlarini bajaradi.

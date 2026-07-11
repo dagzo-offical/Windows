@@ -1,92 +1,102 @@
-# Testing
+# Testlash
 
-Three tiers, matching their blast radius.
+Uch daraja, ularning ta’sir doirasiga mos.
 
-## 1. Unit tests — safe anywhere
+## 1. Birlik (unit) testlar — hamma joyda xavfsiz
 
-No root, no network, no firewall changes. The real `nft` binary is used in
-**check mode only** (`nft -c`) to validate generated rulesets.
+Root yo‘q, tarmoq yo‘q, firewall o‘zgarishlari yo‘q. Haqiqiy `nft` binari yaratilgan
+qoidalar to‘plamini tekshirish uchun **faqat check rejimida** (`nft -c`)
+ishlatiladi.
 
 ```bash
-make test                     # or: PYTHONPATH=src pytest tests/unit
-make test-cov                 # with coverage
+make test                     # yoki: PYTHONPATH=src pytest tests/unit
+make test-cov                 # coverage bilan
 ```
 
-Coverage focuses on the security-critical modules (ruleset generator, integrity
-checker, config validation, state machine, orchestrator fail-closed paths, leak
-result tri-state).
+Qamrov xavfsizlik uchun kritik modullarga qaratilgan (qoidalar to‘plami generatori,
+butunlik tekshiruvchisi, sozlama tekshiruvi, holat mashinasi, orchestrator
+fail-closed yo‘llari, sizib chiqish natijasining uch holati).
 
-What they cover (selection):
+Ular nimani qamrab oladi (tanlab):
 
-- config parsing, strict schema, port/CIDR validation, mode rules;
-- ruleset generation: default-drop, DNS redirect, Tor-uid exception, IPv6 block,
-  UDP block, atomic replace idiom, LAN-mode CIDRs; plus **live `nft -c`**;
-- firewall manager: single-transaction atomic apply, validation-before-apply,
-  emergency lock, table removal never flushing the ruleset;
-- integrity: missing tables and weakened policies detected;
-- Tor bootstrap parsing and timeout; control cookie auth; health probes;
-- DNS packet build/parse; external-IP tri-state; leak-probe logic;
-- orchestrator: firewall-before-Tor ordering, "Tor absent → locked", "leak →
-  locked", "verification unavailable → degraded, not open", "stop keeps
-  firewall";
-- monitor: integrity loss → re-apply, Tor down → restart but never unlock;
-- installer backup/restore/rollback/manifest; platform detection; privileges.
+- sozlama tahlili, qat’iy sxema, port/CIDR tekshiruvi, rejim qoidalari;
+- qoidalar to‘plamini yaratish: default-drop, DNS redirect, Tor-uid istisnosi,
+  IPv6 blok, UDP blok, atomik almashtirish idiomasi, LAN-rejim CIDR’lari; hamda
+  **jonli `nft -c`**;
+- firewall manager: bitta-tranzaksiyali atomik qo‘llash, qo‘llashdan-oldin-tekshirish,
+  favqulodda bloklash, jadval olib tashlash hech qachon qoidalar to‘plamini
+  tozalamasligi;
+- butunlik: yo‘q jadvallar va zaiflashtirilgan siyosatlar aniqlanadi;
+- Tor ulanish bosqichini tahlil qilish va vaqt tugashi; boshqaruv cookie
+  autentifikatsiyasi; holat tekshiruvlari;
+- DNS paketini qurish/tahlil qilish; tashqi-IP uch holati; sizib chiqish
+  tekshiruvi mantig‘i;
+- orchestrator: firewall-Tor’dan-oldin tartibi, "Tor yo‘q → bloklangan", "sizib
+  chiqish → bloklangan", "tekshiruv mavjud emas → cheklangan, ochiq emas", "stop
+  firewall’ni saqlaydi";
+- monitor: butunlik yo‘qolishi → qayta qo‘llash, Tor tushib qolishi → qayta ishga
+  tushirish, lekin hech qachon ochmaslik;
+- o‘rnatuvchi backup/restore/rollback/manifest; platforma aniqlash; imtiyozlar.
 
-## 2. Integration tests — disposable VM only
+## 2. Integratsiya testlari — faqat disposable VM
 
-Change real firewall state. Gated behind `TOR_GUARD_DISPOSABLE_VM=1` **and**
-root; skipped otherwise.
+Haqiqiy firewall holatini o‘zgartiradi. `TOR_GUARD_DISPOSABLE_VM=1` **va** root
+orqasida cheklangan; aks holda o‘tkazib yuboriladi.
 
 ```bash
 sudo TOR_GUARD_DISPOSABLE_VM=1 pytest tests/integration -m integration -v
 ```
 
-## 3. Leak tests — disposable VM, protected mode active
+## 3. Sizib chiqish testlari — disposable VM, himoyalangan rejim faol
 
-Make real outbound attempts. Run after `tor-guard start`. Real public IP is
-never printed — only pass/fail and probe names.
+Haqiqiy chiquvchi urinishlar qiladi. `tor-guard start`dan keyin ishga tushiring.
+Haqiqiy ommaviy IP hech qachon chop etilmaydi — faqat pass/fail va tekshiruv
+nomlari.
 
 ```bash
 sudo TOR_GUARD_DISPOSABLE_VM=1 pytest tests/leak -m leak -v
-# or the CLI suite:
+# yoki CLI to‘plami:
 sudo tor-guard test-leaks --i-understand
 ```
 
-Probes: direct IPv4/IPv6 TCP, UDP DNS, TCP DNS, external UDP, QUIC, alternate
-resolver, and Tor-connectivity confirmation. Expected: Tor-routed traffic
-succeeds; every direct/unsupported path fails.
+Tekshiruvlar: to‘g‘ridan-to‘g‘ri IPv4/IPv6 TCP, UDP DNS, TCP DNS, tashqi UDP,
+QUIC, muqobil resolver va Tor-ulanishni tasdiqlash. Kutiladi: Tor orqali
+yo‘naltirilgan trafik muvaffaqiyatli; har bir to‘g‘ridan-to‘g‘ri/qo‘llab-
+quvvatlanmaydigan yo‘l muvaffaqiyatsiz.
 
-## Full VM matrix
+## To‘liq VM matritsasi
 
-`vm-tests/` provides Vagrant environments for Ubuntu 24.04/22.04, Debian 12, and
-Kali. Each boots a clean VM, installs Tor Guard, activates protected mode, runs
-the leak suite, simulates Tor failure and firewall tampering, and collects
-results. See [`../vm-tests/README.md`](../vm-tests/README.md).
+`vm-tests/` Ubuntu 24.04/22.04, Debian 12 va Kali uchun Vagrant muhitlarini
+ta’minlaydi. Har biri toza VM’ni yuklaydi, Tor Guard’ni o‘rnatadi, himoyalangan
+rejimni faollashtiradi, sizib chiqish to‘plamini ishga tushiradi, Tor
+nosozligini va firewall buzilishini simulyatsiya qiladi hamda natijalarni yig‘adi.
+Qarang: [`../vm-tests/README.md`](../vm-tests/README.md).
 
 ```bash
 cd vm-tests/ubuntu-2404 && vagrant up && cat results/*.txt && vagrant destroy -f
 ```
 
-## Static analysis & quality gates
+## Statik tahlil va sifat darvozalari
 
 ```bash
 make lint        # ruff
 make format      # black + ruff --fix
 make typecheck   # mypy (strict)
 make security    # bandit
-make shellcheck  # shellcheck scripts + vm provisioner
-make nft-check   # generate + validate ruleset with nft -c
-make all         # everything except VM tests
+make shellcheck  # shellcheck skriptlari + vm provisioner
+make nft-check   # qoidalar to‘plamini yaratish + nft -c bilan tekshirish
+make all         # VM testlaridan tashqari hammasi
 ```
 
-CI (`.github/workflows/`) runs the static gates, shellcheck, systemd unit
-verification, `nft -c` validation, the unit matrix (3.11/3.12) with coverage,
-and the gated integration job.
+CI (`.github/workflows/`) statik darvozalarni, shellcheck’ni, systemd birligi
+tekshiruvini, `nft -c` tekshiruvini, coverage bilan unit matritsasini
+(3.11/3.12) va cheklangan integratsiya ishini ishga tushiradi.
 
-## What was executed vs. what needs a VM
+## Nima bajarildi va nimaga VM kerak
 
-The unit suite, `nft -c` validation, and all static gates run in any
-environment (and in CI). The **integration and leak tests require a disposable
-VM with root, systemd, and a working Tor** — they are provided and gated, and
-must be run there for authoritative results. Container runtimes cannot
-faithfully emulate every host-firewall scenario.
+Unit to‘plami, `nft -c` tekshiruvi va barcha statik darvozalar har qanday
+muhitda (va CI’da) ishlaydi. **Integratsiya va sizib chiqish testlari root,
+systemd va ishlaydigan Tor bilan disposable VM talab qiladi** — ular ta’minlangan
+va cheklangan bo‘lib, rasmiy natijalar uchun o‘sha yerda ishga tushirilishi
+kerak. Konteyner muhitlari har bir host-firewall stsenariysini to‘liq taqlid
+qila olmaydi.

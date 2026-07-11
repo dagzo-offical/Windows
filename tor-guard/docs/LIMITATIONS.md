@@ -1,75 +1,80 @@
-# Limitations
+# Cheklovlar
 
-Tor Guard reduces **accidental** exposure of your real IP and DNS. It is not an
-anonymity system. Understand these limits before relying on it.
+Tor Guard haqiqiy IP va DNS’ingizning **tasodifiy** oshkor bo‘lishini
+kamaytiradi. Bu anonimlik tizimi emas. Unga tayanishdan oldin bu cheklovlarni
+tushuning.
 
-## Hard non-goals (never claimed)
+## Qat’iy non-goal’lar (hech qachon da’vo qilinmagan)
 
-Tor Guard does **not** protect against:
+Tor Guard quyidagilardan himoya qil**maydi**:
 
-- a compromised host or kernel (rootkit, malicious driver);
-- a root-level attacker on the machine — root can remove any host control,
-  including Tor Guard;
-- global passive adversaries and traffic-correlation attacks (a fundamental Tor
-  limitation);
-- application-level identity disclosure — logging into your real accounts
-  de-anonymizes you regardless of routing;
-- browser/TLS fingerprinting — use the **Tor Browser** for browsing;
-- malicious documents or malware execution;
-- endpoint telemetry and behavioral correlation across sessions.
+- buzilgan host yoki yadro (rootkit, zararli drayver);
+- mashinada root darajasidagi hujumchi — root har qanday host boshqaruvini,
+  jumladan Tor Guard’ni ham olib tashlashi mumkin;
+- global passiv raqiblar va trafik-korrelyatsiya hujumlari (Tor’ning tub
+  cheklovi);
+- ilova darajasidagi identifikatsiya oshkorligi — haqiqiy hisoblaringizga
+  kirish, marshrutdan qat’i nazar, sizni deanonimlashtiradi;
+- brauzer/TLS barmoq izlari — internetni ko‘rish uchun **Tor Browser**’dan
+  foydalaning;
+- zararli hujjatlar yoki zararli dasturlar ishga tushishi;
+- endpoint telemetriyasi va seanslar bo‘ylab xulq-atvor korrelyatsiyasi.
 
-## Technical limitations
+## Texnik cheklovlar
 
-### Encrypted DNS (DoH/DoT)
-Applications doing DNS-over-HTTPS (`:443`) or DNS-over-TLS (`:853`) send opaque
-TCP that is **redirected through Tor**, not blocked. So it does not leak your
-real IP, but Tor Guard cannot force those apps to use Tor's own resolver — the
-resolver choice stays with the app. Prefer apps that honour the system resolver,
-or disable in-app DoH.
+### Shifrlangan DNS (DoH/DoT)
+DNS-over-HTTPS (`:443`) yoki DNS-over-TLS (`:853`) ishlatuvchi ilovalar noaniq
+TCP yuboradi, u bloklanmaydi, balki **Tor orqali yo‘naltiriladi**. Shunday qilib,
+u haqiqiy IP’ingizni oshkor qilmaydi, lekin Tor Guard bu ilovalarni Tor’ning
+o‘z resolveridan foydalanishga majburlay olmaydi — resolver tanlovi ilovada
+qoladi. Tizim resolverini hurmat qiladigan ilovalarni afzal ko‘ring yoki ilova
+ichidagi DoH’ni o‘chiring.
 
 ### QUIC / HTTP/3
-QUIC runs over UDP, which Tor cannot transparently proxy. Tor Guard blocks it as
-generic UDP; browsers transparently fall back to TCP. Apps that are UDP-only
-will simply fail (fail-closed).
+QUIC UDP ustidan ishlaydi, Tor uni shaffof proksilay olmaydi. Tor Guard uni
+umumiy UDP sifatida bloklaydi; brauzerlar shaffof ravishda TCP’ga qaytadi. Faqat
+UDP’dan foydalanadigan ilovalar oddiygina ishlamaydi (fail-closed).
 
-### General UDP
-Only strictly necessary local UDP is allowed (DHCP; DNS redirected to Tor).
-Everything else outbound UDP is dropped. UDP-based applications will not work
-through Tor Guard.
+### Umumiy UDP
+Faqat qat’iy zarur mahalliy UDP ruxsat etiladi (DHCP; DNS Tor’ga yo‘naltiriladi).
+Qolgan barcha chiquvchi UDP tashlanadi. UDP asosidagi ilovalar Tor Guard orqali
+ishlamaydi.
 
-### Containers / VMs / namespaces
-Forwarded traffic (Docker, Podman, libvirt bridges) is captured by the
-`prerouting` redirect and the `forward` chain's default-drop, so it cannot
-bypass. But transparent proxying of container traffic has edge cases (REDIRECT
-target address selection, custom container networks). Where redirection is
-imperfect, the traffic is **dropped, not leaked**. A root user creating a custom
-routing table or namespace with its own egress path is out of scope (that is an
-adversarial-root scenario).
+### Konteynerlar / VM’lar / namespace’lar
+Forward qilingan trafik (Docker, Podman, libvirt bridge’lari) `prerouting`
+redirect va `forward` zanjirining default-drop’i tomonidan ushlanadi, shuning
+uchun chetlab o‘ta olmaydi. Ammo konteyner trafigini shaffof proksilashda chekka
+holatlar mavjud (REDIRECT manzil tanlovi, maxsus konteyner tarmoqlari).
+Yo‘naltirish nomukammal joyda trafik **tashlanadi, sizib chiqmaydi**. O‘z chiqish
+yo‘liga ega maxsus marshrutlash jadvali yoki namespace yaratayotgan root
+foydalanuvchi ko‘lam tashqarisida (bu — dushman-root stsenariysi).
 
 ### IPv6
-IPv6 is blocked entirely at the firewall (route-independent), not merely via
-sysctl. There is no IPv6-over-Tor path in this release. IPv6-only destinations
-are unreachable while protected.
+IPv6 firewall darajasida to‘liq bloklangan (marshrutdan mustaqil), faqat sysctl
+orqali emas. Bu nashrda IPv6-Tor-orqali yo‘li yo‘q. Himoyalangan holatda faqat
+IPv6 manzillar mavjud emas (yetib bo‘lmaydi).
 
-### External-IP verification
-Verification through `check.torproject.org` (or configured endpoints) can be
-unavailable (network, rate limiting, censorship). Tor Guard reports this as
-*verification unavailable* — it never treats it as proof that you are safe, nor
-as proof that Tor is broken.
+### Tashqi-IP tekshiruvi
+`check.torproject.org` (yoki sozlangan endpointlar) orqali tekshiruv mavjud
+bo‘lmasligi mumkin (tarmoq, tezlik cheklovi, senzura). Tor Guard buni *tekshiruv
+mavjud emas* deb xabar qiladi — buni hech qachon xavfsizligingiz dalili sifatida
+ham, Tor buzilgani dalili sifatida ham qabul qilmaydi.
 
-### Captive portals / hostile Wi-Fi
-The kill switch blocks the captive-portal login page too. You must
-`unlock-clearnet`, complete the portal, then re-`start`. This is intentional:
-silently allowing portal traffic would be a bypass.
+### Captive portallar / xavfli Wi-Fi
+Kill switch captive-portal kirish sahifasini ham bloklaydi.
+`unlock-clearnet` qilishingiz, portalni yakunlashingiz, so‘ng qayta `start`
+qilishingiz kerak. Bu ataylab: portal trafigiga jimgina ruxsat berish chetlab
+o‘tish bo‘lardi.
 
-### Time-to-detect on tampering
-If the nftables rules are removed out-of-band, there is a window up to one
-`monitor_interval` (default 10s) before the monitor re-asserts them. During that
-window the default-drop policy of the surviving base chains still applies where
-present; a full flush is re-applied on the next tick.
+### Buzishni aniqlash vaqti
+Agar nftables qoidalari tashqaridan olib tashlansa, monitor ularni qayta
+tasdiqlashidan oldin bir `monitor_interval` (standart 10s) gacha oyna mavjud.
+Bu oyna davomida omon qolgan asosiy zanjirlarning default-drop siyosati mavjud
+joyda hali ham amal qiladi; keyingi tsiklda to‘liq to‘plam qayta qo‘llanadi.
 
-## Operational guidance
+## Operatsion tavsiyalar
 
-- Do not log into personal accounts you want kept separate.
-- Use the Tor Browser for web browsing (fingerprinting resistance).
-- Treat Tor Guard as a safety net against mistakes, not a cloak of invisibility.
+- Alohida saqlashni istagan shaxsiy hisoblaringizga kirmang.
+- Veb-brauzing uchun Tor Browser’dan foydalaning (barmoq izlariga qarshilik).
+- Tor Guard’ni ko‘rinmaslik pardasi emas, xatolarga qarshi xavfsizlik to‘ri deb
+  hisoblang.

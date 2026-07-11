@@ -1,15 +1,16 @@
-# Installation
+# O‘rnatish
 
-## Prerequisites
+## Talablar
 
-- One of: Ubuntu 24.04, Ubuntu 22.04, Debian 12, current Kali (Debian-based)
-- systemd, root access, outbound network (to reach the Tor network)
+- Quyidagilardan biri: Ubuntu 24.04, Ubuntu 22.04, Debian 12, joriy Kali
+  (Debian asosidagi)
+- systemd, root kirishi, chiquvchi tarmoq (Tor tarmog‘iga ulanish uchun)
 - Python 3.11+
 
-The installer detects unsupported platforms and stops **without changing the
-host**.
+O‘rnatuvchi qo‘llab-quvvatlanmaydigan platformalarni aniqlaydi va **host’ni
+o‘zgartirmasdan** to‘xtaydi.
 
-## Quick install
+## Tez o‘rnatish
 
 ```bash
 git clone https://github.com/dagzo-offical/windows.git
@@ -19,56 +20,57 @@ sudo bash scripts/install.sh
 
 `scripts/install.sh`:
 
-1. verifies the platform (`/etc/os-release`);
-2. installs `nftables`, `tor`, `python3`, `python3-pip`;
-3. installs the `tor-guard` Python package;
-4. runs `tor-guard install`, which:
-   - creates `/etc/tor-guard`, `/var/lib/tor-guard`, `/var/log/tor-guard`
-     (mode `0700`, root-owned);
-   - backs up any existing `/etc/tor/torrc` and configuration;
-   - installs `/etc/tor-guard/tor-guard.yml` (only if absent — your config is
-     never clobbered);
-   - writes the Tor drop-in `/etc/tor/torrc.d/10-tor-guard.conf`;
-   - installs the systemd units;
-   - records an installation manifest for a clean uninstall.
+1. platformani tekshiradi (`/etc/os-release`);
+2. `nftables`, `tor`, `python3`, `python3-pip`’ni o‘rnatadi;
+3. `tor-guard` Python paketini o‘rnatadi;
+4. `tor-guard install`’ni ishga tushiradi, u:
+   - `/etc/tor-guard`, `/var/lib/tor-guard`, `/var/log/tor-guard` papkalarini
+     yaratadi (rejim `0700`, root egaligida);
+   - mavjud `/etc/tor/torrc` va sozlamalarni zaxiralaydi;
+   - `/etc/tor-guard/tor-guard.yml`’ni o‘rnatadi (faqat mavjud bo‘lmasa —
+     sizning sozlamangiz hech qachon ustidan yozilmaydi);
+   - Tor drop-in `/etc/tor/torrc.d/10-tor-guard.conf`’ni yozadi;
+   - systemd birliklarini o‘rnatadi;
+   - toza o‘chirish uchun o‘rnatish manifestini yozib qo‘yadi.
 
-If any install step fails, the installer rolls back the recorded actions; if
-rollback cannot fully restore, it engages the emergency lock so the host is
-**locked, never open**.
+Agar biror o‘rnatish bosqichi muvaffaqiyatsiz bo‘lsa, o‘rnatuvchi yozib olingan
+amallarni oldingi holatga qaytaradi; agar qaytarish to‘liq tiklay olmasa,
+favqulodda bloklashni yoqadi, shunda host **bloklangan, hech qachon ochiq emas**.
 
-## Configure
+## Sozlash
 
 ```bash
 sudoedit /etc/tor-guard/tor-guard.yml
 sudo tor-guard config validate
 ```
 
-See [`CONFIGURATION.md`](CONFIGURATION.md).
+Qarang: [`CONFIGURATION.md`](CONFIGURATION.md).
 
-## Activate
+## Faollashtirish
 
 ```bash
-sudo tor-guard start     # apply firewall -> start Tor -> verify -> PROTECTED
+sudo tor-guard start     # firewall qo‘llash -> Tor’ni ishga tushirish -> tekshirish -> PROTECTED
 sudo tor-guard status
 ```
 
-`start` runs the full sequence: root check → platform → config → dependencies →
-backup → validate ruleset → **apply kill switch** → start Tor → wait for 100%
-bootstrap → validate listeners → confirm Tor exit → confirm direct/IPv6/UDP
-blocked → mark protected. If any required step fails, it stays **locked** and
-prints the exact failure.
+`start` to‘liq ketma-ketlikni bajaradi: root tekshiruvi → platforma → sozlama →
+dependency’lar → zaxira → qoidalar to‘plamini tekshirish → **kill switchni
+qo‘llash** → Tor’ni ishga tushirish → 100% ulanish bosqichini kutish → portlarni
+tekshirish → Tor chiqishini tasdiqlash → to‘g‘ridan-to‘g‘ri/IPv6/UDP bloklanganini
+tasdiqlash → himoyalangan deb belgilash. Agar biror kerakli bosqich muvaffaqiyatsiz
+bo‘lsa, u **bloklangan** qoladi va aniq nosozlikni chop etadi.
 
-## Enable at boot
+## Yuklanishda yoqish
 
 ```bash
 sudo tor-guard enable
 ```
 
-This enables `tor-guard.target`. The firewall unit is ordered
-`Before=network-pre.target`, so the kill switch exists before interfaces come up
-— there is no clearnet window at boot.
+Bu `tor-guard.target`’ni yoqadi. Firewall birligi `Before=network-pre.target`
+tartibida joylashgan, shuning uchun kill switch interfeyslar ko‘tarilishidan
+oldin mavjud bo‘ladi — yuklanishda oddiy internet oynasi yo‘q.
 
-## Manual install (without the bootstrap script)
+## Qo‘lda o‘rnatish (bootstrap skriptisiz)
 
 ```bash
 sudo apt-get install -y nftables tor python3 python3-pip
@@ -76,12 +78,12 @@ sudo python3 -m pip install --break-system-packages .
 sudo tor-guard install --resource-dir "$(pwd)"
 ```
 
-## Uninstall
+## O‘chirish (uninstall)
 
 ```bash
-sudo bash scripts/uninstall.sh            # removes files + firewall (restores net)
-sudo bash scripts/uninstall.sh --keep-firewall   # remove files, keep the lock
+sudo bash scripts/uninstall.sh            # fayllar + firewall’ni olib tashlaydi (tarmoqni tiklaydi)
+sudo bash scripts/uninstall.sh --keep-firewall   # fayllarni olib tashlaydi, blokni saqlaydi
 ```
 
-Uninstall removes only manifest-owned files; it never deletes unrelated
-administrator configuration.
+O‘chirish faqat manifestga tegishli fayllarni olib tashlaydi; u hech qachon
+begona administrator sozlamalarini o‘chirmaydi.

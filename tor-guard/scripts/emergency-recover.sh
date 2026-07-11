@@ -13,10 +13,10 @@
 set -Eeuo pipefail
 
 log() { printf '[recover] %s\n' "$*"; }
-die() { printf '[recover] ERROR: %s\n' "$*" >&2; exit 1; }
+die() { printf '[recover] XATOLIK: %s\n' "$*" >&2; exit 1; }
 
-[ "$(id -u)" -eq 0 ] || die "must run as root"
-command -v nft >/dev/null 2>&1 || die "nft not found"
+[ "$(id -u)" -eq 0 ] || die "root sifatida ishga tushirilishi kerak"
+command -v nft >/dev/null 2>&1 || die "nft topilmadi"
 
 # family:table pairs that Tor Guard may create.
 TABLES=(
@@ -27,29 +27,29 @@ TABLES=(
 )
 
 show_status() {
-  log "current Tor Guard tables:"
+  log "joriy Tor Guard jadvallari:"
   local found=0
   for entry in "${TABLES[@]}"; do
     # shellcheck disable=SC2086
     if nft list table $entry >/dev/null 2>&1; then
-      printf '  present: %s\n' "$entry"
+      printf '  mavjud: %s\n' "$entry"
       found=1
     fi
   done
-  [ "$found" -eq 1 ] || log "  (none present)"
+  [ "$found" -eq 1 ] || log "  (mavjud emas)"
 }
 
 remove_tables() {
   for entry in "${TABLES[@]}"; do
     # shellcheck disable=SC2086
     if nft list table $entry >/dev/null 2>&1; then
-      log "deleting table: $entry"
+      log "jadval o‘chirilmoqda: $entry"
       # shellcheck disable=SC2086
-      nft delete table $entry || log "could not delete $entry (continuing)"
+      nft delete table $entry || log "$entry o‘chirib bo‘lmadi (davom etilmoqda)"
     fi
   done
-  log "Tor Guard tables removed. Direct networking should be restored."
-  log "If DNS still fails, restart networking:  systemctl restart systemd-networkd || dhclient"
+  log "Tor Guard jadvallari olib tashlandi. To‘g‘ridan-to‘g‘ri tarmoq tiklanishi kerak."
+  log "Agar DNS hali ham ishlamasa, tarmoqni qayta ishga tushiring:  systemctl restart systemd-networkd || dhclient"
 }
 
 main() {

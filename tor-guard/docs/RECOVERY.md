@@ -1,81 +1,86 @@
-# Recovery
+# Tiklash
 
-Tor Guard is fail-closed: when something goes wrong you lose Internet access,
-not your anonymity. This guide restores networking safely.
+Tor Guard fail-closed: biror narsa noto‘g‘ri ketganda siz internet kirishini
+yo‘qotasiz, anonimligingizni emas. Bu qo‘llanma tarmoqni xavfsiz tiklaydi.
 
-## 1. Understand the state first
+## 1. Avval holatni tushuning
 
 ```bash
 tor-guard status      # PROTECTED / LOCKED / DEGRADED / UNLOCKED
-tor-guard doctor      # what specifically is unhealthy
+tor-guard doctor      # aynan nima nosog‘lom
 journalctl -u tor-guard-firewall -u tor-guard-monitor --no-pager | tail
 ```
 
-- `LOCKED` is **by design** when Tor is unhealthy. Fixing Tor (or waiting for
-  the monitor to restart it) usually returns you to `PROTECTED`.
-- A failed external-IP check reports *verification unavailable*, which is **not**
-  proof of a leak or of breakage.
+- Tor nosog‘lom bo‘lganda `LOCKED` — bu **dizayn bo‘yicha**. Tor’ni tuzatish
+  (yoki monitor uni qayta ishga tushirishini kutish) odatda sizni `PROTECTED`
+  holatiga qaytaradi.
+- Muvaffaqiyatsiz tashqi-IP tekshiruvi *tekshiruv mavjud emas* deb xabar qiladi,
+  bu sizib chiqish yoki nosozlik dalili **emas**.
 
-## 2. Restore clearnet on purpose (normal path)
+## 2. Oddiy internetni ataylab tiklash (oddiy yo‘l)
 
 ```bash
 sudo tor-guard unlock-clearnet
-# or restore a specific verified backup:
+# yoki muayyan tekshirilgan zaxirani tiklash:
 sudo tor-guard unlock-clearnet --backup /var/lib/tor-guard/backups/ruleset-<ts>.nft
 ```
 
-This is a separate, explicit, audited action. It removes Tor Guard's tables
-(and optionally restores a captured backup) — it never blindly flushes the
-whole ruleset, and it preserves unrelated administrator rules.
+Bu alohida, aniq, audit qilinadigan amal. U Tor Guard jadvallarini olib tashlaydi
+(va ixtiyoriy ravishda saqlangan zaxirani tiklaydi) — hech qachon butun qoidalar
+to‘plamini ko‘r-ko‘rona tozalamaydi va begona administrator qoidalarini saqlaydi.
 
-## 3. Offline recovery (CLI broken / no login shell)
+## 3. Oflayn tiklash (CLI buzilgan / login shell yo‘q)
 
-From a **local console** (not SSH, which the kill switch may block):
-
-```bash
-sudo bash /path/to/tor-guard/scripts/emergency-recover.sh --status   # preview
-sudo bash /path/to/tor-guard/scripts/emergency-recover.sh            # remove tables
-```
-
-`emergency-recover.sh` is deliberately short and auditable. It:
-
-- deletes **only** `tor_guard_nat`, `tor_guard_filter`, `tor_guard6`, and
-  `tor_guard_lock`;
-- **never** runs `nft flush ruleset`;
-- prints how to restart DHCP/networking if DNS is still down.
-
-If networking is still broken afterwards:
+**Mahalliy konsoldan** (SSH emas, uni kill switch bloklashi mumkin):
 
 ```bash
-sudo systemctl restart systemd-networkd  # or: sudo dhclient <iface>
-sudo systemctl restart NetworkManager    # NM-managed hosts
+sudo bash /path/to/tor-guard/scripts/emergency-recover.sh --status   # ko‘rib chiqish
+sudo bash /path/to/tor-guard/scripts/emergency-recover.sh            # jadvallarni olib tashlash
 ```
 
-## 4. Recovering from a failed install/update
+`emergency-recover.sh` ataylab qisqa va audit qilinadigan. U:
 
-The installer is transactional. A failed install rolls back its recorded
-actions automatically; if rollback can't fully restore, it engages the
-emergency lock (host **locked**, not open). To finish cleanup manually:
+- **faqat** `tor_guard_nat`, `tor_guard_filter`, `tor_guard6` va
+  `tor_guard_lock`’ni o‘chiradi;
+- **hech qachon** `nft flush ruleset` bajarmaydi;
+- agar DNS hali ham ishlamasa, DHCP/tarmoqni qayta ishga tushirish yo‘lini chop
+  etadi.
+
+Agar shundan keyin ham tarmoq buzilgan bo‘lsa:
 
 ```bash
-sudo bash scripts/emergency-recover.sh          # drop any Tor Guard tables
-sudo tor-guard uninstall || true                # remove manifest-owned files
+sudo systemctl restart systemd-networkd  # yoki: sudo dhclient <iface>
+sudo systemctl restart NetworkManager    # NM boshqaradigan hostlar
 ```
 
-The installation manifest (`/var/lib/tor-guard/manifest.json`) lists exactly
-what Tor Guard owns, so recovery never touches your other configuration.
+## 4. Muvaffaqiyatsiz o‘rnatish/yangilanishdan tiklash
 
-## 5. Disable at boot
+O‘rnatuvchi tranzaksion. Muvaffaqiyatsiz o‘rnatish o‘zining yozib olingan
+amallarini avtomatik oldingi holatga qaytaradi; agar qaytarish to‘liq tiklay
+olmasa, favqulodda bloklashni yoqadi (host **bloklangan**, ochiq emas).
+Tozalashni qo‘lda yakunlash uchun:
 
 ```bash
-sudo tor-guard disable      # stop starting at boot (does NOT unlock clearnet)
+sudo bash scripts/emergency-recover.sh          # har qanday Tor Guard jadvalini olib tashlash
+sudo tor-guard uninstall || true                # manifestga tegishli fayllarni olib tashlash
 ```
 
-To fully return to a normal host: `disable`, then `unlock-clearnet`, then
-`uninstall`.
+O‘rnatish manifesti (`/var/lib/tor-guard/manifest.json`) Tor Guard nimaga
+egaligini aynan sanab beradi, shuning uchun tiklash hech qachon boshqa
+sozlamalaringizga tegmaydi.
 
-## Failure-state summary
+## 5. Yuklanishda o‘chirish
 
-See the authoritative table in
+```bash
+sudo tor-guard disable      # yuklanishda ishga tushishni to‘xtatadi (oddiy internetni OCHMAYDI)
+```
+
+Host’ni to‘liq oddiy holatga qaytarish uchun: `disable`, so‘ng
+`unlock-clearnet`, so‘ng `uninstall`.
+
+## Nosozlik-holat xulosasi
+
+Rasmiy jadvalga qarang:
 [`SECURITY_INVARIANTS.md`](SECURITY_INVARIANTS.md#failure-state-table-authoritative).
-Every listed failure resolves to *blocked* or *locked*, never to clearnet.
+Sanab o‘tilgan har bir nosozlik *bloklangan* yoki *bloklangan holat*ga olib
+keladi, hech qachon oddiy internetga emas.

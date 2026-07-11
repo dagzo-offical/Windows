@@ -1,52 +1,52 @@
-# Tor Guard configuration.
-# Copy to /etc/tor-guard/tor-guard.yml (mode 0600, root:root).
-# Every field is validated strictly; unknown keys are rejected.
+# Tor Guard sozlamalari.
+# /etc/tor-guard/tor-guard.yml ga nusxalang (rejim 0600, root:root).
+# Har bir maydon qat'iy tekshiriladi; noma'lum kalitlar rad etiladi.
 
-# Operating mode: "strict" (recommended) or "lan-compatible".
-#   strict          -> Internet only via Tor; all LAN/link-local/multicast blocked.
-#   lan-compatible  -> also allow the explicitly listed allowed_lan_cidrs directly.
+# Ish rejimi: "strict" (tavsiya etiladi) yoki "lan-compatible".
+#   strict          -> Internet faqat Tor orqali; barcha LAN/link-local/multicast bloklangan.
+#   lan-compatible  -> aniq ko'rsatilgan allowed_lan_cidrs'ni to'g'ridan-to'g'ri ochishga ruxsat beradi.
 mode: strict
 
-# Dedicated Tor service account. On Debian/Ubuntu/Kali this is "debian-tor".
-# Its UID is the ONLY identity permitted direct egress (never a PID).
+# Maxsus Tor xizmat hisobi. Debian/Ubuntu/Kali'da bu "debian-tor".
+# Uning UID'i to'g'ridan-to'g'ri chiqishga ruxsat etilgan YAGONA identifikator (hech qachon PID emas).
 tor_user: debian-tor
 
-# Tor loopback listeners. Must be distinct.
+# Tor loopback portlari. Bir-biridan farqli bo'lishi shart.
 socks_port: 9050
 trans_port: 9040
 dns_port: 5353
 control_port: 9051
 
-# LAN subnets permitted direct access in lan-compatible mode.
-# MUST be empty in strict mode. Public/global CIDRs are rejected.
+# lan-compatible rejimida to'g'ridan-to'g'ri ruxsat etilgan LAN quyi tarmoqlari.
+# strict rejimida bo'sh bo'lishi SHART. Ommaviy/global CIDR'lar rad etiladi.
 allowed_lan_cidrs: []
-#   Example for lan-compatible:
+#   lan-compatible uchun namuna:
 #   allowed_lan_cidrs:
 #     - 192.168.1.0/24
 
-# Optional explicit interface allow-list (advisory; empty = all).
+# Ixtiyoriy aniq interfeys ruxsat-ro'yxati (tavsiyaviy; bo'sh = barchasi).
 interfaces: []
 
-# Monitoring and health tuning (seconds).
+# Kuzatuv va holat sozlamalari (soniyalarda).
 monitor_interval: 10
 health_timeout: 15
 bootstrap_timeout: 120
 
-# External verification endpoints (https only). Reachability is tri-state:
-# unreachable = "verification unavailable", never treated as proof of leak.
+# Tashqi tekshiruv endpointlari (faqat https). Ulanish uch holatli:
+# ulanib bo'lmasa = "tekshiruv mavjud emas", hech qachon sizib chiqish dalili sifatida qabul qilinmaydi.
 external_ip_endpoints:
   - https://check.torproject.org/api/ip
 
-# Logging: DEBUG | INFO | WARNING | ERROR | CRITICAL
+# Log darajasi: DEBUG | INFO | WARNING | ERROR | CRITICAL
 log_level: INFO
 
-# Let the monitor restart Tor automatically (it NEVER restores clearnet).
+# Monitor Tor'ni avtomatik qayta ishga tushirsin (u HECH QACHON oddiy internetni tiklamaydi).
 auto_restart_tor: true
 
-# Paths (defaults are secure; override only if you know why).
+# Yo'llar (standart qiymatlar xavfsiz; faqat sababini bilsangiz o'zgartiring).
 backup_dir: /var/lib/tor-guard/backups
 state_dir: /var/lib/tor-guard
 lock_file: /run/tor-guard.lock
 
-# Test mode skips active leak probes during start (for CI/dev only).
+# Test rejimi start paytida faol sizib chiqish tekshiruvlarini o'tkazib yuboradi (faqat CI/dev uchun).
 test_mode: false

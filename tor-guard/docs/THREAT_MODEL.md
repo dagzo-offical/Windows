@@ -1,73 +1,79 @@
-# Tor Guard — Threat Model
+# Tor Guard — Tahdid Modeli
 
-## 1. Scope & goal
+## 1. Ko‘lam va maqsad
 
-Tor Guard is a **fail-closed transparent Tor kill switch** for a single Linux
-workstation. Its goal is to *reduce accidental exposure of the user's real
-public IP address and DNS queries* by forcing supported outbound traffic through
-Tor and blocking everything that cannot be routed through Tor.
+Tor Guard — bitta Linux ish stansiyasi uchun **fail-closed shaffof Tor kill
+switch**. Uning maqsadi — qo‘llab-quvvatlanadigan chiquvchi trafikni Tor orqali
+majburlash va Tor orqali yo‘naltirib bo‘lmaydigan hamma narsani bloklash orqali
+*foydalanuvchining haqiqiy ommaviy IP manzili va DNS so‘rovlarining tasodifiy
+oshkor bo‘lishini kamaytirish*.
 
-It is **not** an anonymity guarantee. See §5 non-goals.
+Bu anonimlik kafolati **EMAS**. §5 non-goal’larga qarang.
 
-## 2. Assets
+## 2. Aktivlar
 
-- **A1** Real public IPv4/IPv6 address of the host.
-- **A2** DNS queries (names the user resolves).
-- **A3** Outbound connection metadata (dst IP/port, timing) reaching clearnet.
-- **A4** Firewall integrity (the kill switch itself).
-- **A5** Tor configuration (torrc, control auth cookie).
-- **A6** Administrator access to the host.
-- **A7** System state (protected/locked flags, backups, manifest).
+- **A1** Host’ning haqiqiy ommaviy IPv4/IPv6 manzili.
+- **A2** DNS so‘rovlari (foydalanuvchi aniqlaydigan nomlar).
+- **A3** Oddiy internetga yetib boradigan chiquvchi ulanish metama’lumotlari (dst
+  IP/port, vaqt).
+- **A4** Firewall butunligi (kill switch’ning o‘zi).
+- **A5** Tor sozlamalari (torrc, boshqaruv autentifikatsiya cookie’si).
+- **A6** Host’ga administrator kirishi.
+- **A7** Tizim holati (himoyalangan/bloklangan bayroqlar, zaxiralar, manifest).
 
-## 3. Adversaries & threats
+## 3. Raqiblar va tahdidlar
 
-| ID | Threat | Vector | Mitigation | Residual risk |
+| ID | Tahdid | Vektor | Yumshatish | Qoldiq xavf |
 |----|--------|--------|------------|---------------|
-| T1 | Tor daemon crash | process dies mid-session | Firewall independent of Tor; monitor restarts Tor; egress stays blocked (I3, I11) | Brief loss of connectivity (by design) |
-| T2 | Tor bootstrap failure | network/censorship | `start` remains locked until 100% bootstrap (I2) | User has no Internet until Tor works — intended |
-| T3 | DNS leak | app queries resolver directly | Redirect 53→DNSPort, drop others (I6) | App-level DoH/DoT to :443 — see §4 |
-| T4 | IPv6 leak | dual-stack egress | `ip6` table drop, not sysctl-only (I7) | None for IPv6 egress |
-| T5 | UDP/QUIC bypass | HTTP/3 over UDP/443 | Drop non-essential outbound UDP (I8) | Local DHCP/DNS-to-Tor UDP allowed intentionally |
-| T6 | Direct TCP bypass | app opens raw socket | Default-deny + redirect only (I1) | None while active |
-| T7 | Startup/shutdown race | clearnet window at boot/stop | Firewall `Before=network-pre.target`; stop keeps lock (I2, I4) | None identified |
-| T8 | Firewall rule deletion | admin/script flushes rules | Integrity monitor re-applies (I10) | Window ≤ monitor interval |
-| T9 | Docker/VM bridge bypass | container egress via bridge | `forward`/`prerouting` drop+redirect (I14) | Custom netns with own routing table by root — see §4 |
-| T10 | Network namespace bypass | `ip netns` with veth | prerouting/forward capture; block unknown ifaces | Root can craft evasion — out of scope (see T13) |
-| T11 | Malicious local (non-root) process | tries any egress | Subject to same firewall; cannot change rules | Covert channels via allowed Tor path |
-| T12 | Privileged local attacker (root) | disables Tor Guard | — | **Out of scope**: root can undo any host control |
-| T13 | Compromised host/kernel | rootkit | — | **Out of scope** |
-| T14 | Compromised Tor exit node | sees exit traffic | Use HTTPS/onion; Tor's own guarantees | Standard Tor exit risk |
-| T15 | Browser fingerprinting | JS/TLS fingerprint | — | **Out of scope**; use Tor Browser |
-| T16 | Personal-account correlation | user logs into real account | — | **Out of scope**; opsec responsibility |
-| T17 | Malware/endpoint telemetry | phones home via Tor | Traffic still Tor-routed, not de-anonymized by us | Correlation possible |
-| T18 | Traffic-correlation attack | global passive adversary | — | **Out of scope** (Tor's own limitation) |
-| T19 | Hostile Wi-Fi / captive portal | MITM on L2 | Kill switch blocks clearnet incl. portal | Portal login needs `unlock-clearnet` first |
-| T20 | System update reorders services | apt changes ordering | Units pinned + `doctor` verifies; integrity monitor | Update could disable unit — `doctor` detects |
+| T1 | Tor xizmati ishdan chiqishi | seans o‘rtasida jarayon o‘ladi | Firewall Tor’dan mustaqil; monitor Tor’ni qayta ishga tushiradi; chiqish bloklangan qoladi (I3, I11) | Ulanishning qisqa yo‘qolishi (dizayn bo‘yicha) |
+| T2 | Tor ulanish bosqichi muvaffaqiyatsizligi | tarmoq/senzura | `start` 100% ulanish bosqichigacha bloklangan qoladi (I2) | Tor ishlaguncha foydalanuvchida internet yo‘q — mo‘ljallangan |
+| T3 | DNS sizib chiqishi | ilova resolverni to‘g‘ridan-to‘g‘ri so‘raydi | 53→DNSPort yo‘naltirish, qolganlarini tashlash (I6) | Ilova darajasidagi DoH/DoT :443 ga — §4 ga qarang |
+| T4 | IPv6 sizib chiqishi | dual-stack chiqish | `ip6` jadval drop, faqat sysctl emas (I7) | IPv6 chiqishi uchun yo‘q |
+| T5 | UDP/QUIC chetlab o‘tishi | UDP/443 ustidan HTTP/3 | Zarur bo‘lmagan chiquvchi UDP’ni tashlash (I8) | Mahalliy DHCP/DNS-Tor’ga UDP ataylab ruxsat etilgan |
+| T6 | To‘g‘ridan-to‘g‘ri TCP chetlab o‘tishi | ilova xom soket ochadi | Default-deny + faqat redirect (I1) | Faol paytda yo‘q |
+| T7 | Ishga tushirish/o‘chirish poygasi | yuklanishda/to‘xtashda oddiy internet oynasi | Firewall `Before=network-pre.target`; stop blokni saqlaydi (I2, I4) | Aniqlangani yo‘q |
+| T8 | Firewall qoidasini o‘chirish | admin/skript qoidalarni tozalaydi | Butunlik monitori qayta qo‘llaydi (I10) | Oyna ≤ monitor intervali |
+| T9 | Docker/VM bridge chetlab o‘tishi | konteyner chiqishi bridge orqali | `forward`/`prerouting` drop+redirect (I14) | Root tomonidan o‘z marshrutlash jadvali bilan maxsus netns — §4 ga qarang |
+| T10 | Tarmoq namespace chetlab o‘tishi | veth bilan `ip netns` | prerouting/forward ushlaydi; noma’lum interfeyslarni bloklash | Root chetlab o‘tishni yaratishi mumkin — ko‘lam tashqarisida (T13 ga qarang) |
+| T11 | Zararli mahalliy (root bo‘lmagan) jarayon | har qanday chiqishga urinadi | Xuddi shu firewall’ga bo‘ysunadi; qoidalarni o‘zgartira olmaydi | Ruxsat etilgan Tor yo‘li orqali yashirin kanallar |
+| T12 | Imtiyozli mahalliy hujumchi (root) | Tor Guard’ni o‘chiradi | — | **Ko‘lam tashqarisida**: root har qanday host boshqaruvini bekor qilishi mumkin |
+| T13 | Buzilgan host/yadro | rootkit | — | **Ko‘lam tashqarisida** |
+| T14 | Buzilgan Tor chiqish tuguni | chiqish trafigini ko‘radi | HTTPS/onion ishlating; Tor’ning o‘z kafolatlari | Standart Tor chiqish xavfi |
+| T15 | Brauzer barmoq izlari | JS/TLS barmoq izi | — | **Ko‘lam tashqarisida**; Tor Browser ishlating |
+| T16 | Shaxsiy-hisob korrelyatsiyasi | foydalanuvchi haqiqiy hisobga kiradi | — | **Ko‘lam tashqarisida**; opsec mas’uliyati |
+| T17 | Zararli dastur/endpoint telemetriyasi | Tor orqali serverga bog‘lanadi | Trafik hali ham Tor orqali, biz tomonidan deanonimlashtirilmaydi | Korrelyatsiya mumkin |
+| T18 | Trafik-korrelyatsiya hujumi | global passiv raqib | — | **Ko‘lam tashqarisida** (Tor’ning o‘z cheklovi) |
+| T19 | Xavfli Wi-Fi / captive portal | L2’da MITM | Kill switch oddiy internetni, jumladan portalni ham bloklaydi | Portal kirishi avval `unlock-clearnet` talab qiladi |
+| T20 | Tizim yangilanishi xizmatlarni qayta tartiblaydi | apt tartibni o‘zgartiradi | Birliklar mahkamlangan + `doctor` tekshiradi; butunlik monitori | Yangilanish birlikni o‘chirishi mumkin — `doctor` aniqlaydi |
 
-## 4. Known limitations that widen the attack surface
+## 4. Hujum yuzasini kengaytiradigan ma’lum cheklovlar
 
-- **Application-level encrypted DNS (DoH/DoT)** to port 443/853 looks like normal
-  TCP and is *redirected through Tor*, not blocked — so it does not leak the real
-  IP, but the resolver choice is the app's. We cannot force such apps to use
-  Tor's resolver. Documented in `docs/LIMITATIONS.md`.
-- **Root on the host** can remove Tor Guard. This is fundamental (T12/T13).
-- **Custom routing tables / policy routing by root** (e.g. exotic `ip rule`
-  setups, VRF) may escape a purely `output`-hook design; we add `forward` +
-  `prerouting` coverage but cannot defeat an adversarial root.
-- **QUIC** is blocked as generic UDP; browsers fall back to TCP.
+- **Ilova darajasidagi shifrlangan DNS (DoH/DoT)** 443/853 portiga oddiy TCP’ga
+  o‘xshaydi va bloklanmaydi, balki *Tor orqali yo‘naltiriladi* — shuning uchun u
+  haqiqiy IP’ni oshkor qilmaydi, lekin resolver tanlovi ilovaniki. Biz bunday
+  ilovalarni Tor resolverini ishlatishga majburlay olmaymiz.
+  `docs/LIMITATIONS.md`da hujjatlashtirilgan.
+- **Host’dagi root** Tor Guard’ni olib tashlashi mumkin. Bu tub masala
+  (T12/T13).
+- **Root tomonidan maxsus marshrutlash jadvallari / siyosat marshrutlashi**
+  (masalan, ekzotik `ip rule` sozlamalari, VRF) sof `output`-hook dizaynidan
+  qochishi mumkin; biz `forward` + `prerouting` qamrovini qo‘shamiz, lekin
+  dushman-root’ni yenga olmaymiz.
+- **QUIC** umumiy UDP sifatida bloklanadi; brauzerlar TCP’ga qaytadi.
 
-## 5. Explicit non-goals
+## 5. Aniq non-goal’lar
 
-Tor Guard makes **no claim** of protection against, and must never be described
-as protecting against:
+Tor Guard quyidagilardan himoya qilishga **hech qanday da’vo** qilmaydi va hech
+qachon ulardan himoya qiladi deb ta’riflanmasligi kerak:
 
-- a compromised host or kernel;
-- a root-level attacker on the machine;
-- global passive adversaries / traffic-correlation attacks;
-- application-level identity disclosure (logging into real accounts);
-- browser or TLS fingerprinting;
-- malicious documents / malware execution;
-- endpoint telemetry;
-- behavioral correlation across sessions.
+- buzilgan host yoki yadro;
+- mashinada root darajasidagi hujumchi;
+- global passiv raqiblar / trafik-korrelyatsiya hujumlari;
+- ilova darajasidagi identifikatsiya oshkorligi (haqiqiy hisoblarga kirish);
+- brauzer yoki TLS barmoq izlari;
+- zararli hujjatlar / zararli dasturlar ishga tushishi;
+- endpoint telemetriyasi;
+- seanslar bo‘ylab xulq-atvor korrelyatsiyasi.
 
-It reduces **accidental** real-IP and DNS exposure. That is the entire promise.
+U **tasodifiy** haqiqiy-IP va DNS oshkorligini kamaytiradi. Va’da butunlay
+shundan iborat.

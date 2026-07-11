@@ -1,48 +1,52 @@
-# VM integration & leak testing
+# VM integratsiya va sizib chiqish testlari
 
-These environments run the **destructive** integration and leak tests in
-disposable virtual machines — never on a workstation. Each distribution has a
-`Vagrantfile` that boots a clean VM, installs Tor Guard, activates protected
-mode, runs the leak suite, simulates Tor failure and firewall tampering, and
-collects results under `vm-tests/<distro>/results/`.
+Bu muhitlar **destruktiv** integratsiya va sizib chiqish testlarini disposable
+(bir martalik) virtual mashinalarda ishga tushiradi — hech qachon ish
+stansiyasida emas. Har bir distributiv toza VM’ni yuklaydigan, Tor Guard’ni
+o‘rnatadigan, himoyalangan rejimni faollashtiradigan, sizib chiqish to‘plamini
+ishga tushiradigan, Tor nosozligini va firewall buzilishini simulyatsiya
+qiladigan hamda natijalarni `vm-tests/<distro>/results/` ostida yig‘adigan
+`Vagrantfile`ga ega.
 
-## Supported targets
+## Qo‘llab-quvvatlanadigan maqsadlar
 
-| Directory        | Box                     | OS                    |
+| Papka            | Box                     | OS                    |
 |------------------|-------------------------|-----------------------|
 | `ubuntu-2404/`   | `bento/ubuntu-24.04`    | Ubuntu 24.04 LTS      |
 | `ubuntu-2204/`   | `bento/ubuntu-22.04`    | Ubuntu 22.04 LTS      |
 | `debian-12/`     | `debian/bookworm64`     | Debian 12             |
-| `kali/`          | `kalilinux/rolling`     | Kali (Debian-based)   |
+| `kali/`          | `kalilinux/rolling`     | Kali (Debian asosidagi) |
 
-## Requirements
+## Talablar
 
-- Vagrant + VirtualBox (or libvirt with an adjusted provider block)
-- The tests are gated by `TOR_GUARD_DISPOSABLE_VM=1`, which `provision.sh` sets.
+- Vagrant + VirtualBox (yoki moslashtirilgan provayder bloki bilan libvirt)
+- Testlar `TOR_GUARD_DISPOSABLE_VM=1` bilan cheklangan, uni `provision.sh`
+  o‘rnatadi.
 
-## Run
+## Ishga tushirish
 
 ```bash
 cd vm-tests/ubuntu-2404
-vagrant up            # boots, provisions, runs the full suite
-cat results/*.txt     # inspect leak/failure-simulation results
-vagrant destroy -f    # throw the VM away
+vagrant up            # yuklaydi, provisiya qiladi, to‘liq to‘plamni ishga tushiradi
+cat results/*.txt     # sizib chiqish/nosozlik-simulyatsiya natijalarini ko‘rish
+vagrant destroy -f    # VM’ni tashlab yuborish
 ```
 
-## What the provisioner checks
+## Provisioner nimani tekshiradi
 
 1. `tor-guard install` + `config validate`
-2. `tor-guard start` reaches **protected**
-3. `test-leaks` — direct IPv4/IPv6, UDP DNS, external UDP, QUIC, alternate
-   resolver all blocked; exit confirmed via Tor
-4. **Tor-failure simulation** — after `systemctl stop tor`, clearnet must be
-   unreachable (fail-closed)
-5. **Firewall-tamper simulation** — flush a chain, wait for the monitor to
-   re-assert the ruleset, then `verify`
-6. `unlock-clearnet` restores networking
+2. `tor-guard start` **protected**ga yetadi
+3. `test-leaks` — to‘g‘ridan-to‘g‘ri IPv4/IPv6, UDP DNS, tashqi UDP, QUIC,
+   muqobil resolver barchasi bloklangan; chiqish Tor orqali tasdiqlangan
+4. **Tor-nosozlik simulyatsiyasi** — `systemctl stop tor`dan keyin oddiy
+   internet mavjud bo‘lmasligi kerak (fail-closed)
+5. **Firewall-buzilish simulyatsiyasi** — zanjirni tozalash, monitor qoidalar
+   to‘plamini qayta tasdiqlashini kutish, so‘ng `verify`
+6. `unlock-clearnet` tarmoqni tiklaydi
 
-Real public IP is never printed in results — only pass/fail and probe names.
+Haqiqiy ommaviy IP natijalarda hech qachon chop etilmaydi — faqat pass/fail va
+tekshiruv nomlari.
 
-> Note: containers cannot faithfully emulate every host-firewall scenario
-> (namespaces, kernel netfilter behaviour). Use full VMs for authoritative
-> results, as the specification requires.
+> Eslatma: konteynerlar har bir host-firewall stsenariysini (namespace’lar,
+> yadro netfilter xatti-harakati) to‘liq taqlid qila olmaydi. Rasmiy natijalar
+> uchun, spetsifikatsiya talab qilganidek, to‘liq VM’lardan foydalaning.

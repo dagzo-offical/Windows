@@ -1,57 +1,62 @@
-# Changelog
+# O‘zgarishlar tarixi (Changelog)
 
-All notable changes to Tor Guard are documented here. Format loosely follows
-[Keep a Changelog](https://keepachangelog.com/); this project uses semantic
-versioning.
+Tor Guard’dagi barcha muhim o‘zgarishlar shu yerda hujjatlashtiriladi. Format
+taxminan [Keep a Changelog](https://keepachangelog.com/) ga amal qiladi; bu
+loyiha semantik versiyalashdan foydalanadi.
 
 ## [1.0.0] — 2026-07-10
 
-Initial release.
+Dastlabki nashr.
 
-### Added
-- Fail-closed, system-wide Tor transparent-proxy kill switch for
-  Ubuntu 24.04/22.04, Debian 12, and Kali (systemd + nftables).
-- Two operating modes: STRICT (default) and LAN-COMPATIBLE with strict CIDR
-  validation.
-- Atomic nftables ruleset generation and application (`nft -f`), with a
-  syntax/semantic validator (`nft -c`) run before every apply.
-- Transparent redirect of eligible TCP to Tor's TransPort and DNS to Tor's
-  DNSPort; default-deny for everything else.
-- IPv6 blocked at the firewall (route-independent); general outbound UDP and
-  QUIC blocked; direct DNS blocked.
-- Dedicated-Tor-uid egress exception (by stable uid, never PID).
-- Firewall integrity monitoring with automatic re-assertion; Tor crash handling
-  with automatic restart — never restoring clearnet.
-- Emergency lockdown that works without Tor installed.
-- Explicit, audited `unlock-clearnet` (backup restore or clean removal; never
-  `nft flush ruleset`).
-- Tor management: torrc drop-in generation, cookie-authenticated ControlPort
-  client, 100%-bootstrap gating, listener/circuit health checks.
-- Transactional installer with timestamped backups, file hashing, manifest, and
-  rollback; matching uninstaller that removes only owned files.
-- Offline recovery script (`scripts/emergency-recover.sh`) and full
+### Qo‘shildi
+- Ubuntu 24.04/22.04, Debian 12 va Kali (systemd + nftables) uchun fail-closed,
+  butun tizim bo‘ylab Tor transparent-proxy kill switch.
+- Ikki ish rejimi: STRICT (standart) va qat’iy CIDR tekshiruvi bilan
+  LAN-COMPATIBLE.
+- Atomik nftables qoidalar to‘plamini yaratish va qo‘llash (`nft -f`), har bir
+  qo‘llashdan oldin ishga tushiriladigan sintaksis/semantik tekshiruvchi
+  (`nft -c`) bilan.
+- Mos keluvchi TCP’ni Tor TransPort’ga va DNS’ni Tor DNSPort’ga shaffof
+  yo‘naltirish; qolgan hamma narsa uchun default-deny.
+- IPv6 firewall darajasida bloklangan (marshrutdan mustaqil); umumiy chiquvchi
+  UDP va QUIC bloklangan; to‘g‘ridan-to‘g‘ri DNS bloklangan.
+- Maxsus-Tor-uid chiqish istisnosi (barqaror uid bo‘yicha, hech qachon PID emas).
+- Avtomatik qayta-tasdiqlash bilan firewall butunligi monitoringi; avtomatik
+  qayta ishga tushirish bilan Tor ishdan chiqishini boshqarish — hech qachon
+  oddiy internetni tiklamasdan.
+- Tor o‘rnatilmagan bo‘lsa ham ishlaydigan favqulodda bloklash.
+- Aniq, audit qilinadigan `unlock-clearnet` (zaxiradan tiklash yoki toza olib
+  tashlash; hech qachon `nft flush ruleset` emas).
+- Tor boshqaruvi: torrc drop-in yaratish, cookie-autentifikatsiyali ControlPort
+  klienti, 100%-ulanish bosqichi shartligi, port/kanal holat tekshiruvlari.
+- Vaqt tamg‘ali zaxiralar, fayl hashlash, manifest va rollback bilan
+  tranzaksion o‘rnatuvchi; faqat o‘ziga tegishli fayllarni olib tashlaydigan mos
+  o‘chiruvchi.
+- Oflayn tiklash skripti (`scripts/emergency-recover.sh`) va to‘liq
   `docs/RECOVERY.md`.
 - Typer/Rich CLI: `install, uninstall, enable, disable, start, stop, restart,
   status, doctor, verify, logs, emergency-lock, unlock-clearnet, reload,
   config show, config validate, test-leaks`.
-- Hardened systemd units with correct ordering (firewall before network,
-  Tor after firewall, monitor after Tor) and sandboxing directives.
-- Structured logging with secret/real-IP redaction and a separate audit log.
-- Leak-test framework (direct IPv4/IPv6, UDP/TCP DNS, external UDP, QUIC,
-  alternate resolver, Tor-exit confirmation) and disposable-VM harness for
-  all four supported distributions.
-- 136 unit tests; live `nft -c` validation; CI for static analysis, shellcheck,
-  systemd verification, and the unit/integration matrix.
+- To‘g‘ri tartib (tarmoqdan oldin firewall, firewall’dan keyin Tor, Tor’dan
+  keyin monitor) va sandbox direktivalari bilan mustahkamlangan systemd
+  birliklari.
+- Sir/haqiqiy-IP’ni yashirish (redaction) bilan strukturali loglash va alohida
+  audit log.
+- Sizib chiqish testlari to‘plami (to‘g‘ridan-to‘g‘ri IPv4/IPv6, UDP/TCP DNS,
+  tashqi UDP, QUIC, muqobil resolver, Tor-chiqishni tasdiqlash) va to‘rtala
+  qo‘llab-quvvatlanadigan distributiv uchun disposable-VM tizimi.
+- 136 birlik testi; jonli `nft -c` tekshiruvi; statik tahlil, shellcheck,
+  systemd tekshiruvi va unit/integratsiya matritsasi uchun CI.
 
-### Security
-- Full threat model (`docs/THREAT_MODEL.md`), security invariants with
-  test mapping (`docs/SECURITY_INVARIANTS.md`), and an authoritative
-  failure-state table.
-- Explicit anonymity disclaimers and documented limitations
+### Xavfsizlik
+- To‘liq tahdid modeli (`docs/THREAT_MODEL.md`), test bog‘lanishi bilan
+  xavfsizlik invariantlari (`docs/SECURITY_INVARIANTS.md`) va rasmiy nosozlik-
+  holat jadvali.
+- Aniq anonimlik ogohlantirishlari va hujjatlashtirilgan cheklovlar
   (`docs/LIMITATIONS.md`).
 
-### Known limitations
-- Application-level DoH/DoT is redirected through Tor, not blocked.
-- Full transparent proxying of arbitrary container/namespace traffic has edge
-  cases (fails closed, never leaks).
-- No IPv6-over-Tor path (IPv6 is blocked).
+### Ma’lum cheklovlar
+- Ilova darajasidagi DoH/DoT bloklanmaydi, balki Tor orqali yo‘naltiriladi.
+- Ixtiyoriy konteyner/namespace trafigini to‘liq shaffof proksilashda chekka
+  holatlar mavjud (fail-closed, hech qachon sizib chiqmaydi).
+- IPv6-Tor-orqali yo‘li yo‘q (IPv6 bloklangan).

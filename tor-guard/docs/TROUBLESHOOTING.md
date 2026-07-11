@@ -1,6 +1,6 @@
-# Troubleshooting
+# Nosozliklarni bartaraf etish
 
-Start with:
+Quyidagilardan boshlang:
 
 ```bash
 tor-guard status
@@ -9,66 +9,69 @@ journalctl -u tor-guard-firewall -u tor-guard-monitor -u tor --no-pager | tail -
 tor-guard logs -n 100
 ```
 
-## No Internet after `start`
+## `start`dan keyin internet yo‘q
 
-Expected if `status` shows `LOCKED` — that is fail-closed behavior, not a bug.
-Check why Tor is unhealthy:
+Agar `status` `LOCKED` ko‘rsatsa — bu kutilgan holat: bu fail-closed xatti-harakat,
+xato emas. Tor nima uchun nosog‘lomligini tekshiring:
 
-- `tor-guard doctor` → look at `tor:transport`, `tor:dnsport`, `tor:circuit`.
-- `systemctl status tor` and `journalctl -u tor` → bootstrap errors, wrong
-  `User`, port conflicts.
-- On a censored network, Tor may not bootstrap without bridges. Tor Guard stays
-  locked until Tor reaches 100% — by design.
+- `tor-guard doctor` → `tor:transport`, `tor:dnsport`, `tor:circuit`’ga qarang.
+- `systemctl status tor` va `journalctl -u tor` → ulanish bosqichi xatolari,
+  noto‘g‘ri `User`, port to‘qnashuvlari.
+- Senzuralangan tarmoqda Tor bridge’larsiz ulanish bosqichini o‘tay olmasligi
+  mumkin. Tor 100%’ga yetguncha Tor Guard bloklangan qoladi — dizayn bo‘yicha.
 
-## `start` aborts at "bootstrap"
+## `start` "bootstrap" bosqichida bekor bo‘ladi
 
-Tor didn't reach 100% within `bootstrap_timeout`. Raise the timeout, check
-connectivity for the tor uid, or configure bridges in a torrc drop-in. The host
-stays locked meanwhile.
+Tor `bootstrap_timeout` ichida 100%’ga yetmadi. Vaqt chegarasini oshiring, tor
+uid uchun ulanishni tekshiring yoki torrc drop-in’da bridge’larni sozlang. Bu
+vaqtda host bloklangan qoladi.
 
-## `start` aborts at "required Tor listeners unavailable"
+## `start` "kerakli Tor portlari mavjud emas" bosqichida bekor bo‘ladi
 
-TransPort/DNSPort aren't accepting connections. Verify the drop-in
-`/etc/tor/torrc.d/10-tor-guard.conf` matches your config ports and that
-`tor --verify-config` passes. Re-run `sudo tor-guard reload`.
+TransPort/DNSPort ulanishlarni qabul qilmayapti. Drop-in
+`/etc/tor/torrc.d/10-tor-guard.conf` sizning sozlama portlaringizga mos
+kelishini va `tor --verify-config` o‘tishini tekshiring. `sudo tor-guard reload`
+ni qayta ishga tushiring.
 
-## "external-connectivity: verification unavailable"
+## "external-connectivity: tekshiruv mavjud emas"
 
-The check endpoint was unreachable. This is **informational**, not a leak. If
-listeners and circuit are healthy, you are still protected (state may show
-`DEGRADED`). Try a different `external_ip_endpoints` entry.
+Tekshiruv endpointiga ulanib bo‘lmadi. Bu **ma’lumot xarakterida**, sizib chiqish
+emas. Agar portlar va kanal sog‘lom bo‘lsa, siz hali ham himoyalangansiz (holat
+`DEGRADED` ko‘rsatishi mumkin). Boshqa `external_ip_endpoints` yozuvini sinab
+ko‘ring.
 
-## DNS doesn't resolve
+## DNS aniqlanmayapti
 
-- Confirm `dns_port` in config matches the torrc drop-in.
-- `dig @127.0.0.1 -p 5353 example.com` should resolve via Tor.
-- Direct resolvers (`/etc/resolv.conf` pointing at `8.8.8.8`) are intentionally
-  redirected to Tor's DNSPort; that's expected.
+- Sozlamadagi `dns_port` torrc drop-in’ga mos kelishini tasdiqlang.
+- `dig @127.0.0.1 -p 5353 example.com` Tor orqali aniqlanishi kerak.
+- To‘g‘ridan-to‘g‘ri resolverlar (`/etc/resolv.conf` `8.8.8.8`ga ishora qiluvchi)
+  ataylab Tor DNSPort’ga yo‘naltiriladi; bu kutilgan holat.
 
-## Docker/VM containers lost networking
+## Docker/VM konteynerlari tarmoqni yo‘qotdi
 
-Container egress that can't be transparently redirected is dropped (fail-closed).
-If you need container Internet through Tor, this is a known edge case — see
-[`LIMITATIONS.md`](LIMITATIONS.md). Use LAN-COMPATIBLE mode only for local
-subnets you trust.
+Shaffof yo‘naltirib bo‘lmaydigan konteyner chiqishi tashlanadi (fail-closed).
+Agar sizga Tor orqali konteyner interneti kerak bo‘lsa, bu ma’lum chekka holat —
+[`LIMITATIONS.md`](LIMITATIONS.md)ga qarang. LAN-COMPATIBLE rejimini faqat
+ishonchli mahalliy quyi tarmoqlar uchun ishlating.
 
-## Firewall rules "keep coming back"
+## Firewall qoidalari "qaytaverib turibdi"
 
-That's the integrity monitor doing its job (invariant I10). To make changes,
-edit config and `tor-guard reload`, or `disable` + `unlock-clearnet` first.
+Bu butunlik monitori o‘z ishini bajaryapti (invariant I10). O‘zgartirish kiritish
+uchun sozlamani tahrirlang va `tor-guard reload` qiling yoki avval `disable` +
+`unlock-clearnet` qiling.
 
-## Locked out over SSH
+## SSH orqali kirish bloklandi
 
-The kill switch can block SSH to the box on hostile networks. Recover from a
-**local console**:
+Kill switch xavfli tarmoqlarda mashinaga SSH’ni bloklashi mumkin. **Mahalliy
+konsoldan** tiklang:
 
 ```bash
 sudo bash scripts/emergency-recover.sh
 ```
 
-See [`RECOVERY.md`](RECOVERY.md).
+Qarang: [`RECOVERY.md`](RECOVERY.md).
 
-## Reinstall / reset
+## Qayta o‘rnatish / qayta tiklash
 
 ```bash
 sudo bash scripts/emergency-recover.sh
@@ -76,11 +79,11 @@ sudo tor-guard uninstall
 sudo bash scripts/install.sh
 ```
 
-## Collecting a diagnostics bundle
+## Diagnostika to‘plamini yig‘ish
 
 ```bash
 tor-guard doctor
 ```
 
-The diagnostics collector (used by support bundles) redacts secrets and never
-includes your real public IP.
+Diagnostika yig‘uvchi (qo‘llab-quvvatlash to‘plamlari uchun ishlatiladi) sirlarni
+yashiradi va hech qachon haqiqiy ommaviy IP’ingizni kiritmaydi.

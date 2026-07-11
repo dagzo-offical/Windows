@@ -7,31 +7,31 @@
 set -Eeuo pipefail
 
 log() { printf '[uninstall] %s\n' "$*"; }
-die() { printf '[uninstall] ERROR: %s\n' "$*" >&2; exit 1; }
+die() { printf '[uninstall] XATOLIK: %s\n' "$*" >&2; exit 1; }
 
-[ "$(id -u)" -eq 0 ] || die "must run as root (use sudo)"
+[ "$(id -u)" -eq 0 ] || die "root sifatida ishga tushirilishi kerak (sudo ishlating)"
 
 KEEP_FIREWALL=0
 for arg in "$@"; do
   case "$arg" in
     --keep-firewall) KEEP_FIREWALL=1 ;;
-    *) die "unknown argument: $arg" ;;
+    *) die "noma’lum argument: $arg" ;;
   esac
 done
 
 if command -v tor-guard >/dev/null 2>&1; then
   if [ "$KEEP_FIREWALL" -eq 1 ]; then
-    log "removing files, keeping firewall lock in place"
+    log "fayllar olib tashlanmoqda, firewall bloki joyida qoldirilmoqda"
     tor-guard uninstall --keep-firewall
   else
-    log "removing files and firewall lock (clearnet will be restored)"
+    log "fayllar va firewall bloki olib tashlanmoqda (oddiy internet tiklanadi)"
     tor-guard uninstall
   fi
 else
-  die "tor-guard CLI not found; use scripts/emergency-recover.sh to restore networking"
+  die "tor-guard CLI topilmadi; tarmoqni tiklash uchun scripts/emergency-recover.sh dan foydalaning"
 fi
 
-log "removing the Python package"
-python3 -m pip uninstall -y tor-guard || log "pip uninstall skipped"
+log "Python paketi olib tashlanmoqda"
+python3 -m pip uninstall -y tor-guard || log "pip uninstall o‘tkazib yuborildi"
 
-log "done"
+log "tayyor"
