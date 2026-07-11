@@ -1,0 +1,9 @@
+[Unit]
+Description=Tor Guard (fail-closed Tor kill switch)
+Documentation=https://github.com/dagzo-offical/windows/tree/main/tor-guard
+Requires=tor-guard-firewall.service
+Wants=tor-guard-monitor.service
+After=tor-guard-firewall.service tor-guard-monitor.service
+
+[Install]
+WantedBy=multi-user.target

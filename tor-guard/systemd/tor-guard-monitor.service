@@ -1,0 +1,38 @@
+[Unit]
+Description=Tor Guard health & integrity monitor
+Documentation=https://github.com/dagzo-offical/windows/tree/main/tor-guard
+# Monitor starts after Tor, which starts after the firewall lock.
+After=tor-guard-firewall.service tor.service
+Requires=tor-guard-firewall.service
+Wants=tor.service
+PartOf=tor-guard.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -m tor_guard.monitor.run
+Restart=on-failure
+RestartSec=5
+# If the monitor dies, the firewall stays exactly as it is (fail-closed). The
+# monitor has no teardown responsibility.
+
+# --- Hardening ---
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/tor-guard /var/log/tor-guard /run
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+# Needs NET_ADMIN to re-apply the ruleset if integrity is lost.
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_DAC_OVERRIDE
+AmbientCapabilities=CAP_NET_ADMIN
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+
+[Install]
+WantedBy=tor-guard.target

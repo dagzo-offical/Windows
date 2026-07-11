@@ -1,0 +1,52 @@
+# Tor Guard sozlamalari.
+# /etc/tor-guard/tor-guard.yml ga nusxalang (rejim 0600, root:root).
+# Har bir maydon qat'iy tekshiriladi; noma'lum kalitlar rad etiladi.
+
+# Ish rejimi: "strict" (tavsiya etiladi) yoki "lan-compatible".
+#   strict          -> Internet faqat Tor orqali; barcha LAN/link-local/multicast bloklangan.
+#   lan-compatible  -> aniq ko'rsatilgan allowed_lan_cidrs'ni to'g'ridan-to'g'ri ochishga ruxsat beradi.
+mode: strict
+
+# Maxsus Tor xizmat hisobi. Debian/Ubuntu/Kali'da bu "debian-tor".
+# Uning UID'i to'g'ridan-to'g'ri chiqishga ruxsat etilgan YAGONA identifikator (hech qachon PID emas).
+tor_user: debian-tor
+
+# Tor loopback portlari. Bir-biridan farqli bo'lishi shart.
+socks_port: 9050
+trans_port: 9040
+dns_port: 5353
+control_port: 9051
+
+# lan-compatible rejimida to'g'ridan-to'g'ri ruxsat etilgan LAN quyi tarmoqlari.
+# strict rejimida bo'sh bo'lishi SHART. Ommaviy/global CIDR'lar rad etiladi.
+allowed_lan_cidrs: []
+#   lan-compatible uchun namuna:
+#   allowed_lan_cidrs:
+#     - 192.168.1.0/24
+
+# Ixtiyoriy aniq interfeys ruxsat-ro'yxati (tavsiyaviy; bo'sh = barchasi).
+interfaces: []
+
+# Kuzatuv va holat sozlamalari (soniyalarda).
+monitor_interval: 10
+health_timeout: 15
+bootstrap_timeout: 120
+
+# Tashqi tekshiruv endpointlari (faqat https). Ulanish uch holatli:
+# ulanib bo'lmasa = "tekshiruv mavjud emas", hech qachon sizib chiqish dalili sifatida qabul qilinmaydi.
+external_ip_endpoints:
+  - https://check.torproject.org/api/ip
+
+# Log darajasi: DEBUG | INFO | WARNING | ERROR | CRITICAL
+log_level: INFO
+
+# Monitor Tor'ni avtomatik qayta ishga tushirsin (u HECH QACHON oddiy internetni tiklamaydi).
+auto_restart_tor: true
+
+# Yo'llar (standart qiymatlar xavfsiz; faqat sababini bilsangiz o'zgartiring).
+backup_dir: /var/lib/tor-guard/backups
+state_dir: /var/lib/tor-guard
+lock_file: /run/tor-guard.lock
+
+# Test rejimi start paytida faol sizib chiqish tekshiruvlarini o'tkazib yuboradi (faqat CI/dev uchun).
+test_mode: false

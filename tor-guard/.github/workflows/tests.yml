@@ -1,0 +1,60 @@
+name: tests
+
+on:
+  push:
+    paths:
+      - "tor-guard/**"
+  pull_request:
+    paths:
+      - "tor-guard/**"
+
+defaults:
+  run:
+    working-directory: tor-guard
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Unit tests with coverage
+        run: pytest tests/unit --cov=tor_guard --cov-report=term-missing --cov-report=xml
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: tor-guard/coverage.xml
+        if: always()
+
+  integration:
+    # Destructive firewall/Tor integration tests run in a throwaway CI VM.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system + Python deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nftables tor
+          python -m pip install -e ".[dev]"
+
+      - name: Run gated integration tests (disposable runner)
+        env:
+          TOR_GUARD_DISPOSABLE_VM: "1"
+        run: sudo -E env "PATH=$PATH" pytest tests/integration -v -m integration
