@@ -142,86 +142,126 @@ const SECTIONS={
 };
 
 // ── Lesson content: L01 What is Kali Linux ───────────────────
-function LessonL01(){
-  const lang=useLang();
-  const distros=[
-    {name:"Kali Linux",base:"Debian",uz:"Pentest va xavfsizlik auditi uchun. 600+ oldindan o'rnatilgan vosita.",en:"For pentesting & security auditing. 600+ pre-installed tools.",color:"#a855f7"},
-    {name:"Parrot OS",base:"Debian",uz:"Pentest + maxfiylik va anonimlik vositalari. Yengilroq tizim.",en:"Pentest + privacy/anonymity tools. Lighter footprint.",color:"#00d4ff"},
-    {name:"BlackArch",base:"Arch",uz:"2800+ vosita, tajribali foydalanuvchilar uchun.",en:"2800+ tools, aimed at advanced users.",color:"#ff3a5e"},
-    {name:"Ubuntu",base:"Debian",uz:"Umumiy maqsadli ish stoli/server OS — pentest uchun mo'ljallanmagan.",en:"General-purpose desktop/server OS — not built for pentesting.",color:"#ff9145"},
-  ];
-  const uses=[
-    {icon:"target",uz:"Penetration Testing — tizim zaifliklarini ruxsat bilan sinash",en:"Penetration Testing — probing system weaknesses with authorization"},
-    {icon:"wifi",uz:"Simsiz tarmoq auditi — WiFi xavfsizligini baholash",en:"Wireless auditing — assessing WiFi security"},
-    {icon:"database",uz:"Digital Forensics — raqamli dalillarni tahlil qilish",en:"Digital Forensics — analyzing digital evidence"},
-    {icon:"code",uz:"Reverse Engineering — dasturlarni teskari tahlil qilish",en:"Reverse Engineering — dissecting binaries and malware"},
-  ];
-  return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"Kali Linux nima?","What is Kali Linux?")),
-    React.createElement(P,null,t(lang,
-      "Kali Linux — Debian asosidagi, bepul va ochiq kodli operatsion tizim bo'lib, maxsus penetration testing (kirib borish sinovi) va xavfsizlik auditi uchun mo'ljallangan. U Offensive Security kompaniyasi tomonidan ishlab chiqilgan va mashhur BackTrack Linux ning vorisi hisoblanadi. Kali 600 dan ortiq xavfsizlik vositasi bilan oldindan jihozlangan.",
-      "Kali Linux is a free, open-source, Debian-based operating system purpose-built for penetration testing and security auditing. Developed by Offensive Security, it is the successor to the well-known BackTrack Linux and ships with 600+ pre-installed security tools."
-    )),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Muhim faktlar: ","Key facts: ")),
-      t(lang,
-        "Kali \"rolling release\" modelida ishlaydi — tizim doimiy yangilanib turadi. U jonli (live) USB, virtual mashina, WSL yoki ARM qurilmalarida ishlashi mumkin. Zamonaviy Kali oddiy foydalanuvchi (kali) hisobi bilan keladi, root emas.",
-        "Kali follows a rolling-release model — it updates continuously. It can run from a live USB, a virtual machine, WSL, or ARM devices. Modern Kali defaults to a non-root user (kali), not root."
-      )
-    ),
-    React.createElement(H2,{num:"§2"},t(lang,"Kali vs boshqa distributivlar","Kali vs other distros")),
-    distros.map((dctx,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"12px 14px",background:"var(--surface)",border:`1px solid ${dctx.color}33`,borderRadius:10,alignItems:"flex-start"}},
-      React.createElement("div",{style:{width:10,height:10,borderRadius:"50%",background:dctx.color,marginTop:4,flexShrink:0,boxShadow:`0 0 10px ${dctx.color}`}}),
-      React.createElement("div",{style:{flex:1}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:13,color:"var(--text-0)",marginBottom:2}},
-          dctx.name,React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:dctx.color,marginLeft:8,fontWeight:600}},dctx.base)),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",lineHeight:1.55}},t(lang,dctx.uz,dctx.en))
-      )
-    )),
-    React.createElement(H2,{num:"§3"},t(lang,"Nima uchun ishlatiladi?","What is it used for?")),
-    uses.map((u,i)=>React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",gap:12,marginBottom:7,padding:"10px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-      React.createElement("div",{style:{width:32,height:32,borderRadius:8,background:"var(--accent-soft)",border:"1px solid var(--accent-border)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
-        React.createElement(Icon,{name:u.icon,size:16,style:{color:"var(--accent)"}})),
-      React.createElement("div",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.55}},t(lang,u.uz,u.en))
-    )),
-    React.createElement(H2,{num:"§4"},t(lang,"Birinchi buyruqlar","First commands")),
-    React.createElement(P,null,t(lang,
-      "Kali'ni ishga tushirgach, terminal ochib tizimni tekshiring va yangilang. Quyidagi buyruqlar har bir Kali foydalanuvchisi bilishi shart bo'lgan asosiy amallardir:",
-      "After booting Kali, open a terminal to inspect and update the system. These commands are the essentials every Kali user should know:"
-    )),
-    React.createElement(Terminal,null,
-`# Kali versiyasi va release ma'lumoti
-cat /etc/os-release
-
-# Kernel va arxitektura
-uname -a
-
-# Joriy foydalanuvchi kim?
-whoami
-
-# Kali'ni to'liq yangilash (rolling release)
-sudo apt update && sudo apt full-upgrade -y
-
-# O'rnatilgan xavfsizlik vositalarini ko'rish
-ls /usr/share/ | grep -iE 'nmap|metasploit|wordlists'`),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,
-        "Kali vositalari faqat siz egasi bo'lgan yoki yozma ruxsat olingan tizimlarda ishlatilishi kerak. Ruxsatsiz skanerlash yoki hujum ko'p mamlakatlarda jinoyat hisoblanadi.",
-        "Kali tools must only be used on systems you own or have written permission to test. Unauthorized scanning or attacks are a crime in most jurisdictions."
-      )
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Kali Linux qaysi distributiv asosida qurilgan?",en:"Which distribution is Kali Linux based on?"},
-      opts:["Arch Linux","Debian","Fedora","Gentoo"],
-      correct:1,
-      exp:{uz:"Kali Linux Debian asosida qurilgan va Offensive Security tomonidan ishlab chiqilgan.",en:"Kali Linux is built on Debian and developed by Offensive Security."}
-    })
-  );
+// ── Animated-diagram engine (shared) ──────────────────────────
+function NetAnimStyle(){
+  return React.createElement("style",null,
+`@keyframes na-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes na-glow{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes na-flow{0%{left:1%;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:95%;opacity:0}}
+@keyframes na-dash{to{stroke-dashoffset:-18}}
+@keyframes na-blink{0%,100%{opacity:1}50%{opacity:.3}}
+.na-rise{animation:na-rise .5s cubic-bezier(.2,.8,.2,1) both}
+.na-card{transition:transform .2s ease,border-color .2s ease}
+.na-card:hover{transform:translateY(-3px)}
+.na-step{transition:all .4s ease;opacity:.4}
+.na-step.lit{opacity:1}
+.na-dot{width:8px;height:8px;border-radius:50%;animation:na-glow 1s infinite}
+.na-wire{position:relative;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);border-radius:2px}
+.na-pkt{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);animation:na-flow 2.4s linear infinite}
+@media (prefers-reduced-motion:reduce){.na-rise,.na-pkt,.na-dot,.na-card{animation:none!important}.na-pkt{left:47%}}`);
 }
 
-// ── Lesson L11: Nmap ──────────────────────────────────────────
-function LessonL11(){
+// color-coded vertical layer stack (generalized OSI visual)
+function LayerStack({layers}){
+  const lang=useLang();
+  return React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8,margin:"6px 0 4px"}},
+    layers.map((l,i)=>React.createElement("div",{key:l.n,className:"na-rise na-card",
+      style:{display:"flex",gap:12,alignItems:"flex-start",padding:"11px 14px",background:"var(--surface)",border:`1px solid ${l.color}44`,borderLeft:`3px solid ${l.color}`,borderRadius:11,animationDelay:(i*0.06)+"s"}},
+      React.createElement("div",{style:{flexShrink:0,width:30,height:30,borderRadius:8,display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontWeight:900,fontSize:13,color:l.color,background:l.color+"22",border:`1.5px solid ${l.color}`}},l.n),
+      React.createElement("div",{style:{flex:1}},
+        React.createElement("div",{style:{fontWeight:700,fontSize:13.5,color:"var(--text-0)"}},l.name,l.uz&&React.createElement("span",{style:{fontWeight:400,fontSize:11.5,color:"var(--text-2)",marginLeft:8}},l.uz)),
+        l.desc&&React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",margin:"3px 0 4px",lineHeight:1.5}},t(lang,l.desc.uz,l.desc.en)),
+        l.proto&&React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10.5,color:l.color,opacity:.9}},l.proto)))));
+}
+
+// interactive step-through flow (Play / Reset)
+function FlowSteps({title,steps,color}){
+  const lang=useLang();
+  const c=color||"var(--accent)";
+  const [step,setStep]=useState(-1);
+  const [playing,setPlaying]=useState(false);
+  useEffect(()=>{
+    if(!playing)return;
+    if(step>=steps.length-1){setPlaying(false);return;}
+    const id=setTimeout(()=>setStep(s=>s+1),1050);
+    return()=>clearTimeout(id);
+  },[playing,step,steps.length]);
+  const tx=x=>x==null?"":typeof x==="string"?x:t(lang,x.uz,x.en);
+  const showAll=step<0;
+  return React.createElement("div",{style:{background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:14,padding:16,margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,gap:8,flexWrap:"wrap"}},
+      React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--text-0)"}},tx(title)),
+      React.createElement("div",{style:{display:"flex",gap:6}},
+        React.createElement("button",{onClick:()=>{setStep(0);setPlaying(true);},style:{padding:"5px 13px",background:c,color:"#04060d",border:"none",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}},t(lang,"▶ Ishga tushir","▶ Play")),
+        React.createElement("button",{onClick:()=>{setStep(-1);setPlaying(false);},style:{padding:"5px 12px",background:"var(--bg-2)",color:"var(--text-1)",border:"1px solid var(--border)",borderRadius:8,fontSize:12,cursor:"pointer"}},"↺"))),
+    React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:7}},
+      steps.map((s,i)=>{
+        const lit=showAll||i<=step, cur=i===step;
+        return React.createElement("div",{key:i,className:"na-step"+(lit?" lit":""),
+          style:{display:"flex",alignItems:"center",gap:11,padding:"9px 13px",borderRadius:10,
+            background:lit?(cur?c+"14":"rgba(255,255,255,.02)"):"transparent",
+            border:`1px solid ${lit?(cur?c+"66":"var(--border)"):"rgba(255,255,255,.05)"}`}},
+          React.createElement("div",{style:{flexShrink:0,width:30,height:30,borderRadius:"50%",display:"grid",placeItems:"center",fontSize:15,color:lit?c:"var(--text-2)",background:lit?c+"18":"rgba(255,255,255,.03)",border:`1px solid ${lit?c+"55":"var(--border)"}`}},s.icon||(i+1)),
+          React.createElement("div",{style:{flex:1}},
+            React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:9.5,letterSpacing:".08em",color:lit?c:"var(--text-2)",marginBottom:1}},"STEP "+(i+1)),
+            React.createElement("div",{style:{fontSize:12.5,color:lit?"var(--text-0)":"var(--text-2)",lineHeight:1.45}},tx(s.text))),
+          cur&&React.createElement("div",{className:"na-dot",style:{background:c}}));
+      })));
+}
+
+// animated packet gliding along a wire between two nodes
+function PacketFlow({from,to,label,color}){
+  const lang=useLang();const c=color||"var(--accent)";
+  const tx=x=>typeof x==="string"?x:t(lang,x.uz,x.en);
+  return React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,margin:"12px 0",padding:"14px 12px",background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:12}},
+    React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--text-0)",textAlign:"center",minWidth:60}},tx(from)),
+    React.createElement("div",{style:{flex:1,position:"relative"}},
+      label&&React.createElement("div",{style:{textAlign:"center",fontFamily:"var(--font-mono)",fontSize:10,color:c,marginBottom:6}},tx(label)),
+      React.createElement("div",{className:"na-wire"},React.createElement("div",{className:"na-pkt",style:{background:c,boxShadow:`0 0 8px ${c}`}}))),
+    React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--text-0)",textAlign:"center",minWidth:60}},tx(to)));
+}
+
+// animated two-column comparison
+function CompareCols({left,right}){
+  const lang=useLang();
+  const tx=x=>typeof x==="string"?x:t(lang,x.uz,x.en);
+  const col=d=>React.createElement("div",{className:"na-rise",style:{padding:14,borderRadius:12,background:d.color+"0d",border:`1px solid ${d.color}33`}},
+    React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:11,fontWeight:700,color:d.color,marginBottom:9}},tx(d.title)),
+    d.rows.map((r,i)=>React.createElement("div",{key:i,style:{fontSize:12,color:"var(--text-1)",padding:"5px 0",borderBottom:i<d.rows.length-1?"1px solid var(--border)":"none",lineHeight:1.5}},tx(r))));
+  return React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"12px 0"}},col(left),col(right));
+}
+
+// topology diagram — nodes + animated dashed links (SVG)
+function NodeMap({nodes,links,color,label}){
+  const lang=useLang();const c=color||"var(--accent)";
+  return React.createElement("div",{style:{margin:"12px 0",padding:"14px",background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:12}},
+    label&&React.createElement("div",{style:{textAlign:"center",fontFamily:"var(--font-mono)",fontSize:11,color:c,marginBottom:8,fontWeight:700}},typeof label==="string"?label:t(lang,label.uz,label.en)),
+    React.createElement("svg",{viewBox:"0 0 280 160",style:{width:"100%",maxWidth:300,display:"block",margin:"0 auto"}},
+      links.map((lk,i)=>React.createElement("line",{key:"l"+i,x1:nodes[lk[0]][0],y1:nodes[lk[0]][1],x2:nodes[lk[1]][0],y2:nodes[lk[1]][1],stroke:c,strokeWidth:1.7,strokeDasharray:"5 4",style:{animation:"na-dash 1s linear infinite",opacity:.75}})),
+      nodes.map((n,i)=>React.createElement("g",{key:"n"+i},
+        React.createElement("circle",{cx:n[0],cy:n[1],r:10,fill:c+"22",stroke:c,strokeWidth:1.9}),
+        n[2]&&React.createElement("text",{x:n[0],y:n[1]+22,fill:"var(--text-2)",fontSize:8,textAnchor:"middle",fontFamily:"var(--font-mono)"},n[2])))));
+}
+
+
+function LessonL01(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Kali Linux nima?","What is Kali Linux?")),
+    React.createElement(P,null,t(lang,"Kali Linux — kiberxavfsizlik va penetratsion test uchun maxsus yaratilgan Debian asosidagi operatsion tizim. Uni pentester'ning \"asboblar qutisi\"ga o'xshating: 600 dan ortiq xavfsizlik vositasi oldindan o'rnatilgan holda keladi — skanerlash, hujum, tahlil va forensika uchun. Offensive Security kompaniyasi tomonidan ishlab chiqiladi va bepul.","Kali Linux is a Debian-based operating system built specifically for cybersecurity and penetration testing. Think of it as a pentester's \"toolbox\": over 600 security tools come pre-installed — for scanning, attacking, analyzing and forensics. It's developed by Offensive Security and is free.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Nega aynan Kali?","Why Kali?")),
+    React.createElement(LayerStack,{layers:[
+      {n:"🧰",name:t(lang,"600+ vosita","600+ tools"),color:"#a855f7",desc:{uz:"Nmap, Metasploit, Burp, Wireshark — hammasi tayyor.",en:"Nmap, Metasploit, Burp, Wireshark — all ready."}},
+      {n:"🐧",name:t(lang,"Debian asosida","Debian-based"),color:"#4dabf7",desc:{uz:"Barqaror, apt paket menejeri, keng hamjamiyat.",en:"Stable, apt package manager, large community."}},
+      {n:"🎯",name:t(lang,"Xavfsizlikka yo'naltirilgan","Security-focused"),color:"#69db7c",desc:{uz:"Pentest bosqichlariga mos menyu va sozlamalar.",en:"Menu and defaults organized around pentest phases."}},
+      {n:"🆓",name:t(lang,"Ochiq va bepul","Open & free"),color:"#ffd43b",desc:{uz:"Har kim yuklab, o'rganishi mumkin.",en:"Anyone can download and learn."}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Versiyani tekshirish","Checking the version")),
+    React.createElement(Terminal,null,"cat /etc/os-release\nuname -a\n# Kali GNU/Linux Rolling ..."),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Kali kuchli vosita — undagi vositalarni faqat o'zingizga tegishli yoki yozma ruxsat berilgan tizimlarda ishlating. Ruxsatsiz foydalanish qonunga zid.","Kali is a powerful tool — use its tools only on systems you own or have written permission to test. Unauthorized use is illegal.")),
+    React.createElement(Quiz,{q:{uz:"Kali Linux qaysi distributiv asosida qurilgan?",en:"Kali Linux is built on which distribution?"},opts:[{uz:"Debian",en:"Debian"},{uz:"Windows",en:"Windows"},{uz:"Arch",en:"Arch"},{uz:"macOS",en:"macOS"}],correct:0,exp:{uz:"Kali Debian asosida qurilgan — shu sababli apt paket menejeridan foydalanadi.",en:"Kali is built on Debian — which is why it uses the apt package manager."}}));
+}function LessonL11(){
   const lang=useLang();
   const scans=[
     {flag:"-sS",name:"TCP SYN (Stealth)",uz:"Yarim ochiq skan — to'liq ulanish o'rnatmaydi. Tez va nisbatan yashirin. root talab qiladi.",en:"Half-open scan — never completes the handshake. Fast and relatively stealthy. Needs root."},
@@ -786,94 +826,37 @@ function App(){
 // ── L03: Command line basics ──────────────────────────────────
 function LessonL03(){
   const lang=useLang();
-  const cmds=[
-    {c:"pwd",uz:"Hozirgi joylashuvni (katalogni) ko'rsatadi.",en:"Prints the current working directory."},
-    {c:"ls -la",uz:"Barcha fayllarni (yashirin ham) batafsil ro'yxatlaydi.",en:"Lists all files (including hidden) in long format."},
-    {c:"cd /etc",uz:"Ko'rsatilgan katalogga o'tadi.",en:"Changes into the given directory."},
-    {c:"cp a b",uz:"a faylini b ga nusxalaydi.",en:"Copies file a to b."},
-    {c:"mv a b",uz:"a ni b ga ko'chiradi yoki nomini o'zgartiradi.",en:"Moves or renames a to b."},
-    {c:"rm -rf dir",uz:"Katalogni ichidagi hamma narsa bilan o'chiradi (ehtiyot bo'ling!).",en:"Deletes a directory and everything in it (be careful!)."},
-    {c:"mkdir loot",uz:"Yangi katalog yaratadi.",en:"Creates a new directory."},
-    {c:"cat file",uz:"Fayl mazmunini ekranga chiqaradi.",en:"Prints file contents to the screen."},
-  ];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Nega buyruq qatori?","Why the command line?")),
-    React.createElement(P,null,t(lang,
-      "Kali'da ishning 90% terminalda bajariladi. Buyruq qatori (CLI) grafik interfeysdan tezroq, avtomatlashtirishga qulay va masofaviy serverlarda yagona imkoniyat bo'ladi. Pentester uchun bash'ni bilish — asosiy ko'nikma.",
-      "About 90% of the work in Kali happens in the terminal. The command line (CLI) is faster than a GUI, easy to automate, and often the only option on remote servers. For a pentester, knowing bash is a core skill."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Asosiy buyruqlar","Essential commands")),
-    cmds.map((x,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start"}},
-      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",minWidth:90}},x.c),
-      React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.55}},t(lang,x.uz,x.en))
-    )),
-    React.createElement(H2,{num:"§3"},t(lang,"Quvur (pipe) va yo'naltirish","Pipes and redirection")),
-    React.createElement(P,null,t(lang,
-      "Buyruqlarning kuchi ularni birlashtirishda. Quvur (|) bir buyruq chiqishini boshqasiga uzatadi; > chiqishni faylga yozadi; >> faylga qo'shadi.",
-      "The power of commands is in combining them. A pipe (|) sends one command's output into another; > writes output to a file; >> appends to a file."
-    )),
-    React.createElement(Terminal,null,
-      "# Ochiq portlarni sanab, faylga yozish\ncat scan.txt | grep open | wc -l\n\n# Natijani faylga yo'naltirish\nnmap 10.0.0.1 > result.txt\n\n# Foydalanuvchilarni topish\ncat /etc/passwd | grep -v nologin | cut -d: -f1"
-    ),
-    React.createElement(H2,{num:"§4"},t(lang,"Qidirish: grep va find","Searching: grep and find")),
-    React.createElement(Terminal,null,
-      "# Matn ichidan qidirish (rekursiv, satr raqami bilan)\ngrep -rn \"password\" /var/www/\n\n# Fayl nomi bo'yicha qidirish\nfind / -name \"*.conf\" 2>/dev/null\n\n# SUID bit o'rnatilgan fayllarni topish (privesc uchun)\nfind / -perm -4000 2>/dev/null"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Maslahat: ","Tip: ")),
-      t(lang,"Tab tugmasi buyruq va fayl nomlarini avtomatik to'ldiradi. Yuqoriga strelka oldingi buyruqlarni chaqiradi. history buyrug'i barcha kiritilgan buyruqlarni ko'rsatadi.",
-        "The Tab key auto-completes commands and file names. The up arrow recalls previous commands. The history command shows everything you've typed.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Qaysi belgi bir buyruq chiqishini ikkinchi buyruqqa uzatadi?",en:"Which symbol sends one command's output into another command?"},
-      opts:[{uz:"> (yo'naltirish)",en:"> (redirect)"},{uz:"| (quvur)",en:"| (pipe)"},{uz:"& (fon)",en:"& (background)"},{uz:"# (izoh)",en:"# (comment)"}],
-      correct:1,
-      exp:{uz:"Quvur (|) birinchi buyruqning standart chiqishini ikkinchi buyruqning standart kirishiga uzatadi.",en:"The pipe (|) connects the standard output of the first command to the standard input of the second."}
-    })
-  );
-}
-
-// ── L06: apt package management ───────────────────────────────
-function LessonL06(){
+    React.createElement(P,null,t(lang,"Kali'da ishning 90% terminalda bajariladi. Buyruq qatori grafik interfeysdan tez, avtomatlashtirishga qulay va masofaviy serverlarda yagona imkoniyat. Pentester uchun bash'ni bilish — asosiy ko'nikma.","About 90% of the work in Kali happens in the terminal. The command line is faster than a GUI, easy to automate, and often the only option on remote servers. For a pentester, knowing bash is a core skill.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Buyruq toifalari","Command categories")),
+    React.createElement(LayerStack,{layers:[
+      {n:"📁",name:t(lang,"Navigatsiya","Navigation"),color:"#4dabf7",desc:{uz:"pwd, ls, cd — qayerdaman, nima bor, o'tish.",en:"pwd, ls, cd — where am I, what's here, move."}},
+      {n:"✏",name:t(lang,"Fayl amallari","File operations"),color:"#69db7c",desc:{uz:"cp, mv, rm, mkdir, cat — nusxa, ko'chirish, o'chirish.",en:"cp, mv, rm, mkdir, cat — copy, move, delete."}},
+      {n:"🔎",name:t(lang,"Qidirish","Searching"),color:"#a855f7",desc:{uz:"grep, find — matn va fayllarni topish.",en:"grep, find — locate text and files."}},
+      {n:"🔗",name:t(lang,"Quvur & yo'naltirish","Pipes & redirect"),color:"#ffd43b",desc:{uz:"| bilan buyruqlarni ulash, > bilan faylga yozish.",en:"Chain commands with |, write to a file with >."}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Quvurni sinash","Trying the pipe")),
+    React.createElement(Terminal,null,"# Ochiq portlarni sanab, faylga yozish\ncat scan.txt | grep open | wc -l\n\n# SUID fayllarni topish (privesc uchun)\nfind / -perm -4000 2>/dev/null"),
+    React.createElement(Quiz,{q:{uz:"Qaysi belgi bir buyruq chiqishini ikkinchisiga uzatadi?",en:"Which symbol sends one command's output into another?"},opts:[{uz:"> (yo'naltirish)",en:"> (redirect)"},{uz:"| (quvur)",en:"| (pipe)"},{uz:"& (fon)",en:"& (background)"},{uz:"# (izoh)",en:"# (comment)"}],correct:1,exp:{uz:"Quvur (|) birinchi buyruqning chiqishini ikkinchisining kirishiga uzatadi.",en:"The pipe (|) connects the first command's output to the second's input."}}));
+}function LessonL06(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"apt nima?","What is apt?")),
-    React.createElement(P,null,t(lang,
-      "Kali Debian asosida qurilgani uchun dasturlarni apt (Advanced Package Tool) orqali o'rnatadi. apt paketlarni yuklab olish, o'rnatish, yangilash va o'chirishni, shuningdek bog'liqliklarni (dependencies) avtomatik hal qilishni boshqaradi.",
-      "Because Kali is built on Debian, it installs software via apt (Advanced Package Tool). apt handles downloading, installing, upgrading and removing packages, and automatically resolves dependencies."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Kundalik buyruqlar","Everyday commands")),
-    React.createElement(Terminal,null,
-      "# Paket ro'yxatini yangilash (har doim avval bajaring)\nsudo apt update\n\n# O'rnatilgan paketlarni yangilash\nsudo apt upgrade -y\n\n# Yangi dastur o'rnatish\nsudo apt install gobuster\n\n# Dasturni o'chirish\nsudo apt remove gobuster\n\n# Dasturni sozlamalari bilan to'liq o'chirish\nsudo apt purge gobuster\n\n# Keraksiz bog'liqliklarni tozalash\nsudo apt autoremove"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Qidirish va ma'lumot","Searching and info")),
-    React.createElement(Terminal,null,
-      "# Paketni nomi bo'yicha qidirish\napt search wordlist\n\n# Paket haqida batafsil ma'lumot\napt show nmap\n\n# O'rnatilgan paketlarni ro'yxatlash\napt list --installed | grep hydra"
-    ),
-    React.createElement(H2,{num:"§4"},t(lang,"Manbalar (sources)","Package sources")),
-    React.createElement(P,null,t(lang,
-      "apt qayerdan paket olishini /etc/apt/sources.list fayli belgilaydi. Kali uchun faqat rasmiy Kali omborlaridan foydalaning — noma'lum manbalar tizimni xavf ostiga qo'yadi.",
-      "Where apt gets packages from is defined in /etc/apt/sources.list. For Kali, use only the official Kali repositories — unknown sources put your system at risk."
-    )),
-    React.createElement(Terminal,null,
-      "# Rasmiy Kali ombori\ndeb http://http.kali.org/kali kali-rolling main contrib non-free non-free-firmware"
-    ),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"apt upgrade dan oldin doim apt update bajaring. Aks holda apt eski ombor ro'yxatidan foydalanadi va yangilanishlarni topa olmaydi.",
-        "Always run apt update before apt upgrade. Otherwise apt uses a stale package list and won't find the updates.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"O'rnatilgan dasturni sozlama fayllari bilan birga to'liq o'chirish uchun qaysi buyruq ishlatiladi?",en:"Which command fully removes an installed program along with its config files?"},
-      opts:[{uz:"apt remove",en:"apt remove"},{uz:"apt purge",en:"apt purge"},{uz:"apt clean",en:"apt clean"},{uz:"apt autoremove",en:"apt autoremove"}],
-      correct:1,
-      exp:{uz:"apt purge paketni va uning konfiguratsiya fayllarini o'chiradi; apt remove esa faqat paketni o'chirib, sozlamalarni qoldiradi.",en:"apt purge removes the package and its configuration files; apt remove deletes only the package and leaves configs behind."}
-    })
-  );
-}
-
-// ── L14: DNS enumeration ──────────────────────────────────────
-function LessonL14(){
+    React.createElement(P,null,t(lang,"Kali Debian asosida bo'lgani uchun dasturlarni apt orqali o'rnatadi. apt yuklab olish, o'rnatish, yangilash va bog'liqliklarni avtomatik hal qilishni boshqaradi.","Because Kali is Debian-based, it installs software via apt. apt handles downloading, installing, updating and automatically resolving dependencies.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Paket o'rnatish oqimi","The package-install flow")),
+    React.createElement(FlowSteps,{title:{uz:"apt bilan o'rnatish",en:"Installing with apt"},steps:[
+      {icon:"🔄",text:{uz:"sudo apt update — paket ro'yxatini yangilash (avval!)",en:"sudo apt update — refresh the package list (first!)"}},
+      {icon:"🔎",text:{uz:"apt search gobuster — kerakli paketni topish",en:"apt search gobuster — find the package"}},
+      {icon:"⬇",text:{uz:"sudo apt install gobuster — o'rnatish (+ bog'liqliklar)",en:"sudo apt install gobuster — install (+ dependencies)"}},
+      {icon:"✓",text:{uz:"which gobuster — o'rnatilganini tekshirish",en:"which gobuster — confirm it's installed"}},
+    ]}),
+    React.createElement(Terminal,null,"sudo apt update && sudo apt upgrade -y\nsudo apt install nikto\nsudo apt remove nikto       # o'chirish\nsudo apt autoremove         # keraksiz bog'liqliklarni tozalash"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"apt upgrade dan oldin doim apt update bajaring — aks holda apt eski ro'yxatdan foydalanadi.","Always run apt update before apt upgrade — otherwise apt uses a stale list.")),
+    React.createElement(Quiz,{q:{uz:"Yangi dastur o'rnatishdan oldin qaysi buyruqni bajarish kerak?",en:"Which command should you run before installing a new package?"},opts:[{uz:"apt remove",en:"apt remove"},{uz:"apt update",en:"apt update"},{uz:"apt clean",en:"apt clean"},{uz:"apt purge",en:"apt purge"}],correct:1,exp:{uz:"apt update paket ro'yxatini yangilaydi — shundan keyingina to'g'ri versiyani o'rnatasiz.",en:"apt update refreshes the package list — only then do you install the correct version."}}));
+}function LessonL14(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(H2,{num:"§1"},t(lang,"DNS enumeratsiya nima uchun?","Why DNS enumeration?")),
@@ -1086,266 +1069,124 @@ function LessonL27(){
 // ── L02: Installing Kali ──────────────────────────────────────
 function LessonL02(){
   const lang=useLang();
-  const ways=[
-    {name:t(lang,"Virtual mashina (VM)","Virtual machine (VM)"),uz:"VirtualBox/VMware ichida. Eng xavfsiz va tavsiya etilgan usul — asosiy tizimingizga tegmaydi.",en:"Inside VirtualBox/VMware. The safest and recommended way — it never touches your host OS."},
-    {name:t(lang,"Bare metal","Bare metal"),uz:"To'g'ridan-to'g'ri diskka o'rnatiladi. To'liq unumdorlik, lekin butun mashina Kali'ga bag'ishlanadi.",en:"Installed directly to disk. Full performance, but the whole machine is dedicated to Kali."},
-    {name:t(lang,"Live USB","Live USB"),uz:"USB'dan o'rnatmasdan ishga tushiriladi. Iz qoldirmaydi, forensika uchun qulay.",en:"Boots from USB without installing. Leaves no trace, handy for forensics."},
-    {name:"WSL",uz:"Windows ichida (WSL2). GUI'siz, lekin buyruq qatori vositalari uchun tez.",en:"Inside Windows (WSL2). No GUI, but fast for command-line tools."},
-  ];
   return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"O'rnatish usullari","Installation methods")),
-    React.createElement(P,null,t(lang,
-      "Kali'ni o'rnatishning bir necha yo'li bor. Yangi boshlovchilar uchun virtual mashina eng yaxshi tanlov — xatolar asosiy tizimingizga zarar yetkazmaydi va snapshot'lar orqali istalgan holatga qaytish mumkin.",
-      "There are several ways to install Kali. For beginners a virtual machine is the best choice — mistakes won't harm your host OS, and snapshots let you roll back to any state."
-    )),
-    ways.map((w,i)=>React.createElement("div",{key:i,style:{marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-      React.createElement("div",{style:{fontWeight:700,fontSize:13,color:"var(--accent)",marginBottom:3}},w.name),
-      React.createElement("div",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.55}},t(lang,w.uz,w.en))
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Yuklab olish va tekshirish","Download and verify")),
-    React.createElement(P,null,t(lang,
-      "Har doim faqat rasmiy saytdan (kali.org/get-kali) yuklab oling va SHA256 summasini tekshiring. Bu — o'rnatuvchi buzilmaganiga yoki almashtirilmaganiga ishonch hosil qilishning yagona yo'li.",
-      "Always download only from the official site (kali.org/get-kali) and verify the SHA256 sum. This is the only way to be sure the installer hasn't been corrupted or tampered with."
-    )),
-    React.createElement(Terminal,null,
-      "# Yuklangan ISO ning SHA256 summasini hisoblash\nsha256sum kali-linux-2024.1-installer-amd64.iso\n\n# Natijani sayt'dagi rasmiy summa bilan solishtiring\n# Ular BIR XIL bo'lishi shart"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Birinchi qadamlar","First steps")),
-    React.createElement(Terminal,null,
-      "# O'rnatgandan keyin tizimni yangilang\nsudo apt update && sudo apt full-upgrade -y\n\n# Standart parolni o'zgartiring\npasswd\n\n# (VM'da) snapshot oling — toza holatga qaytish uchun"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Snapshot: ","Snapshot: ")),
-      t(lang,"VM'da toza o'rnatishdan keyin darhol snapshot oling. Biror narsa buzilsa yoki test muhitini ifloslasangiz, bir soniyada toza holatga qaytasiz.",
-        "Take a snapshot right after a clean install in a VM. If something breaks or you pollute your test environment, you can revert to a clean state in a second.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Yangi boshlovchi uchun Kali'ni o'rnatishning eng xavfsiz usuli qaysi?",en:"What is the safest way for a beginner to install Kali?"},
-      opts:[{uz:"Asosiy diskka bare metal",en:"Bare metal on the main disk"},{uz:"Virtual mashina (VM)",en:"Virtual machine (VM)"},{uz:"Telefonga",en:"On a phone"},{uz:"Router'ga",en:"On a router"}],
-      correct:1,
-      exp:{uz:"Virtual mashina asosiy tizimni izolyatsiya qiladi va snapshot orqali xatolardan qaytish imkonini beradi — shuning uchun eng xavfsiz.",en:"A virtual machine isolates the host OS and lets you revert from mistakes via snapshots — hence the safest."}
-    })
-  );
-}
-
-// ── L04: Linux file system ────────────────────────────────────
-function LessonL04(){
-  const lang=useLang();
-  const dirs=[
-    {p:"/",uz:"Ildiz — butun fayl tizimining boshlanish nuqtasi.",en:"Root — the top of the entire file system."},
-    {p:"/etc",uz:"Tizim sozlama fayllari (parollar, xizmatlar, tarmoq).",en:"System configuration files (passwords, services, network)."},
-    {p:"/home",uz:"Oddiy foydalanuvchilarning shaxsiy kataloglari.",en:"Home directories of normal users."},
-    {p:"/root",uz:"root foydalanuvchining shaxsiy katalogi.",en:"The root user's home directory."},
-    {p:"/var",uz:"O'zgaruvchan ma'lumot — loglar (/var/log), veb (/var/www).",en:"Variable data — logs (/var/log), web (/var/www)."},
-    {p:"/tmp",uz:"Vaqtinchalik fayllar. Ko'pincha hammaga yozish ruxsati bor.",en:"Temporary files. Often world-writable."},
-    {p:"/usr",uz:"Foydalanuvchi dasturlari va vositalar.",en:"User programs and tools."},
-    {p:"/bin, /sbin",uz:"Muhim tizim buyruqlari (bajariladigan fayllar).",en:"Essential system commands (executables)."},
-  ];
-  return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"FHS — fayl tizimi ierarxiyasi","FHS — the file system hierarchy")),
-    React.createElement(P,null,t(lang,
-      "Windows'dan farqli o'laroq, Linux'da C: yoki D: disklari yo'q. Hamma narsa yagona ildizdan (/) boshlanadi va daraxt shaklida tarmoqlanadi. Bu tuzilma FHS (Filesystem Hierarchy Standard) deb ataladi.",
-      "Unlike Windows, Linux has no C: or D: drives. Everything starts from a single root (/) and branches out as a tree. This structure is called the FHS (Filesystem Hierarchy Standard)."
-    )),
-    dirs.map((d,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start"}},
-      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",minWidth:80}},d.p),
-      React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.55}},t(lang,d.uz,d.en))
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Pentest uchun muhim yo'llar","Paths that matter in a pentest")),
-    React.createElement(Terminal,null,
-      "/etc/passwd     # foydalanuvchilar ro'yxati (hamma o'qiy oladi)\n/etc/shadow     # parol hashlari (faqat root)\n/var/www/html   # veb-sayt fayllari\n/var/log/auth.log  # kirish urinishlari jurnali\n~/.ssh/         # SSH kalitlari\n/usr/share/wordlists/  # Kali lug'atlari (rockyou.txt)"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Yashirin fayllar: ","Hidden files: ")),
-      t(lang,"Nomi nuqta (.) bilan boshlanadigan fayllar yashiringan hisoblanadi (masalan .bashrc, .ssh). Ularni ko'rish uchun ls -a ishlating — ular ko'pincha maxfiy ma'lumot saqlaydi.",
-        "Files whose names start with a dot (.) are hidden (e.g. .bashrc, .ssh). Use ls -a to see them — they often hold sensitive data.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Parol hashlari qaysi faylda saqlanadi va uni kim o'qiy oladi?",en:"Which file stores password hashes and who can read it?"},
-      opts:[{uz:"/etc/passwd — hamma",en:"/etc/passwd — everyone"},{uz:"/etc/shadow — faqat root",en:"/etc/shadow — only root"},{uz:"/var/log — hamma",en:"/var/log — everyone"},{uz:"/home — mehmonlar",en:"/home — guests"}],
-      correct:1,
-      exp:{uz:"/etc/shadow parol hashlarini saqlaydi va faqat root o'qiy oladi; /etc/passwd esa foydalanuvchilar ro'yxatini saqlaydi va hamma o'qiy oladi.",en:"/etc/shadow stores password hashes and is readable only by root; /etc/passwd holds the user list and is world-readable."}
-    })
-  );
-}
-
-// ── L05: Users & permissions ──────────────────────────────────
-function LessonL05(){
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Kali'ni o'rnatish usullari","Ways to install Kali")),
+    React.createElement(P,null,t(lang,"Kali'ni o'rnatishning bir necha yo'li bor. Yangi boshlovchilar uchun virtual mashina eng xavfsiz tanlov — xatolar asosiy tizimingizga tegmaydi va snapshot orqali istalgan holatga qaytish mumkin.","There are several ways to install Kali. For beginners, a virtual machine is the safest choice — mistakes never touch your host OS, and snapshots let you roll back to any state.")),
+    React.createElement(LayerStack,{layers:[
+      {n:"💻",name:t(lang,"Virtual mashina (tavsiya)","Virtual machine (recommended)"),color:"#69db7c",desc:{uz:"VirtualBox/VMware ichida — izolyatsiya va snapshot.",en:"Inside VirtualBox/VMware — isolation and snapshots."}},
+      {n:"🖥",name:t(lang,"Bare metal","Bare metal"),color:"#4dabf7",desc:{uz:"To'g'ridan-to'g'ri diskka — to'liq unumdorlik.",en:"Directly to disk — full performance."}},
+      {n:"🔌",name:"Live USB",color:"#a855f7",desc:{uz:"USB'dan o'rnatmasdan ishga tushirish — iz qoldirmaydi.",en:"Boot from USB without installing — leaves no trace."}},
+      {n:"🪟",name:"WSL",color:"#ffd43b",desc:{uz:"Windows ichida (GUI'siz, buyruq qatori uchun).",en:"Inside Windows (no GUI, for CLI tools)."}},
+    ]}),
+    React.createElement(H2,{num:"§2"},t(lang,"O'rnatish oqimi","The install flow")),
+    React.createElement(P,null,t(lang,"Xavfsiz o'rnatish shunday kechadi. \"Ishga tushir\":","A safe install goes like this. Press \"Play\":")),
+    React.createElement(FlowSteps,{title:{uz:"Kali o'rnatish",en:"Installing Kali"},steps:[
+      {icon:"⬇",text:{uz:"kali.org dan ISO ni yuklab olish",en:"Download the ISO from kali.org"}},
+      {icon:"🔑",text:{uz:"SHA256 summasini tekshirish (buzilmaganini)",en:"Verify the SHA256 checksum (integrity)"}},
+      {icon:"💻",text:{uz:"VirtualBox'da yangi VM yaratib o'rnatish",en:"Create a new VM in VirtualBox and install"}},
+      {icon:"🔄",text:{uz:"sudo apt update && sudo apt full-upgrade",en:"sudo apt update && sudo apt full-upgrade"}},
+      {icon:"📸",text:{uz:"Snapshot olish — toza holatga qaytish uchun",en:"Take a snapshot — to revert to a clean state"}},
+    ]}),
+    React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"Snapshot: toza o'rnatishdan keyin darhol snapshot oling. Test muhitini ifloslasangiz, bir soniyada toza holatga qaytasiz.","Snapshot: take one right after a clean install. If you pollute your test environment, you revert in a second.")),
+    React.createElement(Quiz,{q:{uz:"Yangi boshlovchi uchun eng xavfsiz o'rnatish usuli qaysi?",en:"Safest install method for a beginner?"},opts:[{uz:"Bare metal",en:"Bare metal"},{uz:"Virtual mashina",en:"Virtual machine"},{uz:"Telefonga",en:"On a phone"},{uz:"Router'ga",en:"On a router"}],correct:1,exp:{uz:"Virtual mashina asosiy tizimni izolyatsiya qiladi va snapshot orqali xatolardan qaytish imkonini beradi.",en:"A VM isolates the host and lets you revert from mistakes via snapshots."}}));
+}function LessonL04(){
   const lang=useLang();
   return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"Foydalanuvchilar va guruhlar","Users and groups")),
-    React.createElement(P,null,t(lang,
-      "Linux — ko'p foydalanuvchili tizim. Har bir foydalanuvchining UID'si (identifikatori) va bir yoki bir necha guruhi bor. root (UID 0) — cheklovsiz superfoydalanuvchi. Pentestda maqsad ko'pincha oddiy foydalanuvchidan root'ga o'tish (privilege escalation).",
-      "Linux is a multi-user system. Each user has a UID (identifier) and one or more groups. root (UID 0) is the unrestricted superuser. In a pentest the goal is often to move from a normal user to root (privilege escalation)."
-    )),
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Linux fayl tizimi (FHS)","The Linux file system (FHS)")),
+    React.createElement(P,null,t(lang,"Windows'dan farqli, Linux'da C: yoki D: yo'q. Hamma narsa yagona ildizdan (/) boshlanadi va daraxt shaklida tarmoqlanadi. Bu tuzilma FHS deb ataladi. Har papka o'z vazifasiga ega:","Unlike Windows, Linux has no C: or D:. Everything starts from a single root (/) and branches out as a tree. This structure is the FHS. Each folder has its own purpose:")),
+    React.createElement(LayerStack,{layers:[
+      {n:"/etc",name:t(lang,"Sozlamalar","Config"),color:"#ff6b6b",desc:{uz:"Tizim sozlama fayllari (passwd, shadow, tarmoq).",en:"System config files (passwd, shadow, network)."}},
+      {n:"/home",name:t(lang,"Foydalanuvchilar","Users"),color:"#ffa94d",desc:{uz:"Oddiy foydalanuvchilarning shaxsiy kataloglari.",en:"Home directories of normal users."}},
+      {n:"/root",name:"root",color:"#ffd43b",desc:{uz:"root superfoydalanuvchining katalogi.",en:"The root superuser's home."}},
+      {n:"/var",name:t(lang,"O'zgaruvchan","Variable"),color:"#69db7c",desc:{uz:"Loglar (/var/log), veb (/var/www).",en:"Logs (/var/log), web (/var/www)."}},
+      {n:"/usr",name:t(lang,"Dasturlar","Programs"),color:"#4dabf7",desc:{uz:"Foydalanuvchi dasturlari, lug'atlar (/usr/share/wordlists).",en:"User programs, wordlists (/usr/share/wordlists)."}},
+      {n:"/tmp",name:t(lang,"Vaqtinchalik","Temporary"),color:"#a855f7",desc:{uz:"Vaqtinchalik fayllar (ko'pincha hammaga yozish).",en:"Temporary files (often world-writable)."}},
+    ]}),
+    React.createElement(H2,{num:"§2"},t(lang,"Pentest uchun muhim yo'llar","Pentest-relevant paths")),
+    React.createElement(Terminal,null,"/etc/passwd     # foydalanuvchilar (hamma o'qiydi)\n/etc/shadow     # parol hashlari (faqat root)\n/usr/share/wordlists/rockyou.txt  # mashhur lug'at"),
+    React.createElement(Quiz,{q:{uz:"Parol hashlari qaysi faylda va uni kim o'qiy oladi?",en:"Which file stores password hashes and who can read it?"},opts:[{uz:"/etc/passwd — hamma",en:"/etc/passwd — everyone"},{uz:"/etc/shadow — faqat root",en:"/etc/shadow — only root"},{uz:"/var/log — hamma",en:"/var/log — everyone"},{uz:"/home — mehmonlar",en:"/home — guests"}],correct:1,exp:{uz:"/etc/shadow parol hashlarini saqlaydi va faqat root o'qiy oladi.",en:"/etc/shadow stores password hashes and is readable only by root."}}));
+}function LessonL05(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Foydalanuvchilar va ruxsatlar","Users and permissions")),
+    React.createElement(P,null,t(lang,"Linux — ko'p foydalanuvchili tizim. root (UID 0) — cheklovsiz superfoydalanuvchi. Pentestda maqsad ko'pincha oddiy foydalanuvchidan root'ga o'tish (privilege escalation).","Linux is multi-user. root (UID 0) is the unrestricted superuser. In a pentest the goal is often to move from a normal user to root (privilege escalation).")),
     React.createElement(H2,{num:"§2"},t(lang,"Ruxsatlarni o'qish (rwx)","Reading permissions (rwx)")),
-    React.createElement(P,null,t(lang,
-      "ls -l har bir fayl uchun 10 belgili ruxsat qatorini ko'rsatadi. Masalan -rwxr-xr-- : birinchi belgi tur (- fayl, d katalog), keyin egasi (rwx), guruhi (r-x) va boshqalar (r--) uchun ruxsatlar. r=o'qish, w=yozish, x=bajarish.",
-      "ls -l shows a 10-character permission string for each file. For example -rwxr-xr-- : the first char is the type (- file, d directory), then permissions for owner (rwx), group (r-x) and others (r--). r=read, w=write, x=execute."
-    )),
-    React.createElement(Terminal,null,
-      "# Ruxsatlarni o'zgartirish (raqamli usul)\nchmod 755 script.sh   # rwxr-xr-x\nchmod 600 id_rsa      # rw------- (faqat egasi)\nchmod +x exploit.sh   # bajarish huquqini qo'shish\n\n# Egasini o'zgartirish\nchown user:group file.txt"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"sudo va SUID","sudo and SUID")),
-    React.createElement(P,null,t(lang,
-      "sudo oddiy foydalanuvchiga vaqtincha root huquqlari bilan buyruq bajarishga ruxsat beradi. SUID biti o'rnatilgan fayllar esa egasining (ko'pincha root'ning) huquqlari bilan ishga tushadi — bu privilege escalation uchun tez-tez ishlatiladigan yo'l.",
-      "sudo lets a normal user run a command temporarily with root rights. Files with the SUID bit set run with the owner's rights (often root's) — a common path for privilege escalation."
-    )),
-    React.createElement(Terminal,null,
-      "# Menga qaysi sudo huquqlari berilgan?\nsudo -l\n\n# SUID o'rnatilgan fayllarni topish (privesc tekshiruvi)\nfind / -perm -4000 -type f 2>/dev/null"
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"chmod 600 id_rsa buyrug'i faylga qanday ruxsat beradi?",en:"What permissions does chmod 600 id_rsa set on the file?"},
-      opts:[{uz:"Hamma o'qiy va yoza oladi",en:"Everyone can read and write"},{uz:"Faqat egasi o'qiy va yoza oladi",en:"Only the owner can read and write"},{uz:"Hamma bajara oladi",en:"Everyone can execute"},{uz:"Hech kim kira olmaydi",en:"No one can access it"}],
-      correct:1,
-      exp:{uz:"600 = rw------- : faqat egasiga o'qish va yozish, guruh va boshqalarga hech qanday huquq yo'q. SSH kalitlari uchun aynan shu talab qilinadi.",en:"600 = rw------- : read and write for the owner only, nothing for group or others. This is exactly what SSH keys require."}
-    })
-  );
-}
-
-// ── L07: Bash scripting ───────────────────────────────────────
-function LessonL07(){
+    React.createElement(LayerStack,{layers:[
+      {n:"r",name:t(lang,"Read — o'qish (4)","Read (4)"),color:"#4dabf7",desc:{uz:"Fayl mazmunini ko'rish.",en:"View the file's contents."}},
+      {n:"w",name:t(lang,"Write — yozish (2)","Write (2)"),color:"#69db7c",desc:{uz:"Faylni o'zgartirish.",en:"Modify the file."}},
+      {n:"x",name:t(lang,"eXecute — bajarish (1)","eXecute (1)"),color:"#a855f7",desc:{uz:"Faylni dastur sifatida ishga tushirish.",en:"Run the file as a program."}},
+      {n:"S",name:"SUID",color:"#ff3a5e",desc:{uz:"Fayl egasining (ko'pincha root) huquqi bilan ishlaydi — privesc yo'li.",en:"Runs with the owner's (often root) rights — a privesc path."}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"chmod 600 id_rsa   # rw------- (faqat egasi)\nchmod +x exploit.sh\nsudo -l            # menda qanday sudo huquqi bor?\nfind / -perm -4000 -type f 2>/dev/null  # SUID fayllar"),
+    React.createElement(Quiz,{q:{uz:"chmod 600 id_rsa faylga qanday ruxsat beradi?",en:"What does chmod 600 id_rsa set?"},opts:[{uz:"Hamma o'qiy/yoza oladi",en:"Everyone read/write"},{uz:"Faqat egasi o'qiy/yoza oladi",en:"Only the owner read/write"},{uz:"Hamma bajara oladi",en:"Everyone execute"},{uz:"Hech kim kira olmaydi",en:"No access"}],correct:1,exp:{uz:"600 = rw------- : faqat egasiga o'qish/yozish. SSH kalitlari uchun aynan shu talab qilinadi.",en:"600 = rw------- : read/write for the owner only. Exactly what SSH keys require."}}));
+}function LessonL07(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Nega bash skript?","Why bash scripting?")),
-    React.createElement(P,null,t(lang,
-      "Bash skript — bir nechta buyruqni bitta faylga jamlab, avtomatik bajarish usuli. Pentestda takrorlanuvchi vazifalarni (skanerlash, IP diapazonini tekshirish, natijalarni saralash) avtomatlashtiradi va vaqtni tejaydi.",
-      "A bash script bundles several commands into one file and runs them automatically. In a pentest it automates repetitive tasks (scanning, checking an IP range, sorting results) and saves time."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Asosiy tuzilma","Basic structure")),
-    React.createElement(Terminal,null,
-      "#!/bin/bash\n# ^ shebang — bu skript bash bilan ishga tushishini bildiradi\n\nTARGET=\"10.0.0.5\"          # o'zgaruvchi\necho \"Skanerlanmoqda: $TARGET\"\n\n# Shart (if)\nif ping -c1 $TARGET &>/dev/null; then\n  echo \"Xost tirik\"\nelse\n  echo \"Xost o'chiq\"\nfi"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Sikllar (loops)","Loops")),
-    React.createElement(Terminal,null,
-      "#!/bin/bash\n# Butun /24 tarmoqni ping bilan tekshirish\nfor i in $(seq 1 254); do\n  ip=\"10.0.0.$i\"\n  ping -c1 -W1 $ip &>/dev/null && echo \"$ip tirik\"\ndone"
-    ),
-    React.createElement(P,null,t(lang,
-      "Skriptni bajarish uchun avval unga bajarish huquqini bering: chmod +x scan.sh, keyin ./scan.sh bilan ishga tushiring.",
-      "To run a script, first give it execute permission: chmod +x scan.sh, then launch it with ./scan.sh."
-    )),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"$() — buyruq almashtirish: ","$() — command substitution: ")),
-      t(lang,"$(buyruq) buyruqning chiqishini o'zgaruvchiga oladi. Masalan HOSTS=$(cat targets.txt) — fayl mazmunini o'zgaruvchiga yuklaydi.",
-        "$(command) captures a command's output into a variable. For example HOSTS=$(cat targets.txt) loads a file's contents into a variable.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Skriptning birinchi qatoridagi #!/bin/bash nima deyiladi va nima vazifasi bor?",en:"What is #!/bin/bash on the first line of a script called, and what is its job?"},
-      opts:[{uz:"Izoh — hech narsa qilmaydi",en:"A comment — it does nothing"},{uz:"Shebang — skriptni qaysi interpretator ishga tushirishini bildiradi",en:"Shebang — it tells which interpreter runs the script"},{uz:"O'zgaruvchi e'loni",en:"A variable declaration"},{uz:"Sikl boshlanishi",en:"The start of a loop"}],
-      correct:1,
-      exp:{uz:"Shebang (#!) qatori tizimga skriptni qaysi dastur (bu yerda /bin/bash) bilan bajarishni ko'rsatadi.",en:"The shebang (#!) line tells the system which program (here /bin/bash) to execute the script with."}
-    })
-  );
-}
-
-// ── L08: Networking basics ────────────────────────────────────
-function LessonL08(){
+    React.createElement(P,null,t(lang,"Bash skript — bir nechta buyruqni bitta faylga jamlab avtomatik bajarish. Pentestda takrorlanuvchi vazifalarni (skanerlash, IP diapazonini tekshirish) avtomatlashtiradi va vaqtni tejaydi.","A bash script bundles several commands into one file and runs them automatically. In a pentest it automates repetitive tasks (scanning, checking an IP range) and saves time.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Skript qanday ishlaydi","How a script runs")),
+    React.createElement(FlowSteps,{title:{uz:"Skriptni yaratish va ishga tushirish",en:"Creating and running a script"},steps:[
+      {icon:"#!",text:{uz:"Birinchi qator: #!/bin/bash (shebang)",en:"First line: #!/bin/bash (shebang)"}},
+      {icon:"📦",text:{uz:"O'zgaruvchilar va shartlar yoziladi",en:"Variables and conditions are written"}},
+      {icon:"🔁",text:{uz:"Sikl (for/while) bilan takror amal",en:"A loop (for/while) repeats an action"}},
+      {icon:"🔓",text:{uz:"chmod +x scan.sh — bajarish huquqi berish",en:"chmod +x scan.sh — grant execute permission"}},
+      {icon:"▶",text:{uz:"./scan.sh — ishga tushirish",en:"./scan.sh — run it"}},
+    ]}),
+    React.createElement(Terminal,null,"#!/bin/bash\n# Butun /24 tarmoqni ping bilan tekshirish\nfor i in $(seq 1 254); do\n  ip=\"10.0.0.$i\"\n  ping -c1 -W1 $ip &>/dev/null && echo \"$ip tirik\"\ndone"),
+    React.createElement(Quiz,{q:{uz:"Skriptning birinchi qatoridagi #!/bin/bash nima deyiladi?",en:"What is #!/bin/bash on a script's first line called?"},opts:[{uz:"Izoh",en:"A comment"},{uz:"Shebang — qaysi interpretator ishga tushirishini bildiradi",en:"Shebang — tells which interpreter runs it"},{uz:"O'zgaruvchi",en:"A variable"},{uz:"Sikl",en:"A loop"}],correct:1,exp:{uz:"Shebang (#!) tizimga skriptni qaysi dastur (bu yerda /bin/bash) bilan bajarishni ko'rsatadi.",en:"The shebang (#!) tells the system which program (here /bin/bash) executes the script."}}));
+}function LessonL08(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Tarmoq holatini ko'rish","Inspecting the network")),
-    React.createElement(P,null,t(lang,
-      "Har qanday tarmoq hujumidan oldin o'z mashinangizning tarmoq holatini bilishingiz kerak: IP manzilingiz, tarmoq interfeyslari va marshrutlar. Kali'da bu uchun zamonaviy ip buyrug'idan foydalaniladi.",
-      "Before any network attack you must know your own machine's network state: your IP address, network interfaces and routes. In Kali this is done with the modern ip command."
-    )),
-    React.createElement(Terminal,null,
-      "# IP manzil va interfeyslar\nip a\n\n# Marshrutlash jadvali (default gateway)\nip route\n\n# Eski uslub (hali ham ishlaydi)\nifconfig\nroute -n"
-    ),
-    React.createElement(H2,{num:"§2"},t(lang,"Ulanishlarni tekshirish","Checking connectivity")),
-    React.createElement(Terminal,null,
-      "# Xost tirikligini tekshirish\nping -c4 10.0.0.1\n\n# Ochiq portlar va faol ulanishlar (zamonaviy)\nss -tulnp\n\n# DNS so'rovi\nnslookup example.com"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Interfeysni boshqarish","Managing an interface")),
-    React.createElement(Terminal,null,
-      "# Interfeysni o'chirish/yoqish\nsudo ip link set eth0 down\nsudo ip link set eth0 up\n\n# MAC manzilni vaqtincha o'zgartirish (anonimlik uchun)\nsudo ip link set eth0 down\nsudo macchanger -r eth0\nsudo ip link set eth0 up"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"ss vs netstat: ","ss vs netstat: ")),
-      t(lang,"ss — netstat'ning zamonaviy va tezroq o'rnini bosuvchisi. ss -tulnp barcha tinglayotgan (listening) TCP/UDP portlar va ularga tegishli jarayonlarni ko'rsatadi.",
-        "ss is the modern, faster replacement for netstat. ss -tulnp shows all listening TCP/UDP ports and their owning processes.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Kali'da IP manzil va tarmoq interfeyslarini ko'rish uchun qaysi zamonaviy buyruq ishlatiladi?",en:"Which modern command shows the IP address and network interfaces in Kali?"},
-      opts:[{uz:"ip a",en:"ip a"},{uz:"ls -l",en:"ls -l"},{uz:"cat /ip",en:"cat /ip"},{uz:"ping",en:"ping"}],
-      correct:0,
-      exp:{uz:"ip a (ip address) interfeyslar va ularning IP manzillarini ko'rsatadi; u eski ifconfig'ning zamonaviy o'rnini bosadi.",en:"ip a (ip address) lists interfaces and their IP addresses; it is the modern replacement for the old ifconfig."}
-    })
-  );
-}
-
-// ── L09: Services ─────────────────────────────────────────────
-function LessonL09(){
+    React.createElement(P,null,t(lang,"Har qanday tarmoq hujumidan oldin o'z mashinangizning tarmoq holatini bilishingiz kerak: IP manzil, interfeyslar va marshrutlar. Kali'da buni zamonaviy ip buyrug'i bilan qilinadi.","Before any network attack you must know your machine's network state: IP, interfaces and routes. In Kali this is done with the modern ip command.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Foydali buyruqlar","Useful commands")),
+    React.createElement(LayerStack,{layers:[
+      {n:"ip a",name:t(lang,"IP va interfeyslar","IP & interfaces"),color:"#4dabf7",desc:{uz:"O'z IP manzilingiz va tarmoq kartalari.",en:"Your IP address and network cards."}},
+      {n:"ip route",name:t(lang,"Marshrutlar","Routes"),color:"#69db7c",desc:{uz:"Default gateway — tashqiga chiqish.",en:"Default gateway — the exit."}},
+      {n:"ss -tulnp",name:t(lang,"Ochiq portlar","Open ports"),color:"#a855f7",desc:{uz:"Tinglayotgan xizmatlar va jarayonlar.",en:"Listening services and processes."}},
+      {n:"ping",name:t(lang,"Ulanish sinovi","Connectivity"),color:"#ffd43b",desc:{uz:"Xost tirikligini tekshirish.",en:"Check if a host is alive."}},
+    ]}),
+    React.createElement(Terminal,null,"ip a\nip route\nping -c4 10.0.0.1\n# MAC ni vaqtincha o'zgartirish (anonimlik):\nsudo macchanger -r eth0"),
+    React.createElement(Quiz,{q:{uz:"Kali'da IP manzil va interfeyslarni ko'rish uchun zamonaviy buyruq qaysi?",en:"Modern command to see IP and interfaces in Kali?"},opts:[{uz:"ip a",en:"ip a"},{uz:"ls -l",en:"ls -l"},{uz:"cat /ip",en:"cat /ip"},{uz:"ping",en:"ping"}],correct:0,exp:{uz:"ip a interfeyslar va IP manzillarni ko'rsatadi — eski ifconfig'ning zamonaviy o'rnini bosadi.",en:"ip a lists interfaces and IPs — the modern replacement for ifconfig."}}));
+}function LessonL09(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Xizmatlar va systemctl","Services and systemctl")),
-    React.createElement(P,null,t(lang,
-      "Xizmat (service) — fonda doimiy ishlab turadigan dastur, masalan veb-server yoki SSH. Kali systemd'dan foydalanadi va xizmatlar systemctl buyrug'i orqali boshqariladi.",
-      "A service is a program that runs continuously in the background, such as a web server or SSH. Kali uses systemd, and services are managed with the systemctl command."
-    )),
-    React.createElement(Terminal,null,
-      "# Xizmatni ishga tushirish / to'xtatish\nsudo systemctl start ssh\nsudo systemctl stop ssh\n\n# Holatini ko'rish\nsudo systemctl status ssh\n\n# Tizim yuklanishida avtomatik ishga tushirish\nsudo systemctl enable ssh\nsudo systemctl disable ssh"
-    ),
-    React.createElement(H2,{num:"§2"},t(lang,"Pentestda kerak bo'ladigan xizmatlar","Services you'll need in a pentest")),
-    React.createElement(Terminal,null,
-      "# Metasploit uchun ma'lumotlar bazasi\nsudo systemctl start postgresql\n\n# Fayl uzatish uchun vaqtinchalik veb-server\nsudo systemctl start apache2\n# yoki tez usul:\npython3 -m http.server 8000\n\n# Masofaviy kirish uchun SSH\nsudo systemctl start ssh"
-    ),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"Xizmatlarni faqat kerak bo'lganda ishga tushiring. Doimiy ishlab turgan SSH yoki veb-server sizning mashinangizni ham hujum nishoniga aylantiradi.",
-        "Only start services when you need them. An always-running SSH or web server turns your own machine into an attack target too.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Xizmatni tizim har yuklanganda avtomatik ishga tushishini ta'minlash uchun qaysi buyruq ishlatiladi?",en:"Which command makes a service start automatically every time the system boots?"},
-      opts:[{uz:"systemctl start",en:"systemctl start"},{uz:"systemctl enable",en:"systemctl enable"},{uz:"systemctl status",en:"systemctl status"},{uz:"systemctl stop",en:"systemctl stop"}],
-      correct:1,
-      exp:{uz:"systemctl enable xizmatni yuklanish vaqtida avtomatik ishga tushirishga sozlaydi; start esa uni faqat hozir bir marta ishga tushiradi.",en:"systemctl enable sets a service to start automatically at boot; start only launches it once right now."}
-    })
-  );
-}
-
-// ── L10: Kali tools overview ──────────────────────────────────
-function LessonL10(){
+    React.createElement(P,null,t(lang,"Xizmat (service) — fonda doimiy ishlaydigan dastur (veb-server, SSH). Kali systemd'dan foydalanadi va xizmatlar systemctl orqali boshqariladi.","A service is a program that runs continuously in the background (web server, SSH). Kali uses systemd, and services are managed with systemctl.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Xizmat hayot tsikli","The service lifecycle")),
+    React.createElement(FlowSteps,{title:{uz:"Xizmatni boshqarish",en:"Managing a service"},steps:[
+      {icon:"▶",text:{uz:"sudo systemctl start ssh — ishga tushirish",en:"sudo systemctl start ssh — start it"}},
+      {icon:"📊",text:{uz:"systemctl status ssh — holatini ko'rish",en:"systemctl status ssh — check status"}},
+      {icon:"🔁",text:{uz:"systemctl enable ssh — yuklanishda avtomatik",en:"systemctl enable ssh — auto-start at boot"}},
+      {icon:"⏹",text:{uz:"systemctl stop ssh — to'xtatish",en:"systemctl stop ssh — stop it"}},
+    ]}),
+    React.createElement(Terminal,null,"# Metasploit uchun ma'lumotlar bazasi\nsudo systemctl start postgresql\n# Fayl uzatish uchun tez veb-server\npython3 -m http.server 8000"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Xizmatlarni faqat kerak bo'lganda ishga tushiring — doimiy SSH/veb-server mashinangizni ham nishonga aylantiradi.","Only start services when needed — an always-on SSH/web server makes your machine a target too.")),
+    React.createElement(Quiz,{q:{uz:"Xizmatni tizim har yuklanganda avtomatik ishga tushirish uchun?",en:"Make a service auto-start at every boot?"},opts:[{uz:"systemctl start",en:"systemctl start"},{uz:"systemctl enable",en:"systemctl enable"},{uz:"systemctl status",en:"systemctl status"},{uz:"systemctl stop",en:"systemctl stop"}],correct:1,exp:{uz:"systemctl enable xizmatni yuklanish vaqtida avtomatik ishga tushishga sozlaydi; start faqat hozir ishga tushiradi.",en:"systemctl enable sets it to auto-start at boot; start only launches it now."}}));
+}function LessonL10(){
   const lang=useLang();
-  const cats=[
-    {n:t(lang,"Ma'lumot to'plash","Information Gathering"),tools:"Nmap, theHarvester, dnsenum, Maltego"},
-    {n:t(lang,"Zaiflik tahlili","Vulnerability Analysis"),tools:"Nikto, OpenVAS, Nmap NSE"},
-    {n:t(lang,"Veb ilovalar","Web Applications"),tools:"Burp Suite, OWASP ZAP, sqlmap, wpscan"},
-    {n:t(lang,"Parol hujumlari","Password Attacks"),tools:"Hydra, John, Hashcat, Medusa"},
-    {n:t(lang,"Simsiz hujumlar","Wireless Attacks"),tools:"Aircrack-ng, Wifite, Kismet"},
-    {n:t(lang,"Ekspluatatsiya","Exploitation"),tools:"Metasploit, searchsploit, SET"},
-    {n:t(lang,"Sniffing & Spoofing","Sniffing & Spoofing"),tools:"Wireshark, Ettercap, Bettercap"},
-    {n:t(lang,"Post-ekspluatatsiya","Post Exploitation"),tools:"Meterpreter, Mimikatz, PowerSploit"},
-  ];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"600+ vosita, tartibli","600+ tools, organized")),
-    React.createElement(P,null,t(lang,
-      "Kali'ning kuchi — 600 dan ortiq oldindan o'rnatilgan xavfsizlik vositasida. Ular pentest bosqichlariga mos ravishda toifalarga ajratilgan. Ilovalar menyusi ham xuddi shu toifalar bo'yicha tuzilgan.",
-      "Kali's power lies in its 600+ pre-installed security tools. They are grouped into categories that mirror the phases of a pentest. The applications menu is organized by these same categories."
-    )),
-    cats.map((c,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start",flexWrap:"wrap"}},
-      React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"var(--accent)",minWidth:150}},c.n),
-      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11.5,color:"var(--text-2)"}},c.tools)
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Vositani topish","Finding a tool")),
-    React.createElement(Terminal,null,
-      "# Vosita o'rnatilganmi?\nwhich nmap\n\n# Vosita haqida qo'llanma\nman nmap\n\n# Ko'pchilik vositada yordam\nnmap --help\n\n# O'rnatilmagan bo'lsa\nsudo apt install <tool>"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Metapaketlar: ","Metapackages: ")),
-      t(lang,"Kali barcha vositani o'rnatishni talab qilmaydi. kali-linux-large yoki maxsus kali-tools-web kabi metapaketlar orqali kerakli toifani birdan o'rnatishingiz mumkin.",
-        "Kali doesn't force you to install every tool. Metapackages like kali-linux-large or the focused kali-tools-web let you install a whole category at once.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Kali vositalari qanday tartibga solingan?",en:"How are Kali's tools organized?"},
-      opts:[{uz:"Alifbo tartibida",en:"Alphabetically"},{uz:"Pentest bosqichlariga mos toifalar bo'yicha",en:"Into categories matching pentest phases"},{uz:"Fayl hajmi bo'yicha",en:"By file size"},{uz:"Tasodifiy",en:"Randomly"}],
-      correct:1,
-      exp:{uz:"Vositalar ma'lumot to'plash, ekspluatatsiya, parol hujumlari kabi pentest bosqichlariga mos toifalarga ajratilgan — bu kerakli vositani tez topishga yordam beradi.",en:"Tools are grouped into categories matching pentest phases such as information gathering, exploitation and password attacks — helping you find the right tool fast."}
-    })
-  );
-}
-
-
-// ── L12: Netdiscover ──────────────────────────────────────────
-function LessonL12(){
+    React.createElement(P,null,t(lang,"Kali'ning kuchi — 600 dan ortiq oldindan o'rnatilgan vositada. Ular pentest bosqichlariga mos toifalarga ajratilgan; ilovalar menyusi ham shu toifalar bo'yicha.","Kali's power is its 600+ pre-installed tools, grouped into categories that mirror the phases of a pentest — the applications menu follows the same categories.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy toifalar","Main categories")),
+    React.createElement(LayerStack,{layers:[
+      {n:"🔍",name:t(lang,"Ma'lumot to'plash","Information Gathering"),color:"#4dabf7",desc:{uz:"Nmap, theHarvester, dnsenum",en:"Nmap, theHarvester, dnsenum"}},
+      {n:"🕸",name:t(lang,"Veb ilovalar","Web Applications"),color:"#69db7c",desc:{uz:"Burp Suite, sqlmap, Nikto, wpscan",en:"Burp Suite, sqlmap, Nikto, wpscan"}},
+      {n:"🔑",name:t(lang,"Parol hujumlari","Password Attacks"),color:"#a855f7",desc:{uz:"Hydra, John, Hashcat",en:"Hydra, John, Hashcat"}},
+      {n:"💥",name:t(lang,"Ekspluatatsiya","Exploitation"),color:"#ff3a5e",desc:{uz:"Metasploit, searchsploit, SET",en:"Metasploit, searchsploit, SET"}},
+      {n:"📡",name:t(lang,"Sniffing & simsiz","Sniffing & wireless"),color:"#ffd43b",desc:{uz:"Wireshark, Aircrack-ng, Bettercap",en:"Wireshark, Aircrack-ng, Bettercap"}},
+    ]}),
+    React.createElement(Terminal,null,"which nmap        # vosita o'rnatilganmi?\nman nmap          # qo'llanma\nnmap --help       # yordam"),
+    React.createElement(Quiz,{q:{uz:"Kali vositalari qanday tartibga solingan?",en:"How are Kali's tools organized?"},opts:[{uz:"Alifbo tartibida",en:"Alphabetically"},{uz:"Pentest bosqichlariga mos toifalar bo'yicha",en:"Into categories matching pentest phases"},{uz:"Fayl hajmi bo'yicha",en:"By file size"},{uz:"Tasodifiy",en:"Randomly"}],correct:1,exp:{uz:"Vositalar ma'lumot to'plash, ekspluatatsiya, parol hujumlari kabi pentest bosqichlariga mos toifalarga ajratilgan.",en:"Tools are grouped into categories matching pentest phases like info gathering, exploitation and password attacks."}}));
+}function LessonL12(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(H2,{num:"§1"},t(lang,"Netdiscover nima?","What is Netdiscover?")),
