@@ -263,74 +263,28 @@ function LessonL01(){
     React.createElement(Quiz,{q:{uz:"Kali Linux qaysi distributiv asosida qurilgan?",en:"Kali Linux is built on which distribution?"},opts:[{uz:"Debian",en:"Debian"},{uz:"Windows",en:"Windows"},{uz:"Arch",en:"Arch"},{uz:"macOS",en:"macOS"}],correct:0,exp:{uz:"Kali Debian asosida qurilgan — shu sababli apt paket menejeridan foydalanadi.",en:"Kali is built on Debian — which is why it uses the apt package manager."}}));
 }function LessonL11(){
   const lang=useLang();
-  const scans=[
-    {flag:"-sS",name:"TCP SYN (Stealth)",uz:"Yarim ochiq skan — to'liq ulanish o'rnatmaydi. Tez va nisbatan yashirin. root talab qiladi.",en:"Half-open scan — never completes the handshake. Fast and relatively stealthy. Needs root."},
-    {flag:"-sT",name:"TCP Connect",uz:"To'liq TCP ulanishi o'rnatiladi. root shart emas, lekin loglarda aniq ko'rinadi.",en:"Completes a full TCP connection. No root needed, but clearly appears in logs."},
-    {flag:"-sU",name:"UDP Scan",uz:"UDP portlarini skanerlaydi. Sekin, lekin DNS/SNMP/DHCP kabi xizmatlar uchun muhim.",en:"Scans UDP ports. Slow, but vital for services like DNS, SNMP and DHCP."},
-    {flag:"-sV",name:"Version Detection",uz:"Ochiq portdagi xizmat va uning aniq versiyasini aniqlaydi.",en:"Identifies the service and its exact version behind an open port."},
-    {flag:"-O",name:"OS Detection",uz:"TCP/IP steka xatti-harakati orqali operatsion tizimni taxmin qiladi.",en:"Fingerprints the operating system via TCP/IP stack behavior."},
-    {flag:"-sn",name:"Ping Scan",uz:"Faqat tirik xostlarni topadi — portlarni skanerlamaydi (host discovery).",en:"Host discovery only — finds live hosts without scanning ports."},
-    {flag:"-A",name:"Aggressive",uz:"Bir buyruqda: -sV, -O, default NSE skriptlar va traceroute.",en:"All-in-one: -sV, -O, default NSE scripts and traceroute."},
-  ];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Nmap nima?","What is Nmap?")),
-    React.createElement(P,null,t(lang,
-      "Nmap (Network Mapper) — tarmoqni kashf qilish va xavfsizlik auditi uchun eng mashhur ochiq kodli vosita. U qaysi xostlar tirik ekanini, qaysi portlar ochiqligini, ular ortida qanday xizmat va versiyalar ishlayotganini hamda hatto operatsion tizimni ham aniqlay oladi. Kali'da oldindan o'rnatilgan.",
-      "Nmap (Network Mapper) is the most popular open-source tool for network discovery and security auditing. It reveals which hosts are alive, which ports are open, what services and versions run behind them, and can even fingerprint the OS. It comes pre-installed on Kali."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Skan turlari","Scan types")),
-    scans.map((s,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start"}},
-      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",background:"var(--accent-soft)",border:"1px solid var(--accent-border)",borderRadius:6,padding:"2px 8px",flexShrink:0,minWidth:38,textAlign:"center"}},s.flag),
-      React.createElement("div",{style:{flex:1}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:12.5,color:"var(--text-0)",marginBottom:2}},s.name),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",lineHeight:1.55}},t(lang,s.uz,s.en))
-      )
-    )),
-    React.createElement(H2,{num:"§3"},t(lang,"Haqiqiy buyruqlar","Real commands")),
-    React.createElement(Terminal,null,
-`# Tezkor skan — eng mashhur 1000 port
-nmap 10.10.10.5
-
-# Barcha 65535 TCP portni skanerlash
-nmap -p- 10.10.10.5
-
-# SYN stealth skan (root kerak)
-sudo nmap -sS 10.10.10.5
-
-# Xizmat versiyalari + OS aniqlash + default skriptlar
-sudo nmap -sV -O -sC 10.10.10.5
-
-# Butun quyi tarmoqdagi tirik xostlarni topish
-nmap -sn 192.168.1.0/24
-
-# Aniq portlar + agressiv skan
-nmap -A -p 22,80,443 10.10.10.5
-
-# NSE skript: ma'lum zaifliklarni tekshirish
-nmap --script vuln 10.10.10.5
-
-# Sekin/yashirin timing + barcha formatlarda saqlash
-sudo nmap -sS -T2 -oA scan_natija 10.10.10.5`),
-    React.createElement(H2,{num:"§4"},t(lang,"Timing va natijalar","Timing & output")),
-    React.createElement(P,null,t(lang,
-      "Timing shablonlari -T0 (paranoid, juda sekin) dan -T5 (insane, juda tez) gacha skan tezligini boshqaradi. Yashirinlik kerak bo'lganda -T1/-T2, tezlik kerak bo'lganda -T4 ishlatiladi. Natijani -oN (oddiy), -oX (XML), -oG (grep) yoki -oA (barcha formatlar) bilan saqlash mumkin.",
-      "Timing templates from -T0 (paranoid, very slow) to -T5 (insane, very fast) control scan speed. Use -T1/-T2 for stealth, -T4 for speed. Save results with -oN (normal), -oX (XML), -oG (grepable) or -oA (all formats at once)."
-    )),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"Faqat yozma ruxsat berilgan tizimlarni skanerlang! Ruxsatsiz port skanerlash ko'p mamlakatlarda noqonuniy hisoblanadi.","Only scan systems you have written permission to test! Unauthorized port scanning is illegal in many countries.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Qaysi nmap bayrog'i yashirin SYN (half-open) skanni bajaradi?",en:"Which nmap flag performs a stealth SYN (half-open) scan?"},
-      opts:["-sT","-sS","-sU","-sn"],
-      correct:1,
-      exp:{uz:"-sS SYN skani to'liq ulanishni o'rnatmaydi, shuning uchun tez va nisbatan yashirin. root huquqi kerak.",en:"-sS never completes the TCP handshake, making it fast and relatively stealthy. It requires root."}
-    })
-  );
-}
-
-// ── Lesson L21: Metasploit Framework ─────────────────────────
-function LessonL21(){
+    React.createElement(P,null,t(lang,"Nmap (Network Mapper) — tarmoqni kashf qilish va xavfsizlik auditi uchun eng mashhur vosita. Qaysi xostlar tirik, qaysi portlar ochiq, ular ortida qanday xizmat va versiyalar ishlashini aniqlaydi. Kali'da oldindan o'rnatilgan.","Nmap (Network Mapper) is the most popular tool for network discovery and security auditing. It finds which hosts are alive, which ports are open, and what services and versions run behind them. Pre-installed on Kali.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Skan qanday ishlaydi","How a scan works")),
+    React.createElement(FlowSteps,{title:{uz:"Nmap skan jarayoni",en:"Nmap scan process"},steps:[
+      {icon:"📡",text:{uz:"Tirik xostlarni topish (host discovery)",en:"Discover live hosts (host discovery)"}},
+      {icon:"🚪",text:{uz:"Har portga so'rov yuborish",en:"Send a probe to each port"}},
+      {icon:"🔎",text:{uz:"Javob → open / closed / filtered",en:"Response → open / closed / filtered"}},
+      {icon:"🏷",text:{uz:"Ochiq portda xizmat + versiya aniqlanadi (-sV)",en:"Service + version detected on open ports (-sV)"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Skan turlari","Scan types")),
+    React.createElement(LayerStack,{layers:[
+      {n:"-sS",name:t(lang,"SYN (yashirin)","SYN (stealth)"),color:"#69db7c",desc:{uz:"Yarim ochiq — tez va yashirinroq (root).",en:"Half-open — fast and stealthier (root)."}},
+      {n:"-sV",name:t(lang,"Versiya","Version"),color:"#4dabf7",desc:{uz:"Xizmat va uning aniq versiyasi.",en:"The service and its exact version."}},
+      {n:"-O",name:"OS",color:"#a855f7",desc:{uz:"Operatsion tizimni taxmin qiladi.",en:"Fingerprints the OS."}},
+      {n:"-A",name:t(lang,"Agressiv","Aggressive"),color:"#ffd43b",desc:{uz:"-sV + -O + skriptlar + traceroute.",en:"-sV + -O + scripts + traceroute."}},
+    ]}),
+    React.createElement(Terminal,null,"nmap -sV -sC 10.0.0.5\nnmap -sn 10.0.0.0/24   # tirik xostlar\nnmap -p- 10.0.0.5      # barcha portlar"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Nmap ni faqat o'zingizga tegishli yoki yozma ruxsat berilgan tizimlarda ishlating.","Only run Nmap on systems you own or have written authorization to test.")),
+    React.createElement(Quiz,{q:{uz:"Nmap -sV nima qiladi?",en:"What does Nmap -sV do?"},opts:[{uz:"Faqat ping",en:"Only pings"},{uz:"Ochiq portdagi xizmat va versiyani aniqlaydi",en:"Detects service and version on an open port"},{uz:"Faylni o'chiradi",en:"Deletes a file"},{uz:"VPN yoqadi",en:"Enables a VPN"}],correct:1,exp:{uz:"-sV ochiq port ortidagi xizmat va uning versiyasini aniqlaydi — ma'lum zaifliklarni izlash uchun asos.",en:"-sV detects the service and version behind an open port — a basis for finding known vulnerabilities."}}));
+}function LessonL21(){
   const lang=useLang();
   const mods=[
     {name:"exploit",uz:"Muayyan zaiflikdan foydalanib nishonga kirish uchun ishlatiladigan kod.",en:"Code that leverages a specific vulnerability to gain access to a target."},
@@ -859,106 +813,53 @@ function LessonL03(){
 }function LessonL14(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"DNS enumeratsiya nima uchun?","Why DNS enumeration?")),
-    React.createElement(P,null,t(lang,
-      "DNS — internetning telefon kitobi. Enumeratsiya jarayonida biz nishon domenning subdomenlarini, pochta serverlarini (MX), nom serverlarini (NS) va IP manzillarini to'playmiz. Bu ma'lumotlar hujum yuzasini (attack surface) kengaytiradi.",
-      "DNS is the phone book of the internet. During enumeration we collect a target domain's subdomains, mail servers (MX), name servers (NS) and IP addresses. This information expands the attack surface."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Asosiy vositalar","Core tools")),
-    React.createElement(Terminal,null,
-      "# dig — moslashuvchan DNS so'rov vositasi\ndig example.com A\ndig example.com MX\ndig example.com NS\n\n# host — sodda va tez\nhost -t mx example.com\n\n# nslookup — interaktiv rejim ham bor\nnslookup example.com"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Zona transferi (AXFR)","Zone transfer (AXFR)")),
-    React.createElement(P,null,t(lang,
-      "Noto'g'ri sozlangan DNS serverlar butun zonani (barcha yozuvlarni) so'ralganda beradi. Bu — jiddiy noto'g'ri konfiguratsiya va pentestda oltin ma'lumot manbasi.",
-      "Misconfigured DNS servers hand over the entire zone (all records) on request. This is a serious misconfiguration and a goldmine of information in a pentest."
-    )),
-    React.createElement(Terminal,null,
-      "# Zona transferini sinash\ndig axfr @ns1.example.com example.com\n\n# dnsenum bilan avtomatik\ndnsenum example.com\n\n# dnsrecon bilan (brute-force subdomen)\ndnsrecon -d example.com -t brt -D /usr/share/wordlists/subdomains.txt"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Yozuv turlari: ","Record types: ")),
-      t(lang,"A (IPv4), AAAA (IPv6), MX (pochta), NS (nom serveri), CNAME (taxallus), TXT (matn, ko'pincha SPF/DKIM), SOA (zona boshi).",
-        "A (IPv4), AAAA (IPv6), MX (mail), NS (name server), CNAME (alias), TXT (text, often SPF/DKIM), SOA (start of authority).")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Noto'g'ri sozlangan DNS serverdan butun zona yozuvlarini olish urinishi qanday ataladi?",en:"What is the attempt to pull all zone records from a misconfigured DNS server called?"},
-      opts:[{uz:"Zona transferi (AXFR)",en:"Zone transfer (AXFR)"},{uz:"Reverse lookup",en:"Reverse lookup"},{uz:"Cache poisoning",en:"Cache poisoning"},{uz:"DNS tunneling",en:"DNS tunneling"}],
-      correct:0,
-      exp:{uz:"Zona transferi (AXFR) — bu domenning barcha DNS yozuvlarini bir so'rovda olish; ochiq qolgan AXFR jiddiy zaiflik hisoblanadi.",en:"A zone transfer (AXFR) retrieves all of a domain's DNS records in one request; an open AXFR is a serious vulnerability."}
-    })
-  );
-}
-
-// ── L16: Nikto ────────────────────────────────────────────────
-function LessonL16(){
+    React.createElement(P,null,t(lang,"DNS — internetning telefon kitobi. Enumeratsiyada nishon domenning subdomenlari, pochta serverlari (MX), nom serverlari (NS) va IP manzillari to'planadi. Bu hujum yuzasini kengaytiradi.","DNS is the internet's phone book. Enumeration collects a target domain's subdomains, mail servers (MX), name servers (NS) and IPs. This expands the attack surface.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Enumeratsiya oqimi","Enumeration flow")),
+    React.createElement(FlowSteps,{title:{uz:"DNS enumeratsiya",en:"DNS enumeration"},steps:[
+      {icon:"📇",text:{uz:"Asosiy yozuvlar: dig A, MX, NS",en:"Basic records: dig A, MX, NS"}},
+      {icon:"🔓",text:{uz:"Zona transferini sinash (AXFR) — ochiq bo'lsa oltin",en:"Try a zone transfer (AXFR) — a goldmine if open"}},
+      {icon:"🧩",text:{uz:"Subdomenlarni brute-force qilish (lug'at bilan)",en:"Brute-force subdomains (with a wordlist)"}},
+      {icon:"🗺",text:{uz:"Barcha topilgan xost/IP ni xaritalash",en:"Map all discovered hosts/IPs"}},
+    ]}),
+    React.createElement(Terminal,null,"dig axfr @ns1.example.com example.com   # zona transfer\ndnsenum example.com\ndnsrecon -d example.com -t brt -D subdomains.txt"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"DNS enumeratsiyani faqat sizga tegishli yoki ruxsat berilgan domenlarda o'tkazing.","Only perform DNS enumeration on domains you own or are authorized to test.")),
+    React.createElement(Quiz,{q:{uz:"Noto'g'ri sozlangan DNS serverdan butun zona yozuvlarini olish urinishi qanday ataladi?",en:"Pulling all zone records from a misconfigured DNS server is called?"},opts:[{uz:"Zona transferi (AXFR)",en:"Zone transfer (AXFR)"},{uz:"Reverse lookup",en:"Reverse lookup"},{uz:"Cache poisoning",en:"Cache poisoning"},{uz:"DNS tunneling",en:"DNS tunneling"}],correct:0,exp:{uz:"Zona transferi (AXFR) domenning barcha DNS yozuvlarini bir so'rovda oladi; ochiq AXFR jiddiy zaiflik.",en:"A zone transfer (AXFR) retrieves all DNS records in one request; an open AXFR is a serious vulnerability."}}));
+}function LessonL16(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Nikto nima?","What is Nikto?")),
-    React.createElement(P,null,t(lang,
-      "Nikto — ochiq kodli veb-server skaneri. U 6700+ potentsial xavfli fayl va dasturni, eskirgan server versiyalarini va konfiguratsiya muammolarini tekshiradi. Tez, lekin \"shovqinli\" — IDS/IPS uni oson aniqlaydi.",
-      "Nikto is an open-source web server scanner. It checks for 6700+ potentially dangerous files and programs, outdated server versions and configuration issues. It is fast but 'noisy' — IDS/IPS detect it easily."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Asosiy foydalanish","Basic usage")),
-    React.createElement(Terminal,null,
-      "# Oddiy skan\nnikto -h http://target.com\n\n# Muayyan portda\nnikto -h target.com -p 8080\n\n# HTTPS bilan\nnikto -h https://target.com -ssl\n\n# Natijani HTML faylga saqlash\nnikto -h target.com -o report.html -Format htm"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Foydali sozlamalar","Useful options")),
-    React.createElement(Terminal,null,
-      "# Faqat muayyan sinov turlarini ishga tushirish (Tuning)\n# 1=fayllar, 2=noto'g'ri konfig, 9=SQLi, x=teskari\nnikto -h target.com -Tuning 1234\n\n# Proksi orqali (Burp bilan tahlil uchun)\nnikto -h target.com -useproxy http://127.0.0.1:8080"
-    ),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"Nikto faqat sizga tegishli yoki yozma ruxsat berilgan tizimlarda ishlatilishi kerak. Ruxsatsiz skanerlash ko'p mamlakatlarda qonunga zid.",
-        "Nikto must only be used on systems you own or have written authorization to test. Unauthorized scanning is illegal in many countries.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Nikto haqida qaysi tavsif to'g'ri?",en:"Which description of Nikto is correct?"},
-      opts:[{uz:"Yashirin (stealth) parol buzuvchi",en:"A stealthy password cracker"},{uz:"Shovqinli veb-server zaiflik skaneri",en:"A noisy web server vulnerability scanner"},{uz:"Tarmoq snifferi",en:"A network sniffer"},{uz:"Ekspluatatsiya frameworki",en:"An exploitation framework"}],
-      correct:1,
-      exp:{uz:"Nikto — veb-serverlardagi ma'lum zaifliklar va noto'g'ri konfiguratsiyalarni tekshiruvchi skaner; u shovqinli, ya'ni himoya tizimlari uni oson aniqlaydi.",en:"Nikto is a scanner that checks web servers for known vulnerabilities and misconfigurations; it is noisy, meaning defenses detect it easily."}
-    })
-  );
-}
-
-// ── L20: Wireshark ────────────────────────────────────────────
-function LessonL20(){
+    React.createElement(P,null,t(lang,"Nikto — ochiq kodli veb-server skaneri. 6700+ potentsial xavfli fayl, eskirgan server versiyalari va konfiguratsiya muammolarini tekshiradi. Tez, lekin \"shovqinli\" — IDS/IPS uni oson aniqlaydi.","Nikto is an open-source web server scanner. It checks 6700+ potentially dangerous files, outdated server versions and config issues. Fast, but \"noisy\" — IDS/IPS detect it easily.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Skan oqimi","Scan flow")),
+    React.createElement(FlowSteps,{title:{uz:"Nikto skan",en:"Nikto scan"},steps:[
+      {icon:"🎯",text:{uz:"Nishon veb-serverga ulanish",en:"Connect to the target web server"}},
+      {icon:"🗂",text:{uz:"6700+ ma'lum xavfli yo'l/fayl sinovi",en:"Test 6700+ known dangerous paths/files"}},
+      {icon:"🏷",text:{uz:"Server versiyasi va sarlavhalarni tekshirish",en:"Check server version and headers"}},
+      {icon:"📋",text:{uz:"Topilmalar hisobotga yoziladi",en:"Findings written to a report"}},
+    ]}),
+    React.createElement(Terminal,null,"nikto -h http://target.com\nnikto -h target.com -p 8080\nnikto -h target.com -o report.html -Format htm"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Nikto ni faqat sizga tegishli yoki yozma ruxsat berilgan tizimlarda ishlating.","Only use Nikto on systems you own or are authorized to test.")),
+    React.createElement(Quiz,{q:{uz:"Nikto haqida qaysi tavsif to'g'ri?",en:"Which description of Nikto is correct?"},opts:[{uz:"Yashirin parol buzuvchi",en:"A stealthy password cracker"},{uz:"Shovqinli veb-server zaiflik skaneri",en:"A noisy web server vulnerability scanner"},{uz:"Tarmoq snifferi",en:"A network sniffer"},{uz:"Ekspluatatsiya frameworki",en:"An exploitation framework"}],correct:1,exp:{uz:"Nikto veb-serverlardagi ma'lum zaifliklarni tekshiruvchi skaner; u shovqinli — himoya tizimlari oson aniqlaydi.",en:"Nikto scans web servers for known vulnerabilities; it's noisy — defenses detect it easily."}}));
+}function LessonL20(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Wireshark nima?","What is Wireshark?")),
-    React.createElement(P,null,t(lang,
-      "Wireshark — dunyodagi eng mashhur tarmoq protokoli analizatori. U tarmoqdan o'tayotgan paketlarni real vaqtda ushlaydi va ularni batafsil, qatlam-qatlam ko'rsatadi. Muammolarni tuzatish, o'rganish va shifrlanmagan ma'lumotlarni tahlil qilish uchun ishlatiladi.",
-      "Wireshark is the world's most popular network protocol analyzer. It captures packets crossing the network in real time and displays them in detail, layer by layer. It is used for troubleshooting, learning and analyzing unencrypted data."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Ushlash va filtrlar","Capture and filters")),
-    React.createElement(P,null,t(lang,
-      "Wireshark ikki xil filtrga ega: ushlash filtri (capture filter) — nimani yozib olishni cheklaydi; ko'rsatish filtri (display filter) — yozilganidan nimani ko'rsatishni cheklaydi. Ko'rsatish filtrlari ancha kuchli.",
-      "Wireshark has two kinds of filters: capture filters limit what gets recorded; display filters limit what is shown from what was recorded. Display filters are far more powerful."
-    )),
-    React.createElement(Terminal,null,
-      "# Keng tarqalgan ko'rsatish filtrlari:\nip.addr == 10.0.0.5          # muayyan IP\ntcp.port == 80               # HTTP trafigi\nhttp                         # faqat HTTP\ndns                          # faqat DNS so'rovlar\ntcp.flags.syn == 1           # SYN paketlar\nhttp.request.method == \"POST\"  # POST so'rovlar"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Oqimni kuzatish (Follow Stream)","Follow Stream")),
-    React.createElement(P,null,t(lang,
-      "Paketga o'ng tugma bosib \"Follow > TCP Stream\" ni tanlang — bu bitta ulanishning butun suhbatini bir oynada ko'rsatadi. Shifrlanmagan protokollarda (HTTP, FTP, Telnet) bu login va parollarni ochib berishi mumkin.",
-      "Right-click a packet and choose 'Follow > TCP Stream' to see an entire conversation of a single connection in one window. On unencrypted protocols (HTTP, FTP, Telnet) this can reveal logins and passwords."
-    )),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"tshark: ","tshark: ")),
-      t(lang,"Wireshark'ning terminal versiyasi. Skriptlar va masofaviy serverlar uchun qulay: tshark -i eth0 -f \"port 80\"",
-        "The terminal version of Wireshark. Handy for scripts and remote servers: tshark -i eth0 -f \"port 80\"")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Yozib olingan paketlardan faqat kerakligini ko'rsatish uchun qaysi filtr ishlatiladi?",en:"Which filter is used to show only relevant packets from those already captured?"},
-      opts:[{uz:"Capture filter (ushlash filtri)",en:"Capture filter"},{uz:"Display filter (ko'rsatish filtri)",en:"Display filter"},{uz:"Firewall qoidasi",en:"Firewall rule"},{uz:"NAT jadvali",en:"NAT table"}],
-      correct:1,
-      exp:{uz:"Ko'rsatish filtri (display filter) allaqachon ushlangan paketlardan nimani ko'rsatishni belgilaydi va ancha moslashuvchan.",en:"The display filter defines what to show from already-captured packets and is much more flexible."}
-    })
-  );
-}
-
-// ── L24: Hydra ────────────────────────────────────────────────
-function LessonL24(){
+    React.createElement(P,null,t(lang,"Wireshark — tarmoqdan o'tayotgan paketlarni real vaqtda ushlab, batafsil ko'rsatuvchi vosita. U tarmoqni \"rentgen\" qilib ko'rsatadi. Muammolarni topish, o'rganish va xavfsizlik tahlili uchun.","Wireshark captures packets crossing the network in real time and shows them in detail — an \"X-ray\" of the network. For troubleshooting, learning and security analysis.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Ish jarayoni","Workflow")),
+    React.createElement(FlowSteps,{title:{uz:"Wireshark bilan tahlil",en:"Analyzing with Wireshark"},steps:[
+      {icon:"🎣",text:{uz:"Interfeysni tanlab paketlarni ushlash",en:"Pick an interface and capture packets"}},
+      {icon:"🔍",text:{uz:"Ko'rsatish filtri bilan keraklisini ajratish",en:"Narrow down with a display filter"}},
+      {icon:"🧵",text:{uz:"\"Follow TCP Stream\" bilan suhbatni ko'rish",en:"See a conversation with \"Follow TCP Stream\""}},
+      {icon:"🔑",text:{uz:"Shifrlanmagan protokolda login/parol ko'rinishi mumkin",en:"On unencrypted protocols, logins/passwords may appear"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Foydali filtrlar","Useful filters")),
+    React.createElement(Terminal,null,"ip.addr == 10.0.0.5\ntcp.port == 80\nhttp.request.method == \"POST\"\ndns"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Boshqalarning trafigini ruxsatsiz ushlash maxfiylikni buzadi. Faqat o'z tarmog'ingiz yoki ruxsat berilgan muhitda.","Capturing others' traffic without permission violates privacy. Only on your own network or an authorized environment.")),
+    React.createElement(Quiz,{q:{uz:"Ushlangan paketlardan faqat keraklisini ko'rsatish uchun nima ishlatiladi?",en:"What shows only the relevant captured packets?"},opts:[{uz:"Display filter",en:"A display filter"},{uz:"Firewall qoidasi",en:"A firewall rule"},{uz:"DNS yozuvi",en:"A DNS record"},{uz:"VPN tunnel",en:"A VPN tunnel"}],correct:0,exp:{uz:"Ko'rsatish filtri (masalan http yoki ip.addr==...) minglab paketdan keraklisini ajratadi.",en:"A display filter (e.g. http or ip.addr==...) narrows thousands of packets to the ones you need."}}));
+}function LessonL24(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(H2,{num:"§1"},t(lang,"Hydra nima?","What is Hydra?")),
@@ -1189,187 +1090,99 @@ function LessonL02(){
 }function LessonL12(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Netdiscover nima?","What is Netdiscover?")),
-    React.createElement(P,null,t(lang,
-      "Netdiscover — ARP so'rovlari yordamida lokal tarmoqdagi tirik xostlarni topadigan vosita. U ping'ga tayanmaydi, shuning uchun ICMP'ni bloklaydigan xostlarni ham aniqlaydi. Tarmoq xaritasini tuzishning eng birinchi qadami.",
-      "Netdiscover finds live hosts on the local network using ARP requests. It doesn't rely on ping, so it detects even hosts that block ICMP. It's the very first step in mapping a network."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
-    React.createElement(Terminal,null,
-      "# Aniq diapazonni skanerlash (tez, aktiv)\nsudo netdiscover -r 10.0.0.0/24\n\n# Muayyan interfeys bo'yicha\nsudo netdiscover -i eth0\n\n# Passiv rejim — faqat tinglaydi, so'rov yubormaydi (yashirin)\nsudo netdiscover -p"
-    ),
-    React.createElement(P,null,t(lang,
-      "Natijada har bir tirik xostning IP manzili, MAC manzili va tarmoq kartasi ishlab chiqaruvchisi (vendor) ko'rsatiladi. MAC vendor ko'pincha qurilma turini (masalan router, printer, VM) ochib beradi.",
-      "The output shows each live host's IP address, MAC address and network card vendor. The MAC vendor often reveals the device type (e.g. router, printer, VM)."
-    )),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Passiv vs aktiv: ","Passive vs active: ")),
-      t(lang,"Passiv rejim (-p) hech qanday paket yubormay, faqat tarmoqdagi ARP trafigini tinglaydi — bu deyarli aniqlanmaydi, lekin sekinroq. Aktiv rejim tezroq, lekin tarmoqqa iz qoldiradi.",
-        "Passive mode (-p) sends no packets and just listens to ARP traffic on the network — nearly undetectable but slower. Active mode is faster but leaves a trace on the network.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Netdiscover qanday protokol yordamida tirik xostlarni topadi?",en:"Which protocol does Netdiscover use to find live hosts?"},
-      opts:[{uz:"ICMP (ping)",en:"ICMP (ping)"},{uz:"ARP",en:"ARP"},{uz:"DNS",en:"DNS"},{uz:"HTTP",en:"HTTP"}],
-      correct:1,
-      exp:{uz:"Netdiscover ARP so'rovlaridan foydalanadi, shuning uchun u ping'ni (ICMP) bloklaydigan xostlarni ham aniqlaydi.",en:"Netdiscover uses ARP requests, so it detects hosts even if they block ping (ICMP)."}
-    })
-  );
-}
-
-// ── L13: Masscan ──────────────────────────────────────────────
-function LessonL13(){
+    React.createElement(P,null,t(lang,"Netdiscover — ARP so'rovlari yordamida lokal tarmoqdagi tirik xostlarni topadi. U ping'ga tayanmaydi, shuning uchun ICMP'ni bloklaydigan xostlarni ham aniqlaydi. Tarmoq xaritasini tuzishning birinchi qadami.","Netdiscover finds live hosts on the local network using ARP requests. It doesn't rely on ping, so it detects even hosts that block ICMP. The first step in mapping a network.")),
+    React.createElement(H2,{num:"§2"},t(lang,"ARP orqali topish","Discovery via ARP")),
+    React.createElement(PacketFlow,{from:{uz:"Kali",en:"Kali"},to:{uz:"Butun tarmoq",en:"The whole LAN"},label:"ARP who-has",color:"#a855f7"}),
+    React.createElement(FlowSteps,{title:{uz:"Netdiscover oqimi",en:"Netdiscover flow"},steps:[
+      {icon:"📢",text:{uz:"Tarmoqqa ARP so'rovlari yuboriladi",en:"ARP requests are broadcast to the network"}},
+      {icon:"🙋",text:{uz:"Har tirik xost o'z MAC bilan javob beradi",en:"Each live host replies with its MAC"}},
+      {icon:"🗺",text:{uz:"IP + MAC + ishlab chiqaruvchi ro'yxatlanadi",en:"IP + MAC + vendor are listed"}},
+    ]}),
+    React.createElement(Terminal,null,"sudo netdiscover -r 10.0.0.0/24\nsudo netdiscover -p          # passiv (yashirin)"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Faqat o'z tarmog'ingizda yoki ruxsat berilgan muhitda ishlating.","Use only on your own network or an authorized environment.")),
+    React.createElement(Quiz,{q:{uz:"Netdiscover qaysi protokol bilan tirik xostlarni topadi?",en:"Which protocol does Netdiscover use to find live hosts?"},opts:[{uz:"ICMP (ping)",en:"ICMP (ping)"},{uz:"ARP",en:"ARP"},{uz:"DNS",en:"DNS"},{uz:"HTTP",en:"HTTP"}],correct:1,exp:{uz:"Netdiscover ARP so'rovlaridan foydalanadi — shuning uchun ping'ni bloklaydigan xostlarni ham aniqlaydi.",en:"Netdiscover uses ARP requests — so it detects hosts even if they block ping."}}));
+}function LessonL13(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Masscan nima?","What is Masscan?")),
-    React.createElement(P,null,t(lang,
-      "Masscan — dunyodagi eng tezkor port skaneri. U o'zining TCP/IP stekidan foydalanib, teoretik jihatdan butun internetni bir necha daqiqada skanerlay oladi. Nmap'dan yuzlab marta tez, lekin kamroq batafsil.",
-      "Masscan is the fastest port scanner in the world. Using its own TCP/IP stack, it can theoretically scan the entire internet in minutes. It's hundreds of times faster than Nmap, but less detailed."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
-    React.createElement(Terminal,null,
-      "# Bitta portni katta diapazonda skanerlash\nsudo masscan 10.0.0.0/16 -p80\n\n# Bir necha port, tezlikni cheklab\nsudo masscan 10.0.0.0/24 -p22,80,443 --rate=1000\n\n# Barcha portlar\nsudo masscan 10.0.0.5 -p0-65535 --rate=10000"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Masscan + Nmap ish oqimi","The Masscan + Nmap workflow")),
-    React.createElement(P,null,t(lang,
-      "Amaliyotda ikkovi birga ishlatiladi: Masscan katta diapazonda ochiq portlarni tez topadi, keyin Nmap topilgan portlarni chuqur (versiya, xizmat) tekshiradi. Bu tezlik va batafsillikni birlashtiradi.",
-      "In practice the two are used together: Masscan quickly finds open ports across a large range, then Nmap deeply inspects the found ports (version, service). This combines speed and detail."
-    )),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"--rate ni ehtiyotkorlik bilan sozlang. Juda yuqori tezlik tarmoqni to'ldirib, xizmatlarni ishdan chiqarishi (DoS) va sizni darhol aniqlashi mumkin. Faqat ruxsat berilgan tarmoqlarda ishlating.",
-        "Set --rate carefully. A very high rate can flood the network, knock out services (DoS) and get you detected instantly. Only use it on authorized networks.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Masscan va Nmap odatda qanday birga ishlatiladi?",en:"How are Masscan and Nmap typically used together?"},
-      opts:[{uz:"Masscan tez topadi, Nmap chuqur tekshiradi",en:"Masscan finds fast, Nmap inspects deeply"},{uz:"Ikkalasi bir xil ishni qiladi",en:"They do the exact same job"},{uz:"Nmap avval, Masscan keyin bekor qiladi",en:"Nmap first, Masscan cancels it"},{uz:"Ular birga ishlamaydi",en:"They cannot work together"}],
-      correct:0,
-      exp:{uz:"Masscan katta diapazonda ochiq portlarni tez aniqlaydi, so'ng Nmap o'sha portlarni versiya va xizmat aniqlash uchun batafsil skanerlaydi.",en:"Masscan rapidly finds open ports over a large range, then Nmap scans those ports in detail for version and service detection."}
-    })
-  );
-}
-
-// ── L15: theHarvester ─────────────────────────────────────────
-function LessonL15(){
+    React.createElement(P,null,t(lang,"Masscan — dunyodagi eng tezkor port skaneri. O'zining TCP/IP stekidan foydalanib, teoretik jihatdan butun internetni bir necha daqiqada skanerlay oladi. Nmap'dan yuzlab marta tez, lekin kamroq batafsil.","Masscan is the fastest port scanner in the world. Using its own TCP/IP stack, it can theoretically scan the entire internet in minutes. Hundreds of times faster than Nmap, but less detailed.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Masscan + Nmap ish oqimi","The Masscan + Nmap workflow")),
+    React.createElement(FlowSteps,{title:{uz:"Tez + batafsil",en:"Fast + detailed"},steps:[
+      {icon:"⚡",text:{uz:"Masscan katta diapazonda ochiq portlarni tez topadi",en:"Masscan quickly finds open ports over a large range"}},
+      {icon:"📋",text:{uz:"Topilgan portlar ro'yxati olinadi",en:"The list of found ports is collected"}},
+      {icon:"🔬",text:{uz:"Nmap o'sha portlarni chuqur tekshiradi (-sV)",en:"Nmap inspects those ports in detail (-sV)"}},
+    ]}),
+    React.createElement(Terminal,null,"sudo masscan 10.0.0.0/24 -p22,80,443 --rate=1000\n# keyin topilgan portlarni Nmap bilan:\nnmap -sV -p22,80,443 10.0.0.5"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"--rate ni ehtiyotkorlik bilan sozlang — juda yuqori tezlik xizmatlarni ishdan chiqarishi (DoS) mumkin. Faqat ruxsat berilgan tarmoqlarda.","Set --rate carefully — too high can knock out services (DoS). Only on authorized networks.")),
+    React.createElement(Quiz,{q:{uz:"Masscan va Nmap odatda qanday birga ishlatiladi?",en:"How are Masscan and Nmap typically used together?"},opts:[{uz:"Masscan tez topadi, Nmap chuqur tekshiradi",en:"Masscan finds fast, Nmap inspects deeply"},{uz:"Ikkalasi bir xil ish",en:"They do the same job"},{uz:"Ular birga ishlamaydi",en:"They can't work together"},{uz:"Nmap avval bekor qiladi",en:"Nmap cancels it"}],correct:0,exp:{uz:"Masscan ochiq portlarni tez topadi, so'ng Nmap ularni versiya/xizmat uchun batafsil skanerlaydi.",en:"Masscan rapidly finds open ports, then Nmap scans them in detail for version/service."}}));
+}function LessonL15(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"theHarvester nima?","What is theHarvester?")),
-    React.createElement(P,null,t(lang,
-      "theHarvester — ochiq manba razvedkasi (OSINT) vositasi. U ochiq manbalardan (qidiruv tizimlari, PGP serverlari, Shodan) nishon tashkilotning email manzillari, subdomenlari, xodim ismlari va IP'larini to'playdi — nishonga hech qanday paket yubormasdan.",
-      "theHarvester is an open-source intelligence (OSINT) tool. It gathers a target organization's email addresses, subdomains, employee names and IPs from public sources (search engines, PGP servers, Shodan) — without sending any packets to the target."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
-    React.createElement(Terminal,null,
-      "# Google orqali email va subdomenlar\ntheHarvester -d example.com -b google\n\n# Bir necha manba birdan\ntheHarvester -d example.com -b bing,duckduckgo,crtsh\n\n# Natijani HTML/XML'ga saqlash\ntheHarvester -d example.com -b all -f natija"
-    ),
-    React.createElement(P,null,t(lang,
-      "Bu passiv razvedka — nishon buni bilmaydi, chunki barcha ma'lumot uchinchi tomon manbalaridan olinadi. Topilgan email manzillar keyingi phishing yoki parol hujumlari uchun ro'yxat bo'lib xizmat qiladi.",
-      "This is passive reconnaissance — the target never knows, since all data comes from third-party sources. The discovered email addresses serve as a list for later phishing or password attacks."
-    )),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"crt.sh manbasi: ","The crt.sh source: ")),
-      t(lang,"crtsh manbasi SSL sertifikat shaffoflik jurnallaridan subdomenlarni topadi — bu ko'pincha yashirin ichki subdomenlarni ham ochib beradi.",
-        "The crtsh source finds subdomains from SSL certificate transparency logs — this often reveals hidden internal subdomains too.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"theHarvester qanday razvedka turiga misol?",en:"What type of reconnaissance is theHarvester an example of?"},
-      opts:[{uz:"Aktiv (nishonga to'g'ridan hujum)",en:"Active (directly probing the target)"},{uz:"Passiv (ochiq manba OSINT)",en:"Passive (open-source OSINT)"},{uz:"Ekspluatatsiya",en:"Exploitation"},{uz:"Post-ekspluatatsiya",en:"Post-exploitation"}],
-      correct:1,
-      exp:{uz:"theHarvester passiv OSINT vositasi — u ma'lumotni uchinchi tomon ochiq manbalaridan oladi va nishonga hech narsa yubormaydi.",en:"theHarvester is a passive OSINT tool — it pulls data from third-party public sources and sends nothing to the target."}
-    })
-  );
-}
-
-// ── L17: WhatWeb ──────────────────────────────────────────────
-function LessonL17(){
+    React.createElement(P,null,t(lang,"theHarvester — ochiq manba razvedkasi (OSINT) vositasi. Ochiq manbalardan (qidiruv tizimlari, sertifikat jurnallari) nishon email manzillari, subdomenlari va IP'larini to'playdi — nishonga hech qanday paket yubormasdan.","theHarvester is an OSINT tool. It gathers a target's email addresses, subdomains and IPs from public sources (search engines, certificate logs) — without sending any packets to the target.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Passiv razvedka oqimi","Passive recon flow")),
+    React.createElement(FlowSteps,{title:{uz:"theHarvester",en:"theHarvester"},steps:[
+      {icon:"🌐",text:{uz:"Ochiq manbalarni so'rash (Google, Bing, crt.sh)",en:"Query public sources (Google, Bing, crt.sh)"}},
+      {icon:"📧",text:{uz:"Email va subdomenlar yig'iladi",en:"Emails and subdomains are collected"}},
+      {icon:"🕵",text:{uz:"Nishon buni sezmaydi (passiv)",en:"The target never notices (passive)"}},
+      {icon:"📄",text:{uz:"Natija keyingi hujum uchun ro'yxat bo'ladi",en:"Results become a list for later attacks"}},
+    ]}),
+    React.createElement(Terminal,null,"theHarvester -d example.com -b google\ntheHarvester -d example.com -b crtsh   # sertifikat jurnallari"),
+    React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"crt.sh manbasi SSL sertifikat jurnallaridan yashirin ichki subdomenlarni ham ochib beradi.","The crt.sh source reveals hidden internal subdomains from SSL certificate logs.")),
+    React.createElement(Quiz,{q:{uz:"theHarvester qanday razvedka turiga misol?",en:"What type of recon is theHarvester?"},opts:[{uz:"Aktiv (nishonga hujum)",en:"Active (probing the target)"},{uz:"Passiv (ochiq manba OSINT)",en:"Passive (open-source OSINT)"},{uz:"Ekspluatatsiya",en:"Exploitation"},{uz:"Post-ekspluatatsiya",en:"Post-exploitation"}],correct:1,exp:{uz:"theHarvester passiv OSINT — ma'lumotni uchinchi tomon manbalaridan oladi, nishonga hech narsa yubormaydi.",en:"theHarvester is passive OSINT — it pulls data from third-party sources and sends nothing to the target."}}));
+}function LessonL17(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"WhatWeb nima?","What is WhatWeb?")),
-    React.createElement(P,null,t(lang,
-      "WhatWeb — veb-saytning \"ostida\" qanday texnologiyalar ishlayotganini aniqlaydi: CMS (WordPress, Joomla), veb-server (Apache, Nginx), dasturlash tili, JavaScript kutubxonalari, analitika va hatto versiyalar. Bu zaifliklarni izlashning boshlanish nuqtasi.",
-      "WhatWeb identifies which technologies run 'under the hood' of a website: CMS (WordPress, Joomla), web server (Apache, Nginx), programming language, JavaScript libraries, analytics and even versions. This is the starting point for finding vulnerabilities."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
-    React.createElement(Terminal,null,
-      "# Oddiy tekshiruv\nwhatweb example.com\n\n# Batafsil (verbose) — ko'proq ma'lumot\nwhatweb -v example.com\n\n# Agressivlik darajasi (3 = ko'proq so'rov, aniqroq)\nwhatweb -a 3 example.com\n\n# Ko'p saytni birdan (fayldan)\nwhatweb -i targets.txt"
-    ),
-    React.createElement(P,null,t(lang,
-      "Masalan, WhatWeb saytda \"WordPress 5.2\" ekanini aniqlasa, siz o'sha aniq versiyaga tegishli ma'lum zaifliklarni (searchsploit wordpress 5.2) izlashingiz mumkin. Texnologiya + versiya = maqsadli hujum.",
-      "For example, if WhatWeb detects 'WordPress 5.2' on a site, you can look up known vulnerabilities for that exact version (searchsploit wordpress 5.2). Technology + version = a targeted attack."
-    )),
-    React.createElement(Quiz,{
-      q:{uz:"WhatWeb asosan nimani aniqlaydi?",en:"What does WhatWeb primarily identify?"},
-      opts:[{uz:"Parol hashlarini",en:"Password hashes"},{uz:"Veb-saytning texnologiya stekini",en:"A website's technology stack"},{uz:"Ochiq UDP portlarni",en:"Open UDP ports"},{uz:"WiFi parollarini",en:"WiFi passwords"}],
-      correct:1,
-      exp:{uz:"WhatWeb veb-sayt ortidagi texnologiyalarni (CMS, server, til, kutubxonalar va versiyalar) aniqlaydi — bu maqsadli zaiflik izlash uchun asos beradi.",en:"WhatWeb detects the technologies behind a website (CMS, server, language, libraries and versions) — providing a basis for targeted vulnerability research."}
-    })
-  );
-}
-
-// ── L18: enum4linux ───────────────────────────────────────────
-function LessonL18(){
+    React.createElement(P,null,t(lang,"WhatWeb veb-saytning \"ostida\" qanday texnologiyalar ishlayotganini aniqlaydi: CMS, veb-server, dasturlash tili, kutubxonalar va hatto versiyalar. Bu zaifliklarni izlashning boshlanish nuqtasi.","WhatWeb identifies the technologies running \"under the hood\" of a site: CMS, web server, language, libraries and even versions. This is the starting point for finding vulnerabilities.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Nima aniqlanadi","What it detects")),
+    React.createElement(LayerStack,{layers:[
+      {n:"🧩",name:"CMS",color:"#a855f7",desc:{uz:"WordPress, Joomla, Drupal + versiya.",en:"WordPress, Joomla, Drupal + version."}},
+      {n:"🖥",name:t(lang,"Veb-server","Web server"),color:"#4dabf7",desc:{uz:"Apache, Nginx, IIS.",en:"Apache, Nginx, IIS."}},
+      {n:"⚙",name:t(lang,"Til/framework","Language/framework"),color:"#69db7c",desc:{uz:"PHP, ASP.NET, Node.",en:"PHP, ASP.NET, Node."}},
+      {n:"📊",name:t(lang,"Analitika/JS","Analytics/JS"),color:"#ffd43b",desc:{uz:"jQuery, Google Analytics.",en:"jQuery, Google Analytics."}},
+    ]}),
+    React.createElement(Terminal,null,"whatweb example.com\nwhatweb -v -a 3 example.com   # batafsil, agressiv"),
+    React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"\"WordPress 5.2\" aniqlansa — searchsploit wordpress 5.2 bilan ma'lum zaifliklarni izlaysiz. Texnologiya + versiya = maqsadli hujum.","If it detects \"WordPress 5.2\" — you look up known vulns with searchsploit wordpress 5.2. Technology + version = a targeted attack.")),
+    React.createElement(Quiz,{q:{uz:"WhatWeb asosan nimani aniqlaydi?",en:"What does WhatWeb primarily identify?"},opts:[{uz:"Parol hashlarini",en:"Password hashes"},{uz:"Veb-saytning texnologiya stekini",en:"A website's technology stack"},{uz:"Ochiq UDP portlarni",en:"Open UDP ports"},{uz:"WiFi parollarini",en:"WiFi passwords"}],correct:1,exp:{uz:"WhatWeb veb-sayt ortidagi texnologiyalarni (CMS, server, til, versiyalar) aniqlaydi.",en:"WhatWeb detects the technologies behind a site (CMS, server, language, versions)."}}));
+}function LessonL18(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"enum4linux nima?","What is enum4linux?")),
-    React.createElement(P,null,t(lang,
-      "enum4linux — Windows va Samba tizimlaridan SMB protokoli orqali ma'lumot to'playdigan vosita. U foydalanuvchilar ro'yxati, guruhlar, ulashilgan papkalar (shares), parol siyosati va operatsion tizim ma'lumotlarini chiqarib olishga urinadi — ko'pincha autentifikatsiyasiz (null session).",
-      "enum4linux gathers information from Windows and Samba systems over the SMB protocol. It attempts to extract the user list, groups, shared folders (shares), password policy and OS details — often without authentication (a null session)."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Foydalanish","Usage")),
-    React.createElement(Terminal,null,
-      "# To'liq enumeratsiya (barcha tekshiruvlar)\nenum4linux -a 10.0.0.5\n\n# Faqat foydalanuvchilar\nenum4linux -U 10.0.0.5\n\n# Faqat ulashilgan papkalar\nenum4linux -S 10.0.0.5\n\n# Zamonaviy Python versiyasi\nenum4linux-ng -A 10.0.0.5"
-    ),
-    React.createElement(P,null,t(lang,
-      "\"Null session\" — bu foydalanuvchi nomi va parolsiz SMB'ga ulanish. Eski yoki noto'g'ri sozlangan Windows tizimlari null session'ga ruxsat beradi va bu butun foydalanuvchilar ro'yxatini ochib berishi mumkin.",
-      "A 'null session' is a connection to SMB with no username or password. Old or misconfigured Windows systems allow null sessions, which can leak the entire user list."
-    )),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"enum4linux 139 va 445 portlar (SMB) ochiq bo'lganda ishlaydi. Topilgan foydalanuvchi ismlari keyinchalik parol hujumlari uchun ishlatilishi mumkin — faqat ruxsat berilgan nishonlarda.",
-        "enum4linux works when ports 139 and 445 (SMB) are open. Discovered usernames may later be used in password attacks — only on authorized targets.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"enum4linux qaysi protokol orqali ma'lumot to'playdi?",en:"Over which protocol does enum4linux gather information?"},
-      opts:[{uz:"SMB",en:"SMB"},{uz:"DNS",en:"DNS"},{uz:"SMTP",en:"SMTP"},{uz:"SNMP",en:"SNMP"}],
-      correct:0,
-      exp:{uz:"enum4linux SMB protokoli (139/445 portlar) orqali Windows/Samba tizimlaridan foydalanuvchilar, guruhlar va ulashmalarni sanaydi.",en:"enum4linux uses the SMB protocol (ports 139/445) to enumerate users, groups and shares from Windows/Samba systems."}
-    })
-  );
-}
-
-// ── L19: SMB enumeration ──────────────────────────────────────
-function LessonL19(){
+    React.createElement(P,null,t(lang,"enum4linux — Windows va Samba tizimlaridan SMB protokoli orqali ma'lumot to'playdi: foydalanuvchilar, guruhlar, ulashmalar, parol siyosati — ko'pincha autentifikatsiyasiz (null session).","enum4linux gathers info from Windows and Samba systems over SMB: users, groups, shares, password policy — often without authentication (a null session).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Enumeratsiya oqimi","Enumeration flow")),
+    React.createElement(FlowSteps,{title:{uz:"enum4linux",en:"enum4linux"},steps:[
+      {icon:"🔌",text:{uz:"SMB'ga null session bilan ulanish (parolsiz)",en:"Connect to SMB with a null session (no password)"}},
+      {icon:"👥",text:{uz:"Foydalanuvchilar va guruhlarni sanash",en:"Enumerate users and groups"}},
+      {icon:"📂",text:{uz:"Ulashilgan papkalarni ro'yxatlash",en:"List shared folders"}},
+      {icon:"📋",text:{uz:"OS va parol siyosati ma'lumoti",en:"OS and password-policy info"}},
+    ]}),
+    React.createElement(Terminal,null,"enum4linux -a 10.0.0.5     # to'liq\nenum4linux-ng -A 10.0.0.5  # zamonaviy versiya"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"enum4linux 139/445 portlar ochiq bo'lganda ishlaydi. Faqat ruxsat berilgan nishonlarda.","enum4linux works when ports 139/445 are open. Only on authorized targets.")),
+    React.createElement(Quiz,{q:{uz:"enum4linux qaysi protokol orqali ma'lumot to'playdi?",en:"Over which protocol does enum4linux gather info?"},opts:[{uz:"SMB",en:"SMB"},{uz:"DNS",en:"DNS"},{uz:"SMTP",en:"SMTP"},{uz:"SNMP",en:"SNMP"}],correct:0,exp:{uz:"enum4linux SMB (139/445) orqali Windows/Samba dan foydalanuvchi, guruh va ulashmalarni sanaydi.",en:"enum4linux uses SMB (139/445) to enumerate users, groups and shares from Windows/Samba."}}));
+}function LessonL19(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"SMB va nima uchun muhim","SMB and why it matters")),
-    React.createElement(P,null,t(lang,
-      "SMB (Server Message Block) — Windows tarmoqlarida fayl va printerlarni ulashish protokoli. U 445-portda ishlaydi va korporativ tarmoqlarda hamma joyda uchraydi. Noto'g'ri sozlangan SMB ulashmalari maxfiy fayllar, parollar va konfiguratsiyalarni ochib berishi mumkin.",
-      "SMB (Server Message Block) is the file and printer sharing protocol in Windows networks. It runs on port 445 and is everywhere in corporate networks. Misconfigured SMB shares can expose confidential files, passwords and configurations."
-    )),
+    React.createElement(P,null,t(lang,"SMB — Windows tarmoqlarida fayl va printer ulashish protokoli. 445-portda ishlaydi va korporativ tarmoqlarda hamma joyda. Noto'g'ri sozlangan SMB ulashmalari maxfiy fayllarni ochib berishi mumkin.","SMB is the file/printer sharing protocol in Windows networks. It runs on port 445 and is everywhere in corporate networks. Misconfigured SMB shares can expose confidential files.")),
     React.createElement(H2,{num:"§2"},t(lang,"Ulashmalarni sanash","Enumerating shares")),
-    React.createElement(Terminal,null,
-      "# Ulashmalar ro'yxati (anonim)\nsmbclient -L //10.0.0.5 -N\n\n# Barcha xostlarda ulashmalarni xaritalash\nsmbmap -H 10.0.0.5\n\n# Nmap SMB skriptlari\nnmap --script smb-enum-shares,smb-os-discovery -p445 10.0.0.5"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Ulashmaga ulanish","Connecting to a share")),
-    React.createElement(Terminal,null,
-      "# Muayyan ulashmaga ulanish\nsmbclient //10.0.0.5/Documents -N\n\n# Ichida: fayllarni ko'rish va yuklab olish\nsmb: \\> ls\nsmb: \\> get maxfiy.txt\nsmb: \\> exit"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"EternalBlue: ","EternalBlue: ")),
-      t(lang,"Eski SMBv1 (MS17-010, EternalBlue) tarixdagi eng mashhur zaifliklardan biri. nmap --script smb-vuln-ms17-010 bilan tekshirib ko'ring — u hali ham ko'p eski tizimlarda ochiq.",
-        "The old SMBv1 (MS17-010, EternalBlue) is one of the most famous vulnerabilities in history. Check for it with nmap --script smb-vuln-ms17-010 — it is still open on many legacy systems.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"SMB protokoli qaysi asosiy portda ishlaydi?",en:"On which main port does the SMB protocol run?"},
-      opts:[{uz:"22",en:"22"},{uz:"80",en:"80"},{uz:"445",en:"445"},{uz:"53",en:"53"}],
-      correct:2,
-      exp:{uz:"SMB asosan 445-portda (eski hollarda 139) ishlaydi va Windows tarmoqlarida fayl ulashish uchun ishlatiladi.",en:"SMB runs mainly on port 445 (139 in legacy cases) and is used for file sharing in Windows networks."}
-    })
-  );
-}
-
-
-// ── L22: msfvenom ─────────────────────────────────────────────
-function LessonL22(){
+    React.createElement(FlowSteps,{title:{uz:"SMB ulashmalari",en:"SMB shares"},steps:[
+      {icon:"📋",text:{uz:"smbclient -L bilan ulashmalar ro'yxati",en:"List shares with smbclient -L"}},
+      {icon:"🗺",text:{uz:"smbmap bilan ruxsatlarni xaritalash",en:"Map permissions with smbmap"}},
+      {icon:"📂",text:{uz:"Ulashmaga ulanib fayllarni ko'rish",en:"Connect and browse files"}},
+      {icon:"⬇",text:{uz:"Qiziqarli fayllarni yuklab olish (get)",en:"Download interesting files (get)"}},
+    ]}),
+    React.createElement(Terminal,null,"smbclient -L //10.0.0.5 -N        # anonim\nsmbmap -H 10.0.0.5\nnmap --script smb-vuln-ms17-010 -p445 10.0.0.5  # EternalBlue"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"SMB enumeratsiyani faqat sizga tegishli yoki ruxsat berilgan tizimlarda o'tkazing.","Only perform SMB enumeration on systems you own or are authorized to test.")),
+    React.createElement(Quiz,{q:{uz:"SMB protokoli qaysi asosiy portda ishlaydi?",en:"On which main port does SMB run?"},opts:[{uz:"22",en:"22"},{uz:"80",en:"80"},{uz:"445",en:"445"},{uz:"53",en:"53"}],correct:2,exp:{uz:"SMB asosan 445-portda (eski hollarda 139) ishlaydi.",en:"SMB runs mainly on port 445 (139 in legacy cases)."}}));
+}function LessonL22(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(H2,{num:"§1"},t(lang,"msfvenom nima?","What is msfvenom?")),
