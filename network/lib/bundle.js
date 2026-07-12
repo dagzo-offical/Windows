@@ -239,6 +239,83 @@ function NodeMap({nodes,links,color,label}){
         n[2]&&React.createElement("text",{x:n[0],y:n[1]+22,fill:"var(--text-2)",fontSize:8,textAnchor:"middle",fontFamily:"var(--font-mono)"},n[2])))));
 }
 
+function DMZSim(){
+  const lang=useLang();
+  const POS={internet:[13,50],extfw:[50,15],dmz:[50,50],intfw:[50,85],lan:[87,50]};
+  const A="#69db7c",D="#ff3a5e",O="#ffa94d",BL="#4dabf7",Y="#ffd43b";
+  const SC={
+    s1:{start:"internet",col:BL,frames:[
+      {to:"extfw",fw:{k:"ext",ok:true},log:{uz:"Tashqi Firewall: 80-portga (Veb) RUXSAT berildi.",en:"Outer firewall: port 80 (web) ALLOWED."}},
+      {to:"dmz",log:{uz:"Paket DMZ dagi Veb serverga yetib bordi.",en:"The packet reached the DMZ web server."},end:"allow"}]},
+    s2:{start:"internet",col:D,frames:[
+      {to:"extfw",fw:{k:"ext",ok:false},log:{uz:"Tashqi Firewall: Internet→LAN to'g'ridan-to'g'ri QAT'IY MAN (DROP).",en:"Outer firewall: direct Internet→LAN is strictly DENIED (DROP)."},end:"deny"}]},
+    s3:{start:"dmz",col:O,frames:[
+      {to:"intfw",fw:{k:"int",ok:false},log:{uz:"Ichki Firewall: DMZ→LAN BLOKLANDI — DMZ ga hech qachon ishonilmaydi!",en:"Inner firewall: DMZ→LAN BLOCKED — the DMZ is never trusted!"},end:"deny"}]},
+    s4:{start:"lan",col:A,frames:[
+      {to:"intfw",fw:{k:"int",ok:true},log:{uz:"Ichki Firewall: ishonchli LAN dan RUXSAT berildi.",en:"Inner firewall: ALLOWED from the trusted LAN."}},
+      {to:"dmz",log:{uz:"Xodim DMZ dagi serverni yangiladi.",en:"The staff member updated the DMZ server."},end:"allow"}]},
+    s5:{start:"lan",col:A,frames:[
+      {to:"intfw",fw:{k:"int",ok:true},log:{uz:"Ichki Firewall: chiquvchi so'rovga RUXSAT (NAT).",en:"Inner firewall: outbound request ALLOWED (NAT)."}},
+      {to:"extfw",fw:{k:"ext",ok:true},log:{uz:"Tashqi Firewall: chiquvchi so'rovga RUXSAT.",en:"Outer firewall: outbound request ALLOWED."}},
+      {to:"internet",log:{uz:"Xodim internetga muvaffaqiyatli chiqdi.",en:"The staff member reached the internet."},end:"allow"}]}
+  };
+  const BTN=[
+    {k:"s1",ic:"👨‍💻",uz:"Foydalanuvchi → Veb",en:"User → Web",c:BL},
+    {k:"s2",ic:"🥷",uz:"Xaker → Ichki DB",en:"Hacker → Internal DB",c:D},
+    {k:"s3",ic:"🥷",uz:"Xaker (DMZ) → LAN",en:"Hacker (DMZ) → LAN",c:O},
+    {k:"s4",ic:"🧑‍🔧",uz:"Xodim → Veb yangilash",en:"Staff → Update Web",c:A},
+    {k:"s5",ic:"🌐",uz:"Xodim → Internet",en:"Staff → Internet",c:A}
+  ];
+  const [run,setRun]=useState(null);
+  const [fi,setFi]=useState(-1);
+  useEffect(()=>{
+    if(run==null) return;
+    const fr=SC[run].frames;
+    if(fi<0){const id=setTimeout(()=>setFi(0),80);return()=>clearTimeout(id);}
+    if(fi>=fr.length-1||fr[fi].end) return;
+    const id=setTimeout(()=>setFi(fi+1),1000);
+    return()=>clearTimeout(id);
+  },[run,fi]);
+  const sc=run?SC[run]:null;
+  const frames=sc?sc.frames:[];
+  const cur=fi>=0&&fi<frames.length?frames[fi]:null;
+  const pktNode=run?(fi<0?sc.start:frames[fi].to):null;
+  let fwExt=null,fwInt=null;
+  for(let i=0;i<=fi&&i<frames.length;i++){const f=frames[i];if(f.fw){if(f.fw.k==="ext")fwExt=f.fw.ok?"ok":"block";else fwInt=f.fw.ok?"ok":"block";}}
+  const verdict=cur&&cur.end?cur.end:null;
+  const dead=verdict==="deny";
+  const logs=[];for(let i=0;i<=fi&&i<frames.length;i++)logs.push(frames[i].log);
+  const node=(key,label,sub,color,ic,w)=>React.createElement("div",{style:{position:"absolute",left:POS[key][0]+"%",top:POS[key][1]+"%",transform:"translate(-50%,-50%)",width:w||96,textAlign:"center",padding:"8px 6px",background:"var(--surface)",border:"1px solid "+color+"66",borderLeft:"3px solid "+color,borderRadius:10,zIndex:2}},
+    React.createElement("div",{style:{fontSize:18,lineHeight:1}},ic),
+    React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"var(--text-0)",marginTop:3}},label),
+    sub&&React.createElement("div",{style:{fontSize:9,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginTop:1}},sub));
+  const fwbox=(key,label,state)=>{const col=state==="ok"?A:state==="block"?D:"#ff9145";return React.createElement("div",{style:{position:"absolute",left:POS[key][0]+"%",top:POS[key][1]+"%",transform:"translate(-50%,-50%)",width:124,textAlign:"center",padding:"6px 4px",background:col+"22",border:"1.5px solid "+col,borderRadius:8,zIndex:3,transition:"all .3s",fontFamily:"var(--font-mono)"}},
+    React.createElement("div",{style:{fontSize:11,fontWeight:800,color:col}},"🔥 "+label),
+    React.createElement("div",{style:{fontSize:9,color:col,marginTop:1}},state==="ok"?t(lang,"RUXSAT ✓","ALLOW ✓"):state==="block"?t(lang,"BLOKLANDI ✗","BLOCKED ✗"):t(lang,"kutmoqda","idle")));};
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{overflowX:"auto"}},
+      React.createElement("div",{style:{position:"relative",height:320,minWidth:580,background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:14,marginBottom:12}},
+        React.createElement("div",{style:{position:"absolute",left:"1.5%",top:"5%",width:"23%",height:"90%",background:D+"0d",border:"1px dashed "+D+"55",borderRadius:12}}),
+        React.createElement("div",{style:{position:"absolute",left:"62%",top:"5%",width:"36%",height:"90%",background:A+"0d",border:"1px dashed "+A+"55",borderRadius:12}}),
+        React.createElement("div",{style:{position:"absolute",left:"4%",top:"7%",fontSize:10,fontWeight:800,color:D,fontFamily:"var(--font-mono)"}},t(lang,"🌐 INTERNET (xavfli)","🌐 INTERNET (unsafe)")),
+        React.createElement("div",{style:{position:"absolute",left:"63%",top:"7%",fontSize:10,fontWeight:800,color:A,fontFamily:"var(--font-mono)"}},t(lang,"🛡 LAN (ichki)","🛡 LAN (internal)")),
+        React.createElement("div",{style:{position:"absolute",left:"41%",top:"7%",fontSize:10,fontWeight:800,color:Y,fontFamily:"var(--font-mono)"}},"🏢 DMZ"),
+        node("internet",t(lang,"Internet","Internet"),null,D,"🌐",78),
+        fwbox("extfw",t(lang,"Tashqi FW","Outer FW"),fwExt),
+        node("dmz",t(lang,"Veb / Mail","Web / Mail"),":80 :443",Y,"🌍",100),
+        fwbox("intfw",t(lang,"Ichki FW","Inner FW"),fwInt),
+        node("lan",t(lang,"DB + Xodim","DB + Staff"),t(lang,"maxfiy","secret"),A,"🗄",92),
+        pktNode&&React.createElement("div",{style:{position:"absolute",left:POS[pktNode][0]+"%",top:POS[pktNode][1]+"%",width:16,height:16,borderRadius:"50%",background:dead?D:sc.col,boxShadow:"0 0 12px "+(dead?D:sc.col),transform:"translate(-50%,-50%)",transition:"left 1s ease,top 1s ease,opacity .4s",opacity:dead?0.2:1,zIndex:5}},
+          dead&&React.createElement("div",{style:{position:"absolute",left:"50%",top:"-20px",transform:"translateX(-50%)",color:D,fontWeight:900,fontSize:16}},"✗")))),
+    React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}},
+      BTN.map(b=>React.createElement("button",{key:b.k,onClick:()=>{setRun(b.k);setFi(-1);},style:{flex:"1 1 auto",padding:"7px 10px",background:run===b.k?b.c+"22":"var(--surface)",color:run===b.k?b.c:"var(--text-1)",border:"1px solid "+b.c+"66",borderRadius:8,fontSize:11,fontWeight:600,cursor:"pointer"}},b.ic+" "+t(lang,b.uz,b.en)))),
+    React.createElement("div",{style:{background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:12,padding:"12px 14px",minHeight:74,fontFamily:"var(--font-mono)",fontSize:11.5,lineHeight:1.6}},
+      run==null?React.createElement("div",{style:{color:"var(--text-2)",textAlign:"center",paddingTop:8}},t(lang,"⬆ Ssenariy tanlang — paket firewall'lardan qanday o'tishini ko'ring.","⬆ Pick a scenario — watch how the packet passes the firewalls.")):
+      React.createElement("div",null,
+        logs.map((l,i)=>React.createElement("div",{key:i,className:"na-rise",style:{color:"var(--text-1)",marginBottom:4}},(i+1)+". "+t(lang,l.uz,l.en))),
+        verdict&&React.createElement("div",{style:{marginTop:8,fontWeight:800,color:verdict==="allow"?A:D}},verdict==="allow"?t(lang,"✓ Natija: Muvaffaqiyatli — LAN xavfsiz qoldi.","✓ Result: Success — the LAN stayed safe."):t(lang,"✗ Natija: Bloklandi — hujum to'xtatildi.","✗ Result: Blocked — the attack was stopped.")))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1128,24 +1205,32 @@ React.createElement(Quiz,{q:{uz:"IDS va IPS o'rtasidagi asosiy farq nima?",en:"K
 }
 function LessonL17(){
   const lang=useLang();
-  const zones=[["🌍 INTERNET",{uz:"Tashqi olam",en:"Outside world"},"#ff3a5e"],["🧱 Firewall 1",{uz:"Tashqi devor",en:"Outer wall"},"#ff9145"],["🖥 DMZ",{uz:"Veb/email server — internetdan ko'rinadi",en:"Web/email server — internet-facing"},"#ffd43b"],["🧱 Firewall 2",{uz:"Ichki devor (qat'iyroq)",en:"Inner wall (stricter)"},"#ff9145"],["🔒 ICHKI TARMOQ",{uz:"Maxfiy ma'lumot",en:"Sensitive data"},"#69db7c"]];
+  const A="#69db7c",D="#ff3a5e";
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1"},t(lang,"DMZ nima?","What is a DMZ?")),
-    React.createElement(P,null,t(lang,"DMZ — ichki tarmoq va internet o'rtasidagi \"neytral zona\". Internetdan ko'rinishi kerak bo'lgan serverlar shu yerda turadi. Hujumchi DMZ dagi serverni buzsa ham, ichki maxfiy tarmoqqa kira olmaydi (uy oldidagi mehmonlar zali kabi).","A DMZ is a \"neutral zone\" between the internal network and the internet. Internet-facing servers live here. Even if an attacker breaks a DMZ server, they can't reach the sensitive internal network (like a reception hall in front of your house).")),
-    React.createElement(H2,{num:"§2"},t(lang,"DMZ arxitekturasi","DMZ architecture")),
-    React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,margin:"8px 0"}},
-      zones.map(function(z,i){return React.createElement("div",{key:i,className:"na-rise",style:{textAlign:"center",padding:"10px 14px",background:z[2]+"12",border:"1px solid "+z[2]+"55",borderRadius:10,animationDelay:(i*0.09)+"s"}},
-        React.createElement("div",{style:{fontWeight:700,fontSize:13,color:z[2]}},z[0]),
-        React.createElement("div",{style:{fontSize:11,color:"var(--text-2)",marginTop:2}},t(lang,z[1].uz,z[1].en)));})),
-    React.createElement(P,null,t(lang,"DMZ ikki devor orasida joylashadi. Tashqi devor internetdan DMZ ga cheklangan kirishga ruxsat beradi; ichki devor DMZ dan ichki tarmoqqa deyarli hech narsa o'tkazmaydi.","The DMZ sits between two firewalls. The outer allows limited access to the DMZ; the inner passes almost nothing from DMZ into the internal network.")),
-        React.createElement(H2,{num:"§3"},t(lang,"DMZ arxitekturasi","The DMZ architecture")),
-    React.createElement(P,null,t(lang,"DMZ (demilitarizatsiya zonasi) — internet va ichki tarmoq orasidagi «bufer» zona. Tashqaridan ko'rinishi kerak bo'lgan serverlar (veb, pochta) shu yerga qo'yiladi. Agar hujumchi DMZ dagi serverni buzsa ham, u to'g'ridan-to'g'ri ichki tarmoqqa (ma'lumotlar bazasi, xodimlar) o'ta olmaydi — ikkinchi firewall to'sadi.","A DMZ (demilitarized zone) is a «buffer» between the internet and the internal network. Servers that must be reachable from outside (web, mail) go here. Even if an attacker breaks a DMZ server, they can't move straight into the internal network (database, staff) — a second firewall blocks it.")),
-    React.createElement(NodeMap,{nodes:[[28,80,"Internet"],[105,80,"Firewall"],[195,42,"DMZ Web"],[195,120,"Ichki"]],links:[[0,1],[1,2],[1,3]],color:"#4dabf7",label:{uz:"Internet → Firewall → DMZ / Ichki",en:"Internet → Firewall → DMZ / Internal"}}),
-    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: qatlamli himoya","Practice: layered defense")),
-    React.createElement(P,null,t(lang,"DMZ «defense in depth» tamoyilining amaliy ko'rinishi: bir necha to'siq. Tashqi firewall faqat 80/443 ni DMZ ga o'tkazadi; ichki firewall DMZ dan ichkariga faqat zarur portni ochadi.","The DMZ is «defense in depth» in practice: several barriers. The outer firewall passes only 80/443 to the DMZ; the inner firewall opens only the necessary port from the DMZ inward.")),
-    React.createElement(Terminal,null,"# Tashqi firewall qoidasi (soddalashtirilgan)\n# ALLOW  internet -> DMZ_web : 80,443\n# DENY   internet -> internal : ALL\n# ALLOW  DMZ_web  -> DB : 3306 only   ← faqat kerakli port"),
-React.createElement(Quiz,{q:{uz:"Veb-server odatda qayerga joylashtiriladi va nima uchun?",en:"Where is a web server usually placed, and why?"},opts:[{uz:"Ichki tarmoqda",en:"In the internal network"},{uz:"DMZ da — buzilса ham ichki tarmoq himoyalanadi",en:"In the DMZ — so a breach doesn't reach the internal network"},{uz:"Routerda",en:"On the router"},{uz:"Tarmoqsiz",en:"With no network"}],correct:1,exp:{uz:"Internetdan ko'rinadigan serverlar DMZ ga qo'yiladi. Buzilса ham, ikkinchi (ichki) firewall maxfiy tarmoqni himoya qiladi.",en:"Internet-facing servers go in the DMZ. Even if breached, the inner firewall protects the sensitive network."}}));
+    React.createElement(H2,{num:"§1"},t(lang,"DMZ nima? — Qal'a analogiyasi","What is a DMZ? — the castle analogy")),
+    React.createElement(P,null,t(lang,"DMZ (Demilitarized Zone) — tarmog'ingizning «oraliq» yoki «bufer» hududi. O'zbekcha «qurolsizlantirilgan hudud», lekin IT sohasida atama o'z holicha ishlatiladi. Buni qal'a bilan tasavvur qiling: qal'a ICHI — bu LAN (podshoh, xazina, aholi ya'ni serverlar va xodimlar) — qattiq qo'riqlanadi. Qal'a TASHQARISI — bu Internet: savdogarlar ham, qaroqchilar (xakerlar) ham bor.","A DMZ (Demilitarized Zone) is your network's «buffer» area. In IT the term is used as-is. Picture a castle: the INSIDE is the LAN (the king, treasury, residents — i.e. servers and staff) — heavily guarded. The OUTSIDE is the Internet: both merchants and raiders (hackers) are out there.")),
+    React.createElement(P,null,t(lang,"DMZ — darvoza oldidagi maxsus hovli. Siz savdo qilishingiz kerak (veb-saytingiz ishlashi kerak), shuning uchun darvoza tashqarisida, lekin baribir nazoratingizdagi alohida maydon qilasiz. Savdogarlar (foydalanuvchilar) shu hovliga kelib, sotuvchilaringiz (veb/pochta server) bilan ko'rishadi — lekin qal'a ichiga kira olmaydi. Yomon niyatli odam DMZ dagi serverni buzsa ham, o'rtada yana bitta devor (ikkinchi Firewall) borligi uchun LAN ga o'ta olmaydi.","The DMZ is a courtyard in front of the gate. You need to do business (your website must work), so you build a separate area outside the gate but still under your control. Merchants (users) come to this courtyard and meet your sellers (web/mail server) — but can't enter the castle. Even if an attacker breaks a DMZ server, a second wall (the inner firewall) stops them reaching the LAN.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator","Interactive simulator")),
+    React.createElement(P,null,t(lang,"Quyidagi tugmalarni bosing — paket qaysi zonadan qayerga borishini va firewall qoidasi uni O'TKAZADI yoki BLOKLAYDI ekanini jonli ko'ring.","Click the buttons below — watch live where the packet travels between zones and whether the firewall rule ALLOWS or BLOCKS it.")),
+    React.createElement(DMZSim),
+    React.createElement(H2,{num:"§3"},t(lang,"DMZ qachon va nega ishlatiladi?","When and why is a DMZ used?")),
+    React.createElement(P,null,t(lang,"Tashqi dunyo (Internet) uchun ochiq bo'lishi kerak bo'lgan xizmatlarni oddiy LAN ichida saqlash juda xavfli — chunki ular buzilsa, hujumchi to'g'ridan-to'g'ri ichki tarmoqqa tushadi. Shu sababli omma uchun ochiq serverlar DMZ ga joylashtiriladi:","Keeping services that must be reachable from the internet inside the plain LAN is very risky — if they're breached, the attacker lands straight in the internal network. That's why public-facing servers go in the DMZ:")),
+    React.createElement(LayerStack,{layers:[
+      {n:"🌍",name:t(lang,"Veb-server","Web server"),color:"#4dabf7",desc:{uz:"HTTP/HTTPS — sayt tashqaridan ochilishi kerak.",en:"HTTP/HTTPS — the site must be reachable from outside."}},
+      {n:"📧",name:t(lang,"Pochta serveri","Mail server"),color:"#69db7c",desc:{uz:"SMTP/IMAP — xatlar kelib-ketishi kerak.",en:"SMTP/IMAP — mail must flow in and out."}},
+      {n:"🔤",name:"DNS",color:"#a855f7",desc:{uz:"Tashqi nom so'rovlariga javob beradi.",en:"Answers external name queries."}},
+      {n:"📁",name:"FTP",color:"#ffd43b",desc:{uz:"Tashqi fayl almashinuvi uchun.",en:"For external file exchange."}}
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"DMZ qoidalari qanday ishlaydi?","How the DMZ rules work")),
+    React.createElement(P,null,t(lang,"Tarmoq ikkita firewall bilan ajratiladi. Qoidalar quyidagicha — eng muhimi qizil bilan belgilangan «DMZ→LAN taqiqlanadi»:","The network is split by two firewalls. The rules are as follows — the most important is the red «DMZ→LAN denied»:")),
+    React.createElement("div",{style:{margin:"8px 0"}},
+React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #69db7c44",borderLeft:"3px solid #69db7c",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#69db7c",minWidth:64}},"ALLOW"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"Internet → DMZ: qisman (faqat kerakli portlar, masalan HTTP 80).","Internet → DMZ: partial (only needed ports, e.g. HTTP 80)."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #ff3a5e44",borderLeft:"3px solid #ff3a5e",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#ff3a5e",minWidth:64}},"DENY"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"Internet → LAN: barchasi yopiq.","Internet → LAN: everything blocked."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #ff3a5e44",borderLeft:"3px solid #ff3a5e",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#ff3a5e",minWidth:64}},"DENY"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"DMZ → LAN: QAT'IYAN taqiqlanadi — DMZ ga ishonib bo'lmaydi (eng muhim qoida!).","DMZ → LAN: strictly denied — the DMZ can't be trusted (the key rule!)."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #69db7c44",borderLeft:"3px solid #69db7c",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#69db7c",minWidth:64}},"ALLOW"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"LAN → DMZ: ruxsat (xodimlar serverni yangilaydi).","LAN → DMZ: allowed (staff update the server)."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #69db7c44",borderLeft:"3px solid #69db7c",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#69db7c",minWidth:64}},"ALLOW"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"LAN → Internet: ruxsat (xodimlar internetdan foydalanadi).","LAN → Internet: allowed (staff use the internet)."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #ffd43b44",borderLeft:"3px solid #ffd43b",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#ffd43b",minWidth:64}},"PART"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"DMZ → Internet: qisman (masalan yangilanish yuklab olish).","DMZ → Internet: partial (e.g. downloading updates)."))),),
+    React.createElement(Terminal,null,"# Firewall qoidalari (soddalashtirilgan)\nALLOW  internet -> dmz_web   : 80,443\nDENY   internet -> lan       : ALL\nDENY   dmz       -> lan       : ALL      # ← eng muhim qoida\nALLOW  lan       -> dmz,internet : ALL"),
+    React.createElement(H2,{num:"§5"},t(lang,"Uy routeridagi «DMZ Host» — bu haqiqiy DMZ emas!","The «DMZ Host» on a home router — not a real DMZ!")),
+    React.createElement(P,null,t(lang,"Uy Wi-Fi routerlarida ham «DMZ» funksiyasi bor, lekin u haqiqiy DMZ EMAS. «DMZ Host» shunchaki bitta kompyuterning BARCHA portlarini internetga ochib yuborish (port forwarding'ning eng xavfli va oson yo'li). U qurilma baribir ichki tarmoqda (LAN) qoladi — agar unga virus tushsa, butun uy tarmog'ingizga tarqalishi mumkin.","Home Wi-Fi routers also have a «DMZ» feature, but it is NOT a real DMZ. «DMZ Host» simply exposes ALL ports of one computer to the internet (the most dangerous, easy form of port forwarding). That device still stays on the internal network (LAN) — if it gets infected, the malware can spread to your whole home network.")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Nima qilayotganingizni aniq bilmasangiz, uy routeringizda «DMZ Host» ni yoqmang — bu bitta qurilmani to'liq himoyasiz qoldiradi va butun tarmoqni xavf ostiga qo'yadi.","Don't enable «DMZ Host» on your home router unless you know exactly what you're doing — it leaves one device fully exposed and puts your whole network at risk.")),
+    React.createElement(Quiz,{q:{uz:"DMZ ning eng muhim firewall qoidasi qaysi?",en:"What is the most important DMZ firewall rule?"},opts:[{uz:"Internet → DMZ ochiq",en:"Internet → DMZ open"},{uz:"DMZ → LAN QAT'IYAN taqiqlanadi",en:"DMZ → LAN is strictly denied"},{uz:"LAN → Internet yopiq",en:"LAN → Internet blocked"},{uz:"Hamma yo'nalish ochiq",en:"All directions open"}],correct:1,exp:{uz:"Eng muhim qoida — DMZ→LAN taqiqlash. Shunda hujumchi DMZ serverini buzsa ham, ichki maxfiy tarmoqqa (LAN) o'ta olmaydi.",en:"The key rule is denying DMZ→LAN. So even if an attacker breaks a DMZ server, they can't move into the sensitive internal network (LAN)."}}));
 }
 function LessonL18(){
   const lang=useLang();
