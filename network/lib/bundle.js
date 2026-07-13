@@ -241,8 +241,9 @@ function NodeMap({nodes,links,color,label}){
 
 function DMZSim(){
   const lang=useLang();
-  const POS={internet:[13,50],extfw:[50,15],dmz:[50,50],intfw:[50,85],lan:[87,50]};
   const A="#69db7c",D="#ff3a5e",O="#ffa94d",BL="#4dabf7",Y="#ffd43b";
+  const X={internet:10,extfw:30,dmz:50,intfw:70,lan:90};
+  const PY=48;
   const SC={
     s1:{start:"internet",col:BL,frames:[
       {to:"extfw",fw:{k:"ext",ok:true},log:{uz:"Tashqi Firewall: 80-portga (Veb) RUXSAT berildi.",en:"Outer firewall: port 80 (web) ALLOWED."}},
@@ -273,7 +274,7 @@ function DMZSim(){
     const fr=SC[run].frames;
     if(fi<0){const id=setTimeout(()=>setFi(0),80);return()=>clearTimeout(id);}
     if(fi>=fr.length-1||fr[fi].end) return;
-    const id=setTimeout(()=>setFi(fi+1),1000);
+    const id=setTimeout(()=>setFi(fi+1),1100);
     return()=>clearTimeout(id);
   },[run,fi]);
   const sc=run?SC[run]:null;
@@ -285,37 +286,38 @@ function DMZSim(){
   const verdict=cur&&cur.end?cur.end:null;
   const dead=verdict==="deny";
   const logs=[];for(let i=0;i<=fi&&i<frames.length;i++)logs.push(frames[i].log);
-  const node=(key,label,sub,color,ic,w)=>React.createElement("div",{style:{position:"absolute",left:POS[key][0]+"%",top:POS[key][1]+"%",transform:"translate(-50%,-50%)",width:w||96,textAlign:"center",padding:"8px 6px",background:"var(--surface)",border:"1px solid "+color+"66",borderLeft:"3px solid "+color,borderRadius:10,zIndex:2}},
-    React.createElement("div",{style:{fontSize:18,lineHeight:1}},ic),
-    React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"var(--text-0)",marginTop:3}},label),
-    sub&&React.createElement("div",{style:{fontSize:9,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginTop:1}},sub));
-  const fwbox=(key,label,state)=>{const col=state==="ok"?A:state==="block"?D:"#ff9145";return React.createElement("div",{style:{position:"absolute",left:POS[key][0]+"%",top:POS[key][1]+"%",transform:"translate(-50%,-50%)",width:124,textAlign:"center",padding:"6px 4px",background:col+"22",border:"1.5px solid "+col,borderRadius:8,zIndex:3,transition:"all .3s",fontFamily:"var(--font-mono)"}},
-    React.createElement("div",{style:{fontSize:11,fontWeight:800,color:col}},"🔥 "+label),
-    React.createElement("div",{style:{fontSize:9,color:col,marginTop:1}},state==="ok"?t(lang,"RUXSAT ✓","ALLOW ✓"):state==="block"?t(lang,"BLOKLANDI ✗","BLOCKED ✗"):t(lang,"kutmoqda","idle")));};
+  const zoneBox=(l,w,col,label)=>React.createElement("div",{style:{position:"absolute",left:l+"%",width:w+"%",top:"9%",height:"82%",background:col+"0c",border:"1px dashed "+col+"66",borderRadius:12,zIndex:0}},
+    React.createElement("div",{style:{position:"absolute",top:7,left:0,right:0,textAlign:"center",fontSize:9.5,fontWeight:800,color:col,fontFamily:"var(--font-mono)",letterSpacing:.5}},label));
+  const server=(xk,ic,label,sub,col)=>React.createElement("div",{style:{position:"absolute",left:X[xk]+"%",top:PY+"%",transform:"translate(-50%,-50%)",width:100,textAlign:"center",padding:"10px 6px",background:"var(--surface)",border:"1px solid "+col+"77",borderTop:"3px solid "+col,borderRadius:11,zIndex:4,boxShadow:"0 4px 14px rgba(0,0,0,.35)"}},
+    React.createElement("div",{style:{fontSize:22,lineHeight:1}},ic),
+    React.createElement("div",{style:{fontSize:11.5,fontWeight:700,color:"var(--text-0)",marginTop:4}},label),
+    sub&&React.createElement("div",{style:{fontSize:9,color:"var(--text-2)",fontFamily:"var(--font-mono)",marginTop:2}},sub));
+  const wall=(xk,label,state)=>{const col=state==="ok"?A:state==="block"?D:"#ff9145";return React.createElement("div",{style:{position:"absolute",left:X[xk]+"%",top:"14%",height:"72%",width:60,transform:"translateX(-50%)",background:col+"1f",border:"2px solid "+col,borderRadius:10,zIndex:5,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,transition:"all .3s",boxShadow:"0 0 16px "+col+"66"}},
+    React.createElement("div",{style:{fontSize:22,lineHeight:1}},"🔥"),
+    React.createElement("div",{style:{fontSize:8.5,fontWeight:800,color:col,fontFamily:"var(--font-mono)",textAlign:"center",lineHeight:1.15}},label,React.createElement("br",null),"FW"),
+    React.createElement("div",{style:{fontSize:8,fontWeight:800,color:"#04060d",background:col,borderRadius:4,padding:"1px 5px",fontFamily:"var(--font-mono)"}},state==="ok"?t(lang,"RUXSAT","ALLOW"):state==="block"?"DROP":"···"));};
   return React.createElement("div",{style:{margin:"14px 0"}},
-    React.createElement("div",{style:{overflowX:"auto"}},
-      React.createElement("div",{style:{position:"relative",height:320,minWidth:580,background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:14,marginBottom:12}},
-        React.createElement("div",{style:{position:"absolute",left:"1.5%",top:"5%",width:"23%",height:"90%",background:D+"0d",border:"1px dashed "+D+"55",borderRadius:12}}),
-        React.createElement("div",{style:{position:"absolute",left:"62%",top:"5%",width:"36%",height:"90%",background:A+"0d",border:"1px dashed "+A+"55",borderRadius:12}}),
-        React.createElement("div",{style:{position:"absolute",left:"4%",top:"7%",fontSize:10,fontWeight:800,color:D,fontFamily:"var(--font-mono)"}},t(lang,"🌐 INTERNET (xavfli)","🌐 INTERNET (unsafe)")),
-        React.createElement("div",{style:{position:"absolute",left:"63%",top:"7%",fontSize:10,fontWeight:800,color:A,fontFamily:"var(--font-mono)"}},t(lang,"🛡 LAN (ichki)","🛡 LAN (internal)")),
-        React.createElement("div",{style:{position:"absolute",left:"41%",top:"7%",fontSize:10,fontWeight:800,color:Y,fontFamily:"var(--font-mono)"}},"🏢 DMZ"),
-        node("internet",t(lang,"Internet","Internet"),null,D,"🌐",78),
-        fwbox("extfw",t(lang,"Tashqi FW","Outer FW"),fwExt),
-        node("dmz",t(lang,"Veb / Mail","Web / Mail"),":80 :443",Y,"🌍",100),
-        fwbox("intfw",t(lang,"Ichki FW","Inner FW"),fwInt),
-        node("lan",t(lang,"DB + Xodim","DB + Staff"),t(lang,"maxfiy","secret"),A,"🗄",92),
-        pktNode&&React.createElement("div",{style:{position:"absolute",left:POS[pktNode][0]+"%",top:POS[pktNode][1]+"%",width:16,height:16,borderRadius:"50%",background:dead?D:sc.col,boxShadow:"0 0 12px "+(dead?D:sc.col),transform:"translate(-50%,-50%)",transition:"left 1s ease,top 1s ease,opacity .4s",opacity:dead?0.2:1,zIndex:5}},
-          dead&&React.createElement("div",{style:{position:"absolute",left:"50%",top:"-20px",transform:"translateX(-50%)",color:D,fontWeight:900,fontSize:16}},"✗")))),
+    React.createElement("div",{style:{overflowX:"auto",paddingBottom:4}},
+      React.createElement("div",{style:{position:"relative",height:212,minWidth:720,background:"radial-gradient(circle at 50% 45%,rgba(122,255,178,.05),transparent 65%),var(--bg-1)",border:"1px solid var(--border)",borderRadius:14,marginBottom:12}},
+        React.createElement("div",{style:{position:"absolute",left:"9%",right:"9%",top:PY+"%",height:2,transform:"translateY(-50%)",background:"repeating-linear-gradient(90deg,var(--text-3) 0 7px,transparent 7px 15px)",opacity:.5,zIndex:1}}),
+        zoneBox(1.5,17,D,t(lang,"🌐 INTERNET","🌐 INTERNET")),
+        zoneBox(39,22,Y,"🏢 DMZ"),
+        zoneBox(81.5,17,A,t(lang,"🛡 LAN","🛡 LAN")),
+        server("internet","🌐",t(lang,"Internet","Internet"),t(lang,"tashqi","external"),D),
+        wall("extfw",t(lang,"TASHQI","OUTER"),fwExt),
+        server("dmz","🌍",t(lang,"Veb/Mail","Web/Mail"),":80 :443",Y),
+        wall("intfw",t(lang,"ICHKI","INNER"),fwInt),
+        server("lan","🗄",t(lang,"DB+Xodim","DB+Staff"),t(lang,"maxfiy","secret"),A),
+        pktNode&&React.createElement("div",{style:{position:"absolute",left:X[pktNode]+"%",top:PY+"%",width:18,height:18,borderRadius:"50%",background:dead?D:sc.col,border:"2px solid #fff",boxShadow:"0 0 16px "+(dead?D:sc.col),transform:"translate(-50%,-50%)",transition:"left .9s cubic-bezier(.4,0,.2,1),opacity .4s",opacity:dead?0.25:1,zIndex:8}},
+          dead&&React.createElement("div",{style:{position:"absolute",left:"50%",top:"-24px",transform:"translateX(-50%)",color:D,fontWeight:900,fontSize:18}},"✗")))),
     React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}},
-      BTN.map(b=>React.createElement("button",{key:b.k,onClick:()=>{setRun(b.k);setFi(-1);},style:{flex:"1 1 auto",padding:"7px 10px",background:run===b.k?b.c+"22":"var(--surface)",color:run===b.k?b.c:"var(--text-1)",border:"1px solid "+b.c+"66",borderRadius:8,fontSize:11,fontWeight:600,cursor:"pointer"}},b.ic+" "+t(lang,b.uz,b.en)))),
+      BTN.map(b=>React.createElement("button",{key:b.k,onClick:()=>{setRun(b.k);setFi(-1);},style:{flex:"1 1 auto",padding:"8px 11px",background:run===b.k?b.c+"22":"var(--surface)",color:run===b.k?b.c:"var(--text-1)",border:"1px solid "+b.c+(run===b.k?"":"55"),borderRadius:8,fontSize:11,fontWeight:600,cursor:"pointer",transition:"all .2s"}},b.ic+" "+t(lang,b.uz,b.en)))),
     React.createElement("div",{style:{background:"var(--bg-1)",border:"1px solid var(--border)",borderRadius:12,padding:"12px 14px",minHeight:74,fontFamily:"var(--font-mono)",fontSize:11.5,lineHeight:1.6}},
       run==null?React.createElement("div",{style:{color:"var(--text-2)",textAlign:"center",paddingTop:8}},t(lang,"⬆ Ssenariy tanlang — paket firewall'lardan qanday o'tishini ko'ring.","⬆ Pick a scenario — watch how the packet passes the firewalls.")):
       React.createElement("div",null,
         logs.map((l,i)=>React.createElement("div",{key:i,className:"na-rise",style:{color:"var(--text-1)",marginBottom:4}},(i+1)+". "+t(lang,l.uz,l.en))),
         verdict&&React.createElement("div",{style:{marginTop:8,fontWeight:800,color:verdict==="allow"?A:D}},verdict==="allow"?t(lang,"✓ Natija: Muvaffaqiyatli — LAN xavfsiz qoldi.","✓ Result: Success — the LAN stayed safe."):t(lang,"✗ Natija: Bloklandi — hujum to'xtatildi.","✗ Result: Blocked — the attack was stopped.")))));
 }
-
 function LessonL01(){
   const lang=useLang();
   const layers=[
