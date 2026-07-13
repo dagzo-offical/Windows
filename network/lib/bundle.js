@@ -346,6 +346,84 @@ function DMZSim(){
             React.createElement("div",null,React.createElement("span",{style:{color:A,fontWeight:700}},"ALLOW: "),t(lang,"LAN → Internet / DMZ","LAN → Internet / DMZ"))))))
   );
 }
+function FirewallSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",SL="#1e293b",SL2="#0f172a",AM="#f59e0b";
+  const RULES=[
+    {act:"ALLOW",proto:"TCP",port:80,src:"any",uz:"Veb (HTTP)",en:"Web (HTTP)"},
+    {act:"ALLOW",proto:"TCP",port:443,src:"any",uz:"Veb (HTTPS)",en:"Web (HTTPS)"},
+    {act:"DENY",proto:"TCP",port:22,src:"internet",uz:"SSH — tashqaridan taqiq",en:"SSH — deny from outside"},
+    {act:"ALLOW",proto:"ANY",port:"any",src:"LAN",uz:"Chiquvchi (ichkaridan)",en:"Outbound (from inside)"},
+    {act:"DENY",proto:"ANY",port:"any",src:"any",uz:"STANDART: qolgan hammasi",en:"DEFAULT: everything else"}
+  ];
+  const PKT={
+    p1:{src:"internet",port:80,proto:"TCP",ic:"🌍",uz:"HTTP so'rovi",en:"HTTP request"},
+    p2:{src:"internet",port:22,proto:"TCP",ic:"🔑",uz:"SSH urinishi",en:"SSH attempt"},
+    p3:{src:"internet",port:443,proto:"TCP",ic:"🔒",uz:"HTTPS so'rovi",en:"HTTPS request"},
+    p4:{src:"internet",port:23,proto:"TCP",ic:"📟",uz:"Telnet urinishi",en:"Telnet attempt"},
+    p5:{src:"LAN",port:3306,proto:"TCP",ic:"💻",uz:"LAN → DB (chiquvchi)",en:"LAN → DB (outbound)"}
+  };
+  const BTN=[["p1","🌍",{uz:"HTTP :80",en:"HTTP :80"}],["p2","🔑",{uz:"SSH :22",en:"SSH :22"}],["p3","🔒",{uz:"HTTPS :443",en:"HTTPS :443"}],["p4","📟",{uz:"Telnet :23",en:"Telnet :23"}],["p5","💻",{uz:"LAN→DB",en:"LAN→DB"}]];
+  const match=(r,p)=>(r.src==="any"||r.src===p.src)&&(r.port==="any"||r.port===p.port)&&(r.proto==="ANY"||r.proto===p.proto);
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const p=PKT[run];
+    if(step<0){const id=setTimeout(()=>setStep(0),160);return()=>clearTimeout(id);}
+    if(step>=RULES.length) return;
+    if(match(RULES[step],p)) return;
+    if(step>=RULES.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),800);return()=>clearTimeout(id);
+  },[run,step]);
+  const p=run?PKT[run]:null;
+  let matched=-1;
+  if(p&&step>=0){for(let i=0;i<=step&&i<RULES.length;i++){if(match(RULES[i],p)){matched=i;break;}}}
+  const outcome=matched>=0?RULES[matched].act:null;
+  const logs=[];
+  if(p&&step>=0){const upto=matched>=0?matched:step;for(let i=0;i<=upto;i++){
+    if(matched>=0&&i===matched)logs.push({t:t(lang,"Qoida "+(i+1)+" MOS KELDI → "+RULES[i].act,"Rule "+(i+1)+" MATCHED → "+RULES[i].act),c:RULES[i].act==="ALLOW"?A:D});
+    else logs.push({t:t(lang,"Qoida "+(i+1)+": mos emas → keyingisiga o'tildi","Rule "+(i+1)+": no match → moved on"),c:"#94a3b8"});}}
+  const start=(k)=>{setRun(k);setStep(-1);};
+  const fld=(l,v)=>React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:11,padding:"3px 0",borderBottom:"1px solid rgba(148,163,184,.12)"}},
+    React.createElement("span",{style:{color:"#94a3b8"}},l),React.createElement("span",{style:{color:"#e2e8f0",fontFamily:"var(--font-mono)",fontWeight:600}},v));
+  const ruleRow=(r,i)=>{
+    let st="idle";
+    if(matched>=0){st=i===matched?"hit":(i<matched?"skip":"idle");}
+    else if(run){st=i<step?"skip":(i===step?"check":"idle");}
+    const hitCol=r.act==="ALLOW"?A:D;
+    const bg=st==="hit"?hitCol+"26":st==="check"?BL+"1f":st==="skip"?"rgba(148,163,184,.05)":SL2;
+    const bd=st==="hit"?hitCol:st==="check"?BL:"rgba(148,163,184,.18)";
+    const dim=st==="skip"?.45:1;
+    return React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",marginBottom:5,background:bg,border:"1px solid "+bd,borderLeft:"4px solid "+(r.act==="ALLOW"?A:D),borderRadius:8,opacity:dim,transition:"all .25s",fontFamily:"var(--font-mono)"}},
+      React.createElement("span",{style:{fontSize:10,color:"#64748b",minWidth:14}},i+1),
+      React.createElement("span",{style:{fontSize:9.5,fontWeight:800,color:r.act==="ALLOW"?A:D,background:(r.act==="ALLOW"?A:D)+"22",borderRadius:4,padding:"2px 6px",minWidth:52,textAlign:"center"}},r.act),
+      React.createElement("span",{style:{fontSize:10.5,color:"#cbd5e1",minWidth:118}},r.proto+" "+(r.port==="any"?"*":":"+r.port)+" ← "+r.src),
+      React.createElement("span",{style:{fontSize:10.5,color:"#94a3b8",flex:1}},t(lang,r.uz,r.en)),
+      st==="check"&&React.createElement("span",{style:{fontSize:12,color:BL}},"🔎"),
+      st==="hit"&&React.createElement("span",{style:{fontSize:12,color:hitCol,fontWeight:900}},r.act==="ALLOW"?"✓":"✗"));};
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{overflowX:"auto"}},
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"0.85fr 1.5fr",gap:12,minWidth:560,alignItems:"start"}},
+        React.createElement("div",{style:{background:SL,border:"1px solid "+(p?(outcome==="ALLOW"?A:outcome==="DENY"?D:BL):"rgba(148,163,184,.25)")+"66",borderRadius:12,padding:14}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#93c5fd",marginBottom:8}},t(lang,"📦 Kiruvchi paket","📦 Incoming packet")),
+          p?React.createElement("div",null,
+            React.createElement("div",{style:{fontSize:34,textAlign:"center",marginBottom:6}},p.ic),
+            React.createElement("div",{style:{fontSize:11.5,fontWeight:600,color:"#e2e8f0",textAlign:"center",marginBottom:10}},t(lang,p.uz,p.en)),
+            fld(t(lang,"Manba","Source"),p.src),fld(t(lang,"Port","Port"),":"+p.port),fld(t(lang,"Protokol","Protocol"),p.proto)):
+          React.createElement("div",{style:{fontSize:11,color:"#64748b",textAlign:"center",padding:"24px 4px"}},t(lang,"Pastdan paket tanlang","Choose a packet below"))),
+        React.createElement("div",{style:{background:SL,border:"1px solid rgba(148,163,184,.2)",borderRadius:12,padding:"12px 12px 8px"}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#93c5fd",marginBottom:8}},t(lang,"🧱 Firewall qoidalari (yuqoridan pastga)","🧱 Firewall rules (top to bottom)")),
+          RULES.map(function(r,i){return ruleRow(r,i);})))),
+    outcome&&React.createElement("div",{style:{marginTop:12,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:13,background:(outcome==="ALLOW"?A:D)+"1f",border:"1px solid "+(outcome==="ALLOW"?A:D),color:outcome==="ALLOW"?A:D}},
+      outcome==="ALLOW"?t(lang,"✓ RUXSAT — paket ichki tarmoqqa o'tkazildi","✓ ALLOW — the packet was forwarded to the network"):t(lang,"✗ DROP — paket bloklandi va yo'q qilindi","✗ DROP — the packet was blocked and discarded")),
+    React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginTop:12}},
+      BTN.map(function(b){return React.createElement("button",{key:b[0],onClick:()=>start(b[0]),style:{flex:"1 1 auto",padding:"8px 10px",background:run===b[0]?BL+"22":SL,color:run===b[0]?"#93c5fd":"#cbd5e1",border:"1px solid "+(run===b[0]?BL:"rgba(148,163,184,.3)"),borderRadius:8,fontSize:11,fontWeight:600,cursor:"pointer"}},b[1]+" "+t(lang,b[2].uz,b[2].en));})),
+    React.createElement("div",{style:{marginTop:10,background:SL2,border:"1px solid rgba(148,163,184,.15)",borderRadius:10,padding:"11px 13px",minHeight:60,fontFamily:"var(--font-mono)",fontSize:11.5,lineHeight:1.65}},
+      run==null?React.createElement("div",{style:{color:"#64748b",textAlign:"center"}},t(lang,"⬆ Paket tanlang — firewall qoidalarni yuqoridan pastga qanday tekshirishini ko'ring.","⬆ Pick a packet — watch the firewall check the rules top to bottom.")):
+      logs.map(function(l,i){return React.createElement("div",{key:i,className:"na-rise",style:{color:l.c,marginBottom:3,fontWeight:l.c==="#94a3b8"?400:700}},(i+1)+". "+l.t);})));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -394,29 +472,31 @@ React.createElement(Quiz,{
 }
 function LessonL13(){
   const lang=useLang();
-  const types=[["Packet Filter",{uz:"IP/port bo'yicha filtrlaydi (sodda, tez)",en:"Filters by IP/port (simple, fast)"},"#4dabf7"],["Stateful",{uz:"Ulanish holatini eslaydi (aqlliroq)",en:"Remembers connection state (smarter)"},"#69db7c"],["Application / WAF",{uz:"Ilova mazmunini tekshiradi (chuqur)",en:"Inspects app-layer content (deep)"},"#9775fa"],["Next-Gen (NGFW)",{uz:"IPS + ilova + tahdid razvedkasi",en:"IPS + app + threat intel"},"#ff9145"]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Firewall nima?","What is a firewall?")),
-    React.createElement(P,null,t(lang,"Firewall — tarmoq va tashqi olam o'rtasidagi \"qorovul devor\". U har bir paketni qoidalar asosida tekshirib, o'tkazadi yoki bloklaydi — chegaradagi bojxona kabi.","A firewall is the \"guarded wall\" between a network and the outside. It checks each packet against rules and allows or blocks it — like customs at a border.")),
-    React.createElement(H2,{num:"§2"},t(lang,"Paketni tekshirish","Inspecting a packet")),
-    React.createElement(P,null,t(lang,"Firewall qoidalarni yuqoridan pastga tekshiradi va birinchi mos kelganida to'xtaydi. \"Ishga tushir\":","A firewall checks rules top-to-bottom and stops at the first match. Press Play:")),
-    React.createElement(FlowSteps,{title:{uz:"Firewall qarori",en:"Firewall decision"},steps:[
-      {icon:"📦",text:{uz:"Paket keladi (manba IP, port, protokol)",en:"Packet arrives (source IP, port, protocol)"}},
-      {icon:"📋",text:{uz:"Qoidalar ro'yxati bilan solishtiriladi",en:"Compared against the rule list"}},
-      {icon:"✅",text:{uz:"Mos ALLOW qoidasi → o'tkaziladi",en:"Matching ALLOW rule → forwarded"}},
-      {icon:"⛔",text:{uz:"Aks holda → DROP (bloklanadi)",en:"Otherwise → DROP (blocked)"}},
+    React.createElement(P,null,t(lang,"Firewall — tarmoq va tashqi olam o'rtasidagi «qorovul devor». Uni chegaradagi bojxona nazoratchisiga o'xshating: har bir o'tuvchi paketni oldindan yozilgan qoidalar ro'yxati bilan solishtiradi va faqat ruxsat berilganini o'tkazadi, qolganini bloklaydi. Firewall'siz tarmoq — darvozasi ochiq uy kabi.","A firewall is the «guard wall» between a network and the outside world. Think of it as a customs officer at a border: it compares every passing packet against a pre-written list of rules and lets through only what is allowed, blocking the rest. A network without a firewall is like a house with its gate wide open.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator","Interactive simulator")),
+    React.createElement(P,null,t(lang,"Pastdan paket tanlang — firewall uni qoidalar ro'yxati bilan YUQORIDAN PASTGA solishtiradi va BIRINCHI mos qoidada to'xtaydi. O'sha qoida ALLOW bo'lsa — paket o'tadi, DENY bo'lsa — bloklanadi.","Pick a packet below — the firewall compares it against the rule list TOP TO BOTTOM and stops at the FIRST matching rule. If that rule is ALLOW the packet passes; if DENY it is blocked.")),
+    React.createElement(FirewallSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Qoidalar qanday ishlaydi","How the rules work")),
+    React.createElement(P,null,t(lang,"Firewall qoidalari TARTIBLI ro'yxat — yuqoridan pastga o'qiladi va birinchi mos kelgan qoida qo'llanadi, qolganlari tekshirilmaydi. Shu sababli TARTIB juda muhim: aniq qoidalar (masalan «22-portni bloklash») umumiy qoidalardan (masalan «hammani ruxsat») OLDIN turishi kerak. Ro'yxat oxirida deyarli har doim «standart: qolgan hammasini rad et» (default deny) turadi — bu «ruxsat berilmagan — taqiqlangan» tamoyili, eng xavfsiz yondashuv.","Firewall rules are an ORDERED list — read top to bottom, and the first matching rule is applied; the rest aren't checked. That's why ORDER matters a lot: specific rules (e.g. «block port 22») must come BEFORE general ones (e.g. «allow everyone»). At the end of the list there is almost always a «default: deny everything else» (default deny) — the «what isn't allowed is forbidden» principle, the safest approach.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Firewall avlodlari","Firewall generations")),
+    React.createElement(P,null,t(lang,"Firewall'lar oddiy port filtridan aqlli, ilova-darajasidagi tizimlargacha rivojlangan:","Firewalls have evolved from a simple port filter to smart, application-aware systems:")),
+    React.createElement(LayerStack,{layers:[
+      {n:"L3-4",name:t(lang,"Packet filter","Packet filter"),color:"#ff6b6b",desc:{uz:"Faqat IP va port bo'yicha — ulanish holatini bilmaydi (stateless). Sodda va tez.",en:"By IP and port only — doesn't know connection state (stateless). Simple and fast."}},
+      {n:"state",name:t(lang,"Stateful","Stateful"),color:"#69db7c",desc:{uz:"Ulanish kontekstini eslaydi — o'rnatilgan ulanish javobini avtomatik o'tkazadi. Bugungi standart.",en:"Remembers connection context — auto-allows replies to established connections. Today's standard."}},
+      {n:"L7",name:t(lang,"NGFW / WAF","NGFW / WAF"),color:"#4dabf7",desc:{uz:"Ilova qatlamini (L7) ko'radi — DPI, IDS/IPS, tahdid razvedkasi. Chuqur tekshiruv.",en:"Sees the application layer (L7) — DPI, IDS/IPS, threat intel. Deep inspection."}}
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Firewall turlari","Firewall types")),
-    types.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+x[2]+"44",borderLeft:"3px solid "+x[2],borderRadius:10,animationDelay:(i*0.06)+"s"}},
-      React.createElement("span",{style:{fontWeight:700,fontSize:12.5,color:x[2],minWidth:130}},x[0]),
-      React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-        React.createElement(H2,{num:"§4"},t(lang,"Firewall avlodlari","Firewall generations")),
-    React.createElement(LayerStack,{layers:[{n:"L3-4",name:t(lang,"Packet filter","Packet filter"),color:"#ff6b6b",desc:{uz:"Faqat IP/port bo'yicha — holatni bilmaydi.",en:"By IP/port only — stateless."}},{n:"state",name:t(lang,"Stateful","Stateful"),color:"#69db7c",desc:{uz:"Ulanish holatini kuzatadi (afzal).",en:"Tracks connection state (preferred)."}},{n:"L7",name:t(lang,"NGFW / WAF","NGFW / WAF"),color:"#4dabf7",desc:{uz:"Ilova qatlamini ko'radi (DPI, IDS).",en:"Sees the application layer (DPI, IDS)."}},]}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: qoidalarni ko'rish","Practice: viewing rules")),
-    React.createElement(P,null,t(lang,"Linux'da ufw yoki iptables firewall qoidalarini boshqaradi. Qoidalar yuqoridan pastga tekshiriladi — birinchi mos kelgani qo'llanadi, oxirida odatda «hammasini rad et» turadi.","On Linux, ufw or iptables manages firewall rules. Rules are checked top-down — the first match applies, and a «deny all» usually sits at the end.")),
-    React.createElement(Terminal,null,"sudo ufw status numbered\n# [ 1] 22/tcp   ALLOW IN  Anywhere    ← SSH ruxsat\n# [ 2] 80/tcp   ALLOW IN  Anywhere\n# [ 3] Anywhere DENY IN  Anywhere    ← qolgan hammasi rad\nsudo iptables -L -n --line-numbers"),
-React.createElement(Quiz,{q:{uz:"Firewall qoidalarni qanday tartibda tekshiradi?",en:"In what order does a firewall check rules?"},opts:[{uz:"Tasodifiy",en:"Randomly"},{uz:"Yuqoridan pastga, birinchi moslikda to'xtaydi",en:"Top-to-bottom, stops at first match"},{uz:"Pastdan yuqoriga",en:"Bottom-to-top"},{uz:"Alifbo bo'yicha",en:"Alphabetically"}],correct:1,exp:{uz:"Firewall qoidalarni yuqoridan pastga tekshiradi va birinchi mos qoidada to'xtaydi — shu sababli aniq ALLOW qoidalari umumiy DROP dan oldin turishi kerak.",en:"A firewall checks rules top-to-bottom and stops at the first match — so specific ALLOW rules must precede a general DROP."}}));
+    React.createElement(H2,{num:"§5"},t(lang,"Stateful va stateless — farqi","Stateful vs stateless — the difference")),
+    React.createElement(CompareCols,{
+      left:{title:{uz:"Stateless (packet filter)",en:"Stateless (packet filter)"},color:"#ff6b6b",rows:[{uz:"Har paketni alohida ko'radi",en:"Sees each packet in isolation"},{uz:"Javob paketi uchun alohida qoida kerak",en:"Needs a separate rule for reply packets"},{uz:"Tez, lekin oson aldanadi",en:"Fast, but easier to trick"}]},
+      right:{title:{uz:"Stateful",en:"Stateful"},color:"#22c55e",rows:[{uz:"Ulanish holatini kuzatadi",en:"Tracks connection state"},{uz:"«O'rnatilgan ulanish javobini o'tkaz» — bitta qoida",en:"«Allow replies to established» — one rule"},{uz:"Xavfsizroq, hozir standart",en:"Safer, now the standard"}]}}),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: Linux firewall","Practice: the Linux firewall")),
+    React.createElement(P,null,t(lang,"Linux'da ufw (sodda) yoki iptables/nftables (kuchli) firewall'ni boshqaradi. Quyida qoidalarni ko'rish va stateful qoida yozish namunasi:","On Linux, ufw (simple) or iptables/nftables (powerful) manages the firewall. Below is how to view rules and write a stateful rule:")),
+    React.createElement(Terminal,null,"sudo ufw status numbered\n# [ 1] 80/tcp    ALLOW IN  Anywhere      ← Veb ruxsat\n# [ 2] 443/tcp   ALLOW IN  Anywhere\n# [ 3] 22/tcp    DENY IN   Anywhere      ← SSH taqiq\n\n# Stateful qoida (o'rnatilgan ulanish javobini o'tkaz):\nsudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT\nsudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT\nsudo iptables -A INPUT -j DROP        # ← default deny (oxirida)"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Firewall qoidalarini masofadan (SSH orqali) o'zgartirayotganda ehtiyot bo'ling — noto'g'ri «default deny» o'zingizni ham qulflab qo'yishi mumkin. Har doim ruxsat qoidangizni default deny'dan OLDIN qo'ying.","Be careful editing firewall rules remotely (over SSH) — a wrong «default deny» can lock you out too. Always place your allow rule BEFORE the default deny.")),
+    React.createElement(Quiz,{q:{uz:"Firewall qoidalarni qanday tartibda tekshiradi?",en:"In what order does a firewall check rules?"},opts:[{uz:"Tasodifiy",en:"Randomly"},{uz:"Yuqoridan pastga, birinchi moslikda to'xtaydi",en:"Top-to-bottom, stops at first match"},{uz:"Pastdan yuqoriga",en:"Bottom-to-top"},{uz:"Alifbo bo'yicha",en:"Alphabetically"}],correct:1,exp:{uz:"Firewall qoidalarni yuqoridan pastga tekshiradi va birinchi mos qoidada to'xtaydi — shu sababli aniq ALLOW/DENY qoidalari umumiy default deny'dan oldin turishi kerak.",en:"A firewall checks rules top-to-bottom and stops at the first match — so specific ALLOW/DENY rules must precede the general default deny."}}));
 }
 function LessonL22(){
   const lang=useLang();
