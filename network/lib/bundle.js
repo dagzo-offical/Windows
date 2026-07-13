@@ -424,6 +424,61 @@ function FirewallSim(){
       logs.map(function(l,i){return React.createElement("div",{key:i,className:"na-rise",style:{color:l.c,marginBottom:3,fontWeight:l.c==="#94a3b8"?400:700}},(i+1)+". "+l.t);})));
 }
 
+function TLSSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",PU="#a855f7",AM="#f59e0b",SL="#1e293b",SL2="#0f172a";
+  const STEPS=[
+    {dir:"c2s",ic:"👋",col:BL,uz:"Client Hello",en:"Client Hello",duz:"Brauzer qo'llab-quvvatlanadigan shifrlar ro'yxati va tasodifiy sonni yuboradi.",den:"The browser sends its supported ciphers and a random number."},
+    {dir:"s2c",ic:"📜",col:PU,uz:"Server Hello + Sertifikat",en:"Server Hello + Certificate",duz:"Server shifrni tanlaydi va o'z sertifikatini (ochiq kalit) yuboradi.",den:"The server picks a cipher and sends its certificate (public key)."},
+    {dir:"chk",ic:"🔎",col:AM,uz:"Sertifikatni tekshirish",en:"Verify certificate",duz:"Brauzer sertifikat ishonchli CA tomonidan imzolanganini tekshiradi.",den:"The browser checks the certificate is signed by a trusted CA."},
+    {dir:"c2s",ic:"🔑",col:A,uz:"Kalit almashinuvi (ECDHE)",en:"Key exchange (ECDHE)",duz:"Ikkala tomon umumiy maxfiy sessiya kalitini kelishadi.",den:"Both sides agree on a shared secret session key."},
+    {dir:"done",ic:"🔒",col:A,uz:"Shifrlangan ulanish",en:"Encrypted connection",duz:"Simmetrik shifrlash boshlanadi — barcha ma'lumot xavfsiz.",den:"Symmetric encryption begins — all data is secure."}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  const certOk=run==="safe";
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    if(step<0){const id=setTimeout(()=>setStep(0),160);return()=>clearTimeout(id);}
+    if(step===2&&!certOk) return;
+    if(step>=STEPS.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1050);return()=>clearTimeout(id);
+  },[run,step]);
+  const failed=run==="fake"&&step>=2;
+  const secure=run==="safe"&&step>=STEPS.length-1;
+  const dirBadge=(s)=>{
+    if(s.dir==="chk"||s.dir==="done") return null;
+    const rev=s.dir==="s2c";
+    return React.createElement("div",{style:{width:100,flexShrink:0}},
+      React.createElement("div",{style:{fontSize:8.5,color:"#64748b",textAlign:"center",fontFamily:"var(--font-mono)",marginBottom:4}},rev?"Server → Client":"Client → Server"),
+      React.createElement("div",{className:"na-wire",style:{transform:rev?"scaleX(-1)":"none"}},
+        React.createElement("div",{className:"na-pkt",style:{background:s.col,boxShadow:"0 0 8px "+s.col}})));
+  };
+  const card=(s,i)=>{
+    const isChk=s.dir==="chk";const chkFail=isChk&&run==="fake";const col=chkFail?D:s.col;
+    return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",alignItems:"center",gap:12,padding:"10px 13px",marginBottom:7,background:step===i?col+"1f":SL2,border:"1px solid "+col+(step===i?"":"44"),borderLeft:"4px solid "+col,borderRadius:10,transition:"all .25s"}},
+      React.createElement("div",{style:{fontSize:22,lineHeight:1}},chkFail?"⚠":s.ic),
+      React.createElement("div",{style:{flex:1}},
+        React.createElement("div",{style:{fontSize:12.5,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+        React.createElement("div",{style:{fontSize:11,color:"#94a3b8",marginTop:2,lineHeight:1.5}},t(lang,s.duz,s.den)),
+        isChk&&React.createElement("div",{style:{fontSize:10.5,fontWeight:700,marginTop:4,color:chkFail?D:A,fontFamily:"var(--font-mono)"}},chkFail?t(lang,"✗ Sertifikat ISHONCHSIZ — soxta! CA imzosi mos emas.","✗ Certificate UNTRUSTED — fake! CA signature invalid."):t(lang,"✓ Sertifikat ishonchli — CA imzosi to'g'ri.","✓ Certificate trusted — CA signature valid."))),
+      dirBadge(s));
+  };
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:10,gap:8,alignItems:"center"}},
+      React.createElement("div",{style:{flex:1,textAlign:"center",padding:"8px",background:SL,border:"1px solid "+BL+"55",borderRadius:10,fontSize:12,fontWeight:700,color:"#93c5fd"}},t(lang,"🌐 Client (Brauzer)","🌐 Client (Browser)")),
+      React.createElement("div",{style:{color:"#64748b",fontSize:18,padding:"0 4px"}},"⇄"),
+      React.createElement("div",{style:{flex:1,textAlign:"center",padding:"8px",background:SL,border:"1px solid "+A+"55",borderRadius:10,fontSize:12,fontWeight:700,color:"#86efac"}},t(lang,"🖥 Server","🖥 Server"))),
+    React.createElement("div",{style:{minHeight:60}},
+      run==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"16px"}},t(lang,"⬇ Ssenariy tanlang — TLS qo'l berishi (handshake) bosqichma-bosqich qanday kechishini ko'ring.","⬇ Pick a scenario — watch the TLS handshake unfold step by step.")):
+      STEPS.map(function(s,i){return step>=i?card(s,i):null;})),
+    (secure||failed)&&React.createElement("div",{style:{marginTop:6,padding:"11px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:13,background:(secure?A:D)+"1f",border:"1px solid "+(secure?A:D),color:secure?A:D}},
+      secure?t(lang,"🔒 Xavfsiz ulanish o'rnatildi — ma'lumot to'liq shifrlangan.","🔒 Secure connection established — data is fully encrypted."):t(lang,"⚠ Sertifikat ishonchsiz — brauzer ulanishni RAD ETDI (MITM hujumi oldini olindi).","⚠ Untrusted certificate — the browser REFUSED the connection (MITM prevented).")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Xavfsiz ulanish","🔒 Secure connection")),
+      React.createElement("button",{onClick:()=>{setRun("fake");setStep(-1);},style:{flex:1,padding:"9px",background:run==="fake"?D+"22":SL,color:run==="fake"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}},t(lang,"🥷 Soxta sertifikat (MITM)","🥷 Fake certificate (MITM)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1271,24 +1326,26 @@ function LessonL15(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"SSL/TLS nima?","What is SSL/TLS?")),
-    React.createElement(P,null,t(lang,"TLS — internetda ma'lumotni shifrlaydigan protokol, HTTPS ning \"S\" harfi (SSL — eski nomi). U ikki narsani beradi: maxfiylik (hech kim o'qiy olmaydi) va ishonch (haqiqiy sayt bilan gaplashyapsiz).","TLS is the protocol that encrypts data on the internet — the \"S\" in HTTPS (SSL is the old name). It provides two things: confidentiality (no one can read it) and trust (you're talking to the real site).")),
-    React.createElement(H2,{num:"§2"},t(lang,"TLS qo'l berishi","The TLS handshake")),
-    React.createElement(P,null,t(lang,"Ulanishdan oldin client va server shifrni kelishadi va serverning haqiqiyligini tekshiradi. \"Ishga tushir\":","Before connecting, client and server agree on encryption and verify the server's identity. Press Play:")),
-    React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"TLS handshake",en:"TLS handshake"},steps:[
-      {icon:"👋",text:{uz:"Client → Server:  \"salom, qaysi shifrlarni bilasan?\"",en:"Client → Server:  \"hello, which ciphers do you support?\""}},
-      {icon:"📜",text:{uz:"Server → Client:  shifr + sertifikat",en:"Server → Client:  cipher + certificate"}},
-      {icon:"🔍",text:{uz:"Client sertifikatni tekshiradi (CA imzosi?)",en:"Client verifies the certificate (CA signature?)"}},
-      {icon:"🔑",text:{uz:"Ikkalasi umumiy maxfiy kalitni kelishadi",en:"Both agree on a shared secret key"}},
-      {icon:"🔒",text:{uz:"Endi hamma narsa shifrlanadi",en:"Everything is now encrypted"}},
+    React.createElement(P,null,t(lang,"TLS — internetda ma'lumotni shifrlaydigan protokol; HTTPS dagi «S» harfi aynan shu (SSL — uning eski nomi). Brauzer manzil satridagi qulf 🔒 — TLS ishlayotganini bildiradi. U ikki muhim narsani beradi: MAXFIYLIK (o'rtadagi hech kim — provayder, xaker — trafikni o'qiy olmaydi) va ISHONCH (siz haqiqiy sayt bilan gaplashyapsiz, soxta bilan emas).","TLS is the protocol that encrypts data on the internet; it's the «S» in HTTPS (SSL is its old name). The padlock 🔒 in the address bar means TLS is active. It provides two key things: CONFIDENTIALITY (no one in the middle — ISP, hacker — can read the traffic) and TRUST (you're talking to the real site, not a fake).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: TLS handshake","Interactive simulator: the TLS handshake")),
+    React.createElement(P,null,t(lang,"Shifrlashdan oldin client va server «qo'l berishadi» (handshake) — shifrni kelishadi va serverning haqiqiyligini tekshiradi. Ikkala ssenariyni sinab ko'ring: xavfsiz ulanish va soxta sertifikatli MITM hujumi.","Before encrypting, the client and server «shake hands» (handshake) — they agree on a cipher and verify the server's identity. Try both scenarios: a secure connection and a fake-certificate MITM attack.")),
+    React.createElement(TLSSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Sertifikat va ishonch zanjiri","Certificates and the chain of trust")),
+    React.createElement(P,null,t(lang,"Sayt o'z haqiqiyligini «sertifikat» (raqamli pasport) bilan isbotlaydi. Sertifikatni ishonchli tashkilot — CA (Certificate Authority) imzolaydi. Ishonch zanjir bo'ylab quriladi: brauzer server sertifikatini oraliq CA gacha, undan Root CA gacha tekshiradi. Root CA lar brauzerga oldindan o'rnatilgan — shuning uchun soxta sertifikat darhol fosh bo'ladi.","A site proves it's genuine with a «certificate» (a digital passport). The certificate is signed by a trusted organization — a CA (Certificate Authority). Trust is built as a chain: the browser checks the server certificate up to an intermediate CA, then up to a Root CA. Root CAs are pre-installed in the browser — so a fake certificate is exposed instantly.")),
+    React.createElement(LayerStack,{layers:[
+      {n:"1",name:t(lang,"Root CA","Root CA"),color:"#22c55e",desc:{uz:"Brauzerga oldindan o'rnatilgan, eng ishonchli ildiz.",en:"Pre-installed in the browser, the most trusted root."}},
+      {n:"2",name:t(lang,"Oraliq CA","Intermediate CA"),color:"#3b82f6",desc:{uz:"Root tomonidan imzolangan; server sertifikatlarini imzolaydi.",en:"Signed by the Root; signs server certificates."}},
+      {n:"3",name:t(lang,"Server sertifikati","Server certificate"),color:"#a855f7",desc:{uz:"Oraliq CA imzolagan; aynan shu saytga (CN=example.com) tegishli.",en:"Signed by the intermediate CA; belongs to this exact site (CN=example.com)."}},
+      {n:"✓",name:t(lang,"Ishonch zanjiri","Chain of trust"),color:"#f59e0b",desc:{uz:"Brauzer zanjirni Root gacha tekshiradi — biror bo'g'in ishonchsiz bo'lsa, ogohlantiradi.",en:"The browser verifies the chain up to the Root — if any link is untrusted, it warns."}}
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Sertifikat va CA","Certificates and CAs")),
-    React.createElement(P,null,t(lang,"Sayt haqiqiyligini \"sertifikat\" bilan isbotlaydi (raqamli pasport). Uni ishonchli tashkilot (CA) imzolaydi. Brauzer CA ro'yxatini biladi, shuning uchun soxta sertifikatni darhol aniqlaydi.","A site proves it's genuine with a \"certificate\" (a digital passport), signed by a trusted CA. The browser knows the CA list, so it instantly detects a fake certificate.")),
-        React.createElement(H2,{num:"§4"},t(lang,"TLS handshake bosqichlari","The TLS handshake")),
-    React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"HTTPS ulanishi",en:"An HTTPS connection"},steps:[{icon:"👋",text:{uz:"Client Hello — qo'llab-quvvatlanadigan shifrlar",en:"Client Hello — supported ciphers"}},{icon:"📜",text:{uz:"Server sertifikat + ochiq kalitni yuboradi",en:"Server sends its certificate + public key"}},{icon:"✅",text:{uz:"Brauzer CA imzosini tekshiradi",en:"The browser verifies the CA signature"}},{icon:"🔑",text:{uz:"Umumiy sessiya kaliti kelishiladi",en:"A shared session key is agreed"}},{icon:"🔒",text:{uz:"Shifrlangan ma'lumot almashinuvi",en:"Encrypted data exchange begins"}},]}),
+    React.createElement(H2,{num:"§4"},t(lang,"SSL va TLS versiyalari","SSL and TLS versions")),
+    React.createElement(CompareCols,{
+      left:{title:{uz:"Eski (ishlatmang)",en:"Old (do not use)"},color:"#ef4444",rows:[{uz:"SSL 2.0 / 3.0 — buzilgan",en:"SSL 2.0 / 3.0 — broken"},{uz:"TLS 1.0 / 1.1 — eskirgan, zaif",en:"TLS 1.0 / 1.1 — outdated, weak"},{uz:"Ma'lum hujumlarga ochiq (POODLE, BEAST)",en:"Open to known attacks (POODLE, BEAST)"}]},
+      right:{title:{uz:"Zamonaviy",en:"Modern"},color:"#22c55e",rows:[{uz:"TLS 1.2 — keng qo'llaniladi, xavfsiz",en:"TLS 1.2 — widely used, secure"},{uz:"TLS 1.3 — eng yangi, tezroq handshake",en:"TLS 1.3 — newest, faster handshake"},{uz:"Faqat kuchli shifrlar (AES-GCM, ChaCha20)",en:"Only strong ciphers (AES-GCM, ChaCha20)"}]}}),
     React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: sertifikatni tekshirish","Practice: inspecting a certificate")),
-    React.createElement(P,null,t(lang,"openssl s_client server sertifikatini, kim imzolaganini (Issuer = CA) va amal muddatini ko'rsatadi. Ishonchli CA imzolamagan sertifikat — brauzerda ogohlantirish beradi.","openssl s_client shows the server certificate, who signed it (Issuer = CA) and its validity. A certificate not signed by a trusted CA triggers a browser warning.")),
-    React.createElement(Terminal,null,"openssl s_client -connect example.com:443 -brief\n# subject: CN=example.com\n# issuer: C=US, O=DigiCert Inc, CN=DigiCert TLS RSA CA  ← CA\n# Protocol: TLSv1.3   Cipher: TLS_AES_256_GCM_SHA384"),
-React.createElement(Quiz,{q:{uz:"TLS sertifikatini kim imzolaydi, shunda brauzer ishonadi?",en:"Who signs a TLS certificate so the browser trusts it?"},opts:[{uz:"Foydalanuvchi",en:"The user"},{uz:"Certificate Authority (CA)",en:"A Certificate Authority (CA)"},{uz:"Provayder",en:"The ISP"},{uz:"DNS server",en:"The DNS server"}],correct:1,exp:{uz:"Ishonchli CA sertifikatni imzolaydi. Brauzer CA lar ro'yxatini biladi — haqiqiy va soxta sertifikatni ajratadi.",en:"A trusted CA signs the certificate. The browser knows the CA list — telling real from fake."}}));
+    React.createElement(P,null,t(lang,"openssl s_client server sertifikatini, uni kim imzolaganini (Issuer = CA), amal muddatini va TLS versiyasini ko'rsatadi. Ishonchli CA imzolamagan sertifikat — brauzerda ogohlantirish beradi.","openssl s_client shows the server certificate, who signed it (Issuer = CA), its validity and the TLS version. A certificate not signed by a trusted CA triggers a browser warning.")),
+    React.createElement(Terminal,null,"openssl s_client -connect example.com:443 -brief\n# subject: CN=example.com                          ← sayt\n# issuer:  C=US, O=DigiCert Inc, CN=DigiCert TLS RSA CA   ← CA (imzolagan)\n# Protocol: TLSv1.3   Cipher: TLS_AES_256_GCM_SHA384\n# Verification: OK                                 ← zanjir ishonchli"),
+    React.createElement(Quiz,{q:{uz:"TLS sertifikatini kim imzolaydi, shunda brauzer ishonadi?",en:"Who signs a TLS certificate so the browser trusts it?"},opts:[{uz:"Foydalanuvchi",en:"The user"},{uz:"Certificate Authority (CA)",en:"A Certificate Authority (CA)"},{uz:"Provayder",en:"The ISP"},{uz:"DNS server",en:"The DNS server"}],correct:1,exp:{uz:"Ishonchli CA sertifikatni imzolaydi. Brauzer CA lar ro'yxatini biladi — shuning uchun haqiqiy va soxta sertifikatni ajratadi va MITM hujumini to'sadi.",en:"A trusted CA signs the certificate. The browser knows the CA list — so it tells real from fake and blocks a MITM attack."}}));
 }
 function LessonL16(){
   const lang=useLang();
