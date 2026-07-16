@@ -1148,6 +1148,47 @@ function ProxySim(){
       React.createElement("button",{onClick:()=>{setRun("rev");setStep(-1);},style:{flex:1,padding:"9px",background:run==="rev"?A+"22":SL2,color:run==="rev"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🖥 Reverse proxy (server yashirin)","🖥 Reverse proxy (server hidden)"))));
 }
 
+function ZeroTrustSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",SL2="#0f172a";
+  const OLD=[
+    {col:AM,uz:"Hujumchi fishing orqali bitta xodim kompyuterini buzadi",en:"An attacker compromises one employee's PC via phishing",duz:"Bu — deyarli har bir haqiqiy buzilishning boshlanish nuqtasi.",den:"This is the starting point of nearly every real-world breach."},
+    {col:AM,uz:"Eski model («qal'a va handaq»): bu qurilma ALLAQACHON ichkarida",en:"Old model («castle and moat»): this device is ALREADY inside",duz:"Perimetr (firewall) bir marta o'tilgach, ichkaridagi hamma narsaga avtomatik ishoniladi.",den:"Once the perimeter (firewall) is crossed once, everything inside is automatically trusted."},
+    {col:D,uz:"Hujumchi to'g'ridan-to'g'ri Payroll bazasiga so'rov yuboradi",en:"The attacker sends a request straight to the Payroll database",duz:"Qayta tekshiruv YO'Q — ichki tarmoqdagi so'rov «xavfsiz» deb qabul qilinadi.",den:"There's NO re-check — a request from inside the network is assumed «safe»."},
+    {col:D,uz:"Kirish berildi — hujumchi butun tarmoqda ERKIN harakatlanadi",en:"Access granted — the attacker moves FREELY across the network",duz:"Bu «lateral movement» deyiladi — bitta zaif nuqta butun tashkilotni xavf ostiga qo'yadi.",den:"This is called «lateral movement» — one weak point puts the entire organization at risk.",final:true,attack:true}
+  ];
+  const ZTS=[
+    {col:AM,uz:"Hujumchi fishing orqali bitta xodim kompyuterini buzadi",en:"An attacker compromises one employee's PC via phishing",duz:"Zero Trust bu bosqichni oldini OLMAYDI — u «buzilish sodir bo'ladi» deb faraz qiladi (assume breach).",den:"Zero Trust doesn't PREVENT this step — it assumes a breach will happen (assume breach)."},
+    {col:"#3b82f6",uz:"Zero Trust: bu so'rov ham QAYTA tekshiriladi — ichkaridan bo'lsa ham",en:"Zero Trust: this request is RE-VERIFIED too — even though it's from inside",duz:"«Hech kimga ishonma, doim tekshir» — manba ichki tarmoqda bo'lishi ishonch bermaydi.",den:"«Never trust, always verify» — being on the internal network grants no automatic trust."},
+    {col:AM,uz:"Tekshiruv: qurilma holati shubhali, MFA tasdiqlanmagan",en:"Check: device posture is suspicious, MFA not confirmed",duz:"Siyosat kim + qaysi qurilma + qanday kontekstni birga baholaydi — biri mos kelmasa, yetarli emas.",den:"The policy evaluates who + which device + what context together — if one fails, it's not enough."},
+    {col:A,uz:"Kirish RAD ETILDI — hujumchi boshqa hech narsaga o'ta olmaydi",en:"Access DENIED — the attacker can't reach anything else",duz:"Mikrosegmentatsiya tufayli buzilgan qurilma FAQAT o'zi bilan cheklanadi — Payroll bazasi xavfsiz qoladi.",den:"Thanks to microsegmentation, the compromised device is CONTAINED to itself — the Payroll database stays safe.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="old"?OLD:ZTS;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="old"?OLD:run==="zt"?ZTS:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{textAlign:"center",padding:"8px",marginBottom:10,background:SL2,border:"1px solid rgba(148,163,184,.25)",borderRadius:10,fontSize:11,fontWeight:700,color:"#94a3b8",fontFamily:"var(--font-mono)"}},t(lang,"🥷 Fishing → 💻 Xodim PC → 🎯 Payroll bazasi","🥷 Phishing → 💻 Employee PC → 🎯 Payroll database")),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — bitta buzilgan qurilma eski model va Zero Trust'da qanday oqibatga olib kelishini ko'ring.","⬇ Pick a scenario — see what one compromised device leads to under the old model versus Zero Trust.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="old"?t(lang,"✗ Bitta zaif nuqta — butun tashkilot xavf ostida","✗ One weak point — the whole organization is at risk"):t(lang,"✓ Bitta zaif nuqta — faqat o'zi bilan cheklandi","✓ One weak point — contained to itself")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("old");setStep(-1);},style:{flex:1,padding:"9px",background:run==="old"?D+"22":SL2,color:run==="old"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🏰 Eski model (qal'a-handaq)","🏰 Old model (castle-moat)")),
+      React.createElement("button",{onClick:()=>{setRun("zt");setStep(-1);},style:{flex:1,padding:"9px",background:run==="zt"?A+"22":SL2,color:run==="zt"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 Zero Trust","🛡 Zero Trust"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2157,28 +2198,31 @@ React.createElement(Quiz,{q:{uz:"Reverse proxy asosan kimni himoya qiladi?",en:"
 }
 function LessonL21(){
   const lang=useLang();
-  const pr=[[{uz:"Doim tekshir",en:"Always verify"},{uz:"Har kirish har safar tasdiqlanadi",en:"Every access is confirmed each time"}],[{uz:"Minimal huquq",en:"Least privilege"},{uz:"Har kim faqat kerakli narsaga kiradi",en:"Everyone gets only what they need"}],[{uz:"Buzilishni faraz qil",en:"Assume breach"},{uz:"Hujumchi allaqachon ichkarida deb himoyalan",en:"Defend as if an attacker is already inside"}],[{uz:"Mikrosegmentatsiya",en:"Microsegmentation"},{uz:"Tarmoq kichik zonalarga bo'linadi",en:"The network is split into small zones"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Zero Trust nima?","What is Zero Trust?")),
-    React.createElement(P,null,t(lang,"Zero Trust — \"hech kimga ishonma, doim tekshir\" tamoyili. Eski model tarmoq ichidagini avtomatik ishonchli deb bilardi (qal'a devori kabi). Zero Trust esa har bir so'rovni — ichkaridan bo'lsa ham — tekshiradi.","Zero Trust means \"never trust, always verify\". The old model auto-trusted anything inside the network (like a castle wall). Zero Trust verifies every request — even from inside.")),
-    React.createElement(H2,{num:"§2"},t(lang,"Har so'rov tekshiriladi","Every request is checked")),
+    React.createElement(P,null,t(lang,"Zero Trust — «hech kimga ishonma, doim tekshir» tamoyili. Eski model tarmoq ichidagini avtomatik ishonchli deb bilardi — xuddi qal'a devori kabi: bir marta ichkariga kirsangiz, hamma narsaga erkin kirish bor edi. Zero Trust esa har bir so'rovni — hatto ichkaridan bo'lsa ham — alohida tekshiradi. Bu DMZ (L17) g'oyasining mantiqiy davomi: perimetrga ishonish o'rniga, HAR resursning o'z chegarasi bor.","Zero Trust means «never trust, always verify». The old model auto-trusted anything inside the network — like a castle wall: once you were in, you had free access to everything. Zero Trust checks every request individually — even from inside. It's the logical continuation of the DMZ idea (L17): instead of trusting the perimeter, EVERY resource has its own boundary.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: bitta buzilgan qurilmadan keyin nima bo'ladi?","Interactive simulator: what happens after one device is compromised?")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xuddi shu boshlang'ich buzilish eski model va Zero Trust'da qanday tubdan farqli oqibatga olib kelishini ko'ring:","Try both scenarios — see how the exact same initial breach leads to radically different outcomes under the old model versus Zero Trust:")),
+    React.createElement(ZeroTrustSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Har so'rov qanday tekshiriladi","How every request is checked")),
     React.createElement(FlowSteps,{title:{uz:"Zero Trust tekshiruvi",en:"Zero Trust check"},steps:[
       {icon:"👤",text:{uz:"Kim? — foydalanuvchi shaxsi tasdiqlanadi (MFA)",en:"Who? — user identity verified (MFA)"}},
-      {icon:"💻",text:{uz:"Qanday qurilma? — holati tekshiriladi",en:"What device? — its posture is checked"}},
-      {icon:"📍",text:{uz:"Qayerdan? — kontekst (joy, vaqt)",en:"From where? — context (location, time)"}},
+      {icon:"💻",text:{uz:"Qanday qurilma? — holati (posture) tekshiriladi",en:"What device? — its posture is checked"}},
+      {icon:"📍",text:{uz:"Qayerdan? — kontekst (joy, vaqt, xatti-harakat)",en:"From where? — context (location, time, behavior)"}},
       {icon:"🔑",text:{uz:"Faqat kerakli resursga minimal ruxsat beriladi",en:"Minimal access granted to just the needed resource"}},
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Asosiy tamoyillar","Core principles")),
-    pr.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
-      React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:150}},t(lang,x[0].uz,x[0].en)),
-      React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
+    React.createElement(H2,{num:"§4"},t(lang,"Zero Trust tamoyillari","Zero Trust principles")),
+    React.createElement(LayerStack,{layers:[
+      {n:"verify",name:t(lang,"Har doim tekshir","Always verify"),color:"#ff3a5e",desc:{uz:"Ichki tarmoqqa ham ishonma — har so'rov tekshiriladi.",en:"Trust nothing, even internal — verify every request."}},
+      {n:"least",name:t(lang,"Eng kam imtiyoz","Least privilege"),color:"#69db7c",desc:{uz:"Faqat zarur kirish beriladi — hech kim keragidan ortiq huquqqa ega bo'lmaydi.",en:"Grant only the access needed — no one has more rights than necessary."}},
+      {n:"micro",name:t(lang,"Mikrosegmentatsiya","Micro-segmentation"),color:"#4dabf7",desc:{uz:"Tarmoq kichik izolyatsiyalangan bo'laklarga bo'linadi — L09 VLAN g'oyasi kengaytirilgan.",en:"The network is split into small isolated segments — an extension of the L09 VLAN idea."}},
+      {n:"assume",name:t(lang,"Buzilishni faraz qil","Assume breach"),color:"#a855f7",desc:{uz:"Hujumchi allaqachon ichkarida deb ishlang — bu simulyatordagi asosiy g'oya.",en:"Work as if the attacker is already inside — the core idea in the simulator."}}
+    ]}),
     React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Oddiy misol: ","Simple example: ")),t(lang,"eski model: ofisga kirsangiz hamma xonaga kirasiz. Zero Trust: har xona eshigi alohida propuskingizni tekshiradi.","old model: once in the office you can enter any room. Zero Trust: each room's door checks your badge separately.")),
-        React.createElement(H2,{num:"§4"},t(lang,"Zero Trust tamoyillari","Zero Trust principles")),
-    React.createElement(LayerStack,{layers:[{n:"verify",name:t(lang,"Har doim tekshir","Always verify"),color:"#ff3a5e",desc:{uz:"Ichki tarmoqqa ham ishonma — har so'rov tekshiriladi.",en:"Trust nothing, even internal — verify every request."}},{n:"least",name:t(lang,"Eng kam imtiyoz","Least privilege"),color:"#69db7c",desc:{uz:"Faqat zarur kirish beriladi.",en:"Grant only the access needed."}},{n:"micro",name:t(lang,"Mikrosegmentatsiya","Micro-segmentation"),color:"#4dabf7",desc:{uz:"Tarmoq kichik izolyatsiyalangan bo'laklarga.",en:"Network split into small isolated segments."}},{n:"assume",name:t(lang,"Buzilishni faraz qil","Assume breach"),color:"#a855f7",desc:{uz:"Hujumchi allaqachon ichkarida deb ishlang.",en:"Work as if the attacker is already inside."}},]}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: eski model va Zero Trust","Practice: old model vs Zero Trust")),
-    React.createElement(P,null,t(lang,"Eski «qal'a va handaq» modeli ichki tarmoqqa to'liq ishonardi — bir marta kirgan hujumchi erkin harakatlanardi. Zero Trust har qadamda qayta tekshiradi: kim, qaysi qurilma, qaysi resursga.","The old «castle and moat» model fully trusted the internal network — an attacker who got in moved freely. Zero Trust re-checks at every step: who, which device, which resource.")),
-    React.createElement(Terminal,null,"# Zero Trust siyosati (soddalashtirilgan)\n# IF user=alice AND device=managed AND mfa=passed\n#   THEN allow -> app:payroll (faqat shu resurs)\n# ELSE deny + log   ← har so'rov qayta baholanadi"),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: siyosat qoidasi","Practice: a policy rule")),
+    React.createElement(P,null,t(lang,"Bu — simulyatordagi «tekshiruv» bosqichining aynan matn ko'rinishi: har shart (kim, qurilma, MFA) birga bajarilishi shart, aks holda rad etiladi.","This is the exact text form of the simulator's «check» step: every condition (who, device, MFA) must be satisfied together, or access is denied.")),
+    React.createElement(Terminal,null,"# Zero Trust siyosati (soddalashtirilgan)\nIF user=alice AND device=managed AND mfa=passed\n  THEN allow -> app:payroll   # faqat shu resurs, faqat shu safar\nELSE deny + log                # har so'rov qayta baholanadi"),
 React.createElement(Quiz,{q:{uz:"Zero Trust ning asosiy shiori qanday?",en:"What is the core motto of Zero Trust?"},opts:[{uz:"Ichkaridagi hammaga ishon",en:"Trust everyone inside"},{uz:"Hech kimga ishonma, doim tekshir",en:"Never trust, always verify"},{uz:"Faqat parolga ishon",en:"Trust only the password"},{uz:"Devor yetarli",en:"A wall is enough"}],correct:1,exp:{uz:"Zero Trust \"hech kimga ishonma, doim tekshir\" — har so'rov, ichkaridan bo'lsa ham, tasdiqlanadi.",en:"Zero Trust is \"never trust, always verify\" — every request, even from inside, is confirmed."}}));
 }
 function LessonL23(){
