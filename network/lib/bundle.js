@@ -827,6 +827,66 @@ function VLANSim(){
       React.createElement("button",{onClick:()=>{setRun("hub");setStep(-1);},style:{flex:1,padding:"9px",background:run==="hub"?D+"22":SL2,color:run==="hub"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔌 Oddiy HUB (solishtirish)","🔌 A plain HUB (compare)"))));
 }
 
+function NATSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",PU="#a855f7",AM="#f59e0b",GY="#64748b",SL2="#0f172a";
+  const ROWS=[{intip:"192.168.1.5:52001",pub:"203.0.113.7:40001",who:"A"},{intip:"192.168.1.6:49500",pub:"203.0.113.7:40002",who:"B"},{intip:"192.168.1.7:51122",pub:"203.0.113.7:40003",who:"C"}];
+  const OUT=[
+    {col:BL,uz:"A (192.168.1.5:52001) tashqariga ulanmoqchi",en:"A (192.168.1.5:52001) wants to connect out",duz:"Router manba manzilini 203.0.113.7:40001 ga almashtiradi va NAT jadvaliga yozadi.",den:"The router rewrites the source to 203.0.113.7:40001 and logs it in the NAT table."},
+    {col:PU,uz:"B (192.168.1.6:49500) tashqariga ulanmoqchi",en:"B (192.168.1.6:49500) wants to connect out",duz:"Boshqa tashqi port (40002) beriladi — shu bilan A ning ulanishidan ajratiladi.",den:"A different external port (40002) is assigned — keeping it distinct from A's connection."},
+    {col:AM,uz:"C (192.168.1.7:51122) tashqariga ulanmoqchi",en:"C (192.168.1.7:51122) wants to connect out",duz:"Yana boshqa port (40003). Uchalasi ham bitta ommaviy IP — 203.0.113.7 — dan chiqadi.",den:"Yet another port (40003). All three exit through one public IP — 203.0.113.7.",final:true}
+  ];
+  const IN=[
+    {col:BL,uz:"Serverdan javob keldi: 203.0.113.7:40002 ga",en:"A reply arrived from the server: to 203.0.113.7:40002",duz:"Router NAT jadvalini tekshiradi — bu port kimning ulanishiga tegishli edi?",den:"The router checks its NAT table — whose connection does this port belong to?"},
+    {col:A,uz:"Topildi! Router B ga (192.168.1.6:49500) forward qiladi",en:"Found it! The router forwards it to B (192.168.1.6:49500)",duz:"Jadvaldagi yozuv tufayli javob aynan TO'G'RI qurilmaga yetib boradi.",den:"Thanks to the table entry, the reply reaches exactly the RIGHT device.",hi:1},
+    {col:AM,uz:"Hujumchi: 203.0.113.7:9999 ga so'ralmagan paket yuboradi",en:"Attacker: sends an unsolicited packet to 203.0.113.7:9999",duz:"Bu portda hech qanday yozuv yo'q — hech kim bunday ulanishni so'ramagan edi.",den:"There's no entry for this port — nobody ever requested such a connection."},
+    {col:D,uz:"Router: mos yozuv topilmadi → paket TASHLANADI",en:"Router: no matching entry found → the packet is DROPPED",duz:"NAT rasmiy firewall bo'lmasa-da, so'ralmagan kiruvchi trafikni tasodifan to'sadi.",den:"NAT isn't formally a firewall, but it incidentally blocks unsolicited inbound traffic.",final:true,attack:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="out"?OUT:IN;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="out"?OUT:run==="in"?IN:null;
+  const cur=list&&step>=0?list[step]:null;
+  const showAttackRow=run==="in"&&step>=2;
+  const rowState=function(i){
+    if(run==="out") return step>=i?"on":"hidden";
+    if(run==="in") return cur&&cur.hi===i?"hi":"on";
+    return "hidden";
+  };
+  const tblRow=function(r,i){
+    const s=rowState(i);
+    const bg=s==="hi"?A+"1f":"transparent",bd=s==="hi"?A:"rgba(148,163,184,.15)",op=s==="hidden"?.2:1;
+    return React.createElement("div",{key:i,style:{display:"grid",gridTemplateColumns:"28px 1fr 1fr",gap:6,padding:"6px 8px",background:bg,border:"1px solid "+bd,borderRadius:6,opacity:op,transition:"all .3s",marginBottom:3}},
+      React.createElement("span",{style:{fontSize:11,fontWeight:800,color:s==="hi"?A:"#94a3b8"}},r.who),
+      React.createElement("span",{style:{fontSize:10.5,fontFamily:"var(--font-mono)",color:"#cbd5e1"}},r.intip),
+      React.createElement("span",{style:{fontSize:10.5,fontFamily:"var(--font-mono)",color:s==="hi"?A:"#93c5fd"}},r.pub));
+  };
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{background:SL2,border:"1px solid rgba(148,163,184,.2)",borderRadius:12,padding:"10px 12px",marginBottom:12}},
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"28px 1fr 1fr",gap:6,padding:"0 8px 6px",fontSize:9,fontWeight:800,color:"#64748b",fontFamily:"var(--font-mono)",letterSpacing:.4}},
+        React.createElement("span",null,"#"),React.createElement("span",null,t(lang,"ICHKI (LAN)","INTERNAL (LAN)")),React.createElement("span",null,t(lang,"OMMAVIY","PUBLIC"))),
+      ROWS.map(tblRow),
+      showAttackRow&&React.createElement("div",{className:"na-rise",style:{display:"grid",gridTemplateColumns:"28px 1fr 1fr",gap:6,padding:"6px 8px",background:D+"1f",border:"1px solid "+D,borderRadius:6,marginTop:4}},
+        React.createElement("span",{style:{fontSize:13}},"🥷"),React.createElement("span",{style:{fontSize:10.5,color:D,fontFamily:"var(--font-mono)"}},"?"),React.createElement("span",{style:{fontSize:10.5,color:D,fontFamily:"var(--font-mono)"}},"203.0.113.7:9999 ✗"))),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — NAT jadvali qanday quriladi va javob qanday to'g'ri qurilmani topishini ko'ring.","⬇ Pick a scenario — see how the NAT table is built and how a reply finds the right device.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="out"?t(lang,"✓ 3 qurilma, bitta ommaviy IP, 3 xil port","✓ 3 devices, one public IP, 3 different ports"):t(lang,"⚠ So'ralmagan kiruvchi trafik — hech qayerga yo'naltirilmaydi","⚠ Unsolicited inbound traffic — has nowhere to be routed")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("out");setStep(-1);},style:{flex:1,padding:"9px",background:run==="out"?BL+"22":SL2,color:run==="out"?"#93c5fd":"#cbd5e1",border:"1px solid "+BL+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"📤 Chiquvchi (jadval quriladi)","📤 Outbound (building the table)")),
+      React.createElement("button",{onClick:()=>{setRun("in");setStep(-1);},style:{flex:1,padding:"9px",background:run==="in"?A+"22":SL2,color:run==="in"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"📥 Kiruvchi (javob vs hujumchi)","📥 Inbound (reply vs attacker)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1583,19 +1643,22 @@ function LessonL10(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"NAT nima?","What is NAT?")),
-    React.createElement(P,null,t(lang,"NAT ko'plab xususiy IP ni bitta ommaviy IP ga aylantiradi. Uydagi barcha qurilma internetga bitta ommaviy IP orqali chiqadi — ofis kommutatori kabi: tashqaridan bitta raqam, ichkarida ko'p ichki raqam.","NAT turns many private IPs into one public IP. All your home devices reach the internet through a single public IP — like an office switchboard: one number outside, many extensions inside.")),
-    React.createElement(PacketFlow,{from:{uz:"Uy qurilmalari",en:"Home devices"},to:{uz:"Internet",en:"Internet"},label:{uz:"NAT (bitta ommaviy IP)",en:"NAT (one public IP)"}}),
-    React.createElement(H2,{num:"§2"},t(lang,"Nega NAT kerak?","Why NAT?")),
-    React.createElement(P,null,t(lang,"IPv4 manzillar kam (~4.3 mlrd), qurilmalar milliardlab. NAT bitta ommaviy IP ni ko'p qurilma bilan ulashadi — manzillarni tejaydi. Ichki qurilmalar internetdan to'g'ridan-to'g'ri ko'rinmaydi — qo'shimcha xavfsizlik.","IPv4 addresses are scarce (~4.3B), devices number in the billions. NAT shares one public IP among many devices — saving addresses. Internal devices aren't directly visible — extra security.")),
-    React.createElement(H2,{num:"§3"},t(lang,"PAT — portlar bilan","PAT — using ports")),
-    React.createElement(P,null,t(lang,"PAT — NAT ning eng keng tarqalgan turi. Router har ichki ulanishga alohida port beradi, shunda qaysi javob qaysi qurilmaga tegishli ekanini biladi (har kishiga alohida quti raqami bergandek).","PAT is the most common NAT. The router gives each internal connection a unique port, so it knows which reply belongs to which device (like giving each person a box number).")),
-    React.createElement(Terminal,null,"192.168.1.5:52001 → 203.0.113.7:40001 → server\n192.168.1.6:49500 → 203.0.113.7:40002 → server\n# bitta ommaviy IP (203.0.113.7), ko'p port"),
-        React.createElement(H2,{num:"§4"},t(lang,"NAT turlari: SNAT, DNAT, PAT","NAT types: SNAT, DNAT, PAT")),
-    React.createElement(LayerStack,{layers:[{n:"SNAT",name:t(lang,"Source NAT","Source NAT"),color:"#4dabf7",desc:{uz:"Chiquvchi: ichki IP → ommaviy IP.",en:"Outbound: internal IP → public IP."}},{n:"DNAT",name:t(lang,"Destination NAT","Destination NAT"),color:"#69db7c",desc:{uz:"Kiruvchi: ommaviy → ichki server (port forward).",en:"Inbound: public → internal server (port forward)."}},{n:"PAT",name:t(lang,"Port Address Translation","Port Address Translation"),color:"#a855f7",desc:{uz:"Ko'p qurilma bitta IP, port bilan ajratiladi.",en:"Many devices, one IP, separated by port."}},]}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: NAT jadvali","Practice: the NAT table")),
-    React.createElement(P,null,t(lang,"Uy routeri PAT ishlatadi: 10 ta qurilma bitta ommaviy IP dan chiqadi, router har birini port raqami bilan eslab qoladi. Linux'da iptables NAT jadvalini boshqaradi.","A home router uses PAT: 10 devices exit through one public IP, and the router remembers each by port number. On Linux, iptables manages the NAT table.")),
-    React.createElement(Terminal,null,"sudo iptables -t nat -L -n\n# Chain POSTROUTING (policy ACCEPT)\n# MASQUERADE  all  --  192.168.1.0/24  0.0.0.0/0   ← SNAT/PAT\nsudo conntrack -L | head   # faol NAT ulanishlari"),
-React.createElement(Quiz,{q:{uz:"NAT ning asosiy foydasi nima?",en:"What is the main benefit of NAT?"},opts:[{uz:"Ma'lumotni shifrlaydi",en:"Encrypts data"},{uz:"Ko'p qurilmaga bitta ommaviy IP ni ulashadi",en:"Shares one public IP among many devices"},{uz:"DNS ni tezlashtiradi",en:"Speeds up DNS"},{uz:"Parolni tekshiradi",en:"Checks passwords"}],correct:1,exp:{uz:"NAT ko'plab xususiy manzilni bitta ommaviy IP ga aylantiradi — kam IPv4 ni tejaydi va ichki qurilmalarni yashiradi.",en:"NAT maps many private addresses to one public IP — saving scarce IPv4 and hiding internal devices."}}));
+    React.createElement(P,null,t(lang,"NAT (Network Address Translation) ko'plab xususiy IP manzilni bitta ommaviy IP ga aylantiradi. Uydagi barcha qurilma (telefon, noutbuk, aqlli TV) internetga bitta ommaviy IP orqali chiqadi — ofis kommutatori kabi: tashqaridan bitta telefon raqami ko'rinadi, ichkarida esa ko'p ichki raqam bor.","NAT (Network Address Translation) turns many private IP addresses into one public IP. Every device at home (phone, laptop, smart TV) reaches the internet through a single public IP — like an office switchboard: one phone number is visible from outside, but there are many extensions inside.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: NAT jadvali","Interactive simulator: the NAT table")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — chiquvchi ulanishlar NAT jadvalini qanday to'ldirishini va kiruvchi javob shu jadval yordamida to'g'ri qurilmani qanday topishini ko'ring:","Try both scenarios — see how outbound connections fill the NAT table, and how an inbound reply uses that table to find the right device:")),
+    React.createElement(NATSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Nega NAT kerak?","Why is NAT needed?")),
+    React.createElement(P,null,t(lang,"IPv4 manzillari cheklangan (~4.3 milliard), qurilmalar esa milliardlab. NAT bitta ommaviy IP ni ko'p qurilma bilan ulashadi — bu manzillarni tejaydi va IPv6 ga to'liq o'tishni kechiktirishga yordam bergan asosiy omillardan biri bo'lgan. Qo'shimcha samara sifatida, ichki qurilmalar internetdan to'g'ridan-to'g'ri ko'rinmaydi.","IPv4 addresses are limited (~4.3 billion), while devices number in the billions. NAT shares one public IP among many devices — saving addresses, and it's one of the main reasons the full move to IPv6 has been delayed. As a side effect, internal devices aren't directly visible from the internet.")),
+    React.createElement(H2,{num:"§4"},t(lang,"NAT turlari: SNAT, DNAT, PAT","NAT types: SNAT, DNAT, PAT")),
+    React.createElement(LayerStack,{layers:[
+      {n:"SNAT",name:t(lang,"Source NAT","Source NAT"),color:"#4dabf7",desc:{uz:"Chiquvchi: ichki IP → ommaviy IP. Simulyatordagi «Chiquvchi» ssenariysi aynan shu.",en:"Outbound: internal IP → public IP. Exactly the «Outbound» scenario in the simulator."}},
+      {n:"DNAT",name:t(lang,"Destination NAT","Destination NAT"),color:"#69db7c",desc:{uz:"Kiruvchi: ommaviy → ichki server (port forwarding — masalan uy serveringizni ochish uchun).",en:"Inbound: public → internal server (port forwarding — e.g. to expose your home server)."}},
+      {n:"PAT",name:t(lang,"Port Address Translation","Port Address Translation"),color:"#a855f7",desc:{uz:"Ko'p qurilma bitta ommaviy IP, lekin har biri boshqa tashqi port bilan ajratiladi.",en:"Many devices, one public IP, but each is distinguished by a different external port."}}
+    ]}),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: NAT jadvalini ko'rish","Practice: viewing the NAT table")),
+    React.createElement(P,null,t(lang,"Linux'da iptables NAT jadvalini boshqaradi; conntrack esa faol tarjima yozuvlarini (simulyatordagi jadval — jonli holatda) ko'rsatadi.","On Linux, iptables manages the NAT rules; conntrack shows the active translation entries (the table from the simulator — live)." )),
+    React.createElement(Terminal,null,"sudo iptables -t nat -L -n\n# Chain POSTROUTING (policy ACCEPT)\n# MASQUERADE  all  --  192.168.1.0/24  0.0.0.0/0   ← SNAT/PAT qoidasi\n\nsudo conntrack -L | head -3\n# tcp 6 431999 ESTABLISHED src=192.168.1.6 dst=93.184.216.34\n#   sport=49500 dport=443 src=93.184.216.34 dst=203.0.113.7\n#   sport=443 dport=40002   ← aynan simulyatordagi B yozuvi"),
+    React.createElement(Quiz,{q:{uz:"NAT ning asosiy foydasi nima?",en:"What is the main benefit of NAT?"},opts:[{uz:"Ma'lumotni shifrlaydi",en:"Encrypts data"},{uz:"Ko'p qurilmaga bitta ommaviy IP ni ulashadi",en:"Shares one public IP among many devices"},{uz:"DNS ni tezlashtiradi",en:"Speeds up DNS"},{uz:"Parolni tekshiradi",en:"Checks passwords"}],correct:1,exp:{uz:"NAT ko'plab xususiy manzilni bitta ommaviy IP ga aylantiradi — kam IPv4 ni tejaydi va ichki qurilmalarni yashiradi.",en:"NAT maps many private addresses to one public IP — saving scarce IPv4 and hiding internal devices."}}));
 }
 function LessonL11(){
   const lang=useLang();
