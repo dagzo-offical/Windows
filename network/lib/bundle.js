@@ -1189,6 +1189,46 @@ function ZeroTrustSim(){
       React.createElement("button",{onClick:()=>{setRun("zt");setStep(-1);},style:{flex:1,padding:"9px",background:run==="zt"?A+"22":SL2,color:run==="zt"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 Zero Trust","🛡 Zero Trust"))));
 }
 
+function ScanSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const SYN=[
+    {col:BL,uz:"Attacker → Target:22 — SYN yuboriladi",en:"Attacker → Target:22 — a SYN is sent",duz:"Odatiy TCP qo'l berishning 1-qadami — ulanish so'rovi.",den:"Step 1 of the normal TCP handshake — a connection request."},
+    {col:AM,uz:"Target → Attacker — SYN-ACK qaytaradi",en:"Target → Attacker — replies with SYN-ACK",duz:"Bu javob PORT OCHIQ ekanini bildiradi — xizmat ulanishga tayyor.",den:"This reply means the PORT IS OPEN — the service is ready to accept a connection."},
+    {col:AM,uz:"Attacker → Target — ACK O'RNIGA RST yuboradi",en:"Attacker → Target — sends RST INSTEAD OF an ACK",duz:"Nmap ulanishni ATAYLAB yakunlamaydi — shuning uchun «yarim ochiq» (half-open) skan deyiladi.",den:"Nmap deliberately never completes the connection — that's why it's called a «half-open» scan."},
+    {col:A,uz:"Natija: port OCHIQ — lekin TO'LIQ ulanish HECH QACHON o'rnatilmadi",en:"Result: the port is OPEN — but a FULL connection was NEVER established",duz:"Ko'p server ilovasi faqat TO'LIQ ulanishlarni logga yozadi — shuning uchun -sS «yashirinroq».",den:"Many server applications only log FULLY established connections — that's why -sS is «stealthier».",final:true}
+  ];
+  const CONNECT=[
+    {col:BL,uz:"Attacker → Target:22 — SYN yuboriladi",en:"Attacker → Target:22 — a SYN is sent",duz:"Xuddi shu birinchi qadam.",den:"The exact same first step."},
+    {col:AM,uz:"Target → Attacker — SYN-ACK qaytaradi",en:"Target → Attacker — replies with SYN-ACK",duz:"Port ochiq — xuddi avvalgi ssenariydek.",den:"The port is open — just like the previous scenario."},
+    {col:AM,uz:"Attacker → Target — ACK yuboradi (to'liq qo'l berish!)",en:"Attacker → Target — sends an ACK (a full handshake!)",duz:"connect() tizim chaqiruvi ishlatiladi — bu odatiy, to'liq TCP ulanish.",den:"The connect() system call is used — this is a normal, complete TCP connection."},
+    {col:D,uz:"Natija: port OCHIQ — lekin TO'LIQ ulanish O'RNATILDI",en:"Result: the port is OPEN — but a FULL connection WAS established",duz:"Aksariyat server ilovasi buni oddiy mijoz sifatida LOGGA yozadi — kamroq yashirin.",den:"Most server applications log this as a normal client connection — much less stealthy.",final:true,attack:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="syn"?SYN:CONNECT;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),950);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="syn"?SYN:run==="connect"?CONNECT:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — SYN scan (-sS) va Connect scan (-sT) paket darajasida qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how a SYN scan (-sS) differs from a Connect scan (-sT) at the packet level.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="syn"?t(lang,"✓ -sS: yashirinroq — to'liq ulanish hech qachon yaratilmaydi","✓ -sS: stealthier — a full connection is never created"):t(lang,"⚠ -sT: aniqroq izlanadi — to'liq ulanish loglarda qoladi","⚠ -sT: leaves more of a trace — a full connection shows up in logs")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("syn");setStep(-1);},style:{flex:1,padding:"9px",background:run==="syn"?A+"22":SL2,color:run==="syn"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🥷 SYN scan (-sS)","🥷 SYN scan (-sS)")),
+      React.createElement("button",{onClick:()=>{setRun("connect");setStep(-1);},style:{flex:1,padding:"9px",background:run==="connect"?D+"22":SL2,color:run==="connect"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔗 Connect scan (-sT)","🔗 Connect scan (-sT)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1278,18 +1318,25 @@ function LessonL22(){
       {icon:"🔎",text:{uz:"Javob → open / closed / filtered",en:"Response → open / closed / filtered"}},
       {icon:"🏷",text:{uz:"Ochiq portlarda xizmat + versiya aniqlanadi",en:"Service + version detected on open ports"}},
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Foydali bayroqlar","Useful flags")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: SYN vs Connect scan","Interactive simulator: SYN vs Connect scan")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xuddi shu ochiq portga qarshi ikki skan turi paket darajasida qanday farq qilishini va nega biri «yashirinroq» ekanini ko'ring:","Try both scenarios — see how two scan types differ at the packet level against the same open port, and why one is «stealthier»:")),
+    React.createElement(ScanSim),
+    React.createElement(H2,{num:"§4"},t(lang,"Foydali bayroqlar","Useful flags")),
     scans.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid "+s[3]+"44",borderLeft:"3px solid "+s[3],borderRadius:9,animationDelay:(i*0.06)+"s"}},
       React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:s[3],fontSize:12,minWidth:44}},s[0]),
       React.createElement("span",{style:{fontSize:12,fontWeight:600,color:"var(--text-0)",minWidth:80}},s[1]),
       React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},t(lang,s[2].uz,s[2].en)));}),
-    React.createElement(Terminal,null,"nmap -sV -sC 10.0.0.5\nnmap -sn 10.0.0.0/24     # tirik xostlar\nnmap -p- 10.0.0.5        # barcha portlar"),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Port skanerlashni faqat o'zingizga tegishli yoki yozma ruxsat berilgan tizimlarda o'tkazing. Ruxsatsiz skanerlash ko'p mamlakatda qonunga zid.","Only scan systems you own or are authorized (in writing) to test. Unauthorized scanning is illegal in many countries.")),
-        React.createElement(H2,{num:"§4"},t(lang,"Port holatlari","Port states")),
-    React.createElement(LayerStack,{layers:[{n:"open",name:t(lang,"open","open"),color:"#69db7c",desc:{uz:"Xizmat javob beradi — hujum yuzasi.",en:"A service answers — attack surface."}},{n:"closed",name:t(lang,"closed","closed"),color:"#ffd43b",desc:{uz:"Port yopiq, lekin xost tirik.",en:"Port closed, but the host is alive."}},{n:"filtered",name:t(lang,"filtered","filtered"),color:"#ff6b6b",desc:{uz:"Firewall to'sib qo'ygan — javob yo'q.",en:"A firewall blocks it — no reply."}},]}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: SYN skan","Practice: a SYN scan")),
-    React.createElement(P,null,t(lang,"nmap -sS «yarim ochiq» skan qiladi — ulanishni tugatmaydi, shuning uchun tez va yashirinroq. -sV har portning xizmat versiyasini aniqlaydi.","nmap -sS does a «half-open» scan — it never completes the handshake, so it's fast and stealthier. -sV identifies each port's service version.")),
-    React.createElement(Terminal,null,"sudo nmap -sS -sV -T4 10.0.0.5\n# PORT    STATE SERVICE VERSION\n# 22/tcp  open  ssh     OpenSSH 8.2\n# 80/tcp  open  http    nginx 1.18.0\n# 3306/tcp filtered mysql  ← firewall to'sgan"),
+    React.createElement(Terminal,null,"sudo nmap -sS -sV -T4 10.0.0.5   # SYN + versiya (root kerak)\nnmap -sT 10.0.0.5                 # Connect scan (root shart emas)\nnmap -sn 10.0.0.0/24              # tirik xostlar\nnmap -p- 10.0.0.5                 # barcha 65535 port"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Port skanerlashni faqat o'zingizga tegishli yoki yozma ruxsat berilgan tizimlarda o'tkazing. Ruxsatsiz skanerlash ko'p mamlakatda qonunga zid.","Only scan systems you own or are authorized (in writing) to test. Unauthorized scanning is illegal in many countries.")),
+    React.createElement(H2,{num:"§5"},t(lang,"Port holatlari","Port states")),
+    React.createElement(LayerStack,{layers:[
+      {n:"open",name:"open",color:"#69db7c",desc:{uz:"Xizmat javob beradi (SYN-ACK) — hujum yuzasi.",en:"A service answers (SYN-ACK) — attack surface."}},
+      {n:"closed",name:"closed",color:"#ffd43b",desc:{uz:"Port yopiq (RST qaytaradi), lekin xost tirik.",en:"Port closed (returns RST), but the host is alive."}},
+      {n:"filtered",name:"filtered",color:"#ff6b6b",desc:{uz:"Firewall to'sib qo'ygan — hech qanday javob yo'q.",en:"A firewall blocks it — no reply at all."}}
+    ]}),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: to'liq natijani o'qish","Practice: reading a full result")),
+    React.createElement(P,null,t(lang,"nmap -sS «yarim ochiq» skan qiladi — bu simulyatordagi aynan birinchi ssenariy. -sV har portning xizmat versiyasini aniqlaydi.","nmap -sS does a «half-open» scan — exactly the first scenario in the simulator. -sV identifies each port's service version.")),
+    React.createElement(Terminal,null,"sudo nmap -sS -sV -T4 10.0.0.5\n# PORT     STATE    SERVICE VERSION\n# 22/tcp   open     ssh     OpenSSH 8.2\n# 80/tcp   open     http    nginx 1.18.0\n# 3306/tcp filtered  mysql  ← firewall to'sgan"),
 React.createElement(Quiz,{q:{uz:"Nmap -sV bayrog'i nima qiladi?",en:"What does the Nmap -sV flag do?"},opts:[{uz:"Faqat ping yuboradi",en:"Only pings"},{uz:"Ochiq portdagi xizmat va versiyani aniqlaydi",en:"Detects the service and version on an open port"},{uz:"Faylni o'chiradi",en:"Deletes a file"},{uz:"VPN yoqadi",en:"Enables a VPN"}],correct:1,exp:{uz:"-sV ochiq port ortidagi xizmat va uning aniq versiyasini aniqlaydi — bu ma'lum zaifliklarni izlash uchun asos.",en:"-sV detects the service and its exact version behind an open port — a basis for finding known vulnerabilities."}}));
 }
 function ComingSoon({lesson}){
