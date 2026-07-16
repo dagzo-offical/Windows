@@ -1396,6 +1396,46 @@ function DNSSpoofSim(){
       React.createElement("button",{onClick:()=>{setRun("on");setStep(-1);},style:{flex:1,padding:"9px",background:run==="on"?A+"22":SL2,color:run==="on"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 DNSSEC yoqilgan","🔒 DNSSEC enabled"))));
 }
 
+function DDoSSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const FLOOD=[
+    {col:BL,uz:"Botnet: minglab bot bir vaqtda SYN so'rov yubora boshlaydi",en:"Botnet: thousands of bots start sending SYN requests simultaneously",duz:"Har bir bot o'zi zararlangan oddiy qurilma — egasi bexabar.",den:"Each bot is just an ordinary infected device — its owner has no idea."},
+    {col:AM,uz:"Server: har bir SYN uchun yarim ochiq ulanish ochadi va navbatga qo'yadi",en:"Server: opens a half-open connection for every SYN and queues it",duz:"Server ACK javobini kutadi — lekin botlar javob bermaydi.",den:"The server waits for the ACK reply — but the bots never answer."},
+    {col:AM,uz:"Ulanishlar navbati TO'LDI — yangi so'rov uchun joy qolmadi",en:"The connection queue is FULL — no room left for new requests",duz:"Server xotirasi/resurslari soxta yarim-ulanishlar bilan band bo'lib qoldi.",den:"The server's memory/resources are all tied up in fake half-connections."},
+    {col:D,uz:"⛔ Haqiqiy mijoz ulana olmaydi — «Connection timed out»",en:"⛔ A real customer can't connect — «Connection timed out»",duz:"Xizmat ishlab turibdi, lekin hech kimga javob bera olmaydi — bu aynan DoS maqsadi.",den:"The service is running, but can't respond to anyone — that's exactly the DoS goal.",final:true,attack:true}
+  ];
+  const MITIG=[
+    {col:BL,uz:"Botnet: xuddi shu minglab bot SYN toshqinini boshlaydi",en:"Botnet: the same thousands of bots start the SYN flood",duz:"Hujum hajmi bir xil — farq faqat serverning javob berish usulida.",den:"The attack volume is identical — the difference is only in how the server responds."},
+    {col:AM,uz:"Server: holat saqlamaydi — o'rniga shifrlangan «SYN cookie» yuboradi",en:"Server: keeps no state — instead sends a cryptographic «SYN cookie»",duz:"Ulanish uchun xotira faqat ACK haqiqiy kelganda ajratiladi.",den:"Memory for the connection is only allocated once a genuine ACK arrives."},
+    {col:AM,uz:"Botlar to'g'ri ACK qaytara olmaydi — chegarada rate-limit ortiqcha manbalarni kesadi",en:"Bots can't return a valid ACK — the edge rate-limit also cuts off excess sources",duz:"Soxta ulanishlar hech qachon to'liq ochilmaydi — server resursi band bo'lmaydi.",den:"The fake connections never fully open — the server's resources stay free."},
+    {col:A,uz:"✅ Haqiqiy mijoz normal ulanadi — server resurslari band emas",en:"✅ A real customer connects normally — the server's resources are free",duz:"SYN cookie + rate-limit + CDN filtri toshqinni chegarada to'xtatadi.",den:"SYN cookies + rate-limiting + a CDN filter stop the flood at the edge.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="raw"?FLOOD:MITIG;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="raw"?FLOOD:run==="safe"?MITIG:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu SYN toshqini himoyasiz va himoyalangan serverda qanday tugashini solishtiring.","⬇ Pick a scenario — compare how the same SYN flood ends against an unprotected versus a protected server.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="raw"?t(lang,"⛔ Xizmat ishdan chiqdi — resurslar soxta ulanishlar bilan tugadi","⛔ The service went down — resources exhausted by fake connections"):t(lang,"🛡 Xizmat ishlashda davom etdi — toshqin chegarada so'ndirildi","🛡 The service kept running — the flood was absorbed at the edge")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("raw");setStep(-1);},style:{flex:1,padding:"9px",background:run==="raw"?D+"22":SL2,color:run==="raw"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🌊 Himoyasiz server","🌊 Unprotected server")),
+      React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL2,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 SYN cookie + rate-limit","🛡 SYN cookies + rate-limit"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2535,18 +2575,20 @@ function LessonL27(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"DoS va DDoS nima?","What are DoS and DDoS?")),
-    React.createElement(P,null,t(lang,"DoS — serverni haddan tashqari so'rov bilan to'ldirib, xizmatni ishdan chiqarish. DDoS — xuddi shu, lekin minglab qurilmadan (botnet) bir vaqtda. Do'kon eshigini soxta mijozlar bilan to'ldirib, haqiqiylarni kirита olmaslikka o'xshaydi.","DoS overwhelms a server with excessive requests to knock the service offline. DDoS is the same but from thousands of devices (a botnet) at once. Like jamming a shop's door with fake customers so real ones can't enter.")),
+    React.createElement(P,null,t(lang,"DoS — serverni haddan tashqari so'rov bilan to'ldirib, xizmatni ishdan chiqarish. DDoS — xuddi shu, lekin minglab qurilmadan (botnet) bir vaqtda. Do'kon eshigini soxta mijozlar bilan to'ldirib, haqiqiylarni kira olmaslikka o'xshaydi.","DoS overwhelms a server with excessive requests to knock the service offline. DDoS is the same but from thousands of devices (a botnet) at once. Like jamming a shop's door with fake customers so real ones can't enter.")),
     React.createElement(H2,{num:"§2"},t(lang,"Hujum turlari","Attack types")),
     types.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+x[2]+"44",borderLeft:"3px solid "+x[2],borderRadius:10,animationDelay:(i*0.06)+"s"}},
       React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:x[2],minWidth:120}},t(lang,x[0].uz,x[0].en)),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-    React.createElement(H2,{num:"§3"},t(lang,"Himoya (mitigatsiya)","Mitigation")),
-    React.createElement(Terminal,null,"✓ Rate limiting — bir IP dan so'rovlarni cheklash\n✓ CDN / DDoS himoya (Cloudflare, Akamai)\n✓ Firewall va trafik filtrlash\n✓ Monitoring — anomal trafikni erta sezish"),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: SYN flood — himoyasiz vs himoyalangan","Interactive simulator: SYN flood — unprotected vs protected")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xuddi shu botnet toshqini himoyasiz va SYN cookie/rate-limit qo'llagan serverda qanday farqli tugashini ko'ring:","Try both scenarios — see how the exact same botnet flood ends differently against an unprotected server versus one using SYN cookies/rate-limiting:")),
+    React.createElement(DDoSSim),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya (mitigatsiya)","Mitigation")),
+    React.createElement(P,null,t(lang,"Simulyatordagi «SYN cookie + rate-limit» ssenariysi quyidagi choralarning bir qismini ko'rsatadi — real hayotda bularning barchasi birgalikda qo'llaniladi:","The simulator's «SYN cookies + rate-limit» scenario shows part of the measures below — in real life they're all combined:")),
+    React.createElement(Terminal,null,"✓ Rate limiting — bir IP dan so'rovlarni cheklash\n✓ SYN cookie — ulanish holatini saqlamasdan tekshirish\n✓ CDN / DDoS himoya (Cloudflare, Akamai)\n✓ Firewall va trafik filtrlash\n✓ Monitoring — anomal trafikni erta sezish"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"DoS/DDoS ni boshqa birovning tizimiga uyushtirish jiddiy jinoyat — hatto \"sinash\" uchun ham. Bu mavzu faqat himoya (blue team) nuqtai nazaridan o'rganiladi.","Launching DoS/DDoS against someone else's system is a serious crime — even \"just to try\". Studied only from a defensive (blue team) perspective.")),
-        React.createElement(H2,{num:"§4"},t(lang,"DoS hujum turlari","DoS attack types")),
-    React.createElement(LayerStack,{layers:[{n:"vol",name:t(lang,"Volumetric","Volumetric"),color:"#ff3a5e",desc:{uz:"Kanalni to'ldirish (UDP/ICMP flood, amplification).",en:"Fill the pipe (UDP/ICMP flood, amplification)."}},{n:"proto",name:t(lang,"Protocol","Protocol"),color:"#ffa94d",desc:{uz:"Resurs tugatish (SYN flood).",en:"Exhaust resources (SYN flood)."}},{n:"app",name:t(lang,"Application","Application"),color:"#a855f7",desc:{uz:"Sekin so'rovlar (Slowloris, HTTP flood).",en:"Slow requests (Slowloris, HTTP flood)."}},]}),
     React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: SYN flood belgisi","Practice: a SYN flood sign")),
-    React.createElement(P,null,t(lang,"DDoS — minglab buzilgan qurilma (botnet) bir nishonga hujum qiladi, shuning uchun bitta IP ni bloklash yetmaydi. SYN flood serverni yarim ochiq ulanishlar bilan to'ldiradi.","A DDoS uses thousands of compromised devices (a botnet) against one target, so blocking a single IP isn't enough. A SYN flood fills the server with half-open connections.")),
+    React.createElement(P,null,t(lang,"DDoS — minglab buzilgan qurilma (botnet) bir nishonga hujum qiladi, shuning uchun bitta IP ni bloklash yetmaydi. SYN flood serverni yarim ochiq ulanishlar bilan to'ldiradi — simulyatordagi «Himoyasiz server» ssenariysi aynan shu holat.","A DDoS uses thousands of compromised devices (a botnet) against one target, so blocking a single IP isn't enough. A SYN flood fills the server with half-open connections — exactly the simulator's «Unprotected server» scenario.")),
     React.createElement(Terminal,null,"# hujum belgisi: ko'p SYN_RECV holati\nnetstat -ant | grep SYN_RECV | wc -l\n# 4812   ← minglab yarim ochiq ulanish = SYN flood\n# himoya: SYN cookies, rate-limit, upstream/CDN filtr"),
 React.createElement(Quiz,{q:{uz:"DDoS ni oddiy DoS dan farqlovchi asosiy narsa nima?",en:"What mainly distinguishes DDoS from DoS?"},opts:[{uz:"DDoS shifrlangan",en:"DDoS is encrypted"},{uz:"DDoS ko'plab qurilmadan (botnet) bir vaqtda keladi",en:"DDoS comes from many devices (a botnet) at once"},{uz:"DDoS sekinroq",en:"DDoS is slower"},{uz:"Farqi yo'q",en:"No difference"}],correct:1,exp:{uz:"DDoS — taqsimlangan DoS: hujum minglab qurilmadan (botnet) bir vaqtda keladi, to'sish qiyinroq.",en:"DDoS is distributed DoS: it comes from thousands of devices (a botnet) at once, harder to block."}}));
 }
