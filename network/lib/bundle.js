@@ -1068,6 +1068,46 @@ function NACSim(){
       React.createElement("button",{onClick:()=>{setRun("bad");setStep(-1);},style:{flex:1,padding:"9px",background:run==="bad"?D+"22":SL2,color:run==="bad"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🥷 Noma'lum qurilma","🥷 Unknown device"))));
 }
 
+function StatefulSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",AM="#f59e0b",SL2="#0f172a";
+  const LESS=[
+    {col:BL,uz:"Client → Server: chiquvchi so'rov (port 51000 → 443)",en:"Client → Server: outbound request (port 51000 → 443)",duz:"Chiquvchi qoida bu paketni o'tkazadi.",den:"An outbound rule allows this packet through."},
+    {col:AM,uz:"Server → Client: javob keladi (443 → 51000)",en:"Server → Client: a reply arrives (443 → 51000)",duz:"Bu paket endi tarmoqqa KIRUVCHI hisoblanadi.",den:"This packet now counts as INBOUND traffic."},
+    {col:AM,uz:"Stateless filtr: bu paketni ilgari ko'rmaganman — hech qanday «xotira» yo'q",en:"Stateless filter: I've never seen this packet before — no «memory» at all",duz:"Filtr har paketni ALOHIDA, kontekstsiz ko'radi. Bu javob ekanini bilmaydi.",den:"The filter judges every packet in ISOLATION, with no context. It has no idea this is a reply."},
+    {col:D,uz:"Agar aniq inbound qoida yo'q bo'lsa → BLOKLANADI (yoki xavfli keng qoida kerak)",en:"With no explicit inbound rule → BLOCKED (or a risky broad rule is needed)",duz:"Yechim: administrator MINGLAB mumkin bo'lgan javob porti uchun qoida yozishi kerak bo'ladi — amalda buning o'rniga xavfli «hammasiga ruxsat» qoidalari yoziladi.",den:"The fix: the admin would need rules for THOUSANDS of possible reply ports — in practice this leads to risky «allow everything» rules instead.",final:true,attack:true}
+  ];
+  const STATEFUL=[
+    {col:BL,uz:"Client → Server: chiquvchi so'rov (port 51000 → 443)",en:"Client → Server: outbound request (port 51000 → 443)",duz:"Xuddi shu chiquvchi so'rov.",den:"The exact same outbound request."},
+    {col:"#a855f7",uz:"Firewall: ulanishni jadvalga yozadi (state: NEW → ESTABLISHED)",en:"Firewall: logs the connection in its table (state: NEW → ESTABLISHED)",duz:"Bu — stateful filtrning kaliti: u har ulanishni «eslab qoladi».",den:"This is the key to a stateful filter: it «remembers» every connection."},
+    {col:AM,uz:"Server → Client: javob keladi (443 → 51000)",en:"Server → Client: a reply arrives (443 → 51000)",duz:"Xuddi avvalgi ssenariydagi bir xil kiruvchi paket.",den:"The exact same inbound packet as before."},
+    {col:A,uz:"Firewall: bu ESTABLISHED ulanishning javobi — avtomatik RUXSAT",en:"Firewall: this is a reply to an ESTABLISHED connection — automatically ALLOWED",duz:"Alohida inbound qoida kerak emas — «ctstate ESTABLISHED,RELATED» bitta qoida barcha javoblarni qamrab oladi.",den:"No separate inbound rule needed — one «ctstate ESTABLISHED,RELATED» rule covers every reply.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="less"?LESS:STATEFUL;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),950);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="less"?LESS:run==="stateful"?STATEFUL:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — javob paketi stateless va stateful filtrda qanday farq bilan ko'rilishini solishtiring.","⬇ Pick a scenario — compare how a reply packet is treated by a stateless versus a stateful filter.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="less"?t(lang,"⚠ Har javob uchun qo'lda qoida kerak — boshqarish qiyin va xavfli","⚠ Every reply needs a manual rule — hard to manage and risky"):t(lang,"✓ Bitta qoida barcha qonuniy javoblarni avtomatik qamrab oladi","✓ One rule automatically covers every legitimate reply")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("less");setStep(-1);},style:{flex:1,padding:"9px",background:run==="less"?D+"22":SL2,color:run==="less"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"📋 Stateless (xotirasiz)","📋 Stateless (no memory)")),
+      React.createElement("button",{onClick:()=>{setRun("stateful");setStep(-1);},style:{flex:1,padding:"9px",background:run==="stateful"?A+"22":SL2,color:run==="stateful"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🧠 Stateful (ulanishni eslaydi)","🧠 Stateful (remembers connections)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2033,20 +2073,25 @@ function LessonL19(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Paket filtrlash nima?","What is packet filtering?")),
-    React.createElement(P,null,t(lang,"Paket filtrlash — har paketni ko'rib, qoidalar asosida o'tkazish yoki bloklash. Har paketning manba/manzil IP si, porti va protokoli tekshiriladi — chegaradagi bojxona kabi.","Packet filtering inspects each packet and allows or blocks it by rules. Each packet's source/destination IP, port and protocol are checked — like customs at a border.")),
-    React.createElement(H2,{num:"§2"},t(lang,"Stateless va Stateful","Stateless vs stateful")),
+    React.createElement(P,null,t(lang,"Paket filtrlash — har paketni ko'rib, qoidalar asosida o'tkazish yoki bloklash. Har paketning manba/manzil IP si, porti va protokoli tekshiriladi — chegaradagi bojxona kabi. Filtrlashning eng muhim savoli: filtr har paketni ALOHIDA ko'radimi, yoki ulanish TARIXINI eslaydimi?","Packet filtering inspects each packet and allows or blocks it by rules. Each packet's source/destination IP, port and protocol are checked — like customs at a border. The most important question in filtering: does the filter judge each packet in ISOLATION, or does it remember the HISTORY of the connection?")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: javob trafigi muammosi","Interactive simulator: the return-traffic problem")),
+    React.createElement(P,null,t(lang,"Chiquvchi so'rovga javob qaytganda ikkala filtr turi ham buni qanday ko'rishini solishtiring — bu stateful firewall'ning haqiqiy afzalligini ochib beradi:","Compare how each filter type sees a reply to an outbound request — this reveals the real advantage of a stateful firewall:")),
+    React.createElement(StatefulSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Stateless va Stateful — solishtiruv","Stateless vs stateful — comparison")),
     React.createElement(CompareCols,{
-      left:{title:{uz:"Stateless (holatsiz)",en:"Stateless"},color:"#4dabf7",rows:[{uz:"Har paketni alohida ko'radi",en:"Judges each packet alone"},{uz:"Kontekstsiz",en:"No context"},{uz:"Tez, lekin sodda",en:"Fast but simple"}]},
-      right:{title:{uz:"Stateful (holatli)",en:"Stateful"},color:"#69db7c",rows:[{uz:"Ulanish holatini eslaydi",en:"Remembers connection state"},{uz:"Javob paketlarini taniydi",en:"Recognizes reply packets"},{uz:"Aqlliroq, xavfsizroq",en:"Smarter, safer"}]}}),
-    React.createElement(H2,{num:"§3"},t(lang,"iptables misoli","An iptables example")),
-    React.createElement(Terminal,null,"# 22-portga faqat bitta IP dan ruxsat\nsudo iptables -A INPUT -p tcp -s 10.0.0.5 --dport 22 -j ACCEPT\n# Boshqa hamma SSH urinishini bloklash\nsudo iptables -A INPUT -p tcp --dport 22 -j DROP"),
-    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Qoidalar tartibi muhim: ","Rule order matters: ")),t(lang,"birinchi mos kelgan qoida ishlaydi — aniq ALLOW umumiy DROP dan oldin turishi kerak.","the first matching rule wins — specific ALLOW must come before a general DROP.")),
-        React.createElement(H2,{num:"§4"},t(lang,"Paket filtrlash chuqurligi","Depth of packet filtering")),
-    React.createElement(LayerStack,{layers:[{n:"stateless",name:t(lang,"Stateless","Stateless"),color:"#ff6b6b",desc:{uz:"Har paketni alohida ko'radi — sodda, tez.",en:"Sees each packet alone — simple, fast."}},{n:"stateful",name:t(lang,"Stateful","Stateful"),color:"#69db7c",desc:{uz:"Ulanish kontekstini eslaydi (javob paketini biladi).",en:"Remembers connection context (knows reply packets)."}},{n:"DPI",name:t(lang,"Deep packet","Deep packet"),color:"#4dabf7",desc:{uz:"Paket mazmunini tekshiradi (L7).",en:"Inspects packet contents (L7)."}},]}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: holatli qoida","Practice: a stateful rule")),
-    React.createElement(P,null,t(lang,"Stateful firewall «o'rnatilgan ulanishning javobini avtomatik o'tkaz» degan qoidani biladi — shuning uchun har javob uchun alohida qoida yozish shart emas.","A stateful firewall knows the rule «automatically allow replies to established connections» — so you don't need a separate rule for every reply.")),
-    React.createElement(Terminal,null,"sudo iptables -A INPUT -m conntrack \\\n  --ctstate ESTABLISHED,RELATED -j ACCEPT\n# ← o'rnatilgan ulanish javoblarini o'tkaz\nsudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT\nsudo iptables -A INPUT -j DROP   # qolgan hammasi"),
-React.createElement(Quiz,{q:{uz:"Stateful firewall ning afzalligi nima?",en:"What advantage does a stateful firewall have?"},opts:[{uz:"Tezroq va soddaroq",en:"Faster and simpler"},{uz:"Ulanish holatini eslaydi va javob paketlarini taniydi",en:"Remembers connection state and recognizes replies"},{uz:"Shifrlaydi",en:"Encrypts"},{uz:"IP bermaydi",en:"Doesn't hand out IPs"}],correct:1,exp:{uz:"Stateful firewall ulanish kontekstini eslaydi — qonuniy javob paketlarini taniydi, bu uni xavfsizroq qiladi.",en:"A stateful firewall remembers connection context — recognizing legitimate replies, making it safer."}}));
+      left:{title:{uz:"Stateless (holatsiz)",en:"Stateless"},color:"#4dabf7",rows:[{uz:"Har paketni alohida ko'radi",en:"Judges each packet alone"},{uz:"Kontekstsiz — javobni tanimaydi",en:"No context — doesn't recognize replies"},{uz:"Tez, lekin har yo'nalish uchun qoida kerak",en:"Fast, but needs a rule per direction"}]},
+      right:{title:{uz:"Stateful (holatli)",en:"Stateful"},color:"#69db7c",rows:[{uz:"Ulanish holatini jadvalga yozadi",en:"Logs connection state in a table"},{uz:"Javob paketlarini avtomatik taniydi",en:"Automatically recognizes reply packets"},{uz:"Aqlliroq, xavfsizroq, boshqarish oson",en:"Smarter, safer, easier to manage"}]}}),
+    React.createElement(H2,{num:"§4"},t(lang,"Paket filtrlash chuqurligi","Depth of packet filtering")),
+    React.createElement(LayerStack,{layers:[
+      {n:"L3-4",name:t(lang,"Stateless","Stateless"),color:"#ff6b6b",desc:{uz:"Har paketni alohida ko'radi — sodda, tez, lekin cheklangan.",en:"Sees each packet alone — simple, fast, but limited."}},
+      {n:"conn",name:t(lang,"Stateful","Stateful"),color:"#69db7c",desc:{uz:"Ulanish kontekstini eslaydi (javob paketini biladi) — bugungi standart.",en:"Remembers connection context (knows reply packets) — today's standard."}},
+      {n:"L7",name:t(lang,"Deep packet (DPI)","Deep packet (DPI)"),color:"#4dabf7",desc:{uz:"Paket MAZMUNINI ham tekshiradi (L7) — NGFW/WAF darajasi.",en:"Also inspects packet CONTENTS (L7) — NGFW/WAF level."}}
+    ]}),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: iptables qoidalari","Practice: iptables rules")),
+    React.createElement(P,null,t(lang,"Quyidagi ikkinchi misol simulyatordagi «Stateful» ssenariysining aynan o'zi — bitta ctstate qoidasi barcha o'rnatilgan ulanish javoblarini qamrab oladi.","The second example below is exactly the simulator's «Stateful» scenario — one ctstate rule covers every reply to an established connection.")),
+    React.createElement(Terminal,null,"# Oddiy (stateless) qoida — faqat bitta IP dan SSH:\nsudo iptables -A INPUT -p tcp -s 10.0.0.5 --dport 22 -j ACCEPT\nsudo iptables -A INPUT -p tcp --dport 22 -j DROP\n\n# Stateful qoida — barcha o'rnatilgan ulanish javoblari:\nsudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT\nsudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT\nsudo iptables -A INPUT -j DROP   # qolgan hammasi"),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Qoidalar tartibi muhim: ","Rule order matters: ")),t(lang,"birinchi mos kelgan qoida ishlaydi — aniq ALLOW umumiy DROP dan oldin turishi kerak (L13 darsini eslang).","the first matching rule wins — specific ALLOW must come before a general DROP (recall L13).")),
+React.createElement(Quiz,{q:{uz:"Stateful firewall ning afzalligi nima?",en:"What advantage does a stateful firewall have?"},opts:[{uz:"Tezroq va soddaroq",en:"Faster and simpler"},{uz:"Ulanish holatini eslaydi va javob paketlarini taniydi",en:"Remembers connection state and recognizes replies"},{uz:"Shifrlaydi",en:"Encrypts"},{uz:"IP bermaydi",en:"Doesn't hand out IPs"}],correct:1,exp:{uz:"Stateful firewall ulanish kontekstini eslaydi — qonuniy javob paketlarini avtomatik taniydi, bu uni xavfsizroq va boshqarish osonroq qiladi.",en:"A stateful firewall remembers connection context — automatically recognizing legitimate replies, making it safer and easier to manage."}}));
 }
 function LessonL20(){
   const lang=useLang();
