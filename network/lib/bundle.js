@@ -1108,6 +1108,46 @@ function StatefulSim(){
       React.createElement("button",{onClick:()=>{setRun("stateful");setStep(-1);},style:{flex:1,padding:"9px",background:run==="stateful"?A+"22":SL2,color:run==="stateful"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🧠 Stateful (ulanishni eslaydi)","🧠 Stateful (remembers connections)"))));
 }
 
+function ProxySim(){
+  const lang=useLang();
+  const A="#22c55e",BL="#3b82f6",PU="#a855f7",SL2="#0f172a";
+  const FWD=[
+    {col:BL,uz:"Siz (10.0.0.5) → Forward Proxy: so'rov yuborasiz",en:"You (10.0.0.5) → Forward Proxy: send a request",duz:"So'rov avval kompaniya/provayder proxy serveriga boradi, to'g'ridan-to'g'ri saytga emas.",den:"The request goes to the company/ISP proxy first, not directly to the site."},
+    {col:PU,uz:"Forward Proxy → Sayt: O'Z IP'si (203.0.113.9) bilan so'raydi",en:"Forward Proxy → Site: requests using ITS OWN IP (203.0.113.9)",duz:"Proxy sizning nomingizdan harakat qiladi — sayt so'rovni proxy'dan kelgan deb ko'radi.",den:"The proxy acts on your behalf — the site sees the request as coming from the proxy."},
+    {col:"#a855f7",uz:"Sayt → Forward Proxy → Siz: javob shu yo'l bilan qaytadi",en:"Site → Forward Proxy → You: the reply travels back the same way",duz:"Javob ham proxy orqali filtrlanib/keshlanib qaytishi mumkin.",den:"The reply can also be filtered/cached by the proxy on its way back."},
+    {col:A,uz:"Natija: sayt SIZNING haqiqiy IP'ingizni hech qachon ko'rmaydi",en:"Result: the site never sees YOUR real IP",duz:"Faqat proxy'ning IP'si ko'rinadi — sizning shaxsingiz (client) serverdan yashiringan.",den:"Only the proxy's IP is visible — your identity (the client) is hidden from the server.",final:true}
+  ];
+  const REV=[
+    {col:BL,uz:"Foydalanuvchi → example.com: oddiy so'rov yuboradi",en:"User → example.com: sends a normal request",duz:"Foydalanuvchi hech narsani bilmaydi — u to'g'ridan-to'g'ri saytga murojaat qilayotganini o'ylaydi.",den:"The user doesn't know anything special — they think they're talking directly to the site."},
+    {col:PU,uz:"Aslida so'rov Reverse Proxy'ga (Cloudflare/nginx) tushadi",en:"In reality the request lands on a Reverse Proxy (Cloudflare/nginx)",duz:"DNS example.com ni HAQIQIY serverga emas, reverse proxy'ga yo'naltiradi.",den:"DNS for example.com points to the reverse proxy, not the real server."},
+    {col:"#a855f7",uz:"Reverse Proxy → Ichki server: so'rovni yashiringan tarmoqqa uzatadi",en:"Reverse Proxy → Internal server: forwards the request into the hidden network",duz:"Haqiqiy server ichki (masalan 10.0.5.20) manzilda — internetdan to'g'ridan-to'g'ri erishib bo'lmaydi.",den:"The real server sits at an internal address (e.g. 10.0.5.20) — unreachable directly from the internet."},
+    {col:A,uz:"Natija: foydalanuvchi HAQIQIY server IP'sini hech qachon bilmaydi",en:"Result: the user never learns the REAL server's IP",duz:"Bu himoya beradi (DDoS so'rilishi, to'g'ridan-to'g'ri hujum imkonsiz) va yuk taqsimlash/TLS'ni markazlashtiradi.",den:"This provides protection (DDoS absorption, no direct attack surface) and centralizes load balancing/TLS.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="fwd"?FWD:REV;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),950);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="fwd"?FWD:run==="rev"?REV:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — forward va reverse proxy'da kimning shaxsi kimdan yashirilishini solishtiring.","⬇ Pick a scenario — see whose identity is hidden from whom, with a forward vs a reverse proxy.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:A+"1f",border:"1px solid "+A,color:A}},
+      run==="fwd"?t(lang,"✓ Forward proxy: MIJOZ shaxsi yashiringan","✓ Forward proxy: the CLIENT's identity is hidden"):t(lang,"✓ Reverse proxy: SERVER shaxsi yashiringan","✓ Reverse proxy: the SERVER's identity is hidden")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("fwd");setStep(-1);},style:{flex:1,padding:"9px",background:run==="fwd"?BL+"22":SL2,color:run==="fwd"?"#93c5fd":"#cbd5e1",border:"1px solid "+BL+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"👤 Forward proxy (mijoz yashirin)","👤 Forward proxy (client hidden)")),
+      React.createElement("button",{onClick:()=>{setRun("rev");setStep(-1);},style:{flex:1,padding:"9px",background:run==="rev"?A+"22":SL2,color:run==="rev"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🖥 Reverse proxy (server yashirin)","🖥 Reverse proxy (server hidden)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2099,17 +2139,19 @@ function LessonL20(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Proxy nima?","What is a proxy?")),
-    React.createElement(P,null,t(lang,"Proxy server — siz va internet o'rtasidagi \"vositachi\". So'rovingiz avval proxy ga boradi, u sizning nomingizdan serverга murojaat qiladi va javobni qaytaradi (kimdandir sizning o'rningizga xarid qilishni so'raganingizdek).","A proxy server is a \"middleman\" between you and the internet. Your request goes to the proxy first, which contacts the server on your behalf and returns the reply (like asking someone to shop for you).")),
+    React.createElement(P,null,t(lang,"Proxy server — siz va internet o'rtasidagi «vositachi». So'rovingiz avval proxy'ga boradi, u sizning nomingizdan serverga murojaat qiladi va javobni qaytaradi (kimdandir sizning o'rningizga xarid qilishni so'raganingizdek). Proxy'ning ikki asosiy turi bor va ular bir-biridan «kimning shaxsini yashirishi» bilan tubdan farq qiladi.","A proxy server is a «middleman» between you and the internet. Your request goes to the proxy first, which contacts the server on your behalf and returns the reply (like asking someone to shop for you). There are two main types of proxy, and they differ fundamentally in «whose identity they hide».")),
     React.createElement(PacketFlow,{from:{uz:"Siz",en:"You"},to:{uz:"Server",en:"Server"},label:{uz:"Proxy (vositachi)",en:"Proxy (middleman)"}}),
-    React.createElement(H2,{num:"§2"},t(lang,"Proxy turlari","Types of proxy")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: kim kimdan yashiringan?","Interactive simulator: who is hidden from whom?")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — forward proxy mijozni serverdan qanday yashirishini, reverse proxy esa serverni mijozdan qanday yashirishini ko'ring:","Try both scenarios — see how a forward proxy hides the client from the server, and how a reverse proxy hides the server from the client:")),
+    React.createElement(ProxySim),
+    React.createElement(H2,{num:"§3"},t(lang,"Proxy turlari","Types of proxy")),
     types.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+x[2]+"44",borderLeft:"3px solid "+x[2],borderRadius:10,animationDelay:(i*0.06)+"s"}},
       React.createElement("span",{style:{fontWeight:700,fontSize:12.5,color:x[2],minWidth:100}},x[0]),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-    React.createElement(P,null,t(lang,"Reverse proxy serverlarni himoya qiladi: haqiqiy serverlarni yashiradi, hujumlarni to'sadi va yukni taqsimlaydi (Nginx, Cloudflare).","A reverse proxy protects servers: hides them, absorbs attacks and balances load (Nginx, Cloudflare).")),
-        React.createElement(H2,{num:"§3"},t(lang,"Forward va reverse proxy","Forward vs reverse proxy")),
+    React.createElement(H2,{num:"§4"},t(lang,"Forward va reverse proxy","Forward vs reverse proxy")),
     React.createElement(CompareCols,{left:{title:{uz:"Forward proxy",en:"Forward proxy"},color:"#4dabf7",rows:[{uz:"Mijozlar oldida turadi",en:"Sits in front of clients"},{uz:"Foydalanuvchini yashiradi",en:"Hides the user"},{uz:"Filtrlash/keshlash",en:"Filtering/caching"},]},right:{title:{uz:"Reverse proxy",en:"Reverse proxy"},color:"#69db7c",rows:[{uz:"Serverlar oldida turadi",en:"Sits in front of servers"},{uz:"Serverni yashiradi/himoya qiladi",en:"Hides/protects the server"},{uz:"Yuk taqsimlash (LB), TLS",en:"Load balancing, TLS"},]}}),
-    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: reverse proxy sarlavhasi","Practice: reverse-proxy headers")),
-    React.createElement(P,null,t(lang,"Reverse proxy (nginx, HAProxy) haqiqiy serverni internetdan yashiradi, yukni taqsimlaydi va TLS ni boshqaradi. Javob sarlavhalari ko'pincha proxy ekanini oshkor qiladi.","A reverse proxy (nginx, HAProxy) hides the real server from the internet, distributes load and handles TLS. Response headers often reveal the proxy.")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: reverse proxy sarlavhasi","Practice: reverse-proxy headers")),
+    React.createElement(P,null,t(lang,"Reverse proxy (nginx, HAProxy, Cloudflare) haqiqiy serverni internetdan yashiradi, yukni taqsimlaydi va TLS ni boshqaradi. Javob sarlavhalari ko'pincha proxy ekanini oshkor qiladi.","A reverse proxy (nginx, HAProxy, Cloudflare) hides the real server from the internet, distributes load and handles TLS. Response headers often reveal the proxy.")),
     React.createElement(Terminal,null,"curl -I https://site.com\n# server: nginx            ← reverse proxy\n# x-cache: HIT             ← keshdan berildi\n# via: 1.1 varnish         ← oldida yana kesh bor"),
 React.createElement(Quiz,{q:{uz:"Reverse proxy asosan kimni himoya qiladi?",en:"What does a reverse proxy mainly protect?"},opts:[{uz:"Foydalanuvchilarni",en:"The users"},{uz:"Orqadagi serverlarni",en:"The backend servers"},{uz:"DNS ni",en:"DNS"},{uz:"Hech kimni",en:"No one"}],correct:1,exp:{uz:"Reverse proxy serverlar oldida turadi — ularni yashiradi, hujumlarni to'sadi va yukni taqsimlaydi.",en:"A reverse proxy sits in front of servers — hiding them, absorbing attacks and balancing load."}}));
 }
