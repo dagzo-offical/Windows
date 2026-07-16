@@ -1315,6 +1315,47 @@ function ARPSpoofSim(){
       React.createElement("button",{onClick:()=>{setRun("dai");setStep(-1);},style:{flex:1,padding:"9px",background:run==="dai"?A+"22":SL2,color:run==="dai"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 DAI yoqilgan","🛡 DAI enabled"))));
 }
 
+function MITMSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const PASSIVE=[
+    {col:BL,uz:"Client → Server: login so'rovi yuboriladi",en:"Client → Server: a login request is sent",duz:"Hujumchi allaqachon o'rtada (masalan ARP spoofing orqali, L24).",den:"The attacker is already in the middle (e.g. via ARP spoofing, L24)."},
+    {col:AM,uz:"Hujumchi: nusxasini o'qiydi, LEKIN o'zgartirmasdan uzatadi",en:"Attacker: reads a copy, but forwards it UNCHANGED",duz:"Faqat kuzatib turadi — login/parolni yozib oladi, lekin paketning o'ziga tegmaydi.",den:"Just observing — logs the login/password, but doesn't touch the packet itself."},
+    {col:AM,uz:"Server → Client: original javob to'siqsiz yetib boradi",en:"Server → Client: the original reply arrives unobstructed",duz:"Foydalanuvchi hech qanday g'alati narsa sezmaydi — hammasi normal ishlayotgandek ko'rinadi.",den:"The user notices nothing odd — everything appears to work normally."},
+    {col:D,uz:"👁 Faqat josuslik — foydalanuvchi bilmagan holda ma'lumot o'g'irlandi",en:"👁 Pure espionage — data was stolen without the user ever knowing",duz:"Passiv MITM aniqlash eng qiyin turlardan biri, chunki hech narsa o'zgarmaydi.",den:"Passive MITM is one of the hardest to detect, because nothing ever changes.",final:true,attack:true}
+  ];
+  const ACTIVE=[
+    {col:BL,uz:"Client → Server: update.exe faylini yuklab olish so'rovi",en:"Client → Server: a request to download update.exe",duz:"Foydalanuvchi haqiqiy, ishonchli dasturni yuklab olmoqchi.",den:"The user is trying to download a genuine, trusted program."},
+    {col:AM,uz:"Hujumchi: serverning javobini USHLAYDI",en:"Attacker: INTERCEPTS the server's response",duz:"Bu safar hujumchi shunchaki o'qib qo'ymaydi — paketni to'liq nazorat qiladi.",den:"This time the attacker doesn't just read it — they take full control of the packet."},
+    {col:D,uz:"Hujumchi: asl faylni ZARARLI fayl bilan ALMASHTIRADI",en:"Attacker: REPLACES the real file with a MALICIOUS one",duz:"Bu — «faol» (active) MITM: mazmunning o'zi in-transit o'zgartiriladi.",den:"This is «active» MITM: the content itself is modified in transit."},
+    {col:D,uz:"☠ Client zararli update.exe ni yuklab oldi — buni HAQIQIY deb o'ylaydi",en:"☠ The client downloaded the malicious update.exe — believing it's GENUINE",duz:"Foydalanuvchi manba (server) ni tekshirgan, lekin yo'ldagi o'zgarishni sezmagan.",den:"The user verified the source (the server), but never noticed the tampering along the way.",final:true,attack:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="pass"?PASSIVE:ACTIVE;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="pass"?PASSIVE:run==="act"?ACTIVE:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{textAlign:"center",padding:"8px",marginBottom:10,background:SL2,border:"1px solid rgba(148,163,184,.25)",borderRadius:10,fontSize:11,fontWeight:700,color:"#94a3b8",fontFamily:"var(--font-mono)"}},t(lang,"💻 Client ⇄ 😈 Hujumchi (o'rtada) ⇄ 🖥 Server","💻 Client ⇄ 😈 Attacker (in the middle) ⇄ 🖥 Server")),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — passiv (faqat tinglash) va faol (mazmunni o'zgartirish) MITM farqini ko'ring.","⬇ Pick a scenario — see the difference between passive (just listening) and active (tampering with content) MITM.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:D+"1f",border:"1px solid "+D,color:D}},
+      run==="pass"?t(lang,"👁 Passiv MITM: ma'lumot o'g'irlandi, hech narsa o'zgarmadi","👁 Passive MITM: data stolen, nothing changed"):t(lang,"☠ Faol MITM: mazmunning o'zi almashtirildi","☠ Active MITM: the content itself was swapped")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("pass");setStep(-1);},style:{flex:1,padding:"9px",background:run==="pass"?AM+"22":SL2,color:run==="pass"?AM:"#cbd5e1",border:"1px solid "+AM+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"👁 Passiv (faqat tinglaydi)","👁 Passive (just listens)")),
+      React.createElement("button",{onClick:()=>{setRun("act");setStep(-1);},style:{flex:1,padding:"9px",background:run==="act"?D+"22":SL2,color:run==="act"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ Faol (mazmunni o'zgartiradi)","☠ Active (tampers with content)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2402,27 +2443,23 @@ React.createElement(Quiz,{q:{uz:"ARP spoofing ARP ning qaysi zaifligidan foydala
 }
 function LessonL25(){
   const lang=useLang();
-  const tech=[["ARP Spoofing",{uz:"Lokal tarmoqda trafikni o'ziga yo'naltirish",en:"Redirect LAN traffic to itself"}],["DNS Spoofing",{uz:"Soxta IP berib soxta saytga yuborish",en:"Fake IP → fake site"}],["Evil Twin",{uz:"Soxta WiFi nuqtasi",en:"Fake WiFi hotspot"}],["SSL Strip",{uz:"HTTPS ni HTTP ga tushirish",en:"Downgrade HTTPS to HTTP"}]];
+  const tech=[["ARP Spoofing",{uz:"Lokal tarmoqda trafikni o'ziga yo'naltirish (L24)",en:"Redirect LAN traffic to itself (L24)"}],["DNS Spoofing",{uz:"Soxta IP berib soxta saytga yuborish (L26)",en:"Fake IP → fake site (L26)"}],["Evil Twin",{uz:"Soxta WiFi nuqtasi",en:"Fake WiFi hotspot"}],["SSL Strip",{uz:"HTTPS ni HTTP ga tushirishga urinish",en:"Try to downgrade HTTPS to HTTP"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"MITM hujumi nima?","What is a MITM attack?")),
-    React.createElement(P,null,t(lang,"MITM (o'rtadagi odam) — hujumchi ikki tomon aloqasiga yashirin kirib, tinglaydi yoki o'zgartiradi. Ikki tomon to'g'ridan-to'g'ri gaplashyapti deb o'ylaydi, aslida hamma narsa hujumchi orqali o'tadi (xatlarni yashirincha o'qiydigan pochtachi kabi).","MITM (man-in-the-middle) — the attacker secretly inserts into a conversation to eavesdrop or alter it. The two parties think they talk directly, but everything passes through the attacker (like a mail carrier secretly reading letters).")),
-    React.createElement(H2,{num:"§2"},t(lang,"Qanday kechadi","How it happens")),
-    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"MITM interseptsiya",en:"MITM interception"},steps:[
-      {icon:"🎯",text:{uz:"Hujumchi ikki tomon orasiga o'rnashadi (masalan ARP spoofing)",en:"Attacker positions between the two (e.g. ARP spoofing)"}},
-      {icon:"👂",text:{uz:"Barcha trafik hujumchi orqali oqadi",en:"All traffic flows through the attacker"}},
-      {icon:"🔓",text:{uz:"Shifrlanmagan bo'lsa — o'qiydi/o'zgartiradi",en:"If unencrypted — reads/alters it"}},
-      {icon:"🔒",text:{uz:"HTTPS bo'lsa — faqat shifrlangan ma'lumot ko'radi",en:"If HTTPS — only sees encrypted data"}},
-    ]}),
+    React.createElement(P,null,t(lang,"MITM (o'rtadagi odam) — hujumchi ikki tomon aloqasiga yashirin kirib, tinglaydi yoki o'zgartiradi. Ikki tomon to'g'ridan-to'g'ri gaplashyapti deb o'ylaydi, aslida hamma narsa hujumchi orqali o'tadi (xatlarni yashirincha o'qiydigan pochtachi kabi). MITM'ning kuchi shu — u faqat josuslik qilmaydi, balki ma'lumotni YO'LDA o'zgartirishi ham mumkin.","MITM (man-in-the-middle) — the attacker secretly inserts into a conversation to eavesdrop or alter it. The two parties think they talk directly, but everything passes through the attacker (like a mail carrier secretly reading letters). MITM's real power is this — it doesn't just spy, it can also alter data ALONG THE WAY.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: passiv vs faol MITM","Interactive simulator: passive vs active MITM")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — hujumchi shunchaki tinglaganda va mazmunning o'zini o'zgartirganda oqibat qanday farq qilishini ko'ring:","Try both scenarios — see how the outcome differs when the attacker merely listens versus when they alter the content itself:")),
+    React.createElement(MITMSim),
     React.createElement(H2,{num:"§3"},t(lang,"Keng tarqalgan usullar","Common techniques")),
     tech.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
       React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:110}},x[0]),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"MITM texnikalari faqat ta'lim va ruxsat berilgan sinov muhitida o'rganilishi kerak. Real aloqani ruxsatsiz tinglash jiddiy jinoyat.","MITM techniques must only be studied in education and authorized test environments. Eavesdropping on real communication without permission is a serious crime.")),
-        React.createElement(H2,{num:"§4"},t(lang,"MITM turlari","Types of MITM")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"MITM texnikalari faqat ta'lim va ruxsat berilgan sinov muhitida o'rganilishi kerak. Real aloqani ruxsatsiz tinglash yoki o'zgartirish jiddiy jinoyat.","MITM techniques must only be studied in education and authorized test environments. Eavesdropping on or altering real communication without permission is a serious crime.")),
+    React.createElement(H2,{num:"§4"},t(lang,"MITM turlari","Types of MITM")),
     React.createElement(LayerStack,{layers:[{n:"arp",name:t(lang,"ARP spoofing","ARP spoofing"),color:"#ff3a5e",desc:{uz:"Mahalliy tarmoqda trafikni burish.",en:"Divert traffic on the local network."}},{n:"dns",name:t(lang,"DNS spoofing","DNS spoofing"),color:"#ffa94d",desc:{uz:"Soxta IP qaytarib, saytga yo'naltirish.",en:"Return a fake IP to redirect a site."}},{n:"rogue",name:t(lang,"Rogue AP","Rogue AP"),color:"#a855f7",desc:{uz:"Soxta WiFi nuqtasi ochish.",en:"Set up a fake WiFi access point."}},{n:"ssl",name:t(lang,"SSL strip","SSL strip"),color:"#4dabf7",desc:{uz:"HTTPS ni HTTP ga tushirishga urinish.",en:"Try to downgrade HTTPS to HTTP."}},]}),
     React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: trafikni tinglash","Practice: sniffing traffic")),
-    React.createElement(P,null,t(lang,"MITM o'rnatilgach, hujumchi shifrlanmagan trafikni (HTTP, FTP) o'qiydi. HTTPS bunga to'sqinlik qiladi — sertifikat mos kelmasa brauzer ogohlantiradi.","Once MITM is set up, the attacker reads unencrypted traffic (HTTP, FTP). HTTPS blocks this — if the certificate doesn't match, the browser warns.")),
+    React.createElement(P,null,t(lang,"MITM o'rnatilgach, hujumchi shifrlanmagan trafikni (HTTP, FTP) o'qiydi — bu simulyatordagi «Passiv» ssenariysi. HTTPS bunga to'sqinlik qiladi (L15) — sertifikat mos kelmasa brauzer ogohlantiradi.","Once MITM is set up, the attacker reads unencrypted traffic (HTTP, FTP) — the simulator's «Passive» scenario. HTTPS blocks this (L15) — if the certificate doesn't match, the browser warns.")),
     React.createElement(Terminal,null,"sudo bettercap -iface eth0\n> net.probe on\n> set arp.spoof.targets 10.0.0.9\n> arp.spoof on ; net.sniff on\n# [sniff] http://site.com  POST user=admin pass=1234  ← ochiq!"),
 React.createElement(Quiz,{q:{uz:"HTTPS MITM hujumida qanday yordam beradi?",en:"How does HTTPS help against MITM?"},opts:[{uz:"Trafikni tezlashtiradi",en:"Speeds up traffic"},{uz:"Mazmunni shifrlaydi — ushlansa ham o'qib bo'lmaydi",en:"Encrypts content — unreadable even if intercepted"},{uz:"IP ni yashiradi",en:"Hides the IP"},{uz:"Yordam bermaydi",en:"Doesn't help"}],correct:1,exp:{uz:"HTTPS mazmunni shifrlaydi — hujumchi trafikni ushlasa ham faqat shifrlangan ma'lumotni ko'radi.",en:"HTTPS encrypts the content — even intercepted, the attacker only sees encrypted data."}}));
 }
