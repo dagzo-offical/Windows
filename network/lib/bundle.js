@@ -776,6 +776,57 @@ function RoutingSim(){
       React.createElement("button",{onClick:()=>{setRun("multi");setStep(-1);},style:{flex:1,padding:"9px",background:run==="multi"?BL+"22":SL2,color:run==="multi"?"#93c5fd":"#cbd5e1",border:"1px solid "+BL+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🌐 Uzoq manzil (4 hop)","🌐 Distant destination (4 hops)"))));
 }
 
+function VLANSim(){
+  const lang=useLang();
+  const VC={10:"#ef4444",20:"#3b82f6",30:"#22c55e"};
+  const AM="#f59e0b",GY="#64748b",A="#22c55e",D="#ef4444",SL2="#0f172a";
+  const PORTS=[{k:"p1",vlan:10,lb:"P1"},{k:"p2",vlan:10,lb:"P2"},{k:"p3",vlan:20,lb:"P3"},{k:"p4",vlan:20,lb:"P4"},{k:"p5",vlan:30,lb:t(lang,"P5 (Mehmon)","P5 (Guest)")}];
+  const VLAN_STEPS=[
+    {st:{p1:"src",p2:"idle",p3:"idle",p4:"idle",p5:"idle"},uz:"P1 (VLAN 10, Buxgalteriya): broadcast frame yuboradi",en:"P1 (VLAN 10, Accounting): sends a broadcast frame",duz:"Frame Ethernet darajasida VLAN 10 teg (802.1Q) bilan belgilangan.",den:"The frame is tagged at the Ethernet level with VLAN 10 (802.1Q)."},
+    {st:{p1:"src",p2:"same",p3:"blocked",p4:"blocked",p5:"blocked"},uz:"Switch: faqat VLAN 10 portlariga yuboradi — P2 oladi",en:"Switch: forwards only to VLAN 10 ports — P2 receives it",duz:"P3, P4 (VLAN 20) va P5 (VLAN 30) bu frame'ni umuman OLMAYDI — boshqa broadcast domenida.",den:"P3, P4 (VLAN 20) and P5 (VLAN 30) never receive this frame at all — they're in a different broadcast domain.",final:true}
+  ];
+  const HUB_STEPS=[
+    {st:{p1:"src",p2:"idle",p3:"idle",p4:"idle",p5:"idle"},uz:"P1: signal yuboradi (eski HUB — VLAN tushunchasi yo'q)",en:"P1: sends a signal (an old HUB — no concept of VLANs)",duz:"Hub 1-qatlamda ishlaydi — u MAC ham, VLAN ham bilmaydi, faqat elektr signalni kuchaytiradi.",den:"A hub works at layer 1 — it knows neither MAC nor VLAN, it just repeats the electrical signal."},
+    {st:{p1:"src",p2:"flood",p3:"flood",p4:"flood",p5:"flood"},uz:"Hub HAMMA portga takrorlaydi — filtrlash yo'q",en:"The hub repeats to EVERY port — no filtering at all",duz:"Mehmon porti (P5) ham Buxgalteriya (P1-P2) va IT (P3-P4) trafigini eshitadi!",den:"Even the guest port (P5) hears Accounting's (P1-P2) and IT's (P3-P4) traffic!",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="vlan"?VLAN_STEPS:HUB_STEPS;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="vlan"?VLAN_STEPS:run==="hub"?HUB_STEPS:null;
+  const cur=list&&step>=0?list[step]:null;
+  const stateOf=function(k){return cur?cur.st[k]:"idle";};
+  const portBox=function(p){
+    const s=stateOf(p.k);
+    const col=s==="src"?VC[p.vlan]:s==="same"?VC[p.vlan]:s==="flood"?AM:s==="blocked"?GY:"rgba(148,163,184,.3)";
+    const op=s==="blocked"?.35:1;
+    return React.createElement("div",{key:p.k,style:{flex:1,textAlign:"center",padding:"9px 4px",background:SL2,border:"1.5px solid "+col,borderRadius:10,opacity:op,transition:"all .3s",boxShadow:(s==="src"||s==="same"||s==="flood")?"0 0 10px "+col+"88":"none"}},
+      React.createElement("div",{style:{fontSize:17}},s==="blocked"?"🚫":"🔌"),
+      React.createElement("div",{style:{fontSize:9,color:"#cbd5e1",marginTop:2,fontFamily:"var(--font-mono)"}},p.lb),
+      React.createElement("div",{style:{fontSize:8,color:col,fontWeight:700,marginTop:1}},"VLAN "+p.vlan));
+  };
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{textAlign:"center",padding:"8px",marginBottom:8,background:SL2,border:"1px solid rgba(148,163,184,.25)",borderRadius:10,fontSize:11,fontWeight:700,color:"#94a3b8",fontFamily:"var(--font-mono)"}},run==="hub"?t(lang,"🔌 HUB (1-qatlam, filtrisiz)","🔌 HUB (layer 1, no filtering)"):t(lang,"🔀 SWITCH (VLAN bilan)","🔀 SWITCH (with VLANs)")),
+    React.createElement("div",{style:{display:"flex",gap:6,marginBottom:12}},PORTS.map(portBox)),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — VLAN bilan trafik qanday izolyatsiya qilinishini va oddiy hub bilan solishtiring.","⬇ Pick a scenario — see how VLANs isolate traffic, compared with a plain hub.")):
+      list.map(function(s,i){ if(step<i) return null;
+        const col=s.final?(run==="vlan"?A:D):"#3b82f6";
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?col+"14":SL2,border:"1px solid "+col+(step===i?"":"44"),borderLeft:"4px solid "+col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(run==="vlan"?A:D)+"1f",border:"1px solid "+(run==="vlan"?A:D),color:run==="vlan"?A:D}},
+      run==="vlan"?t(lang,"✓ VLAN izolyatsiyasi ishladi — mehmon/IT bu trafikni ko'rmadi","✓ VLAN isolation worked — the guest/IT ports never saw this traffic"):t(lang,"⚠ Hub'da hech qanday izolyatsiya yo'q — hamma hammani ko'radi","⚠ No isolation on a hub — everyone sees everyone")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("vlan");setStep(-1);},style:{flex:1,padding:"9px",background:run==="vlan"?A+"22":SL2,color:run==="vlan"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔀 Switch + VLAN","🔀 Switch + VLAN")),
+      React.createElement("button",{onClick:()=>{setRun("hub");setStep(-1);},style:{flex:1,padding:"9px",background:run==="hub"?D+"22":SL2,color:run==="hub"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔌 Oddiy HUB (solishtirish)","🔌 A plain HUB (compare)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1500,25 +1551,32 @@ function LessonL08(){
 }
 function LessonL09(){
   const lang=useLang();
-  const vlans=[["VLAN 10",{uz:"Buxgalteriya",en:"Accounting"},"10.0.10.0/24","#ff6b6b"],["VLAN 20",{uz:"IT bo'limi",en:"IT dept"},"10.0.20.0/24","#4dabf7"],["VLAN 30",{uz:"Mehmonlar",en:"Guests"},"10.0.30.0/24","#69db7c"]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Switch nima?","What is a switch?")),
-    React.createElement(P,null,t(lang,"Switch — lokal tarmoqdagi qurilmalarni bog'lovchi \"aqlli tarqatgich\". U MAC jadvalini saqlaydi va ma'lumotni faqat kerakli qurilmaga yuboradi. Eski \"hub\" hammaga yuborardi (butun sinfga baqirgandek); switch aniq odamga pichirlaydi.","A switch is the \"smart distributor\" connecting devices on a LAN. It keeps a MAC table and sends data only to the right device. An old \"hub\" sent to everyone (shouting to the class); a switch whispers to the exact person.")),
+    React.createElement(P,null,t(lang,"Switch — lokal tarmoqdagi qurilmalarni bog'lovchi «aqlli tarqatgich». U har portdagi qurilmaning MAC manzilini o'rganib, ichki jadvalga yozadi va keyingi frame'larni faqat kerakli portga yuboradi. Eski «hub» esa hech narsani bilmasdi — kelgan signalni HAMMA portga takrorlar edi, xuddi butun sinfga baqirganday. Switch esa aniq odamga pichirlaydi.","A switch is the «smart distributor» connecting devices on a LAN. It learns each port's device MAC address, writes it to an internal table, and sends future frames only to the right port. An old «hub» knew nothing — it repeated every signal to EVERY port, like shouting to the whole classroom. A switch whispers to the exact person.")),
     React.createElement(NodeMap,{label:{uz:"Yulduz (star): hamma switchga ulanadi",en:"Star: everyone connects to the switch"},nodes:[[140,80,"SW"],[140,25],[205,50],[205,110],[140,135],[75,110],[75,50]],links:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6]]}),
-    React.createElement(H2,{num:"§2"},t(lang,"VLAN nima?","What is a VLAN?")),
-    React.createElement(P,null,t(lang,"VLAN bitta fizik switchni bir necha mantiqiy tarmoqqa bo'ladi — katta ofisni devorlar bilan alohida xonalarga bo'lgandek. Bir switchга ulangan bo'lsa ham, bo'limlar bir-birini ko'rmaydi.","A VLAN splits one physical switch into several logical networks — like dividing an office into separate rooms with walls. Even on the same switch, departments can't see each other.")),
-    vlans.map(function(v,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+v[3]+"44",borderLeft:"3px solid "+v[3],borderRadius:10,animationDelay:(i*0.07)+"s"}},
-      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:v[3],fontSize:12,minWidth:70}},v[0]),
-      React.createElement("span",{style:{flex:1,fontSize:12.5,color:"var(--text-0)"}},t(lang,v[1].uz,v[1].en)),
-      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--text-2)"}},v[2]));}),
-    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,"Trunk: "),t(lang,"VLAN lar orasida trafikni tashiydigan maxsus port \"trunk\" deyiladi — u bir necha VLAN ni teglar (802.1Q) bilan tashiydi.","A special port carrying traffic between VLANs is a \"trunk\" — it carries several VLANs, tagging each (802.1Q).")),
-        React.createElement(H2,{num:"§3"},t(lang,"Hub, switch va router","Hub, switch and router")),
-    React.createElement(LayerStack,{layers:[{n:"Hub",name:t(lang,"Hub","Hub"),color:"#ff6b6b",desc:{uz:"Hamma portga takrorlaydi — eski, xavfsiz emas.",en:"Repeats to every port — old, insecure."}},{n:"Switch",name:t(lang,"Switch","Switch"),color:"#69db7c",desc:{uz:"MAC bo'yicha faqat kerakli portga (2-qatlam).",en:"By MAC, only to the right port (layer 2)."}},{n:"Router",name:t(lang,"Router","Router"),color:"#4dabf7",desc:{uz:"Tarmoqlar orasida (3-qatlam, IP).",en:"Between networks (layer 3, IP)."}},]}),
-    React.createElement(H2,{num:"§4"},t(lang,"VLAN va amaliyot","VLAN and practice")),
-    React.createElement(P,null,t(lang,"VLAN bitta fizik switchni bir necha mantiqiy tarmoqqa ajratadi — masalan mehmonlar va xodimlar bir kabelda, lekin ajratilgan. Bu xavfsizlik va tartib uchun. Trunk port bir necha VLAN ni bitta havola orqali tashiydi (802.1Q teglash).","A VLAN splits one physical switch into several logical networks — e.g. guests and staff on the same wiring but separated. This is for security and order. A trunk port carries several VLANs over one link (802.1Q tagging).")),
-    React.createElement(Terminal,null,"# switchda (Cisco IOS)\nshow vlan brief\n# VLAN Name     Status  Ports\n# 10   Staff     active  Fa0/1, Fa0/2\n# 20   Guest     active  Fa0/3\n# → mehmon (20) xodim (10) trafigini ko'ra olmaydi"),
-React.createElement(Quiz,{q:{uz:"VLAN nima uchun ishlatiladi?",en:"What is a VLAN used for?"},opts:[{uz:"Internet tezligini oshirish",en:"Boosting internet speed"},{uz:"Bitta switchni mantiqan alohida tarmoqlarga bo'lish",en:"Logically splitting one switch into separate networks"},{uz:"Parol saqlash",en:"Storing passwords"},{uz:"IP berish",en:"Handing out IPs"}],correct:1,exp:{uz:"VLAN bitta fizik switchni bir necha mantiqiy tarmoqqa bo'ladi — bo'limlarni ajratib xavfsizlik beradi.",en:"A VLAN splits one physical switch into several logical networks — separating departments for security."}}));
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: VLAN izolyatsiyasi vs hub","Interactive simulator: VLAN isolation vs a hub")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — VLAN bilan trafik nega faqat o'z bo'limiga yetishini va VLAN bo'lmasa (oddiy hub) nima xato ketishini solishtiring:","Try both scenarios — see why traffic with VLANs only reaches its own department, and what goes wrong without VLANs (a plain hub):")),
+    React.createElement(VLANSim),
+    React.createElement(H2,{num:"§3"},t(lang,"VLAN nima?","What is a VLAN?")),
+    React.createElement(P,null,t(lang,"VLAN (Virtual LAN) bitta fizik switchni bir necha mustaqil mantiqiy tarmoqqa bo'ladi — katta ofisni devorlar bilan alohida xonalarga bo'lgandek. Bir xil switch'ga ulangan bo'lsa ham, turli VLAN'dagi portlar bir-birining broadcast trafigini UMUMAN ko'rmaydi — bu alohida fizik switch qo'ygandek samarali, lekin kabellarsiz.","A VLAN (Virtual LAN) splits one physical switch into several independent logical networks — like dividing a big office into separate rooms with walls. Even though connected to the same switch, ports on different VLANs never see each other's broadcast traffic at all — as effective as separate physical switches, but without the extra cabling.")),
+    React.createElement(LayerStack,{layers:[
+      {n:"10",name:t(lang,"VLAN 10","VLAN 10"),color:"#ef4444",desc:{uz:"Buxgalteriya — 10.0.10.0/24",en:"Accounting — 10.0.10.0/24"}},
+      {n:"20",name:t(lang,"VLAN 20","VLAN 20"),color:"#3b82f6",desc:{uz:"IT bo'limi — 10.0.20.0/24",en:"IT department — 10.0.20.0/24"}},
+      {n:"30",name:t(lang,"VLAN 30","VLAN 30"),color:"#22c55e",desc:{uz:"Mehmonlar — 10.0.30.0/24 (eng cheklangan)",en:"Guests — 10.0.30.0/24 (most restricted)"}}
+    ]}),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,"Trunk: "),t(lang,"VLAN'lar orasida (masalan ikki switch orasida) trafikni tashiydigan maxsus port «trunk» deyiladi — u bir nechta VLAN'ni bitta jismoniy havola orqali, har frame'ni 802.1Q teg bilan belgilab tashiydi.","A special port that carries traffic between VLANs (e.g. between two switches) is called a «trunk» — it carries several VLANs over one physical link, tagging each frame with 802.1Q.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Hub, switch va router","Hub, switch and router")),
+    React.createElement(LayerStack,{layers:[
+      {n:"L1",name:t(lang,"Hub","Hub"),color:"#ef4444",desc:{uz:"Hamma portga takrorlaydi — eski, samarasiz va xavfsiz emas.",en:"Repeats to every port — old, inefficient and insecure."}},
+      {n:"L2",name:t(lang,"Switch","Switch"),color:"#22c55e",desc:{uz:"MAC jadvali bo'yicha faqat kerakli portga (2-qatlam). VLAN bilan izolyatsiya qo'shadi.",en:"By MAC table, only to the right port (layer 2). VLANs add isolation on top."}},
+      {n:"L3",name:t(lang,"Router","Router"),color:"#3b82f6",desc:{uz:"Tarmoqlar (shu jumladan VLAN'lar) orasida — 3-qatlam, IP asosida (L08 darsi).",en:"Between networks (including VLANs) — layer 3, IP-based (see L08)."}}
+    ]}),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: VLAN'larni ko'rish","Practice: viewing VLANs")),
+    React.createElement(P,null,t(lang,"Boshqariladigan switch'da VLAN sozlamalari va qaysi portlar qaysi VLAN'ga tegishli ekanini ko'rish mumkin.","On a managed switch you can see the VLAN configuration and which ports belong to which VLAN.")),
+    React.createElement(Terminal,null,"# switchda (Cisco IOS uslubi)\nshow vlan brief\n# VLAN Name        Status   Ports\n# 10   Accounting  active   Gi0/1, Gi0/2\n# 20   IT          active   Gi0/3, Gi0/4\n# 30   Guest       active   Gi0/5\n# → VLAN 30 (mehmon) VLAN 10/20 trafigini ko'ra olmaydi"),
+    React.createElement(Quiz,{q:{uz:"VLAN nima uchun ishlatiladi?",en:"What is a VLAN used for?"},opts:[{uz:"Internet tezligini oshirish",en:"Boosting internet speed"},{uz:"Bitta switchni mantiqan alohida tarmoqlarga bo'lish",en:"Logically splitting one switch into separate networks"},{uz:"Parol saqlash",en:"Storing passwords"},{uz:"IP berish",en:"Handing out IPs"}],correct:1,exp:{uz:"VLAN bitta fizik switchni bir necha mantiqiy tarmoqqa bo'ladi — bo'limlarni ajratib xavfsizlik va tartib beradi.",en:"A VLAN splits one physical switch into several logical networks — separating departments for security and order."}}));
 }
 function LessonL10(){
   const lang=useLang();
