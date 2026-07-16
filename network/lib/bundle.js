@@ -887,6 +887,57 @@ function NATSim(){
       React.createElement("button",{onClick:()=>{setRun("in");setStep(-1);},style:{flex:1,padding:"9px",background:run==="in"?A+"22":SL2,color:run==="in"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"📥 Kiruvchi (javob vs hujumchi)","📥 Inbound (reply vs attacker)"))));
 }
 
+function TopoSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",GY="#64748b",SL2="#0f172a";
+  const T={
+    star:{nodes:[[140,80],[140,25],[205,50],[205,110],[140,135],[75,110],[75,50]],edges:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6]],cut:2,affected:[3],col:AM,
+      uz:"Bitta kabel (HUB↔qurilma) uziladi",en:"One cable (HUB↔device) is cut",
+      duz:"Faqat O'SHA bitta qurilma tarmoqdan ajraladi — qolgan hammasi HUB orqali ishlayveradi.",den:"Only THAT one device drops off — everyone else keeps working through the HUB.",
+      fin:"⚠ Faqat 1 ta qurilma yo'qotildi — qolganlari xavfsiz",finE:"⚠ Only 1 device lost — the rest are safe"},
+    bus:{nodes:[[40,80],[105,80],[175,80],[240,80]],edges:[[0,1],[1,2],[2,3]],cut:1,affected:[2,3],col:D,
+      uz:"Umumiy kabelning o'rtasi uziladi",en:"The shared cable is cut in the middle",
+      duz:"Bus — bitta uzun umumiy kabel. Kesilgan joydan narigi TOMONDAGI barcha qurilmalar butunlay ajraladi.",den:"A bus is one long shared cable. Every device on the far side of the cut is completely isolated.",
+      fin:"✗ Tarmoq ikkiga bo'lindi — yarim qurilma butunlay yo'qoldi",finE:"✗ The network split in two — half the devices are completely gone"},
+    ring:{nodes:[[140,25],[210,70],[185,140],[95,140],[70,70]],edges:[[0,1],[1,2],[2,3],[3,4],[4,0]],cut:2,affected:[0,1,2,3,4],col:D,
+      uz:"Halqaning bir nuqtasi uziladi",en:"One point of the ring is cut",
+      duz:"Ma'lumot faqat bitta yo'nalishda aylanadi (klassik Token Ring). Zaxira ikkinchi halqa bo'lmasa, BUTUN aylanish to'xtaydi.",den:"Data circulates in one direction only (classic Token Ring). Without a backup second ring, the ENTIRE loop stops.",
+      fin:"✗ Butun halqa to'xtadi — hech kim ma'lumot uzata olmaydi",finE:"✗ The whole ring stopped — no one can pass data"},
+    mesh:{nodes:[[70,45],[210,45],[210,125],[70,125]],edges:[[0,1],[1,2],[2,3],[3,0],[0,2],[1,3]],cut:0,affected:[],col:A,
+      uz:"Bitta bog'lanish (0↔1) uziladi",en:"One connection (0↔1) is cut",
+      duz:"Har tugun bir nechta yo'lga ega (masalan 0→2→1 orqali ham yetadi) — bitta uzilish HECH KIMGA ta'sir qilmaydi.",den:"Every node has multiple paths (e.g. 0→2→1 still works) — one break affects NO ONE.",
+      fin:"✓ Barcha tugunlar hali ham to'liq bog'langan!",finE:"✓ Every node is still fully connected!"}
+  };
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=1) return;
+    const id=setTimeout(()=>setStep(1),1100);return()=>clearTimeout(id);
+  },[run,step]);
+  const d=run?T[run]:null;
+  const cutDone=d&&step>=1;
+  const mid=function(a,b){return[(a[0]+b[0])/2,(a[1]+b[1])/2];};
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}},
+      ["star","bus","ring","mesh"].map(function(k){const lbl={star:t(lang,"⭐ Yulduz","⭐ Star"),bus:t(lang,"➖ Shina","➖ Bus"),ring:t(lang,"⭕ Halqa","⭕ Ring"),mesh:t(lang,"🕸 To'r","🕸 Mesh")}[k];
+        return React.createElement("button",{key:k,onClick:()=>{setRun(k);setStep(-1);},style:{flex:"1 1 auto",padding:"8px 6px",background:run===k?T[k].col+"22":SL2,color:run===k?T[k].col:"#cbd5e1",border:"1px solid "+(run===k?T[k].col:"rgba(148,163,184,.3)"),borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},lbl);})),
+    React.createElement("div",{style:{background:SL2,border:"1px solid rgba(148,163,184,.2)",borderRadius:12,padding:14,marginBottom:10}},
+      d==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"30px 4px"}},t(lang,"⬆ Topologiya tanlang — kabel uzilganda nima bo'lishini ko'ring.","⬆ Pick a topology — see what happens when a cable is cut.")):
+      React.createElement("svg",{viewBox:"0 0 280 160",style:{width:"100%",maxWidth:280,display:"block",margin:"0 auto"}},
+        d.edges.map(function(e,i){const isCut=i===d.cut;const a=d.nodes[e[0]],b=d.nodes[e[1]];
+          return React.createElement("g",{key:"e"+i},React.createElement("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:isCut&&cutDone?D:"#475569",strokeWidth:isCut&&cutDone?1.5:1.7,strokeDasharray:isCut&&cutDone?"3 4":"5 4",opacity:isCut&&cutDone?.4:.75,style:{animation:isCut&&cutDone?"none":"na-dash 1s linear infinite"}}),
+            isCut&&cutDone&&(function(){const m=mid(a,b);return React.createElement("text",{x:m[0],y:m[1]+3,fill:D,fontSize:13,textAnchor:"middle",fontWeight:900},"✗");})());}),
+        d.nodes.map(function(n,i){const bad=cutDone&&d.affected.indexOf(i)!==-1;const col=bad?D:(cutDone?A:"var(--accent, #4dabf7)");
+          return React.createElement("g",{key:"n"+i},React.createElement("circle",{cx:n[0],cy:n[1],r:i===0&&run==="star"?12:9,fill:col+"22",stroke:col,strokeWidth:1.9}),
+            i===0&&run==="star"&&React.createElement("text",{x:n[0],y:n[1]+3,fill:col,fontSize:7,textAnchor:"middle",fontFamily:"var(--font-mono)",fontWeight:800},"HUB"));}))),
+    d&&React.createElement("div",{className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:(cutDone?d.col:"#3b82f6")+"14",border:"1px solid "+(cutDone?d.col:"#3b82f6")+"55",borderLeft:"4px solid "+(cutDone?d.col:"#3b82f6"),borderRadius:10}},
+      React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},cutDone?t(lang,d.uz,d.en):t(lang,"Normal holat — barchasi bog'langan","Normal state — everything is connected")),
+      React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},cutDone?t(lang,d.duz,d.den):t(lang,"Kuting — kabel hozir uziladi...","Wait — the cable is about to be cut..."))),
+    cutDone&&React.createElement("div",{style:{padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:d.col+"1f",border:"1px solid "+d.col,color:d.col}},t(lang,d.fin,d.finE)));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1671,14 +1722,17 @@ function LessonL11(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Topologiya nima?","What is a topology?")),
-    React.createElement(P,null,t(lang,"Tarmoq topologiyasi — qurilmalar bir-biriga qanday ulanganining \"shakli\". Shahar ko'chalarini turlicha rejalashtirish mumkin bo'lgani kabi, tarmoqni ham turli shakllarda qurish mumkin. Har birining afzallik va kamchiligi bor.","A network topology is the \"shape\" of how devices connect. Like a city's streets can be laid out differently, a network can be built in different shapes. Each has pros and cons.")),
+    React.createElement(P,null,t(lang,"Tarmoq topologiyasi — qurilmalar bir-biriga qanday ulanganining «shakli». Shahar ko'chalarini turlicha rejalashtirish mumkin bo'lgani kabi, tarmoqni ham turli shakllarda qurish mumkin. Har birining afzallik va kamchiligi bor — ayniqsa bitta kabel uzilganda nima bo'lishi bo'yicha.","A network topology is the «shape» of how devices connect. Like a city's streets can be laid out differently, a network can be built in different shapes. Each has pros and cons — especially in what happens when one cable is cut.")),
     React.createElement(H2,{num:"§2"},t(lang,"Asosiy topologiyalar","Main topologies")),
     React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12}},
       maps.map(function(m,i){return React.createElement(NodeMap,{key:i,label:m.label,color:m.color,nodes:m.nodes,links:m.links});})),
-    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Amalda: ","In practice: ")),t(lang,"zamonaviy tarmoqlar aksariyat Star topologiyasidan foydalanadi — har qurilma markaziy switchга ulanadi. Bitta qurilma uzilsa, boshqalar ishlayveradi.","most modern networks use the Star topology — each device connects to a central switch. If one device fails, the others keep working.")),
-        React.createElement(H2,{num:"§3"},t(lang,"Topologiyalarni solishtirish","Comparing topologies")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: kabel uzilsa nima bo'ladi?","Interactive simulator: what happens if a cable is cut?")),
+    React.createElement(P,null,t(lang,"Har topologiyani tanlang va bitta kabel uzilganda aynan nechta qurilma tarmoqdan ajralishini ko'ring — bu topologiyalarni solishtirishning ASOSIY sababi:","Pick each topology and see exactly how many devices drop off the network when one cable is cut — this is the MAIN reason topologies are compared:")),
+    React.createElement(TopoSim),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Amalda: ","In practice: ")),t(lang,"zamonaviy tarmoqlar deyarli har doim Star topologiyasidan foydalanadi — bitta uzilish faqat bitta qurilmaga ta'sir qiladi, qolganlari ishlayveradi. Katta korxonalar esa muhim aloqalar uchun Mesh (yoki uning gibrid variantlari) qo'shadi.","modern networks almost always use Star topology — one break affects only one device, the rest keep working. Large enterprises add Mesh (or hybrid variants of it) for critical links.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Topologiyalarni solishtirish","Comparing topologies")),
     React.createElement(CompareCols,{left:{title:{uz:"Yulduz (Star)",en:"Star"},color:"#69db7c",rows:[{uz:"Markazda switch/router",en:"A switch/router in the center"},{uz:"Bitta uzilsa — faqat o'zi",en:"One fails — only itself"},{uz:"Eng keng tarqalgan",en:"The most common"},]},right:{title:{uz:"Halqa/Shina (Ring/Bus)",en:"Ring/Bus"},color:"#ff6b6b",rows:[{uz:"Bitta uzilish hammani buzadi",en:"One break can down all"},{uz:"Eski, kam ishlatiladi",en:"Old, rarely used"},{uz:"Kabel tejaydi",en:"Saves cabling"},]}}),
-    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: yetib borishni tekshirish","Practice: checking reachability")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: yetib borishni tekshirish","Practice: checking reachability")),
     React.createElement(P,null,t(lang,"ping qurilmaga yetib borish mumkinligini, traceroute yo'lni ko'rsatadi. Yulduz topologiyasida barcha yo'l markaziy qurilmadan o'tadi.","ping checks whether a device is reachable, traceroute shows the path. In a star topology every path goes through the central device.")),
     React.createElement(Terminal,null,"ping -c3 192.168.1.20\n# 64 bytes from 192.168.1.20: icmp_seq=1 ttl=64 time=0.8 ms\n# 3 packets transmitted, 3 received, 0% packet loss\nfping -a -g 192.168.1.0/24 2>/dev/null   # butun tarmoqni tez"),
 React.createElement(Quiz,{q:{uz:"Qaysi topologiyada bitta qurilma uzilsa ham qolganlari ishlayveradi va u eng keng tarqalgan?",en:"In which topology do the rest keep working if one device fails, and which is most common?"},opts:[{uz:"Bus",en:"Bus"},{uz:"Star (yulduz)",en:"Star"},{uz:"Ring (halqa)",en:"Ring"},{uz:"Hech qaysi",en:"None"}],correct:1,exp:{uz:"Star da hamma markaziy switchга ulanadi — bitta uzilса boshqalarga ta'sir qilmaydi. Shu sababli eng keng tarqalgan.",en:"In Star everyone connects to a central switch — one failure doesn't affect others. That's why it's most common."}}));
