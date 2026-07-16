@@ -628,6 +628,59 @@ function HTTPSim(){
         React.createElement("div",{style:{marginTop:7,fontWeight:700,color:D,fontSize:12}},s.sens?"⚠ "+t(lang,"Ochiq matnda "+t(lang,s.sensLbl.uz,s.sensLbl.en)+" ham ko'rinadi!","Plain text — even the "+t(lang,s.sensLbl.uz,s.sensLbl.en)+" is visible!"):t(lang,"⚠ So'rov ochiq — qaysi sahifaga kirganingiz ko'rinadi.","⚠ The request is in the open — which page you visited is visible.")))));
 }
 
+function ARPSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",GY="#64748b",SL="#1e293b",SL2="#0f172a";
+  const BCAST=[
+    {uz:"A → HAMMA (broadcast): «192.168.1.5 kimda? MAC ingni yuboring!»",en:"A → EVERYONE (broadcast): «who has 192.168.1.5? send your MAC!»",
+     duz:"Ethernet darajasida broadcast (FF:FF:FF:FF:FF:FF) — LAN dagi HAR BIR qurilma bu so'rovni oladi.",den:"An Ethernet-level broadcast (FF:FF:FF:FF:FF:FF) — EVERY device on the LAN receives this request.",st:{b:"pulse",c:"pulse",d:"pulse"}},
+    {uz:"B va D: «bu men emas» — javob bermay e'tiborsiz qoldiradi",en:"B and D: «not me» — silently ignore it",
+     duz:"Har qurilma so'ralgan IP o'zinikimi tekshiradi. Mos kelmasa, hech narsa yubormaydi.",den:"Each device checks whether the requested IP is its own. If not, it sends nothing back.",st:{b:"ignore",c:"owner",d:"ignore"}},
+    {uz:"C (egasi) → A (unicast): «Bu men! MAC = aa:bb:cc:dd:ee:ff»",en:"C (the owner) → A (unicast): «That's me! MAC = aa:bb:cc:dd:ee:ff»",
+     duz:"Faqat IP egasi to'g'ridan-to'g'ri (unicast) javob beradi. A bu javobni ARP jadvaliga yozadi va keshlaydi.",den:"Only the IP's owner replies directly (unicast). A stores this answer in its ARP table and caches it.",st:{b:"ignore",c:"owner",d:"ignore",cache:true}}
+  ];
+  const CACHED=[
+    {uz:"A: ARP jadvalini tekshiradi — 192.168.1.5 ALLAQACHON bor!",en:"A: checks its ARP table — 192.168.1.5 is ALREADY there!",
+     duz:"Kesh muddati (odatda ~60 soniya — bir necha daqiqa) hali tugamagan bo'lsa, broadcast shart emas.",den:"If the cache timeout (typically ~60 seconds to a few minutes) hasn't expired, no broadcast is needed.",st:{b:"idle",c:"owner",d:"idle"}},
+    {uz:"A → C: darhol to'g'ridan-to'g'ri (unicast) trafik yuboradi",en:"A → C: sends traffic directly (unicast) right away",
+     duz:"Butun tarmoqqa baqirish o'rniga — bitta xotiradagi yozuv orqali millisekundlarda.",den:"Instead of shouting to the whole network — a single memory lookup, in milliseconds.",st:{b:"idle",c:"owner",d:"idle",cache:true}}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="cold"?BCAST:CACHED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="cold"?BCAST:run==="warm"?CACHED:null;
+  const cur=list&&step>=0?list[step]:null;
+  const st=cur?cur.st:{b:"idle",c:"idle",d:"idle"};
+  const nodeCol=function(k){return st[k]==="pulse"?BL:st[k]==="owner"?A:st[k]==="ignore"?GY:"rgba(148,163,184,.3)";};
+  const nodeOp=function(k){return st[k]==="ignore"?.4:1;};
+  const nbox=function(k,ic,label){return React.createElement("div",{style:{flex:1,textAlign:"center",padding:"10px 4px",background:SL,border:"1.5px solid "+nodeCol(k),borderRadius:10,opacity:nodeOp(k),transition:"all .3s",boxShadow:st[k]==="pulse"?"0 0 12px "+BL+"88":st[k]==="owner"?"0 0 12px "+A+"88":"none"}},
+    React.createElement("div",{style:{fontSize:20}},ic),React.createElement("div",{style:{fontSize:9.5,color:"#cbd5e1",marginTop:2,fontFamily:"var(--font-mono)"}},label));};
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",gap:6,marginBottom:12}},
+      nbox("a","💻",t(lang,"A (so'ragan)","A (asking)")),
+      nbox("b","💻","B"),
+      nbox("c","🎯",t(lang,"C (egasi)","C (owner)")),
+      nbox("d","💻","D")),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — ARP so'rovi butun tarmoqqami yoki keshdanmi hal bo'lishini ko'ring.","⬇ Pick a scenario — see whether the ARP query goes to the whole network or is answered from cache.")):
+      list.map(function(s,i){ if(step<i) return null;
+        const col=i===list.length-1?A:BL;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?col+"14":SL2,border:"1px solid "+col+(step===i?"":"44"),borderLeft:"4px solid "+col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.st.cache&&React.createElement("div",{style:{marginTop:2,padding:"9px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12,background:A+"1f",border:"1px solid "+A,color:A}},
+      run==="cold"?t(lang,"✓ ARP jadvaliga yozildi: 192.168.1.5 → aa:bb:cc:dd:ee:ff (keshlangan)","✓ Written to the ARP table: 192.168.1.5 → aa:bb:cc:dd:ee:ff (cached)"):t(lang,"⚡ Keshdan — broadcast yo'q, darhol javob","⚡ From cache — no broadcast, instant answer")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("cold");setStep(-1);},style:{flex:1,padding:"9px",background:run==="cold"?BL+"22":SL,color:run==="cold"?"#93c5fd":"#cbd5e1",border:"1px solid "+BL+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"📢 Birinchi so'rov (broadcast)","📢 First query (broadcast)")),
+      React.createElement("button",{onClick:()=>{setRun("warm");setStep(-1);},style:{flex:1,padding:"9px",background:run==="warm"?A+"22":SL,color:run==="warm"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Keyingi so'rov (keshdan)","⚡ Next query (from cache)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1290,24 +1343,21 @@ function LessonL06(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"ARP nima?","What is ARP?")),
-    React.createElement(P,null,t(lang,"ARP IP manzilni fizik MAC manzilga bog'laydi. IP — mantiqiy \"uy manzili\", MAC — qurilmaning doimiy \"pasport raqami\". Lokal tarmoqda yetkazish uchun MAC kerak, ARP uni topadi.","ARP links an IP address to a physical MAC address. IP is the logical \"home address\", MAC is the device's permanent \"passport number\". Local delivery needs the MAC, and ARP finds it.")),
-    React.createElement(H2,{num:"§2"},t(lang,"ARP qanday ishlaydi","How ARP works")),
-    React.createElement(P,null,t(lang,"Qurilma faqat IP ni bilsa, butun tarmoqqa baqiradi: \"192.168.1.5 kimda?\" — egasi javob beradi. Bir xonada \"Aziz kim?\" deb baqirib, Aziz qo'l ko'targandek. \"Ishga tushir\":","If a device only knows the IP, it shouts to the whole network: \"who has 192.168.1.5?\" — the owner replies. Like shouting \"who is Aziz?\" and Aziz raising his hand. Press Play:")),
-    React.createElement(FlowSteps,{title:{uz:"ARP so'rov–javob",en:"ARP request–reply"},steps:[
-      {icon:"📢",text:{uz:"A → HAMMA (broadcast):  \"192.168.1.5 kimda? MAC ingni ber\"",en:"A → EVERYONE (broadcast):  \"who has 192.168.1.5? send your MAC\""}},
-      {icon:"🙋",text:{uz:"B → A (unicast):  \"Bu men! MAC = aa:bb:cc:dd:ee:ff\"",en:"B → A (unicast):  \"That's me! MAC = aa:bb:cc:dd:ee:ff\""}},
-      {icon:"🧠",text:{uz:"A ARP jadvaliga IP↔MAC ni eslab qoladi",en:"A caches IP↔MAC in its ARP table"}},
-      {icon:"✓",text:{uz:"Endi A to'g'ridan-to'g'ri B ga yuboradi",en:"Now A sends directly to B"}},
-    ]}),
-    React.createElement(PacketFlow,{from:{uz:"A · 192.168.1.2",en:"A · 192.168.1.2"},to:{uz:"B · 192.168.1.5",en:"B · 192.168.1.5"},label:"ARP"}),
-    React.createElement(H2,{num:"§3"},t(lang,"ARP jadvalini ko'rish","Viewing the ARP table")),
-    React.createElement(Terminal,null,"arp -a\n# 192.168.1.1   00:11:22:33:44:55   dynamic\n# 192.168.1.5   aa:bb:cc:dd:ee:ff   dynamic"),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"ARP javobni tekshirmaydi — shu sababli \"ARP spoofing\" hujumi mumkin (L24). Hujumchi soxta javob yuborib trafikni o'g'irlaydi.","ARP doesn't verify replies — enabling \"ARP spoofing\" attacks (L24). An attacker sends a fake reply to steal traffic.")),
-        React.createElement(H2,{num:"§4"},t(lang,"ARP jadvali va so'rov/javob","The ARP table and request/reply")),
-    React.createElement(P,null,t(lang,"ARP IP manzilni MAC manzilga bog'laydi. Qurilma «10.0.0.1 kimda?» deb butun tarmoqqa so'rov (broadcast) yuboradi; egasi «bu men, MAC im shu» deb javob beradi. Natija ARP jadvalida saqlanadi. Bu ishonchga asoslangani uchun ARP spoofing (L24) hujumiga zaif.","ARP maps an IP address to a MAC address. A device broadcasts «who has 10.0.0.1?» to the whole network; the owner replies «that's me, here's my MAC». The result is stored in the ARP table. Because it is trust-based, it is vulnerable to ARP spoofing (L24).")),
-    React.createElement(CompareCols,{left:{title:{uz:"ARP Request",en:"ARP Request"},color:"#4dabf7",rows:[{uz:"Broadcast — hammaga",en:"Broadcast — to everyone"},{uz:"«Bu IP kimda?»",en:"«Who has this IP?»"},]},right:{title:{uz:"ARP Reply",en:"ARP Reply"},color:"#69db7c",rows:[{uz:"Unicast — so'rovchiga",en:"Unicast — to the asker"},{uz:"«Bu men, MAC im...»",en:"«It's me, my MAC is...»"},]}}),
-    React.createElement(Terminal,null,"arp -a\n# ? (192.168.1.1)  at 00:11:22:33:44:55 [ether] on eth0  ← router\n# ? (192.168.1.20) at aa:bb:cc:dd:ee:ff [ether] on eth0\nip neigh   # zamonaviy muqobil"),
-React.createElement(Quiz,{q:{uz:"ARP nimani nimaga bog'laydi?",en:"What does ARP link to what?"},opts:[{uz:"Domen nomini IP ga",en:"A domain name to an IP"},{uz:"IP manzilni MAC ga",en:"An IP address to a MAC"},{uz:"Portni protokolga",en:"A port to a protocol"},{uz:"Parolni foydalanuvchiga",en:"A password to a user"}],correct:1,exp:{uz:"ARP mantiqiy IP manzilni fizik MAC manzilga bog'laydi.",en:"ARP links a logical IP address to a physical MAC address."}}));
+    React.createElement(P,null,t(lang,"ARP (Address Resolution Protocol) mantiqiy IP manzilni fizik MAC manzilga bog'laydi. IP — qurilmaning «uy manzili» (o'zgarishi mumkin), MAC — tarmoq kartasiga ishlab chiqaruvchi tomonidan yozilgan doimiy «pasport raqami». Bir tarmoqdagi ikki qurilma bevosita gaplashishi uchun MAC manzil shart — ARP aynan shuni topib beradi.","ARP (Address Resolution Protocol) links a logical IP address to a physical MAC address. IP is a device's «home address» (it can change), MAC is the permanent «passport number» burned into the network card by its maker. Two devices on the same network need the MAC to talk directly — and ARP is what finds it.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: broadcast vs kesh","Interactive simulator: broadcast vs cache")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — birinchi so'rov nega BUTUN tarmoqqa yuborilishini va keyingi so'rov nega tezroq bo'lishini solishtiring:","Try both scenarios — compare why the first query is sent to the WHOLE network, and why the next one is faster:")),
+    React.createElement(ARPSim),
+    React.createElement(H2,{num:"§3"},t(lang,"ARP Request va Reply","ARP Request and Reply")),
+    React.createElement(CompareCols,{
+      left:{title:{uz:"ARP Request","en":"ARP Request"},color:"#3b82f6",rows:[{uz:"Broadcast — LAN dagi HAMMAGA",en:"Broadcast — to EVERYONE on the LAN"},{uz:"Ethernet manzili: FF:FF:FF:FF:FF:FF",en:"Ethernet address: FF:FF:FF:FF:FF:FF"},{uz:"«Bu IP kimda?»",en:"«Who has this IP?»"}]},
+      right:{title:{uz:"ARP Reply",en:"ARP Reply"},color:"#22c55e",rows:[{uz:"Unicast — faqat so'rovchiga",en:"Unicast — only to the asker"},{uz:"Faqat IP egasi javob beradi",en:"Only the IP's owner replies"},{uz:"«Bu men, MAC im shu»",en:"«It's me, here's my MAC»"}]}}),
+    React.createElement(P,null,t(lang,"Muhim nuans: ARP so'rovi Ethernet darajasida broadcast bo'lgani uchun, LAN dagi barcha qurilmalar uni «eshitadi» — hatto egasi bo'lmaganlar ham. Bu ARP ni ishonchga asoslangan (hech kim javobni tekshirmaydi) va shu bilan birga zaif qiladi.","An important nuance: because an ARP request is a broadcast at the Ethernet level, every device on the LAN «hears» it — even ones that aren't the owner. This makes ARP trust-based (no one verifies the reply) — and therefore vulnerable.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Nega bu xavfsizlik uchun muhim","Why this matters for security")),
+    React.createElement(P,null,t(lang,"ARP javobni HECH QANDAY tarzda tekshirmaydi — birinchi kelgan «men shu MAC man» javobiga ishonadi. Agar tarmoqdagi hujumchi haqiqiy egasidan OLDIN yoki undan ko'proq soxta javob yuborsa, qurbon uni haqiqiy deb qabul qiladi. Bu — «ARP spoofing» deb ataladi va to'liq tafsilot L24-darsda.","ARP performs NO verification of a reply — it trusts whichever «I'm that MAC» response arrives first. If an attacker on the network sends a fake reply before (or more often than) the real owner, the victim accepts it as genuine. This is called «ARP spoofing», covered in full detail in L24.")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"ARP faqat lokal tarmoq (bir xil segment) ichida ishlaydi — routerdan narigi tomonga o'tmaydi. Shu sababli ARP spoofing faqat bir xil LAN/WiFi ichidagi qurilmalarga xavfli.","ARP only works within the local network (the same segment) — it never crosses a router. That's why ARP spoofing is only a threat to devices on the same LAN/WiFi.")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ARP jadvalini ko'rish","Practice: viewing the ARP table")),
+    React.createElement(Terminal,null,"arp -a\n# ? (192.168.1.1)  at 00:11:22:33:44:55 [ether] on eth0  ← router\n# ? (192.168.1.5)  at aa:bb:cc:dd:ee:ff [ether] on eth0  ← C\n\nip neigh          # zamonaviy muqobil (Linux)\n# 192.168.1.5 dev eth0 lladdr aa:bb:cc:dd:ee:ff REACHABLE"),
+    React.createElement(Quiz,{q:{uz:"ARP nimani nimaga bog'laydi?",en:"What does ARP link to what?"},opts:[{uz:"Domen nomini IP ga",en:"A domain name to an IP"},{uz:"IP manzilni MAC ga",en:"An IP address to a MAC"},{uz:"Portni protokolga",en:"A port to a protocol"},{uz:"Parolni foydalanuvchiga",en:"A password to a user"}],correct:1,exp:{uz:"ARP mantiqiy IP manzilni fizik MAC manzilga bog'laydi — bir xil LAN ichida to'g'ridan-to'g'ri yetkazish uchun zarur.",en:"ARP links a logical IP address to a physical MAC address — needed for direct delivery within the same LAN."}}));
 }
 function LessonL07(){
   const lang=useLang();
