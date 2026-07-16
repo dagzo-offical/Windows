@@ -1476,6 +1476,46 @@ function WiresharkSim(){
       React.createElement("button",{onClick:()=>{setRun("filt");setStep(-1);},style:{flex:1,padding:"9px",background:run==="filt"?A+"22":SL2,color:run==="filt"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🎯 Filtr bilan qidirish","🎯 Search with a filter"))));
 }
 
+function WirelessCrackSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const WEAK=[
+    {col:BL,uz:"Handshake ushlandi — WPA2 4-tomonlama qo'l siqish yozib olindi",en:"Handshake captured — the WPA2 4-way handshake is recorded",duz:"Ikkala ssenariyda ham bu qadam bir xil — farq keyingi bosqichda.",den:"This step is identical in both scenarios — the difference is in what comes next."},
+    {col:AM,uz:"Nishon parol: «parol123» — mashhur lug'atlarda mavjud",en:"Target password: «parol123» — already sits in common wordlists",duz:"Millionlab odam xuddi shunga o'xshash oddiy parol tanlaydi.",den:"Millions of people pick a similarly simple password."},
+    {col:AM,uz:"aircrack-ng lug'at hujumini boshlaydi — soniyasiga minglab urinish",en:"aircrack-ng starts the dictionary attack — thousands of tries per second",duz:"Har bir urinish handshake bilan solishtiriladi — mos kelguncha davom etadi.",den:"Each guess is checked against the handshake — it keeps going until one matches."},
+    {col:D,uz:"🔓 8 soniyada topildi — «parol123» deyarli bir zumda ochildi",en:"🔓 Found in 8 seconds — «parol123» cracked almost instantly",duz:"Kuchli shifrlash (WPA2) ham zaif parolni qutqara olmaydi.",den:"Even strong encryption (WPA2) can't save a weak password.",final:true,bad:true}
+  ];
+  const STRONG=[
+    {col:BL,uz:"Handshake ushlandi — WPA2 4-tomonlama qo'l siqish yozib olindi",en:"Handshake captured — the WPA2 4-way handshake is recorded",duz:"Hujumchi uchun bu qadam xuddi avvalgidek oson.",den:"This step is just as easy for the attacker as before."},
+    {col:AM,uz:"Nishon parol: 18 belgili tasodifiy parol (harf+raqam+belgi)",en:"Target password: an 18-character random password (letters+digits+symbols)",duz:"Hech qanday lug'atda yo'q — faqat tasodifiy tanlash orqali topish mumkin.",den:"It's in no wordlist — the only way to find it is pure random guessing."},
+    {col:AM,uz:"aircrack-ng xuddi shu tezlikda urinadi — lekin variantlar soni astronomik",en:"aircrack-ng tries at the same speed — but the number of possibilities is astronomical",duz:"18 belgili tasodifiy parolning kombinatsiyasi kvadrilliondan ham ko'p.",den:"An 18-character random password has combinations numbering in the quadrillions and beyond."},
+    {col:A,uz:"🔒 Millionlab yillar kerak bo'ladi — amalda buzib bo'lmaydi",en:"🔒 Would take millions of years — practically uncrackable",duz:"Handshake ushlangan bo'lsa ham, parolning o'zi asosiy himoya bo'lib qoladi.",den:"Even with the handshake captured, the password itself remains the real line of defense.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="weak"?WEAK:STRONG;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="weak"?WEAK:run==="strong"?STRONG:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu ushlangan handshake zaif va kuchli parolda qanday farqli tugashini ko'ring.","⬇ Pick a scenario — see how the same captured handshake ends very differently for a weak versus a strong password.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="weak"?t(lang,"✗ Zaif parol: handshake + lug'at = soniyalarda ochilish","✗ Weak password: handshake + wordlist = cracked in seconds"):t(lang,"✓ Kuchli parol: handshake ushlansa ham parol amalda buzilmaydi","✓ Strong password: even with the handshake, it's practically uncrackable")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("weak");setStep(-1);},style:{flex:1,padding:"9px",background:run==="weak"?D+"22":SL2,color:run==="weak"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 Zaif parol","🔓 Weak password")),
+      React.createElement("button",{onClick:()=>{setRun("strong");setStep(-1);},style:{flex:1,padding:"9px",background:run==="strong"?A+"22":SL2,color:run==="strong"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Kuchli parol","🔒 Strong password"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2672,13 +2712,16 @@ function LessonL29(){
     att.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid var(--border)",borderLeft:"3px solid #ff9145",borderRadius:10,animationDelay:(i*0.06)+"s"}},
       React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"#ff9145",minWidth:150}},x[0]),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-    React.createElement(H2,{num:"§3"},t(lang,"Himoya","Defense")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: zaif vs kuchli parol","Interactive simulator: weak vs strong password")),
+    React.createElement(P,null,t(lang,"Handshake ikkala holatda ham bir xil ushlanadi — ammo aynan PAROL qanday tanlanganiga qarab, hujum natijasi tubdan farq qiladi. Ikkalasini sinang:","The handshake gets captured the same way either time — but the outcome hinges entirely on how the PASSWORD was chosen. Try both:")),
+    React.createElement(WirelessCrackSim),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
     React.createElement(Terminal,null,"✓ WPA3 yoki kamida WPA2 (WEP emas!)\n✓ Uzun, murakkab parol (12+ belgi)\n✓ WPS ni o'chiring\n✓ Mehmonlar uchun alohida tarmoq"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Simsiz hujum vositalarini faqat o'z tarmog'ingizda yoki yozma ruxsat bilan sinang. Birovning WiFi siga ruxsatsiz kirish jinoyat.","Test wireless attack tools only on your own network or with written permission. Unauthorized access to someone's WiFi is a crime.")),
-        React.createElement(H2,{num:"§4"},t(lang,"WPA2 buzish oqimi","The WPA2 cracking flow")),
+        React.createElement(H2,{num:"§5"},t(lang,"WPA2 buzish oqimi","The WPA2 cracking flow")),
     React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"WiFi parolini sinash",en:"Testing the WiFi password"},steps:[{icon:"📡",text:{uz:"Monitor rejim — havoni tinglash (airmon-ng)",en:"Monitor mode — listen to the air (airmon-ng)"}},{icon:"🔍",text:{uz:"Nishon AP va mijozni topish (airodump-ng)",en:"Find the target AP and client (airodump-ng)"}},{icon:"👋",text:{uz:"Deauth → handshake ni ushlash",en:"Deauth → capture the handshake"}},{icon:"🔑",text:{uz:"Oflayn lug'at hujumi (aircrack-ng)",en:"Offline dictionary attack (aircrack-ng)"}},]}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: handshake buzish","Practice: cracking the handshake")),
-    React.createElement(P,null,t(lang,"Handshake ushlangach, hujum OFLAYN davom etadi — parol lug'at bilan sinaladi. Kuchli, uzun parol bu hujumni amalda imkonsiz qiladi.","Once the handshake is captured, the attack continues OFFLINE — the password is tested against a wordlist. A strong, long password makes this attack practically impossible.")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: handshake buzish","Practice: cracking the handshake")),
+    React.createElement(P,null,t(lang,"Handshake ushlangach, hujum OFLAYN davom etadi — parol lug'at bilan sinaladi, xuddi simulyatordagi «Zaif parol» ssenariysidek. Kuchli, uzun parol bu hujumni amalda imkonsiz qiladi.","Once the handshake is captured, the attack continues OFFLINE — the password is tested against a wordlist, just like the simulator's «Weak password» scenario. A strong, long password makes this attack practically impossible.")),
     React.createElement(Terminal,null,"aircrack-ng -w rockyou.txt capture.cap\n#   [00:03:12] 145203 keys tested\n#   KEY FOUND! [ MyWiFiPass2024 ]\n# → kuchsiz parol soatlarda ochiladi"),
 React.createElement(Quiz,{q:{uz:"WPA2 \"handshake capture\" dan keyin hujumchi odatda nima qiladi?",en:"After a WPA2 \"handshake capture\", what does the attacker do?"},opts:[{uz:"Parolni oflayn buzishga urinadi",en:"Tries to crack the password offline"},{uz:"Routerni o'chiradi",en:"Turns off the router"},{uz:"IP beradi",en:"Hands out IPs"},{uz:"DNS ni tuzatadi",en:"Fixes DNS"}],correct:0,exp:{uz:"Ushlangan handshake parolning shifrlangan izini o'z ichiga oladi — hujumchi uni oflayn buzishga urinadi. Uzun parol buni deyarli imkonsiz qiladi.",en:"The captured handshake holds an encrypted trace of the password — the attacker tries to crack it offline. A long password makes this nearly impossible."}}));
 }
