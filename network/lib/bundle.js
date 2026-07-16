@@ -479,6 +479,48 @@ function TLSSim(){
       React.createElement("button",{onClick:()=>{setRun("fake");setStep(-1);},style:{flex:1,padding:"9px",background:run==="fake"?D+"22":SL,color:run==="fake"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}},t(lang,"🥷 Soxta sertifikat (MITM)","🥷 Fake certificate (MITM)"))));
 }
 
+function VPNSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",SL="#1e293b",SL2="#0f172a";
+  const X={you:12,mid:50,dst:88};
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=2) return;
+    const id=setTimeout(()=>setStep(step+1),950);return()=>clearTimeout(id);
+  },[run,step]);
+  const on=run==="on";
+  const px=step<=0?X.you:step===1?X.mid:X.dst;
+  const revealed=step>=1;
+  const node=(xk,ic,label,col)=>React.createElement("div",{style:{position:"absolute",left:X[xk]+"%",top:"46%",transform:"translate(-50%,-50%)",width:96,textAlign:"center",padding:"9px 4px",background:SL,border:"1px solid "+col+"66",borderTop:"3px solid "+col,borderRadius:11,zIndex:4}},
+    React.createElement("div",{style:{fontSize:24,lineHeight:1}},ic),
+    React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#e2e8f0",marginTop:3}},label));
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{overflowX:"auto"}},
+      React.createElement("div",{style:{position:"relative",height:150,minWidth:520,background:SL2,border:"1px solid rgba(148,163,184,.2)",borderRadius:14}},
+        on&&React.createElement("div",{style:{position:"absolute",left:"5%",right:"5%",top:"46%",height:44,transform:"translateY(-50%)",background:A+"14",border:"1.5px dashed "+A,borderRadius:22,zIndex:1}},
+          React.createElement("div",{style:{position:"absolute",top:-9,left:0,right:0,textAlign:"center",fontSize:9.5,fontWeight:800,color:A,fontFamily:"var(--font-mono)"}},t(lang,"🔒 Shifrlangan VPN tunnel","🔒 Encrypted VPN tunnel"))),
+        React.createElement("div",{style:{position:"absolute",left:"12%",right:"12%",top:"46%",height:2,transform:"translateY(-50%)",background:"repeating-linear-gradient(90deg,var(--text-3) 0 7px,transparent 7px 15px)",opacity:.5,zIndex:2}}),
+        node("you","🧑",t(lang,"Siz","You"),BL),
+        node("mid","🕵",t(lang,"Xaker / Provayder","Hacker / ISP"),D),
+        node("dst","🌍",t(lang,"Sayt","Website"),A),
+        run&&React.createElement("div",{style:{position:"absolute",left:px+"%",top:"46%",width:24,height:24,borderRadius:on?7:"50%",background:on?A:D,border:"2px solid #fff",boxShadow:"0 0 14px "+(on?A:D),transform:"translate(-50%,-50%)",transition:"left .85s ease-in-out",zIndex:6,display:"grid",placeItems:"center",fontSize:12}},on?"🔒":"✉"))),
+    React.createElement("div",{style:{marginTop:12,background:SL2,border:"1px solid "+(revealed?(on?A:D):"rgba(148,163,184,.2)"),borderRadius:12,padding:"12px 14px",minHeight:70}},
+      React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0",marginBottom:8}},"🕵 "+t(lang,"O'rtadagi xaker/provayder nima ko'radi:","What the hacker/ISP in the middle sees:")),
+      !revealed?React.createElement("div",{style:{color:"#64748b",fontSize:11,fontFamily:"var(--font-mono)"}},t(lang,"paket kutilmoqda...","waiting for the packet...")):
+      on?React.createElement("div",null,
+        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:12,color:"#94a3b8",wordBreak:"break-all",background:"#00000033",padding:"8px 10px",borderRadius:6}},"4a9f2e7b1c...Zk@9#Lp!vB2xQ...e8d0f  (AEAD)"),
+        React.createElement("div",{style:{marginTop:8,fontWeight:700,color:A,fontSize:12.5}},t(lang,"🔒 Tushunarsiz shifr — VPN ma'lumotni himoya qilyapti.","🔒 Unreadable ciphertext — the VPN is protecting the data."))):
+      React.createElement("div",null,
+        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:12,color:"#fca5a5",background:D+"14",padding:"8px 10px",borderRadius:6}},"POST /login  user=admin  password=Secret123"),
+        React.createElement("div",{style:{marginTop:8,fontWeight:700,color:D,fontSize:12.5}},t(lang,"⚠ Hammasi ochiq matnda — login va parol o'qildi!","⚠ Everything in plain text — the login and password were read!")))),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("off");setStep(-1);},style:{flex:1,padding:"9px",background:run==="off"?D+"22":SL,color:run==="off"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}},t(lang,"📴 VPN YO'Q (ochiq)","📴 No VPN (plain)")),
+      React.createElement("button",{onClick:()=>{setRun("on");setStep(-1);},style:{flex:1,padding:"9px",background:run==="on"?A+"22":SL,color:run==="on"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 VPN YONIQ (tunnel)","🔒 VPN ON (tunnel)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1302,24 +1344,31 @@ function LessonL14(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"VPN nima?","What is a VPN?")),
-    React.createElement(P,null,t(lang,"VPN internet ustidan xavfsiz, shifrlangan \"tunnel\" quradi. Ma'lumotingiz ochiq internetdan o'tsa ham, shifrlangan quvur ichida ketadi — ochiq maydondan o'tayotgan yashirin yer osti yo'li kabi.","A VPN builds a secure, encrypted \"tunnel\" over the internet. Even crossing the public internet, your data travels inside an encrypted pipe — like a hidden tunnel across an open field.")),
-    React.createElement(PacketFlow,{from:{uz:"Siz",en:"You"},to:{uz:"Ofis / Internet",en:"Office / Internet"},label:{uz:"🔒 shifrlangan tunnel",en:"🔒 encrypted tunnel"},color:"#69db7c"}),
-    React.createElement(H2,{num:"§2"},t(lang,"VPN nima uchun kerak?","Why use a VPN?")),
-    React.createElement("div",{style:{margin:"6px 0 12px"}},
-      [[{uz:"Maxfiylik",en:"Privacy"},{uz:"Provayder trafikingizni ko'ra olmaydi",en:"Your ISP can't see your traffic"}],
-       [{uz:"Ochiq WiFi himoyasi",en:"Public WiFi safety"},{uz:"Kafe/aeroport WiFi da shifrlanadi",en:"Encrypted on café/airport WiFi"}],
-       [{uz:"Masofaviy ish",en:"Remote work"},{uz:"Uydan ofis tarmog'iga xavfsiz ulanish",en:"Securely reach the office from home"}]].map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
-        React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:120}},t(lang,x[0].uz,x[0].en)),
-        React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));})),
-    React.createElement(H2,{num:"§3"},t(lang,"Turlari va protokollar","Types and protocols")),
-    React.createElement(Terminal,null,"Turlari:\n  Site-to-Site  — ikki ofis tarmog'ini bog'laydi\n  Remote Access — bitta foydalanuvchi ulanadi\nProtokollar:  IPsec · OpenVPN · WireGuard"),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"VPN sizni to'liq \"ko'rinmas\" qilmaydi — u faqat trafikni shifrlaydi. VPN provayderiga ishonishingiz kerak. Bepul VPN lar ko'pincha ma'lumotingizni sotadi.","A VPN doesn't make you fully \"invisible\" — it only encrypts traffic. You must trust the provider. Free VPNs often sell your data.")),
-        React.createElement(H2,{num:"§4"},t(lang,"VPN turlari va protokollari","VPN types and protocols")),
-    React.createElement(CompareCols,{left:{title:{uz:"Remote-access",en:"Remote-access"},color:"#4dabf7",rows:[{uz:"Bitta foydalanuvchi → tarmoq",en:"One user → a network"},{uz:"Masofadan ishlash uchun",en:"For remote work"},{uz:"OpenVPN, WireGuard",en:"OpenVPN, WireGuard"},]},right:{title:{uz:"Site-to-site",en:"Site-to-site"},color:"#69db7c",rows:[{uz:"Ofis ↔ ofis",en:"Office ↔ office"},{uz:"Doimiy tunnel",en:"A permanent tunnel"},{uz:"IPsec",en:"IPsec"},]}}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: tunnel holati","Practice: tunnel status")),
-    React.createElement(P,null,t(lang,"VPN shifrlangan «tunnel» yaratadi — trafik ochiq tarmoqdan o'tsa ham o'qib bo'lmaydi. tun0 interfeysi VPN faol ekanini ko'rsatadi.","A VPN creates an encrypted «tunnel» — even if traffic crosses an open network, it can't be read. The tun0 interface shows the VPN is active.")),
-    React.createElement(Terminal,null,"sudo wg show     # WireGuard holati\n# interface: wg0\n#   public key: xTIB...=   peer: 3.5.7.9:51820\n#   latest handshake: 12 seconds ago\nip a show tun0\n# inet 10.8.0.2/24   ← VPN ichidagi manzil"),
-React.createElement(Quiz,{q:{uz:"VPN ma'lumotingiz bilan asosan nima qiladi?",en:"What does a VPN mainly do with your data?"},opts:[{uz:"Tezlashtiradi",en:"Speeds it up"},{uz:"Shifrlangan tunnel ichida uzatadi",en:"Sends it through an encrypted tunnel"},{uz:"O'chiradi",en:"Deletes it"},{uz:"Rasmga aylantiradi",en:"Turns it into an image"}],correct:1,exp:{uz:"VPN internet ustidan shifrlangan tunnel quradi — ma'lumot ochiq tarmoqdan o'tsa ham ichi ko'rinmaydi.",en:"A VPN builds an encrypted tunnel over the internet — the contents can't be seen even on a public network."}}));
+    React.createElement(P,null,t(lang,"VPN (Virtual Private Network) — ochiq internet ustidan xavfsiz, shifrlangan «tunnel» quradi. Ma'lumotingiz ochiq tarmoqdan o'tsa ham, shifrlangan quvur ichida ketadi — gavjum ko'cha ostidagi yashirin yer osti yo'li kabi. Ikki narsani beradi: MAXFIYLIK (o'rtadagi hech kim — provayder, ochiq WiFi dagi xaker — ichini o'qiy olmaydi) va PRIVAT TARMOQQA KIRISH (uydan ofis tarmog'iga xuddi ichkarida turgandek ulanasiz).","A VPN (Virtual Private Network) builds a secure, encrypted «tunnel» over the public internet. Even crossing an open network, your data travels inside an encrypted pipe — like a hidden tunnel beneath a busy street. It gives two things: PRIVACY (no one in the middle — your ISP, a hacker on public WiFi — can read the contents) and PRIVATE-NETWORK ACCESS (you reach the office network from home as if you were inside).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: VPN YO'Q vs YONIQ","Interactive simulator: VPN off vs on")),
+    React.createElement(P,null,t(lang,"Paket sizdan saytga borishda o'rtadagi xaker/provayder yonidan o'tadi. Ikkala tugmani bosing va o'rtadagi kuzatuvchi NIMA ko'rishini solishtiring:","Your packet passes the hacker/ISP in the middle on its way to the site. Press both buttons and compare WHAT the middle observer sees:")),
+    React.createElement(VPNSim),
+    React.createElement(H2,{num:"§3"},t(lang,"VPN nima qiladi va NIMA qilmaydi","What a VPN does and does NOT do")),
+    React.createElement(CompareCols,{
+      left:{title:{uz:"✓ VPN himoyalaydi",en:"✓ A VPN protects"},color:"#22c55e",rows:[{uz:"Trafikni yo'lda shifrlaydi (provayder/WiFi ko'rmaydi)",en:"Encrypts traffic in transit (ISP/WiFi can't see)"},{uz:"Haqiqiy IP manzilingizni saytdan yashiradi",en:"Hides your real IP from the website"},{uz:"Privat (ofis) tarmoqqa xavfsiz ulaydi",en:"Securely connects you to a private (office) network"}]},
+      right:{title:{uz:"✗ VPN himoyalamaydi",en:"✗ A VPN does NOT"},color:"#ef4444",rows:[{uz:"Sizni VPN provayderining o'zidan yashirmaydi (unga ishonasiz)",en:"Hide you from the VPN provider itself (you trust it)"},{uz:"Virus/fishing/zararli saytdan himoya qilmaydi",en:"Stop malware/phishing/malicious sites"},{uz:"VPN serveridan keyin trafik shifrsiz bo'lishi mumkin",en:"Encrypt traffic beyond the VPN server"}]}}),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"VPN sizni to'liq «ko'rinmas» qilmaydi — u faqat trafikni yo'lda shifrlaydi. VPN provayderiga ishonishingiz kerak; bepul VPN lar ko'pincha ma'lumotingizni yig'adi yoki sotadi.","A VPN doesn't make you fully «invisible» — it only encrypts traffic in transit. You must trust the provider; free VPNs often collect or sell your data.")),
+    React.createElement(H2,{num:"§4"},t(lang,"VPN protokollari","VPN protocols")),
+    React.createElement(LayerStack,{layers:[
+      {n:"WG",name:t(lang,"WireGuard","WireGuard"),color:"#22c55e",desc:{uz:"Zamonaviy va tavsiya etiladi. Juda kichik kod (~4000 qator — tekshirish oson), ChaCha20-Poly1305 shifri, UDP. Juda tez, Linux yadrosida.",en:"Modern and recommended. Very small codebase (~4,000 lines — easy to audit), ChaCha20-Poly1305, UDP. Very fast, in the Linux kernel."}},
+      {n:"OVPN",name:t(lang,"OpenVPN","OpenVPN"),color:"#3b82f6",desc:{uz:"Yetuk va keng qo'llaniladi. OpenSSL (AES-GCM), TCP yoki UDP (port 1194). Juda moslashuvchan, lekin WireGuard'dan sekinroq.",en:"Mature and widely used. OpenSSL (AES-GCM), TCP or UDP (port 1194). Very flexible, but slower than WireGuard."}},
+      {n:"IPsec",name:t(lang,"IPsec / IKEv2","IPsec / IKEv2"),color:"#a855f7",desc:{uz:"Sanoat standarti, 3-qatlamda ishlaydi. IKEv2 mobil uchun zo'r (tarmoq o'zgarsa tez qayta ulanadi). Ofis-ofis (site-to-site) uchun keng tarqalgan.",en:"Industry standard, works at layer 3. IKEv2 is great for mobile (reconnects fast when the network changes). Common for site-to-site."}},
+      {n:"PPTP",name:t(lang,"PPTP / L2TP (eski)","PPTP / L2TP (legacy)"),color:"#ef4444",desc:{uz:"ESKIRGAN — PPTP buzilgan (MS-CHAPv2 zaif), ishlatmang. Faqat tarixiy misol uchun.",en:"OBSOLETE — PPTP is broken (weak MS-CHAPv2), do not use. Only a historical example."}}
+    ]}),
+    React.createElement(H2,{num:"§5"},t(lang,"Tunnel turlari","Tunnel types")),
+    React.createElement(CompareCols,{
+      left:{title:{uz:"Remote-access",en:"Remote-access"},color:"#3b82f6",rows:[{uz:"Bitta foydalanuvchi → tarmoq",en:"One user → a network"},{uz:"Masofadan ishlash (uydan ofisga)",en:"Remote work (home → office)"},{uz:"Odatda WireGuard/OpenVPN",en:"Usually WireGuard/OpenVPN"}]},
+      right:{title:{uz:"Site-to-site",en:"Site-to-site"},color:"#22c55e",rows:[{uz:"Ofis ↔ ofis (tarmoq ↔ tarmoq)",en:"Office ↔ office (network ↔ network)"},{uz:"Doimiy tunnel, foydalanuvchi ilovasisiz",en:"A permanent tunnel, no user app"},{uz:"Odatda IPsec",en:"Usually IPsec"}]}}),
+    React.createElement(P,null,t(lang,"Yana bir farq: to'liq tunnel (full-tunnel) — BARCHA trafik VPN orqali ketadi (xavfsizroq); bo'lingan tunnel (split-tunnel) — faqat ba'zi trafik VPN orqali, qolgani to'g'ridan-to'g'ri (tezroq, lekin kamroq himoyalangan).","One more distinction: full-tunnel — ALL traffic goes through the VPN (more secure); split-tunnel — only some traffic goes through the VPN, the rest goes directly (faster, but less protected).")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: WireGuard","Practice: WireGuard")),
+    React.createElement(P,null,t(lang,"WireGuard'da har tomon kalit juftligiga (private/public) ega. wg show tunnel holatini, so'nggi handshake va o'tgan trafikni ko'rsatadi; wg-quick tunnelni yoqadi/o'chiradi.","In WireGuard each side has a key pair (private/public). wg show displays the tunnel status, the last handshake and transferred traffic; wg-quick brings the tunnel up/down.")),
+    React.createElement(Terminal,null,"sudo wg-quick up wg0            # tunnelni yoqish\nsudo wg show\n# interface: wg0   public key: xTIB...=   listening port: 51820\n# peer: 3.5.7.9:51820\n#   latest handshake: 12 seconds ago\n#   transfer: 1.24 MiB received, 890 KiB sent\nip a show wg0\n# inet 10.8.0.2/24               ← VPN ichidagi manzil"),
+    React.createElement(Quiz,{q:{uz:"VPN YONIQ bo'lganda o'rtadagi xaker/provayder trafikda nimani ko'radi?",en:"With the VPN ON, what does the hacker/ISP in the middle see in the traffic?"},opts:[{uz:"Login va parolni ochiq matnda",en:"The login and password in plain text"},{uz:"Faqat tushunarsiz shifrlangan ma'lumot",en:"Only unreadable encrypted data"},{uz:"Hech narsa — internet o'chadi",en:"Nothing — the internet turns off"},{uz:"Faqat rasmlarni",en:"Only images"}],correct:1,exp:{uz:"VPN trafikni yo'lda shifrlaydi, shuning uchun o'rtadagi kuzatuvchi faqat tushunarsiz shifrlangan ma'lumotni ko'radi — login/parol himoyalangan.",en:"A VPN encrypts traffic in transit, so the middle observer sees only unreadable ciphertext — the login/password is protected."}}));
 }
 function LessonL15(){
   const lang=useLang();
