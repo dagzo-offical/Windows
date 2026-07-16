@@ -1436,6 +1436,46 @@ function DDoSSim(){
       React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL2,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 SYN cookie + rate-limit","🛡 SYN cookies + rate-limit"))));
 }
 
+function WiresharkSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const RAW=[
+    {col:BL,uz:"Capture boshlandi — eth0 interfeysida barcha trafik yozib olinmoqda",en:"Capture started — all traffic on eth0 is being recorded",duz:"Hech qanday cheklov yo'q — TCP, UDP, ARP, broadcast, hammasi tushadi.",den:"No restriction at all — TCP, UDP, ARP, broadcast, everything comes in."},
+    {col:AM,uz:"2 daqiqada 14 000+ aralash paket yig'ildi",en:"In 2 minutes, 14,000+ mixed packets piled up",duz:"DNS so'rovlar, brauzer fon trafigi, keraksiz broadcast — barchasi bir ro'yxatda.",den:"DNS queries, browser background chatter, useless broadcasts — all in one list."},
+    {col:AM,uz:"Filtr qo'llanilmadi — tahlilchi har birini qo'lda ko'rib chiqishga majbur",en:"No filter applied — the analyst must scroll through each one by hand",duz:"Kerakli POST so'rov qaysi qatorda ekani noma'lum.",den:"Which row holds the POST request you need is unknown."},
+    {col:D,uz:"🌊 20+ daqiqadan keyin ham kerakli so'rov topilmadi — signal shovqinda cho'kib ketdi",en:"🌊 Even after 20+ minutes the request wasn't found — the signal drowned in noise",duz:"Vaqt ketdi, natija yo'q — bu filtrsiz tahlilning odatiy holati.",den:"Time spent, no result — the usual fate of unfiltered analysis.",final:true,bad:true}
+  ];
+  const FILT=[
+    {col:BL,uz:"Capture boshlandi — xuddi shu 14 000+ paket yig'ilmoqda",en:"Capture started — the same 14,000+ packets are piling up",duz:"Trafik hajmi bir xil — farq faqat keyingi qadamda.",den:"The traffic volume is identical — the difference is only in the next step."},
+    {col:AM,uz:"Display filtr qo'llanildi:  http.request.method==\"POST\"",en:"A display filter is applied:  http.request.method==\"POST\"",duz:"Faqat aynan shu shartga mos paketlar qoldiriladi.",den:"Only packets matching this exact condition are kept."},
+    {col:AM,uz:"Wireshark ro'yxatni darhol 14 000 tadan 3 taga qisqartiradi",en:"Wireshark instantly narrows the list from 14,000 down to 3",duz:"Qolgan minglab paket ko'rinishdan yashirildi, o'chirilmadi.",den:"The remaining thousands are hidden from view, not deleted."},
+    {col:A,uz:"🎯 3 soniyada topildi — Follow Stream orqali login/parol ochiq ko'rinadi",en:"🎯 Found in 3 seconds — Follow Stream reveals the login/password in the clear",duz:"To'g'ri filtr — soatlab qidiruvni soniyalarga tushiradi.",den:"The right filter turns an hours-long search into seconds.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="raw"?RAW:FILT;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="raw"?RAW:run==="filt"?FILT:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu 14 000 paket ichidan kerakli POST so'rovni filtrsiz va filtr bilan qidiring.","⬇ Pick a scenario — search the same 14,000 packets for the POST request, with and without a filter.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="raw"?t(lang,"✗ Filtrsiz: 14 000 paket ichida qo'lda qidiruv — samarasiz","✗ Unfiltered: a manual search through 14,000 packets — ineffective"):t(lang,"✓ Filtr bilan: to'g'ri so'rov soniyalarda topildi","✓ Filtered: the right request found in seconds")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("raw");setStep(-1);},style:{flex:1,padding:"9px",background:run==="raw"?D+"22":SL2,color:run==="raw"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🌊 Filtrsiz qidirish","🌊 Search unfiltered")),
+      React.createElement("button",{onClick:()=>{setRun("filt");setStep(-1);},style:{flex:1,padding:"9px",background:run==="filt"?A+"22":SL2,color:run==="filt"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🎯 Filtr bilan qidirish","🎯 Search with a filter"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2606,15 +2646,18 @@ function LessonL28(){
       {icon:"🧵",text:{uz:"\"Follow TCP Stream\" bilan suhbatni ko'rish",en:"See the conversation with \"Follow TCP Stream\""}},
       {icon:"📊",text:{uz:"Muammo yoki hujum izlarini aniqlash",en:"Spot the problem or attack traces"}},
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Foydali filtrlar","Useful filters")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: filtrsiz vs filtr bilan qidiruv","Interactive simulator: searching unfiltered vs with a filter")),
+    React.createElement(P,null,t(lang,"14 000 ta ushlangan paket ichida bitta POST so'rovni topish kerak. Ikkala ssenariyni sinang — filtrning haqiqiy qiymatini his qiling:","You need to find one POST request among 14,000 captured packets. Try both scenarios — feel the real value of a filter:")),
+    React.createElement(WiresharkSim),
+    React.createElement(H2,{num:"§4"},t(lang,"Foydali filtrlar","Useful filters")),
     filt.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"8px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.05)+"s"}},
       React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",flex:1}},x[0]),
       React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},t(lang,x[1].uz,x[1].en)));}),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Boshqalarning trafigini ruxsatsiz ushlash maxfiylikni buzadi. Faqat o'z tarmog'ingiz yoki ruxsat berilgan muhitda ishlating.","Capturing others' traffic without permission violates privacy. Use only on your own network or an authorized environment.")),
-        React.createElement(H2,{num:"§4"},t(lang,"Capture va display filtr","Capture vs display filter")),
+        React.createElement(H2,{num:"§5"},t(lang,"Capture va display filtr","Capture vs display filter")),
     React.createElement(CompareCols,{left:{title:{uz:"Capture filtr",en:"Capture filter"},color:"#4dabf7",rows:[{uz:"Ushlashdan OLDIN cheklaydi",en:"Limits BEFORE capture"},{uz:"BPF sintaksisi (tcp port 80)",en:"BPF syntax (tcp port 80)"},{uz:"Diskni tejaydi",en:"Saves disk"},]},right:{title:{uz:"Display filtr",en:"Display filter"},color:"#69db7c",rows:[{uz:"Ushlagandan KEYIN filtrlaydi",en:"Filters AFTER capture"},{uz:"Wireshark sintaksisi (http)",en:"Wireshark syntax (http)"},{uz:"Moslashuvchan tahlil",en:"Flexible analysis"},]}}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: parolni topish","Practice: finding a password")),
-    React.createElement(P,null,t(lang,"Shifrlanmagan protokolda login ochiq ketadi. Display filtr bilan aynan o'sha paketni topib, Follow Stream orqali butun suhbatni o'qish mumkin.","In an unencrypted protocol the login travels in the clear. A display filter finds that exact packet, and Follow Stream lets you read the whole conversation.")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: parolni topish","Practice: finding a password")),
+    React.createElement(P,null,t(lang,"Shifrlanmagan protokolda login ochiq ketadi. Simulyatordagi «Filtr bilan» ssenariysi kabi, display filtr bilan aynan o'sha paketni topib, Follow Stream orqali butun suhbatni o'qish mumkin.","In an unencrypted protocol the login travels in the clear. Just like the simulator's «With a filter» scenario, a display filter finds that exact packet, and Follow Stream lets you read the whole conversation.")),
     React.createElement(Terminal,null,"tshark -i eth0 -Y 'http.request.method==POST' -T fields -e http.file_data\n# username=admin&password=Secret123   ← ochiq parol!\n# capture filtr misoli: tshark -i eth0 -f 'tcp port 80'"),
 React.createElement(Quiz,{q:{uz:"Ushlangan paketlardan faqat keraklisini ko'rsatish uchun nima ishlatiladi?",en:"What shows only the relevant captured packets?"},opts:[{uz:"Display filter (ko'rsatish filtri)",en:"A display filter"},{uz:"Firewall qoidasi",en:"A firewall rule"},{uz:"DNS yozuvi",en:"A DNS record"},{uz:"VPN tunnel",en:"A VPN tunnel"}],correct:0,exp:{uz:"Ko'rsatish filtri (masalan http yoki ip.addr==...) minglab paketdan keraklisini ajratadi.",en:"A display filter (e.g. http or ip.addr==...) narrows thousands of packets to the ones you need."}}));
 }
