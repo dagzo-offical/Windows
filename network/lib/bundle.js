@@ -1025,6 +1025,49 @@ function IDSIPSSim(){
       React.createElement("button",{onClick:()=>{setRun("ips");setStep(-1);},style:{flex:1,padding:"9px",background:run==="ips"?A+"22":SL2,color:run==="ips"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 IPS (yo'lning o'zida)","🛡 IPS (right on the path)"))));
 }
 
+function NACSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",PU="#a855f7",SL2="#0f172a";
+  const OK=[
+    {col:BL,uz:"Supplicant (xodim noutbuki) → Switch: «ulanaman» (EAPOL-Start)",en:"Supplicant (staff laptop) → Switch: «I want to connect» (EAPOL-Start)",duz:"Qurilma switch portiga ulanishi bilanoq, port hali «yopiq» holatda — faqat autentifikatsiya trafigiga ruxsat bor.",den:"As soon as the device connects to the switch port, the port is still «closed» — only authentication traffic is allowed."},
+    {col:PU,uz:"Authenticator (switch) → RADIUS: hisob ma'lumotlarini uzatadi",en:"Authenticator (switch) → RADIUS: forwards the credentials",duz:"Switch o'zi qaror qilmaydi — u shunchaki oraliq, so'rovni markazlashtirilgan serverga yo'naltiradi.",den:"The switch doesn't decide anything itself — it's just a relay, forwarding the request to the central server."},
+    {col:"#a855f7",uz:"RADIUS: login/parol TO'G'RI — Access-Accept + VLAN 10",en:"RADIUS: credentials CORRECT — Access-Accept + VLAN 10",duz:"RADIUS foydalanuvchini bazadan topdi va tasdiqladi, hatto qaysi VLAN'ga tegishli ekanini ham ko'rsatdi.",den:"RADIUS found and verified the user in its database, even specifying which VLAN they belong to."},
+    {col:A,uz:"Switch porti OCHILADI — qurilma Staff VLAN'ga ulandi",en:"The switch port OPENS — the device joins the Staff VLAN",duz:"Endi qurilma ichki tarmoqqa to'liq kirish huquqiga ega.",den:"The device now has full access to the internal network.",final:true}
+  ];
+  const BAD=[
+    {col:BL,uz:"Noma'lum qurilma bo'sh xona rozetkasiga ulanadi",en:"An unknown device is plugged into an empty office jack",duz:"Hech qanday login kiritilmagan yoki soxta noutbuk ulangan — port hali «yopiq».",den:"No credentials were entered, or a rogue laptop was plugged in — the port is still «closed»."},
+    {col:PU,uz:"Authenticator (switch) → RADIUS: ma'lumot so'raydi",en:"Authenticator (switch) → RADIUS: requests credentials",duz:"Switch baribir RADIUS'ga murojaat qiladi — lekin qurilma javob bera olmaydi yoki noto'g'ri javob beradi.",den:"The switch still contacts RADIUS — but the device can't respond, or responds incorrectly."},
+    {col:D,uz:"RADIUS: hisob topilmadi — Access-Reject",en:"RADIUS: no matching account — Access-Reject",duz:"Bazada bunday foydalanuvchi yo'q, shuning uchun kirish rad etiladi.",den:"No such user exists in the database, so access is denied."},
+    {col:D,uz:"Switch porti YOPIQ qoladi — ichki tarmoqqa kirish yo'q",en:"The switch port stays CLOSED — no access to the internal network",duz:"Eng ko'pi bilan cheklangan «mehmon» VLAN'ga tushadi. Ofisga jismoniy kirgan hujumchi ham tarmoqqa ulana olmaydi!",den:"At most it lands in a restricted «guest» VLAN. Even an attacker who physically entered the office can't join the network!",final:true,attack:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="ok"?OK:BAD;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),950);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="ok"?OK:run==="bad"?BAD:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",gap:6,marginBottom:12}},
+      [["💻",t(lang,"Supplicant","Supplicant")],["🔌",t(lang,"Authenticator","Authenticator")],["🛂","RADIUS"]].map(function(n,i){return React.createElement("div",{key:i,style:{flex:1,textAlign:"center",padding:"9px 4px",background:SL2,border:"1px solid rgba(148,163,184,.3)",borderRadius:10}},
+        React.createElement("div",{style:{fontSize:18}},n[0]),React.createElement("div",{style:{fontSize:9,color:"#cbd5e1",marginTop:2,fontFamily:"var(--font-mono)"}},n[1]));})),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — to'g'ri hisobli xodim va noma'lum qurilma uchun natija qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how the outcome differs for a staff member with valid credentials versus an unknown device.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="ok"?t(lang,"✓ Xodim ishchi tarmoqqa ulandi","✓ The staff member joined the working network"):t(lang,"🔒 Rozetkaga ulash yetarli emas — tarmoqqa kirish uchun autentifikatsiya shart","🔒 Plugging in isn't enough — authentication is required to access the network")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("ok");setStep(-1);},style:{flex:1,padding:"9px",background:run==="ok"?A+"22":SL2,color:run==="ok"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"👤 Xodim (to'g'ri hisob)","👤 Staff (valid credentials)")),
+      React.createElement("button",{onClick:()=>{setRun("bad");setStep(-1);},style:{flex:1,padding:"9px",background:run==="bad"?D+"22":SL2,color:run==="bad"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🥷 Noma'lum qurilma","🥷 Unknown device"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1969,20 +2012,20 @@ function LessonL18(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"802.1X va NAC nima?","What are 802.1X and NAC?")),
-    React.createElement(P,null,t(lang,"802.1X — tarmoqqa kirishni nazorat qiluvchi standart. Qurilma portga ulanganda \"kim sen?\" deb so'raydi va faqat tasdiqlanganlarni kiritadi. NAC — shu g'oyaning kengroq nomi. Ofis eshigidagi qorovul kabi — propuskingizni ko'rsatasiz.","802.1X is a standard that controls network access. When a device connects, it asks \"who are you?\" and admits only verified devices. NAC is the broader name. Like a guard at the office door — you show your badge.")),
-    React.createElement(H2,{num:"§2"},t(lang,"Uch ishtirokchi","Three players")),
-    React.createElement(FlowSteps,{title:{uz:"802.1X autentifikatsiya",en:"802.1X authentication"},steps:[
-      {icon:"💻",text:{uz:"Supplicant (qurilma) → Switch:  \"ulanaman\"",en:"Supplicant (device) → Switch:  \"I want to connect\""}},
-      {icon:"🚪",text:{uz:"Authenticator (switch) → RADIUS:  \"kim u?\"",en:"Authenticator (switch) → RADIUS:  \"who is this?\""}},
-      {icon:"🛂",text:{uz:"RADIUS server login/parolni tekshiradi",en:"RADIUS server checks the credentials"}},
-      {icon:"✅",text:{uz:"To'g'ri → port ochiladi  |  ✗ Xato → bloklanadi",en:"OK → port opens  |  ✗ Wrong → blocked"}},
+    React.createElement(P,null,t(lang,"802.1X — tarmoqqa jismoniy yoki simsiz kirishni nazorat qiluvchi standart. Qurilma switch portiga (yoki WiFi'ga) ulanganda «kim sen?» deb so'raladi va faqat tasdiqlanganlarga port ochiladi. NAC (Network Access Control) — shu g'oyaning kengroq nomi. Bu ofis eshigidagi qorovulga o'xshaydi — kirishdan oldin propuskingizni ko'rsatishingiz shart, hatto eshik ochiq bo'lsa ham.","802.1X is a standard that controls physical or wireless network access. When a device connects to a switch port (or WiFi), it's asked «who are you?», and the port only opens for verified devices. NAC (Network Access Control) is the broader name for this idea. It's like a guard at the office door — you must show your badge before entering, even if the door itself is unlocked.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: xodim vs noma'lum qurilma","Interactive simulator: staff vs an unknown device")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — to'g'ri hisobli xodim va bo'sh rozetkaga ulangan noma'lum qurilma uchun natija qanday farq qilishini ko'ring:","Try both scenarios — see how the outcome differs for a staff member with valid credentials versus an unknown device plugged into an empty jack:")),
+    React.createElement(NACSim),
+    React.createElement(H2,{num:"§3"},t(lang,"802.1X uch qismi","The three 802.1X parts")),
+    React.createElement(LayerStack,{layers:[
+      {n:"supplicant",name:t(lang,"Supplicant","Supplicant"),color:"#4dabf7",desc:{uz:"Kirmoqchi bo'lgan qurilma (mijoz) — noutbuk, telefon.",en:"The device trying to connect (client) — a laptop, a phone."}},
+      {n:"authenticator",name:t(lang,"Authenticator","Authenticator"),color:"#69db7c",desc:{uz:"Switch/AP — «eshik qorovuli». O'zi qaror qilmaydi, faqat oraliq.",en:"The switch/AP — the «door guard». It doesn't decide anything, just relays."}},
+      {n:"radius",name:t(lang,"RADIUS server","RADIUS server"),color:"#a855f7",desc:{uz:"Haqiqiy tekshiruvni bajaradi va qaysi VLAN'ga qo'yishni ham belgilaydi.",en:"Performs the actual verification, and can also decide which VLAN to assign."}}
     ]}),
-    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,"RADIUS: "),t(lang,"markazlashtirilgan autentifikatsiya serveri — foydalanuvchi ma'lumotlarini tekshiradi va kirishga ruxsat beradi yoki rad etadi. Yirik tashkilotlarda keng qo'llanadi.","a centralized authentication server — checks credentials and grants or denies access. Widely used in large organizations.")),
-        React.createElement(H2,{num:"§3"},t(lang,"802.1X uch qismi","The three 802.1X parts")),
-    React.createElement(LayerStack,{layers:[{n:"supplicant",name:t(lang,"Supplicant","Supplicant"),color:"#4dabf7",desc:{uz:"Kirmoqchi bo'lgan qurilma (mijoz).",en:"The device trying to connect (client)."}},{n:"authenticator",name:t(lang,"Authenticator","Authenticator"),color:"#69db7c",desc:{uz:"Switch/AP — «eshik qorovuli».",en:"The switch/AP — the «door guard»."}},{n:"radius",name:t(lang,"RADIUS server","RADIUS server"),color:"#a855f7",desc:{uz:"Haqiqiy tekshiruvni bajaradi.",en:"Performs the actual authentication."}},]}),
-    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: NAC oqimi","Practice: the NAC flow")),
-    React.createElement(P,null,t(lang,"802.1X (Network Access Control) qurilma tarmoqqa ulanishidan OLDIN uni tekshiradi. Switch o'zi qaror qilmaydi — u so'rovni RADIUS serveriga uzatadi; faqat tasdiqdan keyin port ochiladi.","802.1X (Network Access Control) checks a device BEFORE it joins the network. The switch doesn't decide itself — it relays the request to a RADIUS server; only after approval does the port open.")),
-    React.createElement(Terminal,null,"# RADIUS log (freeradius)\n# rlm_ldap: user 'alice' authenticated\n# Access-Accept for user alice, VLAN=10\n# → port ochildi, xodim VLAN iga ulandi"),
+    React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,"RADIUS: "),t(lang,"markazlashtirilgan autentifikatsiya serveri — foydalanuvchi ma'lumotlarini tekshiradi va kirishga ruxsat beradi yoki rad etadi. Yirik tashkilotlarda keng qo'llanadi va bir vaqtning o'zida to'g'ri VLAN'ni ham belgilashi mumkin.","a centralized authentication server — checks credentials and grants or denies access. Widely used in large organizations, and can assign the correct VLAN at the same time.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: RADIUS jurnali","Practice: the RADIUS log")),
+    React.createElement(P,null,t(lang,"802.1X qurilma tarmoqqa ulanishidan OLDIN uni tekshiradi — bu simulyatordagi jarayonning aynan o'zi. FreeRADIUS jurnali har urinishni yozib boradi.","802.1X checks a device BEFORE it joins the network — exactly the process from the simulator. The FreeRADIUS log records every attempt.")),
+    React.createElement(Terminal,null,"# RADIUS log (freeradius) — muvaffaqiyatli:\n# rlm_ldap: user 'alice' authenticated\n# Access-Accept for user alice, VLAN=10\n\n# RADIUS log — rad etilgan:\n# rlm_ldap: user not found\n# Access-Reject for unknown supplicant, port remains closed"),
 React.createElement(Quiz,{q:{uz:"802.1X da qurilmani haqiqiy tekshiruvdan o'tkazadigan qism qaysi?",en:"In 802.1X, which part performs the actual verification?"},opts:[{uz:"Supplicant (qurilma)",en:"The supplicant (device)"},{uz:"Authenticator (switch)",en:"The authenticator (switch)"},{uz:"Auth server (RADIUS)",en:"The auth server (RADIUS)"},{uz:"DNS server",en:"The DNS server"}],correct:2,exp:{uz:"RADIUS auth server login/parolni tekshiradi. Switch faqat \"eshik\", qurilma esa supplicant.",en:"The RADIUS auth server checks the credentials. The switch is just the \"door\", the device is the supplicant."}}));
 }
 function LessonL19(){
