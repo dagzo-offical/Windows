@@ -521,6 +521,52 @@ function VPNSim(){
       React.createElement("button",{onClick:()=>{setRun("on");setStep(-1);},style:{flex:1,padding:"9px",background:run==="on"?A+"22":SL,color:run==="on"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 VPN YONIQ (tunnel)","🔒 VPN ON (tunnel)"))));
 }
 
+function DNSSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",PU="#a855f7",AM="#f59e0b",SL="#1e293b",SL2="#0f172a";
+  const UNCACHED=[
+    {a:"💻",b:"🔁",col:BL,uz:"Client → Resolver: «google.com ning IP si nima?»",en:"Client → Resolver: «what's the IP of google.com?»",duz:"Kompyuter odatda provayder yoki 1.1.1.1/8.8.8.8 kabi resolverga so'rov yuboradi.",den:"Your computer asks a resolver — usually your ISP's or a public one like 1.1.1.1/8.8.8.8."},
+    {a:"🔁",b:"🌐",col:PU,uz:"Resolver → Root: «.com qayerda?»",en:"Resolver → Root: «where is .com?»",duz:"Root serveri javobni bilmaydi, lekin .com TLD serverlarining manzilini ko'rsatadi (referral).",den:"The root server doesn't know the answer, but points to the .com TLD servers (a referral)."},
+    {a:"🔁",b:"🏛",col:AM,uz:"Resolver → TLD (.com): «google.com qayerda?»",en:"Resolver → TLD (.com): «where is google.com?»",duz:"TLD serveri ham javobni bilmaydi — google.com ning authoritative NS'larini ko'rsatadi.",den:"The TLD server also doesn't know — it points to google.com's authoritative name servers."},
+    {a:"🔁",b:"📍",col:"#f472b6",uz:"Resolver → Authoritative: «A yozuvi?»",en:"Resolver → Authoritative: «A record?»",duz:"Authoritative server — aniq javobni biladigan YAGONA server. 142.250.187.206 qaytaradi.",den:"The authoritative server — the ONLY one that actually knows. It returns 142.250.187.206."},
+    {a:"🔁",b:"💻",col:A,uz:"Resolver → Client: IP qaytariladi va KESHLANADI",en:"Resolver → Client: the IP is returned and CACHED",duz:"Resolver javobni TTL muddatigacha xotirada saqlaydi — keyingi so'rov tezroq bo'ladi.",den:"The resolver stores the answer until the TTL expires — the next query will be faster."}
+  ];
+  const CACHED=[
+    {a:"💻",b:"🔁",col:BL,uz:"Client → Resolver: «google.com ning IP si nima?»",en:"Client → Resolver: «what's the IP of google.com?»",duz:"Xuddi shu so'rov — lekin bu safar resolver avval yodlab qo'ygan.",den:"The same query — but this time the resolver already remembers it."},
+    {a:"🔁",b:"💻",col:A,uz:"Resolver: keshdan darhol javob — Root/TLD/Authoritative'ga umuman murojaat yo'q!",en:"Resolver: instant answer from cache — no trip to Root/TLD/Authoritative at all!",duz:"TTL hali tugamagan bo'lsa, resolver xotiradan javob beradi — millisekundlarda.",den:"If the TTL hasn't expired, the resolver answers from memory — in milliseconds."}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="cold"?UNCACHED:CACHED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),900);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="cold"?UNCACHED:run==="warm"?CACHED:null;
+  const done=list&&step>=list.length-1;
+  const nodeRow=["💻","🔁","🌐","🏛","📍"];
+  const nodeLbl=[t(lang,"Client","Client"),t(lang,"Resolver","Resolver"),"Root",t(lang,"TLD (.com)","TLD (.com)"),t(lang,"Authoritative","Authoritative")];
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",gap:6,marginBottom:12,overflowX:"auto"}},
+      nodeRow.map(function(ic,i){return React.createElement("div",{key:i,style:{flex:"1 0 auto",minWidth:78,textAlign:"center",padding:"9px 4px",background:SL,border:"1px solid rgba(148,163,184,.25)",borderRadius:10}},
+        React.createElement("div",{style:{fontSize:20}},ic),React.createElement("div",{style:{fontSize:9.5,color:"#94a3b8",marginTop:2,fontFamily:"var(--font-mono)"}},nodeLbl[i]));})),
+    React.createElement("div",{style:{minHeight:56}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"16px"}},t(lang,"⬇ Ssenariy tanlang — DNS so'rovi qanday hal bo'lishini bosqichma-bosqich ko'ring.","⬇ Pick a scenario — watch how a DNS query gets resolved step by step.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",alignItems:"center",gap:12,padding:"10px 13px",marginBottom:7,background:step===i?s.col+"1f":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:18,display:"flex",gap:2,flexShrink:0}},s.a,React.createElement("span",{style:{color:"#64748b",fontSize:12}},"→"),s.b),
+          React.createElement("div",{style:{flex:1}},
+            React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+            React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:2,lineHeight:1.5}},t(lang,s.duz,s.den))));})),
+    done&&React.createElement("div",{style:{marginTop:6,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:A+"1f",border:"1px solid "+A,color:A}},
+      run==="cold"?t(lang,"✓ To'liq (rekursiv) so'rov: ~5 qadam, ~50-200ms","✓ Full (recursive) lookup: ~5 steps, ~50-200ms"):t(lang,"⚡ Keshdan javob: 1 qadam, <1ms — TTL tugagach yana to'liq so'rov kerak bo'ladi","⚡ Answered from cache: 1 step, <1ms — a full lookup will be needed again once the TTL expires")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("cold");setStep(-1);},style:{flex:1,padding:"9px",background:run==="cold"?BL+"22":SL,color:run==="cold"?"#93c5fd":"#cbd5e1",border:"1px solid "+BL+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🧊 Birinchi so'rov (keshsiz)","🧊 First query (no cache)")),
+      React.createElement("button",{onClick:()=>{setRun("warm");setStep(-1);},style:{flex:1,padding:"9px",background:run==="warm"?A+"22":SL,color:run==="warm"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Keyingi so'rov (keshdan)","⚡ Next query (from cache)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1114,32 +1160,34 @@ React.createElement(Quiz,{q:{uz:"192.168.1.10 qanday manzil?",en:"What kind of a
 }
 function LessonL04(){
   const lang=useLang();
-  const recs=[["A",{uz:"Nomni IPv4 ga bog'laydi",en:"Maps a name to IPv4"}],["AAAA",{uz:"Nomni IPv6 ga bog'laydi",en:"Maps a name to IPv6"}],["MX",{uz:"Pochta serverini ko'rsatadi",en:"Points to the mail server"}],["CNAME",{uz:"Taxallus (alias)",en:"Alias to another name"}],["NS",{uz:"Nom serverlari",en:"Name servers"}],["TXT",{uz:"Matn (SPF, DKIM)",en:"Text (SPF, DKIM)"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"DNS nima?","What is DNS?")),
-    React.createElement(P,null,t(lang,"DNS — internetning telefon kitobi. Odamlar nomlarni eslaydi (google.com), kompyuterlar esa IP manzillar bilan ishlaydi (142.250.187.206). DNS nomni IP ga aylantiradi.","DNS is the internet's phone book. People remember names (google.com), computers work with IPs (142.250.187.206). DNS translates a name into an IP.")),
-    React.createElement(H2,{num:"§2"},t(lang,"So'rov qanday hal bo'ladi?","How a query is resolved")),
-    React.createElement(P,null,t(lang,"Brauzerga google.com yozsangiz, kompyuter bir necha serverdan so'raydi, IP topilguncha. \"Ishga tushir\":","When you type google.com, your computer asks several servers until it finds the IP. Press Play:")),
-    React.createElement(FlowSteps,{title:{uz:"DNS so'rovi",en:"DNS resolution"},steps:[
-      {icon:"💻",text:{uz:"Kompyuter → Resolver:  \"google.com IP si?\"",en:"Computer → Resolver:  \"IP of google.com?\""}},
-      {icon:"🌍",text:{uz:"Resolver → Root:  \".com qayerda?\"",en:"Resolver → Root:  \"where is .com?\""}},
-      {icon:"🏛",text:{uz:"Resolver → TLD (.com):  \"google.com qayerda?\"",en:"Resolver → TLD (.com):  \"where is google.com?\""}},
-      {icon:"📍",text:{uz:"Resolver → Authoritative:  \"IP = 142.250.187.206\"",en:"Resolver → Authoritative:  \"IP = 142.250.187.206\""}},
-      {icon:"✓",text:{uz:"Resolver → Kompyuter:  IP qaytariladi (keshlanadi)",en:"Resolver → Computer:  IP returned (cached)"}},
+    React.createElement(P,null,t(lang,"DNS (Domain Name System) — internetning telefon kitobi. Odamlar nomlarni eslab qolishadi (google.com), kompyuterlar esa faqat IP manzillar bilan ishlaydi (142.250.187.206). DNS nomni IP ga aylantiradi — bu jarayon «resolution» (hal qilish) deyiladi va deyarli har bir internet amaliyoti (sayt ochish, email yuborish) undan boshlanadi.","DNS (Domain Name System) is the internet's phone book. People remember names (google.com), but computers only work with IP addresses (142.250.187.206). DNS translates a name into an IP — this process is called «resolution», and almost every internet action (opening a site, sending email) starts with it.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: so'rov qanday hal bo'ladi","Interactive simulator: how a query is resolved")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinab ko'ring — birinchi (keshsiz) so'rov nechta bosqichdan o'tishini va ikkinchi (keshlangan) so'rov qanchalik tezroq ekanini solishtiring:","Try both scenarios — compare how many steps the first (uncached) query takes versus how much faster the second (cached) one is:")),
+    React.createElement(DNSSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Ierarxiya: Root, TLD, Authoritative","The hierarchy: Root, TLD, Authoritative")),
+    React.createElement(P,null,t(lang,"DNS markazlashmagan, daraxt shaklidagi tizim — hech bir server yagona nuqta bo'lib qolmaydi. Har daraja faqat KEYINGI qadamni biladi, yakuniy javobni emas (bundan authoritative server mustasno):","DNS is a decentralized, tree-shaped system — no single server is a bottleneck. Each level only knows the NEXT step, not the final answer (except the authoritative server):")),
+    React.createElement(LayerStack,{layers:[
+      {n:"1",name:t(lang,"Root server","Root server"),color:"#a855f7",desc:{uz:"Dunyoda ~13 ta manzil (yuzlab server sifatida ko'zguladi). Faqat TLD serverlarining manzilini biladi.",en:"~13 addresses worldwide (mirrored as hundreds of servers). Only knows where the TLD servers are."}},
+      {n:"2",name:t(lang,"TLD server","TLD server"),color:"#f59e0b",desc:{uz:".com, .uz, .org kabi har domen zonasi uchun alohida. O'sha zonadagi authoritative NS'larni biladi.",en:"A separate one per zone like .com, .uz, .org. Knows the authoritative NS servers for that zone."}},
+      {n:"3",name:t(lang,"Authoritative NS","Authoritative NS"),color:"#f472b6",desc:{uz:"Muayyan domen (google.com) uchun YAKUNIY javobni beradigan yagona server.",en:"The one server that gives the FINAL answer for a specific domain (google.com)."}},
+      {n:"⚡",name:t(lang,"Recursive resolver","Recursive resolver"),color:"#3b82f6",desc:{uz:"Client o'rniga butun zanjirni yuradi va natijani keshlaydi (masalan 1.1.1.1, 8.8.8.8).",en:"Walks the whole chain on the client's behalf and caches the result (e.g. 1.1.1.1, 8.8.8.8)."}}
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"DNS yozuv turlari","DNS record types")),
-    recs.map(function(r,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.05)+"s"}},
-      React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:"var(--accent)",minWidth:56}},r[0]),
-      React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,r[1].uz,r[1].en)));}),
-    React.createElement(H2,{num:"§4"},t(lang,"Sinab ko'ring","Try it")),
-    React.createElement(Terminal,null,"nslookup google.com\ndig google.com A\ndig google.com MX\ndig +trace google.com"),
-        React.createElement(H2,{num:"§5"},t(lang,"DNS yozuv turlari","DNS record types")),
-    React.createElement(LayerStack,{layers:[{n:"A",name:t(lang,"A","A"),color:"#4dabf7",desc:{uz:"Nom → IPv4 manzil.",en:"Name → IPv4 address."}},{n:"AAAA",name:t(lang,"AAAA","AAAA"),color:"#69db7c",desc:{uz:"Nom → IPv6 manzil.",en:"Name → IPv6 address."}},{n:"MX",name:t(lang,"MX","MX"),color:"#a855f7",desc:{uz:"Pochta serveri.",en:"Mail server."}},{n:"CNAME",name:t(lang,"CNAME","CNAME"),color:"#ffd43b",desc:{uz:"Taxallus (boshqa nomga).",en:"Alias (to another name)."}},{n:"NS",name:t(lang,"NS","NS"),color:"#ff6b6b",desc:{uz:"Domen nom serverlari.",en:"The domain's name servers."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: DNS so'rovi","Practice: a DNS query")),
-    React.createElement(P,null,t(lang,"dig yoki nslookup bilan domen nomining ortidagi IP va yozuvlarni ko'rasiz. Bu tarmoq muammolarini va OSINT razvedkasini boshlashning birinchi qadami.","With dig or nslookup you see the IP and records behind a domain name. This is the first step for diagnosing network issues and for OSINT recon.")),
-    React.createElement(Terminal,null,"dig example.com A +short\n# 93.184.216.34\ndig example.com MX +short\n# 10 mail.example.com.\nnslookup example.com\n# Server: 192.168.1.1\n# Address: 93.184.216.34"),
-React.createElement(Quiz,{q:{uz:"DNS ning asosiy vazifasi nima?",en:"What is the main job of DNS?"},opts:[{uz:"Ma'lumotni shifrlash",en:"Encrypting data"},{uz:"Domen nomini IP ga aylantirish",en:"Translating a domain name into an IP"},{uz:"Paketlarni yo'naltirish",en:"Routing packets"},{uz:"Parol saqlash",en:"Storing passwords"}],correct:1,exp:{uz:"DNS internetning telefon kitobi — nomlarni (google.com) IP manzillarga aylantiradi.",en:"DNS is the internet's phone book — it translates names (google.com) into IP addresses."}}));
+    React.createElement(H2,{num:"§4"},t(lang,"DNS yozuv turlari","DNS record types")),
+    React.createElement(LayerStack,{layers:[
+      {n:"A",name:"A",color:"#4dabf7",desc:{uz:"Nomni IPv4 manzilga bog'laydi — eng ko'p ishlatiladigan yozuv.",en:"Maps a name to an IPv4 address — the most common record."}},
+      {n:"AAAA",name:"AAAA",color:"#69db7c",desc:{uz:"Nomni IPv6 manzilga bog'laydi.",en:"Maps a name to an IPv6 address."}},
+      {n:"MX",name:"MX",color:"#a855f7",desc:{uz:"Domen uchun pochta serverini ko'rsatadi (ustuvorlik raqami bilan).",en:"Points to the mail server for the domain (with a priority number)."}},
+      {n:"CNAME",name:"CNAME",color:"#ffd43b",desc:{uz:"Taxallus — bir nomni boshqa nomga yo'naltiradi (masalan www → asosiy domen).",en:"An alias — points one name to another (e.g. www → the root domain)."}},
+      {n:"NS",name:"NS",color:"#ff6b6b",desc:{uz:"Domen uchun qaysi serverlar authoritative ekanini ko'rsatadi.",en:"Shows which servers are authoritative for the domain."}},
+      {n:"TXT",name:"TXT",color:"#f472b6",desc:{uz:"Erkin matn — ko'pincha SPF/DKIM kabi email tekshiruvlari uchun.",en:"Free-form text — often used for SPF/DKIM email verification."}}
+    ]}),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: dig va nslookup","Practice: dig and nslookup")),
+    React.createElement(P,null,t(lang,"dig +trace butun ierarxiyani (Root → TLD → Authoritative) qadam-baqadam ko'rsatadi — simulyatordagi jarayonni haqiqiy buyruqda ko'rasiz.","dig +trace shows the whole hierarchy (Root → TLD → Authoritative) step by step — you see the exact process from the simulator as a real command.")),
+    React.createElement(Terminal,null,"dig example.com A +short\n# 93.184.216.34\n\ndig example.com MX +short\n# 10 mail.example.com.\n\ndig +trace example.com | tail -6\n# com.  172800  IN  NS  a.gtld-servers.net.        ← TLD\n# example.com. 86400 IN NS a.iana-servers.net.     ← Authoritative\n# example.com.  3600 IN A  93.184.216.34            ← yakuniy javob"),
+    React.createElement(Quiz,{q:{uz:"Root DNS server so'rovga qanday javob beradi?",en:"How does a Root DNS server respond to a query?"},opts:[{uz:"Har doim yakuniy IP manzilni qaytaradi",en:"It always returns the final IP address"},{uz:"Yakuniy javobni bilmaydi — tegishli TLD serverga yo'naltiradi",en:"It doesn't know the final answer — it refers to the right TLD server"},{uz:"So'rovni bloklaydi",en:"It blocks the query"},{uz:"Faqat email manzillarga javob beradi",en:"It only answers for email addresses"}],correct:1,exp:{uz:"Root server yakuniy javobni bilmaydi — u faqat tegishli TLD (masalan .com) serverlarining manzilini ko'rsatadi (referral). Yakuniy javobni faqat authoritative server beradi.",en:"A Root server doesn't know the final answer — it only points to the right TLD (e.g. .com) servers (a referral). Only the authoritative server gives the final answer."}}));
 }
 function LessonL05(){
   const lang=useLang();
