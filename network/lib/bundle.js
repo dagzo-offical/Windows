@@ -726,6 +726,56 @@ function DHCPSim(){
       React.createElement("button",{onClick:()=>{setRun("renew");setStep(-1);},style:{flex:1,padding:"9px",background:run==="renew"?A+"22":SL2,color:run==="renew"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔄 Ijarani yangilash","🔄 Renewing the lease"))));
 }
 
+function RoutingSim(){
+  const lang=useLang();
+  const A="#22c55e",BL="#3b82f6",PU="#a855f7",AM="#f59e0b",GY="#64748b",SL2="#0f172a";
+  const MULTI={
+    nodes:[["💻","PC"],["🏠","R1"],["🌐","R2"],["🛰","R3"],["🎯",t(lang,"Manzil","Dest")]],
+    steps:[
+      {col:BL,ttl:"TTL=64",uz:"PC (10.0.0.5): paket yaratildi — manzil 8.8.8.8",en:"PC (10.0.0.5): packet created — destination 8.8.8.8",duz:"Kompyuter subnet mask bilan solishtiradi: 8.8.8.8 o'z tarmog'ida emas → default gateway'ga yuboradi.",den:"The computer compares against its subnet mask: 8.8.8.8 isn't on its own network → sends it to the default gateway."},
+      {col:PU,ttl:"TTL 64→63",uz:"R1 (uy routeri): aniq yo'l yo'q → standart (0.0.0.0/0) orqali ISP'ga",en:"R1 (home router): no specific route → via the default (0.0.0.0/0) to the ISP",duz:"Jadvalda 8.8.8.8 uchun aniq yozuv yo'q — standart yo'l ishlatiladi.",den:"No exact entry for 8.8.8.8 in the table — the default route is used."},
+      {col:AM,ttl:"TTL 63→62",uz:"R2 (ISP routeri): eng mos yo'l tanlanadi (longest prefix match)",en:"R2 (ISP router): the best-matching route is chosen (longest prefix match)",duz:"Ko'plab yo'l orasidan 8.8.8.0/24 ga ENG ANIQ mos kelgani tanlanadi.",den:"Among many routes, the one that matches 8.8.8.0/24 MOST PRECISELY is chosen."},
+      {col:"#f472b6",ttl:"TTL 62→61",uz:"R3 (magistral router): manzil tarmog'iga to'g'ridan-to'g'ri yo'l topildi",en:"R3 (backbone router): a direct route to the destination network is found",duz:"Manzilga yaqinlashilgani sari yo'llar aniqroq bo'lib boradi.",den:"The closer to the destination, the more specific the routes become."},
+      {col:A,ttl:"TTL=61 qoldi",uz:"Manzilga yetib keldi! (8.8.8.8) — 4 ta hop bosib o'tildi",en:"Arrived at the destination! (8.8.8.8) — 4 hops crossed",duz:"Har hop TTL ni 1 taga kamaytiradi — bu paketning abadiy aylanib yurishining oldini oladi (0 bo'lsa, tashlanadi).",den:"Each hop decrements TTL by 1 — this stops a packet looping forever (if it hits 0, the packet is dropped).",final:true}
+    ]
+  };
+  const DIRECT={
+    nodes:[["💻","PC"],["🎯",t(lang,"Manzil","Dest")]],
+    steps:[
+      {col:BL,ttl:"TTL=64",uz:"PC (10.0.0.5): manzil 10.0.0.8 — subnet mask bilan tekshiriladi",en:"PC (10.0.0.5): destination 10.0.0.8 — checked against the subnet mask",duz:"255.255.255.0 niqobi bilan solishtirilsa, ikkalasi ham 10.0.0.0/24 da — demak manzil SHU YERDA, mahalliy.",den:"Compared with a 255.255.255.0 mask, both are on 10.0.0.0/24 — meaning the destination is LOCAL."},
+      {col:A,ttl:"TTL=64 (o'zgarmadi)",uz:"Router SHART EMAS — ARP bilan MAC topilib, to'g'ridan-to'g'ri yuboriladi",en:"NO router needed — the MAC is found via ARP and it's sent directly",duz:"Bir xil tarmoqdagi qurilmalar switch orqali bevosita gaplashadi (L06 ARP darsini eslang). Routing faqat TARMOQLAR orasida kerak.",den:"Devices on the same network talk directly through a switch (recall L06 ARP). Routing is only needed BETWEEN networks.",final:true}
+    ]
+  };
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const d=run==="multi"?MULTI:DIRECT;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=d.steps.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),950);return()=>clearTimeout(id);
+  },[run,step]);
+  const data=run==="multi"?MULTI:run==="direct"?DIRECT:null;
+  const done=data&&step>=data.steps.length-1;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    data&&React.createElement("div",{style:{display:"flex",gap:6,marginBottom:12}},
+      data.nodes.map(function(n,i){const lit=step>=i;return React.createElement("div",{key:i,style:{flex:1,textAlign:"center",padding:"9px 4px",background:SL2,border:"1.5px solid "+(lit?A:"rgba(148,163,184,.3)"),borderRadius:10,opacity:lit?1:.5,transition:"all .3s",boxShadow:lit&&i===step?"0 0 12px "+A+"88":"none"}},
+        React.createElement("div",{style:{fontSize:19}},n[0]),React.createElement("div",{style:{fontSize:9,color:"#cbd5e1",marginTop:2,fontFamily:"var(--font-mono)"}},n[1]));})),
+    React.createElement("div",{style:{minHeight:50}},
+      data==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — bir xil tarmoqda va uzoq manzilga borishda yo'l qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how the path differs for a same-network vs a distant destination.")):
+      data.steps.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",gap:8}},
+            React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+            React.createElement("div",{style:{fontSize:9.5,fontWeight:800,color:s.col,fontFamily:"var(--font-mono)",flexShrink:0}},s.ttl)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:4,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    done&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:A+"1f",border:"1px solid "+A,color:A}},
+      run==="multi"?t(lang,"✓ 4 hop orqali yetib bordi — har router o'z jadvalidan yo'l tanladi","✓ Delivered across 4 hops — each router picked a path from its own table"):t(lang,"⚡ Router shart emas — bir xil tarmoqda to'g'ridan-to'g'ri yetkazildi","⚡ No router needed — delivered directly on the same network")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("direct");setStep(-1);},style:{flex:1,padding:"9px",background:run==="direct"?A+"22":SL2,color:run==="direct"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🏠 Bir xil tarmoqda","🏠 Same network")),
+      React.createElement("button",{onClick:()=>{setRun("multi");setStep(-1);},style:{flex:1,padding:"9px",background:run==="multi"?BL+"22":SL2,color:run==="multi"?"#93c5fd":"#cbd5e1",border:"1px solid "+BL+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🌐 Uzoq manzil (4 hop)","🌐 Distant destination (4 hops)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1432,27 +1482,21 @@ function LessonL08(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Routing nima?","What is routing?")),
-    React.createElement(P,null,t(lang,"Routing — paketlarni bir tarmoqdan boshqasiga yo'naltirish. Router — tarmoqlararo \"chorraha politsiyachisi\": har paketning manzilini ko'rib, to'g'ri yo'nalishga jo'natadi. Internet — millionlab routerlar orqali bog'langan tarmoqlar to'ri.","Routing directs packets from one network to another. A router is the \"traffic officer\" between networks: it reads each packet's destination and sends it the right way. The internet is a web of networks joined by millions of routers.")),
-    React.createElement(H2,{num:"§2"},t(lang,"Paket qanday sayohat qiladi","How a packet travels")),
-    React.createElement(P,null,t(lang,"Paket manzilга yetguncha bir necha router (hop) dan o'tadi. \"Ishga tushir\":","A packet passes through several routers (hops) to reach its destination. Press Play:")),
-    React.createElement(FlowSteps,{title:{uz:"Paket yo'li (hops)",en:"Packet path (hops)"},steps:[
-      {icon:"💻",text:{uz:"Kompyuter → default gateway (uy routeri)",en:"Computer → default gateway (home router)"}},
-      {icon:"🌐",text:{uz:"ISP routeri → magistral routerlar",en:"ISP router → backbone routers"}},
-      {icon:"🔀",text:{uz:"Har router jadvaldan keyingi hop ni tanlaydi",en:"Each router picks the next hop from its table"}},
-      {icon:"🎯",text:{uz:"Oxirgi router → manzil server",en:"Final router → destination server"}},
-    ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Marshrutlash jadvali","The routing table")),
-    React.createElement(Terminal,null,"ip route\n# default via 192.168.1.1 dev eth0   ← asosiy chiqish\n# 192.168.1.0/24 dev eth0            ← lokal tarmoq\ntraceroute google.com"),
-    React.createElement(P,null,t(lang,"Agar aniq yo'l bo'lmasa, paket \"default gateway\" ga yuboriladi — tarmoqning tashqi olamga eshigi.","With no specific route, the packet goes to the \"default gateway\" — the network's door to the outside world.")),
+    React.createElement(P,null,t(lang,"Routing — paketlarni bir tarmoqdan boshqasiga yo'naltirish jarayoni. Router — tarmoqlararo «chorraha politsiyachisi»: har paketning manzilini ko'rib, to'g'ri yo'nalishga jo'natadi. Internet — millionlab routerlar orqali bog'langan tarmoqlar to'ri; hech bir router butun yo'lni bilmaydi, faqat «keyingi qadam» qayerga ekanini biladi.","Routing is the process of directing packets from one network to another. A router is the «traffic officer» between networks: it reads each packet's destination and sends it the right way. The internet is a web of networks joined by millions of routers; no single router knows the whole path, only where the «next step» is.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: bir xil tarmoq vs uzoq manzil","Interactive simulator: same network vs a distant destination")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — nega ba'zan router umuman kerak emasligini va uzoq manzilga borishda TTL nima uchun kamayib borishini ko'ring:","Try both scenarios — see why sometimes a router isn't needed at all, and why TTL decreases on the way to a distant destination:")),
+    React.createElement(RoutingSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Marshrutlash jadvali va uzatish qarori","The routing table and the forwarding decision")),
+    React.createElement(P,null,t(lang,"Har router o'z marshrutlash jadvaliga ega — «qaysi tarmoq qaysi interfeys/keyingi router orqali yetadi» ro'yxati. Bir nechta yozuv mos kelsa, ENG ANIQ (longest prefix match) tanlanadi — masalan 8.8.8.0/24 8.0.0.0/8 dan ustun turadi. Hech qanday aniq yozuv topilmasa, standart yo'l (0.0.0.0/0) ishlatiladi.","Every router has its own routing table — a list of «which network is reachable via which interface/next router». If several entries match, the MOST SPECIFIC one wins (longest prefix match) — e.g. 8.8.8.0/24 beats 8.0.0.0/8. If nothing matches at all, the default route (0.0.0.0/0) is used.")),
+    React.createElement(Terminal,null,"ip route\n# default via 192.168.1.1 dev eth0     ← standart (hech narsa mos kelmasa)\n# 192.168.1.0/24 dev eth0 proto kernel  ← lokal tarmoq (eng aniq)\n# 10.8.0.0/24 via 192.168.1.1 dev eth0  ← VPN tarmog'i"),
+    React.createElement(H2,{num:"§4"},t(lang,"Statik va dinamik marshrutlash","Static vs dynamic routing")),
     React.createElement(CompareCols,{
-      left:{title:{uz:"Statik",en:"Static"},color:"#4dabf7",rows:[{uz:"Administrator qo'lda kiritadi",en:"Admin enters routes by hand"},{uz:"Kichik tarmoqlar uchun",en:"For small networks"},{uz:"O'zgarishga moslashmaydi",en:"Doesn't adapt to change"}]},
-      right:{title:{uz:"Dinamik",en:"Dynamic"},color:"#69db7c",rows:[{uz:"Routerlar avtomatik o'rganadi",en:"Routers learn automatically"},"OSPF · BGP",{uz:"Katta tarmoqlar uchun",en:"For large networks"}]}}),
-        React.createElement(H2,{num:"§4"},t(lang,"Statik va dinamik marshrutlash","Static vs dynamic routing")),
-    React.createElement(CompareCols,{left:{title:{uz:"Statik marshrut",en:"Static route"},color:"#ffd43b",rows:[{uz:"Admin qo'lda kiritadi",en:"Admin enters it by hand"},{uz:"Kichik, o'zgarmas tarmoq",en:"Small, stable network"},{uz:"Nazorat to'liq",en:"Full control"},]},right:{title:{uz:"Dinamik (RIP/OSPF/BGP)",en:"Dynamic (RIP/OSPF/BGP)"},color:"#4dabf7",rows:[{uz:"Routerlar o'zaro o'rganadi",en:"Routers learn from each other"},{uz:"Katta tarmoqlar uchun",en:"For large networks"},{uz:"O'zgarishga moslashadi",en:"Adapts to changes"},]}}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: marshrut jadvali","Practice: the routing table")),
-    React.createElement(P,null,t(lang,"ip route qurilmaning marshrut jadvalini ko'rsatadi; default (0.0.0.0/0) — «boshqa hamma narsa shu shlyuzga». traceroute paket qaysi routerlardan o'tishini ko'rsatadi.","ip route shows the device's routing table; default (0.0.0.0/0) means «everything else goes to this gateway». traceroute shows which routers a packet passes through.")),
-    React.createElement(Terminal,null,"ip route\n# default via 192.168.1.1 dev eth0   ← nomalum manzillar shu yerga\n# 192.168.1.0/24 dev eth0 proto kernel scope link\ntraceroute 8.8.8.8   # yo'nalishdagi har hop"),
-React.createElement(Quiz,{q:{uz:"Router aniq yo'l topmasa, paketni qayerga yuboradi?",en:"With no specific route, where does a router send the packet?"},opts:[{uz:"O'chiradi",en:"Drops it"},{uz:"Default gateway ga",en:"To the default gateway"},{uz:"Orqaga qaytaradi",en:"Back to sender"},{uz:"DNS ga",en:"To DNS"}],correct:1,exp:{uz:"Aniq yo'l bo'lmasa, paket default gateway (asosiy chiqish) ga yuboriladi.",en:"With no specific route, the packet goes to the default gateway (main exit)."}}));
+      left:{title:{uz:"Statik marshrut",en:"Static route"},color:"#f59e0b",rows:[{uz:"Administrator qo'lda kiritadi",en:"Admin enters it by hand"},{uz:"Kichik, o'zgarmas tarmoq uchun",en:"For small, stable networks"},{uz:"To'liq nazorat, lekin moslashmaydi",en:"Full control, but doesn't adapt"}]},
+      right:{title:{uz:"Dinamik (RIP/OSPF/BGP)",en:"Dynamic (RIP/OSPF/BGP)"},color:"#3b82f6",rows:[{uz:"Routerlar bir-biridan avtomatik o'rganadi",en:"Routers learn from each other automatically"},{uz:"Katta, o'zgaruvchan tarmoqlar uchun",en:"For large, changing networks"},{uz:"Uzilishga tez moslashadi",en:"Adapts quickly to outages"}]}}),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: yo'lni kuzatish","Practice: tracing the path")),
+    React.createElement(P,null,t(lang,"traceroute aynan simulyatordagi mexanizmdan foydalanadi: TTL=1 bilan paket yuboradi, birinchi router uni rad etib xato qaytaradi (shu bilan o'zini oshkor qiladi), so'ng TTL=2, va hokazo — har hop shu tarzda ochiladi.","traceroute uses exactly the mechanism from the simulator: it sends a packet with TTL=1, the first router rejects it and reports back (revealing itself), then TTL=2, and so on — each hop is uncovered this way.")),
+    React.createElement(Terminal,null,"traceroute 8.8.8.8\n#  1  192.168.1.1     1.2 ms   ← R1 (uy routeri)\n#  2  10.20.0.1       8.5 ms   ← R2 (ISP)\n#  3  72.14.exchange   12 ms   ← R3 (magistral)\n#  4  dns.google       15 ms   ← manzil"),
+    React.createElement(Quiz,{q:{uz:"Router aniq yo'l topmasa, paketni qayerga yuboradi?",en:"With no specific route, where does a router send the packet?"},opts:[{uz:"O'chiradi",en:"Drops it"},{uz:"Default gateway ga",en:"To the default gateway"},{uz:"Orqaga qaytaradi",en:"Back to sender"},{uz:"DNS ga",en:"To DNS"}],correct:1,exp:{uz:"Aniq yo'l bo'lmasa, paket standart (default) yo'l — 0.0.0.0/0 — orqali default gateway ga yuboriladi.",en:"With no specific route, the packet is sent via the default route — 0.0.0.0/0 — to the default gateway."}}));
 }
 function LessonL09(){
   const lang=useLang();
