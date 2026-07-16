@@ -1269,6 +1269,52 @@ function EnumSim(){
       React.createElement("button",{onClick:()=>{setRun("good");setStep(-1);},style:{flex:1,padding:"9px",background:run==="good"?A+"22":SL2,color:run==="good"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Qattiqlashtirilgan tizim","🔒 Hardened system"))));
 }
 
+function ARPSpoofSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",SL2="#0f172a";
+  const NO_DEF=[
+    {col:AM,uz:"Hujumchi soxta ARP javobini yuboradi: «10.0.0.1 (gateway) — bu MEN!»",en:"The attacker sends a fake ARP reply: «10.0.0.1 (gateway) — that's ME!»",duz:"ARP javobni hech kim tekshirmaydi (L06) — bu paket haqiqiy router javobidan farqlanmaydi.",den:"No one verifies an ARP reply (L06) — this packet is indistinguishable from a real router reply.",tbl:"attacker"},
+    {col:D,uz:"Qurbon ARP jadvali: gateway yozuvi ZAHARLANDI",en:"Victim's ARP table: the gateway entry is POISONED",duz:"Eski to'g'ri MAC hujumchi MAC'i bilan almashtirildi — jadval endi noto'g'ri.",den:"The correct old MAC has been overwritten with the attacker's MAC — the table is now wrong.",tbl:"attacker"},
+    {col:D,uz:"Qurbonning BARCHA trafigi endi hujumchi orqali oqadi",en:"ALL of the victim's traffic now flows through the attacker",duz:"Bu — to'liq MITM holati (L25 darsida davomi).",den:"This is a full MITM position (continued in L25).",tbl:"attacker"},
+    {col:D,uz:"Hujum MUVAFFAQIYATLI — hujumchi trafikni o'qiy/o'zgartira oladi",en:"Attack SUCCEEDED — the attacker can read/modify the traffic",duz:"Himoya bo'lmagani uchun soxta ARP hech qanday to'siqsiz qabul qilindi.",den:"With no defense, the fake ARP was accepted without any obstacle.",final:true,attack:true,tbl:"attacker"}
+  ];
+  const DAI=[
+    {col:AM,uz:"Hujumchi soxta ARP javobini yuboradi: «10.0.0.1 — bu MEN!»",en:"The attacker sends a fake ARP reply: «10.0.0.1 — that's ME!»",duz:"Xuddi avvalgi hujum urinishi — lekin bu safar switch'da DAI yoqilgan.",den:"The same attack attempt — but this time the switch has DAI enabled.",tbl:"real"},
+    {col:"#3b82f6",uz:"Switch (DAI): javobni DHCP Snooping jadvali bilan solishtiradi",en:"Switch (DAI): checks the reply against the DHCP Snooping table",duz:"DAI har IP↔MAC juftligining ishonchli manbadan (DHCP) kelganini biladi.",den:"DAI knows which IP↔MAC pairing came from a trusted source (DHCP).",tbl:"real"},
+    {col:AM,uz:"Nomuvofiqlik topildi — bu MAC 10.0.0.1 uchun ro'yxatda yo'q",en:"Mismatch found — this MAC isn't on record for 10.0.0.1",duz:"Hujumchi MAC'i DHCP orqali hech qachon 10.0.0.1 ga berilmagan.",den:"The attacker's MAC was never assigned to 10.0.0.1 via DHCP.",tbl:"real"},
+    {col:A,uz:"Soxta ARP paketi TASHLANDI — qurbon jadvali toza qoladi",en:"The fake ARP packet is DROPPED — the victim's table stays clean",duz:"Hujum MUVAFFAQIYATSIZ — DAI soxta javobni chekka portda blokladi.",den:"Attack FAILED — DAI blocked the fake reply right at the edge port.",final:true,tbl:"real"}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="no"?NO_DEF:DAI;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="no"?NO_DEF:run==="dai"?DAI:null;
+  const cur=list&&step>=0?list[step]:null;
+  const tblState=cur?cur.tbl:"real";
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{background:SL2,border:"1px solid "+(tblState==="attacker"?D:"rgba(148,163,184,.25)"),borderRadius:12,padding:"10px 12px",marginBottom:12,transition:"all .3s"}},
+      React.createElement("div",{style:{fontSize:10.5,fontWeight:700,color:"#94a3b8",marginBottom:6,fontFamily:"var(--font-mono)"}},t(lang,"Qurbonning ARP jadvali","The victim's ARP table")),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,padding:"7px 10px",background:tblState==="attacker"?D+"1f":A+"14",border:"1px solid "+(tblState==="attacker"?D:A),borderRadius:8}},
+        React.createElement("span",{style:{fontSize:11,fontFamily:"var(--font-mono)",color:"#cbd5e1"}},"10.0.0.1 (gateway)"),
+        React.createElement("span",{style:{fontSize:11,fontFamily:"var(--font-mono)",fontWeight:700,color:tblState==="attacker"?D:A}},tblState==="attacker"?"08:00:27:AA:BB:CC 🥷":"00:11:22:33:44:55 ✓"))),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — himoyasiz va DAI yoqilgan switch'da hujum natijasi qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how the attack's outcome differs on an undefended switch versus one with DAI enabled.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="no"?t(lang,"✗ Himoyasiz tarmoq — ARP spoofing muvaffaqiyatli","✗ Undefended network — ARP spoofing succeeded"):t(lang,"✓ DAI hujumni chekka portda to'xtatdi","✓ DAI stopped the attack right at the edge port")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("no");setStep(-1);},style:{flex:1,padding:"9px",background:run==="no"?D+"22":SL2,color:run==="no"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🥷 Himoyasiz tarmoq","🥷 Undefended network")),
+      React.createElement("button",{onClick:()=>{setRun("dai");setStep(-1);},style:{flex:1,padding:"9px",background:run==="dai"?A+"22":SL2,color:run==="dai"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 DAI yoqilgan","🛡 DAI enabled"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2339,23 +2385,18 @@ function LessonL24(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"ARP spoofing nima?","What is ARP spoofing?")),
-    React.createElement(P,null,t(lang,"ARP spoofing — hujumchi soxta ARP javoblari yuborib, o'zini boshqa qurilma (masalan router) qilib ko'rsatadi. ARP javobni tekshirmaydi (L06), shundan foydalaniladi: qurbon trafigi hujumchi orqali oqa boshlaydi.","ARP spoofing is when an attacker sends fake ARP replies to impersonate another device (e.g. the router). ARP doesn't verify replies (L06) — so the victim's traffic starts flowing through the attacker.")),
-    React.createElement(H2,{num:"§2"},t(lang,"Hujum qanday kechadi","How the attack unfolds")),
-    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"ARP zaharlash",en:"ARP poisoning"},steps:[
-      {icon:"😈",text:{uz:"Hujumchi qurbonga: \"router MAC = mening MAC im\"",en:"Attacker → victim: \"the router's MAC is my MAC\""}},
-      {icon:"😈",text:{uz:"Hujumchi routerga: \"qurbon MAC = mening MAC im\"",en:"Attacker → router: \"the victim's MAC is my MAC\""}},
-      {icon:"🔀",text:{uz:"Qurbon trafigi endi hujumchi orqali o'tadi",en:"Victim's traffic now passes through the attacker"}},
-      {icon:"👁",text:{uz:"Hujumchi shifrlanmagan hamma narsani ko'radi",en:"Attacker sees everything unencrypted"}},
-    ]}),
-    React.createElement(PacketFlow,{from:{uz:"Qurbon",en:"Victim"},to:{uz:"Router",en:"Router"},label:{uz:"😈 hujumchi o'rtada (MITM)",en:"😈 attacker in the middle (MITM)"},color:"#ff3a5e"}),
-    React.createElement(H2,{num:"§3"},t(lang,"Himoya","Defense")),
-    React.createElement("div",{style:{margin:"6px 0 12px"}},
-      [{uz:"Dynamic ARP Inspection (DAI) — switch soxta ARP ni bloklaydi",en:"Dynamic ARP Inspection (DAI) — switch blocks fake ARP"},{uz:"Statik ARP yozuvlari (muhim qurilmalar uchun)",en:"Static ARP entries (for critical devices)"},{uz:"HTTPS/VPN — mazmun shifrlansa, ko'rilса ham foydasiz",en:"HTTPS/VPN — if encrypted, seeing it is useless"}].map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{fontSize:12.5,color:"var(--text-1)",padding:"6px 0",borderBottom:"1px solid var(--border)",animationDelay:(i*0.06)+"s"}},"• "+t(lang,x.uz,x.en));})),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"ARP spoofing faqat o'z laboratoriyangizda yoki yozma ruxsat berilgan pentestda sinalishi kerak. Boshqa tarmoqda qo'llash jinoyat.","ARP spoofing must only be tested in your own lab or a written-authorized pentest. Using it on another network is a crime.")),
-        React.createElement(H2,{num:"§4"},t(lang,"Hujumdan oldin va keyin","Before and after the attack")),
+    React.createElement(P,null,t(lang,"ARP spoofing — hujumchi soxta ARP javoblari yuborib, o'zini boshqa qurilma (odatda router/gateway) qilib ko'rsatadi. ARP javobni tekshirmaydi (L06 darsini eslang) — aynan shu zaiflikdan foydalaniladi: qurbon trafigi bilmagan holda hujumchi orqali oqa boshlaydi.","ARP spoofing is when an attacker sends fake ARP replies to impersonate another device (usually the router/gateway). ARP doesn't verify replies (recall L06) — that exact weakness is exploited: the victim's traffic unknowingly starts flowing through the attacker.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: himoyasiz vs DAI","Interactive simulator: undefended vs DAI")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — qurbonning ARP jadvali zaharlanishini va Dynamic ARP Inspection (DAI) buni qanday to'xtatishini jonli ko'ring:","Try both scenarios — watch the victim's ARP table get poisoned live, and see how Dynamic ARP Inspection (DAI) stops it:")),
+    React.createElement(ARPSpoofSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Hujumdan oldin va keyin","Before and after the attack")),
     React.createElement(CompareCols,{left:{title:{uz:"Oldin (normal)",en:"Before (normal)"},color:"#69db7c",rows:[{uz:"Shlyuz = haqiqiy MAC",en:"Gateway = real MAC"},{uz:"Trafik to'g'ri boradi",en:"Traffic flows correctly"},]},right:{title:{uz:"Keyin (spoofing)",en:"After (spoofing)"},color:"#ff3a5e",rows:[{uz:"Shlyuz = hujumchi MAC",en:"Gateway = attacker MAC"},{uz:"Trafik hujumchidan o'tadi",en:"Traffic passes through attacker"},]}}),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya usullari","Defense methods")),
+    React.createElement("div",{style:{margin:"6px 0 12px"}},
+      [{uz:"Dynamic ARP Inspection (DAI) — switch soxta ARP ni bloklaydi (simulyatordagi ikkinchi ssenariy)",en:"Dynamic ARP Inspection (DAI) — the switch blocks fake ARP (the simulator's second scenario)"},{uz:"Statik ARP yozuvlari (muhim qurilmalar uchun)",en:"Static ARP entries (for critical devices)"},{uz:"HTTPS/VPN — mazmun shifrlansa, ko'rilsa ham foydasiz",en:"HTTPS/VPN — if encrypted, seeing it is useless"}].map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{fontSize:12.5,color:"var(--text-1)",padding:"6px 0",borderBottom:"1px solid var(--border)",animationDelay:(i*0.06)+"s"}},"• "+t(lang,x.uz,x.en));})),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"ARP spoofing faqat o'z laboratoriyangizda yoki yozma ruxsat berilgan pentestda sinalishi kerak. Boshqa tarmoqda qo'llash jinoyat.","ARP spoofing must only be tested in your own lab or a written-authorized pentest. Using it on another network is a crime.")),
     React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ARP jadvalining zaharlanishi","Practice: ARP table poisoning")),
-    React.createElement(P,null,t(lang,"Hujumchi soxta ARP javoblari yuborib, qurbon jadvalidagi shlyuz MAC ini o'ziniki bilan almashtiradi. Endi qurbonning butun trafigi hujumchidan o'tadi (MITM).","The attacker sends fake ARP replies, replacing the gateway MAC in the victim's table with their own. Now all the victim's traffic flows through the attacker (MITM).")),
+    React.createElement(P,null,t(lang,"Bu — simulyatordagi «Himoyasiz tarmoq» ssenariysining aynan buyruq ko'rinishi.","This is exactly the simulator's «Undefended network» scenario in command form.")),
     React.createElement(Terminal,null,"sudo arpspoof -i eth0 -t 10.0.0.9 10.0.0.1\n# 8:0:27:aa:bb:cc 0:c:29:dd:ee:ff 0806 42: arp reply\n# 10.0.0.1 is-at 8:0:27:aa:bb:cc   ← qurbonga yolg'on\n# (echo 1 > /proc/sys/net/ipv4/ip_forward — trafikni uzatish)"),
 React.createElement(Quiz,{q:{uz:"ARP spoofing ARP ning qaysi zaifligidan foydalanadi?",en:"Which ARP weakness does ARP spoofing exploit?"},opts:[{uz:"ARP juda sekin",en:"ARP is very slow"},{uz:"ARP javobning haqiqiyligini tekshirmaydi",en:"ARP doesn't verify that a reply is genuine"},{uz:"ARP shifrlangan",en:"ARP is encrypted"},{uz:"ARP faqat WiFi da",en:"ARP is WiFi-only"}],correct:1,exp:{uz:"ARP javobni tekshirmaydi — hujumchi soxta javob yuborib o'zini router qilib ko'rsatadi va trafikni o'g'irlaydi.",en:"ARP doesn't verify replies — an attacker sends a fake reply, impersonates the router and steals traffic."}}));
 }
