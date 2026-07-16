@@ -981,6 +981,50 @@ function WiFiSim(){
       React.createElement("button",{onClick:()=>{setRun("open");setStep(-1);},style:{flex:1,padding:"9px",background:run==="open"?D+"22":SL2,color:run==="open"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 Ochiq / WEP","🔓 Open / WEP"))));
 }
 
+function IDSIPSSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const IDS_S=[
+    {col:BL,uz:"Zararli paket (SQLi urinishi) tarmoqqa kiradi",en:"A malicious packet (an SQLi attempt) enters the network",duz:"Paket to'g'ridan-to'g'ri asosiy yo'l bo'ylab serverga qarab ketmoqda.",den:"The packet is heading straight down the main path toward the server."},
+    {col:AM,uz:"IDS trafik NUSXASINI ko'radi (SPAN/TAP porti — yon tarmoqda)",en:"The IDS sees a COPY of the traffic (a SPAN/TAP port — off to the side)",duz:"IDS asosiy yo'lda EMAS — u faqat oynadagi (mirrored) nusxani passiv kuzatadi.",den:"The IDS is NOT on the main path — it passively watches only a mirrored copy."},
+    {col:AM,uz:"IDS: signature mos keldi → OGOHLANTIRISH yaratildi",en:"IDS: signature matched → an ALERT is raised",duz:"IDS hujumni to'g'ri aniqladi va xavfsizlik jamoasiga xabar yubordi.",den:"The IDS correctly identified the attack and notified the security team."},
+    {col:D,uz:"Ammo ASL paket to'xtatilmadi — serverga baribir yetib bordi!",en:"But the ORIGINAL packet wasn't stopped — it still reached the server!",duz:"IDS faqat kuzatadi, hech narsani ushlab qololmaydi — bu uning asosiy cheklovi.",den:"An IDS only watches, it can't intercept anything — this is its key limitation.",final:true,attack:true}
+  ];
+  const IPS_S=[
+    {col:BL,uz:"Zararli paket (SQLi urinishi) tarmoqqa kiradi",en:"A malicious packet (an SQLi attempt) enters the network",duz:"Paket asosiy yo'l bo'ylab ketmoqda — lekin bu safar yo'lda IPS turibdi.",den:"The packet is heading down the main path — but this time the IPS sits right on it."},
+    {col:AM,uz:"IPS trafik ICHIDAN o'tadi (inline) — har paketni real vaqtda tekshiradi",en:"The IPS sits INLINE — checking every packet in real time",duz:"Barcha trafik majburiy ravishda IPS orqali o'tadi, chunki u yo'lning bir qismi.",den:"All traffic is forced through the IPS, because it's physically part of the path."},
+    {col:AM,uz:"IPS: signature mos keldi → OGOHLANTIRISH yaratildi",en:"IPS: signature matched → an ALERT is raised",duz:"Xuddi IDS kabi hujumni aniqlaydi — lekin bu yerda hikoya tugamaydi.",den:"Just like an IDS, it detects the attack — but here the story doesn't end."},
+    {col:A,uz:"Paket DARHOL bloklandi — serverga hech qachon yetib bormadi",en:"The packet was IMMEDIATELY blocked — it never reached the server",duz:"IPS yo'lda turgani uchun zararli paketni real vaqtda ushlab qola oladi.",den:"Because the IPS sits on the path, it can catch the malicious packet in real time.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="ids"?IDS_S:IPS_S;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),950);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="ids"?IDS_S:run==="ips"?IPS_S:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{textAlign:"center",padding:"8px",marginBottom:10,background:SL2,border:"1px solid rgba(148,163,184,.25)",borderRadius:10,fontSize:11,fontWeight:700,color:"#94a3b8",fontFamily:"var(--font-mono)"}},
+      run==="ids"?t(lang,"🥷 Xujumchi → 🌐 Asosiy yo'l → 🖥 Server   (IDS = yon tarmoqda kuzatuvchi)","🥷 Attacker → 🌐 Main path → 🖥 Server   (IDS = watching from the side)"):
+      run==="ips"?t(lang,"🥷 Xujumchi → 🛡 IPS (yo'lning o'zida) → 🖥 Server","🥷 Attacker → 🛡 IPS (right on the path) → 🖥 Server"):
+      t(lang,"🥷 Xujumchi → 🌐 Tarmoq → 🖥 Server","🥷 Attacker → 🌐 Network → 🖥 Server")),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — bir xil hujum IDS va IPS orqali o'tganda natija qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how the outcome differs when the same attack passes an IDS versus an IPS.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="ids"?t(lang,"⚠ IDS: aniqladi, LEKIN to'xtata olmadi","⚠ IDS: detected it, but couldn't stop it"):t(lang,"✓ IPS: aniqladi VA bloklab, hujumni to'xtatdi","✓ IPS: detected it AND blocked it, stopping the attack")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("ids");setStep(-1);},style:{flex:1,padding:"9px",background:run==="ids"?AM+"22":SL2,color:run==="ids"?AM:"#cbd5e1",border:"1px solid "+AM+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"👁 IDS (yon tarmoqda)","👁 IDS (off to the side)")),
+      React.createElement("button",{onClick:()=>{setRun("ips");setStep(-1);},style:{flex:1,padding:"9px",background:run==="ips"?A+"22":SL2,color:run==="ips"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 IPS (yo'lning o'zida)","🛡 IPS (right on the path)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1871,24 +1915,25 @@ function LessonL16(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"IDS va IPS nima?","What are IDS and IPS?")),
-    React.createElement(P,null,t(lang,"IDS tarmoqni kuzatib, shubhali harakatni aniqlaydi va ogohlantiradi. IPS bir qadam oldinga o'tadi — hujumni bloklaydi ham. IDS — signalizatsiya (\"o'g'ri kirdi!\"), IPS — qulflaydigan qorovul.","An IDS watches the network and alerts on suspicious activity. An IPS goes further — it also blocks the attack. IDS is an alarm (\"a burglar!\"), IPS is a guard that locks the door.")),
+    React.createElement(P,null,t(lang,"IDS (Intrusion Detection System) tarmoqni kuzatib, shubhali harakatni aniqlaydi va ogohlantiradi. IPS (Intrusion Prevention System) bir qadam oldinga o'tadi — hujumni bloklaydi ham. Farq shunchaki «nima qiladi»da emas — ASOSIY farq ular tarmoqda QAYERDA turishida: IDS — signalizatsiya («o'g'ri kirdi!»), IPS — eshikni qulflaydigan qorovul.","An IDS (Intrusion Detection System) watches the network and alerts on suspicious activity. An IPS (Intrusion Prevention System) goes further — it also blocks the attack. The difference isn't just «what it does» — the KEY difference is WHERE each sits in the network: an IDS is an alarm («a burglar!»), an IPS is a guard that locks the door.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: bir xil hujum, ikki xil natija","Interactive simulator: the same attack, two different outcomes")),
+    React.createElement(P,null,t(lang,"Xuddi shu zararli paketni IDS va IPS orqali yuboring — joylashuvning o'zi natijani qanday belgilashini ko'ring:","Send the exact same malicious packet through an IDS and an IPS — see how placement alone determines the outcome:")),
+    React.createElement(IDSIPSSim),
+    React.createElement(H2,{num:"§3"},t(lang,"IDS vs IPS — solishtiruv","IDS vs IPS — comparison")),
     React.createElement(CompareCols,{
-      left:{title:"IDS",color:"#ffd43b",rows:[{uz:"Aniqlaydi + ogohlantiradi",en:"Detects + alerts"},{uz:"Trafik nusxasini ko'radi (passiv)",en:"Sees a copy of traffic (passive)"},{uz:"Hujumni to'xtatmaydi",en:"Doesn't stop the attack"}]},
-      right:{title:"IPS",color:"#ff3a5e",rows:[{uz:"Aniqlaydi + bloklaydi",en:"Detects + blocks"},{uz:"Trafik ichidan o'tadi (inline)",en:"Sits inline in the traffic path"},{uz:"Real vaqtda to'xtatadi",en:"Stops it in real time"}]}}),
-    React.createElement(H2,{num:"§2"},t(lang,"Qanday ishlaydi","How it works")),
-    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"IPS oqimi",en:"IPS flow"},steps:[
-      {icon:"👁",text:{uz:"Trafik kuzatiladi",en:"Traffic is monitored"}},
-      {icon:"🔎",text:{uz:"Signature (ma'lum hujum) yoki anomaliya topiladi",en:"Signature (known attack) or anomaly detected"}},
-      {icon:"🚨",text:{uz:"Ogohlantirish yaratiladi",en:"An alert is raised"}},
-      {icon:"⛔",text:{uz:"IPS: zararli paket bloklanadi",en:"IPS: the malicious packet is blocked"}},
+      left:{title:"IDS",color:"#ffd43b",rows:[{uz:"Aniqlaydi + ogohlantiradi",en:"Detects + alerts"},{uz:"Trafik nusxasini ko'radi (passiv, out-of-band)",en:"Sees a copy of traffic (passive, out-of-band)"},{uz:"Hujumni TO'XTATMAYDI",en:"Does NOT stop the attack"}]},
+      right:{title:"IPS",color:"#ff3a5e",rows:[{uz:"Aniqlaydi + bloklaydi",en:"Detects + blocks"},{uz:"Trafik ichidan o'tadi (inline)",en:"Sits inline in the traffic path"},{uz:"Real vaqtda TO'XTATADI",en:"Stops it in real time"}]}}),
+    React.createElement(H2,{num:"§4"},t(lang,"Aniqlash usullari va joylashuv turlari","Detection methods and deployment types")),
+    React.createElement(LayerStack,{layers:[
+      {n:"sig",name:t(lang,"Signature","Signature"),color:"#4dabf7",desc:{uz:"Ma'lum hujum imzolari bilan solishtiradi — tez va aniq, lekin yangi hujumni o'tkazib yuboradi.",en:"Matches against known attack signatures — fast and precise, but misses brand-new attacks."}},
+      {n:"anom",name:t(lang,"Anomaly","Anomaly"),color:"#69db7c",desc:{uz:"Odatiy xatti-harakatdan chetlanishni izlaydi — yangi hujumni ham tutadi, lekin ko'proq soxna signal beradi.",en:"Looks for deviation from normal behavior — catches new attacks too, but generates more false alarms."}},
+      {n:"NIDS",name:"NIDS/NIPS",color:"#a855f7",desc:{uz:"Butun tarmoq segmentini kuzatadi (Snort, Suricata).",en:"Watches an entire network segment (Snort, Suricata)."}},
+      {n:"HIDS",name:"HIDS/HIPS",color:"#ffd43b",desc:{uz:"Bitta xost ichida ishlaydi (OSSEC, Wazuh) — fayl o'zgarishi va jarayonlarni kuzatadi.",en:"Runs on a single host (OSSEC, Wazuh) — watches file changes and processes."}}
     ]}),
-    React.createElement(Terminal,null,"# Snort qoida misoli (soddalashtirilgan):\nalert tcp any any -> 10.0.0.0/24 22 (msg:\"SSH urinishi\";)"),
-        React.createElement(H2,{num:"§3"},t(lang,"Aniqlash usullari va joylashuvi","Detection methods and placement")),
-    React.createElement(LayerStack,{layers:[{n:"sig",name:t(lang,"Signature","Signature"),color:"#4dabf7",desc:{uz:"Ma'lum hujum imzolari (tez, yangi hujumni o'tkazadi).",en:"Known attack signatures (fast, misses new attacks)."}},{n:"anom",name:t(lang,"Anomaly","Anomaly"),color:"#69db7c",desc:{uz:"Odatiy xatti-harakatdan chetlanish (yangi hujum).",en:"Deviation from normal (catches new attacks)."}},{n:"NIDS",name:t(lang,"NIDS","NIDS"),color:"#a855f7",desc:{uz:"Tarmoq bo'ylab (Snort, Suricata).",en:"Across the network (Snort, Suricata)."}},{n:"HIDS",name:t(lang,"HIDS","HIDS"),color:"#ffd43b",desc:{uz:"Xost ichida (OSSEC, Wazuh).",en:"On the host (OSSEC, Wazuh)."}},]}),
-    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: ogohlantirishlar","Practice: alerts")),
-    React.createElement(P,null,t(lang,"IDS faqat ogohlantiradi (kuzatuvchi), IPS esa bloklaydi (yo'lda turadi). Snort ma'lum hujum imzosiga mos trafikni ko'rganda ogohlantirish yozadi.","An IDS only alerts (a monitor), while an IPS blocks (sits inline). Snort writes an alert when traffic matches a known attack signature.")),
-    React.createElement(Terminal,null,"# Snort ogohlantirishi (fast alert)\n# [**] [1:2100498:7] GPL ATTACK_RESPONSE id check [**]\n# [Priority: 2] {TCP} 10.0.0.9:445 -> 10.0.0.5:51324\n# → SMB hujumi shubhasi aniqlandi"),
-React.createElement(Quiz,{q:{uz:"IDS va IPS o'rtasidagi asosiy farq nima?",en:"Key difference between IDS and IPS?"},opts:[{uz:"IDS tezroq",en:"IDS is faster"},{uz:"IPS hujumni bloklaydi, IDS faqat ogohlantiradi",en:"IPS blocks the attack, IDS only alerts"},{uz:"IDS faqat WiFi da",en:"IDS is WiFi-only"},{uz:"Farqi yo'q",en:"No difference"}],correct:1,exp:{uz:"IDS aniqlaydi va ogohlantiradi; IPS aniqlaydi va real vaqtda bloklaydi.",en:"IDS detects and alerts; IPS detects and blocks in real time."}}));
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ogohlantirishlarni ko'rish","Practice: viewing alerts")),
+    React.createElement(P,null,t(lang,"Snort ma'lum hujum imzosiga mos trafikni ko'rganda ogohlantirish yozadi — bu simulyatordagi aynan «signature mos keldi» qadami.","Snort writes an alert when traffic matches a known attack signature — exactly the «signature matched» step from the simulator.")),
+    React.createElement(Terminal,null,"# Snort qoida misoli (soddalashtirilgan):\nalert tcp any any -> 10.0.0.0/24 22 (msg:\"SSH urinishi\";)\n\n# Snort ogohlantirishi (fast alert formatida):\n# [**] [1:2100498:7] GPL ATTACK_RESPONSE id check [**]\n# [Priority: 2] {TCP} 10.0.0.9:445 -> 10.0.0.5:51324\n# → SMB hujumi shubhasi aniqlandi"),
+React.createElement(Quiz,{q:{uz:"IDS va IPS o'rtasidagi asosiy farq nima?",en:"Key difference between IDS and IPS?"},opts:[{uz:"IDS tezroq",en:"IDS is faster"},{uz:"IPS hujumni bloklaydi, IDS faqat ogohlantiradi",en:"IPS blocks the attack, IDS only alerts"},{uz:"IDS faqat WiFi da",en:"IDS is WiFi-only"},{uz:"Farqi yo'q",en:"No difference"}],correct:1,exp:{uz:"IDS aniqlaydi va ogohlantiradi; IPS aniqlaydi va real vaqtda bloklaydi — chunki u yo'lning o'zida (inline) turadi.",en:"IDS detects and alerts; IPS detects and blocks in real time — because it sits right on the path (inline)."}}));
 }
 function LessonL17(){
   const lang=useLang();
