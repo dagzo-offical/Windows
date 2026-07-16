@@ -1516,6 +1516,46 @@ function WirelessCrackSim(){
       React.createElement("button",{onClick:()=>{setRun("strong");setStep(-1);},style:{flex:1,padding:"9px",background:run==="strong"?A+"22":SL2,color:run==="strong"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Kuchli parol","🔒 Strong password"))));
 }
 
+function ForensicsSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const NOHASH=[
+    {col:BL,uz:"Tekshiruvchi diskdan PCAP faylini nusxalaydi — lekin hash OLINMAYDI",en:"Investigator copies the PCAP file from disk — but NO hash is taken",duz:"Shoshilinch holatda bu qadam ko'pincha unutiladi.",den:"In the rush of an incident, this step is often skipped."},
+    {col:AM,uz:"Fayl tahlil serveriga ko'chiriladi, bir necha marta ochib-saqlanadi",en:"The file is moved to the analysis server, opened and saved several times",duz:"Har bir ochish/saqlash fayl metama'lumotini biroz o'zgartirishi mumkin.",den:"Every open/save can subtly change the file's metadata."},
+    {col:AM,uz:"Sudda ayblanuvchi tomon: «Fayl o'zgartirilgan bo'lishi mumkin» deb e'tiroz bildiradi",en:"In court, the defense objects: «The file could have been altered»",duz:"Isbotlovchi hech qanday matematik dalilga ega emas — faqat so'zga tayanadi.",den:"The investigator has no mathematical proof — only their word."},
+    {col:D,uz:"🚫 Isbotlab bo'lmaydi — dalil sudda kuchini yo'qotadi",en:"🚫 Can't be proven — the evidence loses its force in court",duz:"Haqiqiy dalil bo'lsa ham, zanjirdagi bo'shliq uni ishonchsiz qiladi.",den:"Even if the evidence is genuine, the gap in the chain makes it unreliable.",final:true,bad:true}
+  ];
+  const HASH=[
+    {col:BL,uz:"Tekshiruvchi PCAP faylini nusxalaydi va DARHOL SHA256 hash oladi",en:"Investigator copies the PCAP file and IMMEDIATELY takes a SHA256 hash",duz:"Bu — dalil zanjirining birinchi va eng muhim qadami.",den:"This is the first and most critical step of the chain of custody."},
+    {col:AM,uz:"Har bir keyingi qadam (kim, qachon ochdi) jurnalga yoziladi",en:"Every subsequent step (who opened it, when) is logged",duz:"To'liq, uzluksiz hujjatlashtirilgan zanjir shakllanadi.",den:"A complete, unbroken documented chain is formed."},
+    {col:AM,uz:"Tahlildan so'ng hash qayta hisoblanadi — asl hash bilan solishtiriladi: MOS KELADI",en:"After analysis the hash is recomputed and compared to the original: IT MATCHES",duz:"SHA256 da bittagina bit o'zgarsa ham, hash butunlay boshqacha chiqadi.",den:"If even a single bit changed, SHA256 would produce a completely different hash."},
+    {col:A,uz:"✅ O'zgarmaganligi matematik isbotlangan — dalil sudda kuchga ega",en:"✅ Mathematically proven unaltered — the evidence holds up in court",duz:"So'zga emas, kriptografik dalilga tayaniladi.",den:"It rests on cryptographic proof, not just someone's word.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="raw"?NOHASH:HASH;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="raw"?NOHASH:run==="sealed"?HASH:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu PCAP dalili hashsiz va hash bilan qanday farqli taqdirga ega bo'lishini ko'ring.","⬇ Pick a scenario — see how the same PCAP evidence fares very differently without and with a hash.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="raw"?t(lang,"✗ Hashsiz: dalil bahsli — sudda rad etilishi mumkin","✗ No hash: the evidence is contestable — may be thrown out in court"):t(lang,"✓ Hash bilan: o'zgarmaganlik matematik isbotlangan","✓ With a hash: integrity is mathematically proven")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("raw");setStep(-1);},style:{flex:1,padding:"9px",background:run==="raw"?D+"22":SL2,color:run==="raw"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🚫 Hashsiz ishlash","🚫 Work without a hash")),
+      React.createElement("button",{onClick:()=>{setRun("sealed");setStep(-1);},style:{flex:1,padding:"9px",background:run==="sealed"?A+"22":SL2,color:run==="sealed"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Hash bilan muhrlash","✅ Seal it with a hash"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2739,15 +2779,16 @@ function LessonL30(){
       {icon:"🧩",text:{uz:"\"Kim, qachon, qanday\" ni tiklash",en:"Reconstruct \"who, when, how\""}},
       {icon:"📝",text:{uz:"Hisobot + dalil zanjirini hujjatlash",en:"Report + document the chain of custody"}},
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Dalil manbalari","Evidence sources")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: dalil zanjiri — hash bormi, yo'qmi?","Interactive simulator: chain of custody — with or without a hash?")),
+    React.createElement(P,null,t(lang,"Xuddi shu PCAP dalilini ikki xil tekshiruvchi qo'lga oladi — biri hash olishni unutadi, ikkinchisi darhol muhrlaydi. Natija sudda tubdan farq qiladi:","The same PCAP evidence lands in two different investigators' hands — one forgets to hash it, the other seals it immediately. The outcome in court differs completely:")),
+    React.createElement(ForensicsSim),
+    React.createElement(H2,{num:"§4"},t(lang,"Dalil manbalari","Evidence sources")),
     src.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.05)+"s"}},
       React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:150}},t(lang,x[0].uz,x[0].en)),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
     React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Dalil zanjiri: ","Chain of custody: ")),t(lang,"dalil o'zgartirilmagani va kim unga tekkanligi hujjatlanishi shart — aks holda sudda kuchini yo'qotadi. Doim asl nusxadan ish nusxasi olib ishlanadi.","evidence must be documented as unaltered and who handled it recorded — otherwise it loses value in court. Always work on a copy, never the original.")),
-        React.createElement(H2,{num:"§4"},t(lang,"Forensika artefaktlari","Forensic artifacts")),
-    React.createElement(LayerStack,{layers:[{n:"pcap",name:t(lang,"PCAP","PCAP"),color:"#4dabf7",desc:{uz:"Ushlangan tarmoq trafigi (tcpdump/Wireshark).",en:"Captured network traffic (tcpdump/Wireshark)."}},{n:"logs",name:t(lang,"Loglar","Logs"),color:"#69db7c",desc:{uz:"Firewall/server/IDS yozuvlari.",en:"Firewall/server/IDS records."}},{n:"flow",name:t(lang,"NetFlow","NetFlow"),color:"#a855f7",desc:{uz:"Kim-kim bilan gaplashgani (metama'lumot).",en:"Who talked to whom (metadata)."}},{n:"hash",name:t(lang,"Hash","Hash"),color:"#ffd43b",desc:{uz:"Dalil o'zgarmaganini isbotlaydi (SHA256).",en:"Proves evidence is unchanged (SHA256)."}},]}),
     React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: pcap tahlili","Practice: analyzing a pcap")),
-    React.createElement(P,null,t(lang,"Forensika — hodisadan KEYIN dalilni yig'ish va tahlil qilish. Dalil zanjiri: har fayl hashlanadi va kim tekkani yoziladi, shunda dalil sudda kuchga ega bo'ladi.","Forensics is collecting and analyzing evidence AFTER an incident. Chain of custody: each file is hashed and every handler recorded, so the evidence holds up in court.")),
+    React.createElement(P,null,t(lang,"Forensika — hodisadan KEYIN dalilni yig'ish va tahlil qilish. Simulyatordagi «Hash bilan muhrlash» ssenariysi kabi: har fayl hashlanadi va kim tekkani yoziladi, shunda dalil sudda kuchga ega bo'ladi.","Forensics is collecting and analyzing evidence AFTER an incident. Just like the simulator's «Seal it with a hash» scenario: each file is hashed and every handler recorded, so the evidence holds up in court.")),
     React.createElement(Terminal,null,"sha256sum capture.pcap   # dalilni muhrlash\n# 9f2c...  capture.pcap\ntcpdump -r capture.pcap -nn 'port 4444'\n# 10.0.0.9.51002 > 10.0.0.5.4444  ← shubhali reverse shell"),
 React.createElement(Quiz,{q:{uz:"\"Dalil zanjiri\" (chain of custody) nima uchun muhim?",en:"Why is \"chain of custody\" important?"},opts:[{uz:"Tarmoqni tezlashtiradi",en:"Speeds up the network"},{uz:"Dalil o'zgartirilmagani va ishonchli ekanini isbotlaydi",en:"Proves the evidence is unaltered and trustworthy"},{uz:"Parolni shifrlaydi",en:"Encrypts the password"},{uz:"IP beradi",en:"Hands out IPs"}],correct:1,exp:{uz:"Dalil zanjiri dalil o'zgartirilmaganini va kim unga tekkanini hujjatlaydi — bu ishonchlilik va sud kuchini ta'minlaydi.",en:"Chain of custody documents that evidence is unaltered and who handled it — ensuring it's trustworthy and admissible."}}));
 }
