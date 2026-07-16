@@ -938,6 +938,49 @@ function TopoSim(){
     cutDone&&React.createElement("div",{style:{padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:d.col+"1f",border:"1px solid "+d.col,color:d.col}},t(lang,d.fin,d.finE)));
 }
 
+function WiFiSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",PU="#a855f7",AM="#f59e0b",SL2="#0f172a";
+  const WPA=[
+    {col:BL,dir:"AP → Client",uz:"ANonce (tasodifiy son) yuboriladi",en:"An ANonce (random number) is sent",duz:"4 tomonlama qo'l berishning (4-way handshake) 1-qadami — umumiy parol (PSK) hech qachon havoda uzatilmaydi.",den:"Step 1 of the 4-way handshake — the shared password (PSK) is never transmitted over the air."},
+    {col:PU,dir:"Client → AP",uz:"SNonce + MIC yuboriladi",en:"An SNonce + MIC is sent",duz:"Client PSK va ikkala nonce'dan noyob sessiya kaliti (PTK) hisoblaydi va buni MIC bilan isbotlaydi.",den:"The client derives a unique session key (PTK) from the PSK and both nonces, proving it with a MIC."},
+    {col:AM,dir:"AP → Client",uz:"GTK (guruh kaliti) shifrlangan holda yuboriladi",en:"The GTK (group key) is sent, encrypted",duz:"Bu kalit broadcast/multicast trafikni shifrlash uchun barcha qurilmalarga kerak.",den:"This key is needed by all devices to encrypt broadcast/multicast traffic."},
+    {col:A,dir:"Client → AP",uz:"Tasdiqlanadi — ulanish shifrlangan holda o'rnatildi",en:"Confirmed — the connection is now established, encrypted",duz:"Endi barcha trafik noyob sessiya kaliti bilan shifrlanadi. Parolning o'ZI hech qachon havoda ko'rinmadi.",den:"All traffic is now encrypted with the unique session key. The password ITSELF was never sent over the air.",final:true}
+  ];
+  const OPEN=[
+    {col:D,dir:"Client → AP",uz:"To'g'ridan-to'g'ri ulanadi — hech qanday qo'l berish yo'q",en:"Connects directly — no handshake at all",duz:"Ochiq tarmoqda shifrlash UMUMAN yo'q. WEP esa zaif RC4+statik kalit ishlatadi va daqiqalarda buziladi.",den:"An open network has NO encryption at all. WEP uses weak RC4+a static key and is broken within minutes.",final:true,attack:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="wpa"?WPA:OPEN;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),950);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="wpa"?WPA:run==="open"?OPEN:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",gap:8,marginBottom:12}},
+      React.createElement("div",{style:{flex:1,textAlign:"center",padding:"9px",background:SL2,border:"1px solid "+BL+"55",borderRadius:10,fontSize:12,fontWeight:700,color:"#93c5fd"}},t(lang,"📶 Access Point","📶 Access Point")),
+      React.createElement("div",{style:{color:"#64748b",fontSize:16,padding:"0 2px"}},"⇄"),
+      React.createElement("div",{style:{flex:1,textAlign:"center",padding:"9px",background:SL2,border:"1px solid "+A+"55",borderRadius:10,fontSize:12,fontWeight:700,color:"#86efac"}},t(lang,"📱 Client","📱 Client"))),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — WPA2/WPA3 qo'l berishida parol nega hech qachon havoda uzatilmasligini ko'ring.","⬇ Pick a scenario — see why the password is never sent over the air in a WPA2/WPA3 handshake.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{flex:1}},
+            React.createElement("div",{style:{fontSize:9,fontWeight:800,color:s.col,fontFamily:"var(--font-mono)",marginBottom:3,letterSpacing:.4}},s.dir),
+            React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+            React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den))));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="wpa"?t(lang,"✓ Parol hech qachon havoda uzatilmadi — faqat matematik isbot (MIC)","✓ The password was never sent over the air — only a mathematical proof (MIC)"):t(lang,"⚠ Barcha trafik ochiq — atrofdagi HAR KIM uni o'qiy oladi","⚠ All traffic is in the clear — ANYONE nearby can read it")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("wpa");setStep(-1);},style:{flex:1,padding:"9px",background:run==="wpa"?A+"22":SL2,color:run==="wpa"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 WPA2/WPA3 (4-way handshake)","🔒 WPA2/WPA3 (4-way handshake)")),
+      React.createElement("button",{onClick:()=>{setRun("open");setStep(-1);},style:{flex:1,padding:"9px",background:run==="open"?D+"22":SL2,color:run==="open"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 Ochiq / WEP","🔓 Open / WEP"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1740,25 +1783,27 @@ React.createElement(Quiz,{q:{uz:"Qaysi topologiyada bitta qurilma uzilsa ham qol
 function LessonL12(){
   const lang=useLang();
   const std=[["802.11n","WiFi 4","600 Mbps"],["802.11ac","WiFi 5",{uz:"bir necha Gbps",en:"several Gbps"}],["802.11ax","WiFi 6",{uz:"gavjum joyda yaxshi",en:"better in crowds"}]];
-  const sec=[["WEP","#ff3a5e",{uz:"Buzilgan — ISHLATMANG",en:"Broken — DON'T USE"}],["WPA","#ff9145",{uz:"Eskirgan",en:"Outdated"}],["WPA2","#ffd43b",{uz:"Uzoq vaqt standart",en:"Long-time standard"}],["WPA3","#69db7c",{uz:"Eng yangi va xavfsiz",en:"Newest and safest"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Simsiz tarmoq nima?","What is a wireless network?")),
-    React.createElement(P,null,t(lang,"WiFi — kabel o'rniga radio to'lqinlari orqali ma'lumot uzatadi. Qurilmangiz access point (router) bilan radio orqali gaplashadi. Havoda hamma \"eshitishi\" mumkin, shuning uchun shifrlash muhim.","WiFi sends data over radio waves instead of cables. Your device talks to an access point (router) by radio. Anyone in the air can \"hear\", so encryption matters.")),
+    React.createElement(P,null,t(lang,"WiFi — kabel o'rniga radio to'lqinlari orqali ma'lumot uzatadi. Qurilmangiz access point (router) bilan radio orqali gaplashadi. Havoda hamma «eshitishi» mumkin — devor orqasidagi qo'shni ham signalni qabul qiladi — shuning uchun shifrlash kabelli tarmoqdan ham muhimroq.","WiFi sends data over radio waves instead of cables. Your device talks to an access point (router) by radio. Anyone in the air can «hear» it — even a neighbor through the wall receives the signal — which is why encryption matters even more than on a wired network.")),
     React.createElement(PacketFlow,{from:{uz:"Qurilma",en:"Device"},to:{uz:"Access Point",en:"Access Point"},label:{uz:"radio to'lqin",en:"radio waves"}}),
-    React.createElement(H2,{num:"§2"},t(lang,"WiFi standartlari","WiFi standards")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: WPA2/WPA3 vs ochiq tarmoq","Interactive simulator: WPA2/WPA3 vs an open network")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xavfsiz tarmoqqa ulanishda parolning o'zi nega hech qachon havoda uzatilmasligini va ochiq tarmoqda nega hamma narsa ochiq ekanini solishtiring:","Try both scenarios — see why the password itself is never transmitted over the air when joining a secure network, and why everything is exposed on an open one:")),
+    React.createElement(WiFiSim),
+    React.createElement(H2,{num:"§3"},t(lang,"WiFi standartlari","WiFi standards")),
     std.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
       React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:"var(--accent)",fontSize:11.5,minWidth:80}},s[0]),
       React.createElement("span",{style:{fontSize:12,fontWeight:600,color:"var(--text-0)",minWidth:56}},s[1]),
       React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},typeof s[2]==="string"?s[2]:t(lang,s[2].uz,s[2].en)));}),
-    React.createElement(H2,{num:"§3"},t(lang,"WiFi xavfsizligi","WiFi security")),
-    React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,margin:"6px 0 12px"}},
-      sec.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",background:s[1]+"0d",border:"1px solid "+s[1]+"44",borderRadius:9,animationDelay:(i*0.06)+"s"}},
-        React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:s[1],fontSize:12,minWidth:56}},s[0]),
-        React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,s[2].uz,s[2].en)));})),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"WEP ni hech qachon ishlatmang — bir necha daqiqada buziladi. Kamida WPA2, imkon bo'lsa WPA3 va kuchli parol qo'ying.","Never use WEP — it cracks in minutes. Use at least WPA2, ideally WPA3, with a strong password.")),
-        React.createElement(H2,{num:"§4"},t(lang,"WiFi shifrlash avlodlari","WiFi encryption generations")),
-    React.createElement(LayerStack,{layers:[{n:"WEP",name:t(lang,"WEP","WEP"),color:"#ff6b6b",desc:{uz:"Buzilgan — soniyalarda ochiladi. Ishlatmang.",en:"Broken — cracked in seconds. Do not use."}},{n:"WPA",name:t(lang,"WPA","WPA"),color:"#ffa94d",desc:{uz:"Eskirgan, zaif (TKIP).",en:"Outdated, weak (TKIP)."}},{n:"WPA2",name:t(lang,"WPA2","WPA2"),color:"#4dabf7",desc:{uz:"Ko'p yillik standart (AES).",en:"The long-time standard (AES)."}},{n:"WPA3",name:t(lang,"WPA3","WPA3"),color:"#69db7c",desc:{uz:"Eng yangi va xavfsiz — tavsiya.",en:"Newest and safest — recommended."}},]}),
+    React.createElement(H2,{num:"§4"},t(lang,"WiFi shifrlash avlodlari","WiFi encryption generations")),
+    React.createElement(LayerStack,{layers:[
+      {n:"WEP",name:"WEP",color:"#ff6b6b",desc:{uz:"Buzilgan — statik kalit + zaif RC4. Bir necha daqiqada ochiladi. Ishlatmang.",en:"Broken — static key + weak RC4. Cracked within minutes. Do not use."}},
+      {n:"WPA",name:"WPA",color:"#ffa94d",desc:{uz:"Eskirgan, zaif (TKIP) — WEP dan yaxshiroq, lekin hozir ishonchsiz.",en:"Outdated, weak (TKIP) — better than WEP, but untrustworthy today."}},
+      {n:"WPA2",name:"WPA2",color:"#4dabf7",desc:{uz:"Ko'p yillik standart (AES + 4-way handshake). Hali ham xavfsiz.",en:"The long-time standard (AES + 4-way handshake). Still secure."}},
+      {n:"WPA3",name:"WPA3",color:"#69db7c",desc:{uz:"Eng yangi — kuchsiz parolga ham chidamli (SAE). Tavsiya etiladi.",en:"The newest — resistant even to weak passwords (SAE). Recommended."}}
+    ]}),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"WEP ni hech qachon ishlatmang — bir necha daqiqada buziladi. Kamida WPA2, imkon bo'lsa WPA3 va kuchli parol qo'ying.","Never use WEP — it cracks in minutes. Use at least WPA2, ideally WPA3, with a strong password.")),
     React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: atrofdagi tarmoqlar","Practice: nearby networks")),
     React.createElement(P,null,t(lang,"nmcli yaqin-atrofdagi WiFi tarmoqlarini va ularning xavfsizlik turini ko'rsatadi. Ochiq (--) yoki WEP tarmoq — jiddiy xavf belgisi.","nmcli shows nearby WiFi networks and their security type. An open (--) or WEP network is a serious risk sign.")),
     React.createElement(Terminal,null,"nmcli dev wifi list\n# SSID          SIGNAL  SECURITY\n# HomeNet       92      WPA2\n# Office_5G     78      WPA3\n# FreeWiFi      65      --      ← ochiq, xavfli!"),
