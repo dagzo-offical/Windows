@@ -681,6 +681,51 @@ function ARPSim(){
       React.createElement("button",{onClick:()=>{setRun("warm");setStep(-1);},style:{flex:1,padding:"9px",background:run==="warm"?A+"22":SL,color:run==="warm"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Keyingi so'rov (keshdan)","⚡ Next query (from cache)"))));
 }
 
+function DHCPSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",PU="#a855f7",AM="#f59e0b",SL2="#0f172a";
+  const DORA=[
+    {ic:"📢",col:BL,dir:"BROADCAST · UDP 68→67",uz:"Client → HAMMA: «Menga IP kerak!» (DHCPDISCOVER)",en:"Client → EVERYONE: «I need an IP!» (DHCPDISCOVER)",duz:"Qurilmaning hali IP si yo'q, shuning uchun manzil bilmagan holda butun tarmoqqa (255.255.255.255) yuboradi.",den:"The device has no IP yet, so it broadcasts to the whole network (255.255.255.255) without knowing any address."},
+    {ic:"🎁",col:PU,dir:"BROADCAST/UNICAST",uz:"Server → Client: «192.168.1.50 ni taklif qilaman» (DHCPOFFER)",en:"Server → Client: «I'm offering you 192.168.1.50» (DHCPOFFER)",duz:"Server o'z diapazonidan bo'sh manzil tanlab, vaqtincha band qilib qo'yadi.",den:"The server picks a free address from its pool and reserves it temporarily."},
+    {ic:"🤝",col:AM,dir:"BROADCAST",uz:"Client → HAMMA: «192.168.1.50 ni tanladim!» (DHCPREQUEST)",en:"Client → EVERYONE: «I chose 192.168.1.50!» (DHCPREQUEST)",duz:"Bu ham broadcast — agar bir nechta server taklif yuborgan bo'lsa, boshqalari o'z takliflarini bekor qiladi.",den:"This is also a broadcast — if several servers made offers, the others withdraw theirs."},
+    {ic:"✅",col:A,dir:"UNICAST",uz:"Server → Client: «Tasdiqlandi! Ijara: 24 soat» (DHCPACK)",en:"Server → Client: «Confirmed! Lease: 24 hours» (DHCPACK)",duz:"Manzil rasman biriktirildi. T1 (~ijaraning yarmida) qurilma uni yangilashga harakat qiladi.",den:"The address is now officially assigned. At T1 (~halfway through the lease) the device will try to renew it."}
+  ];
+  const RENEW=[
+    {ic:"🔄",col:BL,dir:"UNICAST — to'g'ridan-to'g'ri",uz:"Client → Server: «Ijaramni yangilayman» (DHCPREQUEST)",en:"Client → Server: «Renewing my lease» (DHCPREQUEST)",duz:"T1 vaqtida qurilma serverni allaqachon bilgani uchun broadcast'siz, to'g'ridan-to'g'ri so'raydi.",den:"At T1 the device already knows the server, so it asks directly — no broadcast needed."},
+    {ic:"✅",col:A,dir:"UNICAST",uz:"Server → Client: «Tasdiqlandi, yana 24 soat» (DHCPACK)",en:"Server → Client: «Confirmed, another 24 hours» (DHCPACK)",duz:"Discover va Offer shart emas — to'rt qadamdan faqat ikkitasi yetarli.",den:"Discover and Offer aren't needed — only two of the four steps are required."}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="dora"?DORA:RENEW;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="dora"?DORA:run==="renew"?RENEW:null;
+  const done=list&&step>=list.length-1;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",gap:8,marginBottom:12}},
+      React.createElement("div",{style:{flex:1,textAlign:"center",padding:"9px",background:SL2,border:"1px solid "+BL+"55",borderRadius:10,fontSize:12,fontWeight:700,color:"#93c5fd"}},t(lang,"💻 Client (yangi qurilma)","💻 Client (new device)")),
+      React.createElement("div",{style:{color:"#64748b",fontSize:16,padding:"0 2px"}},"⇄"),
+      React.createElement("div",{style:{flex:1,textAlign:"center",padding:"9px",background:SL2,border:"1px solid "+A+"55",borderRadius:10,fontSize:12,fontWeight:700,color:"#86efac"}},t(lang,"🗄 DHCP Server","🗄 DHCP Server"))),
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — yangi qurilma to'liq DORA jarayonidan o'tishini va ijara yangilash qanchalik qisqaroq ekanini solishtiring.","⬇ Pick a scenario — compare a new device going through the full DORA process versus how much shorter a lease renewal is.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:19,lineHeight:1}},s.ic),
+          React.createElement("div",{style:{flex:1}},
+            React.createElement("div",{style:{fontSize:9,fontWeight:800,color:s.col,fontFamily:"var(--font-mono)",marginBottom:3,letterSpacing:.4}},s.dir),
+            React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+            React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den))));})),
+    done&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:A+"1f",border:"1px solid "+A,color:A}},
+      run==="dora"?t(lang,"✓ To'liq DORA: 4 qadam, 2 tasi broadcast","✓ Full DORA: 4 steps, 2 of them broadcasts"):t(lang,"⚡ Yangilash: bor-yo'g'i 2 qadam, ikkalasi ham unicast — tezroq va shovqinsiz","⚡ Renewal: just 2 steps, both unicast — faster and quieter")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("dora");setStep(-1);},style:{flex:1,padding:"9px",background:run==="dora"?BL+"22":SL2,color:run==="dora"?"#93c5fd":"#cbd5e1",border:"1px solid "+BL+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🆕 Yangi qurilma (to'liq DORA)","🆕 New device (full DORA)")),
+      React.createElement("button",{onClick:()=>{setRun("renew");setStep(-1);},style:{flex:1,padding:"9px",background:run==="renew"?A+"22":SL2,color:run==="renew"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔄 Ijarani yangilash","🔄 Renewing the lease"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1364,24 +1409,23 @@ function LessonL07(){
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"DHCP nima?","What is DHCP?")),
-    React.createElement(P,null,t(lang,"DHCP qurilmalarga IP manzilni avtomatik beradi. Usiz har bir qurilma uchun IP ni qo'lda kiritishga to'g'ri kelardi. DHCP — mehmonxona qabulxonasi kabi: kelasiz, u sizga xona (IP) va yo'l-yo'riq (gateway, DNS) beradi.","DHCP hands devices an IP automatically. Without it you'd type an IP by hand for every device. DHCP is like a hotel front desk: you arrive and it gives you a room (IP) and directions (gateway, DNS).")),
-    React.createElement(H2,{num:"§2"},t(lang,"DORA jarayoni","The DORA process")),
-    React.createElement(P,null,t(lang,"Qurilma tarmoqqa ulanganda 4 bosqichli \"DORA\" suhbati kechadi. \"Ishga tushir\":","When a device joins, a 4-step \"DORA\" exchange happens. Press Play:")),
-    React.createElement(FlowSteps,{title:{uz:"DHCP · DORA",en:"DHCP · DORA"},steps:[
-      {icon:"D",text:{uz:"Discover:  qurilma \"menga IP kerak!\" deb baqiradi",en:"Discover:  device shouts \"I need an IP!\""}},
-      {icon:"O",text:{uz:"Offer:  DHCP server \"mana, 192.168.1.50\"",en:"Offer:  DHCP server \"here, 192.168.1.50\""}},
-      {icon:"R",text:{uz:"Request:  qurilma \"roziman, shuni olaman\"",en:"Request:  device \"agreed, I'll take it\""}},
-      {icon:"A",text:{uz:"Acknowledge:  server \"kelishdik, u sizniki (24 soat)\"",en:"Acknowledge:  server \"done, it's yours (24h)\""}},
+    React.createElement(P,null,t(lang,"DHCP (Dynamic Host Configuration Protocol) qurilmalarga IP manzilni avtomatik beradi — usiz har bir qurilma uchun IP ni qo'lda kiritishga to'g'ri kelardi. DHCP — mehmonxona qabulxonasi kabi: kelasiz, u sizga xona (IP manzil) va yo'l-yo'riq (gateway, DNS server) beradi, siz ketganingizda esa xona bo'shab qoladi.","DHCP (Dynamic Host Configuration Protocol) automatically hands devices an IP address — without it, you'd have to type one in by hand for every device. DHCP is like a hotel front desk: you arrive and it gives you a room (an IP) and directions (gateway, DNS server), and when you leave the room becomes free again.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: to'liq DORA vs yangilash","Interactive simulator: full DORA vs renewal")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — qurilma birinchi marta ulanganda va ijara muddati tugashiga yaqinlashganda nima farq qilishini solishtiring:","Try both scenarios — compare what's different when a device first connects versus when its lease is about to expire:")),
+    React.createElement(DHCPSim),
+    React.createElement(H2,{num:"§3"},t(lang,"DORA — to'rt bosqich","DORA — the four stages")),
+    React.createElement(LayerStack,{layers:[
+      {n:"D",name:"Discover",color:"#3b82f6",desc:{uz:"Client: «DHCP server bormi?» — broadcast, chunki hali IP yo'q.",en:"Client: «any DHCP server out there?» — a broadcast, since there's no IP yet."}},
+      {n:"O",name:"Offer",color:"#a855f7",desc:{uz:"Server: «mana senga bir manzil» — vaqtincha zaxiralaydi.",en:"Server: «here's an address for you» — reserved temporarily."}},
+      {n:"R",name:"Request",color:"#f59e0b",desc:{uz:"Client: «shu manzilni olaman» — bu ham broadcast (boshqa serverlar eshitadi).",en:"Client: «I'll take that one» — also a broadcast (other servers hear it too)."}},
+      {n:"A",name:"Acknowledge",color:"#22c55e",desc:{uz:"Server: «tasdiqlandi, ijara N soat» — manzil rasman biriktirildi.",en:"Server: «confirmed, lease N hours» — the address is now officially assigned."}}
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Ijara (lease)","The lease")),
-    React.createElement(P,null,t(lang,"Berilgan IP abadiy emas — u \"ijaraga\" beriladi (masalan 24 soat). Muddat tugashidan oldin qurilma uni yangilaydi — bu manzillarni tejaydi.","The IP isn't forever — it's a \"lease\" (e.g. 24h). The device renews it before it expires — saving addresses.")),
-    React.createElement(Terminal,null,"# Linux\nsudo dhclient -r   # eskisini qaytarish\nsudo dhclient      # yangisini olish\n# Windows\nipconfig /release\nipconfig /renew"),
-        React.createElement(H2,{num:"§4"},t(lang,"DORA bosqichlari va ijara","The DORA stages and the lease")),
-    React.createElement(LayerStack,{layers:[{n:"D",name:t(lang,"Discover","Discover"),color:"#4dabf7",desc:{uz:"Mijoz: «DHCP server bormi?» (broadcast).",en:"Client: «any DHCP server?» (broadcast)."}},{n:"O",name:t(lang,"Offer","Offer"),color:"#69db7c",desc:{uz:"Server: «mana senga 192.168.1.50».",en:"Server: «here's 192.168.1.50 for you»."}},{n:"R",name:t(lang,"Request","Request"),color:"#a855f7",desc:{uz:"Mijoz: «shu manzilni olaman».",en:"Client: «I'll take that address»."}},{n:"A",name:t(lang,"Acknowledge","Acknowledge"),color:"#ffd43b",desc:{uz:"Server: «tasdiqlandi, ijara N soat».",en:"Server: «confirmed, lease N hours»."}},]}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ijarani yangilash","Practice: renewing the lease")),
-    React.createElement(P,null,t(lang,"DHCP manzilni «ijaraga» beradi — muddat tugashidan oldin mijoz uni yangilaydi. Kali'da manzilni majburan qayta olish mumkin.","DHCP «leases» an address — before it expires the client renews it. In Kali you can force a fresh address.")),
-    React.createElement(Terminal,null,"sudo dhclient -r eth0    # eski ijarani bekor qilish\nsudo dhclient eth0       # yangi manzil so'rash\nip a | grep inet\n# inet 192.168.1.50/24   ← DHCP bergan yangi manzil"),
-React.createElement(Quiz,{q:{uz:"DHCP DORA jarayonining to'g'ri tartibi?",en:"Correct order of the DHCP DORA process?"},opts:[{uz:"Discover → Offer → Request → Acknowledge",en:"Discover → Offer → Request → Acknowledge"},{uz:"Offer → Discover → Acknowledge → Request",en:"Offer → Discover → Acknowledge → Request"},{uz:"Request → Discover → Offer → Acknowledge",en:"Request → Discover → Offer → Acknowledge"},{uz:"Acknowledge → Request → Offer → Discover",en:"Acknowledge → Request → Offer → Discover"}],correct:0,exp:{uz:"DORA: Discover (so'rov) → Offer (taklif) → Request (tasdiq) → Acknowledge (yakun).",en:"DORA: Discover → Offer → Request → Acknowledge."}}));
+    React.createElement(H2,{num:"§4"},t(lang,"Ijara (lease) va uni yangilash","The lease and renewing it")),
+    React.createElement(P,null,t(lang,"Berilgan IP abadiy emas — u ma'lum muddatga «ijaraga» beriladi (masalan 24 soat). Bu manzillarni tejaydi: agar qurilma tarmoqni tark etsa, uning manzili boshqasiga qayta beriladi. Ijara ikki muhim vaqt nuqtasiga ega: T1 (odatda ijaraning ~50% ida) — qurilma o'z serveriga to'g'ridan-to'g'ri (unicast) yangilash so'raydi; agar javob bo'lmasa, T2 da (~87.5%) broadcast orqali HAR QANDAY serverdan so'raydi.","The assigned IP isn't permanent — it's «leased» for a set time (e.g. 24 hours). This saves addresses: if a device leaves the network, its address becomes available again. A lease has two key timers: T1 (usually ~50% of the lease) — the device asks its own server directly (unicast) to renew; if there's no reply, at T2 (~87.5%) it broadcasts to ANY server.")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ijarani boshqarish","Practice: managing the lease")),
+    React.createElement(P,null,t(lang,"dhclient joriy ijarani bekor qiladi yoki yangisini so'raydi. Windows'da xuddi shu vazifani ipconfig bajaradi.","dhclient releases the current lease or requests a new one. On Windows, ipconfig does the same job.")),
+    React.createElement(Terminal,null,"# Linux\nsudo dhclient -r eth0   # eski ijarani qaytarish (DHCPRELEASE)\nsudo dhclient eth0      # yangi manzil so'rash (to'liq DORA)\nip a | grep inet\n# inet 192.168.1.50/24  ← DHCP bergan manzil\n\n# Windows\nipconfig /release\nipconfig /renew"),
+    React.createElement(Quiz,{q:{uz:"DHCP DORA jarayonining to'g'ri tartibi?",en:"Correct order of the DHCP DORA process?"},opts:[{uz:"Discover → Offer → Request → Acknowledge",en:"Discover → Offer → Request → Acknowledge"},{uz:"Offer → Discover → Acknowledge → Request",en:"Offer → Discover → Acknowledge → Request"},{uz:"Request → Discover → Offer → Acknowledge",en:"Request → Discover → Offer → Acknowledge"},{uz:"Acknowledge → Request → Offer → Discover",en:"Acknowledge → Request → Offer → Discover"}],correct:0,exp:{uz:"DORA: Discover (so'rov) → Offer (taklif) → Request (tasdiq) → Acknowledge (yakun).",en:"DORA: Discover → Offer → Request → Acknowledge."}}));
 }
 function LessonL08(){
   const lang=useLang();
