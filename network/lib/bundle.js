@@ -567,6 +567,67 @@ function DNSSim(){
       React.createElement("button",{onClick:()=>{setRun("warm");setStep(-1);},style:{flex:1,padding:"9px",background:run==="warm"?A+"22":SL,color:run==="warm"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Keyingi so'rov (keshdan)","⚡ Next query (from cache)"))));
 }
 
+function HTTPSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",BL="#3b82f6",AM="#f59e0b",SL="#1e293b",SL2="#0f172a";
+  const SCEN={
+    ok:{method:"GET",path:"/",status:200,statusText:"OK",col:A,sens:false,
+      req:"GET / HTTP/1.1\nHost: example.com\nUser-Agent: Mozilla/5.0",
+      res:"HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html>...bosh sahifa...</html>",
+      uz:"GET / — bosh sahifani olish",en:"GET / — fetch the homepage"},
+    notfound:{method:"GET",path:"/missing",status:404,statusText:"Not Found",col:D,sens:false,
+      req:"GET /missing HTTP/1.1\nHost: example.com",
+      res:"HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<h1>404</h1>",
+      uz:"GET /missing — mavjud bo'lmagan sahifa",en:"GET /missing — a page that doesn't exist"},
+    login:{method:"POST",path:"/login",status:302,statusText:"Found",col:AM,sens:true,sensLbl:{uz:"login va parol",en:"login and password"},
+      req:"POST /login HTTP/1.1\nHost: example.com\nContent-Type: application/x-www-form-urlencoded\n\nusername=admin&password=Secret123",
+      res:"HTTP/1.1 302 Found\nLocation: /dashboard\nSet-Cookie: session=abc123xyz",
+      uz:"POST /login — tizimga kirish",en:"POST /login — logging in"},
+    admin:{method:"GET",path:"/admin",status:403,statusText:"Forbidden",col:D,sens:true,sensLbl:{uz:"sessiya cookie",en:"session cookie"},
+      req:"GET /admin HTTP/1.1\nHost: example.com\nCookie: session=abc123xyz",
+      res:"HTTP/1.1 403 Forbidden\nContent-Type: text/html\n\n<h1>Access Denied</h1>",
+      uz:"GET /admin — ruxsatsiz kirish urinishi",en:"GET /admin — an unauthorized access attempt"}
+  };
+  const [scen,setScen]=useState(null);
+  const [step,setStep]=useState(-1);
+  const [proto,setProto]=useState("https");
+  useEffect(()=>{
+    if(scen==null){setStep(-1);return;}
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=1) return;
+    const id=setTimeout(()=>setStep(1),950);return()=>clearTimeout(id);
+  },[scen,step]);
+  const s=scen?SCEN[scen]:null;
+  const line=(dir,ic,mono,col)=>React.createElement("div",{className:"na-rise",style:{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 13px",marginBottom:7,background:col+"14",border:"1px solid "+col+"55",borderLeft:"4px solid "+col,borderRadius:10}},
+    React.createElement("div",{style:{fontSize:17}},ic),
+    React.createElement("div",{style:{flex:1}},
+      React.createElement("div",{style:{fontSize:9.5,fontWeight:800,color:col,fontFamily:"var(--font-mono)",marginBottom:3,letterSpacing:.4}},dir),
+      React.createElement("pre",{style:{margin:0,fontFamily:"var(--font-mono)",fontSize:11,color:"#e2e8f0",whiteSpace:"pre-wrap",lineHeight:1.55}},mono)));
+  const cipher="16 03 03 01 2f a4 9f 2e 7b 1c 88 3d ... 5e Zk#Lp!vB2xQ ... e8 d0 f3  (TLS shifrlangan yozuv)";
+  const wireOn=s&&step>=0;
+  const httpText=s?(s.req+(step>=1?"\n\n"+s.res:"")):"";
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{display:"flex",gap:8,marginBottom:10}},
+      React.createElement("button",{onClick:()=>setProto("http"),style:{flex:1,padding:"7px",background:proto==="http"?D+"22":SL,color:proto==="http"?D:"#94a3b8",border:"1px solid "+D+"55",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 HTTP (ochiq)","🔓 HTTP (plain)")),
+      React.createElement("button",{onClick:()=>setProto("https"),style:{flex:1,padding:"7px",background:proto==="https"?A+"22":SL,color:proto==="https"?A:"#94a3b8",border:"1px solid "+A+"55",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 HTTPS (shifrlangan)","🔒 HTTPS (encrypted)"))),
+    React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}},
+      Object.keys(SCEN).map(function(k){const x=SCEN[k];return React.createElement("button",{key:k,onClick:()=>{setScen(k);setStep(-1);},style:{flex:"1 1 auto",padding:"8px 9px",background:scen===k?x.col+"22":SL,color:scen===k?x.col:"#cbd5e1",border:"1px solid "+(scen===k?x.col:"rgba(148,163,184,.3)"),borderRadius:8,fontSize:10.5,fontWeight:700,cursor:"pointer",fontFamily:"var(--font-mono)"}},x.method+" "+x.path);})),
+    React.createElement("div",{style:{minHeight:40}},
+      s==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬆ So'rov tanlang — so'rov/javob va tarmoqdagi kuzatuvchi nima ko'rishini solishtiring.","⬆ Pick a request — compare the request/response and what an observer on the wire sees.")):
+      React.createElement("div",null,
+        step>=0&&line("BROWSER → SERVER","📤",s.req,BL),
+        step>=1&&line("SERVER → BROWSER · "+s.status+" "+s.statusText,"📥",s.res,s.col))),
+    React.createElement("div",{style:{marginTop:4,background:SL2,border:"1px solid "+(wireOn?(proto==="https"?A:D):"rgba(148,163,184,.2)"),borderRadius:12,padding:"12px 14px",minHeight:64}},
+      React.createElement("div",{style:{fontSize:11.5,fontWeight:700,color:"#e2e8f0",marginBottom:8}},"🕵 "+t(lang,"Tarmoqdagi kuzatuvchi (masalan ochiq WiFi) nima ko'radi:","What an observer on the network (e.g. public WiFi) sees:")),
+      !wireOn?React.createElement("div",{style:{color:"#64748b",fontSize:11,fontFamily:"var(--font-mono)"}},t(lang,"so'rov kutilmoqda...","waiting for a request...")):
+      proto==="https"?React.createElement("div",null,
+        React.createElement("pre",{style:{margin:0,fontFamily:"var(--font-mono)",fontSize:10.5,color:"#94a3b8",whiteSpace:"pre-wrap",wordBreak:"break-all",background:"#00000033",padding:"8px 10px",borderRadius:6}},cipher),
+        React.createElement("div",{style:{marginTop:7,fontWeight:700,color:A,fontSize:12}},t(lang,"🔒 Tushunarsiz shifr — metod, yo'l va ma'lumot yashirin.","🔒 Unreadable ciphertext — method, path and data are hidden."))):
+      React.createElement("div",null,
+        React.createElement("pre",{style:{margin:0,fontFamily:"var(--font-mono)",fontSize:10.5,color:s.sens?"#fca5a5":"#e2e8f0",whiteSpace:"pre-wrap",wordBreak:"break-all",background:D+"14",padding:"8px 10px",borderRadius:6}},httpText),
+        React.createElement("div",{style:{marginTop:7,fontWeight:700,color:D,fontSize:12}},s.sens?"⚠ "+t(lang,"Ochiq matnda "+t(lang,s.sensLbl.uz,s.sensLbl.en)+" ham ko'rinadi!","Plain text — even the "+t(lang,s.sensLbl.uz,s.sensLbl.en)+" is visible!"):t(lang,"⚠ So'rov ochiq — qaysi sahifaga kirganingiz ko'rinadi.","⚠ The request is in the open — which page you visited is visible.")))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -1191,35 +1252,38 @@ function LessonL04(){
 }
 function LessonL05(){
   const lang=useLang();
-  const methods=[["GET",{uz:"Ma'lumot olish",en:"Retrieve data"}],["POST",{uz:"Ma'lumot yuborish",en:"Send data"}],["PUT",{uz:"Yangilash",en:"Update"}],["DELETE",{uz:"O'chirish",en:"Delete"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"HTTP nima?","What is HTTP?")),
-    React.createElement(P,null,t(lang,"HTTP — brauzer va veb-server o'rtasidagi \"til\". Brauzer so'rov yuboradi (\"bu sahifani ber\"), server javob qaytaradi (sahifa). Restoranda ovqat buyurtma qilib, keyin olishga o'xshaydi.","HTTP is the \"language\" between a browser and a web server. The browser sends a request (\"give me this page\"), the server returns a response (the page). Like ordering food at a restaurant then receiving it.")),
-    React.createElement(H2,{num:"§2"},t(lang,"So'rov–javob tsikli","The request–response cycle")),
-    React.createElement(FlowSteps,{title:{uz:"HTTP so'rov–javob",en:"HTTP request–response"},steps:[
-      {icon:"🌐",text:{uz:"Brauzer → Server:  GET /index.html",en:"Browser → Server:  GET /index.html"}},
-      {icon:"⚙",text:{uz:"Server so'rovni qayta ishlaydi",en:"Server processes the request"}},
-      {icon:"📦",text:{uz:"Server → Brauzer:  200 OK + sahifa",en:"Server → Browser:  200 OK + page"}},
-      {icon:"🖥",text:{uz:"Brauzer sahifani ko'rsatadi",en:"Browser renders the page"}},
+    React.createElement(P,null,t(lang,"HTTP (HyperText Transfer Protocol) — brauzer va veb-server o'rtasidagi «til». Brauzer SO'ROV yuboradi («bu sahifani ber»), server JAVOB qaytaradi (sahifa + holat kodi). Bu — restoranda taom buyurtma qilib, keyin uni olishga o'xshaydi: har doim bitta so'rov, bitta javob.","HTTP (HyperText Transfer Protocol) is the «language» between a browser and a web server. The browser sends a REQUEST («give me this page»), the server returns a RESPONSE (the page + a status code). It's like ordering food at a restaurant and then receiving it: always one request, one response.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: so'rov, javob va HTTP vs HTTPS","Interactive simulator: request, response, and HTTP vs HTTPS")),
+    React.createElement(P,null,t(lang,"So'rov tanlang va HTTP/HTTPS orasida almashtiring — tarmoqdagi kuzatuvchi (masalan ochiq WiFi'dagi xaker) nimani ko'ra olishini solishtiring:","Pick a request and switch between HTTP/HTTPS — compare what an observer on the network (e.g. a hacker on public WiFi) can actually see:")),
+    React.createElement(HTTPSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Asosiy metodlar","The main methods")),
+    React.createElement(LayerStack,{layers:[
+      {n:"GET",name:"GET",color:"#3b82f6",desc:{uz:"Ma'lumot o'qish uchun — server holatini o'zgartirmaydi. Sahifa ochishning asosiy usuli.",en:"For reading data — doesn't change server state. The main way pages are loaded."}},
+      {n:"POST",name:"POST",color:"#f59e0b",desc:{uz:"Yangi ma'lumot yuborish uchun — forma to'ldirish, login qilish, fayl yuklash.",en:"For sending new data — submitting a form, logging in, uploading a file."}},
+      {n:"PUT",name:"PUT",color:"#a855f7",desc:{uz:"Mavjud resursni to'liq yangilash uchun.",en:"For fully replacing an existing resource."}},
+      {n:"DELETE",name:"DELETE",color:"#ef4444",desc:{uz:"Resursni o'chirish uchun.",en:"For deleting a resource."}}
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Metodlar va holat kodlari","Methods and status codes")),
-    React.createElement("div",{style:{display:"flex",gap:8,flexWrap:"wrap",margin:"6px 0 12px"}},
-      methods.map(function(m,i){return React.createElement("div",{key:i,className:"na-rise",style:{flex:"1 1 120px",padding:"9px 12px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.05)+"s"}},
-        React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:"var(--accent)",fontSize:12}},m[0]),
-        React.createElement("div",{style:{fontSize:11,color:"var(--text-2)",marginTop:2}},t(lang,m[1].uz,m[1].en)));})),
-    React.createElement(Terminal,null,"2xx OK      — 200 OK\n3xx Redirect — 301, 302\n4xx Client  — 404 Not Found, 403 Forbidden\n5xx Server  — 500, 503"),
-    React.createElement(H2,{num:"§4"},t(lang,"HTTP vs HTTPS","HTTP vs HTTPS")),
+    React.createElement(H2,{num:"§4"},t(lang,"Status kod oilalari","Status code families")),
+    React.createElement(LayerStack,{layers:[
+      {n:"1xx",name:t(lang,"Axborot","Informational"),color:"#64748b",desc:{uz:"Jarayon davom etmoqda (kamdan-kam ko'rinadi). Masalan 100 Continue.",en:"The process is continuing (rarely seen). E.g. 100 Continue."}},
+      {n:"2xx",name:t(lang,"Muvaffaqiyat","Success"),color:"#22c55e",desc:{uz:"So'rov bajarildi. 200 OK, 201 Created.",en:"The request succeeded. 200 OK, 201 Created."}},
+      {n:"3xx",name:t(lang,"Yo'naltirish","Redirection"),color:"#3b82f6",desc:{uz:"Boshqa manzilga o'ting. 301 doimiy, 302 vaqtinchalik.",en:"Go somewhere else. 301 permanent, 302 temporary."}},
+      {n:"4xx",name:t(lang,"Mijoz xatosi","Client error"),color:"#f59e0b",desc:{uz:"So'rovda muammo bor. 404 topilmadi, 403 taqiqlangan, 401 avtorizatsiya kerak.",en:"Something's wrong with the request. 404 not found, 403 forbidden, 401 needs auth."}},
+      {n:"5xx",name:t(lang,"Server xatosi","Server error"),color:"#ef4444",desc:{uz:"Server o'z ishini bajara olmadi. 500 ichki xato, 503 vaqtincha ishlamayapti.",en:"The server failed to do its job. 500 internal error, 503 temporarily unavailable."}}
+    ]}),
+    React.createElement(H2,{num:"§5"},t(lang,"HTTP vs HTTPS — nega TLS muhim","HTTP vs HTTPS — why TLS matters")),
+    React.createElement(P,null,t(lang,"HTTPS shunchaki HTTP + TLS shifrlash (TLS haqida to'liq — L15 darsida). Farq faqat «tezlik» yoki «ko'rinish» emas — HTTP'da so'rovning O'ZI (metod, yo'l, formaga kiritilgan har qanday ma'lumot, cookie'lar) yo'lda ochiq matnda ketadi. Buni istalgan kishi — provayder, ochiq WiFi'dagi boshqa foydalanuvchi, yo'ldagi router — ko'ra oladi.","HTTPS is simply HTTP + TLS encryption (full details in L15). The difference isn't just «speed» or «appearance» — with HTTP the request ITSELF (the method, path, any data typed into a form, cookies) travels in plain text. Anyone — your ISP, another user on public WiFi, a router along the way — can see it.")),
     React.createElement(CompareCols,{
-      left:{title:"HTTP",color:"#ff6b6b",rows:[{uz:"✗ Ochiq matn",en:"✗ Plain text"},{uz:"✗ Kim eshitsa o'qiydi",en:"✗ Anyone can read it"},{uz:"Parollar xavf ostida",en:"Passwords at risk"}]},
-      right:{title:"HTTPS",color:"#69db7c",rows:[{uz:"✓ TLS bilan shifrlangan",en:"✓ Encrypted with TLS"},{uz:"✓ Qulf belgisi 🔒",en:"✓ Padlock icon 🔒"},{uz:"Maxfiy konvert kabi",en:"Like a sealed envelope"}]}}),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Ochiq WiFi da HTTP saytga parol kiritmang — u shifrlanmagan uzatiladi. Doim HTTPS (🔒) borligini tekshiring.","Never enter a password on an HTTP site over public WiFi — it travels unencrypted. Always check for HTTPS (🔒).")),
-        React.createElement(H2,{num:"§5"},t(lang,"Metodlar va status kodlar","Methods and status codes")),
-    React.createElement(CompareCols,{left:{title:{uz:"HTTP metodlar",en:"HTTP methods"},color:"#4dabf7",rows:[{uz:"GET — ma'lumot olish",en:"GET — fetch data"},{uz:"POST — ma'lumot yuborish",en:"POST — send data"},{uz:"PUT/DELETE — o'zgartirish/o'chirish",en:"PUT/DELETE — modify/remove"},]},right:{title:{uz:"Status kodlar",en:"Status codes"},color:"#69db7c",rows:[{uz:"200 OK — muvaffaqiyat",en:"200 OK — success"},{uz:"301/302 — yo'naltirish",en:"301/302 — redirect"},{uz:"403/404 — taqiq/topilmadi",en:"403/404 — forbidden/not found"},{uz:"500 — server xatosi",en:"500 — server error"},]}}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: HTTP sarlavhalari","Practice: HTTP headers")),
-    React.createElement(P,null,t(lang,"curl -I faqat javob sarlavhalarini oladi — server turi, texnologiya va status kodini ko'rsatadi. Bu veb-razvedkaning (WhatWeb, Nikto) asosidir.","curl -I fetches only the response headers — showing the server type, technology and status code. This is the basis of web recon (WhatWeb, Nikto).")),
-    React.createElement(Terminal,null,"curl -I https://example.com\n# HTTP/2 200\n# server: nginx/1.18.0\n# content-type: text/html; charset=UTF-8\n# strict-transport-security: max-age=63072000  ← HTTPS majburiy"),
-React.createElement(Quiz,{q:{uz:"HTTPS ni HTTP dan farqlovchi asosiy narsa nima?",en:"What mainly sets HTTPS apart from HTTP?"},opts:[{uz:"Tezroq",en:"Faster"},{uz:"TLS bilan shifrlaydi",en:"Encrypts with TLS"},{uz:"Rasmlarni yaxshi ko'rsatadi",en:"Shows images better"},{uz:"Faqat mobil",en:"Mobile only"}],correct:1,exp:{uz:"HTTPS = HTTP + TLS shifrlash — yo'lda kim eshitsa ham mazmunni o'qiy olmaydi.",en:"HTTPS = HTTP + TLS encryption — anyone listening in transit can't read the content."}}));
+      left:{title:"HTTP",color:"#ef4444",rows:[{uz:"✗ Butun so'rov ochiq matnda",en:"✗ The whole request is plain text"},{uz:"✗ Parol, cookie ham ko'rinadi",en:"✗ Passwords and cookies are visible too"},{uz:"Port 80 (odatiy)",en:"Port 80 (default)"}]},
+      right:{title:"HTTPS",color:"#22c55e",rows:[{uz:"✓ TLS bilan to'liq shifrlangan",en:"✓ Fully encrypted with TLS"},{uz:"✓ Faqat sizu server ma'nosini biladi",en:"✓ Only you and the server know the content"},{uz:"Port 443 (odatiy), qulf 🔒",en:"Port 443 (default), padlock 🔒"}]}}),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Ochiq WiFi'da HTTP saytga hech qachon parol kiritmang — u shifrlanmagan uzatiladi. Manzil satrida doim qulf 🔒 (HTTPS) borligini tekshiring.","Never enter a password on an HTTP site over public WiFi — it's sent unencrypted. Always check for the padlock 🔒 (HTTPS) in the address bar.")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: haqiqiy so'rovni ko'rish","Practice: inspecting a real request")),
+    React.createElement(P,null,t(lang,"curl -I faqat javob sarlavhalarini oladi; curl -v esa yuborilgan SO'ROVNI ham ko'rsatadi — simulyatordagi «BROWSER → SERVER» qatorining aynan o'zi.","curl -I fetches only the response headers; curl -v also shows the REQUEST that was sent — exactly like the «BROWSER → SERVER» line in the simulator.")),
+    React.createElement(Terminal,null,"curl -I https://example.com\n# HTTP/2 200\n# server: nginx/1.18.0\n# content-type: text/html; charset=UTF-8\n\ncurl -v https://example.com 2>&1 | head -8\n# > GET / HTTP/2                    ← yuborilgan so'rov\n# > Host: example.com\n# < HTTP/2 200                      ← qaytgan javob"),
+    React.createElement(Quiz,{q:{uz:"HTTPS ni HTTP dan farqlovchi asosiy narsa nima?",en:"What mainly sets HTTPS apart from HTTP?"},opts:[{uz:"Tezroq",en:"Faster"},{uz:"TLS bilan shifrlaydi",en:"Encrypts with TLS"},{uz:"Rasmlarni yaxshi ko'rsatadi",en:"Shows images better"},{uz:"Faqat mobil",en:"Mobile only"}],correct:1,exp:{uz:"HTTPS = HTTP + TLS shifrlash — yo'lda kim eshitsa ham so'rov/javob mazmunini (metod, yo'l, forma ma'lumoti) o'qiy olmaydi.",en:"HTTPS = HTTP + TLS encryption — anyone listening in transit can't read the request/response content (method, path, form data)."}}));
 }
 function LessonL06(){
   const lang=useLang();
