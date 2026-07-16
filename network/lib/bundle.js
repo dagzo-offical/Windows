@@ -1356,6 +1356,46 @@ function MITMSim(){
       React.createElement("button",{onClick:()=>{setRun("act");setStep(-1);},style:{flex:1,padding:"9px",background:run==="act"?D+"22":SL2,color:run==="act"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ Faol (mazmunni o'zgartiradi)","☠ Active (tampers with content)"))));
 }
 
+function DNSSpoofSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const NOSEC=[
+    {col:BL,uz:"Client → Resolver: \"bank.com ning IP manzili nima?\"",en:"Client → Resolver: \"What's the IP address of bank.com?\"",duz:"So'rov tarmoq orqali shifrlanmagan holda ketadi.",den:"The query travels over the network unencrypted."},
+    {col:AM,uz:"Hujumchi: soxta javobni haqiqiy serverdan OLDIN yuboradi — \"IP=6.6.6.6\"",en:"Attacker: sends a forged reply BEFORE the real server — \"IP=6.6.6.6\"",duz:"G'olib bo'lish uchun faqat tezroq javob berish kifoya — imzo yoki tasdiq talab qilinmaydi.",den:"Winning the race only requires answering first — no signature or proof is required."},
+    {col:AM,uz:"Resolver: imzo tekshiruvi yo'q — javobni tekshirmasdan qabul qiladi",en:"Resolver: no signature check — accepts the reply without verifying it",duz:"Resolver birinchi kelgan javobni «haqiqiy» deb hisoblaydi va keshlab qo'yadi.",den:"The resolver treats the first reply that arrives as «real» and caches it."},
+    {col:D,uz:"🎣 Client soxta saytga ulanadi va login/parolni kiritadi",en:"🎣 Client connects to the fake site and enters login/password",duz:"Manzil satrida hali ham «bank.com» yozilgan — foydalanuvchi shubhalanmaydi.",den:"The address bar still shows «bank.com» — the user has no reason to suspect anything.",final:true,attack:true}
+  ];
+  const SEC=[
+    {col:BL,uz:"Client → Resolver: \"bank.com IP si?\" (DNSSEC so'ralgan, DO bit)",en:"Client → Resolver: \"IP of bank.com?\" (DNSSEC requested, DO bit)",duz:"So'rovda «imzolangan javob kerak» belgisi ham yuboriladi.",den:"The query also carries a flag saying «a signed reply is required»."},
+    {col:AM,uz:"Hujumchi: xuddi shu soxta javobni yuboradi — \"IP=6.6.6.6\" (imzosiz)",en:"Attacker: sends the same forged reply — \"IP=6.6.6.6\" (unsigned)",duz:"Hujumchi haqiqiy zonaning maxfiy kalitiga ega emas — imzo qo'ya olmaydi.",den:"The attacker doesn't have the real zone's private key — they can't forge a valid signature."},
+    {col:AM,uz:"Resolver: RRSIG imzosini zonaning ochiq kaliti bilan tekshiradi — MOS KELMAYDI",en:"Resolver: checks the RRSIG signature against the zone's public key — DOESN'T MATCH",duz:"Kriptografik tekshiruv — tezlik emas, matematik dalil hal qiladi.",den:"A cryptographic check — not speed, but mathematical proof decides."},
+    {col:A,uz:"🛡 Resolver soxta javobni RAD etadi — faqat to'g'ri imzolangan javob qabul qilinadi",en:"🛡 Resolver REJECTS the forged reply — only a correctly signed reply is accepted",duz:"Client asl serverdan kelgan, to'g'ri imzolangan javobni kutib oladi.",den:"The client waits for and receives the correctly signed reply from the real server.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="off"?NOSEC:SEC;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="off"?NOSEC:run==="on"?SEC:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu soxta javob ikki xil resolver'da qanday qabul qilinishini solishtiring.","⬇ Pick a scenario — compare how the same forged reply is handled by two different resolvers.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="off"?t(lang,"🎣 Soxta javob qabul qilindi — qurbon fishing sahifasiga tushdi","🎣 The forged reply was accepted — the victim landed on a phishing page"):t(lang,"🛡 Soxta javob rad etildi — DNSSEC imzoni tekshirib ushladi","🛡 The forged reply was rejected — DNSSEC caught it via signature check")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("off");setStep(-1);},style:{flex:1,padding:"9px",background:run==="off"?D+"22":SL2,color:run==="off"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 Oddiy DNS (DNSSEC yo'q)","🔓 Plain DNS (no DNSSEC)")),
+      React.createElement("button",{onClick:()=>{setRun("on");setStep(-1);},style:{flex:1,padding:"9px",background:run==="on"?A+"22":SL2,color:run==="on"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 DNSSEC yoqilgan","🔒 DNSSEC enabled"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2476,15 +2516,18 @@ function LessonL26(){
       {icon:"🕸",text:{uz:"Qurbon soxta saytga ulanadi (haqiqiy deb o'ylaydi)",en:"Victim connects to the fake site (thinks it's real)"}},
       {icon:"🔑",text:{uz:"Login/parol o'g'irlanadi",en:"Credentials are stolen"}},
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Himoya — DNSSEC","Defense — DNSSEC")),
-    React.createElement(P,null,t(lang,"DNSSEC DNS javoblarini raqamli imzolaydi — qurilma javob haqiqiy va o'zgartirilmaganini tekshira oladi. Qo'shimcha: HTTPS (sertifikat mos kelmasa ogohlantiradi) va ishonchli DNS (DoH — DNS over HTTPS).","DNSSEC digitally signs DNS replies — a device can verify a reply is genuine and unaltered. Also: HTTPS (warns if the cert doesn't match) and trusted DNS (DoH — DNS over HTTPS).")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: DNSSEC qalqon bo'la oladimi?","Interactive simulator: can DNSSEC act as a shield?")),
+    React.createElement(P,null,t(lang,"Xuddi shu soxta javob ikki xil resolver'ga yuborilsa nima bo'ladi — biri imzoni tekshirmaydi, ikkinchisi tekshiradi:","See what happens when the same forged reply hits two different resolvers — one that never checks a signature, and one that does:")),
+    React.createElement(DNSSpoofSim),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya chuqurroq","Defense in depth")),
+    React.createElement(P,null,t(lang,"DNSSEC har bir DNS yozuvini raqamli imzolaydi (RRSIG) — resolver imzoni zonaning ochiq kaliti bilan tekshiradi. Imzosiz yoki noto'g'ri imzolangan javob rad etiladi. Qo'shimcha qatlamlar: HTTPS (domen sertifikati mos kelmasa brauzer ogohlantiradi) va DoH/DoT (DNS so'rovlarini shifrlab, yo'ldagi almashtirishni qiyinlashtiradi).","DNSSEC digitally signs every DNS record (RRSIG) — the resolver checks the signature against the zone's public key. An unsigned or wrongly signed reply is rejected. Extra layers: HTTPS (the browser warns if the domain cert doesn't match) and DoH/DoT (encrypting DNS queries, making in-transit tampering harder).")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"DNS spoofing faqat nazorat qilinadigan laboratoriya yoki ruxsat berilgan sinovda o'rganilishi kerak.","DNS spoofing must only be studied in a controlled lab or an authorized test.")),
-        React.createElement(H2,{num:"§4"},t(lang,"Haqiqiy va soxta javob","Real vs spoofed reply")),
+        React.createElement(H2,{num:"§5"},t(lang,"Haqiqiy va soxta javob","Real vs spoofed reply")),
     React.createElement(CompareCols,{left:{title:{uz:"Haqiqiy DNS",en:"Real DNS"},color:"#69db7c",rows:[{uz:"bank.com → 93.1.2.3",en:"bank.com → 93.1.2.3"},{uz:"Haqiqiy saytga boradi",en:"Goes to the real site"},]},right:{title:{uz:"Soxta DNS",en:"Spoofed DNS"},color:"#ff3a5e",rows:[{uz:"bank.com → 10.0.0.66",en:"bank.com → 10.0.0.66"},{uz:"Hujumchi soxta sahifasiga",en:"To the attacker's fake page"},]}}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: soxta javob","Practice: a forged reply")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: soxta javob","Practice: a forged reply")),
     React.createElement(P,null,t(lang,"MITM holatida hujumchi DNS so'roviga haqiqiy serverdan oldin javob beradi — qurbon soxta IP oladi va fishing sahifasiga tushadi. Himoya: DNSSEC va HTTPS.","In a MITM position the attacker answers a DNS query before the real server — the victim gets a fake IP and lands on a phishing page. Defense: DNSSEC and HTTPS.")),
     React.createElement(Terminal,null,"sudo dnsspoof -i eth0 -f hosts.txt\n# hosts.txt:  10.0.0.66  bank.com\n# 10.0.0.9.51000 > 1.1.1.1.53: 42+ A? bank.com\n# dnsspoof: bank.com -> 10.0.0.66   ← soxta javob yuborildi"),
-React.createElement(Quiz,{q:{uz:"DNS spoofing hujumchiga nima imkonini beradi?",en:"What does DNS spoofing let an attacker do?"},opts:[{uz:"Faylni shifrlash",en:"Encrypt a file"},{uz:"To'g'ri nom yozilса ham soxta saytga yo'naltirish",en:"Redirect to a fake site even with the correct name typed"},{uz:"WiFi parolini o'zgartirish",en:"Change the WiFi password"},{uz:"Tarmoqni tezlashtirish",en:"Speed up the network"}],correct:1,exp:{uz:"DNS spoofing soxta DNS javob beradi — qurbon to'g'ri nom (bank.com) yozsa ham soxta saytga tushadi.",en:"DNS spoofing returns a fake reply — even typing the right name (bank.com), the victim lands on a fake site."}}));
+React.createElement(Quiz,{q:{uz:"DNS spoofing hujumchiga nima imkonini beradi?",en:"What does DNS spoofing let an attacker do?"},opts:[{uz:"Faylni shifrlash",en:"Encrypt a file"},{uz:"To'g'ri nom yozilsa ham soxta saytga yo'naltirish",en:"Redirect to a fake site even with the correct name typed"},{uz:"WiFi parolini o'zgartirish",en:"Change the WiFi password"},{uz:"Tarmoqni tezlashtirish",en:"Speed up the network"}],correct:1,exp:{uz:"DNS spoofing soxta DNS javob beradi — qurbon to'g'ri nom (bank.com) yozsa ham soxta saytga tushadi.",en:"DNS spoofing returns a fake reply — even typing the right name (bank.com), the victim lands on a fake site."}}));
 }
 function LessonL27(){
   const lang=useLang();
