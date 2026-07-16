@@ -1229,6 +1229,46 @@ function ScanSim(){
       React.createElement("button",{onClick:()=>{setRun("connect");setStep(-1);},style:{flex:1,padding:"9px",background:run==="connect"?D+"22":SL2,color:run==="connect"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔗 Connect scan (-sT)","🔗 Connect scan (-sT)"))));
 }
 
+function EnumSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const BAD=[
+    {col:BL,uz:"nmap -sn: xost TIRIK — ICMP so'roviga javob beradi",en:"nmap -sn: host is ALIVE — replies to the ICMP probe",duz:"Birinchi qadam bajarildi — nishon mavjudligi tasdiqlandi.",den:"Step one done — the target's existence is confirmed."},
+    {col:AM,uz:"nmap -sV: SSH banner ochiladi — «OpenSSH 7.2» (2016-yilgi, ZAIF)",en:"nmap -sV: the SSH banner is exposed — «OpenSSH 7.2» (from 2016, WEAK)",duz:"Aniq versiya ma'lum bo'lganda, unga mos ma'lum zaifliklarni (CVE) izlash mumkin.",den:"Once the exact version is known, known vulnerabilities (CVEs) for it can be looked up."},
+    {col:AM,uz:"smbclient -L: «backups» ulashmasi READ/WRITE — anonim kirish mumkin",en:"smbclient -L: the «backups» share is READ/WRITE — anonymous access works",duz:"Parolsiz kirish mumkin bo'lgan ulashma — potensial maxfiy fayllar oshkor.",den:"A share reachable without a password — potentially sensitive files exposed."},
+    {col:D,uz:"enum4linux: 15 ta foydalanuvchi nomi olindi (admin, backup, svc_sql...)",en:"enum4linux: 15 usernames were harvested (admin, backup, svc_sql...)",duz:"TO'LIQ profil tayyor: OS, versiya, ochiq ulashma, foydalanuvchi nomlari — keyingi hujum (brute-force, exploit) uchun yetarli.",den:"A COMPLETE profile is ready: OS, version, open share, usernames — enough for the next attack (brute-force, exploit).",final:true,attack:true}
+  ];
+  const GOOD=[
+    {col:BL,uz:"nmap -sn: ICMP BLOKLANGAN — host discovery uchun port skan kerak",en:"nmap -sn: ICMP is BLOCKED — host discovery needs a port scan instead",duz:"Nishon ping so'roviga javob bermaydi — bu hujumchini sekinlatadi.",den:"The target doesn't reply to ping — this slows the attacker down."},
+    {col:AM,uz:"nmap -sV: banner YASHIRINGAN — faqat «22/tcp open», versiya noma'lum",en:"nmap -sV: the banner is HIDDEN — only «22/tcp open», version unknown",duz:"Server sozlamalarida versiya matni o'chirilgan — CVE qidirish qiyinlashadi.",den:"The version string was disabled in the server config — makes CVE lookup harder."},
+    {col:AM,uz:"smbclient -L: Access Denied — anonim SMB kirish O'CHIRILGAN",en:"smbclient -L: Access Denied — anonymous SMB access is DISABLED",duz:"Ulashmalarni ko'rish uchun ham autentifikatsiya talab qilinadi.",den:"Even listing shares now requires authentication."},
+    {col:A,uz:"enum4linux: hech qanday foydalanuvchi ro'yxati olinmadi",en:"enum4linux: no user list could be retrieved at all",duz:"Profil DEYARLI BO'SH — hujumchi keyingi qadam uchun deyarli hech narsa bilmaydi.",den:"The profile is NEARLY EMPTY — the attacker knows almost nothing to act on.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="bad"?BAD:GOOD;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="bad"?BAD:run==="good"?GOOD:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu vositalar yomon sozlangan va qattiqlashtirilgan tizimda qancha ma'lumot ochib berishini solishtiring.","⬇ Pick a scenario — see how much the same tools reveal against a poorly configured versus a hardened system.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.attack?D:A)+"1f",border:"1px solid "+(cur.attack?D:A),color:cur.attack?D:A}},
+      run==="bad"?t(lang,"✗ To'liq profil oshkor bo'ldi — keyingi hujum uchun tayyor","✗ A full profile was exposed — ready for the next attack"):t(lang,"✓ Deyarli hech narsa oshkor bo'lmadi — qattiqlashtirish ishladi","✓ Almost nothing was exposed — hardening worked")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("bad");setStep(-1);},style:{flex:1,padding:"9px",background:run==="bad"?D+"22":SL2,color:run==="bad"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 Yomon sozlangan tizim","🔓 Poorly configured system")),
+      React.createElement("button",{onClick:()=>{setRun("good");setStep(-1);},style:{flex:1,padding:"9px",background:run==="good"?A+"22":SL2,color:run==="good"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Qattiqlashtirilgan tizim","🔒 Hardened system"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   const layers=[
@@ -2274,22 +2314,24 @@ React.createElement(Quiz,{q:{uz:"Zero Trust ning asosiy shiori qanday?",en:"What
 }
 function LessonL23(){
   const lang=useLang();
-  const items=[[{uz:"Xostlar",en:"Hosts"},{uz:"Tirik qurilmalar va IP lari",en:"Live devices and their IPs"}],[{uz:"Xizmatlar",en:"Services"},{uz:"Ochiq portlardagi dasturlar/versiyalar",en:"Programs/versions on open ports"}],[{uz:"Ulashmalar",en:"Shares"},{uz:"Ochiq fayl papkalari (SMB, NFS)",en:"Open file folders (SMB, NFS)"}],[{uz:"Foydalanuvchilar",en:"Users"},{uz:"Hisob nomlari va guruhlar",en:"Account names and groups"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
     React.createElement(H2,{num:"§1"},t(lang,"Enumeratsiya nima?","What is enumeration?")),
-    React.createElement(P,null,t(lang,"Enumeratsiya — nishon haqida iloji boricha ko'proq ma'lumot to'plash: qaysi qurilma, xizmat, foydalanuvchi bor. Bosqindan oldin bino rejasini o'rganishga o'xshaydi. Port skanerlashdan bir qadam keyingi — chuqurroq \"kim, nima, qayerda\".","Enumeration gathers as much as possible about a target: which devices, services and users exist. Like studying a building's floor plan before entering. One step beyond port scanning — deeper \"who, what, where\".")),
-    React.createElement(H2,{num:"§2"},t(lang,"Nimalar aniqlanadi","What gets discovered")),
-    items.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
-      React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:110}},t(lang,x[0].uz,x[0].en)),
-      React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-    React.createElement(Terminal,null,"nmap -sV -sC 10.0.0.5\nsmbclient -L //10.0.0.5 -N\nnmap --script smb-enum-shares -p445 10.0.0.5"),
-    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Enumeratsiya faqat sizga tegishli yoki yozma ruxsat berilgan tarmoqlarda o'tkazilishi kerak.","Enumeration must only be done on networks you own or have written authorization to test.")),
-        React.createElement(H2,{num:"§3"},t(lang,"Nimani sanash kerak","What to enumerate")),
-    React.createElement(LayerStack,{layers:[{n:"hosts",name:t(lang,"Xostlar","Hosts"),color:"#4dabf7",desc:{uz:"Tirik qurilmalar va ularning IP/OS.",en:"Live devices and their IP/OS."}},{n:"svc",name:t(lang,"Xizmatlar","Services"),color:"#69db7c",desc:{uz:"Ochiq portlardagi dastur+versiya.",en:"Program+version on open ports."}},{n:"users",name:t(lang,"Foydalanuvchilar","Users"),color:"#a855f7",desc:{uz:"SMB/SNMP orqali hisob nomlari.",en:"Account names via SMB/SNMP."}},{n:"shares",name:t(lang,"Ulashmalar","Shares"),color:"#ffd43b",desc:{uz:"Ochiq papkalar va ruxsatlar.",en:"Open folders and permissions."}},]}),
+    React.createElement(P,null,t(lang,"Enumeratsiya — nishon haqida iloji boricha ko'proq ma'lumot to'plash: qaysi qurilma, xizmat, foydalanuvchi bor. Bosqindan oldin bino rejasini o'rganishga o'xshaydi. Port skanerlashdan bir qadam keyingi — chuqurroq «kim, nima, qayerda». Har bir yig'ilgan ma'lumot bo'lagi keyingi hujum qadamini osonlashtiradi.","Enumeration gathers as much as possible about a target: which devices, services and users exist. Like studying a building's floor plan before entering. One step beyond port scanning — a deeper «who, what, where». Every piece of gathered information makes the next attack step easier.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: qancha ma'lumot oshkor bo'ladi?","Interactive simulator: how much gets exposed?")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xuddi shu 4 ta vosita (nmap, smbclient, enum4linux) yomon sozlangan va qattiqlashtirilgan tizimda qanday farqli natija berishini ko'ring:","Try both scenarios — see how the exact same 4 tools (nmap, smbclient, enum4linux) produce very different results against a poorly configured versus a hardened system:")),
+    React.createElement(EnumSim),
+    React.createElement(H2,{num:"§3"},t(lang,"Nimani sanash kerak","What to enumerate")),
+    React.createElement(LayerStack,{layers:[
+      {n:"hosts",name:t(lang,"Xostlar","Hosts"),color:"#4dabf7",desc:{uz:"Tirik qurilmalar va ularning IP/OS.",en:"Live devices and their IP/OS."}},
+      {n:"svc",name:t(lang,"Xizmatlar","Services"),color:"#69db7c",desc:{uz:"Ochiq portlardagi dastur+versiya.",en:"Program+version on open ports."}},
+      {n:"shares",name:t(lang,"Ulashmalar","Shares"),color:"#ffd43b",desc:{uz:"Ochiq papkalar va ruxsatlar (SMB, NFS).",en:"Open folders and permissions (SMB, NFS)."}},
+      {n:"users",name:t(lang,"Foydalanuvchilar","Users"),color:"#a855f7",desc:{uz:"SMB/SNMP/LDAP orqali hisob nomlari.",en:"Account names via SMB/SNMP/LDAP."}}
+    ]}),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Enumeratsiya faqat sizga tegishli yoki yozma ruxsat berilgan tarmoqlarda o'tkazilishi kerak.","Enumeration must only be done on networks you own or have written authorization to test.")),
     React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: xizmatlarni sanash","Practice: enumerating services")),
-    React.createElement(P,null,t(lang,"Enumeratsiya — skanerlashdan chuqurroq: har xizmatdan aniq ma'lumot tortib olish. Bu keyingi ekspluatatsiya uchun to'g'ri vektorni tanlashga yordam beradi.","Enumeration is deeper than scanning: pulling detailed info from each service. It helps pick the right vector for the next exploitation step.")),
-    React.createElement(Terminal,null,"nmap --script smb-enum-shares,smb-os-discovery 10.0.0.5\n# | smb-os-discovery: Windows Server 2016\n# | smb-enum-shares:\n# |   \\\\10.0.0.5\\backups: READ/WRITE  ← ochiq ulashma"),
+    React.createElement(P,null,t(lang,"Bu buyruqlar aynan simulyatordagi «Yomon sozlangan tizim» ssenariysida ishlatilgan vositalar — real chiqishlar bilan.","These are exactly the tools used in the simulator's «Poorly configured system» scenario — with real output.")),
+    React.createElement(Terminal,null,"nmap -sV -sC 10.0.0.5\nsmbclient -L //10.0.0.5 -N\nnmap --script smb-enum-shares,smb-os-discovery 10.0.0.5\n# | smb-os-discovery: Windows Server 2016\n# | smb-enum-shares:\n# |   \\\\10.0.0.5\\backups: READ/WRITE  ← ochiq ulashma"),
 React.createElement(Quiz,{q:{uz:"Enumeratsiya bosqichining asosiy maqsadi nima?",en:"Main goal of the enumeration phase?"},opts:[{uz:"Ma'lumotni shifrlash",en:"Encrypting data"},{uz:"Nishon haqida iloji boricha ko'proq ma'lumot to'plash",en:"Gathering as much info about the target as possible"},{uz:"Faylni o'chirish",en:"Deleting a file"},{uz:"IP berish",en:"Handing out IPs"}],correct:1,exp:{uz:"Enumeratsiya — nishon tarmoq haqida (xostlar, xizmatlar, foydalanuvchilar) chuqur ma'lumot to'plash bosqichi.",en:"Enumeration is the phase of gathering deep information about the target (hosts, services, users)."}}));
 }
 function LessonL24(){
