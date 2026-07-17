@@ -1508,6 +1508,46 @@ function MethodologySim(){
       React.createElement("button",{onClick:()=>{setRun("methodical");setStep(-1);},style:{flex:1,padding:"9px",background:run==="methodical"?A+"22":SL2,color:run==="methodical"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Metodik enumeratsiya","✅ Methodical enumeration"))));
 }
 
+function ThoroughEnumSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const QUICK=[
+    {col:BL,uz:"id — uid=1000(alper) gid=1000(alper) — «oddiy foydalanuvchiman» xulosasi chiqariladi",en:"id — uid=1000(alper) gid=1000(alper) — concludes «I'm just a normal user»",duz:"Bitta buyruq, bitta xulosa — shu yerda to'xtaladi.",den:"One command, one conclusion — and it stops there."},
+    {col:AM,uz:"Boshqa hech qanday buyruq ishga tushirilmaydi — «bu yerda hech narsa yo'q» deb qaror qilinadi",en:"No other command is run — a decision is made that «there's nothing here»",duz:"Xulosa dalilga emas, taxminga asoslangan.",den:"The conclusion rests on assumption, not evidence."},
+    {col:AM,uz:"history, /etc/passwd, netstat, find — birortasi ham tekshirilmadi",en:"history, /etc/passwd, netstat, find — not one of them gets checked",duz:"§2-§7 dagi barcha usullar sinab ko'rilmasdan qoladi.",den:"Every technique from §2-§7 goes untried."},
+    {col:D,uz:"❌ .secret.txt fayli va tinglovchi port hech qachon topilmadi",en:"❌ The .secret.txt file and the listening port are never found",duz:"Ular yashiringan emas edi — shunchaki qidirilmadi.",den:"They weren't hidden — they simply weren't looked for.",final:true,bad:true}
+  ];
+  const THOROUGH=[
+    {col:BL,uz:"id — xuddi shu natija, lekin bu FAQAT boshlang'ich nuqta deb qaraladi",en:"id — the exact same result, but it's treated as ONLY the starting point",duz:"Xuddi shu buyruq — farq shundan keyin nima qilinishida.",den:"The exact same command — the difference is what happens next."},
+    {col:AM,uz:"ls -la, cat /etc/passwd, netstat -ano, find / -perm -u=s — barchasi navbat bilan bajariladi",en:"ls -la, cat /etc/passwd, netstat -ano, find / -perm -u=s — all run in turn",duz:"§2-§7 dagi har bir texnika sinaladi, hech biri o'tkazib yuborilmaydi.",den:"Every technique from §2-§7 gets tried, none skipped."},
+    {col:AM,uz:"ls -la: .secret.txt topildi; netstat: ichki port 1337 tinglanmoqda",en:"ls -la: .secret.txt is found; netstat: internal port 1337 is listening",duz:"Ikkalasi ham oddiy ls yoki id bilan hech qachon ko'rinmagan bo'lardi.",den:"Neither would ever have shown up with a plain ls or id."},
+    {col:A,uz:"✅ Ikkita yangi ipuchi qo'lga kiritildi — keyingi qadam uchun aniq yo'nalish bor",en:"✅ Two new leads are in hand — a clear direction for the next step",duz:"«Qanchalik ko'p bilsangiz, imtiyozlarni oshirish yo'lini shunchalik oson topasiz» — §1.",den:"«The more you know, the easier you find a privesc path» — §1.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="quick"?QUICK:THOROUGH;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="quick"?QUICK:run==="thorough"?THOROUGH:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu foothold'ni tezkor va puxta enumeratsiya bilan solishtiring.","⬇ Pick a scenario — compare the same foothold under a quick check versus thorough enumeration.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="quick"?t(lang,"✗ Tezkor: hech narsa topilmadi, chunki hech narsa qidirilmadi","✗ Quick: nothing was found because nothing was searched for"):t(lang,"✓ Puxta: yashiringan ipuchlar ochildi","✓ Thorough: hidden leads were uncovered")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("quick");setStep(-1);},style:{flex:1,padding:"9px",background:run==="quick"?D+"22":SL2,color:run==="quick"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"❌ Tezkor (id bilan to'xtash)","❌ Quick (stop at id)")),
+      React.createElement("button",{onClick:()=>{setRun("thorough");setStep(-1);},style:{flex:1,padding:"9px",background:run==="thorough"?A+"22":SL2,color:run==="thorough"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Puxta (hammasini tekshirish)","✅ Thorough (check everything)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2937,7 +2977,10 @@ function LessonL32(){
     React.createElement(Terminal,null,"# Nom bo'yicha\nfind / -name flag1.txt 2>/dev/null\nfind / -type d -name config 2>/dev/null\n# Ruxsat bo'yicha\nfind / -perm 0777 -type f 2>/dev/null       # 777 fayllar\nfind / -writable -type d 2>/dev/null         # yoziladigan papkalar\nfind / -perm -u=s -type f 2>/dev/null        # SUID fayllar (privesc!)\n# Egasi / vaqt / o'lcham bo'yicha\nfind /home -user frank 2>/dev/null\nfind / -mtime 10 2>/dev/null                 # 10 kunda o'zgargan\nfind / -size +100M -type f 2>/dev/null       # katta fayllar\n# Dasturlash tillari\nfind / -name python* 2>/dev/null ; find / -name gcc* 2>/dev/null"),
     React.createElement(SlideImg,{src:"privesc/lpe_s20.png",cap:"find / -size +100M — 2>/dev/null'siz natija xatolar bilan chalkash bo'ladi.",capEn:"find / -size +100M — without 2>/dev/null the output is cluttered with errors."}),
     React.createElement(SlideImg,{src:"privesc/lpe_s22.png",cap:"find man sahifasi — -perm parametri: aniq moslik, '/' (har qanday bit) va '-' (barcha bitlar) shakllari.",capEn:"find man page — the -perm option: exact match, the '/' (any bit) and '-' (all bits) forms."}),
-    eth("Enumeratsiya buyruqlarini faqat siz kirishga haqli bo'lgan tizimlarda ishlating.","Only run enumeration commands on systems you are authorized to access."),
+React.createElement(H2,{num:"§8"},t(lang,"Interaktiv simulyator: tezkor vs puxta enumeratsiya","Interactive simulator: quick vs thorough enumeration")),
+    React.createElement(P,null,t(lang,"§1 dagi asosiy g'oyani his qiling — xuddi shu foothold'ni ikki yondashuv bilan sinang:","Feel §1's core idea for yourself — try the exact same foothold with two approaches:")),
+    React.createElement(ThoroughEnumSim),
+        eth("Enumeratsiya buyruqlarini faqat siz kirishga haqli bo'lgan tizimlarda ishlating.","Only run enumeration commands on systems you are authorized to access."),
     React.createElement(Quiz,{q:{uz:"Nega ls buyrug'ini har doim -la parametri bilan ishlatish kerak?",en:"Why should you always run ls with the -la option?"},opts:[{uz:"U fayllarni o'chiradi",en:"It deletes files"},{uz:"U yashirin fayllarni ham ko'rsatadi (oddiy ls ularni o'tkazib yuboradi)",en:"It also shows hidden files (a plain ls skips them)"},{uz:"U internetni tezlashtiradi",en:"It speeds up the internet"},{uz:"U parolni ko'rsatadi",en:"It shows the password"}],correct:1,exp:{uz:"ls -la yashirin fayllarni (nuqta bilan boshlanadigan, masalan .secret.txt) ham ko'rsatadi — oddiy ls yoki ls -l ularni o'tkazib yuboradi.",en:"ls -la also shows hidden files (those starting with a dot, e.g. .secret.txt) — a plain ls or ls -l skips them."}}));
 }
 function LessonL33(){
