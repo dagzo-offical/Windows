@@ -1428,6 +1428,46 @@ function CronPrivescSim(){
       React.createElement("button",{onClick:()=>{setRun("risky");setStep(-1);},style:{flex:1,padding:"9px",background:run==="risky"?D+"22":SL2,color:run==="risky"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ Yoziladigan skript (777)","☠ Writable script (777)"))));
 }
 
+function FindingQualitySim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const VAGUE=[
+    {col:BL,uz:"Hisobotda yoziladi: «Login sahifasi xavfli ko'rinadi»",en:"The report says: «The login page looks dangerous»",duz:"Bir jumlalik, hech qanday tafsilotsiz eslatma.",den:"A one-line note with no detail at all."},
+    {col:AM,uz:"Isbot yo'q, aniq qadam yo'q, jiddiylik darajasi ko'rsatilmagan",en:"No proof, no exact steps, no severity level given",duz:"O'quvchi nima haqida gap ketayotganini taxmin qilishga majbur.",den:"The reader is left guessing what's actually being described."},
+    {col:AM,uz:"Mijozning IT jamoasi muammoni takrorlay olmaydi — «bizda hammasi normal» deb javob beradi",en:"The client's IT team can't reproduce it — replies «everything looks fine on our end»",duz:"Isbotsiz da'vo — tekshirib bo'lmaydigan da'vo.",den:"A claim without proof is a claim that can't be verified."},
+    {col:D,uz:"🗑 Topilma e'tiborsiz qoldirildi — zaiflik tuzatilmasdan qoladi",en:"🗑 The finding gets ignored — the vulnerability stays unfixed",duz:"Haqiqiy zaiflik bo'lsa ham, yozilish sifati uni yo'qqa chiqardi.",den:"Even if the vulnerability is real, poor writing made it disappear.",final:true,bad:true}
+  ];
+  const STRUCTURED=[
+    {col:BL,uz:"Hisobotda yoziladi: sarlavha + tavsif + CVSS 9.8 + PoC qadamlari",en:"The report has: a title + description + CVSS 9.8 + PoC steps",duz:"Xuddi shu haqiqiy zaiflik — endi to'liq hujjatlashtirilgan.",den:"The exact same real vulnerability — now fully documented."},
+    {col:AM,uz:"PoC: aniq buyruq — username=admin' OR '1'='1 — skrinshot bilan",en:"PoC: the exact command — username=admin' OR '1'='1 — with a screenshot",duz:"O'quvchi buyruqni ko'chirib, o'zi sinab ko'rishi mumkin.",den:"The reader can copy the command and try it themselves."},
+    {col:AM,uz:"Mijozning IT jamoasi xuddi shu qadamlarni takrorlaydi — zaiflikni o'z ko'zi bilan ko'radi",en:"The client's IT team reproduces the exact steps — and sees the vulnerability with their own eyes",duz:"Endi bahs yo'q — natija tekshirib bo'ladigan.",den:"No more debate — the result is verifiable."},
+    {col:A,uz:"✅ Critical deb belgilanib, 24 soat ichida tuzatildi",en:"✅ Flagged Critical and fixed within 24 hours",duz:"Aniq yozilgan topilma — tezkor harakatga aylanadi.",den:"A clearly written finding turns into fast action.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="vague"?VAGUE:STRUCTURED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="vague"?VAGUE:run==="structured"?STRUCTURED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu haqiqiy zaiflikni noaniq va tuzilgan tarzda yozib ko'ring.","⬇ Pick a scenario — write up the exact same real vulnerability vaguely versus in a structured way.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="vague"?t(lang,"✗ Noaniq: haqiqiy zaiflik e'tiborsiz qoldi","✗ Vague: a real vulnerability went unnoticed"):t(lang,"✓ Tuzilgan: haqiqiy zaiflik tezda tuzatildi","✓ Structured: a real vulnerability was fixed fast")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("vague");setStep(-1);},style:{flex:1,padding:"9px",background:run==="vague"?D+"22":SL2,color:run==="vague"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🗑 Noaniq topilma","🗑 Vague finding")),
+      React.createElement("button",{onClick:()=>{setRun("structured");setStep(-1);},style:{flex:1,padding:"9px",background:run==="structured"?A+"22":SL2,color:run==="structured"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Tuzilgan topilma","✅ Structured finding"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2771,9 +2811,12 @@ function LessonL30(){
     React.createElement(H2,{num:"§4"},t(lang,"Yaxshi topilma qanday yoziladi","How to write a good finding")),
     React.createElement(P,null,t(lang,"Har bir topilma bir necha qismdan iborat bo'lishi kerak: (1) Sarlavha — aniq va qisqa (masalan \"Login formasida SQL Injection\"). (2) Tavsif — zaiflik nima va nega xavfli. (3) Ta'sir (Impact) — hujumchi buni ishlatib nima qila oladi. (4) Isbot (Proof of Concept) — aniq buyruqlar, skrinshotlar va qadamlar, mijoz o'zi takrorlab ko'ra olishi uchun. (5) Tuzatish tavsiyasi — aniq, amaliy yechim. (6) Havolalar — OWASP yoki CVE manbalari. Eng muhimi isbot: mijoz muammoni takrorlab, tuzatgach yana sinab ko'rishi mumkin bo'lsin.","Each finding should have several parts: (1) Title — clear and short (e.g. \"SQL Injection in the login form\"). (2) Description — what the vulnerability is and why it is dangerous. (3) Impact — what an attacker can do with it. (4) Proof of Concept — exact commands, screenshots and steps so the client can reproduce it. (5) Remediation — a concrete, practical fix. (6) References — OWASP or CVE sources. Proof matters most: the client should be able to reproduce the issue, fix it, then retest.")),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"Hisobot ikki auditoriya uchun yoziladi: Executive Summary rahbariyat uchun (biznes tili, xavflar, umumiy holat), texnik qism esa IT jamoasi uchun (aniq qadamlar, buyruqlar). Hisobot maxfiy hujjat — u faqat mijoz bilan xavfsiz kanal orqali ulashiladi. Hisobotsiz pentest — tugallanmagan pentest.","A report is written for two audiences: the Executive Summary for management (business language, risks, overall posture) and the technical section for the IT team (exact steps, commands). The report is a confidential document — share it only with the client over a secure channel. A pentest without a report is unfinished.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Jiddiylik darajalari (CVSS)","Severity levels (CVSS)")),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: noaniq vs tuzilgan topilma","Interactive simulator: vague vs structured finding")),
+    React.createElement(P,null,t(lang,"§4 dagi «eng muhimi isbot» da'vosini his qiling — xuddi shu haqiqiy zaiflikni ikki xil yozib ko'ring:","Feel §4's «proof matters most» claim for yourself — write up the exact same real vulnerability two different ways:")),
+    React.createElement(FindingQualitySim),
+    React.createElement(H2,{num:"§6"},t(lang,"Jiddiylik darajalari (CVSS)","Severity levels (CVSS)")),
     React.createElement(LayerStack,{layers:[{n:"9.0+",name:t(lang,"Critical","Critical"),color:"#ff3a5e",desc:{uz:"Darhol tuzatish — masofadan root/RCE.",en:"Fix immediately — remote root/RCE."}},{n:"7.0+",name:t(lang,"High","High"),color:"#f7b955",desc:{uz:"Tez tuzatish — jiddiy ta'sir.",en:"Fix soon — serious impact."}},{n:"4.0+",name:t(lang,"Medium","Medium"),color:"#ffd43b",desc:{uz:"Rejalashtirilgan tuzatish.",en:"Planned remediation."}},{n:"0.1+",name:t(lang,"Low","Low"),color:"#69db7c",desc:{uz:"Kichik xavf / ma'lumot.",en:"Minor risk / informational."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: topilma tuzilishi","Practice: a finding's anatomy")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: topilma tuzilishi","Practice: a finding's anatomy")),
     React.createElement(P,null,t(lang,"Har bir topilma bir xil tuzilishga ega bo'lishi kerak, shunda mijoz uni tushunadi, takrorlaydi va tuzatadi. Quyida bitta topilma namunasi.","Each finding should have the same structure so the client can understand, reproduce and fix it. Below is a sample finding.")),
     React.createElement(Terminal,null,"# FINDING: SQL Injection — login formasida\n# Severity : Critical (CVSS 9.8)\n# Impact   : Ma'lumotlar bazasiga to'liq kirish\n# PoC      : username=admin' OR '1'='1\n# Fix      : Parametrlangan so'rovlar (prepared statements)"),
     React.createElement(Quiz,{q:{uz:"Professional pentesterning eng muhim yakuniy mahsuloti nima?",en:"A professional pentester's most important final deliverable?"},opts:[{uz:"Buzilgan tizimlar soni",en:"The number of systems breached"},{uz:"Aniq, takrorlanadigan va tuzatib bo'ladigan hisobot",en:"A clear, reproducible and fixable report"},{uz:"O'g'irlangan parollar",en:"Stolen passwords"},{uz:"Tozalangan loglar",en:"Cleared logs"}],correct:1,exp:{uz:"Pentestning qiymati hisobotda — topilmalar tushunarli, isbotlangan va tuzatish tavsiyalari bilan hujjatlanishi shart.",en:"The value of a pentest is in the report — findings must be documented clearly, with proof and remediation."}}));
