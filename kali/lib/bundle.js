@@ -1068,6 +1068,46 @@ function ProtocolCaptureSim(){
       React.createElement("button",{onClick:()=>{setRun("https");setStep(-1);},style:{flex:1,padding:"9px",background:run==="https"?A+"22":SL2,color:run==="https"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 HTTPS (shifrlangan)","🔒 HTTPS (encrypted)"))));
 }
 
+function ShellConnectSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const BIND=[
+    {col:BL,uz:"Nishonda: exploit ishga tushadi, port 4444 ochiladi va ulanish kutiladi",en:"On the target: the exploit runs, port 4444 opens and WAITS for a connection",duz:"Nishon endi «server» rolida — kimdir ulanishini kutadi.",den:"The target now plays «server» — waiting for someone to connect."},
+    {col:AM,uz:"Hujumchi: nishonning 4444-portiga ulanishga urinadi (INBOUND)",en:"Attacker: tries to connect INBOUND to the target's port 4444",duz:"Bu — tashqaridan ichkariga kirish yo'nalishi.",den:"This is an outside-to-inside direction."},
+    {col:AM,uz:"Korporativ firewall: kiruvchi ulanishlarni standart bo'yicha BLOKLAYDI",en:"Corporate firewall: blocks inbound connections by default",duz:"Deyarli har qanday zamonaviy tarmoq shu qoidaga amal qiladi.",den:"Almost every modern network follows this rule."},
+    {col:D,uz:"🚫 Ulanish rad etildi — firewall hech qachon o'tkazmadi",en:"🚫 Connection refused — the firewall never let it through",duz:"Exploit'ning o'zi ishlagan bo'lsa ham, natija olinmadi.",den:"Even though the exploit itself worked, no result was obtained.",final:true,bad:true}
+  ];
+  const REVERSE=[
+    {col:BL,uz:"Nishonda: exploit ishga tushadi, DARHOL hujumchiga ulanishga harakat qiladi",en:"On the target: the exploit runs and IMMEDIATELY tries to connect back to the attacker",duz:"Nishon endi «klient» rolida — tashqariga chiqishga harakat qiladi.",den:"The target now plays «client» — trying to reach out."},
+    {col:AM,uz:"Bu — chiquvchi (OUTBOUND) ulanish, xuddi brauzer saytga ulangandek",en:"This is an OUTBOUND connection, just like a browser reaching a website",duz:"Tashqi ko'rinishi oddiy veb-so'rovdan farq qilmaydi.",den:"On the surface it looks no different from an ordinary web request."},
+    {col:AM,uz:"Korporativ firewall: chiquvchi trafikni odatda ochiq qoldiradi (ish uchun kerak)",en:"Corporate firewall: usually leaves outbound traffic open (needed for work)",duz:"Xodimlar internetga chiqishi kerak — bu qoidani qattiqlashtirish qiyin.",den:"Employees need internet access — this rule is hard to lock down."},
+    {col:A,uz:"✅ Ulanish o'tdi — Meterpreter sessiyasi ochildi",en:"✅ The connection got through — a Meterpreter session opened",duz:"Bir xil exploit, faqat ulanish yo'nalishi teskari — va bu yetarli edi.",den:"The same exploit, just the connection direction reversed — and that was enough.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="bind"?BIND:REVERSE;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="bind"?BIND:run==="reverse"?REVERSE:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu exploit korporativ firewall ortida qanday farq bilan ishlashini ko'ring.","⬇ Pick a scenario — see how the exact same exploit fares differently behind a corporate firewall.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="bind"?t(lang,"✗ Bind shell: kiruvchi ulanish bloklandi","✗ Bind shell: the inbound connection was blocked"):t(lang,"✓ Reverse shell: chiquvchi ulanish o'tdi","✓ Reverse shell: the outbound connection got through")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("bind");setStep(-1);},style:{flex:1,padding:"9px",background:run==="bind"?D+"22":SL2,color:run==="bind"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🚫 Bind shell","🚫 Bind shell")),
+      React.createElement("button",{onClick:()=>{setRun("reverse");setStep(-1);},style:{flex:1,padding:"9px",background:run==="reverse"?A+"22":SL2,color:run==="reverse"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Reverse shell","✅ Reverse shell"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1165,7 +1205,10 @@ function LessonL21(){
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Metasploit ni faqat o'zingizga tegishli laboratoriya yoki yozma ruxsat berilgan nishonlarda ishlating. Ruxsatsiz foydalanish jinoyat.","Only use Metasploit in your own lab or on written-authorized targets. Unauthorized use is a crime.")),
     React.createElement(H2,{num:"§6"},t(lang,"Bind va reverse shell","Bind vs reverse shell")),
     React.createElement(CompareCols,{left:{title:{uz:"Bind shell",en:"Bind shell"},color:"#ffd43b",rows:[{uz:"Nishon portni ochib kutadi",en:"The target opens a port and waits"},{uz:"Hujumchi unga ulanadi",en:"The attacker connects to it"},{uz:"Firewall ko'pincha bloklaydi",en:"A firewall often blocks it"},]},right:{title:{uz:"Reverse shell",en:"Reverse shell"},color:"#69db7c",rows:[{uz:"Nishon hujumchiga ulanadi",en:"The target connects back to the attacker"},{uz:"Chiquvchi trafik — firewalldan o'tadi",en:"Outbound traffic — passes the firewall"},{uz:"Amaliyotda ko'proq ishlatiladi",en:"Used more often in practice"},]}}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: msfconsole ish oqimi","Practice: the msfconsole workflow")),
+    React.createElement(H2,{num:"§7"},t(lang,"Interaktiv simulyator: nega reverse shell ishlaydi?","Interactive simulator: why does a reverse shell work?")),
+    React.createElement(P,null,t(lang,"§6 dagi jadvalning ORQASIDA nima yotishini ko'ring — xuddi shu firewall ikkala shell turini qanday farqli ko'rishini sinang:","See what's BEHIND the §6 table — try how the exact same firewall treats each shell type differently:")),
+    React.createElement(ShellConnectSim),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: msfconsole ish oqimi","Practice: the msfconsole workflow")),
     React.createElement(P,null,t(lang,"Metasploit'da search bilan modulni topib, use bilan tanlaysiz, set bilan parametrlarni sozlaysiz va run bilan ishga tushirasiz. Muvaffaqiyatda Meterpreter sessiyasi ochiladi.","In Metasploit you find a module with search, select it with use, configure options with set, and launch with run. On success a Meterpreter session opens.")),
     React.createElement(Terminal,null,"msf6 > search ms17-010\nmsf6 > use exploit/windows/smb/ms17_010_eternalblue\nmsf6 > set RHOSTS 10.0.0.5\nmsf6 > run\n# [*] Meterpreter session 1 opened (10.0.0.10 -> 10.0.0.5)\nmeterpreter > getuid\n# Server username: NT AUTHORITY\\SYSTEM"),
     React.createElement(Quiz,{q:{uz:"Ekspluatatsiya muvaffaqiyatli bo'lgach nishonda bajariladigan kod qanday modul deyiladi?",en:"What module runs on the target after a successful exploit?"},opts:[{uz:"Exploit",en:"Exploit"},{uz:"Payload",en:"Payload"},{uz:"Auxiliary",en:"Auxiliary"},{uz:"Encoder",en:"Encoder"}],correct:1,exp:{uz:"Payload — ekspluatatsiya muvaffaqiyatli bo'lganda nishonda bajariladigan kod (masalan Meterpreter reverse shell).",en:"The payload is the code run on the target once the exploit succeeds (e.g. a Meterpreter reverse shell)."}}));
