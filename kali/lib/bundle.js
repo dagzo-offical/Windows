@@ -388,6 +388,46 @@ function ManualVsPipeSim(){
       React.createElement("button",{onClick:()=>{setRun("pipe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="pipe"?A+"22":SL2,color:run==="pipe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Quvur bilan (grep|wc)","⚡ With a pipe (grep|wc)"))));
 }
 
+function PermissionWalkSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const USERR=[
+    {col:BL,uz:"$ cat /etc/passwd — muvaffaqiyatli o'qildi",en:"$ cat /etc/passwd — read successfully",duz:"Bu fayl atayin hammaga o'qishga ochiq qilingan.",den:"This file is deliberately made world-readable."},
+    {col:AM,uz:"$ cat /etc/shadow — Permission denied",en:"$ cat /etc/shadow — Permission denied",duz:"Parol hashlarini faqat root o'qiy oladi.",den:"Only root can read the password hashes."},
+    {col:AM,uz:"$ ls -la /home/boss/.ssh/ — Permission denied",en:"$ ls -la /home/boss/.ssh/ — Permission denied",duz:"Boshqa foydalanuvchining shaxsiy katalogi yopiq.",den:"Another user's private directory is closed off."},
+    {col:D,uz:"🔒 Ko'p muhim fayl yopiq — chuqurroq kirish uchun imtiyoz oshirish kerak",en:"🔒 Many key files are locked — going deeper requires escalating privileges",duz:"Aynan shu devor Bo'lim 4 (Imtiyozlarni oshirish)ning asosiy mavzusi.",den:"This exact wall is the whole subject of Section 4 (Privilege Escalation).",final:true,bad:true}
+  ];
+  const ROOTR=[
+    {col:BL,uz:"# cat /etc/passwd — muvaffaqiyatli o'qildi",en:"# cat /etc/passwd — read successfully",duz:"root uchun bu ham, keyingisi ham ochiq.",den:"For root, this — and everything next — is open."},
+    {col:AM,uz:"# cat /etc/shadow — muvaffaqiyatli o'qildi, barcha hash'lar ko'rinadi",en:"# cat /etc/shadow — read successfully, all hashes visible",duz:"root ruxsat tekshiruvidan butunlay chetlab o'tadi.",den:"root bypasses the permission check entirely."},
+    {col:AM,uz:"# ls -la /home/*/.ssh/ — barcha foydalanuvchilarning SSH kalitlari ko'rinadi",en:"# ls -la /home/*/.ssh/ — every user's SSH keys are visible",duz:"Hech qanday katalog root uchun yopiq emas.",den:"No directory is closed to root."},
+    {col:A,uz:"🔓 Butun tizim ochiq — hech qanday cheklov yo'q",en:"🔓 The whole system is open — no restrictions at all",duz:"Shuning uchun root'ga ko'tarilish hujumchining asosiy maqsadi bo'ladi.",den:"That's exactly why escalating to root is the attacker's ultimate goal.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="user"?USERR:ROOTR;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="user"?USERR:run==="root"?ROOTR:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu 3 buyruqni oddiy foydalanuvchi va root sifatida ishga tushiring.","⬇ Pick a scenario — run the same 3 commands as a regular user versus as root.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0",fontFamily:"var(--font-mono)"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="user"?t(lang,"✗ Oddiy foydalanuvchi: ko'p joy yopiq","✗ Regular user: much of the tree is locked"):t(lang,"✓ root: hech qanday to'siq yo'q","✓ root: no barrier anywhere")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("user");setStep(-1);},style:{flex:1,padding:"9px",background:run==="user"?D+"22":SL2,color:run==="user"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"👤 Oddiy foydalanuvchi","👤 Regular user")),
+      React.createElement("button",{onClick:()=>{setRun("root");setStep(-1);},style:{flex:1,padding:"9px",background:run==="root"?A+"22":SL2,color:run==="root"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"👑 root"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1190,13 +1230,15 @@ function LessonL04(){
     ]}),
     React.createElement(H2,{num:"§3"},t(lang,"Pentester uchun nega muhim?","Why it matters to a pentester")),
     React.createElement(P,null,t(lang,"Nishon tizimga kirganingizda qayerga qarash kerakligini bilish vaqtni tejaydi. /etc/passwd barcha foydalanuvchilarni sanaydi (hamma o'qiy oladi). /etc/shadow parol hashlarini saqlaydi (faqat root). /var/log/ hujum izlari va kirish urinishlarini yozadi. /home/*/.ssh/ SSH kalitlarini saqlaydi. /var/www/ veb-sayt kodini (ko'pincha ma'lumotlar bazasi parollari bilan) o'z ichiga oladi. Tajribali pentester bu joylarni birinchi bo'lib tekshiradi.","Once you're on a target system, knowing where to look saves time. /etc/passwd lists all users (world-readable). /etc/shadow stores password hashes (root only). /var/log/ records attack traces and login attempts. /home/*/.ssh/ holds SSH keys. /var/www/ contains website code (often with database passwords). An experienced pentester checks these places first.")),
-    React.createElement(Terminal,null,"cat /etc/passwd                 # foydalanuvchilar ro'yxati\ncat /etc/shadow                 # parol hashlari (root kerak)\nls -la /home/*/.ssh/            # SSH kalitlari\nls /usr/share/wordlists/        # mashhur lug'atlar (rockyou)"),
-    React.createElement(H2,{num:"§4"},t(lang,"Mutlaq va nisbiy yo'llar","Absolute vs relative paths")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: oddiy foydalanuvchi vs root","Interactive simulator: regular user vs root")),
+    React.createElement(P,null,t(lang,"Xuddi shu uchta buyruqni ikki xil huquq bilan sinang — fayl tizimidagi «ko'rinmas devor» qayerda ekanini his qiling:","Try the exact same three commands with two different privilege levels — feel exactly where the file system's «invisible wall» sits:")),
+    React.createElement(PermissionWalkSim),
+    React.createElement(H2,{num:"§5"},t(lang,"Mutlaq va nisbiy yo'llar","Absolute vs relative paths")),
     React.createElement(P,null,t(lang,"Mutlaq yo'l ildizdan boshlanadi (/etc/passwd) — qayerda turganingizdan qat'i nazar bir xil joyni bildiradi. Nisbiy yo'l joriy katalogdan boshlanadi (../logs yoki ./script.sh). . joriy katalog, .. bitta yuqori, ~ uy katalogi. Skript yozayotganda mutlaq yo'llar ishonchliroq, chunki ular kutilmagan joyga olib bormaydi.","An absolute path starts from root (/etc/passwd) — it means the same place no matter where you are. A relative path starts from the current directory (../logs or ./script.sh). . is the current dir, .. one up, ~ the home directory. When writing scripts, absolute paths are safer because they never lead somewhere unexpected.")),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"Yashirin fayllar: nomi nuqta (.) bilan boshlanadigan fayllar yashirin (.bashrc, .ssh). Ularni ko'rish uchun ls -a ishlating — ular ko'pincha SSH kalitlari, konfiguratsiya va maxfiy ma'lumot saqlaydi.","Hidden files: files whose names start with a dot (.) are hidden (.bashrc, .ssh). Use ls -a to see them — they often hold SSH keys, config and sensitive data.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Mutlaq va nisbiy yo'l — solishtirish","Absolute vs relative path — compared")),
+    React.createElement(H2,{num:"§6"},t(lang,"Mutlaq va nisbiy yo'l — solishtirish","Absolute vs relative path — compared")),
     React.createElement(CompareCols,{left:{title:{uz:"Mutlaq yo'l",en:"Absolute path"},color:"#4dabf7",rows:[{uz:"/ ildizdan boshlanadi",en:"Starts from the root /"},{uz:"Har doim bir xil joy",en:"Always the same place"},{uz:"Skriptlarda ishonchli",en:"Reliable in scripts"},]},right:{title:{uz:"Nisbiy yo'l",en:"Relative path"},color:"#a855f7",rows:[{uz:"Joriy katalogdan",en:"From the current directory"},{uz:". va .. ishlatiladi",en:"Uses . and .."},{uz:"Qisqa, lekin kontekstga bog'liq",en:"Short but context-dependent"},]}}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: fayl tizimini aylanish","Practice: walking the file system")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: fayl tizimini aylanish","Practice: walking the file system")),
     React.createElement(P,null,t(lang,"Ildizdan boshlab tizimning asosiy papkalarini ko'ramiz. pwd qayerdaligimizni, ls / ildizdagi papkalarni ko'rsatadi.","Starting from the root we look at the system's main folders. pwd shows where we are, ls / shows the folders at the root.")),
     React.createElement(Terminal,null,"pwd\n# /home/kali\nls /\n# bin  boot  dev  etc  home  lib  media  mnt  opt\n# proc root  run  sbin srv  sys  tmp  usr  var\ncd /var/log && ls\n# auth.log  syslog  apache2  ..."),
     React.createElement(Quiz,{q:{uz:"Parol hashlari qaysi faylda va uni kim o'qiy oladi?",en:"Which file stores password hashes and who can read it?"},opts:[{uz:"/etc/passwd — hamma",en:"/etc/passwd — everyone"},{uz:"/etc/shadow — faqat root",en:"/etc/shadow — only root"},{uz:"/var/log — hamma",en:"/var/log — everyone"},{uz:"/home — mehmonlar",en:"/home — guests"}],correct:1,exp:{uz:"/etc/shadow parol hashlarini saqlaydi va faqat root o'qiy oladi; /etc/passwd esa foydalanuvchilar ro'yxatini saqlaydi va hamma o'qiy oladi.",en:"/etc/shadow stores password hashes and is readable only by root; /etc/passwd holds the user list and is world-readable."}}));
