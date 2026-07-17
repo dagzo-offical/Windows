@@ -1268,6 +1268,46 @@ function RulesMutationSim(){
       React.createElement("button",{onClick:()=>{setRun("rules");setStep(-1);},style:{flex:1,padding:"9px",background:run==="rules"?A+"22":SL2,color:run==="rules"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ --rules bilan","✅ With --rules"))));
 }
 
+function GPUSpeedSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const CPU=[
+    {col:BL,uz:"hashcat --force -D 1 -m 0 -a 3 hash.txt ?a?a?a?a?a?a?a?a — CPU'da ishga tushirildi",en:"hashcat --force -D 1 -m 0 -a 3 hash.txt ?a?a?a?a?a?a?a?a — running on the CPU",duz:"8 belgili to'liq brute-force maskasi, faqat protsessor kuchi bilan.",den:"A full 8-character brute-force mask, using only processor power."},
+    {col:AM,uz:"Tezlik: ~50 million taxmin/soniya",en:"Speed: ~50 million guesses/second",duz:"Zamonaviy CPU uchun odatiy MD5 tezligi.",den:"A typical MD5 speed for a modern CPU."},
+    {col:AM,uz:"8 belgili to'liq maydon: ~6,6 kvadrilion kombinatsiya",en:"The full 8-character space: ~6.6 quadrillion combinations",duz:"Katta harf+kichik harf+raqam+belgi — 95 ta variant, 8 pozitsiya.",den:"Upper+lower+digit+symbol — 95 possible characters, 8 positions."},
+    {col:D,uz:"🐌 Baholangan vaqt: ~4 yil — amaliy jihatdan imkonsiz",en:"🐌 Estimated time: ~4 years — practically infeasible",duz:"Hech kim bitta hash uchun 4 yil kutmaydi.",den:"No one waits 4 years for a single hash.",final:true,bad:true}
+  ];
+  const GPU=[
+    {col:BL,uz:"hashcat -m 0 -a 3 hash.txt ?a?a?a?a?a?a?a?a — xuddi shu buyruq, GPU'da",en:"hashcat -m 0 -a 3 hash.txt ?a?a?a?a?a?a?a?a — the exact same command, on the GPU",duz:"Bitta harf ham o'zgarmadi — faqat ishlaydigan uskuna boshqa.",den:"Not a single character changed — only the hardware running it differs."},
+    {col:AM,uz:"Tezlik: ~40 milliard taxmin/soniya (o'rtacha zamonaviy videokarta)",en:"Speed: ~40 billion guesses/second (an average modern GPU)",duz:"Minglab GPU yadrosi bir vaqtda parallel ishlaydi.",den:"Thousands of GPU cores work in parallel at once."},
+    {col:AM,uz:"Xuddi shu ~6,6 kvadrilion kombinatsiya",en:"The exact same ~6.6 quadrillion combinations",duz:"Vazifaning o'zi bir xil — faqat bajarish tezligi farq qiladi.",den:"The task itself is identical — only the execution speed differs."},
+    {col:A,uz:"⚡ Baholangan vaqt: ~2 kun — ~800 barobar tezroq",en:"⚡ Estimated time: ~2 days — ~800x faster",duz:"Xuddi shu vazifa — yillar o'rniga kunlar.",den:"The exact same task — days instead of years.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="cpu"?CPU:GPU;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="cpu"?CPU:run==="gpu"?GPU:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu 8 belgili brute-force vazifasini CPU va GPU'da solishtiring.","⬇ Pick a scenario — compare the same 8-character brute-force job on CPU versus GPU.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="cpu"?t(lang,"✗ CPU: ~4 yil — amalda ishlatib bo'lmaydi","✗ CPU: ~4 years — unusable in practice"):t(lang,"✓ GPU: ~2 kun — amaliy jihatdan imkon bor","✓ GPU: ~2 days — practically feasible")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("cpu");setStep(-1);},style:{flex:1,padding:"9px",background:run==="cpu"?D+"22":SL2,color:run==="cpu"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🐌 CPU'da","🐌 On CPU")),
+      React.createElement("button",{onClick:()=>{setRun("gpu");setStep(-1);},style:{flex:1,padding:"9px",background:run==="gpu"?A+"22":SL2,color:run==="gpu"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ GPU'da","⚡ On GPU"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2508,16 +2548,19 @@ function LessonL26(){
       {n:"-a 6",name:t(lang,"Wordlist + maska","Wordlist + mask"),color:"#4dabf7",desc:{uz:"Lug'at so'ziga qo'shimchalar (password + ?d?d).",en:"Suffixes appended to wordlist words (password + ?d?d)."}},
       {n:"-a 1",name:t(lang,"Kombinator","Combinator"),color:"#a855f7",desc:{uz:"Ikki lug'at so'zini birlashtiradi (summer + 2024).",en:"Joins two wordlist words (summer + 2024)."}},
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Hash turini aniqlash (-m)","Identifying the hash type (-m)")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: CPU vs GPU tezligi","Interactive simulator: CPU vs GPU speed")),
+    React.createElement(P,null,t(lang,"§1 dagi da'voni raqamlar bilan his qiling — xuddi shu 8 belgili brute-force vazifasini ikki uskunada sinang:","Feel the §1 claim in numbers — try the exact same 8-character brute-force job on two kinds of hardware:")),
+    React.createElement(GPUSpeedSim),
+    React.createElement(H2,{num:"§4"},t(lang,"Hash turini aniqlash (-m)","Identifying the hash type (-m)")),
     React.createElement(P,null,t(lang,"Hashcat qaysi hash algoritmini buzayotganini bilishi shart — buni -m raqami belgilaydi. Agar noto'g'ri -m tanlasangiz, Hashcat butunlay boshqa algoritm bilan hashlaydi va hech qachon topa olmaydi. Hash turini ko'rinishidan taxmin qilish mumkin: MD5 — 32 ta belgi, SHA-1 — 40, NTLM (Windows) — 32 lekin boshqacha, bcrypt esa $2a$ bilan boshlanadi. hashid yoki hash-identifier vositalari buni avtomatik aniqlaydi.","Hashcat must know which hash algorithm it is cracking — the -m number sets this. Pick the wrong -m and Hashcat hashes with a completely different algorithm and never finds a match. You can often guess the type from its shape: MD5 is 32 characters, SHA-1 is 40, NTLM (Windows) is 32 but different, and bcrypt starts with $2a$. The hashid or hash-identifier tools detect this automatically.")),
     React.createElement(Terminal,null,"# Avval hash turini aniqlash\nhashid '5f4dcc3b5aa765d61d8327deb882cf99'\n\n# MD5 lug'at hujumi\nhashcat -m 0 -a 0 hashes.txt /usr/share/wordlists/rockyou.txt\n\n# Windows NTLM hash\nhashcat -m 1000 -a 0 ntlm.txt rockyou.txt\n\n# Maska: 8 ta kichik harf\nhashcat -m 0 -a 3 hashes.txt ?l?l?l?l?l?l?l?l\n\n# Buzilgan parollarni ko'rish\nhashcat -m 0 hashes.txt --show"),
-    React.createElement(H2,{num:"§4"},t(lang,"Maskalar va qoidalar","Masks and rules")),
+    React.createElement(H2,{num:"§5"},t(lang,"Maskalar va qoidalar","Masks and rules")),
     React.createElement(P,null,t(lang,"Maskada har belgi turini simvol bildiradi: ?l — kichik harf, ?u — katta harf, ?d — raqam, ?s — maxsus belgi, ?a — hammasi. Masalan ?u?l?l?l?l?d?d?d?d paroli \"Admin2024\" kabi shakllarni sinaydi. Qoidalar (rules, -r) esa lug'at so'zlarini aqlli o'zgartiradi — masalan best64.rule \"password\" so'zidan \"Password1\", \"p@ssw0rd\", \"PASSWORD!\" kabi yuzlab variant yaratadi. Bu haqiqiy odamlarning parol yasash odatlarini taqlid qiladi va samaradorlikni keskin oshiradi.","In a mask each character type has a symbol: ?l is lowercase, ?u uppercase, ?d a digit, ?s a special char, ?a everything. For example ?u?l?l?l?l?d?d?d?d tries shapes like \"Admin2024\". Rules (-r) transform wordlist words intelligently — best64.rule turns \"password\" into hundreds of variants like \"Password1\", \"p@ssw0rd\", \"PASSWORD!\". This mimics how real people build passwords and sharply raises the hit rate.")),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"Buzilgan parollar potfile'ga (~/.hashcat/hashcat.potfile) saqlanadi, shuning uchun --show keyingi safar tez ishlaydi. Katta ishlar uchun rockyou.txt + best64.rule kombinatsiyasi eng yaxshi boshlang'ich nuqta.","Cracked passwords are stored in the potfile (~/.hashcat/hashcat.potfile), so --show is instant next time. For big jobs, rockyou.txt + best64.rule is the best starting combination.")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Hash buzishni faqat o'zingizga tegishli yoki yozma ruxsat berilgan hashlar ustida bajaring. Boshqa birovning parolini ruxsatsiz buzish jinoyat.","Only crack hashes you own or are given written authorization for. Cracking someone else's password without permission is a crime.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Hashcat buzish oqimi","The Hashcat cracking flow")),
+    React.createElement(H2,{num:"§6"},t(lang,"Hashcat buzish oqimi","The Hashcat cracking flow")),
     React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"GPU bilan buzish",en:"Cracking with the GPU"},steps:[{icon:"🔎",text:{uz:"hashid — hash turini aniqlash (-m raqami)",en:"hashid — identify the hash type (-m number)"}},{icon:"📖",text:{uz:"Lug'at + qoida tanlash (rockyou + best64)",en:"Pick a wordlist + rule (rockyou + best64)"}},{icon:"⚡",text:{uz:"GPU sekundiga milliardlab taxminni sinaydi",en:"The GPU tries billions of guesses per second"}},{icon:"✅",text:{uz:"--show — topilgan parolni ko'rsatadi",en:"--show — reveals the found password"}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: NTLM hashni buzish","Practice: cracking an NTLM hash")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: NTLM hashni buzish","Practice: cracking an NTLM hash")),
     React.createElement(P,null,t(lang,"Hashcat GPU quvvatidan foydalanib John'dan o'nlab marta tezroq ishlaydi. -m hash turini, -a hujum rejimini belgilaydi.","Hashcat uses GPU power to run tens of times faster than John. -m sets the hash type, -a the attack mode.")),
     React.createElement(Terminal,null,"hashcat -m 1000 -a 0 ntlm.txt rockyou.txt\n# Session..........: hashcat   Status.....: Cracked\n# 8846f7eaee8fb117ad06bdd830b7586c:Password1\n# Speed.#1...: 12345.6 MH/s"),
     React.createElement(Quiz,{q:{uz:"Hashcat ning John dan asosiy farqi nimada?",en:"Hashcat's main difference from John?"},opts:[{uz:"U onlayn ishlaydi",en:"It works online"},{uz:"U GPU'dan foydalanib ancha tezroq",en:"It uses the GPU and is much faster"},{uz:"U faqat MD5 buzadi",en:"It only cracks MD5"},{uz:"U parol yaratadi",en:"It creates passwords"}],correct:1,exp:{uz:"Hashcat GPU'dan foydalanib sekundiga milliardlab parolni sinaydi — katta ishlar uchun John'dan tezroq. Ikkalasi ham oflayn ishlaydi.",en:"Hashcat leverages the GPU for billions of tries per second — faster than John for big jobs. Both work offline."}}));
