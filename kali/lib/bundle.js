@@ -1188,6 +1188,46 @@ function ExploitVerifySim(){
       React.createElement("button",{onClick:()=>{setRun("verified");setStep(-1);},style:{flex:1,padding:"9px",background:run==="verified"?A+"22":SL2,color:run==="verified"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔍 Avval o'qib chiqish","🔍 Read it first"))));
 }
 
+function BruteForceDefenseSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const OPEN=[
+    {col:BL,uz:"hydra -l admin -P rockyou.txt ssh://10.0.0.5 -t 16 — 16 parallel oqim boshlandi",en:"hydra -l admin -P rockyou.txt ssh://10.0.0.5 -t 16 — 16 parallel threads start",duz:"Hech qanday cheklov yo'qligi sababli maksimal tezlikda ishlaydi.",den:"With no limiting in place, it runs at full speed."},
+    {col:AM,uz:"Server har urinishga cheklovsiz javob beradi — soniyasiga 50+ urinish",en:"The server answers every attempt without limit — 50+ tries per second",duz:"SSH daemon'ning o'zida urinish sonini cheklovchi hech narsa yo'q.",den:"The SSH daemon itself has nothing limiting the attempt count."},
+    {col:AM,uz:"~14 000-chi urinishda to'g'ri parol topildi",en:"The correct password is found at attempt #~14,000",duz:"rockyou.txt'da bu parol taxminan shu joyda turgan.",den:"In rockyou.txt this password happens to sit around that position."},
+    {col:D,uz:"🔓 ~5 daqiqada kirish topildi — hech qanday to'siq yo'q edi",en:"🔓 Access found in ~5 minutes — there was no obstacle at all",duz:"Server o'zini hech qanday himoyasiz to'liq ochiq qoldirgan.",den:"The server left itself completely exposed with no defenses.",final:true,bad:true}
+  ];
+  const LOCKED=[
+    {col:BL,uz:"hydra -l admin -P rockyou.txt ssh://10.0.0.9 -t 16 — xuddi shu hujum boshlandi",en:"hydra -l admin -P rockyou.txt ssh://10.0.0.9 -t 16 — the exact same attack starts",duz:"Hujumchi tomonidan hech narsa boshqacha qilinmadi.",den:"The attacker does nothing differently."},
+    {col:AM,uz:"fail2ban: 5 marta muvaffaqiyatsiz urinishdan keyin IP 10 daqiqaga bloklanadi",en:"fail2ban: after 5 failed attempts, the IP is banned for 10 minutes",duz:"Server loglarni real vaqtda kuzatib, muvaffaqiyatsizliklarni sanaydi.",den:"The server watches its logs in real time and counts failures."},
+    {col:AM,uz:"Hydra endi ulana olmaydi — «Connection refused», barcha oqimlar to'xtaydi",en:"Hydra can no longer connect — «Connection refused», all threads stall",duz:"Parol lug'atining 99% i hech qachon sinab ko'rilmaydi.",den:"99% of the password wordlist is never even tried."},
+    {col:A,uz:"🔒 Faqat 5 urinishdan keyin butunlay to'xtatildi",en:"🔒 Stopped completely after just 5 attempts",duz:"Onlayn hujumning zaif nuqtasi — server sizni ko'rib turadi.",den:"The weak point of an online attack — the server can see you the whole time.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="open"?OPEN:LOCKED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="open"?OPEN:run==="locked"?LOCKED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu Hydra hujumini himoyasiz va fail2ban qo'llagan serverda sinang.","⬇ Pick a scenario — run the same Hydra attack against an unprotected server versus one using fail2ban.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="open"?t(lang,"✗ Himoyasiz: to'liq lug'at cheklovsiz sinaladi","✗ Unprotected: the whole wordlist gets tried unhindered"):t(lang,"✓ fail2ban: onlayn hujum tezda to'xtatiladi","✓ fail2ban: the online attack is stopped fast")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("open");setStep(-1);},style:{flex:1,padding:"9px",background:run==="open"?D+"22":SL2,color:run==="open"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 Himoyasiz server","🔓 Unprotected server")),
+      React.createElement("button",{onClick:()=>{setRun("locked");setStep(-1);},style:{flex:1,padding:"9px",background:run==="locked"?A+"22":SL2,color:run==="locked"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 fail2ban bilan","🔒 With fail2ban"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1881,9 +1921,12 @@ function LessonL24(){
     React.createElement(P,null,t(lang,"Veb login formalari uchun http-post-form moduli ishlatiladi — bu eng murakkab, lekin foydali qism. Sintaksis uch qismdan iborat, ikki nuqta bilan ajratilgan: (1) forma yo'li, (2) yuboriladigan ma'lumot ^USER^ va ^PASS^ o'rin egallovchilari bilan, (3) muvaffaqiyatsizlikni bildiruvchi matn (F=...). Hydra shu matnni ko'rsa — parol noto'g'ri deb biladi. Formani avval Burp Suite bilan tekshirib, aniq maydonlar nomini olish tavsiya etiladi.","For web login forms you use the http-post-form module — the trickiest but most useful part. The syntax has three parts, separated by colons: (1) the form path, (2) the data to send with ^USER^ and ^PASS^ placeholders, (3) the text indicating failure (F=...). When Hydra sees that text, it knows the password is wrong. It's recommended to first inspect the form with Burp Suite to get the exact field names.")),
     React.createElement(Terminal,null,"hydra -l admin -P rockyou.txt ssh://10.0.0.5\nhydra -L users.txt -P pass.txt -t 4 ftp://10.0.0.5\nhydra -l admin -P rockyou.txt 10.0.0.5 http-post-form \\\n  \"/login.php:user=^USER^&pass=^PASS^:F=Invalid credentials\""),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Brute-force hujumlari faqat yozma ruxsat berilgan tizimlarda (CTF yoki shartnomali pentest) o'tkazilishi kerak. Ruxsatsiz urinish jinoyat hisoblanadi va akkauntlarni bloklashi mumkin.","Brute-force attacks must only be run on systems with written authorization (a CTF or contracted pentest). Unauthorized attempts are a crime and can lock out accounts.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Hydra parametrlari","Hydra parameters")),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: himoyasiz server vs fail2ban","Interactive simulator: unprotected server vs fail2ban")),
+    React.createElement(P,null,t(lang,"§1 dagi «onlayn» so'zining haqiqiy ma'nosini his qiling — onlayn hujum sizga qarama-qarshi kuzatilib turishi mumkin. Xuddi shu Hydra hujumini ikki serverda sinang:","Feel what «online» in §1 really means — an online attack can be watched right back at you. Try the exact same Hydra attack against two servers:")),
+    React.createElement(BruteForceDefenseSim),
+    React.createElement(H2,{num:"§6"},t(lang,"Hydra parametrlari","Hydra parameters")),
     React.createElement(LayerStack,{layers:[{n:"-l / -L",name:t(lang,"-l / -L","-l / -L"),color:"#4dabf7",desc:{uz:"Bitta login (-l) yoki login ro'yxati (-L).",en:"One login (-l) or a login list (-L)."}},{n:"-p / -P",name:t(lang,"-p / -P","-p / -P"),color:"#69db7c",desc:{uz:"Bitta parol (-p) yoki parol ro'yxati (-P).",en:"One password (-p) or a password list (-P)."}},{n:"-t",name:t(lang,"-t","-t"),color:"#a855f7",desc:{uz:"Parallel oqimlar soni (tezlik/shovqin).",en:"Number of parallel threads (speed/noise)."}},{n:"modul",name:t(lang,"ssh/http-post-form","ssh/http-post-form"),color:"#ffd43b",desc:{uz:"Qaysi xizmat/protokol hujum qilinadi.",en:"Which service/protocol is attacked."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: SSH brute-force","Practice: SSH brute-force")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: SSH brute-force","Practice: SSH brute-force")),
     React.createElement(P,null,t(lang,"Hydra onlayn (jonli xizmatga) parol sinaydi. http-post-form uchun forma maydonlari va xato xabari : bilan beriladi. Faqat ruxsat berilgan nishonlarda sinang.","Hydra tries passwords online (against a live service). For http-post-form you provide the form fields and the failure message separated by :. Only test on authorized targets.")),
     React.createElement(Terminal,null,"hydra -l admin -P rockyou.txt ssh://10.0.0.5 -t 4\n# [22][ssh] host: 10.0.0.5  login: admin  password: hunter2\n# 1 of 1 target successfully completed, 1 valid password found"),
     React.createElement(Quiz,{q:{uz:"Hydra qanday turdagi parol hujumini amalga oshiradi?",en:"What type of password attack does Hydra perform?"},opts:[{uz:"Oflayn hash buzish",en:"Offline hash cracking"},{uz:"Onlayn (jonli xizmatga) lug'at hujumi",en:"Online (against a live service) dictionary attack"},{uz:"Rainbow table",en:"Rainbow table"},{uz:"Phishing",en:"Phishing"}],correct:1,exp:{uz:"Hydra onlayn hujum vositasi — parollarni to'g'ridan-to'g'ri jonli xizmatga (SSH, FTP...) urinib sinaydi. Hashni oflayn buzish uchun John yoki Hashcat ishlatiladi.",en:"Hydra is an online attack tool — it tries passwords directly against a live service (SSH, FTP...). For offline hash cracking use John or Hashcat."}}));
