@@ -748,6 +748,46 @@ function NetdiscoverModeSim(){
       React.createElement("button",{onClick:()=>{setRun("passive");setStep(-1);},style:{flex:1,padding:"9px",background:run==="passive"?A+"22":SL2,color:run==="passive"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🤫 Passiv (-p)","🤫 Passive (-p)"))));
 }
 
+function MasscanRateSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const SAFE=[
+    {col:BL,uz:"sudo masscan 10.0.0.0/24 -p1-65535 --rate=1000 — soniyasiga 1000 paket",en:"sudo masscan 10.0.0.0/24 -p1-65535 --rate=1000 — 1,000 packets/second",duz:"O'rtacha, ko'p tarmoq uchun xavfsiz tezlik.",den:"A moderate speed, safe for most networks."},
+    {col:AM,uz:"Router va switch'lar navbatni yetkazib ulguradi — paketlar normal ishlanadi",en:"Routers and switches keep up with the queue — packets are processed normally",duz:"Hech qanday bufer to'lib toshmaydi.",den:"No buffer ever overflows."},
+    {col:AM,uz:"Skan ~65 soniyada tugaydi, barcha xizmatlar ishlab turaveradi",en:"The scan finishes in ~65 seconds, all services keep running",duz:"Nishon tarmog'i skan davomida hech narsani sezmaydi.",den:"The target network notices nothing during the scan."},
+    {col:A,uz:"✅ To'liq natija olindi — hech qanday xizmat uzilmadi",en:"✅ Full results obtained — no service outage",duz:"Sekinroq, lekin ishonchli va oqibatsiz.",den:"Slower, but reliable and consequence-free.",final:true}
+  ];
+  const RECKLESS=[
+    {col:BL,uz:"sudo masscan 10.0.0.0/24 -p1-65535 --rate=100000 — soniyasiga 100 000 paket",en:"sudo masscan 10.0.0.0/24 -p1-65535 --rate=100000 — 100,000 packets/second",duz:"100x yuqori tezlik — «tezroq — yaxshiroq» degan noto'g'ri taxmin.",den:"100x the speed — the wrong assumption that «faster is always better»."},
+    {col:AM,uz:"Kichik ofis switch'i bunday hajmni ko'tara olmaydi — bufer to'lib toshadi",en:"The small office switch can't handle this volume — its buffer overflows",duz:"Uskuna sizning nishoningiz uchun emas, oddiy ish uchun mo'ljallangan.",den:"The hardware was sized for ordinary work, not for this."},
+    {col:AM,uz:"VoIP telefon va veb-server javob berishni to'xtatadi — paketlar tushib qolmoqda",en:"The VoIP phone and web server stop responding — packets are being dropped",duz:"Skan bilan bog'liq bo'lmagan xizmatlar ham jabrlanadi.",den:"Even services unrelated to the scan get hurt."},
+    {col:D,uz:"🔥 Tasodifiy DoS — nishon tarmog'i vaqtincha ishdan chiqdi",en:"🔥 Accidental DoS — the target network went down temporarily",duz:"«Faqat skanerlash» edi, lekin natija haqiqiy hujum bilan bir xil.",den:"It was «just a scan», but the result matches a real attack.",final:true,bad:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="safe"?SAFE:RECKLESS;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="safe"?SAFE:run==="reckless"?RECKLESS:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu /24 tarmoqni ehtiyotkor va beparvo --rate bilan skanerlashni solishtiring.","⬇ Pick a scenario — compare scanning the same /24 network with a careful versus a reckless --rate.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="safe"?t(lang,"✓ Ehtiyotkor tezlik: to'liq va oqibatsiz","✓ Careful rate: complete and consequence-free"):t(lang,"✗ Beparvo tezlik: tasodifiy DoS keltirib chiqardi","✗ Reckless rate: caused an accidental DoS")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL2,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Ehtiyotkor (--rate=1000)","✅ Careful (--rate=1000)")),
+      React.createElement("button",{onClick:()=>{setRun("reckless");setStep(-1);},style:{flex:1,padding:"9px",background:run==="reckless"?D+"22":SL2,color:run==="reckless"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔥 Beparvo (--rate=100000)","🔥 Reckless (--rate=100000)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1759,9 +1799,12 @@ function LessonL13(){
     React.createElement(P,null,t(lang,"--rate juda kuchli, lekin xavfli parametr. Juda yuqori tezlik (masalan --rate=100000) tarmoq kanalini to'ldirib, xizmatlarni ishdan chiqarishi (tasodifiy DoS), routerlarni charchatishi va sizni darhol aniqlashi mumkin. Amaliyotda o'rtacha tezlikdan boshlang (--rate=1000) va faqat ruxsat berilgan, barqaror tarmoqlarda oshiring.","--rate is a very powerful but dangerous parameter. Too high (e.g. --rate=100000) can flood the network link, knock out services (an accidental DoS), tire out routers and get you detected instantly. In practice start with a moderate rate (--rate=1000) and only raise it on authorized, stable networks.")),
     React.createElement(Terminal,null,"sudo masscan 10.0.0.0/24 -p22,80,443 --rate=1000\nsudo masscan 10.0.0.5 -p0-65535 --rate=10000 -oL out.txt\n# keyin topilgan portlarni Nmap bilan chuqur tekshirish:\nnmap -sV -p22,80,443 10.0.0.5"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"--rate ni ehtiyotkorlik bilan sozlang — juda yuqori tezlik xizmatlarni ishdan chiqarishi (DoS) va sizni darhol aniqlashi mumkin. Faqat ruxsat berilgan tarmoqlarda.","Set --rate carefully — too high can knock out services (DoS) and get you detected instantly. Only on authorized networks.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Masscan va Nmap — vazifa taqsimoti","Masscan vs Nmap — division of labor")),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: ehtiyotkor vs beparvo tezlik","Interactive simulator: careful vs reckless rate")),
+    React.createElement(P,null,t(lang,"§4 dagi ogohlantirishni his qiling — xuddi shu tarmoqni ikki xil --rate bilan skanerlang:","Feel the §4 warning for yourself — scan the exact same network with two very different --rate values:")),
+    React.createElement(MasscanRateSim),
+    React.createElement(H2,{num:"§6"},t(lang,"Masscan va Nmap — vazifa taqsimoti","Masscan vs Nmap — division of labor")),
     React.createElement(CompareCols,{left:{title:{uz:"Masscan",en:"Masscan"},color:"#ff3a5e",rows:[{uz:"Ultra-tez — millionlab port/sekund",en:"Ultra-fast — millions of ports/sec"},{uz:"Faqat OCHIQ portlarni topadi",en:"Only finds OPEN ports"},{uz:"Keng diapazon uchun",en:"For a wide range"},]},right:{title:{uz:"Nmap",en:"Nmap"},color:"#69db7c",rows:[{uz:"Sekinroq, lekin chuqur",en:"Slower but deep"},{uz:"Xizmat/versiya/NSE",en:"Service/version/NSE"},{uz:"Topilgan portlarga fokus",en:"Focus on found ports"},]}}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: ikki bosqichli ish oqimi","Practice: the two-stage workflow")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: ikki bosqichli ish oqimi","Practice: the two-stage workflow")),
     React.createElement(P,null,t(lang,"Avval Masscan bilan butun diapazonni tez skanerlab ochiq portlarni topamiz, so'ng faqat o'sha portlarni Nmap bilan chuqur tekshiramiz. Bu tezlik va chuqurlikni birlashtiradi.","First scan the whole range fast with Masscan to find open ports, then deep-inspect only those ports with Nmap. This combines speed and depth.")),
     React.createElement(Terminal,null,"sudo masscan -p1-65535 10.0.0.0/24 --rate=10000\n# Discovered open port 80/tcp on 10.0.0.5\n# Discovered open port 22/tcp on 10.0.0.5\nnmap -sV -p22,80 10.0.0.5   # faqat topilgan portlar"),
     React.createElement(Quiz,{q:{uz:"Masscan va Nmap odatda qanday birga ishlatiladi?",en:"How are Masscan and Nmap typically used together?"},opts:[{uz:"Masscan tez topadi, Nmap chuqur tekshiradi",en:"Masscan finds fast, Nmap inspects deeply"},{uz:"Ikkalasi bir xil ish",en:"They do the same job"},{uz:"Ular birga ishlamaydi",en:"They can't work together"},{uz:"Nmap avval bekor qiladi",en:"Nmap cancels it"}],correct:0,exp:{uz:"Masscan katta diapazonda ochiq portlarni tez aniqlaydi, so'ng Nmap o'sha portlarni versiya/xizmat uchun batafsil skanerlaydi.",en:"Masscan rapidly finds open ports over a large range, then Nmap scans them in detail for version/service."}}));
