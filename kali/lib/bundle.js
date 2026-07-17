@@ -1628,6 +1628,46 @@ function KernelExploitRiskSim(){
       React.createElement("button",{onClick:()=>{setRun("careful");setStep(-1);},style:{flex:1,padding:"9px",background:run==="careful"?A+"22":SL2,color:run==="careful"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Ehtiyotkor (avval sinash)","✅ Careful (test first)"))));
 }
 
+function EnvKeepSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const STRIPPED=[
+    {col:BL,uz:"sudo -l — env_keep ro'yxatida LD_PRELOAD YO'Q (standart, xavfsiz sozlama)",en:"sudo -l — LD_PRELOAD is NOT in env_keep (the default, safe configuration)",duz:"Zamonaviy sudo sukut bo'yicha ko'p muhit o'zgaruvchisini tozalaydi.",den:"Modern sudo strips most environment variables by default."},
+    {col:AM,uz:"sudo LD_PRELOAD=/tmp/shell.so find — buyruq yuboriladi",en:"sudo LD_PRELOAD=/tmp/shell.so find — the command is sent",duz:"Hujumchi tomonidan hech narsa boshqacha qilinmaydi.",den:"The attacker does nothing differently."},
+    {col:AM,uz:"sudo LD_PRELOAD o'zgaruvchisini avtomatik TOZALAYDI — dasturga hech qachon yetib bormaydi",en:"sudo automatically STRIPS the LD_PRELOAD variable — it never reaches the program",duz:"find LD_PRELOAD degan narsa borligini bilmasdan ishga tushadi.",den:"find runs without ever knowing LD_PRELOAD existed."},
+    {col:A,uz:"🔒 shell.so hech qachon yuklanmadi — vektor ishlamaydi",en:"🔒 shell.so never gets loaded — the vector doesn't work",duz:"Bitta sozlama qatori butun hujum texnikasini bekor qiladi.",den:"One config line neutralizes the entire attack technique.",final:true}
+  ];
+  const PRESERVED=[
+    {col:BL,uz:"sudo -l — env_keep+=LD_PRELOAD RO'YXATDA BOR (xavfli sozlama)",en:"sudo -l — LD_PRELOAD IS listed in env_keep (a risky configuration)",duz:"Ehtimol muayyan dastur uchun atayin qo'yilgan va unutilgan.",den:"Probably set deliberately for some program and never removed."},
+    {col:AM,uz:"sudo LD_PRELOAD=/tmp/shell.so find — xuddi shu buyruq yuboriladi",en:"sudo LD_PRELOAD=/tmp/shell.so find — the exact same command is sent",duz:"Bir xil urinish, boshqacha sozlama.",den:"The same attempt, a different configuration."},
+    {col:AM,uz:"sudo o'zgaruvchini SAQLAYDI va dasturga uzatadi",en:"sudo PRESERVES the variable and passes it through to the program",duz:"env_keep aynan shu — «bu o'zgaruvchini tozalama» degan buyruq.",den:"That's exactly what env_keep means: «don't strip this variable»."},
+    {col:D,uz:"☠ shell.so yuklanadi, root shell ochiladi",en:"☠ shell.so loads, a root shell opens",duz:"Bitta sozlama qatori butun himoyani ochib qo'yadi.",den:"One config line throws the entire defense wide open.",final:true,bad:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="stripped"?STRIPPED:PRESERVED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="stripped"?STRIPPED:run==="preserved"?PRESERVED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu LD_PRELOAD urinishini ikki env_keep sozlamasida sinang.","⬇ Pick a scenario — try the exact same LD_PRELOAD attempt under two env_keep configurations.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="stripped"?t(lang,"✓ Tozalangan: vektor ishlamaydi","✓ Stripped: the vector doesn't work"):t(lang,"✗ Saqlangan: root shell ochiladi","✗ Preserved: a root shell opens")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("stripped");setStep(-1);},style:{flex:1,padding:"9px",background:run==="stripped"?A+"22":SL2,color:run==="stripped"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 env_keep'da LD_PRELOAD yo'q","🔒 LD_PRELOAD not in env_keep")),
+      React.createElement("button",{onClick:()=>{setRun("preserved");setStep(-1);},style:{flex:1,padding:"9px",background:run==="preserved"?D+"22":SL2,color:run==="preserved"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ env_keep+=LD_PRELOAD bor","☠ env_keep+=LD_PRELOAD set"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -3133,7 +3173,10 @@ function LessonL35(){
       {icon:"⚙",text:{uz:"Umumiy obyekt (.so) fayliga kompilyatsiya qilish",en:"Compile it into a shared object (.so) file"}},
       {icon:"👑",text:{uz:"sudo LD_PRELOAD=.../shell.so <dastur> → root",en:"sudo LD_PRELOAD=.../shell.so <program> → root"}},
     ]}),
-    React.createElement(H2,{num:"§4"},t(lang,"LD_PRELOAD amalda","LD_PRELOAD in practice")),
+React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: env_keep LD_PRELOAD ni saqlaydimi?","Interactive simulator: does env_keep preserve LD_PRELOAD?")),
+    React.createElement(P,null,t(lang,"§3 dagi hal qiluvchi shartni his qiling — xuddi shu urinishni ikki sozlamada sinang:","Feel the deciding condition from §3 for yourself — try the exact same attempt under two configurations:")),
+    React.createElement(EnvKeepSim),
+    React.createElement(H2,{num:"§5"},t(lang,"LD_PRELOAD amalda","LD_PRELOAD in practice")),
     React.createElement(P,null,t(lang,"Root qobig'ini ochadigan oddiy C kodini yozamiz (_init funksiyasi setuid(0) va system(\"/bin/bash\") ni bajaradi), so'ng uni gcc bilan umumiy obyekt (.so) fayliga kompilyatsiya qilamiz. Nihoyat, sudo bilan ishlatishimiz mumkin bo'lgan istalgan dasturni (find, apache2 va h.k.) LD_PRELOAD orqali shu faylga yo'naltirib ishga tushiramiz — natijada root qobig'i paydo bo'ladi.","We write simple C code that opens a root shell (the _init function runs setuid(0) and system(\"/bin/bash\")), then compile it with gcc into a shared object (.so) file. Finally we run any program we can use with sudo (find, apache2, etc.) pointing LD_PRELOAD at that file — and a root shell appears.")),
     React.createElement(SlideImg,{src:"privesc/auto_s08.png",cap:"shell.c (root qobig'ini ochadi) → gcc -fPIC -shared -o shell.so shell.c -nostartfiles bilan kompilyatsiya.",capEn:"shell.c (opens a root shell) → compiled with gcc -fPIC -shared -o shell.so shell.c -nostartfiles."}),
     React.createElement(SlideImg,{src:"privesc/auto_s09.png",cap:"sudo LD_PRELOAD=/home/user/ldpreload/shell.so find → id endi uid=0(root). Root olindi.",capEn:"sudo LD_PRELOAD=/home/user/ldpreload/shell.so find → id now shows uid=0(root). Root obtained."}),
