@@ -588,6 +588,46 @@ function NetDiagSim(){
       React.createElement("button",{onClick:()=>{setRun("gw");setStep(-1);},style:{flex:1,padding:"9px",background:run==="gw"?D+"22":SL2,color:run==="gw"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔌 Shlyuz muammosi","🔌 Gateway problem"))));
 }
 
+function ServiceLifecycleSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const STARTONLY=[
+    {col:BL,uz:"sudo systemctl start ssh — SSH hoziroq ishga tushdi",en:"sudo systemctl start ssh — SSH starts right now",duz:"Buyruq darhol bajariladi, xizmat ishlay boshlaydi.",den:"The command runs immediately, the service starts running."},
+    {col:AM,uz:"systemctl status ssh — Active: active (running) ✓",en:"systemctl status ssh — Active: active (running) ✓",duz:"Hozircha hammasi soz ko'rinadi.",den:"So far everything looks fine."},
+    {col:AM,uz:"Kali qayta yuklanadi (reboot)...",en:"Kali reboots...",duz:"Masalan elektr uzilishi yoki oddiy qayta ishga tushirish.",den:"Say, a power blip or a routine restart."},
+    {col:D,uz:"😴 SSH ishlamayapti — enable qilinmagani uchun avtomatik boshlanmadi",en:"😴 SSH isn't running — it never auto-started because it wasn't enabled",duz:"start faqat «hozir» degani, «doim» degani emas.",den:"start only means «now», not «forever».",final:true,bad:true}
+  ];
+  const ENABLED=[
+    {col:BL,uz:"sudo systemctl enable ssh — SSH yuklanishda avtomatik ishga tushishga sozlandi",en:"sudo systemctl enable ssh — SSH is configured to auto-start at boot",duz:"Diqqat: bu hali uni HOZIR ishga tushirmaydi.",den:"Note: this doesn't start it NOW."},
+    {col:AM,uz:"(Faqat kelajakdagi yuklanishlar uchun sozlandi — hozirgi holat o'zgarmadi)",en:"(Only future boots are configured — the current state is unchanged)",duz:"Shu sababli ko'pincha start && enable birga ishlatiladi.",den:"That's why start && enable are often used together."},
+    {col:AM,uz:"Kali qayta yuklanadi (reboot)...",en:"Kali reboots...",duz:"Xuddi shu voqea — sozlama esa boshqacha.",den:"The exact same event — but the configuration differs."},
+    {col:A,uz:"✅ SSH avtomatik ishga tushdi — systemd uni o'zi yuklanishda ishga tushirdi",en:"✅ SSH auto-started — systemd launched it on boot by itself",duz:"enable — «doim shunday bo'lsin» degan doimiy sozlama.",den:"enable is a permanent setting: «always do this from now on».",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="start"?STARTONLY:ENABLED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="start"?STARTONLY:run==="enable"?ENABLED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — reboot'dan keyin faqat start va enable qilingan xizmat qanday farq qilishini ko'ring.","⬇ Pick a scenario — see the difference after a reboot between a service that was only started and one that was enabled.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="start"?t(lang,"✗ start (bir martalik): reboot'dan keyin o'chib qoladi","✗ start (one-time): dies after a reboot"):t(lang,"✓ enable (doimiy): reboot'dan keyin o'zi qayta ishga tushadi","✓ enable (permanent): comes back by itself after a reboot")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("start");setStep(-1);},style:{flex:1,padding:"9px",background:run==="start"?D+"22":SL2,color:run==="start"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"▶ Faqat start","▶ start only")),
+      React.createElement("button",{onClick:()=>{setRun("enable");setStep(-1);},style:{flex:1,padding:"9px",background:run==="enable"?A+"22":SL2,color:run==="enable"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔁 start + enable","🔁 start + enable"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1502,17 +1542,20 @@ function LessonL09(){
       {icon:"🔁",text:{uz:"systemctl enable ssh — yuklanishda avtomatik",en:"systemctl enable ssh — auto-start at boot"}},
       {icon:"⏹",text:{uz:"systemctl stop ssh — to'xtatish",en:"systemctl stop ssh — stop it"}},
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"systemctl buyruqlari","systemctl commands")),
+    React.createElement(H2,{num:"§3"},t(lang,"start va enable: qanday farq bor?","start vs enable: what's the difference?")),
     React.createElement(P,null,t(lang,"start xizmatni hozir ishga tushiradi; stop to'xtatadi; restart o'chirib-yoqadi (sozlama o'zgargach kerak bo'ladi); status holatini, so'nggi loglarni va ishlayotgan-yo'qligini ko'rsatadi. enable va disable esa bir marta sozlanadi: enable xizmatni tizim HAR yonganda avtomatik ishga tushirishga sozlaydi, disable buni bekor qiladi. start (bir martalik) va enable (doimiy) farqini tushunish muhim.","start launches the service now; stop stops it; restart cycles it off and on (needed after a config change); status shows its state, recent logs and whether it's running. enable and disable are set once: enable configures the service to auto-start EVERY time the system boots, disable undoes it. Understanding the difference between start (one-time) and enable (permanent) is important.")),
-    React.createElement(H2,{num:"§4"},t(lang,"Pentestda kerak bo'ladigan xizmatlar","Services you'll need in a pentest")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: reboot'dan keyin nima bo'ladi?","Interactive simulator: what happens after a reboot?")),
+    React.createElement(P,null,t(lang,"start va enable orasidagi eng aniq farq — reboot paytida ko'rinadi. Ikkalasini sinang:","The clearest difference between start and enable shows up at reboot. Try both:")),
+    React.createElement(ServiceLifecycleSim),
+    React.createElement(H2,{num:"§5"},t(lang,"Pentestda kerak bo'ladigan xizmatlar","Services you'll need in a pentest")),
     React.createElement(P,null,t(lang,"Ba'zi xizmatlar pentestda tez-tez ishga tushiriladi: postgresql — Metasploit uning ma'lumotlar bazasini ishlatadi; apache2 yoki tez python3 -m http.server — nishonga fayl (payload) uzatish uchun vaqtinchalik veb-server; ssh — masofaviy kirish uchun. Ularni faqat kerak bo'lganda yoqing.","Some services are started often in a pentest: postgresql — Metasploit uses its database; apache2 or the quick python3 -m http.server — a temporary web server to deliver files (payloads) to the target; ssh — for remote access. Start them only when needed.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Loglarni ko'rish","Viewing logs")),
+    React.createElement(H2,{num:"§6"},t(lang,"Loglarni ko'rish","Viewing logs")),
     React.createElement(P,null,t(lang,"Xizmat ishlamasa, sabab ko'pincha loglarda. journalctl -u ssh xizmatning loglarini ko'rsatadi. systemctl status ssh esa oxirgi bir necha log qatorini darhol beradi. Bu — nosozlikni tashxislashning birinchi qadami.","If a service won't work, the reason is usually in the logs. journalctl -u ssh shows the service's logs. systemctl status ssh gives the last few log lines immediately. This is the first step in diagnosing a fault.")),
     React.createElement(Terminal,null,"sudo systemctl start postgresql   # Metasploit uchun\nsudo systemctl status ssh\nsudo systemctl enable ssh         # yuklanishda avto\npython3 -m http.server 8000       # tez veb-server\njournalctl -u apache2 --no-pager | tail"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Xizmatlarni faqat kerak bo'lganda ishga tushiring — doimiy ishlab turgan SSH yoki veb-server sizning mashinangizni ham hujum nishoniga aylantiradi.","Only start services when needed — an always-on SSH or web server turns your own machine into an attack target too.")),
-    React.createElement(H2,{num:"§6"},t(lang,"systemctl buyruqlari","The systemctl commands")),
+    React.createElement(H2,{num:"§7"},t(lang,"systemctl — qisqacha ma'lumotnoma","systemctl — quick reference")),
     React.createElement(LayerStack,{layers:[{n:"start",name:t(lang,"start","start"),color:"#69db7c",desc:{uz:"Xizmatni hoziroq ishga tushiradi.",en:"Starts the service now."}},{n:"stop",name:t(lang,"stop","stop"),color:"#ff6b6b",desc:{uz:"Xizmatni to'xtatadi.",en:"Stops the service."}},{n:"status",name:t(lang,"status","status"),color:"#4dabf7",desc:{uz:"Holati, PID va oxirgi loglarni ko'rsatadi.",en:"Shows state, PID and recent logs."}},{n:"enable",name:t(lang,"enable","enable"),color:"#ffd43b",desc:{uz:"Har yuklanishda avtomatik ishga tushiradi.",en:"Auto-starts it on every boot."}},]}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: xizmat holati","Practice: service status")),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: xizmat holati","Practice: service status")),
     React.createElement(P,null,t(lang,"Pentestda ko'pincha o'z Kali'ngizda vaqtincha veb-server yoki SSH ishga tushirasiz (fayl uzatish, reverse shell uchun). status buyrug'i xizmat ishlayotganini tasdiqlaydi.","In a pentest you often start a temporary web server or SSH on your own Kali (for file transfer, reverse shells). The status command confirms the service is running.")),
     React.createElement(Terminal,null,"sudo systemctl start ssh\nsudo systemctl status ssh\n# ● ssh.service - OpenBSD Secure Shell server\n#    Active: active (running) since ...\n#    Main PID: 1337 (sshd)\nsudo systemctl enable ssh   # har yuklanishda"),
     React.createElement(Quiz,{q:{uz:"Xizmatni tizim har yuklanganda avtomatik ishga tushirish uchun qaysi buyruq?",en:"Which command makes a service auto-start at every boot?"},opts:[{uz:"systemctl start",en:"systemctl start"},{uz:"systemctl enable",en:"systemctl enable"},{uz:"systemctl status",en:"systemctl status"},{uz:"systemctl stop",en:"systemctl stop"}],correct:1,exp:{uz:"systemctl enable xizmatni yuklanish vaqtida avtomatik ishga tushirishga sozlaydi; start esa uni faqat hozir bir marta ishga tushiradi.",en:"systemctl enable sets a service to auto-start at boot; start only launches it once now."}}));
