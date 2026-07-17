@@ -868,6 +868,46 @@ function OSINTExposureSim(){
       React.createElement("button",{onClick:()=>{setRun("clean");setStep(-1);},style:{flex:1,padding:"9px",background:run==="clean"?A+"22":SL2,color:run==="clean"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 «Gigienik» kompaniya","🔒 «Hygienic» company"))));
 }
 
+function NiktoTuningSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const FULL=[
+    {col:BL,uz:"nikto -h target.com — barcha 6700+ sinov ishga tushiriladi",en:"nikto -h target.com — all 6700+ tests are launched",duz:"Hech qanday cheklov yo'q — Nikto o'zining to'liq ro'yxatini sinaydi.",den:"No filtering at all — Nikto runs through its entire list."},
+    {col:AM,uz:"Daqiqada 300+ so'rov yuboriladi — WAF buni «flood» deb belgilaydi",en:"300+ requests per minute go out — the WAF flags it as a «flood»",duz:"Bunday zichlikdagi so'rov oddiy foydalanuvchi trafigiga o'xshamaydi.",den:"Traffic this dense doesn't look like an ordinary user."},
+    {col:AM,uz:"~50% da WAF Kali'ning IP manzilini vaqtincha bloklaydi",en:"At ~50% the WAF temporarily blocks Kali's IP address",duz:"Rate-limit chegarasi oshib ketdi.",den:"The rate-limit threshold was exceeded."},
+    {col:D,uz:"🚫 Skan yarim yo'lda to'xtadi — natija to'liq emas",en:"🚫 The scan stops halfway — the results are incomplete",duz:"Qolgan 3300+ sinov hech qachon bajarilmadi.",den:"The remaining 3,300+ tests never ran.",final:true,bad:true}
+  ];
+  const TUNED=[
+    {col:BL,uz:"nikto -h target.com -Tuning 1234 — faqat 4 toifadagi sinov tanlandi",en:"nikto -h target.com -Tuning 1234 — only 4 test categories are selected",duz:"Masalan faqat fayl oshkoralashuvi va konfiguratsiya xatolari.",den:"For example only file disclosure and misconfiguration checks."},
+    {col:AM,uz:"So'rovlar soni ~10 barobar kamayadi — WAF chegarasidan pastda qoladi",en:"The request count drops ~10x — it stays under the WAF's threshold",duz:"Har daqiqada atigi 30 so'rov — oddiy trafikka yaqinroq.",den:"Only ~30 requests per minute — closer to ordinary traffic."},
+    {col:AM,uz:"Skan bloklanmasdan oxirigacha yetadi",en:"The scan reaches the end without being blocked",duz:"IP hech qachon qora ro'yxatga tushmaydi.",den:"The IP never gets blacklisted."},
+    {col:A,uz:"✅ To'liq natija — kerakli toifalar tekshirildi, iz kam qoldi",en:"✅ Full results — the needed categories were checked, with a lighter footprint",duz:"Hammasi emas, lekin kerak bo'lgani — va oxirigacha yetkazilgan holda.",den:"Not everything, but what was needed — and carried through to completion.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="full"?FULL:TUNED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="full"?FULL:run==="tuned"?TUNED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu veb-serverni cheklovsiz va -Tuning bilan skanerlashni solishtiring.","⬇ Pick a scenario — compare scanning the same web server unfiltered versus with -Tuning.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="full"?t(lang,"✗ Cheklovsiz: WAF yarim yo'lda to'xtatdi","✗ Unfiltered: the WAF stopped it halfway"):t(lang,"✓ -Tuning bilan: to'liq skan, bloklanmadi","✓ With -Tuning: a complete scan, never blocked")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("full");setStep(-1);},style:{flex:1,padding:"9px",background:run==="full"?D+"22":SL2,color:run==="full"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🌊 Barcha sinovlar","🌊 All tests")),
+      React.createElement("button",{onClick:()=>{setRun("tuned");setStep(-1);},style:{flex:1,padding:"9px",background:run==="tuned"?A+"22":SL2,color:run==="tuned"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🎯 -Tuning 1234","🎯 -Tuning 1234"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1503,8 +1543,9 @@ function LessonL16(){
     React.createElement(P,null,t(lang,"-Tuning bilan qaysi turdagi sinovlarni ishga tushirishni tanlaysiz (masalan faqat SQLi yoki fayl yuklash sinovlari) — bu tezlashtiradi va shovqinni kamaytiradi. -o report.html -Format htm bilan natijani chiroyli HTML hisobotga saqlaysiz. -useproxy bilan esa Nikto trafigini Burp Suite orqali o'tkazasiz — bu so'rovlarni qo'lda tahlil qilish uchun qulay.","With -Tuning you choose which test types to run (e.g. only SQLi or file-upload tests) — this speeds it up and reduces noise. With -o report.html -Format htm you save results to a nice HTML report. With -useproxy you route Nikto's traffic through Burp Suite — handy for analyzing the requests by hand.")),
     React.createElement(Terminal,null,"nikto -h http://target.com\nnikto -h target.com -p 8080 -ssl\nnikto -h target.com -Tuning 1234        # tanlangan sinovlar\nnikto -h target.com -o report.html -Format htm\nnikto -h target.com -useproxy http://127.0.0.1:8080  # Burp orqali"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Nikto ni faqat sizga tegishli yoki yozma ruxsat berilgan tizimlarda ishlating. Ruxsatsiz skanerlash ko'p mamlakatda qonunga zid.","Only use Nikto on systems you own or are authorized to test. Unauthorized scanning is illegal in many countries.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Nikto nimalarni topadi","What Nikto finds")),
-    React.createElement(LayerStack,{layers:[{n:"hdr",name:t(lang,"Header","Header"),color:"#4dabf7",desc:{uz:"Xavfsizlik sarlavhalari yetishmasligi.",en:"Missing security headers."}},{n:"files",name:t(lang,"Files","Files"),color:"#ff3a5e",desc:{uz:"Xavfli/eskirgan fayllar va skriptlar.",en:"Dangerous/outdated files and scripts."}},{n:"ver",name:t(lang,"Version","Version"),color:"#ffd43b",desc:{uz:"Eskirgan server versiyalari.",en:"Outdated server versions."}},{n:"cfg",name:t(lang,"Config","Config"),color:"#69db7c",desc:{uz:"Noto'g'ri sozlamalar (indekslash, standart).",en:"Misconfigurations (indexing, defaults)."}},]}),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: cheklovsiz skan WAF'ga uchraydi","Interactive simulator: an unfiltered scan meets a WAF")),
+    React.createElement(P,null,t(lang,"Nikto «shovqinli» ekanini his qiling — xuddi shu veb-serverni cheklovsiz va -Tuning bilan skanerlashni solishtiring:","Feel just how «noisy» Nikto is — compare scanning the same web server unfiltered versus with -Tuning:")),
+    React.createElement(NiktoTuningSim),
     React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: veb-serverni skanerlash","Practice: scanning a web server")),
     React.createElement(P,null,t(lang,"Nikto veb-serverga yuzlab ma'lum zaiflik tekshiruvini yuboradi. U SHOVQINLI (loglarga ko'p yozadi), shuning uchun faqat ruxsat berilgan nishonlarda ishlating.","Nikto fires hundreds of known-vulnerability checks at a web server. It is NOISY (writes a lot to logs), so use it only on authorized targets.")),
     React.createElement(Terminal,null,"nikto -h http://10.0.0.5\n# + Server: Apache/2.4.29 (Ubuntu)\n# + The anti-clickjacking X-Frame-Options header is not present.\n# + OSVDB-3268: /admin/: Directory indexing found.\n# + /login.php: Admin login page found."),
