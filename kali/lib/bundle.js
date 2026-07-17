@@ -268,6 +268,46 @@ function SlideImg({src,cap,capEn}){
 }
 
 
+function KaliVsRegularSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const REG=[
+    {col:BL,uz:"Vazifa: SSH loginni tekshirish kerak — vosita qidirilmoqda",en:"Task: need to test an SSH login — searching for a tool",duz:"Oddiy Ubuntu ish stolida pentest vositalari oldindan yo'q.",den:"A regular Ubuntu desktop has no pentest tools preinstalled."},
+    {col:AM,uz:"«hydra» topilmadi — sudo apt install hydra kerak, bog'liqliklar yuklanmoqda",en:"«hydra» not found — need sudo apt install hydra, downloading dependencies",duz:"Internet tezligi va repozitoriy holatiga qarab bu daqiqalar oladi.",den:"Depending on internet speed and repo state, this can take minutes."},
+    {col:AM,uz:"O'rnatilgach ham wordlist yo'q — Google'da qidirib, qo'lda yuklab olinadi",en:"Even once installed, there's no wordlist — search Google, download it manually",duz:"Har bir yangi vosita uchun shu jarayon qaytariladi.",den:"This process repeats for every new tool you need."},
+    {col:D,uz:"⏱ 20+ daqiqa sarflandi — atigi BITTA vosita ishga tayyor bo'ldi",en:"⏱ 20+ minutes spent — only ONE tool is finally ready",duz:"Haqiqiy pentestda o'nlab vosita kerak bo'ladi — vaqt ko'paytiriladi.",den:"A real pentest needs dozens of tools — this time cost multiplies.",final:true,bad:true}
+  ];
+  const KALI=[
+    {col:BL,uz:"Vazifa: SSH loginni tekshirish kerak — Applications menyusi ochiladi",en:"Task: need to test an SSH login — the Applications menu opens",duz:"Xuddi shu vazifa, xuddi shu boshlanish nuqtasi.",den:"The exact same task, the exact same starting point."},
+    {col:AM,uz:"hydra allaqachon o'rnatilgan — «05 – Password Attacks» bo'limida turibdi",en:"hydra is already installed — sitting under «05 – Password Attacks»",duz:"600+ vosita oldindan o'rnatilgan holda menyuda tartiblangan.",den:"600+ tools come preinstalled, organized right in the menu."},
+    {col:AM,uz:"rockyou.txt wordlist ham /usr/share/wordlists papkasida tayyor",en:"The rockyou.txt wordlist is already sitting in /usr/share/wordlists",duz:"Vosita HAM, unga kerakli ma'lumot HAM birga keladi.",den:"Both the tool AND the data it needs arrive together."},
+    {col:A,uz:"⚡ 10 soniyada boshlash mumkin — hammasi tayyor turibdi",en:"⚡ Ready to start in 10 seconds — everything is already there",duz:"O'rnatish emas, faqat vazifaning o'ziga vaqt sarflanadi.",den:"Time goes into the actual task, not into installing things.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="reg"?REG:KALI;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="reg"?REG:run==="kali"?KALI:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu vazifani oddiy OS va Kali'da bajarish qanchalik farq qilishini ko'ring.","⬇ Pick a scenario — see how doing the same task differs on a regular OS versus Kali.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="reg"?t(lang,"✗ Oddiy OS: har bir vosita uchun qidirish+o'rnatish+sozlash","✗ Regular OS: search + install + configure for every single tool"):t(lang,"✓ Kali: vosita va ma'lumot menyuda tayyor kutib turibdi","✓ Kali: the tool and the data are already waiting in the menu")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("reg");setStep(-1);},style:{flex:1,padding:"9px",background:run==="reg"?D+"22":SL2,color:run==="reg"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🐧 Oddiy OS (Ubuntu)","🐧 Regular OS (Ubuntu)")),
+      React.createElement("button",{onClick:()=>{setRun("kali");setStep(-1);},style:{flex:1,padding:"9px",background:run==="kali"?A+"22":SL2,color:run==="kali"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🦂 Kali Linux","🦂 Kali Linux"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -282,17 +322,20 @@ function LessonL01(){
       {n:"🎯",name:t(lang,"Xavfsizlikka yo'naltirilgan","Security-focused"),color:"#69db7c",desc:{uz:"Menyu pentest bosqichlariga ajratilgan; kernel monitor rejimni qo'llaydi.",en:"The menu is grouped by pentest phase; the kernel supports monitor mode."}},
       {n:"🔄",name:t(lang,"Rolling release","Rolling release"),color:"#ffd43b",desc:{uz:"Doimiy yangilanadi — vositalar har doim eng so'nggi versiyada.",en:"Continuously updated — tools stay on the newest versions."}},
     ]}),
-    React.createElement(H2,{num:"§3"},t(lang,"Kali va boshqa distributivlar","Kali vs other distros")),
-    React.createElement(P,null,t(lang,"Kali kundalik foydalanish uchun mo'ljallanmagan. U hujum vositalariga to'la va tarixan root sifatida ishlagan (endi oddiy foydalanuvchi standart). Agar sizga faqat Linux o'rganish kerak bo'lsa — Ubuntu yaxshiroq. Agar yengilroq pentest distributivi kerak bo'lsa — Parrot OS muqobil. Kali'ning kuchi — professional pentest va CTF uchun tayyor, izchil muhit.","Kali is not meant for daily use. It is packed with attack tools and historically ran as root (a normal user is now the default). If you just want to learn Linux, Ubuntu is better. If you want a lighter pentest distro, Parrot OS is an alternative. Kali's strength is being a ready, consistent environment for professional pentesting and CTFs.")),
-    React.createElement(H2,{num:"§4"},t(lang,"Kali'ning turli nashrlari","Kali's editions")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: bir xil vazifa, ikki muhit","Interactive simulator: same task, two environments")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — SSH loginni tekshirish vazifasi oddiy OS'da va Kali'da qanchalik farqli boshlanishini ko'ring:","Try both scenarios — see how differently the exact same «test an SSH login» task starts on a regular OS versus on Kali:")),
+    React.createElement(KaliVsRegularSim),
+    React.createElement(H2,{num:"§4"},t(lang,"Kali va boshqa distributivlar","Kali vs other distros")),
+    React.createElement(P,null,t(lang,"Kali kundalik foydalanish uchun mo'ljallanmagan. U hujum vositalariga to'la va tarixan root sifatida ishlagan (endi oddiy foydalanuvchi standart). Agar sizga faqat Linux o'rganish kerak bo'lsa — Ubuntu yaxshiroq. Agar yengilroq pentest distributivi kerak bo'lsa — Parrot OS muqobil. Kali'ning kuchi — professional pentest va CTF uchun tayyor, izchil muhit, xuddi simulyatordagi kabi vosita va ma'lumot doim tayyor turadi.","Kali is not meant for daily use. It is packed with attack tools and historically ran as root (a normal user is now the default). If you just want to learn Linux, Ubuntu is better. If you want a lighter pentest distro, Parrot OS is an alternative. Kali's strength is being a ready, consistent environment for professional pentesting and CTFs — just like the simulator showed, the tool and the data are always ready.")),
+    React.createElement(H2,{num:"§5"},t(lang,"Kali'ning turli nashrlari","Kali's editions")),
     React.createElement(P,null,t(lang,"Kali bir necha shaklda keladi: to'liq Installer (kompyuterga o'rnatish uchun), Live (o'rnatmasdan USB'dan ishga tushirish), WSL (Windows ichida), ARM (Raspberry Pi), bulut (AWS/Azure) va hatto NetHunter — Android telefonlar uchun mobil pentest platformasi. Har biri bir xil vositalarga ega, faqat ishga tushirish usuli farq qiladi.","Kali comes in several forms: the full Installer (to install on a computer), Live (boot from USB without installing), WSL (inside Windows), ARM (Raspberry Pi), cloud (AWS/Azure), and even NetHunter — a mobile pentest platform for Android phones. Each has the same tools, only the way you run it differs.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Versiyani tekshirish","Checking the version")),
+    React.createElement(H2,{num:"§6"},t(lang,"Versiyani tekshirish","Checking the version")),
     React.createElement(Terminal,null,"cat /etc/os-release      # distributiv nomi va versiyasi\nuname -a                 # kernel versiyasi\n# Kali GNU/Linux Rolling ...\n\n# Vositalar ro'yxatini yangilash\nsudo apt update && sudo apt full-upgrade -y"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Kali kuchli vosita — undagi vositalarni faqat o'zingizga tegishli yoki yozma ruxsat berilgan tizimlarda ishlating. Ruxsatsiz foydalanish ko'p mamlakatda jinoiy javobgarlikka olib keladi.","Kali is a powerful tool — use its tools only on systems you own or have written permission to test. Unauthorized use is a criminal offense in many countries.")),
-    React.createElement(H2,{num:"§6"},t(lang,"Pentest bosqichlari va Kali menyusi","Pentest phases and the Kali menu")),
+    React.createElement(H2,{num:"§7"},t(lang,"Pentest bosqichlari va Kali menyusi","Pentest phases and the Kali menu")),
     React.createElement(P,null,t(lang,"Kali'ning kuchi shundaki, uning ilova menyusi tasodifiy emas — u pentest jarayonining bosqichlariga qarab tartiblangan. Har bir bosqich uchun tayyor vositalar bor, shuning uchun ish oqimini boshidan oxirigacha bir tizimda bajarasiz.","Kali's strength is that its application menu is not random — it is organized by the phases of the pentest process. Each phase has ready tools, so you run the whole workflow end to end in one system.")),
     React.createElement(FlowSteps,{color:"#a855f7",title:{uz:"Pentest ish oqimi",en:"The pentest workflow"},steps:[{icon:"🔍",text:{uz:"Ma'lumot to'plash (recon) — nishon haqida bilib olish",en:"Reconnaissance — learn about the target"}},{icon:"📡",text:{uz:"Skanerlash — ochiq portlar va xizmatlar",en:"Scanning — open ports and services"}},{icon:"💥",text:{uz:"Ekspluatatsiya — zaiflikdan foydalanish",en:"Exploitation — abuse a vulnerability"}},{icon:"🔑",text:{uz:"Post-exploitation — imtiyozni oshirish, tarqalish",en:"Post-exploitation — escalate, pivot"}},{icon:"📄",text:{uz:"Hisobot — topilmalarni hujjatlashtirish",en:"Reporting — document the findings"}},]}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: versiyani aniqlash","Practice: identify the version")),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: versiyani aniqlash","Practice: identify the version")),
     React.createElement(P,null,t(lang,"Har bir pentestni tizimni tanishdan boshlang. Quyidagi buyruqlar Kali versiyasi va yadrosini ko'rsatadi — bu vositalar mosligini va yangilanish zarurligini aniqlashga yordam beradi.","Start every pentest by getting to know the system. The commands below show the Kali version and kernel — which helps confirm tool compatibility and whether an update is needed.")),
     React.createElement(Terminal,null,"cat /etc/os-release\n# PRETTY_NAME=«Kali GNU/Linux Rolling»\n# ID=kali   VERSION=«2024.1»\nuname -r\n# 6.6.9-amd64\nwhoami\n# kali   (root emas — endi standart)"),
     React.createElement(Quiz,{q:{uz:"Kali Linux qaysi distributiv asosida qurilgan?",en:"Kali Linux is built on which distribution?"},opts:[{uz:"Debian",en:"Debian"},{uz:"Windows",en:"Windows"},{uz:"Arch",en:"Arch"},{uz:"macOS",en:"macOS"}],correct:0,exp:{uz:"Kali Debian asosida qurilgan — shu sababli apt paket menejeridan foydalanadi va Debian barqarorligini meros qilib oladi.",en:"Kali is built on Debian — which is why it uses the apt package manager and inherits Debian's stability."}}));
