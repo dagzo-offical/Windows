@@ -1748,6 +1748,46 @@ function WildcardInjectionSim(){
       React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL2,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 tar czf ... ./*","🔒 tar czf ... ./*"))));
 }
 
+function PathHijackSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const VULN=[
+    {col:BL,uz:"SUID root dastur ichida: system(\"thm\") — TO'LIQ YO'LSIZ chaqiriladi",en:"Inside the SUID root program: system(\"thm\") — called WITHOUT a full path",duz:"Dastur o'zi «thm qayerda ekan» deb PATH ga ishonadi.",den:"The program itself trusts PATH to answer «where is thm»."},
+    {col:AM,uz:"Hujumchi: export PATH=/tmp:$PATH — o'z yo'lini birinchi o'ringa qo'yadi",en:"Attacker: export PATH=/tmp:$PATH — puts their own folder first in line",duz:"Endi qidiruv /tmp dan boshlanadi, tizim papkalaridan emas.",den:"Now the search starts at /tmp, not the system folders."},
+    {col:AM,uz:"/tmp/thm (aslida /bin/bash nusxasi) yaratiladi va bajarish huquqi beriladi",en:"/tmp/thm (actually a copy of /bin/bash) is created and made executable",duz:"Nom bir xil — «thm» — lekin mazmuni butunlay boshqa.",den:"The name matches — «thm» — but the contents are completely different."},
+    {col:D,uz:"☠ Dastur o'zgartirilgan PATH bo'yicha /tmp/thm ni topadi va root bilan ishga tushiradi",en:"☠ The program finds /tmp/thm via the modified PATH and runs it as root",duz:"Dastur qaysi «thm» ekanini hech qachon tekshirmadi.",den:"The program never checked which «thm» it was actually running.",final:true,bad:true}
+  ];
+  const SAFE=[
+    {col:BL,uz:"SUID root dastur ichida: system(\"/usr/bin/thm\") — TO'LIQ YO'L bilan chaqiriladi",en:"Inside the SUID root program: system(\"/usr/bin/thm\") — called WITH a full path",duz:"Dastur PATH ga umuman murojaat qilmaydi.",den:"The program never consults PATH at all."},
+    {col:AM,uz:"Hujumchi xuddi shu hiyla-nayrangni sinaydi: export PATH=/tmp:$PATH",en:"The attacker tries the exact same trick: export PATH=/tmp:$PATH",duz:"Hujumchi tomonidan hech narsa boshqacha qilinmaydi.",den:"The attacker does nothing differently."},
+    {col:AM,uz:"/tmp/thm yaratiladi, lekin dastur PATH ni umuman tekshirmaydi",en:"/tmp/thm is created, but the program never even checks PATH",duz:"O'zgartirilgan PATH dasturga ta'sir qilmaydi.",den:"The modified PATH has no effect on the program."},
+    {col:A,uz:"🔒 Dastur to'g'ridan-to'g'ri /usr/bin/thm ga boradi — soxta faylimiz e'tiborsiz qoladi",en:"🔒 The program goes straight to /usr/bin/thm — our fake file is ignored",duz:"To'liq yo'l — PATH hijacking'ga qarshi eng oddiy himoya.",den:"A full path is the simplest defense against PATH hijacking.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="vuln"?VULN:SAFE;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="vuln"?VULN:run==="safe"?SAFE:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — §2 dagi 4-savolni amalda sinang: SUID dastur to'liq yo'lsiz chaqiradimi?","⬇ Pick a scenario — test §2's fourth question in action: does the SUID program call without a full path?")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0",fontFamily:"var(--font-mono)"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="vuln"?t(lang,"✗ Nisbiy chaqiruv: PATH hijacking ishlaydi","✗ Relative call: PATH hijacking works"):t(lang,"✓ To'liq yo'l: PATH hijacking ishlamaydi","✓ Full path: PATH hijacking fails")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("vuln");setStep(-1);},style:{flex:1,padding:"9px",background:run==="vuln"?D+"22":SL2,color:run==="vuln"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ system(\"thm\")","☠ system(\"thm\")")),
+      React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL2,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 system(\"/usr/bin/thm\")","🔒 system(\"/usr/bin/thm\")"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -3346,10 +3386,13 @@ function LessonL38(){
     React.createElement(SlideImg,{src:"privesc/path_s07_b.png",cap:"Tozalangan yoziladigan papkalar; /tmp odatda yoziladi, lekin PATH da bo'lmasligi mumkin.",capEn:"The cleaned writable folders; /tmp is usually writable but may not be in PATH."}),
     React.createElement(SlideImg,{src:"privesc/path_s08_a.png",cap:"cd /tmp; echo '/bin/bash' > thm; chmod 777 thm — PATH ga qo'shilgach, zararli 'thm' yaratiladi.",capEn:"cd /tmp; echo '/bin/bash' > thm; chmod 777 thm — after adding to PATH, the malicious 'thm' is created."}),
     React.createElement(SlideImg,{src:"privesc/path_s08_b.png",cap:"./path (root SUID skript) ishga tushganda bizning thm (bash) root bilan ochiladi: id → uid=0(root).",capEn:"When ./path (a root SUID script) runs, our thm (bash) opens as root: id → uid=0(root)."}),
-    React.createElement(H2,{num:"§4"},t(lang,"NFS va no_root_squash","NFS and no_root_squash")),
+React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: qachon PATH hijacking ishlaydi?","Interactive simulator: when does PATH hijacking work?")),
+    React.createElement(P,null,t(lang,"§2 dagi 4-savolni his qiling — xuddi shu PATH hiylasi ikki SUID dastur ustida qanday farq qilishini ko'ring:","Feel §2's fourth question for yourself — see how the exact same PATH trick fares against two SUID programs:")),
+    React.createElement(PathHijackSim),
+    React.createElement(H2,{num:"§5"},t(lang,"NFS va no_root_squash","NFS and no_root_squash")),
     React.createElement(P,null,t(lang,"Imtiyozlarni oshirish faqat ichki vektorlar bilan cheklanmaydi. NFS (Network File Share) konfiguratsiyasi /etc/exports faylida saqlanadi va odatda o'qilishi mumkin. Muhim element — no_root_squash opsiyasi. Odatda NFS masofaviy root'ni past imtiyozli nfsnobody ga o'zgartiradi; lekin no_root_squash yoqilgan yoziladigan ulashmada masofaviy root o'z huquqini saqlaydi. Bu holda biz SUID bit o'rnatilgan bajariladigan fayl yaratib, uni nishonda root bilan ishga tushira olamiz.","Privilege escalation isn't limited to internal vectors. NFS (Network File Share) configuration is stored in /etc/exports and is usually readable. The key element is the no_root_squash option. Normally NFS maps a remote root to the low-privilege nfsnobody; but on a writable share with no_root_squash enabled, a remote root keeps its rights. In that case we can create a SUID executable and run it as root on the target.")),
     React.createElement(SlideImg,{src:"privesc/path_s10.png",cap:"cat /etc/exports — /tmp va /backups ulashmalarida no_root_squash opsiyasi (privesc vektori).",capEn:"cat /etc/exports — the no_root_squash option on the /tmp and /backups shares (a privesc vector)."}),
-    React.createElement(H2,{num:"§5"},t(lang,"NFS ekspluatatsiyasi","NFS exploitation")),
+    React.createElement(H2,{num:"§6"},t(lang,"NFS ekspluatatsiyasi","NFS exploitation")),
     React.createElement(P,null,t(lang,"Hujum mashinamizdan o'rnatilishi mumkin bo'lgan ulashmalarni ko'ramiz (showmount -e), so'ng no_root_squash li ulashmani o'rnatamiz (mount). Ulashmada root bilan ishlaydigan oddiy C dasturini (nfs.c — /bin/bash ni chaqiradi) yozib, kompilyatsiya qilamiz va SUID bitini o'rnatamiz. Nishonda ushbu SUID fayl (nfs) root imtiyozi bilan ishlaydi, ./nfs esa to'g'ridan-to'g'ri root qobig'ini beradi.","From our attack box we list mountable shares (showmount -e), then mount the no_root_squash share (mount). On the share we write a simple C program that runs as root (nfs.c — it calls /bin/bash), compile it and set the SUID bit. On the target this SUID file (nfs) runs with root privileges, and ./nfs gives a root shell directly.")),
     React.createElement(SlideImg,{src:"privesc/path_s11_a.png",cap:"showmount -e <IP> — nishondagi NFS ulashmalarini ko'rish (/backups, /mnt/sharedfolder, /tmp).",capEn:"showmount -e <IP> — list the target's NFS shares (/backups, /mnt/sharedfolder, /tmp)."}),
     React.createElement(SlideImg,{src:"privesc/path_s11_b.png",cap:"no_root_squash li ulashmani hujum mashinamizga mount qilamiz (mount -o rw ...).",capEn:"We mount the no_root_squash share onto our attack box (mount -o rw ...)."}),
