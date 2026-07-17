@@ -1388,6 +1388,46 @@ function MFADefenseSim(){
       React.createElement("button",{onClick:()=>{setRun("mfa");setStep(-1);},style:{flex:1,padding:"9px",background:run==="mfa"?A+"22":SL2,color:run==="mfa"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 MFA bilan","🔒 With MFA"))));
 }
 
+function CronPrivescSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const SAFE=[
+    {col:BL,uz:"cat /etc/crontab — root har daqiqada /opt/backup.sh ni ishga tushiradi",en:"cat /etc/crontab — root runs /opt/backup.sh every minute",duz:"Bu — juda odatiy, zararsiz ko'rinadigan sozlama.",den:"This is a very ordinary, innocent-looking setup."},
+    {col:AM,uz:"ls -la /opt/backup.sh — -rwxr-xr-x root:root — faqat root yoza oladi",en:"ls -la /opt/backup.sh — -rwxr-xr-x root:root — only root can write to it",duz:"Ruxsatlar to'g'ri sozlangan: 755.",den:"Permissions are set correctly: 755."},
+    {col:AM,uz:"Oddiy foydalanuvchi sifatida tahrirlashga urinish: echo evil >> backup.sh — Permission denied",en:"Trying to edit it as a normal user: echo evil >> backup.sh — Permission denied",duz:"Yozish ruxsati yo'qligi sababli urinish darhol rad etiladi.",den:"Without write permission, the attempt is rejected immediately."},
+    {col:A,uz:"🔒 Skript himoyalangan — cron orqali privesc yo'li yopiq",en:"🔒 The script is protected — the cron privesc path is closed",duz:"To'g'ri ruxsat — butun hujum vektorini yo'qqa chiqaradi.",den:"Correct permissions eliminate this entire attack vector.",final:true}
+  ];
+  const RISKY=[
+    {col:BL,uz:"cat /etc/crontab — root har daqiqada xuddi shu /opt/backup.sh ni ishga tushiradi",en:"cat /etc/crontab — root runs the exact same /opt/backup.sh every minute",duz:"Tashqi ko'rinishi bir xil — muammo faqat ruxsatlarda.",den:"It looks identical from the outside — the problem is only in the permissions."},
+    {col:AM,uz:"ls -la /opt/backup.sh — -rwxrwxrwx root:root — HAMMA yoza oladi (xato!)",en:"ls -la /opt/backup.sh — -rwxrwxrwx root:root — EVERYONE can write to it (a mistake!)",duz:"777 — ehtimol tezkor tuzatish uchun vaqtincha qo'yilgan va unutilgan.",den:"777 — probably set as a quick fix once and never reverted."},
+    {col:AM,uz:"echo 'chmod +s /bin/bash' >> /opt/backup.sh — o'z qatorimiz qo'shildi",en:"echo 'chmod +s /bin/bash' >> /opt/backup.sh — our own line is appended",duz:"Skriptning mazmuni endi bizning nazoratimizda.",den:"The script's contents are now under our control."},
+    {col:D,uz:"☠ Bir daqiqadan keyin cron ishga tushadi — /bin/bash SUID bo'ldi, root shell tayyor",en:"☠ A minute later cron runs it — /bin/bash becomes SUID, a root shell is ready",duz:"bash -p buyrug'i endi to'g'ridan-to'g'ri root beradi.",den:"Running bash -p now hands over root directly.",final:true,bad:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="safe"?SAFE:RISKY;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="safe"?SAFE:run==="risky"?RISKY:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — root ishga tushiradigan bir xil cron skriptini ikki ruxsat sozlamasida ko'ring.","⬇ Pick a scenario — see the same root-run cron script under two different permission settings.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="safe"?t(lang,"✓ 755: cron privesc vektori yopiq","✓ 755: the cron privesc vector is closed"):t(lang,"✗ 777: bir daqiqada root shell","✗ 777: root shell within a minute")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL2,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Himoyalangan skript (755)","🔒 Protected script (755)")),
+      React.createElement("button",{onClick:()=>{setRun("risky");setStep(-1);},style:{flex:1,padding:"9px",background:run==="risky"?D+"22":SL2,color:run==="risky"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ Yoziladigan skript (777)","☠ Writable script (777)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2703,9 +2743,12 @@ function LessonL29(){
     React.createElement(Terminal,null,"# Qo'lda tez tekshiruv\nsudo -l                              # parolsiz sudo huquqlari\nfind / -perm -4000 -type f 2>/dev/null   # SUID fayllar\nuname -a                             # kernel versiyasi\ncat /etc/crontab                     # rejalashtirilgan ishlar\ngetcap -r / 2>/dev/null               # capabilitylar\n\n# Avtomatik (barcha tekshiruvlar birdan)\n./linpeas.sh"),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"GTFOBins (gtfobins.github.io) — SUID/sudo huquqli oddiy dasturlarni (vim, find, less) qanday qilib root olishga aylantirishni ko'rsatadi. Windows uchun ekvivalenti — LOLBAS. LinPEAS/WinPEAS esa barcha tekshiruvlarni avtomatlashtiradi va topilmalarni rang bilan belgilaydi.","GTFOBins (gtfobins.github.io) shows how ordinary programs (vim, find, less) with SUID/sudo can be turned into root. The Windows equivalent is LOLBAS. LinPEAS/WinPEAS automate all the checks and color-highlight the findings.")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Privesc texnikalarini faqat o'z laboratoriyangizda yoki yozma ruxsat berilgan pentestda sinang.","Only test privesc techniques in your own lab or a written-authorized pentest.")),
-    React.createElement(H2,{num:"§4"},t(lang,"Asosiy privesc vektorlari","The main privesc vectors")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: yoziladigan cron skripti","Interactive simulator: a writable cron script")),
+    React.createElement(P,null,t(lang,"§3 dagi 3-vektorni amalda ko'ring — root ishga tushiradigan bir xil skriptni ikki ruxsat sozlamasida sinang:","See §3's third vector in action — try the exact same root-run script under two different permission settings:")),
+    React.createElement(CronPrivescSim),
+    React.createElement(H2,{num:"§5"},t(lang,"Asosiy privesc vektorlari","The main privesc vectors")),
     React.createElement(LayerStack,{layers:[{n:"sudo",name:t(lang,"sudo -l","sudo -l"),color:"#ff3a5e",desc:{uz:"Parolsiz sudo → ko'pincha root shell.",en:"Passwordless sudo → often a root shell."}},{n:"SUID",name:t(lang,"SUID","SUID"),color:"#f7b955",desc:{uz:"find -perm -4000 → GTFOBins.",en:"find -perm -4000 → GTFOBins."}},{n:"cron",name:t(lang,"cron","cron"),color:"#4dabf7",desc:{uz:"Yoziladigan root skripti → reverse shell.",en:"A writable root script → reverse shell."}},{n:"kernel",name:t(lang,"kernel","kernel"),color:"#a855f7",desc:{uz:"Eski yadro → ma'lum exploit.",en:"Old kernel → a known exploit."}},]}),
-    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: birinchi tekshiruvlar","Practice: the first checks")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: birinchi tekshiruvlar","Practice: the first checks")),
     React.createElement(P,null,t(lang,"Kirgach, tez tekshiruvlardan boshlang: sudo -l, SUID fayllar va yadro versiyasi. Bular ko'pincha eng tez root yo'lini ochadi. To'liq bo'lim — 4-bo'limda.","After landing, start with the quick checks: sudo -l, SUID files and the kernel version. These often open the fastest path to root. The full section is in Section 4.")),
     React.createElement(Terminal,null,"sudo -l\n# User www-data may run the following commands:\n#   (root) NOPASSWD: /usr/bin/find\n# → GTFOBins: sudo find . -exec /bin/sh \\; -quit → root!\nuname -r ; find / -perm -4000 2>/dev/null"),
     React.createElement(Quiz,{q:{uz:"Linux privescning eng birinchi tekshiruvi qaysi?",en:"One of the very first Linux privesc checks?"},opts:[{uz:"sudo -l bilan sudo huquqlarini ko'rish",en:"Checking sudo rights with sudo -l"},{uz:"Kompyuterni o'chirish",en:"Shutting down the computer"},{uz:"Brauzerni ochish",en:"Opening a browser"},{uz:"Fonni o'zgartirish",en:"Changing the wallpaper"}],correct:0,exp:{uz:"sudo -l joriy foydalanuvchiga qanday sudo huquqlari berilganini ko'rsatadi — ko'pincha root'ga tez yo'l.",en:"sudo -l shows the current user's sudo rights — often a quick path to root."}}));
