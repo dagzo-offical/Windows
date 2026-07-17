@@ -348,6 +348,46 @@ function ISOVerifySim(){
       React.createElement("button",{onClick:()=>{setRun("bad");setStep(-1);},style:{flex:1,padding:"9px",background:run==="bad"?D+"22":SL2,color:run==="bad"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⛔ Shubhali ISO","⛔ Suspicious ISO"))));
 }
 
+function ManualVsPipeSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const MANUAL=[
+    {col:BL,uz:"auth.log faylida 2000+ qatorli tizim jurnali bor",en:"auth.log holds a 2000+ line system journal",duz:"Vazifa: muvaffaqiyatsiz SSH kirish urinishlari sonini bilish.",den:"Task: find out how many failed SSH login attempts there were."},
+    {col:AM,uz:"cat auth.log — barcha 2000+ qator ekranga bab-baravar oqib chiqadi",en:"cat auth.log — all 2000+ lines flood the screen at once",duz:"Terminalda faqat oxirgi ekran ko'rinadi, qolgani yuqoriga chiqib ketadi.",den:"Only the last screenful is visible — the rest scrolls off the top."},
+    {col:AM,uz:"«Failed password» iborasini qo'lda ko'zdan kechirib sanash kerak",en:"Must manually scan for and count «Failed password» by eye",duz:"Diqqat toza bo'lmasa, ba'zi qatorlar osongina o'tkazib yuboriladi.",den:"Without perfect focus, some matching lines are easy to miss."},
+    {col:D,uz:"😵 5+ daqiqa ketdi, natija baribir noaniq — ko'p urinish o'tkazib yuborilgan",en:"😵 5+ minutes spent, the result is still uncertain — many attempts were missed",duz:"Qo'lda sanash katta fayllarda ishonchli usul emas.",den:"Manual counting isn't a reliable method on large files.",final:true,bad:true}
+  ];
+  const PIPE=[
+    {col:BL,uz:"auth.log faylida xuddi shu 2000+ qatorli jurnal bor",en:"auth.log holds the exact same 2000+ line journal",duz:"Bir xil vazifa, bir xil fayl — usul boshqacha.",den:"Same task, same file — only the method differs."},
+    {col:AM,uz:"grep \"Failed password\" auth.log — faqat mos qatorlar qoladi",en:"grep \"Failed password\" auth.log — only matching lines remain",duz:"grep 2000 qatorni soniyaning ulushida ko'zdan kechiradi.",den:"grep scans all 2000 lines in a fraction of a second."},
+    {col:AM,uz:"| wc -l — qolgan qatorlar avtomatik sanaladi",en:"| wc -l — the remaining lines are counted automatically",duz:"Ikkinchi buyruq birinchisining natijasini darhol qabul qiladi.",den:"The second command instantly takes the first one's output as input."},
+    {col:A,uz:"⚡ 1 soniyada aniq javob: 342 — brute-force belgisi darhol ko'rinadi",en:"⚡ Exact answer in 1 second: 342 — a brute-force sign is immediately visible",duz:"Bitta qatorlik buyruq — inson xatosiz, to'liq va tezkor.",den:"One line of command — no human error, complete, and instant.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="manual"?MANUAL:PIPE;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="manual"?MANUAL:run==="pipe"?PIPE:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu 2000+ qatorli jurnalni qo'lda va quvur bilan tekshirishni solishtiring.","⬇ Pick a scenario — compare checking the same 2000+ line log by hand versus with a pipe.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="manual"?t(lang,"✗ Qo'lda: sekin va xatoga moyil","✗ By hand: slow and error-prone"):t(lang,"✓ Quvur bilan: tezkor va aniq","✓ With a pipe: instant and exact")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("manual");setStep(-1);},style:{flex:1,padding:"9px",background:run==="manual"?D+"22":SL2,color:run==="manual"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"😵 Qo'lda o'qish (cat)","😵 Read by hand (cat)")),
+      React.createElement("button",{onClick:()=>{setRun("pipe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="pipe"?A+"22":SL2,color:run==="pipe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Quvur bilan (grep|wc)","⚡ With a pipe (grep|wc)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -889,13 +929,16 @@ function LessonL03(){
     React.createElement(P,null,t(lang,"Faylni ochishning bir necha usuli bor: cat butun faylni ekranga chiqaradi (kichik fayllar uchun); less faylni sahifalab ko'rsatadi (katta loglar uchun, o'q tugmalari bilan aylantiriladi); head -n 20 birinchi 20 qatorni, tail -n 20 oxirgi 20 qatorni beradi; tail -f faylni real vaqtda kuzatadi (loglarni jonli ko'rish uchun). Har biri o'z o'rnida foydali.","There are several ways to read a file: cat prints the whole file (for small files); less shows it page by page (for large logs, scroll with arrow keys); head -n 20 gives the first 20 lines, tail -n 20 the last 20; tail -f watches a file in real time (to see logs live). Each is useful in its place.")),
     React.createElement(H2,{num:"§5"},t(lang,"Quvur va yo'naltirish","Pipes and redirection")),
     React.createElement(P,null,t(lang,"Buyruqlarning haqiqiy kuchi ularni birlashtirishda. Quvur (|) bir buyruqning chiqishini boshqasining kirishiga uzatadi. > chiqishni faylga yozadi (eskisini o'chirib), >> faylga qo'shadi. 2> xatolarni alohida faylga, &> hammasini (chiqish+xato) bir faylga yo'naltiradi. Bu belgilar orqali murakkab ish oqimlarini bir qatorda quyasiz.","The real power of commands is in combining them. A pipe (|) sends one command's output into another's input. > writes output to a file (overwriting), >> appends. 2> redirects errors to a separate file, &> everything (output+errors) to one file. With these symbols you build complex workflows in a single line.")),
-    React.createElement(H2,{num:"§6"},t(lang,"Wildcard va yordam","Wildcards and help")),
+    React.createElement(H2,{num:"§6"},t(lang,"Interaktiv simulyator: qo'lda o'qish vs quvur bilan filtrlash","Interactive simulator: reading by hand vs filtering with a pipe")),
+    React.createElement(P,null,t(lang,"Xuddi shu vazifani ikki usulda bajaring — 2000 qatorli auth.log faylida muvaffaqiyatsiz SSH urinishlarini sanash kerak:","Do the exact same task two ways — count the failed SSH attempts in a 2000-line auth.log file:")),
+    React.createElement(ManualVsPipeSim),
+    React.createElement(H2,{num:"§7"},t(lang,"Wildcard va yordam","Wildcards and help")),
     React.createElement(P,null,t(lang,"Wildcard'lar ko'p faylni bir vaqtda tanlaydi: * har qanday belgilar (*.txt — barcha .txt fayllar), ? bitta belgi, [abc] qavsdagi belgilardan biri. Yordam kerak bo'lsa: man buyruq to'liq qo'llanma, buyruq --help qisqa yordam, tldr buyruq sodda misollar beradi.","Wildcards select many files at once: * any characters (*.txt — all .txt files), ? one character, [abc] one of the bracketed characters. When you need help: man command is the full manual, command --help a short help, tldr command gives simple examples.")),
     React.createElement(Terminal,null,"# Ochiq portlarni sanab, faylga yozish\ncat scan.txt | grep open | wc -l\n\n# SUID fayllarni topib, xatolarni yashirish (privesc uchun)\nfind / -perm -4000 2>/dev/null > suid.txt\n\n# Barcha .conf fayllarni topish\nfind /etc -name \"*.conf\""),
-    React.createElement(H2,{num:"§7"},t(lang,"Quvur qanday oqadi","How a pipe flows")),
-    React.createElement(P,null,t(lang,"Quvur (|) chapdagi buyruqning chiqishini o'ngdagining kirishiga uzatadi. Bir necha quvurni ulab, ma'lumotni bosqichma-bosqich filtrlaydigan «konveyer» quramiz — bu bash'ning eng kuchli g'oyasi.","A pipe (|) sends the left command's output into the right command's input. By chaining several pipes we build a «conveyor» that filters data step by step — the most powerful idea in bash.")),
+    React.createElement(H2,{num:"§8"},t(lang,"Quvur qanday oqadi","How a pipe flows")),
+    React.createElement(P,null,t(lang,"Quvur (|) chapdagi buyruqning chiqishini o'ngdagining kirishiga uzatadi. Bir necha quvurni ulab, ma'lumotni bosqichma-bosqich filtrlaydigan «konveyer» quramiz — bu bash'ning eng kuchli g'oyasi, xuddi simulyatordagi «Quvur bilan» ssenariysida ko'rganingizdek.","A pipe (|) sends the left command's output into the right command's input. By chaining several pipes we build a «conveyor» that filters data step by step — the most powerful idea in bash, just like the simulator's «With a pipe» scenario showed.")),
     React.createElement(FlowSteps,{color:"#ffd43b",title:{uz:"cat scan.txt | grep open | wc -l",en:"cat scan.txt | grep open | wc -l"},steps:[{icon:"📄",text:{uz:"cat — faylning barcha qatorlarini chiqaradi",en:"cat — emits all lines of the file"}},{icon:"🔎",text:{uz:"grep open — faqat «open» bor qatorlar",en:"grep open — only lines containing «open»"}},{icon:"🔢",text:{uz:"wc -l — qolgan qatorlarni sanaydi",en:"wc -l — counts the remaining lines"}},]}),
-    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: haqiqiy natija","Practice: real output")),
+    React.createElement(H2,{num:"§9"},t(lang,"Amaliyot: haqiqiy natija","Practice: real output")),
     React.createElement(P,null,t(lang,"Quyidagi misolda ls -l batafsil ro'yxat beradi, so'ng uni grep bilan filtrlaymiz. Chiqishga qarab har bir bayroqning ta'sirini ko'rasiz.","In the example below ls -l gives a detailed listing, then we filter it with grep. From the output you can see the effect of each flag.")),
     React.createElement(Terminal,null,"ls -l /etc | head -3\n# total 1160\n# drwxr-xr-x  3 root root 4096 Jan  5 10:22 apache2\n# -rw-r--r--  1 root root 2981 Jan  5 10:20 passwd\n\nls /etc | grep -c conf\n# 42   (nomida «conf» bor fayllar soni)"),
     React.createElement(Quiz,{q:{uz:"Qaysi belgi bir buyruq chiqishini ikkinchisiga uzatadi?",en:"Which symbol sends one command's output into another?"},opts:[{uz:"> (yo'naltirish)",en:"> (redirect)"},{uz:"| (quvur)",en:"| (pipe)"},{uz:"& (fon)",en:"& (background)"},{uz:"# (izoh)",en:"# (comment)"}],correct:1,exp:{uz:"Quvur (|) birinchi buyruqning standart chiqishini ikkinchisining standart kirishiga uzatadi. > esa faylga yozadi.",en:"The pipe (|) connects the first command's stdout to the second's stdin. > writes to a file instead."}}));
