@@ -828,6 +828,46 @@ function AXFRSim(){
       React.createElement("button",{onClick:()=>{setRun("closed");setStep(-1);},style:{flex:1,padding:"9px",background:run==="closed"?A+"22":SL2,color:run==="closed"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Cheklangan AXFR (to'g'ri)","🔒 Restricted AXFR (correct)"))));
 }
 
+function OSINTExposureSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const LEAKY=[
+    {col:BL,uz:"theHarvester -d bigcorp.com -b crtsh,google,linkedin — so'rov yuborildi",en:"theHarvester -d bigcorp.com -b crtsh,google,linkedin — the query is sent",duz:"Hujumchi hech qanday maxsus mahorat ko'rsatmadi — bu standart so'rov.",den:"The attacker showed no special skill — this is a standard query."},
+    {col:AM,uz:"crt.sh: 340 ta sertifikat — dev, staging, old-vpn, admin-panel kabi 60+ subdomen oshkor",en:"crt.sh: 340 certificates — 60+ subdomains exposed, like dev, staging, old-vpn, admin-panel",duz:"Har bir subdomen uchun alohida sertifikat chiqarilgan — hammasi jurnalda.",den:"A separate certificate was issued per subdomain — all of it logged."},
+    {col:AM,uz:"LinkedIn: 200+ xodim profili — email formatini (ism.familiya@) taxmin qilish oson",en:"LinkedIn: 200+ employee profiles — easy to guess the email format (first.last@)",duz:"Ochiq profillar to'liq ism va lavozimni ko'rsatadi.",den:"Public profiles show full names and job titles."},
+    {col:D,uz:"📂 To'liq xodim+infratuzilma ro'yxati — hech narsa yubormasdan olindi",en:"📂 A full employee+infrastructure list — obtained without sending a single packet",duz:"Bu ro'yxat keyingi fishing yoki parol hujumi uchun tayyor asos.",den:"This list is a ready-made foundation for the next phishing or password attack.",final:true,bad:true}
+  ];
+  const CLEAN=[
+    {col:BL,uz:"theHarvester -d smallcorp.com -b crtsh,google,linkedin — xuddi shu so'rov",en:"theHarvester -d smallcorp.com -b crtsh,google,linkedin — the exact same query",duz:"Hujumchi tomonidan hech narsa boshqacha qilinmadi.",den:"The attacker did nothing differently."},
+    {col:AM,uz:"crt.sh: faqat 3 ta sertifikat (wildcard *.smallcorp.com) — subdomen nomlari yashirin",en:"crt.sh: only 3 certificates (a wildcard *.smallcorp.com) — subdomain names stay hidden",duz:"Bitta wildcard sertifikat cheksiz subdomenni bitta yozuv orqasiga yashiradi.",den:"One wildcard certificate hides unlimited subdomains behind a single entry."},
+    {col:AM,uz:"LinkedIn: kompaniya sahifasi yopiq, xodimlar profilida ish joyi ko'rsatilmagan",en:"LinkedIn: the company page is private, employees don't list their employer",duz:"Bu — texnik emas, tashkiliy siyosat natijasi.",den:"This is the result of policy, not technology."},
+    {col:A,uz:"🔒 Deyarli bo'sh natija — OSINT gigienasi hujumchini «ko'r» qoldirdi",en:"🔒 Almost nothing — OSINT hygiene left the attacker «blind»",duz:"Passiv razvedka faqat nishon ochiq bo'lgan qadar samarali.",den:"Passive recon is only as effective as the target is exposed.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="leaky"?LEAKY:CLEAN;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="leaky"?LEAKY:run==="clean"?CLEAN:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — bir xil theHarvester so'rovi ikki xil kompaniyada qancha ma'lumot ochib berishini solishtiring.","⬇ Pick a scenario — see how much the same theHarvester query reveals about two different companies.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="leaky"?t(lang,"✗ Oshkor kompaniya: OSINT hamma narsani beradi","✗ Exposed company: OSINT gives up everything"):t(lang,"✓ Gigienik kompaniya: OSINT deyarli hech narsa topmaydi","✓ Hygienic company: OSINT finds almost nothing")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("leaky");setStep(-1);},style:{flex:1,padding:"9px",background:run==="leaky"?D+"22":SL2,color:run==="leaky"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"📂 «Oshkor» kompaniya","📂 «Exposed» company")),
+      React.createElement("button",{onClick:()=>{setRun("clean");setStep(-1);},style:{flex:1,padding:"9px",background:run==="clean"?A+"22":SL2,color:run==="clean"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 «Gigienik» kompaniya","🔒 «Hygienic» company"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1865,13 +1905,16 @@ function LessonL15(){
     ]}),
     React.createElement(H2,{num:"§3"},t(lang,"Nega passiv razvedka qimmatli?","Why passive recon is valuable")),
     React.createElement(P,null,t(lang,"Passiv razvedka pentestning eng birinchi va eng xavfsiz bosqichi — nishonga tegmasdan ko'p narsa bilib olasiz. Topilgan email manzillar keyingi fishing yoki parol hujumlari uchun foydalanuvchi ro'yxati bo'lib xizmat qiladi (masalan aziz@example.com dan aziz login nomini taxmin qilish mumkin). Xodim ismlari ijtimoiy muhandislik uchun, subdomenlar esa yangi hujum yuzasi uchun ishlatiladi.","Passive recon is the first and safest phase of a pentest — you learn a lot without touching the target. Discovered email addresses serve as a username list for later phishing or password attacks (e.g. from alice@example.com you can guess the login name alice). Employee names are used for social engineering, and subdomains as a new attack surface.")),
-    React.createElement(H2,{num:"§4"},t(lang,"Manbalar va crt.sh","Sources and crt.sh")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: oshkor vs gigienik kompaniya","Interactive simulator: exposed vs hygienic company")),
+    React.createElement(P,null,t(lang,"Hujumchining harakati bir xil — natija esa nishonning o'z ochiqligiga bog'liq. Ikkala kompaniyani sinang:","The attacker's action is identical — the result depends entirely on how exposed the target itself is. Try both companies:")),
+    React.createElement(OSINTExposureSim),
+    React.createElement(H2,{num:"§5"},t(lang,"Manbalar va crt.sh","Sources and crt.sh")),
     React.createElement(P,null,t(lang,"theHarvester -b bilan qaysi manbadan qidirishni tanlaysiz: google, bing, duckduckgo, linkedin va boshqalar. Ayniqsa qimmatlisi — crtsh manbasi: u SSL sertifikat shaffoflik jurnallaridan subdomenlarni topadi. Nega bu kuchli? Chunki har bir HTTPS sayti sertifikat oladi, va bu sertifikatlar ochiq jurnallarga yoziladi — shuning uchun crt.sh ko'pincha kompaniya yashirmoqchi bo'lgan ichki subdomenlarni ham ochib beradi.","With theHarvester -b you choose which source to query: google, bing, duckduckgo, linkedin and others. Especially valuable is the crtsh source: it finds subdomains from SSL certificate transparency logs. Why is it powerful? Because every HTTPS site gets a certificate, and those certificates are written to public logs — so crt.sh often reveals even the internal subdomains a company meant to hide.")),
     React.createElement(Terminal,null,"theHarvester -d example.com -b google\ntheHarvester -d example.com -b bing,duckduckgo,crtsh\ntheHarvester -d example.com -b all -f natija   # HTML/XML ga saqlash"),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"crt.sh manbasi SSL sertifikat jurnallaridan subdomenlarni topadi — bu ko'pincha yashirin ichki subdomenlarni ham ochib beradi.","The crt.sh source finds subdomains from SSL certificate logs — often revealing hidden internal subdomains too.")),
-    React.createElement(H2,{num:"§5"},t(lang,"theHarvester manbalari","theHarvester sources")),
+    React.createElement(H2,{num:"§6"},t(lang,"theHarvester manbalari","theHarvester sources")),
     React.createElement(LayerStack,{layers:[{n:"google",name:t(lang,"google","google"),color:"#4dabf7",desc:{uz:"Qidiruv natijalaridan email/subdomen.",en:"Emails/subdomains from search results."}},{n:"crtsh",name:t(lang,"crt.sh","crt.sh"),color:"#69db7c",desc:{uz:"Sertifikat shaffofligidan subdomenlar.",en:"Subdomains from certificate transparency."}},{n:"linkedin",name:t(lang,"linkedin","linkedin"),color:"#a855f7",desc:{uz:"Xodimlar ismlari (ijtimoiy muhandislik uchun).",en:"Employee names (for social engineering)."}},{n:"dns",name:t(lang,"dns","dns"),color:"#ffd43b",desc:{uz:"DNS orqali xostlar.",en:"Hosts via DNS."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: passiv razvedka","Practice: passive recon")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: passiv razvedka","Practice: passive recon")),
     React.createElement(P,null,t(lang,"theHarvester nishon bilan to'g'ridan-to'g'ri aloqa qilmasdan (passiv) ochiq manbalardan email, subdomen va xostlarni yig'adi — shuning uchun nishon buni sezmaydi.","theHarvester gathers emails, subdomains and hosts from open sources without contacting the target directly (passive) — so the target never notices.")),
     React.createElement(Terminal,null,"theHarvester -d example.com -b crtsh,dns\n# [*] Emails found:\n#   admin@example.com\n#   info@example.com\n# [*] Hosts found:\n#   mail.example.com  vpn.example.com  dev.example.com"),
     React.createElement(Quiz,{q:{uz:"theHarvester qanday razvedka turiga misol?",en:"What type of recon is theHarvester?"},opts:[{uz:"Aktiv (nishonga hujum)",en:"Active (probing the target)"},{uz:"Passiv (ochiq manba OSINT)",en:"Passive (open-source OSINT)"},{uz:"Ekspluatatsiya",en:"Exploitation"},{uz:"Post-ekspluatatsiya",en:"Post-exploitation"}],correct:1,exp:{uz:"theHarvester passiv OSINT vositasi — u ma'lumotni uchinchi tomon ochiq manbalaridan oladi va nishonga hech narsa yubormaydi.",en:"theHarvester is a passive OSINT tool — it pulls data from third-party public sources and sends nothing to the target."}}));
