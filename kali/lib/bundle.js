@@ -988,6 +988,46 @@ function NullSessionSim(){
       React.createElement("button",{onClick:()=>{setRun("restricted");setStep(-1);},style:{flex:1,padding:"9px",background:run==="restricted"?A+"22":SL2,color:run==="restricted"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Zamonaviy Windows (2022)","🔒 Modern Windows (2022)"))));
 }
 
+function EternalBlueSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const VULN=[
+    {col:BL,uz:"nmap --script smb-vuln-ms17-010 -p445 10.0.0.5 — SMBv1 yoqilgan, patch qilinmagan",en:"nmap --script smb-vuln-ms17-010 -p445 10.0.0.5 — SMBv1 is on, unpatched",duz:"2017-yilgi zaiflik hamon ochiq turibdi.",den:"A 2017 vulnerability still sitting wide open."},
+    {col:AM,uz:"Natija: VULNERABLE — MS17-010 (EternalBlue) tasdiqlandi",en:"Result: VULNERABLE — MS17-010 (EternalBlue) confirmed",duz:"WannaCry va NotPetya aynan shu kamchilikdan foydalangan.",den:"WannaCry and NotPetya both exploited exactly this flaw."},
+    {col:AM,uz:"Metasploit exploit/windows/smb/ms17_010_eternalblue ishga tushiriladi",en:"Metasploit's exploit/windows/smb/ms17_010_eternalblue is launched",duz:"Tayyor, keng tarqalgan modul — maxsus bilim talab qilmaydi.",den:"A ready-made, widely used module — requires no special expertise."},
+    {col:D,uz:"☠ Autentifikatsiyasiz TO'LIQ masofaviy kod bajarish — SYSTEM huquqi",en:"☠ Unauthenticated, FULL remote code execution — SYSTEM privileges",duz:"Login yoki parol umuman kerak bo'lmadi.",den:"No login or password was ever needed.",final:true,bad:true}
+  ];
+  const PATCHED=[
+    {col:BL,uz:"nmap --script smb-vuln-ms17-010 -p445 10.0.0.9 — SMBv1 o'chirilgan, faqat SMBv2/3",en:"nmap --script smb-vuln-ms17-010 -p445 10.0.0.9 — SMBv1 disabled, only SMBv2/3",duz:"Xuddi shu skript, xuddi shu buyruq.",den:"The exact same script, the exact same command."},
+    {col:AM,uz:"Natija: NOT VULNERABLE — zaif protokol umuman javob bermaydi",en:"Result: NOT VULNERABLE — the weak protocol doesn't even respond",duz:"SMBv1 o'zi mavjud bo'lmagani uchun kamchilikning o'zi yo'q.",den:"With SMBv1 simply absent, the flaw has nothing to live in."},
+    {col:AM,uz:"Metasploit moduli muvaffaqiyatsiz — SMBv1 mavjud emas",en:"The Metasploit module fails — SMBv1 doesn't exist to exploit",duz:"Eng mashhur exploit ham ishlaydigan nishonsiz foydasiz.",den:"Even the most famous exploit is useless without a target to work on."},
+    {col:A,uz:"🛡 2017-yildan beri ma'lum bo'lgan hujum bekor — bitta yangilanish yetarli edi",en:"🛡 An attack known since 2017 neutralized — one update was enough",duz:"Muntazam yamash (patching) bu darajadagi hujumni butunlay yo'qqa chiqaradi.",den:"Regular patching wipes out an attack of this magnitude entirely.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="vuln"?VULN:PATCHED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="vuln"?VULN:run==="patched"?PATCHED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu MS17-010 tekshiruvini zaif va yangilangan SMB'da sinang.","⬇ Pick a scenario — run the same MS17-010 check against vulnerable and patched SMB.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="vuln"?t(lang,"✗ SMBv1: butun tizim bir buyruqda egallandi","✗ SMBv1: the whole system taken over in one command"):t(lang,"✓ SMBv2/3: eng mashhur exploit ham ishlamaydi","✓ SMBv2/3: even the most famous exploit fails")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("vuln");setStep(-1);},style:{flex:1,padding:"9px",background:run==="vuln"?D+"22":SL2,color:run==="vuln"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ SMBv1 (patch qilinmagan)","☠ SMBv1 (unpatched)")),
+      React.createElement("button",{onClick:()=>{setRun("patched");setStep(-1);},style:{flex:1,padding:"9px",background:run==="patched"?A+"22":SL2,color:run==="patched"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 SMBv2/3 (yangilangan)","🛡 SMBv2/3 (patched)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2115,9 +2155,12 @@ function LessonL19(){
     React.createElement(P,null,t(lang,"SMB tarixdagi eng mashhur zaifliklardan biriga ega — MS17-010, ya'ni EternalBlue. Bu eski SMBv1'dagi kamchilik bo'lib, hujumchiga masofadan kod bajarishga (tizimni to'liq egallashga) imkon beradi — WannaCry ransomware aynan shuni ishlatgan. Ajablanarlisi, u hali ham ko'p eski, yangilanmagan tizimlarda ochiq. Nmap skripti bilan tekshirib ko'rish mumkin.","SMB has one of the most famous vulnerabilities in history — MS17-010, aka EternalBlue. It's a flaw in the old SMBv1 that lets an attacker execute code remotely (fully take over the system) — the WannaCry ransomware used exactly this. Remarkably, it's still open on many old, unpatched systems. You can check for it with an Nmap script.")),
     React.createElement(Terminal,null,"smbclient -L //10.0.0.5 -N        # anonim ulashmalar ro'yxati\nsmbmap -H 10.0.0.5                 # ruxsatlarni xaritalash\nsmbclient //10.0.0.5/Documents -N # ulashmaga ulanish\nnmap --script smb-vuln-ms17-010 -p445 10.0.0.5  # EternalBlue"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"SMB enumeratsiyani faqat sizga tegishli yoki yozma ruxsat berilgan tizimlarda o'tkazing.","Only perform SMB enumeration on systems you own or are authorized to test.")),
-    React.createElement(H2,{num:"§5"},t(lang,"SMB vositalari","The SMB tools")),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: SMBv1 zaif vs yangilangan","Interactive simulator: vulnerable SMBv1 vs patched")),
+    React.createElement(P,null,t(lang,"Xuddi shu MS17-010 tekshiruvi ikki xil serverda qanday farqli tugashini ko'ring:","See how the exact same MS17-010 check ends very differently against two different servers:")),
+    React.createElement(EternalBlueSim),
+    React.createElement(H2,{num:"§6"},t(lang,"SMB vositalari","The SMB tools")),
     React.createElement(LayerStack,{layers:[{n:"smbclient",name:t(lang,"smbclient","smbclient"),color:"#4dabf7",desc:{uz:"Ulashmalarga FTP kabi ulanish.",en:"Connect to shares like FTP."}},{n:"smbmap",name:t(lang,"smbmap","smbmap"),color:"#69db7c",desc:{uz:"Ulashmalar va ruxsatlarni tez sanash.",en:"Quickly enumerate shares and permissions."}},{n:"crackmapexec",name:t(lang,"crackmapexec","crackmapexec"),color:"#a855f7",desc:{uz:"Ommaviy tekshirish va ma'lumotnoma sinovi.",en:"Mass checks and credential testing."}},{n:"445",name:t(lang,"port 445","port 445"),color:"#ffd43b",desc:{uz:"SMB asosiy porti (139 — eski NetBIOS).",en:"The main SMB port (139 — legacy NetBIOS)."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: ulashmalarni ko'rish","Practice: listing shares")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: ulashmalarni ko'rish","Practice: listing shares")),
     React.createElement(P,null,t(lang,"smbclient -L bilan mavjud ulashmalarni sanaydi. «read/write» ruxsatli ulashma — fayl yuklash yoki chiqarish uchun to'g'ridan-to'g'ri imkoniyat.","smbclient -L lists the available shares. A share with read/write permission is a direct opportunity to upload or exfiltrate files.")),
     React.createElement(Terminal,null,"smbclient -L //10.0.0.5 -N\n#   Sharename       Type      Comment\n#   backups         Disk\n#   IPC$            IPC       Remote IPC\nsmbclient //10.0.0.5/backups -N\n# smb: \\> ls   → fayllarni ko'rish"),
     React.createElement(Quiz,{q:{uz:"SMB protokoli qaysi asosiy portda ishlaydi?",en:"On which main port does SMB run?"},opts:[{uz:"22",en:"22"},{uz:"80",en:"80"},{uz:"445",en:"445"},{uz:"53",en:"53"}],correct:2,exp:{uz:"SMB asosan 445-portda (eski hollarda 139) ishlaydi va Windows tarmoqlarida fayl ulashish uchun ishlatiladi.",en:"SMB runs mainly on port 445 (139 in legacy cases) and is used for file sharing in Windows networks."}}));
