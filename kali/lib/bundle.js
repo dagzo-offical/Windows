@@ -908,6 +908,46 @@ function NiktoTuningSim(){
       React.createElement("button",{onClick:()=>{setRun("tuned");setStep(-1);},style:{flex:1,padding:"9px",background:run==="tuned"?A+"22":SL2,color:run==="tuned"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🎯 -Tuning 1234","🎯 -Tuning 1234"))));
 }
 
+function WhatWebAggroSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const A1=[
+    {col:BL,uz:"whatweb -a 1 target.com — faqat bosh sahifaga bitta so'rov",en:"whatweb -a 1 target.com — just one request to the homepage",duz:"Eng yashirin daraja — deyarli oddiy brauzer so'rovidek ko'rinadi.",den:"The stealthiest level — looks almost like an ordinary browser request."},
+    {col:AM,uz:"Aniqlandi: Apache, PHP — sarlavhalardan ko'ringan narsalar",en:"Detected: Apache, PHP — what's visible from the headers",duz:"Bitta so'rov faqat sirtdagi narsani ko'rsatadi.",den:"A single request only reveals what's on the surface."},
+    {col:AM,uz:"CMS versiyasi ANIQLANMADI — buning uchun qo'shimcha yo'llar (/wp-login.php) tekshirilishi kerak edi",en:"CMS version NOT detected — that would need extra paths tested (/wp-login.php)",duz:"WordPress bor-yo'qligi ham aniq emas, faqat taxmin.",den:"Whether WordPress is even present is unclear — only a guess."},
+    {col:D,uz:"🌫 Yarim rasm — versiyasiz maqsadli hujum rejalashtirib bo'lmaydi",en:"🌫 A half picture — without a version, no targeted attack can be planned",duz:"Yashirinlik uchun ma'lumot chuqurligidan voz kechildi.",den:"Depth of information was traded away for stealth.",final:true,bad:true}
+  ];
+  const A4=[
+    {col:BL,uz:"whatweb -a 4 target.com — o'nlab qo'shimcha yo'l va fayl tekshiriladi",en:"whatweb -a 4 target.com — dozens of extra paths and files are probed",duz:"Endi bitta emas, ko'plab so'rov ketma-ket yuboriladi.",den:"Now not one but many requests go out in sequence."},
+    {col:AM,uz:"/wp-login.php, /wp-content/, readme.html kabi WordPress'ga xos yo'llar sinaladi",en:"WordPress-specific paths like /wp-login.php, /wp-content/, readme.html are tried",duz:"Har CMS'ning o'ziga xos «imzo fayllari» bor.",den:"Every CMS has its own tell-tale «signature files»."},
+    {col:AM,uz:"Aniqlandi: WordPress 5.2, o'rnatilgan plaginlar ro'yxati bilan",en:"Detected: WordPress 5.2, along with a list of installed plugins",duz:"Chuqurroq tekshiruv — chuqurroq javob.",den:"A deeper probe — a deeper answer."},
+    {col:A,uz:"🎯 To'liq rasm — searchsploit wordpress 5.2 bilan darhol qidiruv boshlanadi",en:"🎯 A full picture — a targeted searchsploit wordpress 5.2 lookup can start right away",duz:"Aniq versiya — aniq hujum rejasi.",den:"An exact version — an exact attack plan.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="a1"?A1:A4;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="a1"?A1:run==="a4"?A4:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu saytni -a 1 va -a 4 bilan tekshirishni solishtiring.","⬇ Pick a scenario — compare probing the same site with -a 1 versus -a 4.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="a1"?t(lang,"✗ -a 1: yashirin, lekin sayoz","✗ -a 1: stealthy, but shallow"):t(lang,"✓ -a 4: chuqur, versiyagacha aniq","✓ -a 4: deep, down to the exact version")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("a1");setStep(-1);},style:{flex:1,padding:"9px",background:run==="a1"?D+"22":SL2,color:run==="a1"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🌫 -a 1 (yashirin)","🌫 -a 1 (stealthy)")),
+      React.createElement("button",{onClick:()=>{setRun("a4");setStep(-1);},style:{flex:1,padding:"9px",background:run==="a4"?A+"22":SL2,color:run==="a4"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🎯 -a 4 (agressiv)","🎯 -a 4 (aggressive)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1979,9 +2019,12 @@ function LessonL17(){
     React.createElement(P,null,t(lang,"-a bayrog'i agressivlik darajasini belgilaydi: -a 1 (yashirin, faqat asosiy sahifa), -a 3 (o'rtacha, ko'proq so'rov) va -a 4 (agressiv, eng aniq). Yuqori daraja ko'proq aniqlaydi, lekin ko'proq iz qoldiradi. Muhimi — keyingi qadam: agar WhatWeb \"WordPress 5.2\" ni aniqlasa, siz darhol searchsploit wordpress 5.2 bilan o'sha versiyaga tegishli ma'lum zaifliklarni izlaysiz. Texnologiya + versiya = maqsadli hujum.","The -a flag sets the aggression level: -a 1 (stealthy, main page only), -a 3 (moderate, more requests), -a 4 (aggressive, most accurate). Higher levels detect more but leave more trace. The key is the next step: if WhatWeb detects \"WordPress 5.2\", you immediately look up known vulnerabilities for that version with searchsploit wordpress 5.2. Technology + version = a targeted attack.")),
     React.createElement(Terminal,null,"whatweb example.com\nwhatweb -v example.com          # batafsil\nwhatweb -a 3 example.com        # agressivlik darajasi\nwhatweb -i targets.txt          # ko'p saytni birdan"),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"\"WordPress 5.2\" aniqlansa — searchsploit wordpress 5.2 bilan ma'lum zaifliklarni izlaysiz. Texnologiya + versiya = maqsadli hujum.","If it detects \"WordPress 5.2\" — you look up known vulns with searchsploit wordpress 5.2. Technology + version = a targeted attack.")),
-    React.createElement(H2,{num:"§5"},t(lang,"WhatWeb aniqlash oqimi","WhatWeb detection flow")),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: -a 1 vs -a 4","Interactive simulator: -a 1 vs -a 4")),
+    React.createElement(P,null,t(lang,"Xuddi shu saytni ikki agressivlik darajasida sinang — nima yo'qolib, nima ochilishini ko'ring:","Probe the same site at two aggression levels — see what gets missed and what gets revealed:")),
+    React.createElement(WhatWebAggroSim),
+    React.createElement(H2,{num:"§6"},t(lang,"WhatWeb aniqlash oqimi","WhatWeb detection flow")),
     React.createElement(FlowSteps,{color:"#a855f7",title:{uz:"Texnologiyani aniqlash",en:"Fingerprinting a site"},steps:[{icon:"📡",text:{uz:"HTTP so'rov yuborib, javob va sarlavhalarni oladi",en:"Sends an HTTP request, reads the response and headers"}},{icon:"🔬",text:{uz:"Imzolarni (HTML, cookie, header) solishtiradi",en:"Matches signatures (HTML, cookies, headers)"}},{icon:"🏷",text:{uz:"CMS, server, til va versiyani aniqlaydi",en:"Identifies the CMS, server, language and version"}},{icon:"🎯",text:{uz:"Versiya → searchsploit bilan zaiflik qidirish",en:"Version → hunt vulns with searchsploit"}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: texnologiyalarni aniqlash","Practice: identifying tech")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: texnologiyalarni aniqlash","Practice: identifying tech")),
     React.createElement(P,null,t(lang,"WhatWeb bir so'rov bilan saytning butun texnologiya to'plamini aniqlaydi. Aniqlangan versiya keyingi bosqichning kalitidir.","WhatWeb identifies a site's whole technology stack in a single request. The detected version is the key to the next step.")),
     React.createElement(Terminal,null,"whatweb http://10.0.0.5\n# http://10.0.0.5 [200 OK] Apache[2.4.29],\n#   Country[RESERVED], HTTPServer[Ubuntu Linux],\n#   PHP[7.2.24], WordPress[5.2], X-Powered-By[PHP/7.2.24]\n# → searchsploit wordpress 5.2"),
     React.createElement(Quiz,{q:{uz:"WhatWeb asosan nimani aniqlaydi?",en:"What does WhatWeb primarily identify?"},opts:[{uz:"Parol hashlarini",en:"Password hashes"},{uz:"Veb-saytning texnologiya stekini",en:"A website's technology stack"},{uz:"Ochiq UDP portlarni",en:"Open UDP ports"},{uz:"WiFi parollarini",en:"WiFi passwords"}],correct:1,exp:{uz:"WhatWeb veb-sayt ortidagi texnologiyalarni (CMS, server, til, kutubxonalar va versiyalar) aniqlaydi — maqsadli zaiflik izlash uchun asos.",en:"WhatWeb detects the technologies behind a website (CMS, server, language, libraries and versions) — a basis for targeted vulnerability research."}}));
