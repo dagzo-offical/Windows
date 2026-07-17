@@ -1228,6 +1228,46 @@ function BruteForceDefenseSim(){
       React.createElement("button",{onClick:()=>{setRun("locked");setStep(-1);},style:{flex:1,padding:"9px",background:run==="locked"?A+"22":SL2,color:run==="locked"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 fail2ban bilan","🔒 With fail2ban"))));
 }
 
+function RulesMutationSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const PLAIN=[
+    {col:BL,uz:"john --wordlist=rockyou.txt hashes.txt — qoidasiz oddiy lug'at hujumi",en:"john --wordlist=rockyou.txt hashes.txt — a plain wordlist attack, no rules",duz:"Nishon parol: Password123! (foydalanuvchi «password» so'zidan yasagan).",den:"Target password: Password123! (the user built it from the word «password»)."},
+    {col:AM,uz:"rockyou.txt'da «password» so'zi aynan shu ko'rinishda bor — lekin hash boshqacha",en:"rockyou.txt has the word «password» in exactly that form — but the hash is different",duz:"Lug'at so'zni O'ZGARTIRMASDAN, aynan shu holida sinaydi.",den:"The wordlist tries the word UNCHANGED, exactly as it is."},
+    {col:AM,uz:"~14 million so'z sinaldi — birortasi hash bilan aniq mos kelmadi",en:"~14 million words are tried — not one matches the hash exactly",duz:"«Password123!» lug'atning o'zida alohida qator sifatida yo'q.",den:"«Password123!» doesn't exist as its own line in the wordlist."},
+    {col:D,uz:"❌ 0 ta hash buzildi — «password» asosligi sezilmay qoldi",en:"❌ 0 hashes cracked — the fact it was based on «password» went unnoticed",duz:"Asl so'zga juda yaqin bo'lsa ham, aynan mos kelmasa John uni topmaydi.",den:"Even sitting very close to the original word, if it isn't an exact match, John won't find it.",final:true,bad:true}
+  ];
+  const RULES=[
+    {col:BL,uz:"john --wordlist=rockyou.txt --rules hashes.txt — qoidalar bilan",en:"john --wordlist=rockyou.txt --rules hashes.txt — with mutation rules",duz:"Xuddi shu lug'at, xuddi shu hash — faqat yondashuv boshqacha.",den:"The same wordlist, the same hash — only the approach differs."},
+    {col:AM,uz:"«password» so'zidan yuzlab variant avtomatik yasaladi",en:"Hundreds of variants are automatically generated from «password»",duz:"Bosh harf, oxiriga raqam, belgi bilan almashtirish — hammasi sinaladi.",den:"Capitalization, appended digits, symbol substitution — all get tried."},
+    {col:AM,uz:"Variantlardan biri: Password123! — hash bilan AYNAN mos keladi",en:"One of the variants: Password123! — matches the hash EXACTLY",duz:"Qoidalar odamlarning «murakkablashtirish» odatini taqlid qiladi.",den:"The rules imitate the way people typically «complicate» a password."},
+    {col:A,uz:"✅ Hash buzildi — inson odatlari qoidalar bilan qamrab olindi",en:"✅ The hash is cracked — human habits were captured by the rules",duz:"Xuddi shu 14 million so'z — endi har biridan yuzlab variant.",den:"The same 14 million words — now with hundreds of variants each.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="plain"?PLAIN:RULES;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="plain"?PLAIN:run==="rules"?RULES:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu «Password123!» hashini qoidasiz va --rules bilan sinang.","⬇ Pick a scenario — try cracking the same «Password123!» hash with and without --rules.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="plain"?t(lang,"✗ Qoidasiz: aynan mos kelmasa — topilmaydi","✗ Without rules: not an exact match, not found"):t(lang,"✓ --rules bilan: variant hash bilan mos keldi","✓ With --rules: a variant matched the hash")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("plain");setStep(-1);},style:{flex:1,padding:"9px",background:run==="plain"?D+"22":SL2,color:run==="plain"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"❌ Qoidasiz lug'at","❌ Plain wordlist")),
+      React.createElement("button",{onClick:()=>{setRun("rules");setStep(-1);},style:{flex:1,padding:"9px",background:run==="rules"?A+"22":SL2,color:run==="rules"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ --rules bilan","✅ With --rules"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1950,9 +1990,12 @@ function LessonL25(){
     React.createElement(P,null,t(lang,"John uch asosiy rejimda ishlaydi. Wordlist (lug'at) — fayldagi har so'zni sinaydi (tez, eng ko'p ishlatiladi). Incremental — barcha belgilar kombinatsiyasini sinaydi (brute-force, sekin, lekin har narsani topadi). Single crack — foydalanuvchi ma'lumotidan parol taxmin qiladi. Eng kuchli usul — --rules: u lug'atdagi so'zlarni o'zgartiradi (password → P@ssw0rd, Password123) — chunki odamlar aynan shunday \"murakkablashtiradi\". Buzilgan parollar potfile ga saqlanadi va --show bilan ko'riladi.","John works in three main modes. Wordlist — tries each word in a file (fast, most used). Incremental — tries all character combinations (brute-force, slow, but finds anything). Single crack — guesses passwords from user info. The most powerful technique is --rules: it mutates wordlist words (password → P@ssw0rd, Password123) — because that's exactly how people \"complicate\" them. Cracked passwords are saved to the potfile and viewed with --show.")),
     React.createElement(Terminal,null,"unshadow /etc/passwd /etc/shadow > hashes.txt\njohn --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt\njohn --wordlist=rockyou.txt --rules hashes.txt   # qoidalar bilan\njohn --format=raw-md5 md5.txt\njohn --show hashes.txt                            # buzilganlarni ko'rish"),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"John CPU'da moslashuvchan va hash turini avtomatik aniqlaydi; Hashcat esa GPU tezligida ancha tez ishlaydi. Katta hajmdagi ishlar uchun Hashcat afzal (L26).","John is flexible on the CPU and auto-detects the hash type; Hashcat runs much faster at GPU speed. For large jobs Hashcat is preferred (L26).")),
-    React.createElement(H2,{num:"§5"},t(lang,"John rejimlari","John's modes")),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: qoidasiz vs --rules bilan","Interactive simulator: without rules vs with --rules")),
+    React.createElement(P,null,t(lang,"§4 dagi eng kuchli usulni his qiling — xuddi shu «Password123!» hashini ikki usulda sinang:","Feel the most powerful technique from §4 for yourself — try cracking the same «Password123!» hash two ways:")),
+    React.createElement(RulesMutationSim),
+    React.createElement(H2,{num:"§6"},t(lang,"John rejimlari","John's modes")),
     React.createElement(LayerStack,{layers:[{n:"single",name:t(lang,"single","single"),color:"#4dabf7",desc:{uz:"Foydalanuvchi nomidan variantlar yasaydi.",en:"Builds guesses from the username."}},{n:"wordlist",name:t(lang,"wordlist","wordlist"),color:"#69db7c",desc:{uz:"Lug'at + qoidalar (--rules) bilan.",en:"Dictionary + rules (--rules)."}},{n:"incremental",name:t(lang,"incremental","incremental"),color:"#ff3a5e",desc:{uz:"Brute-force — barcha kombinatsiyalar.",en:"Brute-force — all combinations."}},{n:"--show",name:t(lang,"--show","--show"),color:"#ffd43b",desc:{uz:"Buzilgan parollarni ko'rsatadi.",en:"Shows the cracked passwords."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: hashni buzish","Practice: cracking a hash")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: hashni buzish","Practice: cracking a hash")),
     React.createElement(P,null,t(lang,"John hash turini avtomatik aniqlaydi. Avval unshadow bilan fayl tayyorlanadi, so'ng lug'at hujumi ishga tushiriladi. Natija --show bilan ko'riladi.","John auto-detects the hash type. First unshadow prepares the file, then a dictionary attack runs. The result is viewed with --show.")),
     React.createElement(Terminal,null,"john --wordlist=rockyou.txt passwords.txt\n# Loaded 2 password hashes (sha512crypt)\n# hunter2          (alice)\n# Password123      (bob)\njohn --show passwords.txt   # buzilganlarni qayta ko'rish"),
     React.createElement(Quiz,{q:{uz:"John \"oflayn\" vosita deganda nima nazarda tutiladi?",en:"What does it mean that John is an \"offline\" tool?"},opts:[{uz:"Internet talab qilmaydi",en:"It needs no internet"},{uz:"Nishonga ulanmasdan mavjud hashlarni buzadi",en:"It cracks existing hashes without touching the target"},{uz:"Faqat kechasi ishlaydi",en:"It only runs at night"},{uz:"Faqat Windows'da",en:"Windows only"}],correct:1,exp:{uz:"Oflayn buzish — qo'lga kiritilgan hashlarni mahalliy ravishda, nishon xizmatiga hech qanday so'rov yubormasdan sindirish.",en:"Offline cracking means breaking captured hashes locally, sending no requests to the target service."}}));
