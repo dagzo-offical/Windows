@@ -628,6 +628,46 @@ function ServiceLifecycleSim(){
       React.createElement("button",{onClick:()=>{setRun("enable");setStep(-1);},style:{flex:1,padding:"9px",background:run==="enable"?A+"22":SL2,color:run==="enable"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔁 start + enable","🔁 start + enable"))));
 }
 
+function ToolSourceSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const REPO=[
+    {col:BL,uz:"apt search gobuster — natija topildi: gobuster/kali-rolling 3.6.0",en:"apt search gobuster — a result is found: gobuster/kali-rolling 3.6.0",duz:"Vosita rasmiy Kali ombori tomonidan qadoqlangan va tekshirilgan.",den:"The tool is packaged and vetted by the official Kali repo."},
+    {col:AM,uz:"sudo apt install gobuster — bog'liqliklar bilan avtomatik o'rnatiladi",en:"sudo apt install gobuster — installs automatically with its dependencies",duz:"Go kutubxonalarini qo'lda yig'ish shart emas.",den:"No need to manually gather Go libraries."},
+    {col:AM,uz:"which gobuster — /usr/bin/gobuster, PATH'da tayyor",en:"which gobuster — /usr/bin/gobuster, ready on PATH",duz:"Har qayerdan gobuster deb chaqirsa bo'ladi.",den:"It can be invoked as gobuster from anywhere."},
+    {col:A,uz:"✅ ~15 soniyada tayyor — apt hammasini o'zi hal qildi",en:"✅ Ready in ~15 seconds — apt handled everything itself",duz:"Kali'ning 600+ vositasining aksariyati aynan shu tez yo'ldan o'tadi.",den:"Most of Kali's 600+ tools go through exactly this fast path.",final:true}
+  ];
+  const GITHUB=[
+    {col:BL,uz:"apt search newtool123 — hech narsa topilmadi",en:"apt search newtool123 — nothing found",duz:"Yangi yoki niche vosita hali Kali omboriga qo'shilmagan bo'lishi mumkin.",den:"A new or niche tool may not have made it into the Kali repo yet."},
+    {col:AM,uz:"kali.org/tools va GitHub'da qidiriladi — loyihaning manzili topiladi",en:"Search kali.org/tools and GitHub — the project's repo is found",duz:"Ko'p xavfsizlik vositasi faqat GitHub'da tarqatiladi.",den:"Many security tools are distributed only via GitHub."},
+    {col:AM,uz:"git clone ... && pip install -r requirements.txt — qo'lda o'rnatish",en:"git clone ... && pip install -r requirements.txt — manual install",duz:"Bog'liqliklarni endi siz o'zingiz hal qilasiz.",den:"Now you resolve the dependencies yourself."},
+    {col:AM,uz:"python3 newtool123.py — to'g'ridan-to'g'ri manba kodidan ishga tushiriladi",en:"python3 newtool123.py — run directly from the source code",duz:"apt emas, siz vositaning \"paket menejeri\"siz.",den:"Not apt — you are the tool's \"package manager\" this time.",final:true,slow:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="repo"?REPO:GITHUB;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="repo"?REPO:run==="github"?GITHUB:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — kerakli vosita Kali omborida bor va yo'q holatlarini solishtiring.","⬇ Pick a scenario — compare finding a tool that's in the Kali repo versus one that isn't.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.slow?AM:A)+"1f",border:"1px solid "+(cur.slow?AM:A),color:cur.slow?AM:A}},
+      run==="repo"?t(lang,"✓ Omborda bor: apt hammasini bir buyruqda hal qiladi","✓ In the repo: apt handles everything in one command"):t(lang,"⏳ Omborda yo'q: ishlaydi, lekin qo'l mehnati ko'proq kerak","⏳ Not in the repo: it works, but needs more manual effort")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("repo");setStep(-1);},style:{flex:1,padding:"9px",background:run==="repo"?A+"22":SL2,color:run==="repo"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"📦 Omborda bor","📦 In the repo")),
+      React.createElement("button",{onClick:()=>{setRun("github");setStep(-1);},style:{flex:1,padding:"9px",background:run==="github"?AM+"22":SL2,color:run==="github"?AM:"#cbd5e1",border:"1px solid "+AM+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🐙 Omborda yo'q (GitHub)","🐙 Not in repo (GitHub)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1576,13 +1616,14 @@ function LessonL10(){
     ]}),
     React.createElement(H2,{num:"§3"},t(lang,"Toifalar pentest bosqichlariga mos","Categories map to pentest phases")),
     React.createElement(P,null,t(lang,"Bu toifalar tasodifiy emas — ular haqiqiy pentest jarayonining bosqichlarini aks ettiradi: avval Information Gathering (razvedka), keyin Vulnerability Analysis (zaifliklarni topish), so'ng Exploitation (foydalanish), keyin Post Exploitation (kirishdan keyin), va nihoyat Reporting (hisobot). Menyu shu tartibda o'qilsa, u sizga pentest \"yo'l xaritasi\"ni ham o'rgatadi.","These categories aren't random — they mirror the phases of a real pentest: first Information Gathering (recon), then Vulnerability Analysis (finding weaknesses), then Exploitation, then Post Exploitation (after access), and finally Reporting. Read in that order, the menu also teaches you the pentest \"roadmap\".")),
-    React.createElement(H2,{num:"§4"},t(lang,"Vositani topish va o'rnatish","Finding and installing a tool")),
+    React.createElement(H2,{num:"§4"},t(lang,"Vositani topish va o'rnatish — asoslar","Finding and installing a tool — the basics")),
     React.createElement(P,null,t(lang,"which nom — vosita o'rnatilganini tekshiradi va yo'lini beradi. Agar o'rnatilmagan bo'lsa, sudo apt install nom bilan o'rnatasiz, yoki metapaket orqali butun toifani (kali-tools-web). Har vosita haqida to'liq ma'lumot kali.org/tools saytida bor — u yerda misollar va bayroqlar tushuntirilgan.","which name — checks that a tool is installed and gives its path. If it's not installed, install it with sudo apt install name, or install a whole category via a metapackage (kali-tools-web). Full info on every tool is at kali.org/tools — with examples and flags explained there.")),
     React.createElement(H2,{num:"§5"},t(lang,"Vosita bilan yordam olish","Getting help with a tool")),
     React.createElement(P,null,t(lang,"Yangi vositani ishlatishdan oldin uni tushunish muhim. man nom to'liq qo'llanma beradi; nom --help yoki nom -h qisqa bayroqlar ro'yxati; ko'p vosita nom -h bilan misollar ham ko'rsatadi. Vositani ko'r-ko'rona ishlatmang — avval nima qilishini va parametrlarini o'rganing.","Before using a new tool, it's important to understand it. man name gives the full manual; name --help or name -h a short list of flags; many tools also show examples with name -h. Don't use a tool blindly — first learn what it does and its parameters.")),
     React.createElement(Terminal,null,"which nmap        # o'rnatilganmi? yo'li qayerda?\nman nmap          # to'liq qo'llanma\nnmap --help       # qisqa yordam\nsudo apt install kali-linux-large   # ko'p vosita metapaketi"),
-    React.createElement(H2,{num:"§6"},t(lang,"Vositani topish va o'rnatish oqimi","Finding and installing a tool")),
-    React.createElement(FlowSteps,{color:"#a855f7",title:{uz:"Yangi vosita kerak bo'lsa",en:"When you need a new tool"},steps:[{icon:"🔎",text:{uz:"apt search nom — omborda bormi?",en:"apt search name — is it in the repo?"}},{icon:"📦",text:{uz:"sudo apt install nom — o'rnatish",en:"sudo apt install name — install it"}},{icon:"❓",text:{uz:"nom --help / man nom — qanday ishlatish",en:"name --help / man name — how to use it"}},{icon:"🐙",text:{uz:"GitHub'dan — omborda bo'lmasa",en:"from GitHub — if not in the repo"}},]}),
+    React.createElement(H2,{num:"§6"},t(lang,"Interaktiv simulyator: omborda bormi, yo'qmi?","Interactive simulator: in the repo, or not?")),
+    React.createElement(P,null,t(lang,"600+ vosita ham hamma narsani qamramaydi. Ikkala ssenariyni sinang — kerakli vosita Kali omborida bo'lgan va bo'lmagan holat qanchalik farq qilishini ko'ring:","Even 600+ tools don't cover everything. Try both scenarios — see how different it is when the tool you need is in the Kali repo versus when it isn't:")),
+    React.createElement(ToolSourceSim),
     React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: vosita qidirish","Practice: searching for a tool")),
     React.createElement(P,null,t(lang,"Kali'da 600+ vosita bor, lekin hammasi standart o'rnatilmagan. apt search kerakli vositani topadi; metapaketlar (kali-linux-large) bir yo'la yuzlab vositani o'rnatadi.","Kali has 600+ tools, but not all are installed by default. apt search finds the tool you need; metapackages (kali-linux-large) install hundreds at once.")),
     React.createElement(Terminal,null,"apt search gobuster\n# gobuster/kali-rolling 3.6.0 amd64\n#   Directory/file & DNS busting tool written in Go\nsudo apt install -y kali-linux-large   # ko'plab vositani birdan"),
