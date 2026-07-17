@@ -548,6 +548,46 @@ function ManualVsScriptSim(){
       React.createElement("button",{onClick:()=>{setRun("script");setStep(-1);},style:{flex:1,padding:"9px",background:run==="script"?A+"22":SL2,color:run==="script"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Skript bilan (bitta sikl)","⚡ With a script (one loop)"))));
 }
 
+function NetDiagSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const DNSB=[
+    {col:BL,uz:"ip a — eth0 da IP bor: 10.0.2.15/24 ✓",en:"ip a — eth0 has an IP: 10.0.2.15/24 ✓",duz:"Birinchi qatlam sog'lom — mashinaning o'zi tarmoqda.",den:"The first layer is healthy — the machine itself is on the network."},
+    {col:AM,uz:"ping 10.0.2.2 (shlyuz) — javob keladi ✓",en:"ping 10.0.2.2 (the gateway) — it replies ✓",duz:"Mahalliy tarmoq va router ishlayapti.",den:"The local network and router are working."},
+    {col:AM,uz:"ping 8.8.8.8 (to'g'ridan-to'g'ri IP) — javob keladi ✓ — internet ishlayapti!",en:"ping 8.8.8.8 (raw IP) — it replies ✓ — the internet works!",duz:"Gateway'dan tashqariga chiqish yo'li ham ochiq.",den:"The route out past the gateway is open too."},
+    {col:D,uz:"ping google.com — «Name or service not known» ✗",en:"ping google.com — «Name or service not known» ✗",duz:"Faqat NOM orqali so'ralganda uziladi — muammo aynan DNS'da.",den:"It only breaks when resolving by NAME — the problem is exactly DNS.",final:true,verdict:{uz:"🔤 Diagnoz: DNS ishlamayapti (lekin tarmoqning o'zi soz)",en:"🔤 Diagnosis: DNS is broken (but the network itself is fine)"}}
+  ];
+  const GWD=[
+    {col:BL,uz:"ip a — eth0 da IP bor: 10.0.2.15/24 ✓",en:"ip a — eth0 has an IP: 10.0.2.15/24 ✓",duz:"Xuddi shu birinchi natija — mashina o'zi sog'lom.",den:"The exact same first result — the machine itself is fine."},
+    {col:D,uz:"ping 10.0.2.2 (shlyuz) — «Destination Host Unreachable» ✗",en:"ping 10.0.2.2 (the gateway) — «Destination Host Unreachable» ✗",duz:"Ikkinchi qatlamning o'zida uziladi.",den:"It breaks right at the second layer."},
+    {col:AM,uz:"Shlyuzning o'zi javob bermayapti — undan naryidagi (8.8.8.8, DNS) tekshirish shart emas",en:"The gateway itself doesn't answer — no point testing anything further out",duz:"Zanjirning shu bo'g'inidan narisini tekshirish vaqt yo'qotish bo'lardi.",den:"Testing past this link in the chain would just waste time."},
+    {col:D,uz:"🔌 Muammo mahalliy tarmoqda — router o'chgan yoki kabel uzilgan",en:"🔌 The problem is on the LAN — the router is off or the cable is unplugged",duz:"DNS yoki internetni tekshirishning ma'nosi yo'q, chunki undan oldingi bosqich allaqachon buzuq.",den:"There's no point checking DNS or the internet — an earlier layer is already broken.",final:true,verdict:{uz:"🔌 Diagnoz: mahalliy tarmoq/shlyuz muammosi",en:"🔌 Diagnosis: local network/gateway problem"}}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="dns"?DNSB:GWD;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="dns"?DNSB:run==="gw"?GWD:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — bosqichma-bosqich tekshiruv qayerda uzilishiga qarab muammoni qanday aniq topishini ko'ring.","⬇ Pick a scenario — see how the step-by-step check pinpoints the problem based on exactly where it breaks.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0",fontFamily:"var(--font-mono)"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:D+"1f",border:"1px solid "+D,color:D}},
+      t(lang,cur.verdict.uz,cur.verdict.en)),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("dns");setStep(-1);},style:{flex:1,padding:"9px",background:run==="dns"?AM+"22":SL2,color:run==="dns"?AM:"#cbd5e1",border:"1px solid "+AM+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔤 DNS muammosi","🔤 DNS problem")),
+      React.createElement("button",{onClick:()=>{setRun("gw");setStep(-1);},style:{flex:1,padding:"9px",background:run==="gw"?D+"22":SL2,color:run==="gw"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔌 Shlyuz muammosi","🔌 Gateway problem"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1439,15 +1479,13 @@ function LessonL08(){
     ]}),
     React.createElement(H2,{num:"§3"},t(lang,"ip a chiqishini o'qish","Reading ip a output")),
     React.createElement(P,null,t(lang,"ip a har interfeys uchun ma'lumot beradi: lo — loopback (127.0.0.1, mashinaning o'zi), eth0 — simli, wlan0 — simsiz. Har interfeys ostida inet qatori IPv4 manzilni /24 kabi tarmoq maskasi bilan ko'rsatadi (192.168.1.10/24), inet6 esa IPv6 ni. link/ether qatori MAC manzilni beradi. \"UP\" so'zi interfeys faol ekanini bildiradi.","ip a gives info for each interface: lo — loopback (127.0.0.1, the machine itself), eth0 — wired, wlan0 — wireless. Under each interface, the inet line shows the IPv4 address with a netmask like /24 (192.168.1.10/24), and inet6 the IPv6. The link/ether line gives the MAC address. The word \"UP\" means the interface is active.")),
-    React.createElement(H2,{num:"§4"},t(lang,"Ulanishni bosqichma-bosqich sinash","Testing connectivity step by step")),
-    React.createElement(P,null,t(lang,"Internet ishlamasa, muammoni qatlam-qatlam toraytiring: avval ping 8.8.8.8 (IP bo'yicha) — ishlasa, tarmoq va gateway joyida. Keyin ping google.com — bu ishlamasa-yu 8.8.8.8 ishlasa, muammo DNS da. traceroute paket qaysi routerlardan o'tishini ko'rsatadi (qayerda uzilishini topish uchun). ss -tulnp esa o'z mashinangizda qaysi portlar ochiqligini beradi.","If the internet is down, narrow the problem layer by layer: first ping 8.8.8.8 (by IP) — if it works, the network and gateway are fine. Then ping google.com — if that fails but 8.8.8.8 works, the issue is DNS. traceroute shows which routers a packet passes through (to find where it breaks). ss -tulnp shows which ports are open on your own machine.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: zanjir qayerda uzilgan?","Interactive simulator: where does the chain break?")),
+    React.createElement(P,null,t(lang,"Tarmoq muammosini pastdan yuqoriga qarab tekshiring: avval o'z interfeysingiz, keyin shlyuz, keyin internet, keyin DNS. Xuddi shu tekshiruv zanjiri ikki xil nuqtada uzilsa nima bo'lishini solishtiring:","Diagnose a network problem bottom-up: first your own interface, then the gateway, then the internet, then DNS. Compare what happens when that exact same check chain breaks at two different points:")),
+    React.createElement(NetDiagSim),
     React.createElement(H2,{num:"§5"},t(lang,"MAC manzilni o'zgartirish","Changing the MAC address")),
     React.createElement(P,null,t(lang,"MAC manzil — tarmoq kartasining doimiy \"pasport raqami\". Anonimlik yoki MAC filtrlashni chetlab o'tish uchun uni vaqtincha o'zgartirish mumkin (macchanger bilan). Bu faqat ta'lim va ruxsat berilgan muhitda qilinadi.","The MAC address is the network card's permanent \"passport number\". For anonymity or to bypass MAC filtering, you can temporarily change it (with macchanger). Do this only in educational and authorized environments.")),
     React.createElement(Terminal,null,"ip a\nip route\nping -c4 8.8.8.8       # IP bo'yicha\nping -c4 google.com    # DNS bilan\ntraceroute google.com\n# MAC ni vaqtincha o'zgartirish:\nsudo ip link set eth0 down\nsudo macchanger -r eth0\nsudo ip link set eth0 up"),
-    React.createElement(H2,{num:"§6"},t(lang,"Ulanishni bosqichma-bosqich sinash","Testing connectivity step by step")),
-    React.createElement(P,null,t(lang,"Tarmoq muammosini pastdan yuqoriga qarab tekshiring: avval o'z interfeysingiz, keyin shlyuz, keyin DNS, keyin internet. Har bosqich qayerda uzilganini aniqlaydi.","Diagnose a network problem bottom-up: first your own interface, then the gateway, then DNS, then the internet. Each step pinpoints where the break is.")),
-    React.createElement(FlowSteps,{color:"#4dabf7",title:{uz:"Tarmoqni tekshirish",en:"Checking the network"},steps:[{icon:"🔌",text:{uz:"ip a — o'z IP manzilim bormi?",en:"ip a — do I have an IP?"}},{icon:"🚪",text:{uz:"ping shlyuz — mahalliy tarmoq ishlaydimi?",en:"ping the gateway — does the LAN work?"}},{icon:"🌐",text:{uz:"ping 8.8.8.8 — internetga yo'l bormi?",en:"ping 8.8.8.8 — is there a route out?"}},{icon:"🔤",text:{uz:"ping google.com — DNS ishlaydimi?",en:"ping google.com — does DNS resolve?"}},]}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: ip a chiqishini o'qish","Practice: reading ip a")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: ip a chiqishini o'qish","Practice: reading ip a")),
     React.createElement(Terminal,null,"ip a\n# 2: eth0: <BROADCAST,MULTICAST,UP> mtu 1500\n#    inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0\n# 3: tun0: <POINTOPOINT,UP> — VPN interfeysi\nip route\n# default via 10.0.2.2 dev eth0   (shlyuz = 10.0.2.2)"),
     React.createElement(Quiz,{q:{uz:"Kali'da IP manzil va interfeyslarni ko'rish uchun zamonaviy buyruq qaysi?",en:"Modern command to see IP and interfaces in Kali?"},opts:[{uz:"ip a",en:"ip a"},{uz:"ls -l",en:"ls -l"},{uz:"cat /ip",en:"cat /ip"},{uz:"ping",en:"ping"}],correct:0,exp:{uz:"ip a (ip address) interfeyslar va ularning IP manzillarini ko'rsatadi — eski ifconfig'ning zamonaviy o'rnini bosadi.",en:"ip a (ip address) lists interfaces and their IPs — the modern replacement for ifconfig."}}));
 }
