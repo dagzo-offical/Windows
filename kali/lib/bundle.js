@@ -468,6 +468,46 @@ function SUIDRiskSim(){
       React.createElement("button",{onClick:()=>{setRun("risky");setStep(-1);},style:{flex:1,padding:"9px",background:run==="risky"?D+"22":SL2,color:run==="risky"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ Xavfli SUID (find)","☠ Risky SUID (find)"))));
 }
 
+function AptUpdateSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const STALE=[
+    {col:BL,uz:"sudo apt install gobuster — to'g'ridan-to'g'ri, update qilinmagan",en:"sudo apt install gobuster — installed directly, no update first",duz:"Tizim oxirgi marta 3 oy oldin yangilangan.",den:"The system was last refreshed 3 months ago."},
+    {col:AM,uz:"Paket ro'yxati eski — gobuster'ning eskirgan manzili ko'rsatilgan",en:"The package list is stale — it points to an outdated gobuster location",duz:"apt hali ham 3 oy oldingi «xarita»ga ishonadi.",den:"apt still trusts the 3-month-old «map»."},
+    {col:AM,uz:"404 Not Found — server bu eski manzilda paketni endi saqlamaydi",en:"404 Not Found — the server no longer hosts the package at that old address",duz:"Ombordagi fayllar ko'chirilgan yoki versiya almashtirilgan.",den:"The repo's files have moved or the version has changed."},
+    {col:D,uz:"❌ O'rnatish muvaffaqiyatsiz — «Unable to fetch some archives»",en:"❌ Install fails — «Unable to fetch some archives»",duz:"Eskirgan xaritaga ishonish — vaqtni behuda sarflaydi.",den:"Trusting a stale map wastes real time.",final:true,bad:true}
+  ];
+  const FRESH=[
+    {col:BL,uz:"sudo apt update — birinchi navbatda paket ro'yxati yangilanadi",en:"sudo apt update — the package list is refreshed first",duz:"Bu — har doim install'dan OLDIN bajariladigan qadam.",den:"This is the step that always comes BEFORE install."},
+    {col:AM,uz:"Barcha ombordagi eng so'nggi manzillar va versiyalar olinadi",en:"The latest URLs and versions across all repositories are fetched",duz:"apt endi hozirgi, to'g'ri «xarita»ga ega.",den:"apt now holds a current, accurate «map»."},
+    {col:AM,uz:"sudo apt install gobuster — endi to'g'ri, joriy manzildan yuklanadi",en:"sudo apt install gobuster — now downloads from the correct, current location",duz:"Xuddi shu buyruq, lekin endi to'g'ri xaritaga asoslangan.",den:"The exact same command, but now based on an accurate map."},
+    {col:A,uz:"✅ O'rnatish muvaffaqiyatli — eng so'nggi versiya to'g'ri o'rnatildi",en:"✅ Install succeeds — the latest version installed correctly",duz:"Bir qatorlik odat — update — ko'p vaqtni tejaydi.",den:"One extra line of habit — update — saves real time.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="stale"?STALE:FRESH;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="stale"?STALE:run==="fresh"?FRESH:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu o'rnatish buyrug'i update'siz va update bilan qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how the exact same install command differs with and without an update first.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="stale"?t(lang,"✗ Eski ro'yxat — o'rnatish yiqiladi","✗ Stale list — the install fails"):t(lang,"✓ Yangi ro'yxat — o'rnatish ishlaydi","✓ Fresh list — the install works")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("stale");setStep(-1);},style:{flex:1,padding:"9px",background:run==="stale"?D+"22":SL2,color:run==="stale"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"❌ update'siz o'rnatish","❌ Install without update")),
+      React.createElement("button",{onClick:()=>{setRun("fresh");setStep(-1);},style:{flex:1,padding:"9px",background:run==="fresh"?A+"22":SL2,color:run==="fresh"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ update, keyin install","✅ Update, then install"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1038,16 +1078,19 @@ function LessonL06(){
     ]}),
     React.createElement(H2,{num:"§3"},t(lang,"update va upgrade farqi","update vs upgrade")),
     React.createElement(P,null,t(lang,"Ko'p yangi boshlovchilar bu ikkisini chalkashtiradi. apt update — omborlardan yangi paket RO'YXATINI yuklab oladi (qanday versiyalar mavjudligini biladi), lekin hech narsani o'rnatmaydi. apt upgrade — o'rnatilgan paketlarni ro'yxatdagi yangi versiyalarga YANGILAYDI. Shuning uchun tartib muhim: avval update (ro'yxatni yangilash), keyin upgrade (haqiqiy yangilash). apt full-upgrade esa kerak bo'lsa eski paketlarni olib tashlab, chuqurroq yangilaydi.","Many beginners confuse these two. apt update downloads the new package LIST from the repositories (it learns what versions are available) but installs nothing. apt upgrade UPGRADES installed packages to the newer versions in that list. So order matters: update first (refresh the list), then upgrade (do the real update). apt full-upgrade goes deeper, removing old packages if needed.")),
-    React.createElement(H2,{num:"§4"},t(lang,"Asosiy buyruqlar","Core commands")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: update'ni tashlab ketsangiz nima bo'ladi?","Interactive simulator: what happens if you skip update?")),
+    React.createElement(P,null,t(lang,"Xuddi shu o'rnatish buyrug'ini ikki holatda sinang — bittasida update qadami tashlab ketilgan, ikkinchisida bajarilgan:","Try the exact same install command in two situations — one skips the update step, the other doesn't:")),
+    React.createElement(AptUpdateSim),
+    React.createElement(H2,{num:"§5"},t(lang,"Asosiy buyruqlar","Core commands")),
     React.createElement(P,null,t(lang,"install — o'rnatadi; remove — dasturni o'chiradi (sozlamalarni qoldiradi); purge — dasturni sozlamalari bilan to'liq o'chiradi; autoremove — endi kerak bo'lmagan bog'liqliklarni tozalaydi. search nom bo'yicha qidiradi, show esa paket haqida batafsil ma'lumot (versiya, o'lcham, tavsif) beradi. dpkg -l esa o'rnatilgan barcha paketlarni sanaydi.","install installs; remove deletes the program (leaving its config); purge fully removes the program with its config; autoremove cleans up dependencies no longer needed. search finds by name, show gives details about a package (version, size, description). dpkg -l lists all installed packages.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Omborlar va metapaketlar","Repositories and metapackages")),
+    React.createElement(H2,{num:"§6"},t(lang,"Omborlar va metapaketlar","Repositories and metapackages")),
     React.createElement(P,null,t(lang,"apt qayerdan paket olishini /etc/apt/sources.list fayli belgilaydi. Kali uchun faqat rasmiy Kali omborlaridan foydalaning — noma'lum manbalar tizimga zararli dastur olib kirishi mumkin. Kali barcha 600+ vositani birdan o'rnatishni talab qilmaydi: metapaketlar orqali kerakli to'plamni o'rnatasiz — kali-linux-large (ko'p vosita), kali-tools-web (faqat veb vositalar), kali-tools-wireless va h.k.","Where apt gets packages from is defined in /etc/apt/sources.list. For Kali, use only the official Kali repositories — unknown sources can bring malware into the system. Kali doesn't force you to install all 600+ tools at once: metapackages install a focused set — kali-linux-large (many tools), kali-tools-web (web tools only), kali-tools-wireless, and so on.")),
     React.createElement(Terminal,null,"sudo apt update && sudo apt full-upgrade -y\nsudo apt install nikto        # o'rnatish\nsudo apt purge nikto          # sozlamalari bilan o'chirish\nsudo apt autoremove           # keraksiz bog'liqliklarni tozalash\napt show nmap                 # paket haqida ma'lumot\nsudo apt install kali-tools-web   # metapaket"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"apt upgrade dan oldin DOIM apt update bajaring — aks holda apt eski ro'yxatdan foydalanadi va yangilanishlarni topa olmaydi yoki buzilgan bog'liqliklarga duch keladi.","Always run apt update before apt upgrade — otherwise apt uses a stale list and may miss updates or hit broken dependencies.")),
-    React.createElement(H2,{num:"§6"},t(lang,"apt buyruqlari qatlamma-qatlam","The apt commands, layer by layer")),
+    React.createElement(H2,{num:"§7"},t(lang,"apt buyruqlari qatlamma-qatlam","The apt commands, layer by layer")),
     React.createElement(LayerStack,{layers:[{n:"update",name:t(lang,"update","update"),color:"#4dabf7",desc:{uz:"Paket ro'yxatini yangilaydi (dastur o'rnatmaydi).",en:"Refreshes the package list (installs nothing)."}},{n:"install",name:t(lang,"install","install"),color:"#69db7c",desc:{uz:"Paket va uning bog'liqliklarini o'rnatadi.",en:"Installs a package and its dependencies."}},{n:"upgrade",name:t(lang,"upgrade","upgrade"),color:"#ffd43b",desc:{uz:"O'rnatilgan paketlarni yangi versiyaga ko'taradi.",en:"Upgrades installed packages to newer versions."}},{n:"remove",name:t(lang,"remove","remove"),color:"#ff6b6b",desc:{uz:"Paketni o'chiradi (purge — sozlamalari bilan).",en:"Removes a package (purge — with its config)."}},]}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: dastur o'rnatish","Practice: installing a tool")),
-    React.createElement(P,null,t(lang,"Har doim avval update, keyin install. Quyidagi natija gobuster o'rnatilishini ko'rsatadi — apt bog'liqliklarni avtomatik hal qiladi.","Always update first, then install. The output below shows gobuster being installed — apt resolves dependencies automatically.")),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: dastur o'rnatish","Practice: installing a tool")),
+    React.createElement(P,null,t(lang,"Har doim avval update, keyin install — xuddi simulyatordagi «update, keyin install» ssenariysi kabi. Quyidagi natija gobuster o'rnatilishini ko'rsatadi — apt bog'liqliklarni avtomatik hal qiladi.","Always update first, then install — just like the simulator's «Update, then install» scenario. The output below shows gobuster being installed — apt resolves dependencies automatically.")),
     React.createElement(Terminal,null,"sudo apt update\n# Get:1 http://http.kali.org/kali kali-rolling InRelease\n# Reading package lists... Done\nsudo apt install -y gobuster\n# The following NEW packages will be installed: gobuster\n# Unpacking gobuster ... Setting up gobuster ... done"),
     React.createElement(Quiz,{q:{uz:"Yangi dastur o'rnatishdan oldin qaysi buyruqni bajarish kerak?",en:"Which command should you run before installing a new package?"},opts:[{uz:"apt remove",en:"apt remove"},{uz:"apt update",en:"apt update"},{uz:"apt clean",en:"apt clean"},{uz:"apt purge",en:"apt purge"}],correct:1,exp:{uz:"apt update paket ro'yxatini yangilaydi — shundan keyingina apt to'g'ri (eng so'nggi) versiyani topib o'rnatadi.",en:"apt update refreshes the package list — only then can apt find and install the correct (latest) version."}}));
 }
