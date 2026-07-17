@@ -708,6 +708,46 @@ function ScanStealthSim(){
       React.createElement("button",{onClick:()=>{setRun("sS");setStep(-1);},style:{flex:1,padding:"9px",background:run==="sS"?A+"22":SL2,color:run==="sS"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🥷 -sS (SYN)","🥷 -sS (SYN)"))));
 }
 
+function NetdiscoverModeSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const ACTIVE=[
+    {col:BL,uz:"sudo netdiscover -r 10.0.0.0/24 — 254 ta ARP so'rovi darhol yuboriladi",en:"sudo netdiscover -r 10.0.0.0/24 — 254 ARP requests are sent immediately",duz:"Har bir mumkin bo'lgan IP uchun alohida so'rov yuboriladi.",den:"A separate request is sent for every possible IP."},
+    {col:AM,uz:"Barcha 12 ta tirik xost soniyalar ichida javob beradi va ro'yxatlanadi",en:"All 12 live hosts reply within seconds and get listed",duz:"Sokin turgan qurilmalar ham javob berishga majbur bo'ladi.",den:"Even quiet devices are forced to respond."},
+    {col:AM,uz:"Tarmoq monitoring vositasi (arpwatch) g'ayrioddiy ARP portlashini qayd etadi",en:"A network monitor (arpwatch) logs the unusual ARP burst",duz:"254 ta so'rov bir necha soniyada — bu me'yordagi trafik emas.",den:"254 requests in a few seconds isn't normal traffic."},
+    {col:D,uz:"⚡ Tez (~10 soniya), lekin iz qoldirdi — kuzatuvchi buni sezishi mumkin",en:"⚡ Fast (~10 seconds), but left a trace — a watcher may notice",duz:"To'liq rasm oldingiz, lekin sukunatda emas.",den:"You got the full picture, but not quietly.",final:true,bad:true}
+  ];
+  const PASSIVE=[
+    {col:BL,uz:"sudo netdiscover -p — hech qanday paket yuborilmaydi, faqat tinglanadi",en:"sudo netdiscover -p — no packets are sent, it only listens",duz:"Tarmoqqa sizning mavjudligingizni bildiradigan hech narsa chiqmaydi.",den:"Nothing goes out that reveals your presence on the network."},
+    {col:AM,uz:"Faqat allaqachon gaplashayotgan xostlarning ARP trafigi eshitiladi",en:"Only the ARP traffic of hosts already chatting is overheard",duz:"Sokin turgan qurilmalar hech qachon o'zini bildirmaydi.",den:"Quiet devices never give themselves away."},
+    {col:AM,uz:"5 daqiqa ichida atigi 7 ta xost «eshitildi» — sokin 5 tasi ko'rinmay qoldi",en:"In 5 minutes only 7 hosts are «heard» — 5 quiet ones stay invisible",duz:"Sekinroq va to'liq emas — lekin bu tinchlikning narxi.",den:"Slower and incomplete — but that's the price of staying quiet."},
+    {col:A,uz:"🤫 Hech qanday iz yo'q — lekin rasm to'liq emas",en:"🤫 No trace at all — but the picture isn't complete",duz:"Yashirinlik va to'liqlik orasidagi klassik almashinuv.",den:"The classic tradeoff between stealth and completeness.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="active"?ACTIVE:PASSIVE;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="active"?ACTIVE:run==="passive"?PASSIVE:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — bir xil /24 tarmoqni aktiv va passiv rejimda sinang.","⬇ Pick a scenario — probe the same /24 network in active versus passive mode.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="active"?t(lang,"✗ Aktiv: to'liq, lekin ko'rinadigan","✗ Active: complete, but visible"):t(lang,"✓ Passiv: ko'rinmas, lekin to'liq emas","✓ Passive: invisible, but incomplete")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("active");setStep(-1);},style:{flex:1,padding:"9px",background:run==="active"?D+"22":SL2,color:run==="active"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Aktiv (-r)","⚡ Active (-r)")),
+      React.createElement("button",{onClick:()=>{setRun("passive");setStep(-1);},style:{flex:1,padding:"9px",background:run==="passive"?A+"22":SL2,color:run==="passive"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🤫 Passiv (-p)","🤫 Passive (-p)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1687,13 +1727,16 @@ function LessonL12(){
     ]}),
     React.createElement(H2,{num:"§3"},t(lang,"Passiv va aktiv rejim","Passive vs active mode")),
     React.createElement(P,null,t(lang,"Netdiscover ikki rejimda ishlaydi. Aktiv rejim (-r bilan diapazon berilganda) o'zi ARP so'rovlarini yuboradi — tez, lekin tarmoqda iz qoldiradi. Passiv rejim (-p) esa hech qanday paket yubormaydi — u shunchaki tarmoqdagi mavjud ARP trafigini tinglaydi va shundan xostlarni aniqlaydi. Passiv rejim deyarli aniqlanmaydi, lekin sekinroq va faqat gaplashayotgan xostlarni ko'radi.","Netdiscover works in two modes. Active mode (when you give a range with -r) sends ARP requests itself — fast, but leaves a trace on the network. Passive mode (-p) sends no packets — it just listens to the existing ARP traffic on the network and identifies hosts from it. Passive mode is nearly undetectable, but slower and only sees hosts that are talking.")),
-    React.createElement(H2,{num:"§4"},t(lang,"Natijani o'qish","Reading the output")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: aktiv vs passiv qanday farq qiladi","Interactive simulator: how active differs from passive")),
+    React.createElement(P,null,t(lang,"Xuddi shu /24 tarmoqni ikki rejimda sinang — tezlik, to'liqlik va sezilish orasidagi almashinuvni his qiling:","Probe the exact same /24 network in both modes — feel the tradeoff between speed, completeness and detectability:")),
+    React.createElement(NetdiscoverModeSim),
+    React.createElement(H2,{num:"§5"},t(lang,"Natijani o'qish","Reading the output")),
     React.createElement(P,null,t(lang,"Netdiscover har tirik xost uchun IP manzil, MAC manzil va tarmoq kartasi ishlab chiqaruvchisini (vendor) ko'rsatadi. Vendor ma'lumoti juda foydali: u ko'pincha qurilma turini ochib beradi — masalan \"VMware\" (virtual mashina), \"Cisco\" (router/switch), \"Raspberry Pi\" yoki printer ishlab chiqaruvchisi. Bu sizga nishonlarni ustuvorlashtirishga yordam beradi.","Netdiscover shows an IP address, MAC address and network card vendor for each live host. The vendor info is very useful: it often reveals the device type — e.g. \"VMware\" (a VM), \"Cisco\" (router/switch), \"Raspberry Pi\" or a printer maker. This helps you prioritize targets.")),
     React.createElement(Terminal,null,"sudo netdiscover -r 10.0.0.0/24    # aktiv, aniq diapazon\nsudo netdiscover -i eth0           # interfeys bo'yicha\nsudo netdiscover -p                # passiv (yashirin)"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Faqat o'z tarmog'ingizda yoki ruxsat berilgan muhitda ishlating.","Use only on your own network or an authorized environment.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Netdiscover parametrlari","Netdiscover options")),
+    React.createElement(H2,{num:"§6"},t(lang,"Netdiscover parametrlari","Netdiscover options")),
     React.createElement(LayerStack,{layers:[{n:"-r",name:t(lang,"-r","-r"),color:"#4dabf7",desc:{uz:"Skanerlanadigan tarmoq diapazoni (-r 10.0.0.0/24).",en:"The range to scan (-r 10.0.0.0/24)."}},{n:"-p",name:t(lang,"-p","-p"),color:"#a855f7",desc:{uz:"Passiv rejim — faqat tinglaydi, paket yubormaydi.",en:"Passive mode — only listens, sends nothing."}},{n:"-i",name:t(lang,"-i","-i"),color:"#69db7c",desc:{uz:"Qaysi interfeys (-i eth0).",en:"Which interface (-i eth0)."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: tirik xostlar","Practice: live hosts")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: tirik xostlar","Practice: live hosts")),
     React.createElement(P,null,t(lang,"Netdiscover ARP so'rovlari yuborib, javob bergan qurilmalarni ro'yxatlaydi. MAC manzilning birinchi qismi (OUI) ishlab chiqaruvchini oshkor qiladi — bu nishonni tushunishga yordam beradi.","Netdiscover sends ARP requests and lists devices that reply. The first part of the MAC (OUI) reveals the vendor — which helps you understand the target.")),
     React.createElement(Terminal,null,"sudo netdiscover -r 10.0.0.0/24\n# IP           MAC Address        Count  Vendor\n# 10.0.0.1     52:54:00:12:35:00   1     QEMU\n# 10.0.0.5     08:00:27:8a:ff:b9   1     PCS (VirtualBox)\n# 10.0.0.15    00:0c:29:3d:1a:44   1     VMware"),
     React.createElement(Quiz,{q:{uz:"Netdiscover qaysi protokol bilan tirik xostlarni topadi?",en:"Which protocol does Netdiscover use to find live hosts?"},opts:[{uz:"ICMP (ping)",en:"ICMP (ping)"},{uz:"ARP",en:"ARP"},{uz:"DNS",en:"DNS"},{uz:"HTTP",en:"HTTP"}],correct:1,exp:{uz:"Netdiscover ARP so'rovlaridan foydalanadi — shuning uchun u ping'ni (ICMP) bloklaydigan xostlarni ham aniqlaydi.",en:"Netdiscover uses ARP requests — so it detects hosts even if they block ping (ICMP)."}}));
