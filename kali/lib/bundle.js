@@ -1468,6 +1468,46 @@ function FindingQualitySim(){
       React.createElement("button",{onClick:()=>{setRun("structured");setStep(-1);},style:{flex:1,padding:"9px",background:run==="structured"?A+"22":SL2,color:run==="structured"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Tuzilgan topilma","✅ Structured finding"))));
 }
 
+function MethodologySim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const RANDOM=[
+    {col:BL,uz:"Foothold qo'lga kiritildi — www-data foydalanuvchisi",en:"Foothold obtained — the www-data user",duz:"Boshlang'ich nuqta ikkala ssenariyda ham bir xil.",den:"The starting point is identical in both scenarios."},
+    {col:AM,uz:"Enumeratsiyasiz to'g'ridan-to'g'ri mashhur exploit'lar sinab ko'riladi",en:"Famous exploits are tried directly, with no enumeration first",duz:"«Balki ishlar» degan taxminga tayaniladi.",den:"Relying on a «maybe it'll work» guess."},
+    {col:AM,uz:"10 ta turli kernel exploit sinaldi — birortasi mos kelmadi",en:"10 different kernel exploits are tried — not one matches",duz:"Nishonning haqiqiy yadro versiyasi hech qachon tekshirilmagan edi.",den:"The target's actual kernel version was never checked."},
+    {col:D,uz:"😩 2 soat behuda ketdi — oddiy sudo -l hech qachon tekshirilmadi",en:"😩 2 hours wasted — the simple sudo -l was never even checked",duz:"Eng oson vektor butun vaqt davomida ko'rinmay turgan edi.",den:"The easiest vector sat unnoticed the entire time.",final:true,bad:true}
+  ];
+  const METHODICAL=[
+    {col:BL,uz:"Foothold qo'lga kiritildi — xuddi shu www-data foydalanuvchisi",en:"Foothold obtained — the exact same www-data user",duz:"Bir xil boshlang'ich nuqta, boshqacha yondashuv.",den:"The same starting point, a different approach."},
+    {col:AM,uz:"Enumeratsiya: sudo -l, SUID, cron, kernel versiyasi — barchasi tizimli tekshiriladi",en:"Enumeration: sudo -l, SUID, cron, kernel version — all checked systematically",duz:"§3 dagi metodologiya bosqichma-bosqich bajariladi.",den:"The §3 methodology is followed step by step."},
+    {col:AM,uz:"sudo -l: NOPASSWD: /usr/bin/find topildi — aniq vektor",en:"sudo -l: NOPASSWD: /usr/bin/find is found — a clear vector",duz:"Taxmin emas, kuzatilgan dalilga asoslangan tanlov.",den:"Not a guess — a choice based on observed evidence."},
+    {col:A,uz:"✅ 5 daqiqada root — GTFOBins'dagi tayyor texnika qo'llanildi",en:"✅ Root in 5 minutes — a ready GTFOBins technique applied",duz:"Enumeratsiya vaqtni tejaydi, sarflamaydi.",den:"Enumeration saves time, it doesn't cost it.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="random"?RANDOM:METHODICAL;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="random"?RANDOM:run==="methodical"?METHODICAL:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu foothold'dan tasodifiy va metodik yondashuv bilan root'gacha boring.","⬇ Pick a scenario — go from the same foothold to root, with a random versus a methodical approach.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="random"?t(lang,"✗ Tasodifiy: soatlab urinish, natija yo'q","✗ Random: hours of trying, no result"):t(lang,"✓ Metodik: daqiqalarda aniq vektor topildi","✓ Methodical: a clear vector found in minutes")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("random");setStep(-1);},style:{flex:1,padding:"9px",background:run==="random"?D+"22":SL2,color:run==="random"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"😩 Tasodifiy urinish","😩 Random guessing")),
+      React.createElement("button",{onClick:()=>{setRun("methodical");setStep(-1);},style:{flex:1,padding:"9px",background:run==="methodical"?A+"22":SL2,color:run==="methodical"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Metodik enumeratsiya","✅ Methodical enumeration"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2847,6 +2887,9 @@ function LessonL31(){
       {icon:"👑",text:{uz:"Root — to'liq nazorat va post-exploitation",en:"Root — full control and post-exploitation"}},
     ]}),
     React.createElement(Terminal,null,"# Kirgach, kim ekanligimizni tekshiramiz\nwhoami\nid\n# uid=1000(user) gid=1000(user) ... — past imtiyozli, hali root emas"),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: tasodifiy urinish vs metodik enumeratsiya","Interactive simulator: random guessing vs methodical enumeration")),
+    React.createElement(P,null,t(lang,"§3 dagi metodologiyaning nega ishlashini his qiling — xuddi shu foothold'dan ikki yondashuv bilan boring:","Feel why the §3 methodology works — go from the exact same foothold with two different approaches:")),
+    React.createElement(MethodologySim),
     eth("Imtiyozlarni oshirish texnikalarini faqat o'z laboratoriyangizda, CTF'da yoki yozma ruxsat berilgan pentestda sinang. Ruxsatsiz tizimda buni qilish jinoyat.","Only practise privilege-escalation techniques in your own lab, in CTFs, or on a written-authorized pentest. Doing this on an unauthorized system is a crime."),
     React.createElement(Quiz,{q:{uz:"Imtiyozlarni oshirishning asosiy maqsadi nima?",en:"What is the main goal of privilege escalation?"},opts:[{uz:"Internet tezligini oshirish",en:"Speeding up the internet"},{uz:"Past imtiyozli hisobdan root/Administrator huquqiga o'tish",en:"Moving from a low-privilege account to root/Administrator"},{uz:"Fayllarni shifrlash",en:"Encrypting files"},{uz:"Parolni unutish",en:"Forgetting a password"}],correct:1,exp:{uz:"Privesc — past imtiyozli kirishdan tizim ustidan to'liq nazorat (root/Administrator) beradigan yuqori huquqqa o'tishdir.",en:"Privesc is moving from low-privilege access to the high privileges (root/Administrator) that give full control of the system."}}));
 }
