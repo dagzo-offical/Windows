@@ -508,6 +508,46 @@ function AptUpdateSim(){
       React.createElement("button",{onClick:()=>{setRun("fresh");setStep(-1);},style:{flex:1,padding:"9px",background:run==="fresh"?A+"22":SL2,color:run==="fresh"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ update, keyin install","✅ Update, then install"))));
 }
 
+function ManualVsScriptSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const MANUAL=[
+    {col:BL,uz:"Vazifa: 254 ta IP (10.0.0.1–254) orasidan tirik xostlarni topish",en:"Task: find the live hosts among 254 IPs (10.0.0.1–254)",duz:"Hech qanday skript yo'q — hammasi qo'lda.",den:"No script — everything by hand."},
+    {col:AM,uz:"ping -c1 10.0.0.1, ping -c1 10.0.0.2, ping -c1 10.0.0.3 ... har birini qo'lda terish",en:"ping -c1 10.0.0.1, then 10.0.0.2, then 10.0.0.3 ... typing each one by hand",duz:"Har bir buyruqdan keyin natijani ko'zdan kechirib, keyingisiga o'tish kerak.",den:"After each command you must read the result before moving to the next."},
+    {col:AM,uz:"~50-IP atrofida charchoq boshlanadi — ba'zi raqamlar terilmasdan qoladi",en:"Around IP #50 fatigue sets in — some numbers get skipped or mistyped",duz:"Diqqat pasayadi, xuddi shu ishni 200+ marta qaytarish inson uchun mos emas.",den:"Attention fades — repeating the same action 200+ times isn't suited to a human."},
+    {col:D,uz:"😩 25+ daqiqa, 254 ta buyruq qo'lda — bir nechtasi albatta o'tkazib yuborilgan",en:"😩 25+ minutes, 254 commands typed by hand — a few are inevitably missed",duz:"Aynan shu ish uchun bash skript yaratilgan.",den:"This is exactly the job bash scripting was invented for.",final:true,bad:true}
+  ];
+  const SCRIPT=[
+    {col:BL,uz:"Vazifa: xuddi shu 254 ta IP orasidan tirik xostlarni topish",en:"Task: find the live hosts among the exact same 254 IPs",duz:"Bir marta yozilgan skript istalgancha marta ishlatiladi.",den:"A script written once can be reused any number of times."},
+    {col:AM,uz:"for i in $(seq 1 254); do ... done — bitta sikl barcha 254 tasini qamrab oladi",en:"for i in $(seq 1 254); do ... done — one loop covers all 254 of them",duz:"Yozish atigi bir necha soniya oladi.",den:"Writing it takes only a few seconds."},
+    {col:AM,uz:"./scan.sh — skript ishga tushadi, tekshirish avtomatik ketma-ket boradi",en:"./scan.sh — the script runs, checking proceeds automatically in sequence",duz:"Kompyuter charchamaydi va hech birini o'tkazib yubormaydi.",den:"The computer doesn't get tired and never skips one."},
+    {col:A,uz:"⚡ ~4 daqiqa (ping kutish vaqtiga bog'liq), 0 ta o'tkazib yuborish",en:"⚡ ~4 minutes (bounded by ping's wait time), zero skips",duz:"Bir marta yozilgan mantiq — istalgancha marta, xatosiz qaytariladi.",den:"Logic written once repeats flawlessly, as many times as needed.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="manual"?MANUAL:SCRIPT;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="manual"?MANUAL:run==="script"?SCRIPT:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — 254 ta IP'ni qo'lda va bitta skript bilan tekshirishni solishtiring.","⬇ Pick a scenario — compare checking 254 IPs by hand versus with one script.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="manual"?t(lang,"✗ Qo'lda: sekin, charchoq, o'tkazib yuborishlar","✗ By hand: slow, tiring, things get missed"):t(lang,"✓ Skript bilan: tez, charchamaydi, hech narsa o'tkazib yuborilmaydi","✓ With a script: fast, tireless, nothing skipped")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("manual");setStep(-1);},style:{flex:1,padding:"9px",background:run==="manual"?D+"22":SL2,color:run==="manual"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"😩 Qo'lda (254 marta)","😩 By hand (254 times)")),
+      React.createElement("button",{onClick:()=>{setRun("script");setStep(-1);},style:{flex:1,padding:"9px",background:run==="script"?A+"22":SL2,color:run==="script"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Skript bilan (bitta sikl)","⚡ With a script (one loop)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1379,9 +1419,9 @@ function LessonL07(){
     React.createElement(Terminal,null,"#!/bin/bash\n# ^ shebang — skript bash bilan ishga tushadi\nfor i in $(seq 1 254); do\n  ip=\"10.0.0.$i\"\n  ping -c1 -W1 $ip &>/dev/null && echo \"$ip tirik\"\ndone\n\n# ishga tushirish:\n# chmod +x scan.sh && ./scan.sh"),
     React.createElement(H2,{num:"§6"},t(lang,"Bash qurilishlari","Bash building blocks")),
     React.createElement(LayerStack,{layers:[{n:"$var",name:t(lang,"$var","$var"),color:"#4dabf7",desc:{uz:"O'zgaruvchi qiymati (ikki qo'shtirnoq ichida kengayadi).",en:"Variable value (expands inside double quotes)."}},{n:"if",name:t(lang,"if","if"),color:"#69db7c",desc:{uz:"Shart: [ -f file ] fayl bor-yo'qligini tekshiradi.",en:"Condition: [ -f file ] tests if a file exists."}},{n:"for",name:t(lang,"for","for"),color:"#a855f7",desc:{uz:"Sikl: ro'yxatdagi har element ustidan takrorlaydi.",en:"Loop: iterates over each item in a list."}},{n:"$( )",name:t(lang,"$( )","$( )"),color:"#ffd43b",desc:{uz:"Buyruq natijasini o'zgaruvchiga oladi.",en:"Captures a command's output into a variable."}},]}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: ping-sweep skripti","Practice: a ping-sweep script")),
-    React.createElement(P,null,t(lang,"Quyidagi kichik skript /24 tarmoqdagi tirik xostlarni topadi — for sikli va if sharti birga ishlaydi. O'ngda uni ishga tushirganda chiqadigan natija.","The small script below finds live hosts in a /24 network — a for loop and an if condition working together. On the right is the output when you run it.")),
-    React.createElement(Terminal,null,"for i in $(seq 1 254); do\n  ping -c1 -W1 10.0.0.$i &>/dev/null && echo «10.0.0.$i tirik»\ndone\n# 10.0.0.1 tirik\n# 10.0.0.10 tirik\n# 10.0.0.15 tirik"),
+    React.createElement(H2,{num:"§7"},t(lang,"Interaktiv simulyator: qo'lda vs skript bilan","Interactive simulator: by hand vs with a script")),
+    React.createElement(P,null,t(lang,"§1 dagi da'voni his qiling — xuddi shu /24 tarmoqni tekshirish vazifasini qo'lda va bitta skript bilan bajarishni solishtiring:","Feel the claim from §1 for yourself — compare doing the same /24 network check by hand versus with one script:")),
+    React.createElement(ManualVsScriptSim),
     React.createElement(Quiz,{q:{uz:"Skriptning birinchi qatoridagi #!/bin/bash nima deyiladi?",en:"What is #!/bin/bash on a script's first line called?"},opts:[{uz:"Izoh",en:"A comment"},{uz:"Shebang — qaysi interpretator ishga tushirishini bildiradi",en:"Shebang — tells which interpreter runs it"},{uz:"O'zgaruvchi",en:"A variable"},{uz:"Sikl",en:"A loop"}],correct:1,exp:{uz:"Shebang (#!) tizimga skriptni qaysi dastur (bu yerda /bin/bash) bilan bajarishni ko'rsatadi — birinchi qatorda turishi shart.",en:"The shebang (#!) tells the system which program (here /bin/bash) executes the script — it must be the first line."}}));
 }
 function LessonL08(){
