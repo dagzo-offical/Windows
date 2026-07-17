@@ -428,6 +428,46 @@ function PermissionWalkSim(){
       React.createElement("button",{onClick:()=>{setRun("root");setStep(-1);},style:{flex:1,padding:"9px",background:run==="root"?A+"22":SL2,color:run==="root"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"👑 root"))));
 }
 
+function SUIDRiskSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const SAFE=[
+    {col:BL,uz:"/usr/bin/passwd fayli SUID+root — istalgan foydalanuvchi ishga tushira oladi",en:"/usr/bin/passwd is SUID+root — any user can run it",duz:"Parol o'zgartirish uchun vaqtincha root huquqi kerak, shuning uchun SUID atayin qo'yilgan.",den:"Changing a password briefly needs root rights, so SUID is deliberately set here."},
+    {col:AM,uz:"Dastur ICHIDA qattiq nazorat bor — faqat o'z parolingizni o'zgartirishga ruxsat beradi",en:"Internally the program strictly limits itself — it only lets you change YOUR OWN password",duz:"Kod diqqat bilan yozilgan: hech qanday tashqi buyruq yoki fayl argumentini qabul qilmaydi.",den:"The code is carefully written: it accepts no external command or file argument."},
+    {col:AM,uz:"Boshqa foydalanuvchi parolini yoki ixtiyoriy faylni o'zgartirish imkoni yo'q",en:"There's no way to change another user's password or an arbitrary file",duz:"Root huquqi faqat bitta tor vazifaga qat'iy cheklangan.",den:"The root privilege is tightly scoped to exactly one narrow task."},
+    {col:A,uz:"🔒 SUID xavfsiz — dastur o'zini ongli ravishda cheklagan",en:"🔒 SUID is safe here — the program deliberately restricts itself",duz:"Xavfsiz SUID = kam, aniq belgilangan imkoniyat.",den:"Safe SUID = a small, precisely defined set of capabilities.",final:true}
+  ];
+  const RISKY=[
+    {col:BL,uz:"Administrator xato bilan /usr/bin/find fayliga SUID+root o'rnatgan",en:"An admin mistakenly set SUID+root on /usr/bin/find",duz:"Ehtimol «vaqtincha» debgina, keyin olib tashlashni unutgan.",den:"Maybe set \"temporarily\" and never removed."},
+    {col:AM,uz:"find'ning o'zida -exec bayrog'i bor — u ISTALGAN buyruqni ishga tushira oladi",en:"find itself has an -exec flag — it can launch ANY command at all",duz:"find bu uchun mo'ljallanmagan, lekin funksiyasi buni imkon qiladi.",den:"find wasn't designed for this, but its own feature allows it."},
+    {col:AM,uz:"find . -exec /bin/sh -p \\; — buyruq SUID orqali root sifatida bajariladi",en:"find . -exec /bin/sh -p \\; — the command runs as root via SUID",duz:"-p bayrog'i sh'ga imtiyozlarni tashlab yubormaslikni buyuradi.",den:"The -p flag tells sh not to drop its elevated privileges."},
+    {col:D,uz:"☠ Oddiy foydalanuvchi soniyada root bo'ldi — bitta noto'g'ri SUID yetarli edi",en:"☠ A regular user became root in seconds — one misconfigured SUID was enough",duz:"Bu — GTFOBins'da hujjatlashtirilgan eng klassik privesc texnikalaridan biri.",den:"This is one of the most classic privesc techniques, documented on GTFOBins.",final:true,bad:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="safe"?SAFE:RISKY;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="safe"?SAFE:run==="risky"?RISKY:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — SUID biti xavfsiz va xavfli dasturda qanday farqli oqibatga olib kelishini ko'ring.","⬇ Pick a scenario — see how the SUID bit leads to very different outcomes on a safe versus a risky program.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="safe"?t(lang,"✓ passwd: SUID to'g'ri cheklangan","✓ passwd: SUID is properly scoped"):t(lang,"✗ find: SUID to'g'ridan-to'g'ri root shell beradi","✗ find: SUID hands over a root shell directly")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("safe");setStep(-1);},style:{flex:1,padding:"9px",background:run==="safe"?A+"22":SL2,color:run==="safe"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Xavfsiz SUID (passwd)","🔒 Safe SUID (passwd)")),
+      React.createElement("button",{onClick:()=>{setRun("risky");setStep(-1);},style:{flex:1,padding:"9px",background:run==="risky"?D+"22":SL2,color:run==="risky"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ Xavfli SUID (find)","☠ Risky SUID (find)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1263,9 +1303,12 @@ function LessonL05(){
     React.createElement(H2,{num:"§5"},t(lang,"SUID, SGID va sudo","SUID, SGID and sudo")),
     React.createElement(P,null,t(lang,"SUID biti o'rnatilgan fayl egasining huquqi bilan ishlaydi — agar egasi root bo'lsa, oddiy foydalanuvchi ham uni root huquqida bajaradi. Bu ba'zan zarur (masalan passwd buyrug'i), lekin noto'g'ri sozlangan SUID fayllar privilege escalation uchun eng ko'p ishlatiladigan yo'ldir. sudo esa oddiy foydalanuvchiga vaqtincha root buyrug'ini bajarishga ruxsat beradi. sudo -l — sizga qanday sudo huquqlari berilganini ko'rsatadi (privescning birinchi tekshiruvi).","A file with the SUID bit set runs with the owner's rights — if the owner is root, even a normal user runs it as root. This is sometimes necessary (e.g. the passwd command), but misconfigured SUID files are the most common path for privilege escalation. sudo lets a normal user run a command temporarily as root. sudo -l shows what sudo rights you've been given (the first privesc check).")),
     React.createElement(Terminal,null,"chmod 600 id_rsa       # rw------- (SSH kaliti uchun majburiy)\nchmod +x exploit.sh    # bajarish huquqi\nchown www-data:www-data shell.php\nsudo -l                # menda qanday sudo huquqi bor?\nfind / -perm -4000 -type f 2>/dev/null  # SUID fayllar"),
-    React.createElement(H2,{num:"§6"},t(lang,"Sakkizlik va simvolik — ikki usul","Octal vs symbolic — two ways")),
+    React.createElement(H2,{num:"§6"},t(lang,"Interaktiv simulyator: xavfsiz vs xavfli SUID","Interactive simulator: safe vs risky SUID")),
+    React.createElement(P,null,t(lang,"Bir xil SUID biti ikki xil dasturda tubdan boshqacha oqibatga olib keladi. Ikkalasini sinang:","The same SUID bit leads to a wildly different outcome depending on the program. Try both:")),
+    React.createElement(SUIDRiskSim),
+    React.createElement(H2,{num:"§7"},t(lang,"Sakkizlik va simvolik — ikki usul","Octal vs symbolic — two ways")),
     React.createElement(CompareCols,{left:{title:{uz:"Sakkizlik (raqam)",en:"Octal (number)"},color:"#ffd43b",rows:[{uz:"chmod 755 file",en:"chmod 755 file"},{uz:"Bir martaga to'liq o'rnatadi",en:"Sets everything at once"},{uz:"r=4 w=2 x=1 yig'indisi",en:"Sum of r=4 w=2 x=1"},]},right:{title:{uz:"Simvolik (harf)",en:"Symbolic (letter)"},color:"#69db7c",rows:[{uz:"chmod u+x file",en:"chmod u+x file"},{uz:"Bittasini qo'shadi/olib tashlaydi",en:"Adds/removes just one bit"},{uz:"u/g/o + r/w/x",en:"u/g/o + r/w/x"},]}}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: ruxsatlarni o'qish","Practice: reading permissions")),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: ruxsatlarni o'qish","Practice: reading permissions")),
     React.createElement(P,null,t(lang,"ls -l birinchi ustunida 10 belgi ruxsatlarni ko'rsatadi: birinchi belgi tur (- fayl, d katalog), keyin uch-uchdan egasi, guruh va boshqalar uchun rwx. Quyidagi natijani o'qishga harakat qiling.","The first column of ls -l shows permissions in 10 characters: the first is the type (- file, d directory), then three-by-three rwx for owner, group and others. Try reading the output below.")),
     React.createElement(Terminal,null,"ls -l\n# -rw-------  1 kali kali 2610 id_rsa      → 600, faqat egasi (SSH kaliti)\n# -rwxr-xr-x  1 kali kali  180 exploit.sh  → 755, hamma bajaradi\n# -rw-r--r--  1 root root 2981 passwd      → 644, hamma o'qiydi\nfind / -perm -4000 -type f 2>/dev/null\n# /usr/bin/passwd  /usr/bin/sudo  ...  (SUID fayllar)"),
     React.createElement(Quiz,{q:{uz:"chmod 600 id_rsa faylga qanday ruxsat beradi?",en:"What does chmod 600 id_rsa set?"},opts:[{uz:"Hamma o'qiy/yoza oladi",en:"Everyone read/write"},{uz:"Faqat egasi o'qiy/yoza oladi",en:"Only the owner read/write"},{uz:"Hamma bajara oladi",en:"Everyone execute"},{uz:"Hech kim kira olmaydi",en:"No access"}],correct:1,exp:{uz:"600 = rw------- : 6 (rw) egasiga, 0 guruhga, 0 boshqalarga. SSH kalitlari uchun aynan shu talab qilinadi.",en:"600 = rw------- : 6 (rw) for owner, 0 for group, 0 for others. Exactly what SSH keys require."}}));
