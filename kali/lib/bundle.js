@@ -1028,6 +1028,46 @@ function EternalBlueSim(){
       React.createElement("button",{onClick:()=>{setRun("patched");setStep(-1);},style:{flex:1,padding:"9px",background:run==="patched"?A+"22":SL2,color:run==="patched"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🛡 SMBv2/3 (yangilangan)","🛡 SMBv2/3 (patched)"))));
 }
 
+function ProtocolCaptureSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const HTTPF=[
+    {col:BL,uz:"Follow → TCP Stream — HTTP suhbati ochiladi",en:"Follow → TCP Stream — an HTTP conversation opens",duz:"Butun suhbat bitta o'qilishi mumkin matn sifatida ko'rinadi.",den:"The whole conversation appears as one readable block of text."},
+    {col:AM,uz:"So'rov matni to'liq o'qiladi: POST /login HTTP/1.1",en:"The request text reads in full: POST /login HTTP/1.1",duz:"Sarlavhalar ham, tana ham ochiq matn.",den:"Both headers and body are plain text."},
+    {col:AM,uz:"Body qismida: username=admin&password=SuperSecret123",en:"In the body: username=admin&password=SuperSecret123",duz:"Hech qanday shifrlash yo'q — baytlar aynan shu ko'rinishda tarmoqdan o'tgan.",den:"No encryption at all — these are the exact bytes that crossed the wire."},
+    {col:D,uz:"🔓 Parol ochiq matnda — Wireshark uni to'g'ridan-to'g'ri ko'rsatadi",en:"🔓 The password is in plaintext — Wireshark shows it directly",duz:"Buni ushlab turgan har kim parolni o'qiy oladi.",den:"Anyone capturing this traffic can simply read the password.",final:true,bad:true}
+  ];
+  const HTTPSF=[
+    {col:BL,uz:"Follow → TCP Stream — HTTPS suhbatini ochishga urinish",en:"Follow → TCP Stream — attempting to open an HTTPS conversation",duz:"Xuddi shu buyruq, xuddi shu login shakli.",den:"The exact same action, the exact same login form."},
+    {col:AM,uz:"TLS handshake ko'rinadi (Client Hello, sertifikat) — bu shifrlash SOZLAMASI",en:"The TLS handshake is visible (Client Hello, certificate) — this is the encryption SETUP",duz:"Handshake'ning o'zi shifrlanmagan, lekin mazmunni oshkor qilmaydi.",den:"The handshake itself is unencrypted, but it reveals no content."},
+    {col:AM,uz:"Application Data: faqat tasodifiy ko'ringan baytlar",en:"Application Data: just random-looking bytes",duz:"«username» yoki «password» so'zi hech qayerda ko'rinmaydi.",den:"The words «username» or «password» appear nowhere."},
+    {col:A,uz:"🔒 Parol umuman ko'rinmaydi — shifrlash mazmunni yashiradi",en:"🔒 The password never becomes visible — encryption hides the content",duz:"Ushlab turgan kishi trafikni ko'radi, lekin uni o'qiy olmaydi.",den:"Whoever captures this traffic sees it, but cannot read it.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="http"?HTTPF:HTTPSF;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="http"?HTTPF:run==="https"?HTTPSF:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu login jarayonini HTTP va HTTPS'da Follow Stream bilan solishtiring.","⬇ Pick a scenario — compare Follow Stream on the exact same login over HTTP versus HTTPS.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="http"?t(lang,"✗ HTTP: parol Wireshark'da ochiq o'qiladi","✗ HTTP: the password reads in plain sight in Wireshark"):t(lang,"✓ HTTPS: parol hech qachon ochilmaydi","✓ HTTPS: the password never gets exposed")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("http");setStep(-1);},style:{flex:1,padding:"9px",background:run==="http"?D+"22":SL2,color:run==="http"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 HTTP (shifrlanmagan)","🔓 HTTP (unencrypted)")),
+      React.createElement("button",{onClick:()=>{setRun("https");setStep(-1);},style:{flex:1,padding:"9px",background:run==="https"?A+"22":SL2,color:run==="https"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 HTTPS (shifrlangan)","🔒 HTTPS (encrypted)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1690,10 +1730,13 @@ function LessonL20(){
     React.createElement(P,null,t(lang,"Paketga o'ng tugma bosib \"Follow > TCP Stream\" ni tanlaganingizda, bitta ulanishning butun suhbatini bir oynada ko'rasiz — alohida paketlarni yig'ib o'tirmaysiz. Shifrlanmagan protokollarda (HTTP, FTP, Telnet) bu login va parollarni ochib berishi mumkin — aynan shuning uchun shifrlash (HTTPS) muhim. tshark esa Wireshark'ning terminal versiyasi — skriptlar va masofaviy serverlar uchun qulay.","When you right-click a packet and choose \"Follow > TCP Stream\", you see an entire conversation of one connection in a single window — no need to piece together individual packets. On unencrypted protocols (HTTP, FTP, Telnet) this can reveal logins and passwords — which is exactly why encryption (HTTPS) matters. tshark is the terminal version of Wireshark — handy for scripts and remote servers.")),
     React.createElement(Terminal,null,"# Keng tarqalgan ko'rsatish filtrlari:\nip.addr == 10.0.0.5\ntcp.port == 80\nhttp.request.method == \"POST\"\ndns\n# terminal versiyasi:\ntshark -i eth0 -f \"port 80\""),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Boshqalarning trafigini ruxsatsiz ushlash maxfiylikni buzadi va ko'p joyda qonunga zid. Faqat o'z tarmog'ingiz yoki ruxsat berilgan muhitda.","Capturing others' traffic without permission violates privacy and is illegal in many places. Only on your own network or an authorized environment.")),
-    React.createElement(H2,{num:"§5"},t(lang,"Foydali displey filtrlari","Useful display filters")),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: HTTP vs HTTPS Follow Stream","Interactive simulator: HTTP vs HTTPS Follow Stream")),
+    React.createElement(P,null,t(lang,"Xuddi shu login jarayonini ikki protokolda ushlab, Follow Stream nima ko'rsatishini solishtiring:","Capture the exact same login two different ways and compare what Follow Stream reveals:")),
+    React.createElement(ProtocolCaptureSim),
+    React.createElement(H2,{num:"§6"},t(lang,"Foydali displey filtrlari","Useful display filters")),
     React.createElement(LayerStack,{layers:[{n:"http",name:t(lang,"http","http"),color:"#4dabf7",desc:{uz:"Faqat HTTP trafigini ko'rsatadi.",en:"Shows only HTTP traffic."}},{n:"ip.addr==",name:t(lang,"ip.addr==x","ip.addr==x"),color:"#69db7c",desc:{uz:"Berilgan IP bilan bog'liq paketlar.",en:"Packets involving a given IP."}},{n:"tcp.port==",name:t(lang,"tcp.port==x","tcp.port==x"),color:"#a855f7",desc:{uz:"Muayyan port trafigi.",en:"Traffic on a specific port."}},{n:"http.request",name:t(lang,"http.request","http.request"),color:"#ffd43b",desc:{uz:"Faqat HTTP so'rovlari (login, parol).",en:"Only HTTP requests (logins, passwords)."}},]}),
-    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: parolni ko'rish","Practice: spotting a password")),
-    React.createElement(P,null,t(lang,"Shifrlanmagan protokollarda (HTTP, FTP, Telnet) login va parol ochiq matnda uzatiladi. Displey filtri bilan aynan o'sha paketni topib, Follow Stream orqali butun suhbatni o'qish mumkin.","In unencrypted protocols (HTTP, FTP, Telnet) the login and password travel in plain text. With a display filter you find that exact packet, and Follow Stream lets you read the whole conversation.")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: parolni ko'rish","Practice: spotting a password")),
+    React.createElement(P,null,t(lang,"Shifrlanmagan protokollarda (HTTP, FTP, Telnet) login va parol ochiq matnda uzatiladi, xuddi simulyatordagi «HTTP» ssenariysidek. Displey filtri bilan aynan o'sha paketni topib, Follow Stream orqali butun suhbatni o'qish mumkin.","In unencrypted protocols (HTTP, FTP, Telnet) the login and password travel in plain text, just like the simulator's «HTTP» scenario. With a display filter you find that exact packet, and Follow Stream lets you read the whole conversation.")),
     React.createElement(Terminal,null,"# tshark — Wireshark'ning buyruq qatori versiyasi\ntshark -i eth0 -Y «http.request.method==POST» -T fields -e http.file_data\n# username=admin&password=SuperSecret123\n# → shifrlanmagan trafik xavfli!"),
     React.createElement(Quiz,{q:{uz:"Ushlangan paketlardan faqat keraklisini ko'rsatish uchun nima ishlatiladi?",en:"What shows only the relevant captured packets?"},opts:[{uz:"Display filter (ko'rsatish filtri)",en:"A display filter"},{uz:"Firewall qoidasi",en:"A firewall rule"},{uz:"DNS yozuvi",en:"A DNS record"},{uz:"VPN tunnel",en:"A VPN tunnel"}],correct:0,exp:{uz:"Ko'rsatish filtri (masalan http yoki ip.addr==...) allaqachon ushlangan minglab paketdan faqat keraklisini ajratib ko'rsatadi.",en:"A display filter (e.g. http or ip.addr==...) narrows the thousands of already-captured packets to just the ones you need."}}));
 }
