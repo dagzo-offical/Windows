@@ -948,6 +948,46 @@ function WhatWebAggroSim(){
       React.createElement("button",{onClick:()=>{setRun("a4");setStep(-1);},style:{flex:1,padding:"9px",background:run==="a4"?A+"22":SL2,color:run==="a4"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🎯 -a 4 (agressiv)","🎯 -a 4 (aggressive)"))));
 }
 
+function NullSessionSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const ALLOWED=[
+    {col:BL,uz:"enum4linux -a 10.0.0.5 — SMB'ga parolsiz (null session) ulanishga urinadi",en:"enum4linux -a 10.0.0.5 — attempts an SMB connection with no password (null session)",duz:"Foydalanuvchi nomi ham, parol ham berilmaydi.",den:"No username, no password is supplied at all."},
+    {col:AM,uz:"Eski Windows Server 2008: null session RUXSAT ETILGAN",en:"Old Windows Server 2008: null session is ALLOWED",duz:"Eski standart sozlama anonim SMB ulanishga yo'l qo'yardi.",den:"The old default configuration permitted anonymous SMB connections."},
+    {col:AM,uz:"15 ta foydalanuvchi nomi, guruhlar va parol siyosati to'liq chiqadi",en:"15 usernames, groups and the password policy all come out in full",duz:"Autentifikatsiyasiz — bitta ham parol kiritilmadi.",den:"Without authentication — not a single password was entered."},
+    {col:D,uz:"🔓 To'liq profil — endi faqat parolni topish qoldi",en:"🔓 A full profile — only finding the password remains",duz:"Foydalanuvchi nomlari ro'yxati brute-force uchun tayyor asos.",den:"The username list is a ready-made base for brute-forcing.",final:true,bad:true}
+  ];
+  const RESTRICTED=[
+    {col:BL,uz:"enum4linux -a 10.0.0.9 — xuddi shu null session urinishi",en:"enum4linux -a 10.0.0.9 — the exact same null-session attempt",duz:"Hujumchi tomonidan hech narsa boshqacha qilinmadi.",den:"The attacker does nothing differently."},
+    {col:AM,uz:"Zamonaviy Windows Server 2022: null session TAQIQLANGAN (standart)",en:"Modern Windows Server 2022: null session is DISABLED (the default)",duz:"Zamonaviy Windows anonim SMB ulanishni sukut bo'yicha yopadi.",den:"Modern Windows blocks anonymous SMB by default."},
+    {col:AM,uz:"NT_STATUS_ACCESS_DENIED — hech qanday foydalanuvchi nomi olinmadi",en:"NT_STATUS_ACCESS_DENIED — no usernames are extracted at all",duz:"So'rov autentifikatsiya darajasida rad etiladi.",den:"The request is rejected right at the authentication check."},
+    {col:A,uz:"🔒 Deyarli bo'sh natija — hujumchi hech kimning nomini bilmaydi",en:"🔒 An almost empty result — the attacker doesn't learn a single name",duz:"Parol hujumi uchun kerakli «yarim yo'l» bu safar yo'q.",den:"The «halfway point» needed for a password attack simply isn't there this time.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="allowed"?ALLOWED:RESTRICTED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="allowed"?ALLOWED:run==="restricted"?RESTRICTED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu null session urinishi eski va zamonaviy Windows'da qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how the exact same null-session attempt differs on old versus modern Windows.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="allowed"?t(lang,"✗ Null session ruxsat etilgan: to'liq profil oshkor","✗ Null session allowed: a full profile is exposed"):t(lang,"✓ Null session taqiqlangan: hech narsa oshkor bo'lmaydi","✓ Null session disabled: nothing gets exposed")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("allowed");setStep(-1);},style:{flex:1,padding:"9px",background:run==="allowed"?D+"22":SL2,color:run==="allowed"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 Eski Windows (2008)","🔓 Old Windows (2008)")),
+      React.createElement("button",{onClick:()=>{setRun("restricted");setStep(-1);},style:{flex:1,padding:"9px",background:run==="restricted"?A+"22":SL2,color:run==="restricted"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Zamonaviy Windows (2022)","🔒 Modern Windows (2022)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2048,8 +2088,9 @@ function LessonL18(){
     React.createElement(P,null,t(lang,"-a bayrog'i barcha tekshiruvlarni ishga tushiradi: foydalanuvchilar (RID cycling orqali ham), guruhlar, ulashmalar, parol siyosati, va operatsion tizim versiyasi. Zamonaviy muqobil — enum4linux-ng (Python bilan qayta yozilgan, tezroq va tuzilgan chiqish beradi). enum4linux 139 va 445 portlar (SMB) ochiq bo'lganda ishlaydi — ular Nmap bilan avval aniqlanadi.","The -a flag runs all checks: users (including via RID cycling), groups, shares, password policy and OS version. The modern alternative is enum4linux-ng (rewritten in Python, faster and with structured output). enum4linux works when ports 139 and 445 (SMB) are open — which you first find with Nmap.")),
     React.createElement(Terminal,null,"enum4linux -a 10.0.0.5           # to'liq\nenum4linux -U 10.0.0.5           # faqat foydalanuvchilar\nenum4linux -S 10.0.0.5           # faqat ulashmalar\nenum4linux-ng -A 10.0.0.5        # zamonaviy versiya"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"enum4linux topilgan foydalanuvchi ismlarini keyinchalik parol hujumlari uchun ishlatish mumkin — faqat ruxsat berilgan nishonlarda.","Usernames enum4linux finds may be used in later password attacks — only on authorized targets.")),
-    React.createElement(H2,{num:"§5"},t(lang,"enum4linux nimani chiqaradi","What enum4linux extracts")),
-    React.createElement(LayerStack,{layers:[{n:"users",name:t(lang,"Users","Users"),color:"#4dabf7",desc:{uz:"Foydalanuvchi nomlari va RID'lar.",en:"User names and RIDs."}},{n:"shares",name:t(lang,"Shares","Shares"),color:"#69db7c",desc:{uz:"Umumiy papkalar (shares).",en:"Shared folders."}},{n:"groups",name:t(lang,"Groups","Groups"),color:"#a855f7",desc:{uz:"Guruhlar va a'zolik.",en:"Groups and membership."}},{n:"policy",name:t(lang,"Policy","Policy"),color:"#ffd43b",desc:{uz:"Parol siyosati va OS versiyasi.",en:"Password policy and OS version."}},]}),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: null session ruxsat etilganmi?","Interactive simulator: is the null session allowed?")),
+    React.createElement(P,null,t(lang,"§3 dagi xavfni his qiling — xuddi shu null session urinishini eski va zamonaviy Windows'da sinang:","Feel the §3 risk for yourself — try the exact same null-session attempt against old and modern Windows:")),
+    React.createElement(NullSessionSim),
     React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: SMB enumeratsiyasi","Practice: SMB enumeration")),
     React.createElement(P,null,t(lang,"enum4linux Windows/Samba tizimlaridan SMB/NetBIOS orqali ma'lumot yig'adi. -a barcha tekshiruvlarni birdan bajaradi.","enum4linux gathers info from Windows/Samba systems over SMB/NetBIOS. -a runs all checks at once.")),
     React.createElement(Terminal,null,"enum4linux -a 10.0.0.5\n# [+] Got domain/workgroup name: WORKGROUP\n# [+] Users: alice (RID 1000), bob (RID 1001)\n# [+] Share Enumeration:\n#     backups   Disk    (read/write!)\n#     IPC$      IPC"),
