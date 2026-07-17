@@ -308,6 +308,46 @@ function KaliVsRegularSim(){
       React.createElement("button",{onClick:()=>{setRun("kali");setStep(-1);},style:{flex:1,padding:"9px",background:run==="kali"?A+"22":SL2,color:run==="kali"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🦂 Kali Linux","🦂 Kali Linux"))));
 }
 
+function ISOVerifySim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const OK=[
+    {col:BL,uz:"ISO fayl rasmiy kali.org saytidan yuklab olindi",en:"The ISO file is downloaded from the official kali.org site",duz:"Manba — Kali jamoasining o'zi.",den:"The source is the Kali team itself."},
+    {col:AM,uz:"sha256sum hisoblanadi:  3c3e1e9a7f...",en:"sha256sum is computed:  3c3e1e9a7f...",duz:"Bu — faylning yagona «raqamli barmoq izi».",den:"This is the file's unique «digital fingerprint»."},
+    {col:AM,uz:"Rasmiy saytdagi e'lon qilingan qiymat bilan solishtiriladi",en:"It's compared against the value published on the official site",duz:"Ikkala qiymat baytma-bayt tenglashtiriladi.",den:"Both values are compared byte for byte."},
+    {col:A,uz:"✅ MOS KELDI — fayl asl, o'zgartirilmagan, xavfsiz o'rnatsa bo'ladi",en:"✅ MATCH — the file is genuine, unaltered, safe to install",duz:"Bitta bit ham o'zgarmagani matematik jihatdan tasdiqlandi.",den:"It's mathematically confirmed that not even a single bit changed.",final:true}
+  ];
+  const BAD=[
+    {col:BL,uz:"ISO fayl ishonchsiz uchinchi tomon oynasi (mirror)'dan yuklab olindi",en:"The ISO file is downloaded from an untrusted third-party mirror",duz:"Tezroq bo'lishi mumkin, lekin manba tasdiqlanmagan.",den:"It might be faster, but the source is unverified."},
+    {col:AM,uz:"sha256sum hisoblanadi:  9f61a2d4c8... (boshqacha qiymat)",en:"sha256sum is computed:  9f61a2d4c8... (a different value)",duz:"Fayl hajmi va nomi bir xil ko'rinsa ham, ichi boshqa.",den:"Even if the file size and name look the same, the contents differ."},
+    {col:AM,uz:"Rasmiy saytdagi qiymat bilan solishtiriladi — MOS KELMAYDI",en:"It's compared to the official value — it DOESN'T MATCH",duz:"Hatto bitta bayt farq qilsa ham, butun hash boshqacha chiqadi.",den:"Even a single differing byte produces a completely different hash."},
+    {col:D,uz:"⛔ Fayl buzilgan yoki ichiga zararli kod qo'shilgan bo'lishi mumkin",en:"⛔ The file may be corrupted or have malicious code injected into it",duz:"Bunday ISO'ni hech qachon o'rnatmang — backdoor bo'lishi mumkin.",den:"Never install an ISO like this — it could be a backdoor.",final:true,bad:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="ok"?OK:BAD;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="ok"?OK:run==="bad"?BAD:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — bitta ISO haqiqiy manbadan, ikkinchisi shubhali manbadan kelganda tekshiruv qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how the checksum check differs when one ISO comes from a genuine source and one from a suspicious one.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="ok"?t(lang,"✓ Tasdiqlangan — o'rnatishga tayyor","✓ Verified — safe to install"):t(lang,"✗ Rad etildi — bu ISO ishonib bo'lmaydi","✗ Rejected — this ISO cannot be trusted")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("ok");setStep(-1);},style:{flex:1,padding:"9px",background:run==="ok"?A+"22":SL2,color:run==="ok"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Rasmiy ISO","✅ Official ISO")),
+      React.createElement("button",{onClick:()=>{setRun("bad");setStep(-1);},style:{flex:1,padding:"9px",background:run==="bad"?D+"22":SL2,color:run==="bad"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⛔ Shubhali ISO","⛔ Suspicious ISO"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1074,17 +1114,19 @@ function LessonL02(){
     ]}),
     React.createElement(H2,{num:"§3"},t(lang,"Yuklab olishni tekshirish nima uchun muhim","Why verifying the download matters")),
     React.createElement(P,null,t(lang,"ISO faylni yuklab olgach, uning SHA256 summasini hisoblab, rasmiy saytdagi summa bilan solishtiring. Nega? Chunki ISO yuklanish paytida buzilishi mumkin, yoki hujumchi soxta, zararli ISO'ni tarqatgan bo'lishi mumkin. Summalar bir xil bo'lsa — fayl aynan Kali jamoasi chiqargani, o'zgartirilmagan. Bu — o'rnatuvchiga ishonishning yagona ishonchli yo'li. Qo'shimcha xavfsizlik uchun GPG imzosini ham tekshirish mumkin.","After downloading the ISO, compute its SHA256 checksum and compare it to the one on the official site. Why? Because the ISO can get corrupted during download, or an attacker may distribute a fake, malicious ISO. If the sums match, the file is exactly what the Kali team released, unaltered. This is the only reliable way to trust the installer. For extra safety you can also verify the GPG signature.")),
-    React.createElement(Terminal,null,"sha256sum kali-linux-2024.1-installer-amd64.iso\n# natijani kali.org dagi rasmiy summa bilan solishtiring — BIR XIL bo'lishi shart"),
-    React.createElement(H2,{num:"§4"},t(lang,"O'rnatishdan keyingi birinchi qadamlar","First steps after install")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: ISO tasdiqlandimi yoki buzilganmi?","Interactive simulator: is the ISO verified or tampered?")),
+    React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — hash tekshiruvi haqiqiy ISO va shubhali ISO'ni qanday farqlashini ko'ring:","Try both scenarios — see how a checksum check tells a genuine ISO apart from a suspicious one:")),
+    React.createElement(ISOVerifySim),
+    React.createElement(H2,{num:"§5"},t(lang,"O'rnatishdan keyingi birinchi qadamlar","First steps after install")),
     React.createElement(P,null,t(lang,"O'rnatgach: (1) tizimni yangilang — vositalar so'nggi versiyada bo'lsin; (2) standart parolni o'zgartiring; (3) VM'da darhol snapshot oling; (4) kerak bo'lsa qo'shimcha vositalarni metapaketlar orqali o'rnating (masalan kali-linux-large). Bu odatlar ishingizni xavfsiz va tartibli qiladi.","After install: (1) update the system so tools are current; (2) change the default password; (3) take a snapshot immediately in a VM; (4) install extra tools via metapackages if needed (e.g. kali-linux-large). These habits keep your work safe and organized.")),
-    React.createElement(H2,{num:"§5"},t(lang,"VM tarmoq rejimlari","VM network modes")),
+    React.createElement(H2,{num:"§6"},t(lang,"VM tarmoq rejimlari","VM network modes")),
     React.createElement(P,null,t(lang,"VirtualBox'da tarmoqni to'g'ri sozlash muhim. NAT — Kali internetga chiqadi, lekin tashqaridan ko'rinmaydi (xavfsiz, sukut bo'yicha). Bridged — Kali haqiqiy tarmoqda alohida qurilmadek ko'rinadi (real tarmoqni test qilish uchun). Host-only — faqat sizning mashinangiz va VM'lar orasidagi izolyatsiya qilingan tarmoq (nishon VM bilan xavfsiz mashq uchun ideal).","Configuring the VM network correctly matters. NAT — Kali reaches the internet but isn't visible from outside (safe, the default). Bridged — Kali appears as a separate device on the real network (for testing a real LAN). Host-only — an isolated network between just your machine and the VMs (ideal for safe practice against a target VM).")),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"Snapshot: toza o'rnatishdan keyin darhol snapshot oling. Test muhitini ifloslasangiz yoki biror narsa buzilsa, bir soniyada toza holatga qaytasiz — hech narsani qayta o'rnatmasdan.","Snapshot: take one right after a clean install. If you pollute your test environment or something breaks, you revert to a clean state in a second — without reinstalling anything.")),
-    React.createElement(H2,{num:"§6"},t(lang,"VM tarmoq rejimlarini solishtirish","Comparing VM network modes")),
+    React.createElement(H2,{num:"§7"},t(lang,"VM tarmoq rejimlarini solishtirish","Comparing VM network modes")),
     React.createElement(P,null,t(lang,"Laboratoriya qurishda tarmoq rejimini to'g'ri tanlash xavfsizlikni belgilaydi. Quyida ikkita eng ko'p ishlatiladigan rejim solishtirilgan — mashq uchun odatda Host-only + NAT birgalikda ishlatiladi.","When building a lab, choosing the right network mode defines your safety. Below are the two most-used modes compared — for practice, Host-only + NAT together is the usual setup.")),
     React.createElement(CompareCols,{left:{title:{uz:"NAT",en:"NAT"},color:"#69db7c",rows:[{uz:"Kali internetga chiqadi",en:"Kali reaches the internet"},{uz:"Tashqaridan ko'rinmaydi",en:"Invisible from outside"},{uz:"Sukut bo'yicha, xavfsiz",en:"Default, safe"},]},right:{title:{uz:"Bridged",en:"Bridged"},color:"#ff3a5e",rows:[{uz:"Real tarmoqda alohida qurilma",en:"A separate device on the LAN"},{uz:"Boshqalar ko'ra oladi",en:"Others can see it"},{uz:"Faqat ruxsat berilgan tarmoqda",en:"Only on an authorized network"},]}}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: ISO ni tekshirish","Practice: verify the ISO")),
-    React.createElement(P,null,t(lang,"ISO yuklab olingach, uning SHA256 summasini hisoblang va kali.org dagi rasmiy qiymat bilan solishtiring. Ular bir xil bo'lsa — fayl ishonchli.","After downloading the ISO, compute its SHA256 sum and compare it to the official value on kali.org. If they match, the file is trustworthy.")),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: ISO ni tekshirish","Practice: verify the ISO")),
+    React.createElement(P,null,t(lang,"Simulyatordagi «Rasmiy ISO» ssenariysi aynan shu buyruqqa asoslangan. ISO yuklab olingach, uning SHA256 summasini hisoblang va kali.org dagi rasmiy qiymat bilan solishtiring.","The simulator's «Official ISO» scenario is based on exactly this command. After downloading the ISO, compute its SHA256 sum and compare it to the official value on kali.org.")),
     React.createElement(Terminal,null,"sha256sum kali-linux-2024.1-installer-amd64.iso\n# 3c3e1e9... (bu qiymat kali.org dagi bilan BIR XIL bo'lishi shart)\n\nsudo apt update && sudo apt full-upgrade -y\n# ... Reading package lists... Done"),
     React.createElement(Quiz,{q:{uz:"Yangi boshlovchi uchun eng xavfsiz o'rnatish usuli qaysi?",en:"Safest install method for a beginner?"},opts:[{uz:"Bare metal",en:"Bare metal"},{uz:"Virtual mashina",en:"Virtual machine"},{uz:"Telefonga",en:"On a phone"},{uz:"Router'ga",en:"On a router"}],correct:1,exp:{uz:"Virtual mashina asosiy tizimni izolyatsiya qiladi va snapshot orqali xatolardan bir soniyada qaytish imkonini beradi.",en:"A VM isolates the host and lets you revert from mistakes in a second via snapshots."}}));
 }
