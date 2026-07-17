@@ -1308,6 +1308,46 @@ function GPUSpeedSim(){
       React.createElement("button",{onClick:()=>{setRun("gpu");setStep(-1);},style:{flex:1,padding:"9px",background:run==="gpu"?A+"22":SL2,color:run==="gpu"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ GPU'da","⚡ On GPU"))));
 }
 
+function IntruderModeSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const SNIPER=[
+    {col:BL,uz:"Login formasi: username va password — ikkala maydon ham § bilan belgilangan",en:"Login form: username and password — both fields are marked with §",duz:"Vazifa: to'g'ri admin/hunter2 juftligini topish.",den:"Goal: find the correct admin/hunter2 pair."},
+    {col:AM,uz:"Sniper: BITTA ro'yxatni har joyga NAVBAT bilan qo'yadi",en:"Sniper: puts ONE list into each spot, ONE AT A TIME",duz:"Bir vaqtning o'zida faqat bitta maydon o'zgaradi, qolgani asl holida qoladi.",den:"Only one field changes at a time, the rest stay at their original value."},
+    {col:AM,uz:"admin/§so'z1§, admin/§so'z2§... keyin §so'z1§/test123, §so'z2§/test123...",en:"admin/§word1§, admin/§word2§... then §word1§/test123, §word2§/test123...",duz:"Ikkala maydon BIR VAQTDA hech qachon o'zgartirilmaydi.",den:"Both fields are never varied AT THE SAME TIME."},
+    {col:D,uz:"❌ To'g'ri juftlik (admin+hunter2) hech qachon birga yuborilmaydi",en:"❌ The correct pair (admin+hunter2) is never sent together",duz:"Noto'g'ri rejim tanlash — vaqt behuda ketadi, natija yo'q.",den:"The wrong mode choice — time wasted, no result.",final:true,bad:true}
+  ];
+  const CLUSTER=[
+    {col:BL,uz:"Login formasi: xuddi shu ikkala maydon § bilan belgilangan",en:"Login form: the exact same two fields marked with §",duz:"Xuddi shu vazifa, xuddi shu forma.",den:"The exact same goal, the exact same form."},
+    {col:AM,uz:"Cluster bomb: IKKI alohida ro'yxat — usernames.txt va passwords.txt",en:"Cluster bomb: TWO separate lists — usernames.txt and passwords.txt",duz:"Har bir maydon o'z ro'yxatiga ega.",den:"Each field gets its own list."},
+    {col:AM,uz:"Har username BARCHA parollar bilan sinaladi — to'liq kombinatsiya jadvali",en:"Every username is tried with EVERY password — a full combination matrix",duz:"5 login × 1000 parol = 5000 ta so'rov, hech biri o'tkazib yuborilmaydi.",den:"5 logins × 1000 passwords = 5,000 requests, none skipped."},
+    {col:A,uz:"✅ admin+hunter2 juftligi albatta bir marta birga sinaladi — topiladi",en:"✅ The admin+hunter2 pair is definitely tried together once — and found",duz:"To'g'ri rejim tanlash — vazifaning o'ziga mos usul.",den:"The right mode choice — a method that actually fits the task.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="sniper"?SNIPER:CLUSTER;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="sniper"?SNIPER:run==="cluster"?CLUSTER:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — ikkita maydonli login formasini Sniper va Cluster bomb bilan sinang.","⬇ Pick a scenario — attack the same two-field login form with Sniper versus Cluster bomb.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="sniper"?t(lang,"✗ Sniper: bu vazifa uchun noto'g'ri rejim","✗ Sniper: the wrong mode for this task"):t(lang,"✓ Cluster bomb: har kombinatsiya sinaladi","✓ Cluster bomb: every combination gets tried")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("sniper");setStep(-1);},style:{flex:1,padding:"9px",background:run==="sniper"?D+"22":SL2,color:run==="sniper"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"❌ Sniper","❌ Sniper")),
+      React.createElement("button",{onClick:()=>{setRun("cluster");setStep(-1);},style:{flex:1,padding:"9px",background:run==="cluster"?A+"22":SL2,color:run==="cluster"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Cluster bomb","✅ Cluster bomb"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2065,11 +2105,14 @@ function LessonL27(){
     React.createElement(H2,{num:"§5"},t(lang,"Intruder hujum turlari","Intruder attack types")),
     React.createElement(P,null,t(lang,"Intruder so'rovning bir yoki bir necha joyiga avtomatik ravishda ko'plab qiymat qo'yib sinaydi — parol brute-force, foydalanuvchi nomlarini sanash yoki parametr fuzzing uchun. To'rt turi bor: Sniper — bitta payload ro'yxatini har bir belgilangan joyga navbat bilan qo'yadi; Battering ram — bir xil payloadni barcha joylarga bir vaqtda; Pitchfork — har joyga alohida ro'yxat (parallel); Cluster bomb — barcha ro'yxatlarning har bir kombinatsiyasini sinaydi (login+parol juftliklari uchun ideal).","Intruder automatically inserts many values into one or more spots in a request — for password brute-force, username enumeration or parameter fuzzing. There are four types: Sniper puts one payload list into each marked spot in turn; Battering ram puts the same payload into all spots at once; Pitchfork uses a separate list per spot (parallel); Cluster bomb tries every combination of all lists (ideal for login+password pairs).")),
     React.createElement(Terminal,null,"# Burp'ni ishga tushirish\nburpsuite &\n\n# Repeater'da qo'l bilan yuboriladigan so'rov namunasi:\nPOST /login HTTP/1.1\nHost: target.local\nContent-Type: application/x-www-form-urlencoded\n\nusername=admin&password=test123"),
+    React.createElement(H2,{num:"§6"},t(lang,"Interaktiv simulyator: Sniper vs Cluster bomb","Interactive simulator: Sniper vs Cluster bomb")),
+    React.createElement(P,null,t(lang,"Eng ko'p chalkashtiriladigan ikki rejimni his qiling — ikkala maydonli login formasini ikkalasi bilan sinang:","Feel the two most commonly confused modes — attack the same two-field login form with each:")),
+    React.createElement(IntruderModeSim),
     React.createElement(InfoBox,{color:"var(--accent)"},t(lang,"Bepul Community versiyasida Repeater va Proxy to'liq ishlaydi, lekin Intruder sekinlashtirilgan. Mashq uchun PortSwigger Web Security Academy (portswigger.net/web-security) bepul, qonuniy laboratoriyalar beradi.","In the free Community edition Repeater and Proxy work fully, but Intruder is throttled. For practice, PortSwigger Web Security Academy (portswigger.net/web-security) offers free, legal labs.")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Burp ni faqat sizga tegishli yoki yozma ruxsat berilgan veb-ilovalarda ishlating.","Only use Burp on web apps you own or have written authorization to test.")),
-    React.createElement(H2,{num:"§6"},t(lang,"Community va Professional","Community vs Professional")),
+    React.createElement(H2,{num:"§7"},t(lang,"Community va Professional","Community vs Professional")),
     React.createElement(CompareCols,{left:{title:{uz:"Community (bepul)",en:"Community (free)"},color:"#69db7c",rows:[{uz:"Proxy va Repeater to'liq",en:"Full Proxy and Repeater"},{uz:"Intruder sekinlashtirilgan",en:"Intruder is throttled"},{uz:"O'rganish uchun yetarli",en:"Enough for learning"},]},right:{title:{uz:"Professional",en:"Professional"},color:"#ff3a5e",rows:[{uz:"Avtomatik skaner (Scanner)",en:"Automated Scanner"},{uz:"Tez Intruder",en:"Fast Intruder"},{uz:"Professional pentest uchun",en:"For professional pentests"},]}}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: so'rovni ushlash","Practice: intercepting a request")),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: so'rovni ushlash","Practice: intercepting a request")),
     React.createElement(P,null,t(lang,"Proxy so'rovni ushlaydi, siz uni Repeater'ga yuborib qo'lda o'zgartirasiz. Quyida login so'rovi — password maydonini o'zgartirib, javobni tahlil qilish mumkin.","The Proxy intercepts a request, you send it to Repeater and modify it by hand. Below is a login request — you can tweak the password field and analyze the response.")),
     React.createElement(Terminal,null,"POST /login HTTP/1.1\nHost: 10.0.0.5\nContent-Type: application/x-www-form-urlencoded\n\nusername=admin&password=test' OR '1'='1\n# → javobda SQL xatosi = SQL Injection ehtimoli"),
     React.createElement(Quiz,{q:{uz:"Burp'ning qaysi qismi bitta so'rovni qo'lda o'zgartirib qayta yuborishga mo'ljallangan?",en:"Which Burp part is for manually tweaking and resending one request?"},opts:[{uz:"Proxy",en:"Proxy"},{uz:"Repeater",en:"Repeater"},{uz:"Decoder",en:"Decoder"},{uz:"Comparer",en:"Comparer"}],correct:1,exp:{uz:"Repeater bitta so'rovni qo'lda o'zgartirib, qayta yuborish va javoblarni solishtirish uchun ishlatiladi.",en:"Repeater is used to manually tweak a single request, resend it and compare responses."}}));
