@@ -1348,6 +1348,46 @@ function IntruderModeSim(){
       React.createElement("button",{onClick:()=>{setRun("cluster");setStep(-1);},style:{flex:1,padding:"9px",background:run==="cluster"?A+"22":SL2,color:run==="cluster"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Cluster bomb","✅ Cluster bomb"))));
 }
 
+function MFADefenseSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const NOMFA=[
+    {col:BL,uz:"Qurbon SET orqali klonlangan sahifaga login/parolni kiritdi",en:"The victim enters credentials on the page SET cloned",duz:"Sahifa aslidan farqlanmaydi — qurbon shubhalanmaydi.",den:"The page is indistinguishable from the real one — the victim suspects nothing."},
+    {col:AM,uz:"Hujumchi terminalida darhol ko'rinadi: admin@corp.com : Summer2024!",en:"It instantly appears in the attacker's terminal: admin@corp.com : Summer2024!",duz:"Credential Harvester har kiritilgan qiymatni to'g'ridan-to'g'ri yozib boradi.",den:"The Credential Harvester logs every entered value directly."},
+    {col:AM,uz:"Hujumchi haqiqiy saytga o'sha login/parol bilan kiradi",en:"The attacker logs into the real site with those exact credentials",duz:"Faqat login+parol talab qilinadi — boshqa hech narsa yo'q.",den:"Only a login+password is required — nothing else."},
+    {col:D,uz:"🔓 Darhol kirildi — bitta parol butun akkauntni ochib berdi",en:"🔓 Instant access — one password opened the entire account",duz:"Parol yagona to'siq bo'lganda, uni o'g'irlash yetarli.",den:"When the password is the only barrier, stealing it is enough.",final:true,bad:true}
+  ];
+  const MFA=[
+    {col:BL,uz:"Xuddi shu qurbon xuddi shu klonlangan sahifaga login/parolni kiritdi",en:"The exact same victim enters credentials on the exact same cloned page",duz:"Phishing bosqichining o'zi bir xil muvaffaqiyatli o'tdi.",den:"The phishing step itself succeeds just the same."},
+    {col:AM,uz:"Hujumchi terminalida bir xil ko'rinadi: admin@corp.com : Summer2024!",en:"The same credentials appear in the attacker's terminal: admin@corp.com : Summer2024!",duz:"Parol o'g'irlanishining o'zi hech qanday farq qilmadi.",den:"The password theft itself made no difference so far."},
+    {col:AM,uz:"Hujumchi haqiqiy saytga kirmoqchi bo'ladi — tizim qurbonning telefoniga tasdiq so'rovi yuboradi",en:"The attacker tries to log into the real site — the system sends an approval request to the victim's phone",duz:"Bu — hujumchida yo'q, faqat qurbonda bo'lgan ikkinchi omil.",den:"This is the second factor — something only the victim has, not the attacker."},
+    {col:A,uz:"🔒 Qurbon kutilmagan tasdiq so'rovini ko'rib rad etadi — hujum to'xtatildi",en:"🔒 The victim sees the unexpected prompt and denies it — the attack is stopped",duz:"O'g'irlangan parolning o'zi endi yetarli emas edi.",den:"The stolen password alone was no longer enough.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="no_mfa"?NOMFA:MFA;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="no_mfa"?NOMFA:run==="mfa"?MFA:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu o'g'irlangan parol MFA'siz va MFA bilan qanday farqli oqibatga olib kelishini ko'ring.","⬇ Pick a scenario — see how the same stolen password leads to a very different outcome without and with MFA.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="no_mfa"?t(lang,"✗ MFA'siz: o'g'irlangan parol yetarli edi","✗ Without MFA: the stolen password was enough"):t(lang,"✓ MFA bilan: o'g'irlangan parol yetarli emas edi","✓ With MFA: the stolen password wasn't enough")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("no_mfa");setStep(-1);},style:{flex:1,padding:"9px",background:run==="no_mfa"?D+"22":SL2,color:run==="no_mfa"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔓 MFA'siz","🔓 Without MFA")),
+      React.createElement("button",{onClick:()=>{setRun("mfa");setStep(-1);},style:{flex:1,padding:"9px",background:run==="mfa"?A+"22":SL2,color:run==="mfa"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 MFA bilan","🔒 With MFA"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2633,10 +2673,13 @@ function LessonL28(){
     React.createElement(Terminal,null,"sudo setoolkit\n# 1) Social-Engineering Attacks\n#   2) Website Attack Vectors\n#     3) Credential Harvester Attack Method\n#       2) Site Cloner\n# Klonlash uchun URL kiriting va IP ni ko'rsating"),
     React.createElement(H2,{num:"§5"},t(lang,"Himoya","Defense")),
     React.createElement(P,null,t(lang,"Ijtimoiy muhandislikka qarshi eng yaxshi himoya — texnik emas, balki ta'lim. Xodimlarni muntazam o'qitish, shubhali emaillarni tekshirish odati, havola ustiga bosishdan oldin manzilni ko'rish, va eng muhimi — ko'p faktorli autentifikatsiya (MFA). MFA yoqilgan bo'lsa, hujumchi parolni o'g'irlasa ham ikkinchi omilsiz (telefon kodi) kira olmaydi. Har qanday shoshilinch \"hoziroq parolingizni tasdiqlang\" so'rovi — ogohlantirish belgisi.","The best defense against social engineering is not technical but education. Regular staff training, a habit of scrutinizing suspicious emails, checking a link's address before clicking, and most importantly multi-factor authentication (MFA). With MFA on, even if the attacker steals the password they cannot log in without the second factor (a phone code). Any urgent \"confirm your password right now\" request is a warning sign.")),
+    React.createElement(H2,{num:"§6"},t(lang,"Interaktiv simulyator: MFA'siz vs MFA bilan","Interactive simulator: without MFA vs with MFA")),
+    React.createElement(P,null,t(lang,"§5 dagi eng muhim himoyani his qiling — bir xil o'g'irlangan parol ikki holatda qanday farqli tugashini ko'ring:","Feel the most important defense from §5 for yourself — see how the same stolen password ends very differently in two situations:")),
+    React.createElement(MFADefenseSim),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Ijtimoiy muhandislik hujumlari faqat rasmiy, yozma ruxsat berilgan pentest doirasida o'tkazilishi mumkin. Aks holda bu firibgarlik va jinoyat.","Social engineering attacks may only be run within a formal, written-authorized pentest. Otherwise it is fraud and a crime.")),
-    React.createElement(H2,{num:"§6"},t(lang,"Himoya qatlamlari","Layers of defense")),
+    React.createElement(H2,{num:"§7"},t(lang,"Himoya qatlamlari","Layers of defense")),
     React.createElement(LayerStack,{layers:[{n:"🎓",name:t(lang,"Ta'lim","Training"),color:"#69db7c",desc:{uz:"Xodimlarni muntazam o'qitish — eng samarali himoya.",en:"Regular staff training — the most effective defense."}},{n:"🔐",name:t(lang,"MFA","MFA"),color:"#4dabf7",desc:{uz:"Parol o'g'irlansa ham ikkinchi omil to'sadi.",en:"Even if the password is stolen, the second factor blocks entry."}},{n:"🔗",name:t(lang,"Havolani tekshirish","Check links"),color:"#ffd43b",desc:{uz:"Bosishdan oldin manzilni ko'rish.",en:"Inspect the address before clicking."}},{n:"🚨",name:t(lang,"Shoshilinch so'rov","Urgent request"),color:"#ff3a5e",desc:{uz:"«Hoziroq tasdiqlang» — ogohlantirish belgisi.",en:"«Confirm right now» — a warning sign."}},]}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: SET menyusi","Practice: the SET menu")),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: SET menyusi","Practice: the SET menu")),
     React.createElement(P,null,t(lang,"SET menyu asosida ishlaydi: hujum turini va metodni tanlaysiz, u soxta sahifani avtomatik klonlaydi. Bu faqat ruxsat berilgan pentestda, insoniy omilni ko'rsatish uchun.","SET is menu-driven: you pick an attack type and method, and it auto-clones a fake page. This is only for authorized pentests, to demonstrate the human factor.")),
     React.createElement(Terminal,null,"sudo setoolkit\n#  1) Social-Engineering Attacks\n#    2) Website Attack Vectors\n#      3) Credential Harvester Attack Method\n#        2) Site Cloner"),
     React.createElement(Quiz,{q:{uz:"Ijtimoiy muhandislik nimaga asoslanadi?",en:"What does social engineering rely on?"},opts:[{uz:"Dasturiy zaifliklarga",en:"Software vulnerabilities"},{uz:"Insonlarni aldash va ishonchdan foydalanishga",en:"Deceiving people and abusing trust"},{uz:"Tarmoq portlariga",en:"Network ports"},{uz:"Shifrlash xatolariga",en:"Encryption flaws"}],correct:1,exp:{uz:"Ijtimoiy muhandislik insoniy omilga qaratilgan — odamlarni aldab maxfiy ma'lumot yoki kirish berishga undaydi.",en:"Social engineering targets the human factor — tricking people into handing over secrets or access."}}));
