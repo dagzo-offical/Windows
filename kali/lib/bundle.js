@@ -1978,7 +1978,7 @@ function LandingScreen({setRoute,setLang}){
 function DashboardScreen({setRoute,user}){
   const lang=useLang();
   const completed=user?.completedLessons||[];
-  return React.createElement("div",{style:{maxWidth:900,margin:"0 auto",padding:"24px 16px"}},
+  return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
     React.createElement("div",{style:{marginBottom:28,display:"flex",alignItems:"center",justifyContent:"space-between"}},
       React.createElement("div",null,
         React.createElement("h1",{style:{fontFamily:"var(--font-display)",fontSize:24,fontWeight:800,margin:0}},
@@ -2021,7 +2021,7 @@ function SectionScreen({setRoute,user,sec=1}){
   const section=SECTIONS[sec];
   const lessons=Object.values(LESSONS).filter(l=>l.sec===sec);
   const completed=user?.completedLessons||[];
-  return React.createElement("div",{style:{maxWidth:800,margin:"0 auto",padding:"24px 16px"}},
+  return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
     React.createElement("button",{onClick:()=>setRoute("dashboard"),style:{appearance:"none",background:"none",border:"none",cursor:"pointer",color:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:11,marginBottom:16,padding:0,display:"flex",alignItems:"center",gap:6}},
       "← ",t(lang,"Kurslar","Courses")
     ),
@@ -2102,7 +2102,7 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
     num===38?React.createElement(LessonL38):
     React.createElement(ComingSoon,{lesson});
 
-  return React.createElement("div",{style:{maxWidth:800,margin:"0 auto",padding:"24px 16px"}},
+  return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
     React.createElement("button",{onClick:()=>setRoute({name:"section",sec:lesson.sec}),style:{appearance:"none",background:"none",border:"none",cursor:"pointer",color:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:11,marginBottom:16,padding:0,display:"flex",alignItems:"center",gap:6}},
       "← ",t(lang,sec.uz,sec.en)
     ),
