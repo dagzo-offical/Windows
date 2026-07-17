@@ -788,6 +788,46 @@ function MasscanRateSim(){
       React.createElement("button",{onClick:()=>{setRun("reckless");setStep(-1);},style:{flex:1,padding:"9px",background:run==="reckless"?D+"22":SL2,color:run==="reckless"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔥 Beparvo (--rate=100000)","🔥 Reckless (--rate=100000)"))));
 }
 
+function AXFRSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const OPEN=[
+    {col:BL,uz:"dig axfr @ns1.example.com example.com — so'rov yuborildi",en:"dig axfr @ns1.example.com example.com — the query is sent",duz:"Har qanday kishi shu bitta buyruqni yozishi mumkin.",den:"Anyone can type this exact same command."},
+    {col:AM,uz:"Server hech qanday tekshiruv qilmaydi — so'ragan har kimga ruxsat beradi",en:"The server performs no check — it allows anyone who asks",duz:"Zona transferi faqat ikkilamchi (secondary) DNS serverlar uchun mo'ljallangan edi.",den:"Zone transfer was meant only for secondary DNS servers."},
+    {col:AM,uz:"BARCHA yozuvlar (200+ subdomen, ichki IP, admin panellari) bir zumda tushadi",en:"ALL records (200+ subdomains, internal IPs, admin panels) dump instantly",duz:"Bitta so'rov — infratuzilmaning to'liq xaritasi.",den:"One query — a complete map of the infrastructure."},
+    {col:D,uz:"💰 Oltin qazilma — butun infratuzilma bir buyruqda qo'lga tushdi",en:"💰 A goldmine — the whole infrastructure captured in a single command",duz:"Endi qaysi subdomenni brute-force qilish shart emas — hammasi allaqachon qo'lda.",den:"No more need to brute-force subdomains — everything is already in hand.",final:true,bad:true}
+  ];
+  const CLOSED=[
+    {col:BL,uz:"dig axfr @ns1.example.com example.com — xuddi shu so'rov yuboriladi",en:"dig axfr @ns1.example.com example.com — the exact same query is sent",duz:"Hujumchi tomonidan hech narsa boshqacha qilinmaydi.",den:"The attacker does nothing differently."},
+    {col:AM,uz:"Server so'rovchi manzilni tekshiradi — faqat ro'yxatdagi ikkilamchi serverlarga ruxsat",en:"The server checks the requester's address — only whitelisted secondary servers are allowed",duz:"Bu — DNS serverni to'g'ri sozlashning bir qismi.",den:"This is part of correctly configuring a DNS server."},
+    {col:AM,uz:"Kali'ning IP manzili bu ro'yxatda yo'q",en:"Kali's IP address isn't on that list",duz:"So'rov manba darajasida rad etiladi.",den:"The request is rejected right at the source check."},
+    {col:A,uz:"🔒 «Transfer failed» — to'g'ri sozlangan himoya ishladi",en:"🔒 «Transfer failed» — the properly configured defense worked",duz:"Hujumchi endi brute-force kabi sekinroq usulga o'tishga majbur.",den:"The attacker is now forced back to a slower method like brute-force.",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="open"?OPEN:CLOSED;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="open"?OPEN:run==="closed"?CLOSED:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu AXFR so'rovi ochiq va to'g'ri cheklangan DNS serverda qanday farq qilishini ko'ring.","⬇ Pick a scenario — see how the same AXFR request differs between an open and a properly restricted DNS server.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="open"?t(lang,"✗ Ochiq AXFR: butun zona oshkor bo'ldi","✗ Open AXFR: the whole zone was exposed"):t(lang,"✓ Cheklangan AXFR: so'rov rad etildi","✓ Restricted AXFR: the request was rejected")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("open");setStep(-1);},style:{flex:1,padding:"9px",background:run==="open"?D+"22":SL2,color:run==="open"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"💰 Ochiq AXFR (xato)","💰 Open AXFR (misconfigured)")),
+      React.createElement("button",{onClick:()=>{setRun("closed");setStep(-1);},style:{flex:1,padding:"9px",background:run==="closed"?A+"22":SL2,color:run==="closed"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔒 Cheklangan AXFR (to'g'ri)","🔒 Restricted AXFR (correct)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -1396,10 +1436,11 @@ function LessonL14(){
     React.createElement(P,null,t(lang,"Ikki asosiy usul bor. Zona transferi (AXFR) — noto'g'ri sozlangan DNS serverdan butun zonani (barcha yozuvlarni) bir so'rovda so'rash. Ochiq AXFR — jiddiy noto'g'ri konfiguratsiya va oltin ma'lumot manbasi, lekin bugun kam uchraydi. Brute-force esa lug'atdagi har bir so'zni domen oldiga qo'yib sinaydi (dev, test, admin, vpn...) — bu ko'proq ishlaydi. dnsenum, dnsrecon, fierce va gobuster dns bu vositalar sirasiga kiradi.","There are two main approaches. Zone transfer (AXFR) — asking a misconfigured DNS server for the entire zone (all records) in one request. An open AXFR is a serious misconfiguration and a goldmine, but rare today. Brute-force tries each word from a wordlist prefixed to the domain (dev, test, admin, vpn...) — this works more often. dnsenum, dnsrecon, fierce and gobuster dns are tools for this.")),
     React.createElement(Terminal,null,"dig example.com A\ndig example.com MX\ndig axfr @ns1.example.com example.com   # zona transfer\ndnsenum example.com\ndnsrecon -d example.com -t brt -D /usr/share/wordlists/subdomains.txt"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"DNS enumeratsiyani faqat sizga tegishli yoki ruxsat berilgan domenlarda o'tkazing.","Only perform DNS enumeration on domains you own or are authorized to test.")),
-    React.createElement(H2,{num:"§5"},t(lang,"DNS yozuv turlari","DNS record types")),
-    React.createElement(LayerStack,{layers:[{n:"A",name:t(lang,"A","A"),color:"#4dabf7",desc:{uz:"Domen nomini IPv4 manzilga bog'laydi.",en:"Maps a domain name to an IPv4 address."}},{n:"MX",name:t(lang,"MX","MX"),color:"#69db7c",desc:{uz:"Pochta serverini ko'rsatadi.",en:"Points to the mail server."}},{n:"NS",name:t(lang,"NS","NS"),color:"#a855f7",desc:{uz:"Domen uchun nom serverlari.",en:"The name servers for the domain."}},{n:"TXT",name:t(lang,"TXT","TXT"),color:"#ffd43b",desc:{uz:"Matn (SPF, DKIM, tekshiruvlar).",en:"Text (SPF, DKIM, verifications)."}},{n:"CNAME",name:t(lang,"CNAME","CNAME"),color:"#ff6b6b",desc:{uz:"Taxallus — boshqa nomga yo'naltiradi.",en:"Alias — redirects to another name."}},]}),
+    React.createElement(H2,{num:"§5"},t(lang,"Interaktiv simulyator: AXFR ochiq yoki yopiqmi?","Interactive simulator: is AXFR open or restricted?")),
+    React.createElement(P,null,t(lang,"Xuddi shu zona-transfer so'rovi ikki xil sozlangan serverda qanday farqli tugashini ko'ring:","See how the exact same zone-transfer request ends very differently against two differently configured servers:")),
+    React.createElement(AXFRSim),
     React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: yozuvlarni so'rash","Practice: querying records")),
-    React.createElement(P,null,t(lang,"dig bilan alohida yozuvlarni, dnsenum bilan avtomatik enumeratsiyani bajarasiz. AXFR (zona transferi) muvaffaqiyatli bo'lsa — butun domen tuzilishi qo'lga tushadi.","With dig you query individual records, with dnsenum you run automated enumeration. If AXFR (zone transfer) succeeds, the whole domain structure is captured.")),
+    React.createElement(P,null,t(lang,"dig bilan alohida yozuvlarni, dnsenum bilan avtomatik enumeratsiyani bajarasiz. AXFR (zona transferi) muvaffaqiyatli bo'lsa — butun domen tuzilishi qo'lga tushadi, xuddi simulyatordagi «Ochiq AXFR» ssenariysidek.","With dig you query individual records, with dnsenum you run automated enumeration. If AXFR (zone transfer) succeeds, the whole domain structure is captured — just like the simulator's «Open AXFR» scenario.")),
     React.createElement(Terminal,null,"dig example.com MX +short\n# 10 mail.example.com.\ndig axfr @ns1.example.com example.com\n# ; agar ruxsat berilgan bo'lsa — BARCHA yozuvlar chiqadi (xato konfiguratsiya)\ndnsenum example.com"),
     React.createElement(Quiz,{q:{uz:"Noto'g'ri sozlangan DNS serverdan butun zona yozuvlarini olish urinishi qanday ataladi?",en:"Pulling all zone records from a misconfigured DNS server is called?"},opts:[{uz:"Zona transferi (AXFR)",en:"Zone transfer (AXFR)"},{uz:"Reverse lookup",en:"Reverse lookup"},{uz:"Cache poisoning",en:"Cache poisoning"},{uz:"DNS tunneling",en:"DNS tunneling"}],correct:0,exp:{uz:"Zona transferi (AXFR) domenning barcha DNS yozuvlarini bir so'rovda oladi; ochiq AXFR jiddiy zaiflik hisoblanadi.",en:"A zone transfer (AXFR) retrieves all of a domain's DNS records in one request; an open AXFR is a serious vulnerability."}}));
 }
