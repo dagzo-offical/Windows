@@ -668,6 +668,46 @@ function ToolSourceSim(){
       React.createElement("button",{onClick:()=>{setRun("github");setStep(-1);},style:{flex:1,padding:"9px",background:run==="github"?AM+"22":SL2,color:run==="github"?AM:"#cbd5e1",border:"1px solid "+AM+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🐙 Omborda yo'q (GitHub)","🐙 Not in repo (GitHub)"))));
 }
 
+function ScanStealthSim(){
+  const lang=useLang();
+  const A="#22c55e",D="#ef4444",AM="#f59e0b",BL="#3b82f6",SL2="#0f172a";
+  const CONNECT=[
+    {col:BL,uz:"nmap -sT 10.0.0.5 — to'liq TCP qo'l siqish (SYN → SYN-ACK → ACK)",en:"nmap -sT 10.0.0.5 — a full TCP handshake (SYN → SYN-ACK → ACK)",duz:"Uchinchi ACK yuborilishi bilan ulanish TO'LIQ ochiladi.",den:"Sending that third ACK fully opens the connection."},
+    {col:AM,uz:"Nishon: ulanish to'liq o'rnatildi — dastur darajasida qabul qilinadi",en:"Target: the connection is fully established — accepted at the application level",duz:"Operatsion tizim buni oddiy, haqiqiy ulanish deb hisoblaydi.",den:"The OS treats this as an ordinary, genuine connection."},
+    {col:AM,uz:"auth.log va IDS'da yozuv paydo bo'ladi: «Connection from 10.0.0.9»",en:"An entry appears in auth.log and the IDS: «Connection from 10.0.0.9»",duz:"To'liq ulanishlar deyarli har doim qayd etiladi.",den:"Fully completed connections are logged almost every time."},
+    {col:D,uz:"🚨 IDS ogohlantiradi — hujumchi allaqachon aniqlangan",en:"🚨 The IDS alerts — the attacker is already detected",duz:"Nishon endi hushyor — keyingi qadamlar kuzatilishi mumkin.",den:"The target is now on guard — further steps may be watched.",final:true,bad:true}
+  ];
+  const STEALTH=[
+    {col:BL,uz:"nmap -sS 10.0.0.5 — faqat SYN yuboriladi, ACK HECH QACHON jo'natilmaydi",en:"nmap -sS 10.0.0.5 — only SYN is sent, ACK is NEVER sent",duz:"Nmap ataylab uchinchi qadamni tashlab ketadi.",den:"Nmap deliberately skips the third step."},
+    {col:AM,uz:"Nishon SYN-ACK bilan javob beradi, lekin ulanish hech qachon tugallanmaydi",en:"The target replies with SYN-ACK, but the connection never completes",duz:"Bu holat «yarim ochiq» deb ataladi.",den:"This state is called «half-open»."},
+    {col:AM,uz:"Ko'p ilova va oddiy loglar buni umuman qayd etmaydi — faqat kernel darajasida ko'rinadi",en:"Most apps and basic logs never record this — visible only at the kernel level",duz:"auth.log kabi ilova darajasidagi loglar bu voqeani hech qachon ko'rmaydi.",den:"App-level logs like auth.log never even see this event."},
+    {col:A,uz:"🥷 Sezilmadi — port holati bilindi, nishon hushyor bo'lib qolmadi",en:"🥷 Went unnoticed — the port's state was learned, the target never got suspicious",duz:"Shu sababli -sS «stealth (yashirin) skan» deb ataladi.",den:"That's exactly why -sS is called a «stealth scan».",final:true}
+  ];
+  const [run,setRun]=useState(null);
+  const [step,setStep]=useState(-1);
+  useEffect(()=>{
+    if(run==null){setStep(-1);return;}
+    const list=run==="sT"?CONNECT:STEALTH;
+    if(step<0){const id=setTimeout(()=>setStep(0),140);return()=>clearTimeout(id);}
+    if(step>=list.length-1) return;
+    const id=setTimeout(()=>setStep(step+1),1000);return()=>clearTimeout(id);
+  },[run,step]);
+  const list=run==="sT"?CONNECT:run==="sS"?STEALTH:null;
+  const cur=list&&step>=0?list[step]:null;
+  return React.createElement("div",{style:{margin:"14px 0"}},
+    React.createElement("div",{style:{minHeight:50}},
+      list==null?React.createElement("div",{style:{textAlign:"center",color:"#64748b",fontSize:12,padding:"14px"}},t(lang,"⬇ Ssenariy tanlang — xuddi shu portni skanerlash IDS tomonidan qanday farqli ko'rinishini solishtiring.","⬇ Pick a scenario — see how scanning the same port looks very different to an IDS.")):
+      list.map(function(s,i){ if(step<i) return null;
+        return React.createElement("div",{key:i,className:"na-rise",style:{padding:"10px 13px",marginBottom:7,background:step===i?s.col+"14":SL2,border:"1px solid "+s.col+(step===i?"":"44"),borderLeft:"4px solid "+s.col,borderRadius:10}},
+          React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
+          React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:3,lineHeight:1.5}},t(lang,s.duz,s.den)));})),
+    cur&&cur.final&&React.createElement("div",{style:{marginTop:2,padding:"10px 14px",borderRadius:10,textAlign:"center",fontWeight:800,fontSize:12.5,background:(cur.bad?D:A)+"1f",border:"1px solid "+(cur.bad?D:A),color:cur.bad?D:A}},
+      run==="sT"?t(lang,"✗ -sT: ko'rindi va qayd etildi","✗ -sT: seen and logged"):t(lang,"✓ -sS: bilindi, lekin sezilmadi","✓ -sS: learned, but unnoticed")),
+    React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
+      React.createElement("button",{onClick:()=>{setRun("sT");setStep(-1);},style:{flex:1,padding:"9px",background:run==="sT"?D+"22":SL2,color:run==="sT"?D:"#cbd5e1",border:"1px solid "+D+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🔌 -sT (Connect)","🔌 -sT (Connect)")),
+      React.createElement("button",{onClick:()=>{setRun("sS");setStep(-1);},style:{flex:1,padding:"9px",background:run==="sS"?A+"22":SL2,color:run==="sS"?A:"#cbd5e1",border:"1px solid "+A+"66",borderRadius:8,fontSize:11.5,fontWeight:700,cursor:"pointer"}},t(lang,"🥷 -sS (SYN)","🥷 -sS (SYN)"))));
+}
+
 function LessonL01(){
   const lang=useLang();
   return React.createElement("section",null,
@@ -720,15 +760,18 @@ function LessonL11(){
       {n:"-sU",name:"UDP",color:"#a855f7",desc:{uz:"UDP portlari (DNS, SNMP, DHCP) — sekin, lekin muhim.",en:"UDP ports (DNS, SNMP, DHCP) — slow but important."}},
       {n:"-sV / -O",name:t(lang,"Versiya / OS","Version / OS"),color:"#ffd43b",desc:{uz:"Xizmat versiyasi va operatsion tizimni aniqlaydi.",en:"Detects service version and the OS."}},
     ]}),
-    React.createElement(H2,{num:"§4"},t(lang,"Tezlik shablonlari (timing)","Timing templates")),
+    React.createElement(H2,{num:"§4"},t(lang,"Interaktiv simulyator: kim sizni sezadi?","Interactive simulator: who notices you?")),
+    React.createElement(P,null,t(lang,"Xuddi shu portni ikki xil skan bilan tekshiring — natija (ochiq/yopiq) bir xil chiqadi, lekin nishon tomonidan sezilish darajasi butunlay boshqacha:","Probe the exact same port with two different scans — the result (open/closed) comes out the same, but how visible you are to the target is completely different:")),
+    React.createElement(ScanStealthSim),
+    React.createElement(H2,{num:"§5"},t(lang,"Tezlik shablonlari (timing)","Timing templates")),
     React.createElement(P,null,t(lang,"Nmap ning tezligini -T0 dan -T5 gacha shablonlar boshqaradi. -T0/-T1 juda sekin va yashirin (IDS'dan qochish uchun), -T3 standart (muvozanatli), -T4 tez (barqaror tarmoqlarda odatiy tanlov), -T5 juda tez (lekin natijalar noaniq bo'lishi va nishonni ishdan chiqarishi mumkin). Yashirinlik kerak bo'lsa sekin, tezlik kerak bo'lsa -T4 tanlanadi.","Nmap's speed is controlled by templates from -T0 to -T5. -T0/-T1 are very slow and stealthy (to evade IDS), -T3 is the default (balanced), -T4 is fast (the usual choice on stable networks), -T5 is very fast (but results can be unreliable and it may overwhelm the target). Choose slow for stealth, -T4 for speed.")),
-    React.createElement(H2,{num:"§5"},t(lang,"NSE skriptlar va chiqish formatlari","NSE scripts and output formats")),
+    React.createElement(H2,{num:"§6"},t(lang,"NSE skriptlar va chiqish formatlari","NSE scripts and output formats")),
     React.createElement(P,null,t(lang,"Nmap Scripting Engine (NSE) — Nmap'ni oddiy skanerdan zaiflik detektoriga aylantiradi. -sC standart skriptlarni ishga tushiradi, --script vuln ma'lum zaifliklarni tekshiradi. Natijalarni saqlash uchun: -oN oddiy matn, -oX XML (boshqa vositalar uchun), -oG grep uchun qulay, -oA hammasini birdan. Katta pentestda natijalarni doim faylga saqlang.","The Nmap Scripting Engine (NSE) turns Nmap from a simple scanner into a vulnerability detector. -sC runs default scripts, --script vuln checks for known vulnerabilities. To save results: -oN plain text, -oX XML (for other tools), -oG grep-friendly, -oA all at once. In a real pentest, always save results to a file.")),
     React.createElement(Terminal,null,"nmap -sV -sC -T4 10.0.0.5           # versiya + skriptlar\nnmap -sn 10.0.0.0/24                # faqat tirik xostlar\nnmap -p- 10.0.0.5                   # barcha 65535 port\nnmap --script vuln 10.0.0.5         # zaifliklarni tekshirish\nnmap -sV -oA scan_result 10.0.0.5   # 3 formatda saqlash"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Nmap ni faqat o'zingizga tegishli yoki yozma ruxsat berilgan tizimlarda ishlating. Ruxsatsiz skanerlash ko'p mamlakatda qonunga zid.","Only run Nmap on systems you own or have written authorization to test. Unauthorized scanning is illegal in many countries.")),
-    React.createElement(H2,{num:"§6"},t(lang,"Skan turlarini solishtirish","Comparing scan types")),
+    React.createElement(H2,{num:"§7"},t(lang,"Skan turlarini solishtirish","Comparing scan types")),
     React.createElement(CompareCols,{left:{title:{uz:"-sS (SYN)",en:"-sS (SYN)"},color:"#69db7c",rows:[{uz:"Yarim ochiq — ulanishni tugatmaydi",en:"Half-open — never completes the handshake"},{uz:"Tez va yashirinroq",en:"Fast and stealthier"},{uz:"root huquqi kerak",en:"Needs root"},]},right:{title:{uz:"-sT (Connect)",en:"-sT (Connect)"},color:"#ffd43b",rows:[{uz:"To'liq TCP ulanish",en:"Full TCP connection"},{uz:"Sekinroq, logga tushadi",en:"Slower, gets logged"},{uz:"root shart emas",en:"No root required"},]}}),
-    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: xizmatlarni aniqlash","Practice: service detection")),
+    React.createElement(H2,{num:"§8"},t(lang,"Amaliyot: xizmatlarni aniqlash","Practice: service detection")),
     React.createElement(P,null,t(lang,"-sV har ochiq portning ortidagi dastur va uning VERSIYASINI aniqlaydi. Bu eng muhim qadam, chunki aniq versiya ma'lum zaifliklarni (searchsploit) qidirishga yo'l ochadi.","-sV identifies the program behind each open port and its VERSION. This is the key step, because an exact version opens the door to searching known vulnerabilities (searchsploit).")),
     React.createElement(Terminal,null,"nmap -sV -T4 10.0.0.5\n# PORT     STATE SERVICE VERSION\n# 22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu\n# 80/tcp   open  http    Apache httpd 2.4.29\n# 445/tcp  open  microsoft-ds Samba smbd 4.7.6\n# → keyingi qadam: searchsploit apache 2.4.29"),
     React.createElement(Quiz,{q:{uz:"Nmap -sV bayrog'i nima qiladi?",en:"What does the Nmap -sV flag do?"},opts:[{uz:"Faqat ping",en:"Only pings"},{uz:"Ochiq portdagi xizmat va versiyani aniqlaydi",en:"Detects the service and version on an open port"},{uz:"Faylni o'chiradi",en:"Deletes a file"},{uz:"VPN yoqadi",en:"Enables a VPN"}],correct:1,exp:{uz:"-sV ochiq port ortidagi xizmat va uning aniq versiyasini aniqlaydi — bu ma'lum zaifliklarni (CVE) izlash uchun asos.",en:"-sV detects the service and its exact version behind an open port — a basis for finding known vulnerabilities (CVEs)."}}));
