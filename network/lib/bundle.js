@@ -57,7 +57,7 @@ const ICONS={
 function Icon({name,size=16,style={}}){const d=ICONS[name]||ICONS.star;return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",fill:"currentColor",style:{flexShrink:0,...style}},React.createElement("path",{d}));}
 
 // ── Core UI components ─────────────────────────────────────────
-function H2({num,id,children}){return React.createElement("h2",{id,style:{fontFamily:"var(--font-display)",fontSize:18,fontWeight:700,margin:"28px 0 10px",color:"var(--text-0)",display:"flex",alignItems:"center",gap:10,scrollMarginTop:70}},num&&React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:900}},num),children);}
+function H2({num,children}){return React.createElement("h2",{style:{fontFamily:"var(--font-display)",fontSize:18,fontWeight:700,margin:"28px 0 10px",color:"var(--text-0)",display:"flex",alignItems:"center",gap:10}},num&&React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",fontWeight:900}},num),children);}
 function P({children,style={}}){return React.createElement("p",{style:{fontSize:13.5,lineHeight:1.75,color:"var(--text-1)",margin:"0 0 14px",...style}},children);}
 function Term({children}){return React.createElement("code",{style:{background:"rgba(0,212,255,0.1)",border:"1px solid var(--accent-border)",borderRadius:6,padding:"1px 6px",fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)"}},children);}
 function Terminal({children}){return React.createElement("pre",{style:{background:"rgba(0,0,0,0.5)",border:"1px solid var(--border)",borderRadius:10,padding:"14px 16px",fontFamily:"var(--font-mono)",fontSize:12,color:"#7effb2",overflowX:"auto",margin:"12px 0",lineHeight:1.65}},children);}
@@ -1571,14 +1571,14 @@ function LessonL01(){
   const wcol=["#ff6b6b","#ffa94d","#ffd43b","#69db7c","#4dabf7","#9775fa","#ff6b6b"];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L1-1"},t(lang,"OSI modeli nima?","What is the OSI Model?")),
+    React.createElement(H2,{num:"§1"},t(lang,"OSI modeli nima?","What is the OSI Model?")),
     React.createElement(P,null,t(lang,"OSI (Open Systems Interconnection) modeli — tarmoq aloqasini 7 ta mantiqiy qatlamga bo'lib tushuntiruvchi konseptual freymvork. ISO tomonidan 1984-yilda turli ishlab chiqaruvchilar va protokollarni standartlashtirish uchun yaratilgan.","The OSI (Open Systems Interconnection) model is a conceptual framework that splits network communication into 7 logical layers. Created by ISO in 1984 to standardize different vendors and protocols.")),
     React.createElement(InfoBox,{color:"var(--accent)"},
       t(lang,"Eslab qolish uchun (7→1):","Mnemonic to remember (7→1):"),React.createElement("br",null),
       words.map(function(w,i){return React.createElement("span",{key:i,style:{color:wcol[i],fontWeight:800}},w);})),
-    React.createElement(H2,{num:"§2",id:"toc-L1-2"},t(lang,"7 ta qatlam","The 7 Layers")),
+    React.createElement(H2,{num:"§2"},t(lang,"7 ta qatlam","The 7 Layers")),
     React.createElement(LayerStack,{layers:layers}),
-    React.createElement(H2,{num:"§3",id:"toc-L1-3"},t(lang,"Ma'lumot qanday harakatlanadi?","How does data travel?")),
+    React.createElement(H2,{num:"§3"},t(lang,"Ma'lumot qanday harakatlanadi?","How does data travel?")),
     React.createElement(P,null,t(lang,"Yuboruvchida ma'lumot 7→1 qatlamga tushib, har qatlamda sarlavha (header) qo'shiladi — encapsulation. Qabul qiluvchida 1→7 ga chiqib, har sarlavha olib tashlanadi — decapsulation. \"Ishga tushir\" ni bosib kuzating:","On the sender, data goes 7→1, each layer adding a header — encapsulation. On the receiver it goes 1→7, each header removed — decapsulation. Press Play to watch:")),
     React.createElement(FlowSteps,{title:{uz:"Encapsulation — yuboruvchi (7→1)",en:"Encapsulation — sender (7→1)"},steps:[
       {icon:"📄",text:{uz:"7 Application — ma'lumot yaratiladi",en:"7 Application — data is created"}},
@@ -1587,12 +1587,12 @@ function LessonL01(){
       {icon:"🔗",text:{uz:"2 Data Link — MAC manzil (kadr) qo'shiladi",en:"2 Data Link — MAC address (frame) added"}},
       {icon:"📡",text:{uz:"1 Physical — bitlar kabel orqali uzatiladi",en:"1 Physical — bits sent over the cable"}},
     ]}),
-    React.createElement(H2,{num:"§4",id:"toc-L1-4"},t(lang,"TCP/IP vs OSI","TCP/IP vs OSI")),
+    React.createElement(H2,{num:"§4"},t(lang,"TCP/IP vs OSI","TCP/IP vs OSI")),
     React.createElement(P,null,t(lang,"Amalda internet TCP/IP modelini ishlatadi — u OSI ning 7 qatlamini 4 qatlamga soddalashtirgan:","In practice the internet uses the TCP/IP model — it simplifies OSI's 7 layers into 4:")),
     React.createElement(CompareCols,{
       left:{title:"OSI · 7 qatlam",color:"#4dabf7",rows:["7 Application","6 Presentation","5 Session","4 Transport","3 Network","2 Data Link","1 Physical"]},
       right:{title:"TCP/IP · 4 qatlam",color:"#69db7c",rows:["4 Application → OSI 5,6,7","3 Transport → OSI 4","2 Internet → OSI 3","1 Network Access → OSI 1,2"]}}),
-        React.createElement(H2,{num:"§5",id:"toc-L1-5"},t(lang,"Qatlamlar amalda","The layers in practice")),
+        React.createElement(H2,{num:"§5"},t(lang,"Qatlamlar amalda","The layers in practice")),
     React.createElement(P,null,t(lang,"Har bir qatlam alohida ishlaydi, lekin birga bir ma'lumot uzatadi. traceroute buyrug'i 3-qatlam (Network) marshrutini ko'rsatadi — paket manzilga yetguncha qancha router (hop) dan o'tishini. Bu OSI modelini «jonli» ko'rishning eng oson yo'li.","Each layer works separately, but together they carry one message. The traceroute command shows the layer-3 (Network) route — how many routers (hops) a packet passes to reach its destination. This is the easiest way to see the OSI model «live».")),
     React.createElement(Terminal,null,"traceroute google.com\n#  1  192.168.1.1     1.2 ms   ← 2/3-qatlam: mahalliy router\n#  2  10.20.0.1       8.5 ms   ← ISP shlyuzi\n#  3  72.14.exchange  12 ms\n#  4  google.com      15 ms    ← manzilga yetdi (7-qatlam ilova)"),
 React.createElement(Quiz,{
@@ -1606,14 +1606,14 @@ function LessonL13(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L13-1"},t(lang,"Firewall nima?","What is a firewall?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Firewall nima?","What is a firewall?")),
     React.createElement(P,null,t(lang,"Firewall — tarmoq va tashqi olam o'rtasidagi «qorovul devor». Uni chegaradagi bojxona nazoratchisiga o'xshating: har bir o'tuvchi paketni oldindan yozilgan qoidalar ro'yxati bilan solishtiradi va faqat ruxsat berilganini o'tkazadi, qolganini bloklaydi. Firewall'siz tarmoq — darvozasi ochiq uy kabi.","A firewall is the «guard wall» between a network and the outside world. Think of it as a customs officer at a border: it compares every passing packet against a pre-written list of rules and lets through only what is allowed, blocking the rest. A network without a firewall is like a house with its gate wide open.")),
-    React.createElement(H2,{num:"§2",id:"toc-L13-2"},t(lang,"Interaktiv simulyator","Interactive simulator")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator","Interactive simulator")),
     React.createElement(P,null,t(lang,"Pastdan paket tanlang — firewall uni qoidalar ro'yxati bilan YUQORIDAN PASTGA solishtiradi va BIRINCHI mos qoidada to'xtaydi. O'sha qoida ALLOW bo'lsa — paket o'tadi, DENY bo'lsa — bloklanadi.","Pick a packet below — the firewall compares it against the rule list TOP TO BOTTOM and stops at the FIRST matching rule. If that rule is ALLOW the packet passes; if DENY it is blocked.")),
     React.createElement(FirewallSim),
-    React.createElement(H2,{num:"§3",id:"toc-L13-3"},t(lang,"Qoidalar qanday ishlaydi","How the rules work")),
+    React.createElement(H2,{num:"§3"},t(lang,"Qoidalar qanday ishlaydi","How the rules work")),
     React.createElement(P,null,t(lang,"Firewall qoidalari TARTIBLI ro'yxat — yuqoridan pastga o'qiladi va birinchi mos kelgan qoida qo'llanadi, qolganlari tekshirilmaydi. Shu sababli TARTIB juda muhim: aniq qoidalar (masalan «22-portni bloklash») umumiy qoidalardan (masalan «hammani ruxsat») OLDIN turishi kerak. Ro'yxat oxirida deyarli har doim «standart: qolgan hammasini rad et» (default deny) turadi — bu «ruxsat berilmagan — taqiqlangan» tamoyili, eng xavfsiz yondashuv.","Firewall rules are an ORDERED list — read top to bottom, and the first matching rule is applied; the rest aren't checked. That's why ORDER matters a lot: specific rules (e.g. «block port 22») must come BEFORE general ones (e.g. «allow everyone»). At the end of the list there is almost always a «default: deny everything else» (default deny) — the «what isn't allowed is forbidden» principle, the safest approach.")),
-    React.createElement(H2,{num:"§4",id:"toc-L13-4"},t(lang,"Firewall turlari (4 ta)","Firewall types (4)")),
+    React.createElement(H2,{num:"§4"},t(lang,"Firewall turlari (4 ta)","Firewall types (4)")),
     React.createElement(P,null,t(lang,"Firewall'lar oddiy port filtridan aqlli, ilova-darajasidagi tizimlargacha to'rt bosqichda rivojlangan. Har yangi tur oldingisidan chuqurroq tekshiradi:","Firewalls have evolved through four stages, from a simple port filter to smart, application-aware systems. Each newer type inspects more deeply than the last:")),
     React.createElement(LayerStack,{layers:[
       {n:"1",name:t(lang,"Packet Filter","Packet Filter"),color:"#ff6b6b",desc:{uz:"IP va port bo'yicha filtrlaydi — ulanish holatini bilmaydi (stateless). Sodda va tez.",en:"Filters by IP and port — doesn't know connection state (stateless). Simple and fast."}},
@@ -1621,11 +1621,11 @@ function LessonL13(){
       {n:"3",name:t(lang,"Application / WAF","Application / WAF"),color:"#a855f7",desc:{uz:"Ilova mazmunini (L7) tekshiradi — DPI. WAF veb-hujumlarni (SQLi, XSS) to'sadi. Chuqur tekshiruv.",en:"Inspects application content (L7) — DPI. A WAF blocks web attacks (SQLi, XSS). Deep inspection."}},
       {n:"4",name:t(lang,"Next-Gen (NGFW)","Next-Gen (NGFW)"),color:"#ff9145",desc:{uz:"Hammasi birga: IPS + ilova nazorati + tahdid razvedkasi (threat intel). Eng zamonaviy.",en:"All in one: IPS + application control + threat intel. The most modern."}}
     ]}),
-    React.createElement(H2,{num:"§5",id:"toc-L13-5"},t(lang,"Stateful va stateless — farqi","Stateful vs stateless — the difference")),
+    React.createElement(H2,{num:"§5"},t(lang,"Stateful va stateless — farqi","Stateful vs stateless — the difference")),
     React.createElement(CompareCols,{
       left:{title:{uz:"Stateless (packet filter)",en:"Stateless (packet filter)"},color:"#ff6b6b",rows:[{uz:"Har paketni alohida ko'radi",en:"Sees each packet in isolation"},{uz:"Javob paketi uchun alohida qoida kerak",en:"Needs a separate rule for reply packets"},{uz:"Tez, lekin oson aldanadi",en:"Fast, but easier to trick"}]},
       right:{title:{uz:"Stateful",en:"Stateful"},color:"#22c55e",rows:[{uz:"Ulanish holatini kuzatadi",en:"Tracks connection state"},{uz:"«O'rnatilgan ulanish javobini o'tkaz» — bitta qoida",en:"«Allow replies to established» — one rule"},{uz:"Xavfsizroq, hozir standart",en:"Safer, now the standard"}]}}),
-    React.createElement(H2,{num:"§6",id:"toc-L13-6"},t(lang,"Amaliyot: Linux firewall","Practice: the Linux firewall")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: Linux firewall","Practice: the Linux firewall")),
     React.createElement(P,null,t(lang,"Linux'da ufw (sodda) yoki iptables/nftables (kuchli) firewall'ni boshqaradi. Quyida qoidalarni ko'rish va stateful qoida yozish namunasi:","On Linux, ufw (simple) or iptables/nftables (powerful) manages the firewall. Below is how to view rules and write a stateful rule:")),
     React.createElement(Terminal,null,"sudo ufw status numbered\n# [ 1] 80/tcp    ALLOW IN  Anywhere      ← Veb ruxsat\n# [ 2] 443/tcp   ALLOW IN  Anywhere\n# [ 3] 22/tcp    DENY IN   Anywhere      ← SSH taqiq\n\n# Stateful qoida (o'rnatilgan ulanish javobini o'tkaz):\nsudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT\nsudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT\nsudo iptables -A INPUT -j DROP        # ← default deny (oxirida)"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Firewall qoidalarini masofadan (SSH orqali) o'zgartirayotganda ehtiyot bo'ling — noto'g'ri «default deny» o'zingizni ham qulflab qo'yishi mumkin. Har doim ruxsat qoidangizni default deny'dan OLDIN qo'ying.","Be careful editing firewall rules remotely (over SSH) — a wrong «default deny» can lock you out too. Always place your allow rule BEFORE the default deny.")),
@@ -1636,32 +1636,32 @@ function LessonL22(){
   const scans=[["-sS","TCP SYN",{uz:"Yarim ochiq — tez, yashirinroq (root)",en:"Half-open — fast, stealthier (root)"},"#69db7c"],["-sV","Version",{uz:"Xizmat va versiyani aniqlaydi",en:"Detects service and version"},"#4dabf7"],["-O","OS Detect",{uz:"Operatsion tizimni taxmin qiladi",en:"Fingerprints the OS"},"#9775fa"],["-sn","Ping Scan",{uz:"Faqat tirik xostlarni topadi",en:"Finds live hosts only"},"#ffd43b"]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L22-1"},t(lang,"Port skanerlash nima?","What is port scanning?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Port skanerlash nima?","What is port scanning?")),
     React.createElement(P,null,t(lang,"Port skanerlash — nishonda qaysi portlar ochiq va qaysi xizmatlar ishlayotganini aniqlash. Nmap — eng mashhur vosita. Bino oldidan aylanib, qaysi eshik-derazalar ochiq ekanini tekshirishga o'xshaydi.","Port scanning finds which ports are open and which services run on a target. Nmap is the most popular tool. It's like walking around a building to see which doors and windows are open.")),
-    React.createElement(H2,{num:"§2",id:"toc-L22-2"},t(lang,"Skan qanday ishlaydi","How a scan works")),
+    React.createElement(H2,{num:"§2"},t(lang,"Skan qanday ishlaydi","How a scan works")),
     React.createElement(FlowSteps,{color:"#ffd43b",title:{uz:"Nmap skan jarayoni",en:"Nmap scan process"},steps:[
       {icon:"📡",text:{uz:"Tirik xostlar aniqlanadi (host discovery)",en:"Live hosts are discovered (host discovery)"}},
       {icon:"🚪",text:{uz:"Har portga so'rov yuboriladi",en:"A probe is sent to each port"}},
       {icon:"🔎",text:{uz:"Javob → open / closed / filtered",en:"Response → open / closed / filtered"}},
       {icon:"🏷",text:{uz:"Ochiq portlarda xizmat + versiya aniqlanadi",en:"Service + version detected on open ports"}},
     ]}),
-    React.createElement(H2,{num:"§3",id:"toc-L22-3"},t(lang,"Interaktiv simulyator: SYN vs Connect scan","Interactive simulator: SYN vs Connect scan")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: SYN vs Connect scan","Interactive simulator: SYN vs Connect scan")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xuddi shu ochiq portga qarshi ikki skan turi paket darajasida qanday farq qilishini va nega biri «yashirinroq» ekanini ko'ring:","Try both scenarios — see how two scan types differ at the packet level against the same open port, and why one is «stealthier»:")),
     React.createElement(ScanSim),
-    React.createElement(H2,{num:"§4",id:"toc-L22-4"},t(lang,"Foydali bayroqlar","Useful flags")),
+    React.createElement(H2,{num:"§4"},t(lang,"Foydali bayroqlar","Useful flags")),
     scans.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid "+s[3]+"44",borderLeft:"3px solid "+s[3],borderRadius:9,animationDelay:(i*0.06)+"s"}},
       React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:s[3],fontSize:12,minWidth:44}},s[0]),
       React.createElement("span",{style:{fontSize:12,fontWeight:600,color:"var(--text-0)",minWidth:80}},s[1]),
       React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},t(lang,s[2].uz,s[2].en)));}),
     React.createElement(Terminal,null,"sudo nmap -sS -sV -T4 10.0.0.5   # SYN + versiya (root kerak)\nnmap -sT 10.0.0.5                 # Connect scan (root shart emas)\nnmap -sn 10.0.0.0/24              # tirik xostlar\nnmap -p- 10.0.0.5                 # barcha 65535 port"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Port skanerlashni faqat o'zingizga tegishli yoki yozma ruxsat berilgan tizimlarda o'tkazing. Ruxsatsiz skanerlash ko'p mamlakatda qonunga zid.","Only scan systems you own or are authorized (in writing) to test. Unauthorized scanning is illegal in many countries.")),
-    React.createElement(H2,{num:"§5",id:"toc-L22-5"},t(lang,"Port holatlari","Port states")),
+    React.createElement(H2,{num:"§5"},t(lang,"Port holatlari","Port states")),
     React.createElement(LayerStack,{layers:[
       {n:"open",name:"open",color:"#69db7c",desc:{uz:"Xizmat javob beradi (SYN-ACK) — hujum yuzasi.",en:"A service answers (SYN-ACK) — attack surface."}},
       {n:"closed",name:"closed",color:"#ffd43b",desc:{uz:"Port yopiq (RST qaytaradi), lekin xost tirik.",en:"Port closed (returns RST), but the host is alive."}},
       {n:"filtered",name:"filtered",color:"#ff6b6b",desc:{uz:"Firewall to'sib qo'ygan — hech qanday javob yo'q.",en:"A firewall blocks it — no reply at all."}}
     ]}),
-    React.createElement(H2,{num:"§6",id:"toc-L22-6"},t(lang,"Amaliyot: to'liq natijani o'qish","Practice: reading a full result")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: to'liq natijani o'qish","Practice: reading a full result")),
     React.createElement(P,null,t(lang,"nmap -sS «yarim ochiq» skan qiladi — bu simulyatordagi aynan birinchi ssenariy. -sV har portning xizmat versiyasini aniqlaydi.","nmap -sS does a «half-open» scan — exactly the first scenario in the simulator. -sV identifies each port's service version.")),
     React.createElement(Terminal,null,"sudo nmap -sS -sV -T4 10.0.0.5\n# PORT     STATE    SERVICE VERSION\n# 22/tcp   open     ssh     OpenSSH 8.2\n# 80/tcp   open     http    nginx 1.18.0\n# 3306/tcp filtered  mysql  ← firewall to'sgan"),
 React.createElement(Quiz,{q:{uz:"Nmap -sV bayrog'i nima qiladi?",en:"What does the Nmap -sV flag do?"},opts:[{uz:"Faqat ping yuboradi",en:"Only pings"},{uz:"Ochiq portdagi xizmat va versiyani aniqlaydi",en:"Detects the service and version on an open port"},{uz:"Faylni o'chiradi",en:"Deletes a file"},{uz:"VPN yoqadi",en:"Enables a VPN"}],correct:1,exp:{uz:"-sV ochiq port ortidagi xizmat va uning aniq versiyasini aniqlaydi — bu ma'lum zaifliklarni izlash uchun asos.",en:"-sV detects the service and its exact version behind an open port — a basis for finding known vulnerabilities."}}));
@@ -1872,69 +1872,6 @@ function SectionScreen({setRoute,user,sec=1}){
 }
 
 // ── Lesson Screen ─────────────────────────────────────────────
-const TOC_SECTIONS={
-  1:[{id:"toc-L1-1",uz:"OSI modeli nima?",en:"What is the OSI Model?"},{id:"toc-L1-2",uz:"7 ta qatlam",en:"The 7 Layers"},{id:"toc-L1-3",uz:"Ma'lumot qanday harakatlanadi?",en:"How does data travel?"},{id:"toc-L1-4",uz:"TCP/IP vs OSI",en:"TCP/IP vs OSI"},{id:"toc-L1-5",uz:"Qatlamlar amalda",en:"The layers in practice"}],
-  2:[{id:"toc-L2-1",uz:"TCP/IP nima?",en:"What is TCP/IP?"},{id:"toc-L2-2",uz:"4 qatlamli model",en:"The 4-layer model"},{id:"toc-L2-3",uz:"TCP va UDP farqi",en:"TCP vs UDP"},{id:"toc-L2-4",uz:"3 bosqichli qo'l berish (Handshake)",en:"The 3-way handshake"},{id:"toc-L2-5",uz:"Portlar va ulanish holati",en:"Ports and connection state"}],
-  3:[{id:"toc-L3-1",uz:"IP manzil nima?",en:"What is an IP address?"},{id:"toc-L3-2",uz:"IPv4 tuzilishi",en:"IPv4 structure"},{id:"toc-L3-3",uz:"Xususiy va ommaviy manzillar",en:"Private and public addresses"},{id:"toc-L3-4",uz:"CIDR, subnetting va IPv6",en:"CIDR, subnetting and IPv6"},{id:"toc-L3-5",uz:"Statik va dinamik IP",en:"Static vs dynamic IP"},{id:"toc-L3-6",uz:"Ommaviy va xususiy — va NAT",en:"Public and private — and NAT"},{id:"toc-L3-7",uz:"Amaliyot: o'z IP ingizni ko'rish",en:"Practice: seeing your own IP"}],
-  4:[{id:"toc-L4-1",uz:"DNS nima?",en:"What is DNS?"},{id:"toc-L4-2",uz:"Interaktiv simulyator: so'rov qanday hal bo'ladi",en:"Interactive simulator: how a query is resolved"},{id:"toc-L4-3",uz:"Ierarxiya: Root, TLD, Authoritative",en:"The hierarchy: Root, TLD, Authoritative"},{id:"toc-L4-4",uz:"DNS yozuv turlari",en:"DNS record types"},{id:"toc-L4-5",uz:"Amaliyot: dig va nslookup",en:"Practice: dig and nslookup"}],
-  5:[{id:"toc-L5-1",uz:"HTTP nima?",en:"What is HTTP?"},{id:"toc-L5-2",uz:"Interaktiv simulyator: so'rov, javob va HTTP vs HTTPS",en:"Interactive simulator: request, response, and HTTP vs HTTPS"},{id:"toc-L5-3",uz:"Asosiy metodlar",en:"The main methods"},{id:"toc-L5-4",uz:"Status kod oilalari",en:"Status code families"},{id:"toc-L5-5",uz:"HTTP vs HTTPS — nega TLS muhim",en:"HTTP vs HTTPS — why TLS matters"},{id:"toc-L5-6",uz:"Amaliyot: haqiqiy so'rovni ko'rish",en:"Practice: inspecting a real request"}],
-  6:[{id:"toc-L6-1",uz:"ARP nima?",en:"What is ARP?"},{id:"toc-L6-2",uz:"Interaktiv simulyator: broadcast vs kesh",en:"Interactive simulator: broadcast vs cache"},{id:"toc-L6-3",uz:"ARP Request va Reply",en:"ARP Request and Reply"},{id:"toc-L6-4",uz:"Nega bu xavfsizlik uchun muhim",en:"Why this matters for security"},{id:"toc-L6-5",uz:"Amaliyot: ARP jadvalini ko'rish",en:"Practice: viewing the ARP table"}],
-  7:[{id:"toc-L7-1",uz:"DHCP nima?",en:"What is DHCP?"},{id:"toc-L7-2",uz:"Interaktiv simulyator: to'liq DORA vs yangilash",en:"Interactive simulator: full DORA vs renewal"},{id:"toc-L7-3",uz:"DORA — to'rt bosqich",en:"DORA — the four stages"},{id:"toc-L7-4",uz:"Ijara (lease) va uni yangilash",en:"The lease and renewing it"},{id:"toc-L7-5",uz:"Amaliyot: ijarani boshqarish",en:"Practice: managing the lease"}],
-  8:[{id:"toc-L8-1",uz:"Routing nima?",en:"What is routing?"},{id:"toc-L8-2",uz:"Interaktiv simulyator: bir xil tarmoq vs uzoq manzil",en:"Interactive simulator: same network vs a distant destination"},{id:"toc-L8-3",uz:"Marshrutlash jadvali va uzatish qarori",en:"The routing table and the forwarding decision"},{id:"toc-L8-4",uz:"Statik va dinamik marshrutlash",en:"Static vs dynamic routing"},{id:"toc-L8-5",uz:"Amaliyot: yo'lni kuzatish",en:"Practice: tracing the path"}],
-  9:[{id:"toc-L9-1",uz:"Switch nima?",en:"What is a switch?"},{id:"toc-L9-2",uz:"Interaktiv simulyator: VLAN izolyatsiyasi vs hub",en:"Interactive simulator: VLAN isolation vs a hub"},{id:"toc-L9-3",uz:"VLAN nima?",en:"What is a VLAN?"},{id:"toc-L9-4",uz:"Hub, switch va router",en:"Hub, switch and router"},{id:"toc-L9-5",uz:"Amaliyot: VLAN'larni ko'rish",en:"Practice: viewing VLANs"}],
-  10:[{id:"toc-L10-1",uz:"NAT nima?",en:"What is NAT?"},{id:"toc-L10-2",uz:"Interaktiv simulyator: NAT jadvali",en:"Interactive simulator: the NAT table"},{id:"toc-L10-3",uz:"Nega NAT kerak?",en:"Why is NAT needed?"},{id:"toc-L10-4",uz:"NAT turlari: SNAT, DNAT, PAT",en:"NAT types: SNAT, DNAT, PAT"},{id:"toc-L10-5",uz:"Amaliyot: NAT jadvalini ko'rish",en:"Practice: viewing the NAT table"}],
-  11:[{id:"toc-L11-1",uz:"Topologiya nima?",en:"What is a topology?"},{id:"toc-L11-2",uz:"Asosiy topologiyalar",en:"Main topologies"},{id:"toc-L11-3",uz:"Interaktiv simulyator: kabel uzilsa nima bo'ladi?",en:"Interactive simulator: what happens if a cable is cut?"},{id:"toc-L11-4",uz:"Topologiyalarni solishtirish",en:"Comparing topologies"},{id:"toc-L11-5",uz:"Amaliyot: yetib borishni tekshirish",en:"Practice: checking reachability"}],
-  12:[{id:"toc-L12-1",uz:"Simsiz tarmoq nima?",en:"What is a wireless network?"},{id:"toc-L12-2",uz:"Interaktiv simulyator: WPA2/WPA3 vs ochiq tarmoq",en:"Interactive simulator: WPA2/WPA3 vs an open network"},{id:"toc-L12-3",uz:"WiFi standartlari",en:"WiFi standards"},{id:"toc-L12-4",uz:"WiFi shifrlash avlodlari",en:"WiFi encryption generations"},{id:"toc-L12-5",uz:"Amaliyot: atrofdagi tarmoqlar",en:"Practice: nearby networks"}],
-  13:[{id:"toc-L13-1",uz:"Firewall nima?",en:"What is a firewall?"},{id:"toc-L13-2",uz:"Interaktiv simulyator",en:"Interactive simulator"},{id:"toc-L13-3",uz:"Qoidalar qanday ishlaydi",en:"How the rules work"},{id:"toc-L13-4",uz:"Firewall turlari (4 ta)",en:"Firewall types (4)"},{id:"toc-L13-5",uz:"Stateful va stateless — farqi",en:"Stateful vs stateless — the difference"},{id:"toc-L13-6",uz:"Amaliyot: Linux firewall",en:"Practice: the Linux firewall"}],
-  14:[{id:"toc-L14-1",uz:"VPN nima?",en:"What is a VPN?"},{id:"toc-L14-2",uz:"Interaktiv simulyator: VPN YO'Q vs YONIQ",en:"Interactive simulator: VPN off vs on"},{id:"toc-L14-3",uz:"VPN nima qiladi va NIMA qilmaydi",en:"What a VPN does and does NOT do"},{id:"toc-L14-4",uz:"VPN protokollari",en:"VPN protocols"},{id:"toc-L14-5",uz:"Tunnel turlari",en:"Tunnel types"},{id:"toc-L14-6",uz:"Amaliyot: WireGuard",en:"Practice: WireGuard"}],
-  15:[{id:"toc-L15-1",uz:"SSL/TLS nima?",en:"What is SSL/TLS?"},{id:"toc-L15-2",uz:"Interaktiv simulyator: TLS handshake",en:"Interactive simulator: the TLS handshake"},{id:"toc-L15-3",uz:"Sertifikat va ishonch zanjiri",en:"Certificates and the chain of trust"},{id:"toc-L15-4",uz:"SSL va TLS versiyalari",en:"SSL and TLS versions"},{id:"toc-L15-5",uz:"Amaliyot: sertifikatni tekshirish",en:"Practice: inspecting a certificate"}],
-  16:[{id:"toc-L16-1",uz:"IDS va IPS nima?",en:"What are IDS and IPS?"},{id:"toc-L16-2",uz:"Interaktiv simulyator: bir xil hujum, ikki xil natija",en:"Interactive simulator: the same attack, two different outcomes"},{id:"toc-L16-3",uz:"IDS vs IPS — solishtiruv",en:"IDS vs IPS — comparison"},{id:"toc-L16-4",uz:"Aniqlash usullari va joylashuv turlari",en:"Detection methods and deployment types"},{id:"toc-L16-5",uz:"Amaliyot: ogohlantirishlarni ko'rish",en:"Practice: viewing alerts"}],
-  17:[{id:"toc-L17-1",uz:"DMZ nima? — Qal'a analogiyasi",en:"What is a DMZ? — the castle analogy"},{id:"toc-L17-2",uz:"Interaktiv simulyator",en:"Interactive simulator"},{id:"toc-L17-3",uz:"DMZ qachon va nega ishlatiladi?",en:"When and why is a DMZ used?"},{id:"toc-L17-4",uz:"DMZ qoidalari qanday ishlaydi?",en:"How the DMZ rules work"},{id:"toc-L17-5",uz:"Uy routeridagi «DMZ Host» — bu haqiqiy DMZ emas!",en:"The «DMZ Host» on a home router — not a real DMZ!"}],
-  18:[{id:"toc-L18-1",uz:"802.1X va NAC nima?",en:"What are 802.1X and NAC?"},{id:"toc-L18-2",uz:"Interaktiv simulyator: xodim vs noma'lum qurilma",en:"Interactive simulator: staff vs an unknown device"},{id:"toc-L18-3",uz:"802.1X uch qismi",en:"The three 802.1X parts"},{id:"toc-L18-4",uz:"Amaliyot: RADIUS jurnali",en:"Practice: the RADIUS log"}],
-  19:[{id:"toc-L19-1",uz:"Paket filtrlash nima?",en:"What is packet filtering?"},{id:"toc-L19-2",uz:"Interaktiv simulyator: javob trafigi muammosi",en:"Interactive simulator: the return-traffic problem"},{id:"toc-L19-3",uz:"Stateless va Stateful — solishtiruv",en:"Stateless vs stateful — comparison"},{id:"toc-L19-4",uz:"Paket filtrlash chuqurligi",en:"Depth of packet filtering"},{id:"toc-L19-5",uz:"Amaliyot: iptables qoidalari",en:"Practice: iptables rules"}],
-  20:[{id:"toc-L20-1",uz:"Proxy nima?",en:"What is a proxy?"},{id:"toc-L20-2",uz:"Interaktiv simulyator: kim kimdan yashiringan?",en:"Interactive simulator: who is hidden from whom?"},{id:"toc-L20-3",uz:"Proxy turlari",en:"Types of proxy"},{id:"toc-L20-4",uz:"Forward va reverse proxy",en:"Forward vs reverse proxy"},{id:"toc-L20-5",uz:"Amaliyot: reverse proxy sarlavhasi",en:"Practice: reverse-proxy headers"}],
-  21:[{id:"toc-L21-1",uz:"Zero Trust nima?",en:"What is Zero Trust?"},{id:"toc-L21-2",uz:"Interaktiv simulyator: bitta buzilgan qurilmadan keyin nima bo'ladi?",en:"Interactive simulator: what happens after one device is compromised?"},{id:"toc-L21-3",uz:"Har so'rov qanday tekshiriladi",en:"How every request is checked"},{id:"toc-L21-4",uz:"Zero Trust tamoyillari",en:"Zero Trust principles"},{id:"toc-L21-5",uz:"Amaliyot: siyosat qoidasi",en:"Practice: a policy rule"}],
-  22:[{id:"toc-L22-1",uz:"Port skanerlash nima?",en:"What is port scanning?"},{id:"toc-L22-2",uz:"Skan qanday ishlaydi",en:"How a scan works"},{id:"toc-L22-3",uz:"Interaktiv simulyator: SYN vs Connect scan",en:"Interactive simulator: SYN vs Connect scan"},{id:"toc-L22-4",uz:"Foydali bayroqlar",en:"Useful flags"},{id:"toc-L22-5",uz:"Port holatlari",en:"Port states"},{id:"toc-L22-6",uz:"Amaliyot: to'liq natijani o'qish",en:"Practice: reading a full result"}],
-  23:[{id:"toc-L23-1",uz:"Enumeratsiya nima?",en:"What is enumeration?"},{id:"toc-L23-2",uz:"Interaktiv simulyator: qancha ma'lumot oshkor bo'ladi?",en:"Interactive simulator: how much gets exposed?"},{id:"toc-L23-3",uz:"Nimani sanash kerak",en:"What to enumerate"},{id:"toc-L23-4",uz:"Amaliyot: xizmatlarni sanash",en:"Practice: enumerating services"}],
-  24:[{id:"toc-L24-1",uz:"ARP spoofing nima?",en:"What is ARP spoofing?"},{id:"toc-L24-2",uz:"Interaktiv simulyator: himoyasiz vs DAI",en:"Interactive simulator: undefended vs DAI"},{id:"toc-L24-3",uz:"Hujumdan oldin va keyin",en:"Before and after the attack"},{id:"toc-L24-4",uz:"Himoya usullari",en:"Defense methods"},{id:"toc-L24-5",uz:"Amaliyot: ARP jadvalining zaharlanishi",en:"Practice: ARP table poisoning"}],
-  25:[{id:"toc-L25-1",uz:"MITM hujumi nima?",en:"What is a MITM attack?"},{id:"toc-L25-2",uz:"Interaktiv simulyator: passiv vs faol MITM",en:"Interactive simulator: passive vs active MITM"},{id:"toc-L25-3",uz:"Keng tarqalgan usullar",en:"Common techniques"},{id:"toc-L25-4",uz:"MITM turlari",en:"Types of MITM"},{id:"toc-L25-5",uz:"Amaliyot: trafikni tinglash",en:"Practice: sniffing traffic"}],
-  26:[{id:"toc-L26-1",uz:"DNS spoofing nima?",en:"What is DNS spoofing?"},{id:"toc-L26-2",uz:"Qanday ishlaydi",en:"How it works"},{id:"toc-L26-3",uz:"Interaktiv simulyator: DNSSEC qalqon bo'la oladimi?",en:"Interactive simulator: can DNSSEC act as a shield?"},{id:"toc-L26-4",uz:"Himoya chuqurroq",en:"Defense in depth"},{id:"toc-L26-5",uz:"Haqiqiy va soxta javob",en:"Real vs spoofed reply"},{id:"toc-L26-6",uz:"Amaliyot: soxta javob",en:"Practice: a forged reply"}],
-  27:[{id:"toc-L27-1",uz:"DoS va DDoS nima?",en:"What are DoS and DDoS?"},{id:"toc-L27-2",uz:"Hujum turlari",en:"Attack types"},{id:"toc-L27-3",uz:"Interaktiv simulyator: SYN flood — himoyasiz vs himoyalangan",en:"Interactive simulator: SYN flood — unprotected vs protected"},{id:"toc-L27-4",uz:"Himoya (mitigatsiya)",en:"Mitigation"},{id:"toc-L27-5",uz:"Amaliyot: SYN flood belgisi",en:"Practice: a SYN flood sign"}],
-  28:[{id:"toc-L28-1",uz:"Wireshark nima?",en:"What is Wireshark?"},{id:"toc-L28-2",uz:"Ish jarayoni",en:"Workflow"},{id:"toc-L28-3",uz:"Interaktiv simulyator: filtrsiz vs filtr bilan qidiruv",en:"Interactive simulator: searching unfiltered vs with a filter"},{id:"toc-L28-4",uz:"Foydali filtrlar",en:"Useful filters"},{id:"toc-L28-5",uz:"Capture va display filtr",en:"Capture vs display filter"},{id:"toc-L28-6",uz:"Amaliyot: parolni topish",en:"Practice: finding a password"}],
-  29:[{id:"toc-L29-1",uz:"Simsiz hujumlar nima?",en:"What are wireless attacks?"},{id:"toc-L29-2",uz:"Keng tarqalgan hujumlar",en:"Common attacks"},{id:"toc-L29-3",uz:"Interaktiv simulyator: zaif vs kuchli parol",en:"Interactive simulator: weak vs strong password"},{id:"toc-L29-4",uz:"Himoya",en:"Defense"},{id:"toc-L29-5",uz:"WPA2 buzish oqimi",en:"The WPA2 cracking flow"},{id:"toc-L29-6",uz:"Amaliyot: handshake buzish",en:"Practice: cracking the handshake"}],
-  30:[{id:"toc-L30-1",uz:"Tarmoq forensikasi nima?",en:"What is network forensics?"},{id:"toc-L30-2",uz:"Tekshiruv jarayoni",en:"The investigation process"},{id:"toc-L30-3",uz:"Interaktiv simulyator: dalil zanjiri — hash bormi, yo'qmi?",en:"Interactive simulator: chain of custody — with or without a hash?"},{id:"toc-L30-4",uz:"Dalil manbalari",en:"Evidence sources"},{id:"toc-L30-5",uz:"Amaliyot: pcap tahlili",en:"Practice: analyzing a pcap"}],
-};
-function LessonTOC({num}){
-  const lang=useLang();
-  const sections=TOC_SECTIONS[num]||[];
-  const [active,setActive]=useState(sections[0]?sections[0].id:"");
-  useEffect(()=>{
-    function onScroll(){
-      let cur=sections.length?sections[0].id:"";
-      for(const s of sections){
-        const el=document.getElementById(s.id);
-        if(el&&el.getBoundingClientRect().top<200)cur=s.id;
-      }
-      setActive(cur);
-    }
-    onScroll();
-    window.addEventListener("scroll",onScroll,{passive:true});
-    return ()=>window.removeEventListener("scroll",onScroll);
-  },[num]);
-  if(!sections.length)return React.createElement("div",{style:{width:0}});
-  return React.createElement("aside",{style:{position:"sticky",top:66,padding:"24px 12px 24px 20px",maxHeight:"calc(100vh - 66px)",overflowY:"auto"}},
-    React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,letterSpacing:2,color:"var(--accent)",opacity:.85,textTransform:"uppercase",marginBottom:10,paddingLeft:10}},t(lang,"// Mundarija","// Contents")),
-    React.createElement("ol",{style:{listStyle:"none",padding:0,margin:0,display:"flex",flexDirection:"column",gap:2}},
-      sections.map((s,i)=>React.createElement("li",{key:s.id},
-        React.createElement("a",{href:"#"+s.id,onClick:e=>{e.preventDefault();const el=document.getElementById(s.id);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});},
-          style:{display:"flex",gap:8,padding:"7px 10px",borderRadius:7,fontSize:12,textDecoration:"none",
-            color:active===s.id?"var(--accent)":"var(--text-2)",
-            background:active===s.id?"var(--accent-soft)":"transparent",
-            borderLeft:`2px solid ${active===s.id?"var(--accent)":"transparent"}`,
-            transition:"all 200ms"}},
-          React.createElement("span",{style:{fontFamily:"var(--font-mono)",opacity:.5,fontSize:10,width:16,flexShrink:0}},String(i+1).padStart(2,"0")),
-          React.createElement("span",null,t(lang,s.uz,s.en)))))));
-}
 function LessonScreen({setRoute,user,markComplete,num=1}){
   const lang=useLang();
   const [done,setDone]=useState(false);
@@ -1975,27 +1912,24 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
     num===30?React.createElement(LessonL30):
     React.createElement(ComingSoon,{lesson});
 
-  return React.createElement("div",{style:{display:"grid",gridTemplateColumns:"230px 1fr",maxWidth:1320,margin:"0 auto"}},
-    React.createElement(LessonTOC,{num}),
-    React.createElement("div",{style:{padding:"24px 20px 60px 16px",maxWidth:"100%"}},
-      React.createElement("button",{onClick:()=>setRoute({name:"section",sec:lesson.sec}),style:{appearance:"none",background:"none",border:"none",cursor:"pointer",color:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:11,marginBottom:16,padding:0,display:"flex",alignItems:"center",gap:6}},
-        "← ",t(lang,sec.uz,sec.en)
-      ),
-      React.createElement("div",{style:{marginBottom:24,padding:"20px 24px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:16}},
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:sec.color,fontWeight:700,letterSpacing:1,marginBottom:6}},
-          lesson.num),
-        React.createElement("h1",{style:{fontFamily:"var(--font-display)",fontSize:22,fontWeight:800,margin:"0 0 6px"}},
-          t(lang,lesson.uz,lesson.en||lesson.uz)),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-2)"}},lesson.sub)
-      ),
-      content,
-      !alreadyDone&&!done&&num<=30&&React.createElement("button",{
-        onClick:()=>{markComplete&&markComplete(lessonKey);setDone(true);},
-        style:{marginTop:24,padding:"12px 28px",borderRadius:10,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,boxShadow:"0 0 20px var(--accent-glow)"}
-      },t(lang,"Darsni yakunlash ✓","Complete Lesson ✓")),
-      (alreadyDone||done)&&React.createElement("div",{style:{marginTop:24,padding:"14px",background:"var(--accent-soft)",border:"1px solid var(--accent-border)",borderRadius:10,textAlign:"center",fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)"}},
-        t(lang,"✓ Dars bajarildi! +50 XP","✓ Lesson completed! +50 XP"))
-    )
+  return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
+    React.createElement("button",{onClick:()=>setRoute({name:"section",sec:lesson.sec}),style:{appearance:"none",background:"none",border:"none",cursor:"pointer",color:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:11,marginBottom:16,padding:0,display:"flex",alignItems:"center",gap:6}},
+      "← ",t(lang,sec.uz,sec.en)
+    ),
+    React.createElement("div",{style:{marginBottom:24,padding:"20px 24px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:16}},
+      React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:sec.color,fontWeight:700,letterSpacing:1,marginBottom:6}},
+        lesson.num),
+      React.createElement("h1",{style:{fontFamily:"var(--font-display)",fontSize:22,fontWeight:800,margin:"0 0 6px"}},
+        t(lang,lesson.uz,lesson.en||lesson.uz)),
+      React.createElement("div",{style:{fontSize:12,color:"var(--text-2)"}},lesson.sub)
+    ),
+    content,
+    !alreadyDone&&!done&&num<=30&&React.createElement("button",{
+      onClick:()=>{markComplete&&markComplete(lessonKey);setDone(true);},
+      style:{marginTop:24,padding:"12px 28px",borderRadius:10,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,boxShadow:"0 0 20px var(--accent-glow)"}
+    },t(lang,"Darsni yakunlash ✓","Complete Lesson ✓")),
+    (alreadyDone||done)&&React.createElement("div",{style:{marginTop:24,padding:"14px",background:"var(--accent-soft)",border:"1px solid var(--accent-border)",borderRadius:10,textAlign:"center",fontFamily:"var(--font-mono)",fontSize:12,color:"var(--accent)"}},
+      t(lang,"✓ Dars bajarildi! +50 XP","✓ Lesson completed! +50 XP"))
   );
 }
 
@@ -2202,17 +2136,17 @@ function LessonL02(){
   ];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L2-1"},t(lang,"TCP/IP nima?","What is TCP/IP?")),
+    React.createElement(H2,{num:"§1"},t(lang,"TCP/IP nima?","What is TCP/IP?")),
     React.createElement(P,null,t(lang,"TCP/IP — internet ishlashining asosi bo'lgan protokollar to'plami. Uni pochta tizimiga o'xshating: xat (ma'lumot) konvertga solinadi, manzil yoziladi, pochta bo'limlari orqali o'tib yetkaziladi. TCP/IP shu qoidalar to'plami bo'lib, dunyodagi har qanday ikki qurilma bir-biri bilan gaplasha olishini ta'minlaydi.","TCP/IP is the suite of protocols the internet runs on. Think of the postal system: a letter (data) goes in an envelope, gets an address, passes through post offices and is delivered. TCP/IP is that set of rules, letting any two devices talk.")),
-    React.createElement(H2,{num:"§2",id:"toc-L2-2"},t(lang,"4 qatlamli model","The 4-layer model")),
+    React.createElement(H2,{num:"§2"},t(lang,"4 qatlamli model","The 4-layer model")),
     React.createElement(P,null,t(lang,"TCP/IP OSI ning 7 qatlamini 4 ta amaliy qatlamga soddalashtiradi:","TCP/IP simplifies OSI's 7 layers into 4 practical layers:")),
     React.createElement(LayerStack,{layers:layers}),
-    React.createElement(H2,{num:"§3",id:"toc-L2-3"},t(lang,"TCP va UDP farqi","TCP vs UDP")),
+    React.createElement(H2,{num:"§3"},t(lang,"TCP va UDP farqi","TCP vs UDP")),
     React.createElement(P,null,t(lang,"Transport qatlamida ikkita protokol bor. TCP — ishonchli (buyurtma qilingan pochta kabi: yetgani tasdiqlanadi). UDP — tez, ammo tasdiqlamaydi (oddiy xat tashlagandek).","The transport layer has two protocols. TCP is reliable (like registered mail: delivery is confirmed). UDP is fast but unconfirmed (like dropping a postcard).")),
     React.createElement(CompareCols,{
       left:{title:"TCP",color:"#69db7c",rows:[{uz:"✓ Ishonchli",en:"✓ Reliable"},{uz:"✓ Tartibli yetkazish",en:"✓ Ordered delivery"},{uz:"✓ Xatolarni tuzatish",en:"✓ Error correction"},{uz:"✗ Sekinroq",en:"✗ Slower"},{uz:"Veb, email, fayl",en:"Web, email, files"}]},
       right:{title:"UDP",color:"#4dabf7",rows:[{uz:"✓ Juda tez",en:"✓ Very fast"},{uz:"✓ Kam yuk",en:"✓ Low overhead"},{uz:"✗ Tasdiqlamaydi",en:"✗ No confirmation"},{uz:"✗ Paket yo'qolishi mumkin",en:"✗ Packets may drop"},{uz:"Video, o'yin, DNS",en:"Video, games, DNS"}]}}),
-    React.createElement(H2,{num:"§4",id:"toc-L2-4"},t(lang,"3 bosqichli qo'l berish (Handshake)","The 3-way handshake")),
+    React.createElement(H2,{num:"§4"},t(lang,"3 bosqichli qo'l berish (Handshake)","The 3-way handshake")),
     React.createElement(P,null,t(lang,"TCP ulanishdan oldin ikki qurilma \"qo'l beradi\" — bir-birini tayyor ekanini tasdiqlaydi. \"Ishga tushir\" ni bosing:","Before TCP connects, the two devices \"shake hands\" — confirming each is ready. Press Play:")),
     React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"TCP 3-way handshake",en:"TCP 3-way handshake"},steps:[
       {icon:"→",text:{uz:"Client → Server:  SYN  (\"ulanamizmi?\")",en:"Client → Server:  SYN  (\"shall we connect?\")"}},
@@ -2220,7 +2154,7 @@ function LessonL02(){
       {icon:"→",text:{uz:"Client → Server:  ACK  (\"kelishdik!\")",en:"Client → Server:  ACK  (\"agreed!\")"}},
       {icon:"✓",text:{uz:"Ulanish tayyor — ma'lumot uzatiladi",en:"Connection ready — data flows"}},
     ]}),
-        React.createElement(H2,{num:"§5",id:"toc-L2-5"},t(lang,"Portlar va ulanish holati","Ports and connection state")),
+        React.createElement(H2,{num:"§5"},t(lang,"Portlar va ulanish holati","Ports and connection state")),
     React.createElement(P,null,t(lang,"TCP har ulanishni port raqami bilan belgilaydi (HTTP=80, HTTPS=443, SSH=22) va uni holat mashinasi orqali boshqaradi: LISTEN (kutmoqda), ESTABLISHED (ulangan), TIME_WAIT (yopilmoqda). ss buyrug'i bu holatlarni ko'rsatadi — pentestda ochiq xizmatlarni topishga yordam beradi.","TCP identifies each connection by a port number (HTTP=80, HTTPS=443, SSH=22) and manages it via a state machine: LISTEN (waiting), ESTABLISHED (connected), TIME_WAIT (closing). The ss command shows these states — helpful in a pentest to find open services.")),
     React.createElement(LayerStack,{layers:[{n:"22",name:t(lang,"SSH","SSH"),color:"#4dabf7",desc:{uz:"Xavfsiz masofaviy kirish (TCP).",en:"Secure remote access (TCP)."}},{n:"53",name:t(lang,"DNS","DNS"),color:"#69db7c",desc:{uz:"Nom → IP (asosan UDP).",en:"Name → IP (mostly UDP)."}},{n:"80/443",name:t(lang,"HTTP/S","HTTP/S"),color:"#a855f7",desc:{uz:"Veb trafik (TCP).",en:"Web traffic (TCP)."}},{n:"3389",name:t(lang,"RDP","RDP"),color:"#ffd43b",desc:{uz:"Windows masofaviy ish stoli.",en:"Windows remote desktop."}},]}),
     React.createElement(Terminal,null,"ss -tan\n# State    Local Address:Port   Peer Address:Port\n# LISTEN   0.0.0.0:22           0.0.0.0:*      ← SSH kutmoqda\n# ESTAB    10.0.0.5:443         10.0.0.9:51324 ← faol HTTPS\n# TIME-WAIT 10.0.0.5:80         10.0.0.9:51001"),
@@ -2238,9 +2172,9 @@ function LessonL03(){
     ["192.168.0.0/16","192.168.x.x",{uz:"Uy / kichik ofis",en:"Home / small office"},"#9775fa"]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L3-1"},t(lang,"IP manzil nima?","What is an IP address?")),
+    React.createElement(H2,{num:"§1"},t(lang,"IP manzil nima?","What is an IP address?")),
     React.createElement(P,null,t(lang,"IP manzil — tarmoqdagi har bir qurilmaning yagona \"uy manzili\". Pochta xatni to'g'ri uyga yetkazish uchun manzilga muhtoj bo'lgani kabi, tarmoq ham ma'lumotni to'g'ri qurilmaga yetkazish uchun IP manzildan foydalanadi.","An IP address is the unique \"home address\" of every device on a network. Just as the post office needs an address to deliver to the right house, the network uses an IP to reach the right device.")),
-    React.createElement(H2,{num:"§2",id:"toc-L3-2"},t(lang,"IPv4 tuzilishi","IPv4 structure")),
+    React.createElement(H2,{num:"§2"},t(lang,"IPv4 tuzilishi","IPv4 structure")),
     React.createElement("div",{className:"na-rise",style:{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",margin:"10px 0 14px"}},
       [["192","",false],["168","",false],["1","",true],["10","",true]].map(function(o,i){return React.createElement("div",{key:i,style:{textAlign:"center"}},
         React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontWeight:800,fontSize:20,color:o[2]?"#ffd43b":"#4dabf7",background:(o[2]?"#ffd43b":"#4dabf7")+"18",border:"1px solid "+(o[2]?"#ffd43b":"#4dabf7")+"55",borderRadius:8,padding:"8px 14px",minWidth:52}},o[0]),
@@ -2248,24 +2182,24 @@ function LessonL03(){
     React.createElement("div",{style:{textAlign:"center",fontSize:12,color:"var(--text-2)",marginBottom:14}},
       React.createElement("span",{style:{color:"#4dabf7"}},t(lang,"■ Tarmoq qismi","■ Network part"))," · ",
       React.createElement("span",{style:{color:"#ffd43b"}},t(lang,"■ Xost qismi","■ Host part"))," · ",t(lang,"jami 32 bit, har son 0–255","32 bits total, each 0–255")),
-    React.createElement(H2,{num:"§3",id:"toc-L3-3"},t(lang,"Xususiy va ommaviy manzillar","Private and public addresses")),
+    React.createElement(H2,{num:"§3"},t(lang,"Xususiy va ommaviy manzillar","Private and public addresses")),
     React.createElement(P,null,t(lang,"Ba'zi diapazonlar \"xususiy\" — faqat ichki tarmoqda ishlaydi va internetda ko'rinmaydi (uy ichidagi xona raqamlari kabi).","Some ranges are \"private\" — used only inside a local network and never seen on the internet (like room numbers inside a house).")),
     ranges.map(function(r,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+r[3]+"44",borderLeft:"3px solid "+r[3],borderRadius:10,animationDelay:(i*0.07)+"s"}},
       React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:12,fontWeight:700,color:r[3],minWidth:120}},r[0]),
       React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--text-2)",flex:1}},r[1]),
       React.createElement("span",{style:{fontSize:11.5,color:"var(--text-1)"}},t(lang,r[2].uz,r[2].en)));}),
-    React.createElement(H2,{num:"§4",id:"toc-L3-4"},t(lang,"CIDR, subnetting va IPv6","CIDR, subnetting and IPv6")),
+    React.createElement(H2,{num:"§4"},t(lang,"CIDR, subnetting va IPv6","CIDR, subnetting and IPv6")),
     React.createElement(P,null,t(lang,"CIDR yozuvi (masalan /24) manzilning qancha qismi \"tarmoq\", qanchasi \"xost\" ekanini bildiradi. /24 = birinchi 24 bit tarmoq, qolgan 8 bit xostlar uchun (256 manzil). Subnetting — katta tarmoqni kichik bo'laklarga bo'lish.","CIDR notation (e.g. /24) tells how much of an address is \"network\" vs \"host\". /24 = first 24 bits network, last 8 bits for hosts (256 addresses). Subnetting splits a big network into smaller pieces.")),
     React.createElement(CompareCols,{
       left:{title:"IPv4",color:"#4dabf7",rows:[{uz:"32 bit · ~4.3 mlrd manzil",en:"32-bit · ~4.3 billion addresses"},"192.168.1.10",{uz:"Manzillar tugab bormoqda",en:"Addresses are running out"}]},
       right:{title:"IPv6",color:"#69db7c",rows:[{uz:"128 bit · deyarli cheksiz",en:"128-bit · almost unlimited"},"2001:db8::8a2e:370:7334",{uz:"Kelajak IPv6 da",en:"The future is IPv6"}]}}),
-        React.createElement(H2,{num:"§5",id:"toc-L3-5"},t(lang,"Statik va dinamik IP","Static vs dynamic IP")),
+        React.createElement(H2,{num:"§5"},t(lang,"Statik va dinamik IP","Static vs dynamic IP")),
     React.createElement(P,null,t(lang,"IP manzil qurilmaga ikki yo'l bilan beriladi. Dinamik — DHCP serveri avtomatik beradi va vaqti-vaqti bilan o'zgarishi mumkin (uy va ofis qurilmalari uchun qulay). Statik — qo'lda qat'iy o'rnatiladi va o'zgarmaydi (serverlar, routerlar, printerlar uchun zarur, chunki ular doimo bir manzilda topilishi kerak).","An IP is assigned to a device in two ways. Dynamic — given automatically by a DHCP server and may change over time (convenient for home and office devices). Static — set manually and never changes (required for servers, routers, printers, which must always be reachable at the same address).")),
     React.createElement(CompareCols,{left:{title:{uz:"Dinamik (DHCP)",en:"Dynamic (DHCP)"},color:"#4dabf7",rows:[{uz:"Avtomatik beriladi",en:"Assigned automatically"},{uz:"Vaqt o'tib o'zgarishi mumkin",en:"Can change over time"},{uz:"Oddiy qurilmalar uchun",en:"For ordinary devices"},]},right:{title:{uz:"Statik (qo'lda)",en:"Static (manual)"},color:"#ffd43b",rows:[{uz:"Qat'iy, o'zgarmas",en:"Fixed, unchanging"},{uz:"Qo'lda sozlanadi",en:"Configured by hand"},{uz:"Server/router/printer uchun",en:"For servers/routers/printers"},]}}),
-    React.createElement(H2,{num:"§6",id:"toc-L3-6"},t(lang,"Ommaviy va xususiy — va NAT","Public and private — and NAT")),
+    React.createElement(H2,{num:"§6"},t(lang,"Ommaviy va xususiy — va NAT","Public and private — and NAT")),
     React.createElement(P,null,t(lang,"Xususiy (private) manzillar faqat ichki tarmoqda ishlaydi va internetda takrorlanadi — millionlab uy bir xil 192.168.1.x dan foydalanadi. Ommaviy (public) manzil internetda yagona bo'lib, uni provayder (ISP) beradi. Ichki qurilmalar internetga chiqqanda NAT ularning xususiy manzilini bitta ommaviy manzilga almashtiradi — shu sabab bir uydagi 10 ta qurilma bitta ommaviy IP orqali internetga chiqadi.","Private addresses work only inside a local network and are reused across the internet — millions of homes use the same 192.168.1.x. A public address is unique on the internet and is given by your ISP. When internal devices go online, NAT swaps their private address for a single public one — which is why 10 devices in one home reach the internet through one public IP.")),
     React.createElement(LayerStack,{layers:[{n:"10.x",name:t(lang,"10.0.0.0/8","10.0.0.0/8"),color:"#69db7c",desc:{uz:"Xususiy — katta tarmoqlar.",en:"Private — large networks."}},{n:"172.16",name:t(lang,"172.16.0.0/12","172.16.0.0/12"),color:"#4dabf7",desc:{uz:"Xususiy — o'rta tarmoqlar.",en:"Private — medium networks."}},{n:"192.168",name:t(lang,"192.168.0.0/16","192.168.0.0/16"),color:"#a855f7",desc:{uz:"Xususiy — uy/kichik ofis.",en:"Private — home/small office."}},{n:"127.0.0.1",name:t(lang,"loopback","loopback"),color:"#ffd43b",desc:{uz:"O'z-o'ziga — «localhost».",en:"Yourself — «localhost»."}},{n:"169.254",name:t(lang,"APIPA","APIPA"),color:"#ff6b6b",desc:{uz:"DHCP topilmasa avto-beriladi.",en:"Auto-assigned when no DHCP."}},]}),
-    React.createElement(H2,{num:"§7",id:"toc-L3-7"},t(lang,"Amaliyot: o'z IP ingizni ko'rish","Practice: seeing your own IP")),
+    React.createElement(H2,{num:"§7"},t(lang,"Amaliyot: o'z IP ingizni ko'rish","Practice: seeing your own IP")),
     React.createElement(P,null,t(lang,"ip a interfeys va manzilni, ip route standart shlyuzni ko'rsatadi. /24 — birinchi 24 bit tarmoq, qolgan 8 bit 254 ta xost uchun. Ommaviy IP ni bilish uchun tashqi xizmatga murojaat qilinadi.","ip a shows the interface and address, ip route the default gateway. /24 means the first 24 bits are network, the last 8 give 254 hosts. To learn the public IP you query an external service.")),
     React.createElement(Terminal,null,"ip a\n# 2: eth0: inet 192.168.1.10/24 brd 192.168.1.255  ← xususiy, /24\nip route\n# default via 192.168.1.1 dev eth0   ← shlyuz (router)\ncurl ifconfig.me\n# 85.132.44.7   ← ISP bergan OMMAVIY IP (NAT orqasidagi butun uy)"),
 React.createElement(Quiz,{q:{uz:"192.168.1.10 qanday manzil?",en:"What kind of address is 192.168.1.10?"},opts:[{uz:"Ommaviy (public)",en:"Public"},{uz:"Xususiy (private) ichki tarmoq",en:"Private internal network"},{uz:"IPv6",en:"IPv6"},{uz:"MAC",en:"MAC"}],correct:1,exp:{uz:"192.168.0.0/16 xususiy diapazon — uy va kichik ofis tarmoqlarida ishlatiladi, internetda to'g'ridan-to'g'ri ko'rinmaydi.",en:"192.168.0.0/16 is private — used in home/small-office networks, not directly visible on the internet."}}));
@@ -2274,12 +2208,12 @@ function LessonL04(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L4-1"},t(lang,"DNS nima?","What is DNS?")),
+    React.createElement(H2,{num:"§1"},t(lang,"DNS nima?","What is DNS?")),
     React.createElement(P,null,t(lang,"DNS (Domain Name System) — internetning telefon kitobi. Odamlar nomlarni eslab qolishadi (google.com), kompyuterlar esa faqat IP manzillar bilan ishlaydi (142.250.187.206). DNS nomni IP ga aylantiradi — bu jarayon «resolution» (hal qilish) deyiladi va deyarli har bir internet amaliyoti (sayt ochish, email yuborish) undan boshlanadi.","DNS (Domain Name System) is the internet's phone book. People remember names (google.com), but computers only work with IP addresses (142.250.187.206). DNS translates a name into an IP — this process is called «resolution», and almost every internet action (opening a site, sending email) starts with it.")),
-    React.createElement(H2,{num:"§2",id:"toc-L4-2"},t(lang,"Interaktiv simulyator: so'rov qanday hal bo'ladi","Interactive simulator: how a query is resolved")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: so'rov qanday hal bo'ladi","Interactive simulator: how a query is resolved")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinab ko'ring — birinchi (keshsiz) so'rov nechta bosqichdan o'tishini va ikkinchi (keshlangan) so'rov qanchalik tezroq ekanini solishtiring:","Try both scenarios — compare how many steps the first (uncached) query takes versus how much faster the second (cached) one is:")),
     React.createElement(DNSSim),
-    React.createElement(H2,{num:"§3",id:"toc-L4-3"},t(lang,"Ierarxiya: Root, TLD, Authoritative","The hierarchy: Root, TLD, Authoritative")),
+    React.createElement(H2,{num:"§3"},t(lang,"Ierarxiya: Root, TLD, Authoritative","The hierarchy: Root, TLD, Authoritative")),
     React.createElement(P,null,t(lang,"DNS markazlashmagan, daraxt shaklidagi tizim — hech bir server yagona nuqta bo'lib qolmaydi. Har daraja faqat KEYINGI qadamni biladi, yakuniy javobni emas (bundan authoritative server mustasno):","DNS is a decentralized, tree-shaped system — no single server is a bottleneck. Each level only knows the NEXT step, not the final answer (except the authoritative server):")),
     React.createElement(LayerStack,{layers:[
       {n:"1",name:t(lang,"Root server","Root server"),color:"#a855f7",desc:{uz:"Dunyoda ~13 ta manzil (yuzlab server sifatida ko'zguladi). Faqat TLD serverlarining manzilini biladi.",en:"~13 addresses worldwide (mirrored as hundreds of servers). Only knows where the TLD servers are."}},
@@ -2287,7 +2221,7 @@ function LessonL04(){
       {n:"3",name:t(lang,"Authoritative NS","Authoritative NS"),color:"#f472b6",desc:{uz:"Muayyan domen (google.com) uchun YAKUNIY javobni beradigan yagona server.",en:"The one server that gives the FINAL answer for a specific domain (google.com)."}},
       {n:"⚡",name:t(lang,"Recursive resolver","Recursive resolver"),color:"#3b82f6",desc:{uz:"Client o'rniga butun zanjirni yuradi va natijani keshlaydi (masalan 1.1.1.1, 8.8.8.8).",en:"Walks the whole chain on the client's behalf and caches the result (e.g. 1.1.1.1, 8.8.8.8)."}}
     ]}),
-    React.createElement(H2,{num:"§4",id:"toc-L4-4"},t(lang,"DNS yozuv turlari","DNS record types")),
+    React.createElement(H2,{num:"§4"},t(lang,"DNS yozuv turlari","DNS record types")),
     React.createElement(LayerStack,{layers:[
       {n:"A",name:"A",color:"#4dabf7",desc:{uz:"Nomni IPv4 manzilga bog'laydi — eng ko'p ishlatiladigan yozuv.",en:"Maps a name to an IPv4 address — the most common record."}},
       {n:"AAAA",name:"AAAA",color:"#69db7c",desc:{uz:"Nomni IPv6 manzilga bog'laydi.",en:"Maps a name to an IPv6 address."}},
@@ -2296,7 +2230,7 @@ function LessonL04(){
       {n:"NS",name:"NS",color:"#ff6b6b",desc:{uz:"Domen uchun qaysi serverlar authoritative ekanini ko'rsatadi.",en:"Shows which servers are authoritative for the domain."}},
       {n:"TXT",name:"TXT",color:"#f472b6",desc:{uz:"Erkin matn — ko'pincha SPF/DKIM kabi email tekshiruvlari uchun.",en:"Free-form text — often used for SPF/DKIM email verification."}}
     ]}),
-    React.createElement(H2,{num:"§5",id:"toc-L4-5"},t(lang,"Amaliyot: dig va nslookup","Practice: dig and nslookup")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: dig va nslookup","Practice: dig and nslookup")),
     React.createElement(P,null,t(lang,"dig +trace butun ierarxiyani (Root → TLD → Authoritative) qadam-baqadam ko'rsatadi — simulyatordagi jarayonni haqiqiy buyruqda ko'rasiz.","dig +trace shows the whole hierarchy (Root → TLD → Authoritative) step by step — you see the exact process from the simulator as a real command.")),
     React.createElement(Terminal,null,"dig example.com A +short\n# 93.184.216.34\n\ndig example.com MX +short\n# 10 mail.example.com.\n\ndig +trace example.com | tail -6\n# com.  172800  IN  NS  a.gtld-servers.net.        ← TLD\n# example.com. 86400 IN NS a.iana-servers.net.     ← Authoritative\n# example.com.  3600 IN A  93.184.216.34            ← yakuniy javob"),
     React.createElement(Quiz,{q:{uz:"Root DNS server so'rovga qanday javob beradi?",en:"How does a Root DNS server respond to a query?"},opts:[{uz:"Har doim yakuniy IP manzilni qaytaradi",en:"It always returns the final IP address"},{uz:"Yakuniy javobni bilmaydi — tegishli TLD serverga yo'naltiradi",en:"It doesn't know the final answer — it refers to the right TLD server"},{uz:"So'rovni bloklaydi",en:"It blocks the query"},{uz:"Faqat email manzillarga javob beradi",en:"It only answers for email addresses"}],correct:1,exp:{uz:"Root server yakuniy javobni bilmaydi — u faqat tegishli TLD (masalan .com) serverlarining manzilini ko'rsatadi (referral). Yakuniy javobni faqat authoritative server beradi.",en:"A Root server doesn't know the final answer — it only points to the right TLD (e.g. .com) servers (a referral). Only the authoritative server gives the final answer."}}));
@@ -2305,19 +2239,19 @@ function LessonL05(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L5-1"},t(lang,"HTTP nima?","What is HTTP?")),
+    React.createElement(H2,{num:"§1"},t(lang,"HTTP nima?","What is HTTP?")),
     React.createElement(P,null,t(lang,"HTTP (HyperText Transfer Protocol) — brauzer va veb-server o'rtasidagi «til». Brauzer SO'ROV yuboradi («bu sahifani ber»), server JAVOB qaytaradi (sahifa + holat kodi). Bu — restoranda taom buyurtma qilib, keyin uni olishga o'xshaydi: har doim bitta so'rov, bitta javob.","HTTP (HyperText Transfer Protocol) is the «language» between a browser and a web server. The browser sends a REQUEST («give me this page»), the server returns a RESPONSE (the page + a status code). It's like ordering food at a restaurant and then receiving it: always one request, one response.")),
-    React.createElement(H2,{num:"§2",id:"toc-L5-2"},t(lang,"Interaktiv simulyator: so'rov, javob va HTTP vs HTTPS","Interactive simulator: request, response, and HTTP vs HTTPS")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: so'rov, javob va HTTP vs HTTPS","Interactive simulator: request, response, and HTTP vs HTTPS")),
     React.createElement(P,null,t(lang,"So'rov tanlang va HTTP/HTTPS orasida almashtiring — tarmoqdagi kuzatuvchi (masalan ochiq WiFi'dagi xaker) nimani ko'ra olishini solishtiring:","Pick a request and switch between HTTP/HTTPS — compare what an observer on the network (e.g. a hacker on public WiFi) can actually see:")),
     React.createElement(HTTPSim),
-    React.createElement(H2,{num:"§3",id:"toc-L5-3"},t(lang,"Asosiy metodlar","The main methods")),
+    React.createElement(H2,{num:"§3"},t(lang,"Asosiy metodlar","The main methods")),
     React.createElement(LayerStack,{layers:[
       {n:"GET",name:"GET",color:"#3b82f6",desc:{uz:"Ma'lumot o'qish uchun — server holatini o'zgartirmaydi. Sahifa ochishning asosiy usuli.",en:"For reading data — doesn't change server state. The main way pages are loaded."}},
       {n:"POST",name:"POST",color:"#f59e0b",desc:{uz:"Yangi ma'lumot yuborish uchun — forma to'ldirish, login qilish, fayl yuklash.",en:"For sending new data — submitting a form, logging in, uploading a file."}},
       {n:"PUT",name:"PUT",color:"#a855f7",desc:{uz:"Mavjud resursni to'liq yangilash uchun.",en:"For fully replacing an existing resource."}},
       {n:"DELETE",name:"DELETE",color:"#ef4444",desc:{uz:"Resursni o'chirish uchun.",en:"For deleting a resource."}}
     ]}),
-    React.createElement(H2,{num:"§4",id:"toc-L5-4"},t(lang,"Status kod oilalari","Status code families")),
+    React.createElement(H2,{num:"§4"},t(lang,"Status kod oilalari","Status code families")),
     React.createElement(LayerStack,{layers:[
       {n:"1xx",name:t(lang,"Axborot","Informational"),color:"#64748b",desc:{uz:"Jarayon davom etmoqda (kamdan-kam ko'rinadi). Masalan 100 Continue.",en:"The process is continuing (rarely seen). E.g. 100 Continue."}},
       {n:"2xx",name:t(lang,"Muvaffaqiyat","Success"),color:"#22c55e",desc:{uz:"So'rov bajarildi. 200 OK, 201 Created.",en:"The request succeeded. 200 OK, 201 Created."}},
@@ -2325,13 +2259,13 @@ function LessonL05(){
       {n:"4xx",name:t(lang,"Mijoz xatosi","Client error"),color:"#f59e0b",desc:{uz:"So'rovda muammo bor. 404 topilmadi, 403 taqiqlangan, 401 avtorizatsiya kerak.",en:"Something's wrong with the request. 404 not found, 403 forbidden, 401 needs auth."}},
       {n:"5xx",name:t(lang,"Server xatosi","Server error"),color:"#ef4444",desc:{uz:"Server o'z ishini bajara olmadi. 500 ichki xato, 503 vaqtincha ishlamayapti.",en:"The server failed to do its job. 500 internal error, 503 temporarily unavailable."}}
     ]}),
-    React.createElement(H2,{num:"§5",id:"toc-L5-5"},t(lang,"HTTP vs HTTPS — nega TLS muhim","HTTP vs HTTPS — why TLS matters")),
+    React.createElement(H2,{num:"§5"},t(lang,"HTTP vs HTTPS — nega TLS muhim","HTTP vs HTTPS — why TLS matters")),
     React.createElement(P,null,t(lang,"HTTPS shunchaki HTTP + TLS shifrlash (TLS haqida to'liq — L15 darsida). Farq faqat «tezlik» yoki «ko'rinish» emas — HTTP'da so'rovning O'ZI (metod, yo'l, formaga kiritilgan har qanday ma'lumot, cookie'lar) yo'lda ochiq matnda ketadi. Buni istalgan kishi — provayder, ochiq WiFi'dagi boshqa foydalanuvchi, yo'ldagi router — ko'ra oladi.","HTTPS is simply HTTP + TLS encryption (full details in L15). The difference isn't just «speed» or «appearance» — with HTTP the request ITSELF (the method, path, any data typed into a form, cookies) travels in plain text. Anyone — your ISP, another user on public WiFi, a router along the way — can see it.")),
     React.createElement(CompareCols,{
       left:{title:"HTTP",color:"#ef4444",rows:[{uz:"✗ Butun so'rov ochiq matnda",en:"✗ The whole request is plain text"},{uz:"✗ Parol, cookie ham ko'rinadi",en:"✗ Passwords and cookies are visible too"},{uz:"Port 80 (odatiy)",en:"Port 80 (default)"}]},
       right:{title:"HTTPS",color:"#22c55e",rows:[{uz:"✓ TLS bilan to'liq shifrlangan",en:"✓ Fully encrypted with TLS"},{uz:"✓ Faqat sizu server ma'nosini biladi",en:"✓ Only you and the server know the content"},{uz:"Port 443 (odatiy), qulf 🔒",en:"Port 443 (default), padlock 🔒"}]}}),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Ochiq WiFi'da HTTP saytga hech qachon parol kiritmang — u shifrlanmagan uzatiladi. Manzil satrida doim qulf 🔒 (HTTPS) borligini tekshiring.","Never enter a password on an HTTP site over public WiFi — it's sent unencrypted. Always check for the padlock 🔒 (HTTPS) in the address bar.")),
-    React.createElement(H2,{num:"§6",id:"toc-L5-6"},t(lang,"Amaliyot: haqiqiy so'rovni ko'rish","Practice: inspecting a real request")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: haqiqiy so'rovni ko'rish","Practice: inspecting a real request")),
     React.createElement(P,null,t(lang,"curl -I faqat javob sarlavhalarini oladi; curl -v esa yuborilgan SO'ROVNI ham ko'rsatadi — simulyatordagi «BROWSER → SERVER» qatorining aynan o'zi.","curl -I fetches only the response headers; curl -v also shows the REQUEST that was sent — exactly like the «BROWSER → SERVER» line in the simulator.")),
     React.createElement(Terminal,null,"curl -I https://example.com\n# HTTP/2 200\n# server: nginx/1.18.0\n# content-type: text/html; charset=UTF-8\n\ncurl -v https://example.com 2>&1 | head -8\n# > GET / HTTP/2                    ← yuborilgan so'rov\n# > Host: example.com\n# < HTTP/2 200                      ← qaytgan javob"),
     React.createElement(Quiz,{q:{uz:"HTTPS ni HTTP dan farqlovchi asosiy narsa nima?",en:"What mainly sets HTTPS apart from HTTP?"},opts:[{uz:"Tezroq",en:"Faster"},{uz:"TLS bilan shifrlaydi",en:"Encrypts with TLS"},{uz:"Rasmlarni yaxshi ko'rsatadi",en:"Shows images better"},{uz:"Faqat mobil",en:"Mobile only"}],correct:1,exp:{uz:"HTTPS = HTTP + TLS shifrlash — yo'lda kim eshitsa ham so'rov/javob mazmunini (metod, yo'l, forma ma'lumoti) o'qiy olmaydi.",en:"HTTPS = HTTP + TLS encryption — anyone listening in transit can't read the request/response content (method, path, form data)."}}));
@@ -2340,20 +2274,20 @@ function LessonL06(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L6-1"},t(lang,"ARP nima?","What is ARP?")),
+    React.createElement(H2,{num:"§1"},t(lang,"ARP nima?","What is ARP?")),
     React.createElement(P,null,t(lang,"ARP (Address Resolution Protocol) mantiqiy IP manzilni fizik MAC manzilga bog'laydi. IP — qurilmaning «uy manzili» (o'zgarishi mumkin), MAC — tarmoq kartasiga ishlab chiqaruvchi tomonidan yozilgan doimiy «pasport raqami». Bir tarmoqdagi ikki qurilma bevosita gaplashishi uchun MAC manzil shart — ARP aynan shuni topib beradi.","ARP (Address Resolution Protocol) links a logical IP address to a physical MAC address. IP is a device's «home address» (it can change), MAC is the permanent «passport number» burned into the network card by its maker. Two devices on the same network need the MAC to talk directly — and ARP is what finds it.")),
-    React.createElement(H2,{num:"§2",id:"toc-L6-2"},t(lang,"Interaktiv simulyator: broadcast vs kesh","Interactive simulator: broadcast vs cache")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: broadcast vs kesh","Interactive simulator: broadcast vs cache")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — birinchi so'rov nega BUTUN tarmoqqa yuborilishini va keyingi so'rov nega tezroq bo'lishini solishtiring:","Try both scenarios — compare why the first query is sent to the WHOLE network, and why the next one is faster:")),
     React.createElement(ARPSim),
-    React.createElement(H2,{num:"§3",id:"toc-L6-3"},t(lang,"ARP Request va Reply","ARP Request and Reply")),
+    React.createElement(H2,{num:"§3"},t(lang,"ARP Request va Reply","ARP Request and Reply")),
     React.createElement(CompareCols,{
       left:{title:{uz:"ARP Request","en":"ARP Request"},color:"#3b82f6",rows:[{uz:"Broadcast — LAN dagi HAMMAGA",en:"Broadcast — to EVERYONE on the LAN"},{uz:"Ethernet manzili: FF:FF:FF:FF:FF:FF",en:"Ethernet address: FF:FF:FF:FF:FF:FF"},{uz:"«Bu IP kimda?»",en:"«Who has this IP?»"}]},
       right:{title:{uz:"ARP Reply",en:"ARP Reply"},color:"#22c55e",rows:[{uz:"Unicast — faqat so'rovchiga",en:"Unicast — only to the asker"},{uz:"Faqat IP egasi javob beradi",en:"Only the IP's owner replies"},{uz:"«Bu men, MAC im shu»",en:"«It's me, here's my MAC»"}]}}),
     React.createElement(P,null,t(lang,"Muhim nuans: ARP so'rovi Ethernet darajasida broadcast bo'lgani uchun, LAN dagi barcha qurilmalar uni «eshitadi» — hatto egasi bo'lmaganlar ham. Bu ARP ni ishonchga asoslangan (hech kim javobni tekshirmaydi) va shu bilan birga zaif qiladi.","An important nuance: because an ARP request is a broadcast at the Ethernet level, every device on the LAN «hears» it — even ones that aren't the owner. This makes ARP trust-based (no one verifies the reply) — and therefore vulnerable.")),
-    React.createElement(H2,{num:"§4",id:"toc-L6-4"},t(lang,"Nega bu xavfsizlik uchun muhim","Why this matters for security")),
+    React.createElement(H2,{num:"§4"},t(lang,"Nega bu xavfsizlik uchun muhim","Why this matters for security")),
     React.createElement(P,null,t(lang,"ARP javobni HECH QANDAY tarzda tekshirmaydi — birinchi kelgan «men shu MAC man» javobiga ishonadi. Agar tarmoqdagi hujumchi haqiqiy egasidan OLDIN yoki undan ko'proq soxta javob yuborsa, qurbon uni haqiqiy deb qabul qiladi. Bu — «ARP spoofing» deb ataladi va to'liq tafsilot L24-darsda.","ARP performs NO verification of a reply — it trusts whichever «I'm that MAC» response arrives first. If an attacker on the network sends a fake reply before (or more often than) the real owner, the victim accepts it as genuine. This is called «ARP spoofing», covered in full detail in L24.")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"ARP faqat lokal tarmoq (bir xil segment) ichida ishlaydi — routerdan narigi tomonga o'tmaydi. Shu sababli ARP spoofing faqat bir xil LAN/WiFi ichidagi qurilmalarga xavfli.","ARP only works within the local network (the same segment) — it never crosses a router. That's why ARP spoofing is only a threat to devices on the same LAN/WiFi.")),
-    React.createElement(H2,{num:"§5",id:"toc-L6-5"},t(lang,"Amaliyot: ARP jadvalini ko'rish","Practice: viewing the ARP table")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ARP jadvalini ko'rish","Practice: viewing the ARP table")),
     React.createElement(Terminal,null,"arp -a\n# ? (192.168.1.1)  at 00:11:22:33:44:55 [ether] on eth0  ← router\n# ? (192.168.1.5)  at aa:bb:cc:dd:ee:ff [ether] on eth0  ← C\n\nip neigh          # zamonaviy muqobil (Linux)\n# 192.168.1.5 dev eth0 lladdr aa:bb:cc:dd:ee:ff REACHABLE"),
     React.createElement(Quiz,{q:{uz:"ARP nimani nimaga bog'laydi?",en:"What does ARP link to what?"},opts:[{uz:"Domen nomini IP ga",en:"A domain name to an IP"},{uz:"IP manzilni MAC ga",en:"An IP address to a MAC"},{uz:"Portni protokolga",en:"A port to a protocol"},{uz:"Parolni foydalanuvchiga",en:"A password to a user"}],correct:1,exp:{uz:"ARP mantiqiy IP manzilni fizik MAC manzilga bog'laydi — bir xil LAN ichida to'g'ridan-to'g'ri yetkazish uchun zarur.",en:"ARP links a logical IP address to a physical MAC address — needed for direct delivery within the same LAN."}}));
 }
@@ -2361,21 +2295,21 @@ function LessonL07(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L7-1"},t(lang,"DHCP nima?","What is DHCP?")),
+    React.createElement(H2,{num:"§1"},t(lang,"DHCP nima?","What is DHCP?")),
     React.createElement(P,null,t(lang,"DHCP (Dynamic Host Configuration Protocol) qurilmalarga IP manzilni avtomatik beradi — usiz har bir qurilma uchun IP ni qo'lda kiritishga to'g'ri kelardi. DHCP — mehmonxona qabulxonasi kabi: kelasiz, u sizga xona (IP manzil) va yo'l-yo'riq (gateway, DNS server) beradi, siz ketganingizda esa xona bo'shab qoladi.","DHCP (Dynamic Host Configuration Protocol) automatically hands devices an IP address — without it, you'd have to type one in by hand for every device. DHCP is like a hotel front desk: you arrive and it gives you a room (an IP) and directions (gateway, DNS server), and when you leave the room becomes free again.")),
-    React.createElement(H2,{num:"§2",id:"toc-L7-2"},t(lang,"Interaktiv simulyator: to'liq DORA vs yangilash","Interactive simulator: full DORA vs renewal")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: to'liq DORA vs yangilash","Interactive simulator: full DORA vs renewal")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — qurilma birinchi marta ulanganda va ijara muddati tugashiga yaqinlashganda nima farq qilishini solishtiring:","Try both scenarios — compare what's different when a device first connects versus when its lease is about to expire:")),
     React.createElement(DHCPSim),
-    React.createElement(H2,{num:"§3",id:"toc-L7-3"},t(lang,"DORA — to'rt bosqich","DORA — the four stages")),
+    React.createElement(H2,{num:"§3"},t(lang,"DORA — to'rt bosqich","DORA — the four stages")),
     React.createElement(LayerStack,{layers:[
       {n:"D",name:"Discover",color:"#3b82f6",desc:{uz:"Client: «DHCP server bormi?» — broadcast, chunki hali IP yo'q.",en:"Client: «any DHCP server out there?» — a broadcast, since there's no IP yet."}},
       {n:"O",name:"Offer",color:"#a855f7",desc:{uz:"Server: «mana senga bir manzil» — vaqtincha zaxiralaydi.",en:"Server: «here's an address for you» — reserved temporarily."}},
       {n:"R",name:"Request",color:"#f59e0b",desc:{uz:"Client: «shu manzilni olaman» — bu ham broadcast (boshqa serverlar eshitadi).",en:"Client: «I'll take that one» — also a broadcast (other servers hear it too)."}},
       {n:"A",name:"Acknowledge",color:"#22c55e",desc:{uz:"Server: «tasdiqlandi, ijara N soat» — manzil rasman biriktirildi.",en:"Server: «confirmed, lease N hours» — the address is now officially assigned."}}
     ]}),
-    React.createElement(H2,{num:"§4",id:"toc-L7-4"},t(lang,"Ijara (lease) va uni yangilash","The lease and renewing it")),
+    React.createElement(H2,{num:"§4"},t(lang,"Ijara (lease) va uni yangilash","The lease and renewing it")),
     React.createElement(P,null,t(lang,"Berilgan IP abadiy emas — u ma'lum muddatga «ijaraga» beriladi (masalan 24 soat). Bu manzillarni tejaydi: agar qurilma tarmoqni tark etsa, uning manzili boshqasiga qayta beriladi. Ijara ikki muhim vaqt nuqtasiga ega: T1 (odatda ijaraning ~50% ida) — qurilma o'z serveriga to'g'ridan-to'g'ri (unicast) yangilash so'raydi; agar javob bo'lmasa, T2 da (~87.5%) broadcast orqali HAR QANDAY serverdan so'raydi.","The assigned IP isn't permanent — it's «leased» for a set time (e.g. 24 hours). This saves addresses: if a device leaves the network, its address becomes available again. A lease has two key timers: T1 (usually ~50% of the lease) — the device asks its own server directly (unicast) to renew; if there's no reply, at T2 (~87.5%) it broadcasts to ANY server.")),
-    React.createElement(H2,{num:"§5",id:"toc-L7-5"},t(lang,"Amaliyot: ijarani boshqarish","Practice: managing the lease")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ijarani boshqarish","Practice: managing the lease")),
     React.createElement(P,null,t(lang,"dhclient joriy ijarani bekor qiladi yoki yangisini so'raydi. Windows'da xuddi shu vazifani ipconfig bajaradi.","dhclient releases the current lease or requests a new one. On Windows, ipconfig does the same job.")),
     React.createElement(Terminal,null,"# Linux\nsudo dhclient -r eth0   # eski ijarani qaytarish (DHCPRELEASE)\nsudo dhclient eth0      # yangi manzil so'rash (to'liq DORA)\nip a | grep inet\n# inet 192.168.1.50/24  ← DHCP bergan manzil\n\n# Windows\nipconfig /release\nipconfig /renew"),
     React.createElement(Quiz,{q:{uz:"DHCP DORA jarayonining to'g'ri tartibi?",en:"Correct order of the DHCP DORA process?"},opts:[{uz:"Discover → Offer → Request → Acknowledge",en:"Discover → Offer → Request → Acknowledge"},{uz:"Offer → Discover → Acknowledge → Request",en:"Offer → Discover → Acknowledge → Request"},{uz:"Request → Discover → Offer → Acknowledge",en:"Request → Discover → Offer → Acknowledge"},{uz:"Acknowledge → Request → Offer → Discover",en:"Acknowledge → Request → Offer → Discover"}],correct:0,exp:{uz:"DORA: Discover (so'rov) → Offer (taklif) → Request (tasdiq) → Acknowledge (yakun).",en:"DORA: Discover → Offer → Request → Acknowledge."}}));
@@ -2384,19 +2318,19 @@ function LessonL08(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L8-1"},t(lang,"Routing nima?","What is routing?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Routing nima?","What is routing?")),
     React.createElement(P,null,t(lang,"Routing — paketlarni bir tarmoqdan boshqasiga yo'naltirish jarayoni. Router — tarmoqlararo «chorraha politsiyachisi»: har paketning manzilini ko'rib, to'g'ri yo'nalishga jo'natadi. Internet — millionlab routerlar orqali bog'langan tarmoqlar to'ri; hech bir router butun yo'lni bilmaydi, faqat «keyingi qadam» qayerga ekanini biladi.","Routing is the process of directing packets from one network to another. A router is the «traffic officer» between networks: it reads each packet's destination and sends it the right way. The internet is a web of networks joined by millions of routers; no single router knows the whole path, only where the «next step» is.")),
-    React.createElement(H2,{num:"§2",id:"toc-L8-2"},t(lang,"Interaktiv simulyator: bir xil tarmoq vs uzoq manzil","Interactive simulator: same network vs a distant destination")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: bir xil tarmoq vs uzoq manzil","Interactive simulator: same network vs a distant destination")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — nega ba'zan router umuman kerak emasligini va uzoq manzilga borishda TTL nima uchun kamayib borishini ko'ring:","Try both scenarios — see why sometimes a router isn't needed at all, and why TTL decreases on the way to a distant destination:")),
     React.createElement(RoutingSim),
-    React.createElement(H2,{num:"§3",id:"toc-L8-3"},t(lang,"Marshrutlash jadvali va uzatish qarori","The routing table and the forwarding decision")),
+    React.createElement(H2,{num:"§3"},t(lang,"Marshrutlash jadvali va uzatish qarori","The routing table and the forwarding decision")),
     React.createElement(P,null,t(lang,"Har router o'z marshrutlash jadvaliga ega — «qaysi tarmoq qaysi interfeys/keyingi router orqali yetadi» ro'yxati. Bir nechta yozuv mos kelsa, ENG ANIQ (longest prefix match) tanlanadi — masalan 8.8.8.0/24 8.0.0.0/8 dan ustun turadi. Hech qanday aniq yozuv topilmasa, standart yo'l (0.0.0.0/0) ishlatiladi.","Every router has its own routing table — a list of «which network is reachable via which interface/next router». If several entries match, the MOST SPECIFIC one wins (longest prefix match) — e.g. 8.8.8.0/24 beats 8.0.0.0/8. If nothing matches at all, the default route (0.0.0.0/0) is used.")),
     React.createElement(Terminal,null,"ip route\n# default via 192.168.1.1 dev eth0     ← standart (hech narsa mos kelmasa)\n# 192.168.1.0/24 dev eth0 proto kernel  ← lokal tarmoq (eng aniq)\n# 10.8.0.0/24 via 192.168.1.1 dev eth0  ← VPN tarmog'i"),
-    React.createElement(H2,{num:"§4",id:"toc-L8-4"},t(lang,"Statik va dinamik marshrutlash","Static vs dynamic routing")),
+    React.createElement(H2,{num:"§4"},t(lang,"Statik va dinamik marshrutlash","Static vs dynamic routing")),
     React.createElement(CompareCols,{
       left:{title:{uz:"Statik marshrut",en:"Static route"},color:"#f59e0b",rows:[{uz:"Administrator qo'lda kiritadi",en:"Admin enters it by hand"},{uz:"Kichik, o'zgarmas tarmoq uchun",en:"For small, stable networks"},{uz:"To'liq nazorat, lekin moslashmaydi",en:"Full control, but doesn't adapt"}]},
       right:{title:{uz:"Dinamik (RIP/OSPF/BGP)",en:"Dynamic (RIP/OSPF/BGP)"},color:"#3b82f6",rows:[{uz:"Routerlar bir-biridan avtomatik o'rganadi",en:"Routers learn from each other automatically"},{uz:"Katta, o'zgaruvchan tarmoqlar uchun",en:"For large, changing networks"},{uz:"Uzilishga tez moslashadi",en:"Adapts quickly to outages"}]}}),
-    React.createElement(H2,{num:"§5",id:"toc-L8-5"},t(lang,"Amaliyot: yo'lni kuzatish","Practice: tracing the path")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: yo'lni kuzatish","Practice: tracing the path")),
     React.createElement(P,null,t(lang,"traceroute aynan simulyatordagi mexanizmdan foydalanadi: TTL=1 bilan paket yuboradi, birinchi router uni rad etib xato qaytaradi (shu bilan o'zini oshkor qiladi), so'ng TTL=2, va hokazo — har hop shu tarzda ochiladi.","traceroute uses exactly the mechanism from the simulator: it sends a packet with TTL=1, the first router rejects it and reports back (revealing itself), then TTL=2, and so on — each hop is uncovered this way.")),
     React.createElement(Terminal,null,"traceroute 8.8.8.8\n#  1  192.168.1.1     1.2 ms   ← R1 (uy routeri)\n#  2  10.20.0.1       8.5 ms   ← R2 (ISP)\n#  3  72.14.exchange   12 ms   ← R3 (magistral)\n#  4  dns.google       15 ms   ← manzil"),
     React.createElement(Quiz,{q:{uz:"Router aniq yo'l topmasa, paketni qayerga yuboradi?",en:"With no specific route, where does a router send the packet?"},opts:[{uz:"O'chiradi",en:"Drops it"},{uz:"Default gateway ga",en:"To the default gateway"},{uz:"Orqaga qaytaradi",en:"Back to sender"},{uz:"DNS ga",en:"To DNS"}],correct:1,exp:{uz:"Aniq yo'l bo'lmasa, paket standart (default) yo'l — 0.0.0.0/0 — orqali default gateway ga yuboriladi.",en:"With no specific route, the packet is sent via the default route — 0.0.0.0/0 — to the default gateway."}}));
@@ -2405,13 +2339,13 @@ function LessonL09(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L9-1"},t(lang,"Switch nima?","What is a switch?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Switch nima?","What is a switch?")),
     React.createElement(P,null,t(lang,"Switch — lokal tarmoqdagi qurilmalarni bog'lovchi «aqlli tarqatgich». U har portdagi qurilmaning MAC manzilini o'rganib, ichki jadvalga yozadi va keyingi frame'larni faqat kerakli portga yuboradi. Eski «hub» esa hech narsani bilmasdi — kelgan signalni HAMMA portga takrorlar edi, xuddi butun sinfga baqirganday. Switch esa aniq odamga pichirlaydi.","A switch is the «smart distributor» connecting devices on a LAN. It learns each port's device MAC address, writes it to an internal table, and sends future frames only to the right port. An old «hub» knew nothing — it repeated every signal to EVERY port, like shouting to the whole classroom. A switch whispers to the exact person.")),
     React.createElement(NodeMap,{label:{uz:"Yulduz (star): hamma switchga ulanadi",en:"Star: everyone connects to the switch"},nodes:[[140,80,"SW"],[140,25],[205,50],[205,110],[140,135],[75,110],[75,50]],links:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6]]}),
-    React.createElement(H2,{num:"§2",id:"toc-L9-2"},t(lang,"Interaktiv simulyator: VLAN izolyatsiyasi vs hub","Interactive simulator: VLAN isolation vs a hub")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: VLAN izolyatsiyasi vs hub","Interactive simulator: VLAN isolation vs a hub")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — VLAN bilan trafik nega faqat o'z bo'limiga yetishini va VLAN bo'lmasa (oddiy hub) nima xato ketishini solishtiring:","Try both scenarios — see why traffic with VLANs only reaches its own department, and what goes wrong without VLANs (a plain hub):")),
     React.createElement(VLANSim),
-    React.createElement(H2,{num:"§3",id:"toc-L9-3"},t(lang,"VLAN nima?","What is a VLAN?")),
+    React.createElement(H2,{num:"§3"},t(lang,"VLAN nima?","What is a VLAN?")),
     React.createElement(P,null,t(lang,"VLAN (Virtual LAN) bitta fizik switchni bir necha mustaqil mantiqiy tarmoqqa bo'ladi — katta ofisni devorlar bilan alohida xonalarga bo'lgandek. Bir xil switch'ga ulangan bo'lsa ham, turli VLAN'dagi portlar bir-birining broadcast trafigini UMUMAN ko'rmaydi — bu alohida fizik switch qo'ygandek samarali, lekin kabellarsiz.","A VLAN (Virtual LAN) splits one physical switch into several independent logical networks — like dividing a big office into separate rooms with walls. Even though connected to the same switch, ports on different VLANs never see each other's broadcast traffic at all — as effective as separate physical switches, but without the extra cabling.")),
     React.createElement(LayerStack,{layers:[
       {n:"10",name:t(lang,"VLAN 10","VLAN 10"),color:"#ef4444",desc:{uz:"Buxgalteriya — 10.0.10.0/24",en:"Accounting — 10.0.10.0/24"}},
@@ -2419,13 +2353,13 @@ function LessonL09(){
       {n:"30",name:t(lang,"VLAN 30","VLAN 30"),color:"#22c55e",desc:{uz:"Mehmonlar — 10.0.30.0/24 (eng cheklangan)",en:"Guests — 10.0.30.0/24 (most restricted)"}}
     ]}),
     React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,"Trunk: "),t(lang,"VLAN'lar orasida (masalan ikki switch orasida) trafikni tashiydigan maxsus port «trunk» deyiladi — u bir nechta VLAN'ni bitta jismoniy havola orqali, har frame'ni 802.1Q teg bilan belgilab tashiydi.","A special port that carries traffic between VLANs (e.g. between two switches) is called a «trunk» — it carries several VLANs over one physical link, tagging each frame with 802.1Q.")),
-    React.createElement(H2,{num:"§4",id:"toc-L9-4"},t(lang,"Hub, switch va router","Hub, switch and router")),
+    React.createElement(H2,{num:"§4"},t(lang,"Hub, switch va router","Hub, switch and router")),
     React.createElement(LayerStack,{layers:[
       {n:"L1",name:t(lang,"Hub","Hub"),color:"#ef4444",desc:{uz:"Hamma portga takrorlaydi — eski, samarasiz va xavfsiz emas.",en:"Repeats to every port — old, inefficient and insecure."}},
       {n:"L2",name:t(lang,"Switch","Switch"),color:"#22c55e",desc:{uz:"MAC jadvali bo'yicha faqat kerakli portga (2-qatlam). VLAN bilan izolyatsiya qo'shadi.",en:"By MAC table, only to the right port (layer 2). VLANs add isolation on top."}},
       {n:"L3",name:t(lang,"Router","Router"),color:"#3b82f6",desc:{uz:"Tarmoqlar (shu jumladan VLAN'lar) orasida — 3-qatlam, IP asosida (L08 darsi).",en:"Between networks (including VLANs) — layer 3, IP-based (see L08)."}}
     ]}),
-    React.createElement(H2,{num:"§5",id:"toc-L9-5"},t(lang,"Amaliyot: VLAN'larni ko'rish","Practice: viewing VLANs")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: VLAN'larni ko'rish","Practice: viewing VLANs")),
     React.createElement(P,null,t(lang,"Boshqariladigan switch'da VLAN sozlamalari va qaysi portlar qaysi VLAN'ga tegishli ekanini ko'rish mumkin.","On a managed switch you can see the VLAN configuration and which ports belong to which VLAN.")),
     React.createElement(Terminal,null,"# switchda (Cisco IOS uslubi)\nshow vlan brief\n# VLAN Name        Status   Ports\n# 10   Accounting  active   Gi0/1, Gi0/2\n# 20   IT          active   Gi0/3, Gi0/4\n# 30   Guest       active   Gi0/5\n# → VLAN 30 (mehmon) VLAN 10/20 trafigini ko'ra olmaydi"),
     React.createElement(Quiz,{q:{uz:"VLAN nima uchun ishlatiladi?",en:"What is a VLAN used for?"},opts:[{uz:"Internet tezligini oshirish",en:"Boosting internet speed"},{uz:"Bitta switchni mantiqan alohida tarmoqlarga bo'lish",en:"Logically splitting one switch into separate networks"},{uz:"Parol saqlash",en:"Storing passwords"},{uz:"IP berish",en:"Handing out IPs"}],correct:1,exp:{uz:"VLAN bitta fizik switchni bir necha mantiqiy tarmoqqa bo'ladi — bo'limlarni ajratib xavfsizlik va tartib beradi.",en:"A VLAN splits one physical switch into several logical networks — separating departments for security and order."}}));
@@ -2434,20 +2368,20 @@ function LessonL10(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L10-1"},t(lang,"NAT nima?","What is NAT?")),
+    React.createElement(H2,{num:"§1"},t(lang,"NAT nima?","What is NAT?")),
     React.createElement(P,null,t(lang,"NAT (Network Address Translation) ko'plab xususiy IP manzilni bitta ommaviy IP ga aylantiradi. Uydagi barcha qurilma (telefon, noutbuk, aqlli TV) internetga bitta ommaviy IP orqali chiqadi — ofis kommutatori kabi: tashqaridan bitta telefon raqami ko'rinadi, ichkarida esa ko'p ichki raqam bor.","NAT (Network Address Translation) turns many private IP addresses into one public IP. Every device at home (phone, laptop, smart TV) reaches the internet through a single public IP — like an office switchboard: one phone number is visible from outside, but there are many extensions inside.")),
-    React.createElement(H2,{num:"§2",id:"toc-L10-2"},t(lang,"Interaktiv simulyator: NAT jadvali","Interactive simulator: the NAT table")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: NAT jadvali","Interactive simulator: the NAT table")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — chiquvchi ulanishlar NAT jadvalini qanday to'ldirishini va kiruvchi javob shu jadval yordamida to'g'ri qurilmani qanday topishini ko'ring:","Try both scenarios — see how outbound connections fill the NAT table, and how an inbound reply uses that table to find the right device:")),
     React.createElement(NATSim),
-    React.createElement(H2,{num:"§3",id:"toc-L10-3"},t(lang,"Nega NAT kerak?","Why is NAT needed?")),
+    React.createElement(H2,{num:"§3"},t(lang,"Nega NAT kerak?","Why is NAT needed?")),
     React.createElement(P,null,t(lang,"IPv4 manzillari cheklangan (~4.3 milliard), qurilmalar esa milliardlab. NAT bitta ommaviy IP ni ko'p qurilma bilan ulashadi — bu manzillarni tejaydi va IPv6 ga to'liq o'tishni kechiktirishga yordam bergan asosiy omillardan biri bo'lgan. Qo'shimcha samara sifatida, ichki qurilmalar internetdan to'g'ridan-to'g'ri ko'rinmaydi.","IPv4 addresses are limited (~4.3 billion), while devices number in the billions. NAT shares one public IP among many devices — saving addresses, and it's one of the main reasons the full move to IPv6 has been delayed. As a side effect, internal devices aren't directly visible from the internet.")),
-    React.createElement(H2,{num:"§4",id:"toc-L10-4"},t(lang,"NAT turlari: SNAT, DNAT, PAT","NAT types: SNAT, DNAT, PAT")),
+    React.createElement(H2,{num:"§4"},t(lang,"NAT turlari: SNAT, DNAT, PAT","NAT types: SNAT, DNAT, PAT")),
     React.createElement(LayerStack,{layers:[
       {n:"SNAT",name:t(lang,"Source NAT","Source NAT"),color:"#4dabf7",desc:{uz:"Chiquvchi: ichki IP → ommaviy IP. Simulyatordagi «Chiquvchi» ssenariysi aynan shu.",en:"Outbound: internal IP → public IP. Exactly the «Outbound» scenario in the simulator."}},
       {n:"DNAT",name:t(lang,"Destination NAT","Destination NAT"),color:"#69db7c",desc:{uz:"Kiruvchi: ommaviy → ichki server (port forwarding — masalan uy serveringizni ochish uchun).",en:"Inbound: public → internal server (port forwarding — e.g. to expose your home server)."}},
       {n:"PAT",name:t(lang,"Port Address Translation","Port Address Translation"),color:"#a855f7",desc:{uz:"Ko'p qurilma bitta ommaviy IP, lekin har biri boshqa tashqi port bilan ajratiladi.",en:"Many devices, one public IP, but each is distinguished by a different external port."}}
     ]}),
-    React.createElement(H2,{num:"§5",id:"toc-L10-5"},t(lang,"Amaliyot: NAT jadvalini ko'rish","Practice: viewing the NAT table")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: NAT jadvalini ko'rish","Practice: viewing the NAT table")),
     React.createElement(P,null,t(lang,"Linux'da iptables NAT jadvalini boshqaradi; conntrack esa faol tarjima yozuvlarini (simulyatordagi jadval — jonli holatda) ko'rsatadi.","On Linux, iptables manages the NAT rules; conntrack shows the active translation entries (the table from the simulator — live)." )),
     React.createElement(Terminal,null,"sudo iptables -t nat -L -n\n# Chain POSTROUTING (policy ACCEPT)\n# MASQUERADE  all  --  192.168.1.0/24  0.0.0.0/0   ← SNAT/PAT qoidasi\n\nsudo conntrack -L | head -3\n# tcp 6 431999 ESTABLISHED src=192.168.1.6 dst=93.184.216.34\n#   sport=49500 dport=443 src=93.184.216.34 dst=203.0.113.7\n#   sport=443 dport=40002   ← aynan simulyatordagi B yozuvi"),
     React.createElement(Quiz,{q:{uz:"NAT ning asosiy foydasi nima?",en:"What is the main benefit of NAT?"},opts:[{uz:"Ma'lumotni shifrlaydi",en:"Encrypts data"},{uz:"Ko'p qurilmaga bitta ommaviy IP ni ulashadi",en:"Shares one public IP among many devices"},{uz:"DNS ni tezlashtiradi",en:"Speeds up DNS"},{uz:"Parolni tekshiradi",en:"Checks passwords"}],correct:1,exp:{uz:"NAT ko'plab xususiy manzilni bitta ommaviy IP ga aylantiradi — kam IPv4 ni tejaydi va ichki qurilmalarni yashiradi.",en:"NAT maps many private addresses to one public IP — saving scarce IPv4 and hiding internal devices."}}));
@@ -2462,18 +2396,18 @@ function LessonL11(){
   ];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L11-1"},t(lang,"Topologiya nima?","What is a topology?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Topologiya nima?","What is a topology?")),
     React.createElement(P,null,t(lang,"Tarmoq topologiyasi — qurilmalar bir-biriga qanday ulanganining «shakli». Shahar ko'chalarini turlicha rejalashtirish mumkin bo'lgani kabi, tarmoqni ham turli shakllarda qurish mumkin. Har birining afzallik va kamchiligi bor — ayniqsa bitta kabel uzilganda nima bo'lishi bo'yicha.","A network topology is the «shape» of how devices connect. Like a city's streets can be laid out differently, a network can be built in different shapes. Each has pros and cons — especially in what happens when one cable is cut.")),
-    React.createElement(H2,{num:"§2",id:"toc-L11-2"},t(lang,"Asosiy topologiyalar","Main topologies")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy topologiyalar","Main topologies")),
     React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12}},
       maps.map(function(m,i){return React.createElement(NodeMap,{key:i,label:m.label,color:m.color,nodes:m.nodes,links:m.links});})),
-    React.createElement(H2,{num:"§3",id:"toc-L11-3"},t(lang,"Interaktiv simulyator: kabel uzilsa nima bo'ladi?","Interactive simulator: what happens if a cable is cut?")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: kabel uzilsa nima bo'ladi?","Interactive simulator: what happens if a cable is cut?")),
     React.createElement(P,null,t(lang,"Har topologiyani tanlang va bitta kabel uzilganda aynan nechta qurilma tarmoqdan ajralishini ko'ring — bu topologiyalarni solishtirishning ASOSIY sababi:","Pick each topology and see exactly how many devices drop off the network when one cable is cut — this is the MAIN reason topologies are compared:")),
     React.createElement(TopoSim),
     React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Amalda: ","In practice: ")),t(lang,"zamonaviy tarmoqlar deyarli har doim Star topologiyasidan foydalanadi — bitta uzilish faqat bitta qurilmaga ta'sir qiladi, qolganlari ishlayveradi. Katta korxonalar esa muhim aloqalar uchun Mesh (yoki uning gibrid variantlari) qo'shadi.","modern networks almost always use Star topology — one break affects only one device, the rest keep working. Large enterprises add Mesh (or hybrid variants of it) for critical links.")),
-    React.createElement(H2,{num:"§4",id:"toc-L11-4"},t(lang,"Topologiyalarni solishtirish","Comparing topologies")),
+    React.createElement(H2,{num:"§4"},t(lang,"Topologiyalarni solishtirish","Comparing topologies")),
     React.createElement(CompareCols,{left:{title:{uz:"Yulduz (Star)",en:"Star"},color:"#69db7c",rows:[{uz:"Markazda switch/router",en:"A switch/router in the center"},{uz:"Bitta uzilsa — faqat o'zi",en:"One fails — only itself"},{uz:"Eng keng tarqalgan",en:"The most common"},]},right:{title:{uz:"Halqa/Shina (Ring/Bus)",en:"Ring/Bus"},color:"#ff6b6b",rows:[{uz:"Bitta uzilish hammani buzadi",en:"One break can down all"},{uz:"Eski, kam ishlatiladi",en:"Old, rarely used"},{uz:"Kabel tejaydi",en:"Saves cabling"},]}}),
-    React.createElement(H2,{num:"§5",id:"toc-L11-5"},t(lang,"Amaliyot: yetib borishni tekshirish","Practice: checking reachability")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: yetib borishni tekshirish","Practice: checking reachability")),
     React.createElement(P,null,t(lang,"ping qurilmaga yetib borish mumkinligini, traceroute yo'lni ko'rsatadi. Yulduz topologiyasida barcha yo'l markaziy qurilmadan o'tadi.","ping checks whether a device is reachable, traceroute shows the path. In a star topology every path goes through the central device.")),
     React.createElement(Terminal,null,"ping -c3 192.168.1.20\n# 64 bytes from 192.168.1.20: icmp_seq=1 ttl=64 time=0.8 ms\n# 3 packets transmitted, 3 received, 0% packet loss\nfping -a -g 192.168.1.0/24 2>/dev/null   # butun tarmoqni tez"),
 React.createElement(Quiz,{q:{uz:"Qaysi topologiyada bitta qurilma uzilsa ham qolganlari ishlayveradi va u eng keng tarqalgan?",en:"In which topology do the rest keep working if one device fails, and which is most common?"},opts:[{uz:"Bus",en:"Bus"},{uz:"Star (yulduz)",en:"Star"},{uz:"Ring (halqa)",en:"Ring"},{uz:"Hech qaysi",en:"None"}],correct:1,exp:{uz:"Star da hamma markaziy switchга ulanadi — bitta uzilса boshqalarga ta'sir qilmaydi. Shu sababli eng keng tarqalgan.",en:"In Star everyone connects to a central switch — one failure doesn't affect others. That's why it's most common."}}));
@@ -2483,18 +2417,18 @@ function LessonL12(){
   const std=[["802.11n","WiFi 4","600 Mbps"],["802.11ac","WiFi 5",{uz:"bir necha Gbps",en:"several Gbps"}],["802.11ax","WiFi 6",{uz:"gavjum joyda yaxshi",en:"better in crowds"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L12-1"},t(lang,"Simsiz tarmoq nima?","What is a wireless network?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Simsiz tarmoq nima?","What is a wireless network?")),
     React.createElement(P,null,t(lang,"WiFi — kabel o'rniga radio to'lqinlari orqali ma'lumot uzatadi. Qurilmangiz access point (router) bilan radio orqali gaplashadi. Havoda hamma «eshitishi» mumkin — devor orqasidagi qo'shni ham signalni qabul qiladi — shuning uchun shifrlash kabelli tarmoqdan ham muhimroq.","WiFi sends data over radio waves instead of cables. Your device talks to an access point (router) by radio. Anyone in the air can «hear» it — even a neighbor through the wall receives the signal — which is why encryption matters even more than on a wired network.")),
     React.createElement(PacketFlow,{from:{uz:"Qurilma",en:"Device"},to:{uz:"Access Point",en:"Access Point"},label:{uz:"radio to'lqin",en:"radio waves"}}),
-    React.createElement(H2,{num:"§2",id:"toc-L12-2"},t(lang,"Interaktiv simulyator: WPA2/WPA3 vs ochiq tarmoq","Interactive simulator: WPA2/WPA3 vs an open network")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: WPA2/WPA3 vs ochiq tarmoq","Interactive simulator: WPA2/WPA3 vs an open network")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xavfsiz tarmoqqa ulanishda parolning o'zi nega hech qachon havoda uzatilmasligini va ochiq tarmoqda nega hamma narsa ochiq ekanini solishtiring:","Try both scenarios — see why the password itself is never transmitted over the air when joining a secure network, and why everything is exposed on an open one:")),
     React.createElement(WiFiSim),
-    React.createElement(H2,{num:"§3",id:"toc-L12-3"},t(lang,"WiFi standartlari","WiFi standards")),
+    React.createElement(H2,{num:"§3"},t(lang,"WiFi standartlari","WiFi standards")),
     std.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
       React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:700,color:"var(--accent)",fontSize:11.5,minWidth:80}},s[0]),
       React.createElement("span",{style:{fontSize:12,fontWeight:600,color:"var(--text-0)",minWidth:56}},s[1]),
       React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},typeof s[2]==="string"?s[2]:t(lang,s[2].uz,s[2].en)));}),
-    React.createElement(H2,{num:"§4",id:"toc-L12-4"},t(lang,"WiFi shifrlash avlodlari","WiFi encryption generations")),
+    React.createElement(H2,{num:"§4"},t(lang,"WiFi shifrlash avlodlari","WiFi encryption generations")),
     React.createElement(LayerStack,{layers:[
       {n:"WEP",name:"WEP",color:"#ff6b6b",desc:{uz:"Buzilgan — statik kalit + zaif RC4. Bir necha daqiqada ochiladi. Ishlatmang.",en:"Broken — static key + weak RC4. Cracked within minutes. Do not use."}},
       {n:"WPA",name:"WPA",color:"#ffa94d",desc:{uz:"Eskirgan, zaif (TKIP) — WEP dan yaxshiroq, lekin hozir ishonchsiz.",en:"Outdated, weak (TKIP) — better than WEP, but untrustworthy today."}},
@@ -2502,7 +2436,7 @@ function LessonL12(){
       {n:"WPA3",name:"WPA3",color:"#69db7c",desc:{uz:"Eng yangi — kuchsiz parolga ham chidamli (SAE). Tavsiya etiladi.",en:"The newest — resistant even to weak passwords (SAE). Recommended."}}
     ]}),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"WEP ni hech qachon ishlatmang — bir necha daqiqada buziladi. Kamida WPA2, imkon bo'lsa WPA3 va kuchli parol qo'ying.","Never use WEP — it cracks in minutes. Use at least WPA2, ideally WPA3, with a strong password.")),
-    React.createElement(H2,{num:"§5",id:"toc-L12-5"},t(lang,"Amaliyot: atrofdagi tarmoqlar","Practice: nearby networks")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: atrofdagi tarmoqlar","Practice: nearby networks")),
     React.createElement(P,null,t(lang,"nmcli yaqin-atrofdagi WiFi tarmoqlarini va ularning xavfsizlik turini ko'rsatadi. Ochiq (--) yoki WEP tarmoq — jiddiy xavf belgisi.","nmcli shows nearby WiFi networks and their security type. An open (--) or WEP network is a serious risk sign.")),
     React.createElement(Terminal,null,"nmcli dev wifi list\n# SSID          SIGNAL  SECURITY\n# HomeNet       92      WPA2\n# Office_5G     78      WPA3\n# FreeWiFi      65      --      ← ochiq, xavfli!"),
 React.createElement(Quiz,{q:{uz:"Uy WiFi uchun bugun qaysi shifrlash tavsiya etiladi?",en:"Which encryption is recommended for home WiFi today?"},opts:[{uz:"WEP",en:"WEP"},{uz:"Ochiq (shifrsiz)",en:"Open (none)"},{uz:"WPA2 yoki WPA3",en:"WPA2 or WPA3"},{uz:"HTTP",en:"HTTP"}],correct:2,exp:{uz:"WPA2 (yoki yangiroq WPA3) zamonaviy va xavfsiz. WEP buzilgan.",en:"WPA2 (or newer WPA3) is modern and secure. WEP is broken."}}));
@@ -2511,29 +2445,29 @@ function LessonL14(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L14-1"},t(lang,"VPN nima?","What is a VPN?")),
+    React.createElement(H2,{num:"§1"},t(lang,"VPN nima?","What is a VPN?")),
     React.createElement(P,null,t(lang,"VPN (Virtual Private Network) — ochiq internet ustidan xavfsiz, shifrlangan «tunnel» quradi. Ma'lumotingiz ochiq tarmoqdan o'tsa ham, shifrlangan quvur ichida ketadi — gavjum ko'cha ostidagi yashirin yer osti yo'li kabi. Ikki narsani beradi: MAXFIYLIK (o'rtadagi hech kim — provayder, ochiq WiFi dagi xaker — ichini o'qiy olmaydi) va PRIVAT TARMOQQA KIRISH (uydan ofis tarmog'iga xuddi ichkarida turgandek ulanasiz).","A VPN (Virtual Private Network) builds a secure, encrypted «tunnel» over the public internet. Even crossing an open network, your data travels inside an encrypted pipe — like a hidden tunnel beneath a busy street. It gives two things: PRIVACY (no one in the middle — your ISP, a hacker on public WiFi — can read the contents) and PRIVATE-NETWORK ACCESS (you reach the office network from home as if you were inside).")),
-    React.createElement(H2,{num:"§2",id:"toc-L14-2"},t(lang,"Interaktiv simulyator: VPN YO'Q vs YONIQ","Interactive simulator: VPN off vs on")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: VPN YO'Q vs YONIQ","Interactive simulator: VPN off vs on")),
     React.createElement(P,null,t(lang,"Paket sizdan saytga borishda o'rtadagi xaker/provayder yonidan o'tadi. Ikkala tugmani bosing va o'rtadagi kuzatuvchi NIMA ko'rishini solishtiring:","Your packet passes the hacker/ISP in the middle on its way to the site. Press both buttons and compare WHAT the middle observer sees:")),
     React.createElement(VPNSim),
-    React.createElement(H2,{num:"§3",id:"toc-L14-3"},t(lang,"VPN nima qiladi va NIMA qilmaydi","What a VPN does and does NOT do")),
+    React.createElement(H2,{num:"§3"},t(lang,"VPN nima qiladi va NIMA qilmaydi","What a VPN does and does NOT do")),
     React.createElement(CompareCols,{
       left:{title:{uz:"✓ VPN himoyalaydi",en:"✓ A VPN protects"},color:"#22c55e",rows:[{uz:"Trafikni yo'lda shifrlaydi (provayder/WiFi ko'rmaydi)",en:"Encrypts traffic in transit (ISP/WiFi can't see)"},{uz:"Haqiqiy IP manzilingizni saytdan yashiradi",en:"Hides your real IP from the website"},{uz:"Privat (ofis) tarmoqqa xavfsiz ulaydi",en:"Securely connects you to a private (office) network"}]},
       right:{title:{uz:"✗ VPN himoyalamaydi",en:"✗ A VPN does NOT"},color:"#ef4444",rows:[{uz:"Sizni VPN provayderining o'zidan yashirmaydi (unga ishonasiz)",en:"Hide you from the VPN provider itself (you trust it)"},{uz:"Virus/fishing/zararli saytdan himoya qilmaydi",en:"Stop malware/phishing/malicious sites"},{uz:"VPN serveridan keyin trafik shifrsiz bo'lishi mumkin",en:"Encrypt traffic beyond the VPN server"}]}}),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"VPN sizni to'liq «ko'rinmas» qilmaydi — u faqat trafikni yo'lda shifrlaydi. VPN provayderiga ishonishingiz kerak; bepul VPN lar ko'pincha ma'lumotingizni yig'adi yoki sotadi.","A VPN doesn't make you fully «invisible» — it only encrypts traffic in transit. You must trust the provider; free VPNs often collect or sell your data.")),
-    React.createElement(H2,{num:"§4",id:"toc-L14-4"},t(lang,"VPN protokollari","VPN protocols")),
+    React.createElement(H2,{num:"§4"},t(lang,"VPN protokollari","VPN protocols")),
     React.createElement(LayerStack,{layers:[
       {n:"WG",name:t(lang,"WireGuard","WireGuard"),color:"#22c55e",desc:{uz:"Zamonaviy va tavsiya etiladi. Juda kichik kod (~4000 qator — tekshirish oson), ChaCha20-Poly1305 shifri, UDP. Juda tez, Linux yadrosida.",en:"Modern and recommended. Very small codebase (~4,000 lines — easy to audit), ChaCha20-Poly1305, UDP. Very fast, in the Linux kernel."}},
       {n:"OVPN",name:t(lang,"OpenVPN","OpenVPN"),color:"#3b82f6",desc:{uz:"Yetuk va keng qo'llaniladi. OpenSSL (AES-GCM), TCP yoki UDP (port 1194). Juda moslashuvchan, lekin WireGuard'dan sekinroq.",en:"Mature and widely used. OpenSSL (AES-GCM), TCP or UDP (port 1194). Very flexible, but slower than WireGuard."}},
       {n:"IPsec",name:t(lang,"IPsec / IKEv2","IPsec / IKEv2"),color:"#a855f7",desc:{uz:"Sanoat standarti, 3-qatlamda ishlaydi. IKEv2 mobil uchun zo'r (tarmoq o'zgarsa tez qayta ulanadi). Ofis-ofis (site-to-site) uchun keng tarqalgan.",en:"Industry standard, works at layer 3. IKEv2 is great for mobile (reconnects fast when the network changes). Common for site-to-site."}},
       {n:"PPTP",name:t(lang,"PPTP / L2TP (eski)","PPTP / L2TP (legacy)"),color:"#ef4444",desc:{uz:"ESKIRGAN — PPTP buzilgan (MS-CHAPv2 zaif), ishlatmang. Faqat tarixiy misol uchun.",en:"OBSOLETE — PPTP is broken (weak MS-CHAPv2), do not use. Only a historical example."}}
     ]}),
-    React.createElement(H2,{num:"§5",id:"toc-L14-5"},t(lang,"Tunnel turlari","Tunnel types")),
+    React.createElement(H2,{num:"§5"},t(lang,"Tunnel turlari","Tunnel types")),
     React.createElement(CompareCols,{
       left:{title:{uz:"Remote-access",en:"Remote-access"},color:"#3b82f6",rows:[{uz:"Bitta foydalanuvchi → tarmoq",en:"One user → a network"},{uz:"Masofadan ishlash (uydan ofisga)",en:"Remote work (home → office)"},{uz:"Odatda WireGuard/OpenVPN",en:"Usually WireGuard/OpenVPN"}]},
       right:{title:{uz:"Site-to-site",en:"Site-to-site"},color:"#22c55e",rows:[{uz:"Ofis ↔ ofis (tarmoq ↔ tarmoq)",en:"Office ↔ office (network ↔ network)"},{uz:"Doimiy tunnel, foydalanuvchi ilovasisiz",en:"A permanent tunnel, no user app"},{uz:"Odatda IPsec",en:"Usually IPsec"}]}}),
     React.createElement(P,null,t(lang,"Yana bir farq: to'liq tunnel (full-tunnel) — BARCHA trafik VPN orqali ketadi (xavfsizroq); bo'lingan tunnel (split-tunnel) — faqat ba'zi trafik VPN orqali, qolgani to'g'ridan-to'g'ri (tezroq, lekin kamroq himoyalangan).","One more distinction: full-tunnel — ALL traffic goes through the VPN (more secure); split-tunnel — only some traffic goes through the VPN, the rest goes directly (faster, but less protected).")),
-    React.createElement(H2,{num:"§6",id:"toc-L14-6"},t(lang,"Amaliyot: WireGuard","Practice: WireGuard")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: WireGuard","Practice: WireGuard")),
     React.createElement(P,null,t(lang,"WireGuard'da har tomon kalit juftligiga (private/public) ega. wg show tunnel holatini, so'nggi handshake va o'tgan trafikni ko'rsatadi; wg-quick tunnelni yoqadi/o'chiradi.","In WireGuard each side has a key pair (private/public). wg show displays the tunnel status, the last handshake and transferred traffic; wg-quick brings the tunnel up/down.")),
     React.createElement(Terminal,null,"sudo wg-quick up wg0            # tunnelni yoqish\nsudo wg show\n# interface: wg0   public key: xTIB...=   listening port: 51820\n# peer: 3.5.7.9:51820\n#   latest handshake: 12 seconds ago\n#   transfer: 1.24 MiB received, 890 KiB sent\nip a show wg0\n# inet 10.8.0.2/24               ← VPN ichidagi manzil"),
     React.createElement(Quiz,{q:{uz:"VPN YONIQ bo'lganda o'rtadagi xaker/provayder trafikda nimani ko'radi?",en:"With the VPN ON, what does the hacker/ISP in the middle see in the traffic?"},opts:[{uz:"Login va parolni ochiq matnda",en:"The login and password in plain text"},{uz:"Faqat tushunarsiz shifrlangan ma'lumot",en:"Only unreadable encrypted data"},{uz:"Hech narsa — internet o'chadi",en:"Nothing — the internet turns off"},{uz:"Faqat rasmlarni",en:"Only images"}],correct:1,exp:{uz:"VPN trafikni yo'lda shifrlaydi, shuning uchun o'rtadagi kuzatuvchi faqat tushunarsiz shifrlangan ma'lumotni ko'radi — login/parol himoyalangan.",en:"A VPN encrypts traffic in transit, so the middle observer sees only unreadable ciphertext — the login/password is protected."}}));
@@ -2542,12 +2476,12 @@ function LessonL15(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L15-1"},t(lang,"SSL/TLS nima?","What is SSL/TLS?")),
+    React.createElement(H2,{num:"§1"},t(lang,"SSL/TLS nima?","What is SSL/TLS?")),
     React.createElement(P,null,t(lang,"TLS — internetda ma'lumotni shifrlaydigan protokol; HTTPS dagi «S» harfi aynan shu (SSL — uning eski nomi). Brauzer manzil satridagi qulf 🔒 — TLS ishlayotganini bildiradi. U ikki muhim narsani beradi: MAXFIYLIK (o'rtadagi hech kim — provayder, xaker — trafikni o'qiy olmaydi) va ISHONCH (siz haqiqiy sayt bilan gaplashyapsiz, soxta bilan emas).","TLS is the protocol that encrypts data on the internet; it's the «S» in HTTPS (SSL is its old name). The padlock 🔒 in the address bar means TLS is active. It provides two key things: CONFIDENTIALITY (no one in the middle — ISP, hacker — can read the traffic) and TRUST (you're talking to the real site, not a fake).")),
-    React.createElement(H2,{num:"§2",id:"toc-L15-2"},t(lang,"Interaktiv simulyator: TLS handshake","Interactive simulator: the TLS handshake")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: TLS handshake","Interactive simulator: the TLS handshake")),
     React.createElement(P,null,t(lang,"Shifrlashdan oldin client va server «qo'l berishadi» (handshake) — shifrni kelishadi va serverning haqiqiyligini tekshiradi. Ikkala ssenariyni sinab ko'ring: xavfsiz ulanish va soxta sertifikatli MITM hujumi.","Before encrypting, the client and server «shake hands» (handshake) — they agree on a cipher and verify the server's identity. Try both scenarios: a secure connection and a fake-certificate MITM attack.")),
     React.createElement(TLSSim),
-    React.createElement(H2,{num:"§3",id:"toc-L15-3"},t(lang,"Sertifikat va ishonch zanjiri","Certificates and the chain of trust")),
+    React.createElement(H2,{num:"§3"},t(lang,"Sertifikat va ishonch zanjiri","Certificates and the chain of trust")),
     React.createElement(P,null,t(lang,"Sayt o'z haqiqiyligini «sertifikat» (raqamli pasport) bilan isbotlaydi. Sertifikatni ishonchli tashkilot — CA (Certificate Authority) imzolaydi. Ishonch zanjir bo'ylab quriladi: brauzer server sertifikatini oraliq CA gacha, undan Root CA gacha tekshiradi. Root CA lar brauzerga oldindan o'rnatilgan — shuning uchun soxta sertifikat darhol fosh bo'ladi.","A site proves it's genuine with a «certificate» (a digital passport). The certificate is signed by a trusted organization — a CA (Certificate Authority). Trust is built as a chain: the browser checks the server certificate up to an intermediate CA, then up to a Root CA. Root CAs are pre-installed in the browser — so a fake certificate is exposed instantly.")),
     React.createElement(LayerStack,{layers:[
       {n:"1",name:t(lang,"Root CA","Root CA"),color:"#22c55e",desc:{uz:"Brauzerga oldindan o'rnatilgan, eng ishonchli ildiz.",en:"Pre-installed in the browser, the most trusted root."}},
@@ -2555,11 +2489,11 @@ function LessonL15(){
       {n:"3",name:t(lang,"Server sertifikati","Server certificate"),color:"#a855f7",desc:{uz:"Oraliq CA imzolagan; aynan shu saytga (CN=example.com) tegishli.",en:"Signed by the intermediate CA; belongs to this exact site (CN=example.com)."}},
       {n:"✓",name:t(lang,"Ishonch zanjiri","Chain of trust"),color:"#f59e0b",desc:{uz:"Brauzer zanjirni Root gacha tekshiradi — biror bo'g'in ishonchsiz bo'lsa, ogohlantiradi.",en:"The browser verifies the chain up to the Root — if any link is untrusted, it warns."}}
     ]}),
-    React.createElement(H2,{num:"§4",id:"toc-L15-4"},t(lang,"SSL va TLS versiyalari","SSL and TLS versions")),
+    React.createElement(H2,{num:"§4"},t(lang,"SSL va TLS versiyalari","SSL and TLS versions")),
     React.createElement(CompareCols,{
       left:{title:{uz:"Eski (ishlatmang)",en:"Old (do not use)"},color:"#ef4444",rows:[{uz:"SSL 2.0 / 3.0 — buzilgan",en:"SSL 2.0 / 3.0 — broken"},{uz:"TLS 1.0 / 1.1 — eskirgan, zaif",en:"TLS 1.0 / 1.1 — outdated, weak"},{uz:"Ma'lum hujumlarga ochiq (POODLE, BEAST)",en:"Open to known attacks (POODLE, BEAST)"}]},
       right:{title:{uz:"Zamonaviy",en:"Modern"},color:"#22c55e",rows:[{uz:"TLS 1.2 — keng qo'llaniladi, xavfsiz",en:"TLS 1.2 — widely used, secure"},{uz:"TLS 1.3 — eng yangi, tezroq handshake",en:"TLS 1.3 — newest, faster handshake"},{uz:"Faqat kuchli shifrlar (AES-GCM, ChaCha20)",en:"Only strong ciphers (AES-GCM, ChaCha20)"}]}}),
-    React.createElement(H2,{num:"§5",id:"toc-L15-5"},t(lang,"Amaliyot: sertifikatni tekshirish","Practice: inspecting a certificate")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: sertifikatni tekshirish","Practice: inspecting a certificate")),
     React.createElement(P,null,t(lang,"openssl s_client server sertifikatini, uni kim imzolaganini (Issuer = CA), amal muddatini va TLS versiyasini ko'rsatadi. Ishonchli CA imzolamagan sertifikat — brauzerda ogohlantirish beradi.","openssl s_client shows the server certificate, who signed it (Issuer = CA), its validity and the TLS version. A certificate not signed by a trusted CA triggers a browser warning.")),
     React.createElement(Terminal,null,"openssl s_client -connect example.com:443 -brief\n# subject: CN=example.com                          ← sayt\n# issuer:  C=US, O=DigiCert Inc, CN=DigiCert TLS RSA CA   ← CA (imzolagan)\n# Protocol: TLSv1.3   Cipher: TLS_AES_256_GCM_SHA384\n# Verification: OK                                 ← zanjir ishonchli"),
     React.createElement(Quiz,{q:{uz:"TLS sertifikatini kim imzolaydi, shunda brauzer ishonadi?",en:"Who signs a TLS certificate so the browser trusts it?"},opts:[{uz:"Foydalanuvchi",en:"The user"},{uz:"Certificate Authority (CA)",en:"A Certificate Authority (CA)"},{uz:"Provayder",en:"The ISP"},{uz:"DNS server",en:"The DNS server"}],correct:1,exp:{uz:"Ishonchli CA sertifikatni imzolaydi. Brauzer CA lar ro'yxatini biladi — shuning uchun haqiqiy va soxta sertifikatni ajratadi va MITM hujumini to'sadi.",en:"A trusted CA signs the certificate. The browser knows the CA list — so it tells real from fake and blocks a MITM attack."}}));
@@ -2568,23 +2502,23 @@ function LessonL16(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L16-1"},t(lang,"IDS va IPS nima?","What are IDS and IPS?")),
+    React.createElement(H2,{num:"§1"},t(lang,"IDS va IPS nima?","What are IDS and IPS?")),
     React.createElement(P,null,t(lang,"IDS (Intrusion Detection System) tarmoqni kuzatib, shubhali harakatni aniqlaydi va ogohlantiradi. IPS (Intrusion Prevention System) bir qadam oldinga o'tadi — hujumni bloklaydi ham. Farq shunchaki «nima qiladi»da emas — ASOSIY farq ular tarmoqda QAYERDA turishida: IDS — signalizatsiya («o'g'ri kirdi!»), IPS — eshikni qulflaydigan qorovul.","An IDS (Intrusion Detection System) watches the network and alerts on suspicious activity. An IPS (Intrusion Prevention System) goes further — it also blocks the attack. The difference isn't just «what it does» — the KEY difference is WHERE each sits in the network: an IDS is an alarm («a burglar!»), an IPS is a guard that locks the door.")),
-    React.createElement(H2,{num:"§2",id:"toc-L16-2"},t(lang,"Interaktiv simulyator: bir xil hujum, ikki xil natija","Interactive simulator: the same attack, two different outcomes")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: bir xil hujum, ikki xil natija","Interactive simulator: the same attack, two different outcomes")),
     React.createElement(P,null,t(lang,"Xuddi shu zararli paketni IDS va IPS orqali yuboring — joylashuvning o'zi natijani qanday belgilashini ko'ring:","Send the exact same malicious packet through an IDS and an IPS — see how placement alone determines the outcome:")),
     React.createElement(IDSIPSSim),
-    React.createElement(H2,{num:"§3",id:"toc-L16-3"},t(lang,"IDS vs IPS — solishtiruv","IDS vs IPS — comparison")),
+    React.createElement(H2,{num:"§3"},t(lang,"IDS vs IPS — solishtiruv","IDS vs IPS — comparison")),
     React.createElement(CompareCols,{
       left:{title:"IDS",color:"#ffd43b",rows:[{uz:"Aniqlaydi + ogohlantiradi",en:"Detects + alerts"},{uz:"Trafik nusxasini ko'radi (passiv, out-of-band)",en:"Sees a copy of traffic (passive, out-of-band)"},{uz:"Hujumni TO'XTATMAYDI",en:"Does NOT stop the attack"}]},
       right:{title:"IPS",color:"#ff3a5e",rows:[{uz:"Aniqlaydi + bloklaydi",en:"Detects + blocks"},{uz:"Trafik ichidan o'tadi (inline)",en:"Sits inline in the traffic path"},{uz:"Real vaqtda TO'XTATADI",en:"Stops it in real time"}]}}),
-    React.createElement(H2,{num:"§4",id:"toc-L16-4"},t(lang,"Aniqlash usullari va joylashuv turlari","Detection methods and deployment types")),
+    React.createElement(H2,{num:"§4"},t(lang,"Aniqlash usullari va joylashuv turlari","Detection methods and deployment types")),
     React.createElement(LayerStack,{layers:[
       {n:"sig",name:t(lang,"Signature","Signature"),color:"#4dabf7",desc:{uz:"Ma'lum hujum imzolari bilan solishtiradi — tez va aniq, lekin yangi hujumni o'tkazib yuboradi.",en:"Matches against known attack signatures — fast and precise, but misses brand-new attacks."}},
       {n:"anom",name:t(lang,"Anomaly","Anomaly"),color:"#69db7c",desc:{uz:"Odatiy xatti-harakatdan chetlanishni izlaydi — yangi hujumni ham tutadi, lekin ko'proq soxna signal beradi.",en:"Looks for deviation from normal behavior — catches new attacks too, but generates more false alarms."}},
       {n:"NIDS",name:"NIDS/NIPS",color:"#a855f7",desc:{uz:"Butun tarmoq segmentini kuzatadi (Snort, Suricata).",en:"Watches an entire network segment (Snort, Suricata)."}},
       {n:"HIDS",name:"HIDS/HIPS",color:"#ffd43b",desc:{uz:"Bitta xost ichida ishlaydi (OSSEC, Wazuh) — fayl o'zgarishi va jarayonlarni kuzatadi.",en:"Runs on a single host (OSSEC, Wazuh) — watches file changes and processes."}}
     ]}),
-    React.createElement(H2,{num:"§5",id:"toc-L16-5"},t(lang,"Amaliyot: ogohlantirishlarni ko'rish","Practice: viewing alerts")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ogohlantirishlarni ko'rish","Practice: viewing alerts")),
     React.createElement(P,null,t(lang,"Snort ma'lum hujum imzosiga mos trafikni ko'rganda ogohlantirish yozadi — bu simulyatordagi aynan «signature mos keldi» qadami.","Snort writes an alert when traffic matches a known attack signature — exactly the «signature matched» step from the simulator.")),
     React.createElement(Terminal,null,"# Snort qoida misoli (soddalashtirilgan):\nalert tcp any any -> 10.0.0.0/24 22 (msg:\"SSH urinishi\";)\n\n# Snort ogohlantirishi (fast alert formatida):\n# [**] [1:2100498:7] GPL ATTACK_RESPONSE id check [**]\n# [Priority: 2] {TCP} 10.0.0.9:445 -> 10.0.0.5:51324\n# → SMB hujumi shubhasi aniqlandi"),
 React.createElement(Quiz,{q:{uz:"IDS va IPS o'rtasidagi asosiy farq nima?",en:"Key difference between IDS and IPS?"},opts:[{uz:"IDS tezroq",en:"IDS is faster"},{uz:"IPS hujumni bloklaydi, IDS faqat ogohlantiradi",en:"IPS blocks the attack, IDS only alerts"},{uz:"IDS faqat WiFi da",en:"IDS is WiFi-only"},{uz:"Farqi yo'q",en:"No difference"}],correct:1,exp:{uz:"IDS aniqlaydi va ogohlantiradi; IPS aniqlaydi va real vaqtda bloklaydi — chunki u yo'lning o'zida (inline) turadi.",en:"IDS detects and alerts; IPS detects and blocks in real time — because it sits right on the path (inline)."}}));
@@ -2594,13 +2528,13 @@ function LessonL17(){
   const A="#69db7c",D="#ff3a5e";
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L17-1"},t(lang,"DMZ nima? — Qal'a analogiyasi","What is a DMZ? — the castle analogy")),
+    React.createElement(H2,{num:"§1"},t(lang,"DMZ nima? — Qal'a analogiyasi","What is a DMZ? — the castle analogy")),
     React.createElement(P,null,t(lang,"DMZ (Demilitarized Zone) — tarmog'ingizning «oraliq» yoki «bufer» hududi. O'zbekcha «qurolsizlantirilgan hudud», lekin IT sohasida atama o'z holicha ishlatiladi. Buni qal'a bilan tasavvur qiling: qal'a ICHI — bu LAN (podshoh, xazina, aholi ya'ni serverlar va xodimlar) — qattiq qo'riqlanadi. Qal'a TASHQARISI — bu Internet: savdogarlar ham, qaroqchilar (xakerlar) ham bor.","A DMZ (Demilitarized Zone) is your network's «buffer» area. In IT the term is used as-is. Picture a castle: the INSIDE is the LAN (the king, treasury, residents — i.e. servers and staff) — heavily guarded. The OUTSIDE is the Internet: both merchants and raiders (hackers) are out there.")),
     React.createElement(P,null,t(lang,"DMZ — darvoza oldidagi maxsus hovli. Siz savdo qilishingiz kerak (veb-saytingiz ishlashi kerak), shuning uchun darvoza tashqarisida, lekin baribir nazoratingizdagi alohida maydon qilasiz. Savdogarlar (foydalanuvchilar) shu hovliga kelib, sotuvchilaringiz (veb/pochta server) bilan ko'rishadi — lekin qal'a ichiga kira olmaydi. Yomon niyatli odam DMZ dagi serverni buzsa ham, o'rtada yana bitta devor (ikkinchi Firewall) borligi uchun LAN ga o'ta olmaydi.","The DMZ is a courtyard in front of the gate. You need to do business (your website must work), so you build a separate area outside the gate but still under your control. Merchants (users) come to this courtyard and meet your sellers (web/mail server) — but can't enter the castle. Even if an attacker breaks a DMZ server, a second wall (the inner firewall) stops them reaching the LAN.")),
-    React.createElement(H2,{num:"§2",id:"toc-L17-2"},t(lang,"Interaktiv simulyator","Interactive simulator")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator","Interactive simulator")),
     React.createElement(P,null,t(lang,"Quyidagi tugmalarni bosing — paket qaysi zonadan qayerga borishini va firewall qoidasi uni O'TKAZADI yoki BLOKLAYDI ekanini jonli ko'ring.","Click the buttons below — watch live where the packet travels between zones and whether the firewall rule ALLOWS or BLOCKS it.")),
     React.createElement(DMZSim),
-    React.createElement(H2,{num:"§3",id:"toc-L17-3"},t(lang,"DMZ qachon va nega ishlatiladi?","When and why is a DMZ used?")),
+    React.createElement(H2,{num:"§3"},t(lang,"DMZ qachon va nega ishlatiladi?","When and why is a DMZ used?")),
     React.createElement(P,null,t(lang,"Tashqi dunyo (Internet) uchun ochiq bo'lishi kerak bo'lgan xizmatlarni oddiy LAN ichida saqlash juda xavfli — chunki ular buzilsa, hujumchi to'g'ridan-to'g'ri ichki tarmoqqa tushadi. Shu sababli omma uchun ochiq serverlar DMZ ga joylashtiriladi:","Keeping services that must be reachable from the internet inside the plain LAN is very risky — if they're breached, the attacker lands straight in the internal network. That's why public-facing servers go in the DMZ:")),
     React.createElement(LayerStack,{layers:[
       {n:"🌍",name:t(lang,"Veb-server","Web server"),color:"#4dabf7",desc:{uz:"HTTP/HTTPS — sayt tashqaridan ochilishi kerak.",en:"HTTP/HTTPS — the site must be reachable from outside."}},
@@ -2608,12 +2542,12 @@ function LessonL17(){
       {n:"🔤",name:"DNS",color:"#a855f7",desc:{uz:"Tashqi nom so'rovlariga javob beradi.",en:"Answers external name queries."}},
       {n:"📁",name:"FTP",color:"#ffd43b",desc:{uz:"Tashqi fayl almashinuvi uchun.",en:"For external file exchange."}}
     ]}),
-    React.createElement(H2,{num:"§4",id:"toc-L17-4"},t(lang,"DMZ qoidalari qanday ishlaydi?","How the DMZ rules work")),
+    React.createElement(H2,{num:"§4"},t(lang,"DMZ qoidalari qanday ishlaydi?","How the DMZ rules work")),
     React.createElement(P,null,t(lang,"Tarmoq ikkita firewall bilan ajratiladi. Qoidalar quyidagicha — eng muhimi qizil bilan belgilangan «DMZ→LAN taqiqlanadi»:","The network is split by two firewalls. The rules are as follows — the most important is the red «DMZ→LAN denied»:")),
     React.createElement("div",{style:{margin:"8px 0"}},
 React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #69db7c44",borderLeft:"3px solid #69db7c",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#69db7c",minWidth:64}},"ALLOW"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"Internet → DMZ: qisman (faqat kerakli portlar, masalan HTTP 80).","Internet → DMZ: partial (only needed ports, e.g. HTTP 80)."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #ff3a5e44",borderLeft:"3px solid #ff3a5e",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#ff3a5e",minWidth:64}},"DENY"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"Internet → LAN: barchasi yopiq.","Internet → LAN: everything blocked."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #ff3a5e44",borderLeft:"3px solid #ff3a5e",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#ff3a5e",minWidth:64}},"DENY"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"DMZ → LAN: QAT'IYAN taqiqlanadi — DMZ ga ishonib bo'lmaydi (eng muhim qoida!).","DMZ → LAN: strictly denied — the DMZ can't be trusted (the key rule!)."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #69db7c44",borderLeft:"3px solid #69db7c",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#69db7c",minWidth:64}},"ALLOW"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"LAN → DMZ: ruxsat (xodimlar serverni yangilaydi).","LAN → DMZ: allowed (staff update the server)."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #69db7c44",borderLeft:"3px solid #69db7c",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#69db7c",minWidth:64}},"ALLOW"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"LAN → Internet: ruxsat (xodimlar internetdan foydalanadi).","LAN → Internet: allowed (staff use the internet)."))),React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"7px 12px",marginBottom:6,background:"var(--surface)",border:"1px solid #ffd43b44",borderLeft:"3px solid #ffd43b",borderRadius:9}},React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontSize:10,fontWeight:800,color:"#ffd43b",minWidth:64}},"PART"),React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,"DMZ → Internet: qisman (masalan yangilanish yuklab olish).","DMZ → Internet: partial (e.g. downloading updates)."))),),
     React.createElement(Terminal,null,"# Firewall qoidalari (soddalashtirilgan)\nALLOW  internet -> dmz_web   : 80,443\nDENY   internet -> lan       : ALL\nDENY   dmz       -> lan       : ALL      # ← eng muhim qoida\nALLOW  lan       -> dmz,internet : ALL"),
-    React.createElement(H2,{num:"§5",id:"toc-L17-5"},t(lang,"Uy routeridagi «DMZ Host» — bu haqiqiy DMZ emas!","The «DMZ Host» on a home router — not a real DMZ!")),
+    React.createElement(H2,{num:"§5"},t(lang,"Uy routeridagi «DMZ Host» — bu haqiqiy DMZ emas!","The «DMZ Host» on a home router — not a real DMZ!")),
     React.createElement(P,null,t(lang,"Uy Wi-Fi routerlarida ham «DMZ» funksiyasi bor, lekin u haqiqiy DMZ EMAS. «DMZ Host» shunchaki bitta kompyuterning BARCHA portlarini internetga ochib yuborish (port forwarding'ning eng xavfli va oson yo'li). U qurilma baribir ichki tarmoqda (LAN) qoladi — agar unga virus tushsa, butun uy tarmog'ingizga tarqalishi mumkin.","Home Wi-Fi routers also have a «DMZ» feature, but it is NOT a real DMZ. «DMZ Host» simply exposes ALL ports of one computer to the internet (the most dangerous, easy form of port forwarding). That device still stays on the internal network (LAN) — if it gets infected, the malware can spread to your whole home network.")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Nima qilayotganingizni aniq bilmasangiz, uy routeringizda «DMZ Host» ni yoqmang — bu bitta qurilmani to'liq himoyasiz qoldiradi va butun tarmoqni xavf ostiga qo'yadi.","Don't enable «DMZ Host» on your home router unless you know exactly what you're doing — it leaves one device fully exposed and puts your whole network at risk.")),
     React.createElement(Quiz,{q:{uz:"DMZ ning eng muhim firewall qoidasi qaysi?",en:"What is the most important DMZ firewall rule?"},opts:[{uz:"Internet → DMZ ochiq",en:"Internet → DMZ open"},{uz:"DMZ → LAN QAT'IYAN taqiqlanadi",en:"DMZ → LAN is strictly denied"},{uz:"LAN → Internet yopiq",en:"LAN → Internet blocked"},{uz:"Hamma yo'nalish ochiq",en:"All directions open"}],correct:1,exp:{uz:"Eng muhim qoida — DMZ→LAN taqiqlash. Shunda hujumchi DMZ serverini buzsa ham, ichki maxfiy tarmoqqa (LAN) o'ta olmaydi.",en:"The key rule is denying DMZ→LAN. So even if an attacker breaks a DMZ server, they can't move into the sensitive internal network (LAN)."}}));
@@ -2622,19 +2556,19 @@ function LessonL18(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L18-1"},t(lang,"802.1X va NAC nima?","What are 802.1X and NAC?")),
+    React.createElement(H2,{num:"§1"},t(lang,"802.1X va NAC nima?","What are 802.1X and NAC?")),
     React.createElement(P,null,t(lang,"802.1X — tarmoqqa jismoniy yoki simsiz kirishni nazorat qiluvchi standart. Qurilma switch portiga (yoki WiFi'ga) ulanganda «kim sen?» deb so'raladi va faqat tasdiqlanganlarga port ochiladi. NAC (Network Access Control) — shu g'oyaning kengroq nomi. Bu ofis eshigidagi qorovulga o'xshaydi — kirishdan oldin propuskingizni ko'rsatishingiz shart, hatto eshik ochiq bo'lsa ham.","802.1X is a standard that controls physical or wireless network access. When a device connects to a switch port (or WiFi), it's asked «who are you?», and the port only opens for verified devices. NAC (Network Access Control) is the broader name for this idea. It's like a guard at the office door — you must show your badge before entering, even if the door itself is unlocked.")),
-    React.createElement(H2,{num:"§2",id:"toc-L18-2"},t(lang,"Interaktiv simulyator: xodim vs noma'lum qurilma","Interactive simulator: staff vs an unknown device")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: xodim vs noma'lum qurilma","Interactive simulator: staff vs an unknown device")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — to'g'ri hisobli xodim va bo'sh rozetkaga ulangan noma'lum qurilma uchun natija qanday farq qilishini ko'ring:","Try both scenarios — see how the outcome differs for a staff member with valid credentials versus an unknown device plugged into an empty jack:")),
     React.createElement(NACSim),
-    React.createElement(H2,{num:"§3",id:"toc-L18-3"},t(lang,"802.1X uch qismi","The three 802.1X parts")),
+    React.createElement(H2,{num:"§3"},t(lang,"802.1X uch qismi","The three 802.1X parts")),
     React.createElement(LayerStack,{layers:[
       {n:"supplicant",name:t(lang,"Supplicant","Supplicant"),color:"#4dabf7",desc:{uz:"Kirmoqchi bo'lgan qurilma (mijoz) — noutbuk, telefon.",en:"The device trying to connect (client) — a laptop, a phone."}},
       {n:"authenticator",name:t(lang,"Authenticator","Authenticator"),color:"#69db7c",desc:{uz:"Switch/AP — «eshik qorovuli». O'zi qaror qilmaydi, faqat oraliq.",en:"The switch/AP — the «door guard». It doesn't decide anything, just relays."}},
       {n:"radius",name:t(lang,"RADIUS server","RADIUS server"),color:"#a855f7",desc:{uz:"Haqiqiy tekshiruvni bajaradi va qaysi VLAN'ga qo'yishni ham belgilaydi.",en:"Performs the actual verification, and can also decide which VLAN to assign."}}
     ]}),
     React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,"RADIUS: "),t(lang,"markazlashtirilgan autentifikatsiya serveri — foydalanuvchi ma'lumotlarini tekshiradi va kirishga ruxsat beradi yoki rad etadi. Yirik tashkilotlarda keng qo'llanadi va bir vaqtning o'zida to'g'ri VLAN'ni ham belgilashi mumkin.","a centralized authentication server — checks credentials and grants or denies access. Widely used in large organizations, and can assign the correct VLAN at the same time.")),
-    React.createElement(H2,{num:"§4",id:"toc-L18-4"},t(lang,"Amaliyot: RADIUS jurnali","Practice: the RADIUS log")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: RADIUS jurnali","Practice: the RADIUS log")),
     React.createElement(P,null,t(lang,"802.1X qurilma tarmoqqa ulanishidan OLDIN uni tekshiradi — bu simulyatordagi jarayonning aynan o'zi. FreeRADIUS jurnali har urinishni yozib boradi.","802.1X checks a device BEFORE it joins the network — exactly the process from the simulator. The FreeRADIUS log records every attempt.")),
     React.createElement(Terminal,null,"# RADIUS log (freeradius) — muvaffaqiyatli:\n# rlm_ldap: user 'alice' authenticated\n# Access-Accept for user alice, VLAN=10\n\n# RADIUS log — rad etilgan:\n# rlm_ldap: user not found\n# Access-Reject for unknown supplicant, port remains closed"),
 React.createElement(Quiz,{q:{uz:"802.1X da qurilmani haqiqiy tekshiruvdan o'tkazadigan qism qaysi?",en:"In 802.1X, which part performs the actual verification?"},opts:[{uz:"Supplicant (qurilma)",en:"The supplicant (device)"},{uz:"Authenticator (switch)",en:"The authenticator (switch)"},{uz:"Auth server (RADIUS)",en:"The auth server (RADIUS)"},{uz:"DNS server",en:"The DNS server"}],correct:2,exp:{uz:"RADIUS auth server login/parolni tekshiradi. Switch faqat \"eshik\", qurilma esa supplicant.",en:"The RADIUS auth server checks the credentials. The switch is just the \"door\", the device is the supplicant."}}));
@@ -2643,22 +2577,22 @@ function LessonL19(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L19-1"},t(lang,"Paket filtrlash nima?","What is packet filtering?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Paket filtrlash nima?","What is packet filtering?")),
     React.createElement(P,null,t(lang,"Paket filtrlash — har paketni ko'rib, qoidalar asosida o'tkazish yoki bloklash. Har paketning manba/manzil IP si, porti va protokoli tekshiriladi — chegaradagi bojxona kabi. Filtrlashning eng muhim savoli: filtr har paketni ALOHIDA ko'radimi, yoki ulanish TARIXINI eslaydimi?","Packet filtering inspects each packet and allows or blocks it by rules. Each packet's source/destination IP, port and protocol are checked — like customs at a border. The most important question in filtering: does the filter judge each packet in ISOLATION, or does it remember the HISTORY of the connection?")),
-    React.createElement(H2,{num:"§2",id:"toc-L19-2"},t(lang,"Interaktiv simulyator: javob trafigi muammosi","Interactive simulator: the return-traffic problem")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: javob trafigi muammosi","Interactive simulator: the return-traffic problem")),
     React.createElement(P,null,t(lang,"Chiquvchi so'rovga javob qaytganda ikkala filtr turi ham buni qanday ko'rishini solishtiring — bu stateful firewall'ning haqiqiy afzalligini ochib beradi:","Compare how each filter type sees a reply to an outbound request — this reveals the real advantage of a stateful firewall:")),
     React.createElement(StatefulSim),
-    React.createElement(H2,{num:"§3",id:"toc-L19-3"},t(lang,"Stateless va Stateful — solishtiruv","Stateless vs stateful — comparison")),
+    React.createElement(H2,{num:"§3"},t(lang,"Stateless va Stateful — solishtiruv","Stateless vs stateful — comparison")),
     React.createElement(CompareCols,{
       left:{title:{uz:"Stateless (holatsiz)",en:"Stateless"},color:"#4dabf7",rows:[{uz:"Har paketni alohida ko'radi",en:"Judges each packet alone"},{uz:"Kontekstsiz — javobni tanimaydi",en:"No context — doesn't recognize replies"},{uz:"Tez, lekin har yo'nalish uchun qoida kerak",en:"Fast, but needs a rule per direction"}]},
       right:{title:{uz:"Stateful (holatli)",en:"Stateful"},color:"#69db7c",rows:[{uz:"Ulanish holatini jadvalga yozadi",en:"Logs connection state in a table"},{uz:"Javob paketlarini avtomatik taniydi",en:"Automatically recognizes reply packets"},{uz:"Aqlliroq, xavfsizroq, boshqarish oson",en:"Smarter, safer, easier to manage"}]}}),
-    React.createElement(H2,{num:"§4",id:"toc-L19-4"},t(lang,"Paket filtrlash chuqurligi","Depth of packet filtering")),
+    React.createElement(H2,{num:"§4"},t(lang,"Paket filtrlash chuqurligi","Depth of packet filtering")),
     React.createElement(LayerStack,{layers:[
       {n:"L3-4",name:t(lang,"Stateless","Stateless"),color:"#ff6b6b",desc:{uz:"Har paketni alohida ko'radi — sodda, tez, lekin cheklangan.",en:"Sees each packet alone — simple, fast, but limited."}},
       {n:"conn",name:t(lang,"Stateful","Stateful"),color:"#69db7c",desc:{uz:"Ulanish kontekstini eslaydi (javob paketini biladi) — bugungi standart.",en:"Remembers connection context (knows reply packets) — today's standard."}},
       {n:"L7",name:t(lang,"Deep packet (DPI)","Deep packet (DPI)"),color:"#4dabf7",desc:{uz:"Paket MAZMUNINI ham tekshiradi (L7) — NGFW/WAF darajasi.",en:"Also inspects packet CONTENTS (L7) — NGFW/WAF level."}}
     ]}),
-    React.createElement(H2,{num:"§5",id:"toc-L19-5"},t(lang,"Amaliyot: iptables qoidalari","Practice: iptables rules")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: iptables qoidalari","Practice: iptables rules")),
     React.createElement(P,null,t(lang,"Quyidagi ikkinchi misol simulyatordagi «Stateful» ssenariysining aynan o'zi — bitta ctstate qoidasi barcha o'rnatilgan ulanish javoblarini qamrab oladi.","The second example below is exactly the simulator's «Stateful» scenario — one ctstate rule covers every reply to an established connection.")),
     React.createElement(Terminal,null,"# Oddiy (stateless) qoida — faqat bitta IP dan SSH:\nsudo iptables -A INPUT -p tcp -s 10.0.0.5 --dport 22 -j ACCEPT\nsudo iptables -A INPUT -p tcp --dport 22 -j DROP\n\n# Stateful qoida — barcha o'rnatilgan ulanish javoblari:\nsudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT\nsudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT\nsudo iptables -A INPUT -j DROP   # qolgan hammasi"),
     React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Qoidalar tartibi muhim: ","Rule order matters: ")),t(lang,"birinchi mos kelgan qoida ishlaydi — aniq ALLOW umumiy DROP dan oldin turishi kerak (L13 darsini eslang).","the first matching rule wins — specific ALLOW must come before a general DROP (recall L13).")),
@@ -2669,19 +2603,19 @@ function LessonL20(){
   const types=[["Forward",{uz:"Foydalanuvchilar nomidan internetga chiqadi (filtr, kesh, anonimlik)",en:"Goes out for users (filter, cache, anonymity)"},"#4dabf7"],["Reverse",{uz:"Serverlar oldida turadi (yukni taqsimlash, himoya, kesh)",en:"Sits in front of servers (load balancing, protection, cache)"},"#69db7c"],["Transparent",{uz:"Foydalanuvchi sezmaydi — tarmoq avtomatik yo'naltiradi",en:"User doesn't notice — network redirects automatically"},"#9775fa"]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L20-1"},t(lang,"Proxy nima?","What is a proxy?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Proxy nima?","What is a proxy?")),
     React.createElement(P,null,t(lang,"Proxy server — siz va internet o'rtasidagi «vositachi». So'rovingiz avval proxy'ga boradi, u sizning nomingizdan serverga murojaat qiladi va javobni qaytaradi (kimdandir sizning o'rningizga xarid qilishni so'raganingizdek). Proxy'ning ikki asosiy turi bor va ular bir-biridan «kimning shaxsini yashirishi» bilan tubdan farq qiladi.","A proxy server is a «middleman» between you and the internet. Your request goes to the proxy first, which contacts the server on your behalf and returns the reply (like asking someone to shop for you). There are two main types of proxy, and they differ fundamentally in «whose identity they hide».")),
     React.createElement(PacketFlow,{from:{uz:"Siz",en:"You"},to:{uz:"Server",en:"Server"},label:{uz:"Proxy (vositachi)",en:"Proxy (middleman)"}}),
-    React.createElement(H2,{num:"§2",id:"toc-L20-2"},t(lang,"Interaktiv simulyator: kim kimdan yashiringan?","Interactive simulator: who is hidden from whom?")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: kim kimdan yashiringan?","Interactive simulator: who is hidden from whom?")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — forward proxy mijozni serverdan qanday yashirishini, reverse proxy esa serverni mijozdan qanday yashirishini ko'ring:","Try both scenarios — see how a forward proxy hides the client from the server, and how a reverse proxy hides the server from the client:")),
     React.createElement(ProxySim),
-    React.createElement(H2,{num:"§3",id:"toc-L20-3"},t(lang,"Proxy turlari","Types of proxy")),
+    React.createElement(H2,{num:"§3"},t(lang,"Proxy turlari","Types of proxy")),
     types.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+x[2]+"44",borderLeft:"3px solid "+x[2],borderRadius:10,animationDelay:(i*0.06)+"s"}},
       React.createElement("span",{style:{fontWeight:700,fontSize:12.5,color:x[2],minWidth:100}},x[0]),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-    React.createElement(H2,{num:"§4",id:"toc-L20-4"},t(lang,"Forward va reverse proxy","Forward vs reverse proxy")),
+    React.createElement(H2,{num:"§4"},t(lang,"Forward va reverse proxy","Forward vs reverse proxy")),
     React.createElement(CompareCols,{left:{title:{uz:"Forward proxy",en:"Forward proxy"},color:"#4dabf7",rows:[{uz:"Mijozlar oldida turadi",en:"Sits in front of clients"},{uz:"Foydalanuvchini yashiradi",en:"Hides the user"},{uz:"Filtrlash/keshlash",en:"Filtering/caching"},]},right:{title:{uz:"Reverse proxy",en:"Reverse proxy"},color:"#69db7c",rows:[{uz:"Serverlar oldida turadi",en:"Sits in front of servers"},{uz:"Serverni yashiradi/himoya qiladi",en:"Hides/protects the server"},{uz:"Yuk taqsimlash (LB), TLS",en:"Load balancing, TLS"},]}}),
-    React.createElement(H2,{num:"§5",id:"toc-L20-5"},t(lang,"Amaliyot: reverse proxy sarlavhasi","Practice: reverse-proxy headers")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: reverse proxy sarlavhasi","Practice: reverse-proxy headers")),
     React.createElement(P,null,t(lang,"Reverse proxy (nginx, HAProxy, Cloudflare) haqiqiy serverni internetdan yashiradi, yukni taqsimlaydi va TLS ni boshqaradi. Javob sarlavhalari ko'pincha proxy ekanini oshkor qiladi.","A reverse proxy (nginx, HAProxy, Cloudflare) hides the real server from the internet, distributes load and handles TLS. Response headers often reveal the proxy.")),
     React.createElement(Terminal,null,"curl -I https://site.com\n# server: nginx            ← reverse proxy\n# x-cache: HIT             ← keshdan berildi\n# via: 1.1 varnish         ← oldida yana kesh bor"),
 React.createElement(Quiz,{q:{uz:"Reverse proxy asosan kimni himoya qiladi?",en:"What does a reverse proxy mainly protect?"},opts:[{uz:"Foydalanuvchilarni",en:"The users"},{uz:"Orqadagi serverlarni",en:"The backend servers"},{uz:"DNS ni",en:"DNS"},{uz:"Hech kimni",en:"No one"}],correct:1,exp:{uz:"Reverse proxy serverlar oldida turadi — ularni yashiradi, hujumlarni to'sadi va yukni taqsimlaydi.",en:"A reverse proxy sits in front of servers — hiding them, absorbing attacks and balancing load."}}));
@@ -2690,19 +2624,19 @@ function LessonL21(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L21-1"},t(lang,"Zero Trust nima?","What is Zero Trust?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Zero Trust nima?","What is Zero Trust?")),
     React.createElement(P,null,t(lang,"Zero Trust — «hech kimga ishonma, doim tekshir» tamoyili. Eski model tarmoq ichidagini avtomatik ishonchli deb bilardi — xuddi qal'a devori kabi: bir marta ichkariga kirsangiz, hamma narsaga erkin kirish bor edi. Zero Trust esa har bir so'rovni — hatto ichkaridan bo'lsa ham — alohida tekshiradi. Bu DMZ (L17) g'oyasining mantiqiy davomi: perimetrga ishonish o'rniga, HAR resursning o'z chegarasi bor.","Zero Trust means «never trust, always verify». The old model auto-trusted anything inside the network — like a castle wall: once you were in, you had free access to everything. Zero Trust checks every request individually — even from inside. It's the logical continuation of the DMZ idea (L17): instead of trusting the perimeter, EVERY resource has its own boundary.")),
-    React.createElement(H2,{num:"§2",id:"toc-L21-2"},t(lang,"Interaktiv simulyator: bitta buzilgan qurilmadan keyin nima bo'ladi?","Interactive simulator: what happens after one device is compromised?")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: bitta buzilgan qurilmadan keyin nima bo'ladi?","Interactive simulator: what happens after one device is compromised?")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xuddi shu boshlang'ich buzilish eski model va Zero Trust'da qanday tubdan farqli oqibatga olib kelishini ko'ring:","Try both scenarios — see how the exact same initial breach leads to radically different outcomes under the old model versus Zero Trust:")),
     React.createElement(ZeroTrustSim),
-    React.createElement(H2,{num:"§3",id:"toc-L21-3"},t(lang,"Har so'rov qanday tekshiriladi","How every request is checked")),
+    React.createElement(H2,{num:"§3"},t(lang,"Har so'rov qanday tekshiriladi","How every request is checked")),
     React.createElement(FlowSteps,{title:{uz:"Zero Trust tekshiruvi",en:"Zero Trust check"},steps:[
       {icon:"👤",text:{uz:"Kim? — foydalanuvchi shaxsi tasdiqlanadi (MFA)",en:"Who? — user identity verified (MFA)"}},
       {icon:"💻",text:{uz:"Qanday qurilma? — holati (posture) tekshiriladi",en:"What device? — its posture is checked"}},
       {icon:"📍",text:{uz:"Qayerdan? — kontekst (joy, vaqt, xatti-harakat)",en:"From where? — context (location, time, behavior)"}},
       {icon:"🔑",text:{uz:"Faqat kerakli resursga minimal ruxsat beriladi",en:"Minimal access granted to just the needed resource"}},
     ]}),
-    React.createElement(H2,{num:"§4",id:"toc-L21-4"},t(lang,"Zero Trust tamoyillari","Zero Trust principles")),
+    React.createElement(H2,{num:"§4"},t(lang,"Zero Trust tamoyillari","Zero Trust principles")),
     React.createElement(LayerStack,{layers:[
       {n:"verify",name:t(lang,"Har doim tekshir","Always verify"),color:"#ff3a5e",desc:{uz:"Ichki tarmoqqa ham ishonma — har so'rov tekshiriladi.",en:"Trust nothing, even internal — verify every request."}},
       {n:"least",name:t(lang,"Eng kam imtiyoz","Least privilege"),color:"#69db7c",desc:{uz:"Faqat zarur kirish beriladi — hech kim keragidan ortiq huquqqa ega bo'lmaydi.",en:"Grant only the access needed — no one has more rights than necessary."}},
@@ -2710,7 +2644,7 @@ function LessonL21(){
       {n:"assume",name:t(lang,"Buzilishni faraz qil","Assume breach"),color:"#a855f7",desc:{uz:"Hujumchi allaqachon ichkarida deb ishlang — bu simulyatordagi asosiy g'oya.",en:"Work as if the attacker is already inside — the core idea in the simulator."}}
     ]}),
     React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Oddiy misol: ","Simple example: ")),t(lang,"eski model: ofisga kirsangiz hamma xonaga kirasiz. Zero Trust: har xona eshigi alohida propuskingizni tekshiradi.","old model: once in the office you can enter any room. Zero Trust: each room's door checks your badge separately.")),
-    React.createElement(H2,{num:"§5",id:"toc-L21-5"},t(lang,"Amaliyot: siyosat qoidasi","Practice: a policy rule")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: siyosat qoidasi","Practice: a policy rule")),
     React.createElement(P,null,t(lang,"Bu — simulyatordagi «tekshiruv» bosqichining aynan matn ko'rinishi: har shart (kim, qurilma, MFA) birga bajarilishi shart, aks holda rad etiladi.","This is the exact text form of the simulator's «check» step: every condition (who, device, MFA) must be satisfied together, or access is denied.")),
     React.createElement(Terminal,null,"# Zero Trust siyosati (soddalashtirilgan)\nIF user=alice AND device=managed AND mfa=passed\n  THEN allow -> app:payroll   # faqat shu resurs, faqat shu safar\nELSE deny + log                # har so'rov qayta baholanadi"),
 React.createElement(Quiz,{q:{uz:"Zero Trust ning asosiy shiori qanday?",en:"What is the core motto of Zero Trust?"},opts:[{uz:"Ichkaridagi hammaga ishon",en:"Trust everyone inside"},{uz:"Hech kimga ishonma, doim tekshir",en:"Never trust, always verify"},{uz:"Faqat parolga ishon",en:"Trust only the password"},{uz:"Devor yetarli",en:"A wall is enough"}],correct:1,exp:{uz:"Zero Trust \"hech kimga ishonma, doim tekshir\" — har so'rov, ichkaridan bo'lsa ham, tasdiqlanadi.",en:"Zero Trust is \"never trust, always verify\" — every request, even from inside, is confirmed."}}));
@@ -2719,12 +2653,12 @@ function LessonL23(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L23-1"},t(lang,"Enumeratsiya nima?","What is enumeration?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Enumeratsiya nima?","What is enumeration?")),
     React.createElement(P,null,t(lang,"Enumeratsiya — nishon haqida iloji boricha ko'proq ma'lumot to'plash: qaysi qurilma, xizmat, foydalanuvchi bor. Bosqindan oldin bino rejasini o'rganishga o'xshaydi. Port skanerlashdan bir qadam keyingi — chuqurroq «kim, nima, qayerda». Har bir yig'ilgan ma'lumot bo'lagi keyingi hujum qadamini osonlashtiradi.","Enumeration gathers as much as possible about a target: which devices, services and users exist. Like studying a building's floor plan before entering. One step beyond port scanning — a deeper «who, what, where». Every piece of gathered information makes the next attack step easier.")),
-    React.createElement(H2,{num:"§2",id:"toc-L23-2"},t(lang,"Interaktiv simulyator: qancha ma'lumot oshkor bo'ladi?","Interactive simulator: how much gets exposed?")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: qancha ma'lumot oshkor bo'ladi?","Interactive simulator: how much gets exposed?")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xuddi shu 4 ta vosita (nmap, smbclient, enum4linux) yomon sozlangan va qattiqlashtirilgan tizimda qanday farqli natija berishini ko'ring:","Try both scenarios — see how the exact same 4 tools (nmap, smbclient, enum4linux) produce very different results against a poorly configured versus a hardened system:")),
     React.createElement(EnumSim),
-    React.createElement(H2,{num:"§3",id:"toc-L23-3"},t(lang,"Nimani sanash kerak","What to enumerate")),
+    React.createElement(H2,{num:"§3"},t(lang,"Nimani sanash kerak","What to enumerate")),
     React.createElement(LayerStack,{layers:[
       {n:"hosts",name:t(lang,"Xostlar","Hosts"),color:"#4dabf7",desc:{uz:"Tirik qurilmalar va ularning IP/OS.",en:"Live devices and their IP/OS."}},
       {n:"svc",name:t(lang,"Xizmatlar","Services"),color:"#69db7c",desc:{uz:"Ochiq portlardagi dastur+versiya.",en:"Program+version on open ports."}},
@@ -2732,7 +2666,7 @@ function LessonL23(){
       {n:"users",name:t(lang,"Foydalanuvchilar","Users"),color:"#a855f7",desc:{uz:"SMB/SNMP/LDAP orqali hisob nomlari.",en:"Account names via SMB/SNMP/LDAP."}}
     ]}),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"Enumeratsiya faqat sizga tegishli yoki yozma ruxsat berilgan tarmoqlarda o'tkazilishi kerak.","Enumeration must only be done on networks you own or have written authorization to test.")),
-    React.createElement(H2,{num:"§4",id:"toc-L23-4"},t(lang,"Amaliyot: xizmatlarni sanash","Practice: enumerating services")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot: xizmatlarni sanash","Practice: enumerating services")),
     React.createElement(P,null,t(lang,"Bu buyruqlar aynan simulyatordagi «Yomon sozlangan tizim» ssenariysida ishlatilgan vositalar — real chiqishlar bilan.","These are exactly the tools used in the simulator's «Poorly configured system» scenario — with real output.")),
     React.createElement(Terminal,null,"nmap -sV -sC 10.0.0.5\nsmbclient -L //10.0.0.5 -N\nnmap --script smb-enum-shares,smb-os-discovery 10.0.0.5\n# | smb-os-discovery: Windows Server 2016\n# | smb-enum-shares:\n# |   \\\\10.0.0.5\\backups: READ/WRITE  ← ochiq ulashma"),
 React.createElement(Quiz,{q:{uz:"Enumeratsiya bosqichining asosiy maqsadi nima?",en:"Main goal of the enumeration phase?"},opts:[{uz:"Ma'lumotni shifrlash",en:"Encrypting data"},{uz:"Nishon haqida iloji boricha ko'proq ma'lumot to'plash",en:"Gathering as much info about the target as possible"},{uz:"Faylni o'chirish",en:"Deleting a file"},{uz:"IP berish",en:"Handing out IPs"}],correct:1,exp:{uz:"Enumeratsiya — nishon tarmoq haqida (xostlar, xizmatlar, foydalanuvchilar) chuqur ma'lumot to'plash bosqichi.",en:"Enumeration is the phase of gathering deep information about the target (hosts, services, users)."}}));
@@ -2741,18 +2675,18 @@ function LessonL24(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L24-1"},t(lang,"ARP spoofing nima?","What is ARP spoofing?")),
+    React.createElement(H2,{num:"§1"},t(lang,"ARP spoofing nima?","What is ARP spoofing?")),
     React.createElement(P,null,t(lang,"ARP spoofing — hujumchi soxta ARP javoblari yuborib, o'zini boshqa qurilma (odatda router/gateway) qilib ko'rsatadi. ARP javobni tekshirmaydi (L06 darsini eslang) — aynan shu zaiflikdan foydalaniladi: qurbon trafigi bilmagan holda hujumchi orqali oqa boshlaydi.","ARP spoofing is when an attacker sends fake ARP replies to impersonate another device (usually the router/gateway). ARP doesn't verify replies (recall L06) — that exact weakness is exploited: the victim's traffic unknowingly starts flowing through the attacker.")),
-    React.createElement(H2,{num:"§2",id:"toc-L24-2"},t(lang,"Interaktiv simulyator: himoyasiz vs DAI","Interactive simulator: undefended vs DAI")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: himoyasiz vs DAI","Interactive simulator: undefended vs DAI")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — qurbonning ARP jadvali zaharlanishini va Dynamic ARP Inspection (DAI) buni qanday to'xtatishini jonli ko'ring:","Try both scenarios — watch the victim's ARP table get poisoned live, and see how Dynamic ARP Inspection (DAI) stops it:")),
     React.createElement(ARPSpoofSim),
-    React.createElement(H2,{num:"§3",id:"toc-L24-3"},t(lang,"Hujumdan oldin va keyin","Before and after the attack")),
+    React.createElement(H2,{num:"§3"},t(lang,"Hujumdan oldin va keyin","Before and after the attack")),
     React.createElement(CompareCols,{left:{title:{uz:"Oldin (normal)",en:"Before (normal)"},color:"#69db7c",rows:[{uz:"Shlyuz = haqiqiy MAC",en:"Gateway = real MAC"},{uz:"Trafik to'g'ri boradi",en:"Traffic flows correctly"},]},right:{title:{uz:"Keyin (spoofing)",en:"After (spoofing)"},color:"#ff3a5e",rows:[{uz:"Shlyuz = hujumchi MAC",en:"Gateway = attacker MAC"},{uz:"Trafik hujumchidan o'tadi",en:"Traffic passes through attacker"},]}}),
-    React.createElement(H2,{num:"§4",id:"toc-L24-4"},t(lang,"Himoya usullari","Defense methods")),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya usullari","Defense methods")),
     React.createElement("div",{style:{margin:"6px 0 12px"}},
       [{uz:"Dynamic ARP Inspection (DAI) — switch soxta ARP ni bloklaydi (simulyatordagi ikkinchi ssenariy)",en:"Dynamic ARP Inspection (DAI) — the switch blocks fake ARP (the simulator's second scenario)"},{uz:"Statik ARP yozuvlari (muhim qurilmalar uchun)",en:"Static ARP entries (for critical devices)"},{uz:"HTTPS/VPN — mazmun shifrlansa, ko'rilsa ham foydasiz",en:"HTTPS/VPN — if encrypted, seeing it is useless"}].map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{fontSize:12.5,color:"var(--text-1)",padding:"6px 0",borderBottom:"1px solid var(--border)",animationDelay:(i*0.06)+"s"}},"• "+t(lang,x.uz,x.en));})),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"ARP spoofing faqat o'z laboratoriyangizda yoki yozma ruxsat berilgan pentestda sinalishi kerak. Boshqa tarmoqda qo'llash jinoyat.","ARP spoofing must only be tested in your own lab or a written-authorized pentest. Using it on another network is a crime.")),
-    React.createElement(H2,{num:"§5",id:"toc-L24-5"},t(lang,"Amaliyot: ARP jadvalining zaharlanishi","Practice: ARP table poisoning")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: ARP jadvalining zaharlanishi","Practice: ARP table poisoning")),
     React.createElement(P,null,t(lang,"Bu — simulyatordagi «Himoyasiz tarmoq» ssenariysining aynan buyruq ko'rinishi.","This is exactly the simulator's «Undefended network» scenario in command form.")),
     React.createElement(Terminal,null,"sudo arpspoof -i eth0 -t 10.0.0.9 10.0.0.1\n# 8:0:27:aa:bb:cc 0:c:29:dd:ee:ff 0806 42: arp reply\n# 10.0.0.1 is-at 8:0:27:aa:bb:cc   ← qurbonga yolg'on\n# (echo 1 > /proc/sys/net/ipv4/ip_forward — trafikni uzatish)"),
 React.createElement(Quiz,{q:{uz:"ARP spoofing ARP ning qaysi zaifligidan foydalanadi?",en:"Which ARP weakness does ARP spoofing exploit?"},opts:[{uz:"ARP juda sekin",en:"ARP is very slow"},{uz:"ARP javobning haqiqiyligini tekshirmaydi",en:"ARP doesn't verify that a reply is genuine"},{uz:"ARP shifrlangan",en:"ARP is encrypted"},{uz:"ARP faqat WiFi da",en:"ARP is WiFi-only"}],correct:1,exp:{uz:"ARP javobni tekshirmaydi — hujumchi soxta javob yuborib o'zini router qilib ko'rsatadi va trafikni o'g'irlaydi.",en:"ARP doesn't verify replies — an attacker sends a fake reply, impersonates the router and steals traffic."}}));
@@ -2762,19 +2696,19 @@ function LessonL25(){
   const tech=[["ARP Spoofing",{uz:"Lokal tarmoqda trafikni o'ziga yo'naltirish (L24)",en:"Redirect LAN traffic to itself (L24)"}],["DNS Spoofing",{uz:"Soxta IP berib soxta saytga yuborish (L26)",en:"Fake IP → fake site (L26)"}],["Evil Twin",{uz:"Soxta WiFi nuqtasi",en:"Fake WiFi hotspot"}],["SSL Strip",{uz:"HTTPS ni HTTP ga tushirishga urinish",en:"Try to downgrade HTTPS to HTTP"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L25-1"},t(lang,"MITM hujumi nima?","What is a MITM attack?")),
+    React.createElement(H2,{num:"§1"},t(lang,"MITM hujumi nima?","What is a MITM attack?")),
     React.createElement(P,null,t(lang,"MITM (o'rtadagi odam) — hujumchi ikki tomon aloqasiga yashirin kirib, tinglaydi yoki o'zgartiradi. Ikki tomon to'g'ridan-to'g'ri gaplashyapti deb o'ylaydi, aslida hamma narsa hujumchi orqali o'tadi (xatlarni yashirincha o'qiydigan pochtachi kabi). MITM'ning kuchi shu — u faqat josuslik qilmaydi, balki ma'lumotni YO'LDA o'zgartirishi ham mumkin.","MITM (man-in-the-middle) — the attacker secretly inserts into a conversation to eavesdrop or alter it. The two parties think they talk directly, but everything passes through the attacker (like a mail carrier secretly reading letters). MITM's real power is this — it doesn't just spy, it can also alter data ALONG THE WAY.")),
-    React.createElement(H2,{num:"§2",id:"toc-L25-2"},t(lang,"Interaktiv simulyator: passiv vs faol MITM","Interactive simulator: passive vs active MITM")),
+    React.createElement(H2,{num:"§2"},t(lang,"Interaktiv simulyator: passiv vs faol MITM","Interactive simulator: passive vs active MITM")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — hujumchi shunchaki tinglaganda va mazmunning o'zini o'zgartirganda oqibat qanday farq qilishini ko'ring:","Try both scenarios — see how the outcome differs when the attacker merely listens versus when they alter the content itself:")),
     React.createElement(MITMSim),
-    React.createElement(H2,{num:"§3",id:"toc-L25-3"},t(lang,"Keng tarqalgan usullar","Common techniques")),
+    React.createElement(H2,{num:"§3"},t(lang,"Keng tarqalgan usullar","Common techniques")),
     tech.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.06)+"s"}},
       React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:110}},x[0]),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
     React.createElement(InfoBox,{color:"var(--c-warn)"},"⚠ ",t(lang,"MITM texnikalari faqat ta'lim va ruxsat berilgan sinov muhitida o'rganilishi kerak. Real aloqani ruxsatsiz tinglash yoki o'zgartirish jiddiy jinoyat.","MITM techniques must only be studied in education and authorized test environments. Eavesdropping on or altering real communication without permission is a serious crime.")),
-    React.createElement(H2,{num:"§4",id:"toc-L25-4"},t(lang,"MITM turlari","Types of MITM")),
+    React.createElement(H2,{num:"§4"},t(lang,"MITM turlari","Types of MITM")),
     React.createElement(LayerStack,{layers:[{n:"arp",name:t(lang,"ARP spoofing","ARP spoofing"),color:"#ff3a5e",desc:{uz:"Mahalliy tarmoqda trafikni burish.",en:"Divert traffic on the local network."}},{n:"dns",name:t(lang,"DNS spoofing","DNS spoofing"),color:"#ffa94d",desc:{uz:"Soxta IP qaytarib, saytga yo'naltirish.",en:"Return a fake IP to redirect a site."}},{n:"rogue",name:t(lang,"Rogue AP","Rogue AP"),color:"#a855f7",desc:{uz:"Soxta WiFi nuqtasi ochish.",en:"Set up a fake WiFi access point."}},{n:"ssl",name:t(lang,"SSL strip","SSL strip"),color:"#4dabf7",desc:{uz:"HTTPS ni HTTP ga tushirishga urinish.",en:"Try to downgrade HTTPS to HTTP."}},]}),
-    React.createElement(H2,{num:"§5",id:"toc-L25-5"},t(lang,"Amaliyot: trafikni tinglash","Practice: sniffing traffic")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: trafikni tinglash","Practice: sniffing traffic")),
     React.createElement(P,null,t(lang,"MITM o'rnatilgach, hujumchi shifrlanmagan trafikni (HTTP, FTP) o'qiydi — bu simulyatordagi «Passiv» ssenariysi. HTTPS bunga to'sqinlik qiladi (L15) — sertifikat mos kelmasa brauzer ogohlantiradi.","Once MITM is set up, the attacker reads unencrypted traffic (HTTP, FTP) — the simulator's «Passive» scenario. HTTPS blocks this (L15) — if the certificate doesn't match, the browser warns.")),
     React.createElement(Terminal,null,"sudo bettercap -iface eth0\n> net.probe on\n> set arp.spoof.targets 10.0.0.9\n> arp.spoof on ; net.sniff on\n# [sniff] http://site.com  POST user=admin pass=1234  ← ochiq!"),
 React.createElement(Quiz,{q:{uz:"HTTPS MITM hujumida qanday yordam beradi?",en:"How does HTTPS help against MITM?"},opts:[{uz:"Trafikni tezlashtiradi",en:"Speeds up traffic"},{uz:"Mazmunni shifrlaydi — ushlansa ham o'qib bo'lmaydi",en:"Encrypts content — unreadable even if intercepted"},{uz:"IP ni yashiradi",en:"Hides the IP"},{uz:"Yordam bermaydi",en:"Doesn't help"}],correct:1,exp:{uz:"HTTPS mazmunni shifrlaydi — hujumchi trafikni ushlasa ham faqat shifrlangan ma'lumotni ko'radi.",en:"HTTPS encrypts the content — even intercepted, the attacker only sees encrypted data."}}));
@@ -2783,24 +2717,24 @@ function LessonL26(){
   const lang=useLang();
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L26-1"},t(lang,"DNS spoofing nima?","What is DNS spoofing?")),
+    React.createElement(H2,{num:"§1"},t(lang,"DNS spoofing nima?","What is DNS spoofing?")),
     React.createElement(P,null,t(lang,"DNS spoofing — hujumchi soxta DNS javob berib, qurbonni noto'g'ri IP ga yo'naltiradi. Qurbon bank.com yozadi, lekin hujumchining soxta serveriga tushadi (telefon kitobidagi raqamni yashirincha almashtirgandek).","DNS spoofing — the attacker returns a fake DNS reply to send the victim to the wrong IP. The victim types bank.com but lands on the attacker's fake server (like swapping a number in a phone book).")),
-    React.createElement(H2,{num:"§2",id:"toc-L26-2"},t(lang,"Qanday ishlaydi","How it works")),
+    React.createElement(H2,{num:"§2"},t(lang,"Qanday ishlaydi","How it works")),
     React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"DNS zaharlash",en:"DNS poisoning"},steps:[
       {icon:"🔎",text:{uz:"Qurbon so'raydi:  \"bank.com IP si?\"",en:"Victim asks:  \"IP of bank.com?\""}},
       {icon:"😈",text:{uz:"Hujumchi soxta javob beradi:  \"IP = 6.6.6.6\"",en:"Attacker replies fake:  \"IP = 6.6.6.6\""}},
       {icon:"🕸",text:{uz:"Qurbon soxta saytga ulanadi (haqiqiy deb o'ylaydi)",en:"Victim connects to the fake site (thinks it's real)"}},
       {icon:"🔑",text:{uz:"Login/parol o'g'irlanadi",en:"Credentials are stolen"}},
     ]}),
-    React.createElement(H2,{num:"§3",id:"toc-L26-3"},t(lang,"Interaktiv simulyator: DNSSEC qalqon bo'la oladimi?","Interactive simulator: can DNSSEC act as a shield?")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: DNSSEC qalqon bo'la oladimi?","Interactive simulator: can DNSSEC act as a shield?")),
     React.createElement(P,null,t(lang,"Xuddi shu soxta javob ikki xil resolver'ga yuborilsa nima bo'ladi — biri imzoni tekshirmaydi, ikkinchisi tekshiradi:","See what happens when the same forged reply hits two different resolvers — one that never checks a signature, and one that does:")),
     React.createElement(DNSSpoofSim),
-    React.createElement(H2,{num:"§4",id:"toc-L26-4"},t(lang,"Himoya chuqurroq","Defense in depth")),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya chuqurroq","Defense in depth")),
     React.createElement(P,null,t(lang,"DNSSEC har bir DNS yozuvini raqamli imzolaydi (RRSIG) — resolver imzoni zonaning ochiq kaliti bilan tekshiradi. Imzosiz yoki noto'g'ri imzolangan javob rad etiladi. Qo'shimcha qatlamlar: HTTPS (domen sertifikati mos kelmasa brauzer ogohlantiradi) va DoH/DoT (DNS so'rovlarini shifrlab, yo'ldagi almashtirishni qiyinlashtiradi).","DNSSEC digitally signs every DNS record (RRSIG) — the resolver checks the signature against the zone's public key. An unsigned or wrongly signed reply is rejected. Extra layers: HTTPS (the browser warns if the domain cert doesn't match) and DoH/DoT (encrypting DNS queries, making in-transit tampering harder).")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"DNS spoofing faqat nazorat qilinadigan laboratoriya yoki ruxsat berilgan sinovda o'rganilishi kerak.","DNS spoofing must only be studied in a controlled lab or an authorized test.")),
-        React.createElement(H2,{num:"§5",id:"toc-L26-5"},t(lang,"Haqiqiy va soxta javob","Real vs spoofed reply")),
+        React.createElement(H2,{num:"§5"},t(lang,"Haqiqiy va soxta javob","Real vs spoofed reply")),
     React.createElement(CompareCols,{left:{title:{uz:"Haqiqiy DNS",en:"Real DNS"},color:"#69db7c",rows:[{uz:"bank.com → 93.1.2.3",en:"bank.com → 93.1.2.3"},{uz:"Haqiqiy saytga boradi",en:"Goes to the real site"},]},right:{title:{uz:"Soxta DNS",en:"Spoofed DNS"},color:"#ff3a5e",rows:[{uz:"bank.com → 10.0.0.66",en:"bank.com → 10.0.0.66"},{uz:"Hujumchi soxta sahifasiga",en:"To the attacker's fake page"},]}}),
-    React.createElement(H2,{num:"§6",id:"toc-L26-6"},t(lang,"Amaliyot: soxta javob","Practice: a forged reply")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: soxta javob","Practice: a forged reply")),
     React.createElement(P,null,t(lang,"MITM holatida hujumchi DNS so'roviga haqiqiy serverdan oldin javob beradi — qurbon soxta IP oladi va fishing sahifasiga tushadi. Himoya: DNSSEC va HTTPS.","In a MITM position the attacker answers a DNS query before the real server — the victim gets a fake IP and lands on a phishing page. Defense: DNSSEC and HTTPS.")),
     React.createElement(Terminal,null,"sudo dnsspoof -i eth0 -f hosts.txt\n# hosts.txt:  10.0.0.66  bank.com\n# 10.0.0.9.51000 > 1.1.1.1.53: 42+ A? bank.com\n# dnsspoof: bank.com -> 10.0.0.66   ← soxta javob yuborildi"),
 React.createElement(Quiz,{q:{uz:"DNS spoofing hujumchiga nima imkonini beradi?",en:"What does DNS spoofing let an attacker do?"},opts:[{uz:"Faylni shifrlash",en:"Encrypt a file"},{uz:"To'g'ri nom yozilsa ham soxta saytga yo'naltirish",en:"Redirect to a fake site even with the correct name typed"},{uz:"WiFi parolini o'zgartirish",en:"Change the WiFi password"},{uz:"Tarmoqni tezlashtirish",en:"Speed up the network"}],correct:1,exp:{uz:"DNS spoofing soxta DNS javob beradi — qurbon to'g'ri nom (bank.com) yozsa ham soxta saytga tushadi.",en:"DNS spoofing returns a fake reply — even typing the right name (bank.com), the victim lands on a fake site."}}));
@@ -2810,20 +2744,20 @@ function LessonL27(){
   const types=[[{uz:"Volumetrik",en:"Volumetric"},{uz:"Kanalni ulkan trafik bilan to'ldiradi (UDP flood)",en:"Floods the link with huge traffic (UDP flood)"},"#ff3a5e"],[{uz:"Protokol",en:"Protocol"},{uz:"Server resurslarini tugatadi (SYN flood)",en:"Exhausts server resources (SYN flood)"},"#ff9145"],[{uz:"Ilova qatlami",en:"Application"},{uz:"Og'ir so'rovlar bilan charchatadi (HTTP flood)",en:"Tires the app with heavy requests (HTTP flood)"},"#ffd43b"]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L27-1"},t(lang,"DoS va DDoS nima?","What are DoS and DDoS?")),
+    React.createElement(H2,{num:"§1"},t(lang,"DoS va DDoS nima?","What are DoS and DDoS?")),
     React.createElement(P,null,t(lang,"DoS — serverni haddan tashqari so'rov bilan to'ldirib, xizmatni ishdan chiqarish. DDoS — xuddi shu, lekin minglab qurilmadan (botnet) bir vaqtda. Do'kon eshigini soxta mijozlar bilan to'ldirib, haqiqiylarni kira olmaslikka o'xshaydi.","DoS overwhelms a server with excessive requests to knock the service offline. DDoS is the same but from thousands of devices (a botnet) at once. Like jamming a shop's door with fake customers so real ones can't enter.")),
-    React.createElement(H2,{num:"§2",id:"toc-L27-2"},t(lang,"Hujum turlari","Attack types")),
+    React.createElement(H2,{num:"§2"},t(lang,"Hujum turlari","Attack types")),
     types.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid "+x[2]+"44",borderLeft:"3px solid "+x[2],borderRadius:10,animationDelay:(i*0.06)+"s"}},
       React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:x[2],minWidth:120}},t(lang,x[0].uz,x[0].en)),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-    React.createElement(H2,{num:"§3",id:"toc-L27-3"},t(lang,"Interaktiv simulyator: SYN flood — himoyasiz vs himoyalangan","Interactive simulator: SYN flood — unprotected vs protected")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: SYN flood — himoyasiz vs himoyalangan","Interactive simulator: SYN flood — unprotected vs protected")),
     React.createElement(P,null,t(lang,"Ikkala ssenariyni sinang — xuddi shu botnet toshqini himoyasiz va SYN cookie/rate-limit qo'llagan serverda qanday farqli tugashini ko'ring:","Try both scenarios — see how the exact same botnet flood ends differently against an unprotected server versus one using SYN cookies/rate-limiting:")),
     React.createElement(DDoSSim),
-    React.createElement(H2,{num:"§4",id:"toc-L27-4"},t(lang,"Himoya (mitigatsiya)","Mitigation")),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya (mitigatsiya)","Mitigation")),
     React.createElement(P,null,t(lang,"Simulyatordagi «SYN cookie + rate-limit» ssenariysi quyidagi choralarning bir qismini ko'rsatadi — real hayotda bularning barchasi birgalikda qo'llaniladi:","The simulator's «SYN cookies + rate-limit» scenario shows part of the measures below — in real life they're all combined:")),
     React.createElement(Terminal,null,"✓ Rate limiting — bir IP dan so'rovlarni cheklash\n✓ SYN cookie — ulanish holatini saqlamasdan tekshirish\n✓ CDN / DDoS himoya (Cloudflare, Akamai)\n✓ Firewall va trafik filtrlash\n✓ Monitoring — anomal trafikni erta sezish"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"DoS/DDoS ni boshqa birovning tizimiga uyushtirish jiddiy jinoyat — hatto \"sinash\" uchun ham. Bu mavzu faqat himoya (blue team) nuqtai nazaridan o'rganiladi.","Launching DoS/DDoS against someone else's system is a serious crime — even \"just to try\". Studied only from a defensive (blue team) perspective.")),
-    React.createElement(H2,{num:"§5",id:"toc-L27-5"},t(lang,"Amaliyot: SYN flood belgisi","Practice: a SYN flood sign")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: SYN flood belgisi","Practice: a SYN flood sign")),
     React.createElement(P,null,t(lang,"DDoS — minglab buzilgan qurilma (botnet) bir nishonga hujum qiladi, shuning uchun bitta IP ni bloklash yetmaydi. SYN flood serverni yarim ochiq ulanishlar bilan to'ldiradi — simulyatordagi «Himoyasiz server» ssenariysi aynan shu holat.","A DDoS uses thousands of compromised devices (a botnet) against one target, so blocking a single IP isn't enough. A SYN flood fills the server with half-open connections — exactly the simulator's «Unprotected server» scenario.")),
     React.createElement(Terminal,null,"# hujum belgisi: ko'p SYN_RECV holati\nnetstat -ant | grep SYN_RECV | wc -l\n# 4812   ← minglab yarim ochiq ulanish = SYN flood\n# himoya: SYN cookies, rate-limit, upstream/CDN filtr"),
 React.createElement(Quiz,{q:{uz:"DDoS ni oddiy DoS dan farqlovchi asosiy narsa nima?",en:"What mainly distinguishes DDoS from DoS?"},opts:[{uz:"DDoS shifrlangan",en:"DDoS is encrypted"},{uz:"DDoS ko'plab qurilmadan (botnet) bir vaqtda keladi",en:"DDoS comes from many devices (a botnet) at once"},{uz:"DDoS sekinroq",en:"DDoS is slower"},{uz:"Farqi yo'q",en:"No difference"}],correct:1,exp:{uz:"DDoS — taqsimlangan DoS: hujum minglab qurilmadan (botnet) bir vaqtda keladi, to'sish qiyinroq.",en:"DDoS is distributed DoS: it comes from thousands of devices (a botnet) at once, harder to block."}}));
@@ -2833,26 +2767,26 @@ function LessonL28(){
   const filt=[["ip.addr == 10.0.0.5",{uz:"muayyan IP",en:"specific IP"}],["tcp.port == 80",{uz:"HTTP trafigi",en:"HTTP traffic"}],["dns",{uz:"faqat DNS",en:"DNS only"}],["http.request.method==\"POST\"",{uz:"POST so'rovlar",en:"POST requests"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L28-1"},t(lang,"Wireshark nima?","What is Wireshark?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Wireshark nima?","What is Wireshark?")),
     React.createElement(P,null,t(lang,"Wireshark — tarmoqdan o'tayotgan paketlarni real vaqtda ushlab, batafsil ko'rsatuvchi vosita. U tarmoqni \"rentgen\" qilib ko'rsatadi. Muammolarni topish, o'rganish va xavfsizlik tahlili uchun ishlatiladi.","Wireshark captures packets crossing the network in real time and shows them in detail — an \"X-ray\" of the network. Used for troubleshooting, learning and security analysis.")),
-    React.createElement(H2,{num:"§2",id:"toc-L28-2"},t(lang,"Ish jarayoni","Workflow")),
+    React.createElement(H2,{num:"§2"},t(lang,"Ish jarayoni","Workflow")),
     React.createElement(FlowSteps,{title:{uz:"Wireshark bilan tahlil",en:"Analyzing with Wireshark"},steps:[
       {icon:"🎣",text:{uz:"Interfeysni tanlab, paketlarni ushlash (capture)",en:"Pick an interface and capture packets"}},
       {icon:"🔍",text:{uz:"Ko'rsatish filtri bilan keraklisini ajratish",en:"Narrow down with a display filter"}},
       {icon:"🧵",text:{uz:"\"Follow TCP Stream\" bilan suhbatni ko'rish",en:"See the conversation with \"Follow TCP Stream\""}},
       {icon:"📊",text:{uz:"Muammo yoki hujum izlarini aniqlash",en:"Spot the problem or attack traces"}},
     ]}),
-    React.createElement(H2,{num:"§3",id:"toc-L28-3"},t(lang,"Interaktiv simulyator: filtrsiz vs filtr bilan qidiruv","Interactive simulator: searching unfiltered vs with a filter")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: filtrsiz vs filtr bilan qidiruv","Interactive simulator: searching unfiltered vs with a filter")),
     React.createElement(P,null,t(lang,"14 000 ta ushlangan paket ichida bitta POST so'rovni topish kerak. Ikkala ssenariyni sinang — filtrning haqiqiy qiymatini his qiling:","You need to find one POST request among 14,000 captured packets. Try both scenarios — feel the real value of a filter:")),
     React.createElement(WiresharkSim),
-    React.createElement(H2,{num:"§4",id:"toc-L28-4"},t(lang,"Foydali filtrlar","Useful filters")),
+    React.createElement(H2,{num:"§4"},t(lang,"Foydali filtrlar","Useful filters")),
     filt.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,alignItems:"center",padding:"8px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.05)+"s"}},
       React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--accent)",flex:1}},x[0]),
       React.createElement("span",{style:{fontSize:11.5,color:"var(--text-2)"}},t(lang,x[1].uz,x[1].en)));}),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Boshqalarning trafigini ruxsatsiz ushlash maxfiylikni buzadi. Faqat o'z tarmog'ingiz yoki ruxsat berilgan muhitda ishlating.","Capturing others' traffic without permission violates privacy. Use only on your own network or an authorized environment.")),
-        React.createElement(H2,{num:"§5",id:"toc-L28-5"},t(lang,"Capture va display filtr","Capture vs display filter")),
+        React.createElement(H2,{num:"§5"},t(lang,"Capture va display filtr","Capture vs display filter")),
     React.createElement(CompareCols,{left:{title:{uz:"Capture filtr",en:"Capture filter"},color:"#4dabf7",rows:[{uz:"Ushlashdan OLDIN cheklaydi",en:"Limits BEFORE capture"},{uz:"BPF sintaksisi (tcp port 80)",en:"BPF syntax (tcp port 80)"},{uz:"Diskni tejaydi",en:"Saves disk"},]},right:{title:{uz:"Display filtr",en:"Display filter"},color:"#69db7c",rows:[{uz:"Ushlagandan KEYIN filtrlaydi",en:"Filters AFTER capture"},{uz:"Wireshark sintaksisi (http)",en:"Wireshark syntax (http)"},{uz:"Moslashuvchan tahlil",en:"Flexible analysis"},]}}),
-    React.createElement(H2,{num:"§6",id:"toc-L28-6"},t(lang,"Amaliyot: parolni topish","Practice: finding a password")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: parolni topish","Practice: finding a password")),
     React.createElement(P,null,t(lang,"Shifrlanmagan protokolda login ochiq ketadi. Simulyatordagi «Filtr bilan» ssenariysi kabi, display filtr bilan aynan o'sha paketni topib, Follow Stream orqali butun suhbatni o'qish mumkin.","In an unencrypted protocol the login travels in the clear. Just like the simulator's «With a filter» scenario, a display filter finds that exact packet, and Follow Stream lets you read the whole conversation.")),
     React.createElement(Terminal,null,"tshark -i eth0 -Y 'http.request.method==POST' -T fields -e http.file_data\n# username=admin&password=Secret123   ← ochiq parol!\n# capture filtr misoli: tshark -i eth0 -f 'tcp port 80'"),
 React.createElement(Quiz,{q:{uz:"Ushlangan paketlardan faqat keraklisini ko'rsatish uchun nima ishlatiladi?",en:"What shows only the relevant captured packets?"},opts:[{uz:"Display filter (ko'rsatish filtri)",en:"A display filter"},{uz:"Firewall qoidasi",en:"A firewall rule"},{uz:"DNS yozuvi",en:"A DNS record"},{uz:"VPN tunnel",en:"A VPN tunnel"}],correct:0,exp:{uz:"Ko'rsatish filtri (masalan http yoki ip.addr==...) minglab paketdan keraklisini ajratadi.",en:"A display filter (e.g. http or ip.addr==...) narrows thousands of packets to the ones you need."}}));
@@ -2862,21 +2796,21 @@ function LessonL29(){
   const att=[["Deauth",{uz:"Qurilmani WiFi dan majburan uzadi",en:"Forcibly disconnects a device"}],["Evil Twin",{uz:"Soxta WiFi nuqtasi (haqiqiy nomni ko'chiradi)",en:"Fake AP cloning the real name"}],["Handshake capture",{uz:"WPA2 handshake ni ushlab, parolni oflayn buzish",en:"Capture WPA2 handshake, crack offline"}],["WPS hujumi",{uz:"WPS PIN zaifligidan foydalanish",en:"Exploit the WPS PIN weakness"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L29-1"},t(lang,"Simsiz hujumlar nima?","What are wireless attacks?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Simsiz hujumlar nima?","What are wireless attacks?")),
     React.createElement(P,null,t(lang,"WiFi havo orqali uzatgani uchun kabel tarmoqdan ko'ra ko'proq hujumga ochiq — signalni radiusdagi har kim \"eshitishi\" mumkin. Bu hujumlarni bilish o'z tarmog'ingizni himoya qilish uchun zarur.","Because WiFi transmits through the air, it's more exposed than wired networks — anyone in range can \"hear\" the signal. Knowing these attacks is essential to protect your own network.")),
-    React.createElement(H2,{num:"§2",id:"toc-L29-2"},t(lang,"Keng tarqalgan hujumlar","Common attacks")),
+    React.createElement(H2,{num:"§2"},t(lang,"Keng tarqalgan hujumlar","Common attacks")),
     att.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,padding:"10px 14px",marginBottom:7,background:"var(--surface)",border:"1px solid var(--border)",borderLeft:"3px solid #ff9145",borderRadius:10,animationDelay:(i*0.06)+"s"}},
       React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"#ff9145",minWidth:150}},x[0]),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
-    React.createElement(H2,{num:"§3",id:"toc-L29-3"},t(lang,"Interaktiv simulyator: zaif vs kuchli parol","Interactive simulator: weak vs strong password")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: zaif vs kuchli parol","Interactive simulator: weak vs strong password")),
     React.createElement(P,null,t(lang,"Handshake ikkala holatda ham bir xil ushlanadi — ammo aynan PAROL qanday tanlanganiga qarab, hujum natijasi tubdan farq qiladi. Ikkalasini sinang:","The handshake gets captured the same way either time — but the outcome hinges entirely on how the PASSWORD was chosen. Try both:")),
     React.createElement(WirelessCrackSim),
-    React.createElement(H2,{num:"§4",id:"toc-L29-4"},t(lang,"Himoya","Defense")),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
     React.createElement(Terminal,null,"✓ WPA3 yoki kamida WPA2 (WEP emas!)\n✓ Uzun, murakkab parol (12+ belgi)\n✓ WPS ni o'chiring\n✓ Mehmonlar uchun alohida tarmoq"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Simsiz hujum vositalarini faqat o'z tarmog'ingizda yoki yozma ruxsat bilan sinang. Birovning WiFi siga ruxsatsiz kirish jinoyat.","Test wireless attack tools only on your own network or with written permission. Unauthorized access to someone's WiFi is a crime.")),
-        React.createElement(H2,{num:"§5",id:"toc-L29-5"},t(lang,"WPA2 buzish oqimi","The WPA2 cracking flow")),
+        React.createElement(H2,{num:"§5"},t(lang,"WPA2 buzish oqimi","The WPA2 cracking flow")),
     React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"WiFi parolini sinash",en:"Testing the WiFi password"},steps:[{icon:"📡",text:{uz:"Monitor rejim — havoni tinglash (airmon-ng)",en:"Monitor mode — listen to the air (airmon-ng)"}},{icon:"🔍",text:{uz:"Nishon AP va mijozni topish (airodump-ng)",en:"Find the target AP and client (airodump-ng)"}},{icon:"👋",text:{uz:"Deauth → handshake ni ushlash",en:"Deauth → capture the handshake"}},{icon:"🔑",text:{uz:"Oflayn lug'at hujumi (aircrack-ng)",en:"Offline dictionary attack (aircrack-ng)"}},]}),
-    React.createElement(H2,{num:"§6",id:"toc-L29-6"},t(lang,"Amaliyot: handshake buzish","Practice: cracking the handshake")),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: handshake buzish","Practice: cracking the handshake")),
     React.createElement(P,null,t(lang,"Handshake ushlangach, hujum OFLAYN davom etadi — parol lug'at bilan sinaladi, xuddi simulyatordagi «Zaif parol» ssenariysidek. Kuchli, uzun parol bu hujumni amalda imkonsiz qiladi.","Once the handshake is captured, the attack continues OFFLINE — the password is tested against a wordlist, just like the simulator's «Weak password» scenario. A strong, long password makes this attack practically impossible.")),
     React.createElement(Terminal,null,"aircrack-ng -w rockyou.txt capture.cap\n#   [00:03:12] 145203 keys tested\n#   KEY FOUND! [ MyWiFiPass2024 ]\n# → kuchsiz parol soatlarda ochiladi"),
 React.createElement(Quiz,{q:{uz:"WPA2 \"handshake capture\" dan keyin hujumchi odatda nima qiladi?",en:"After a WPA2 \"handshake capture\", what does the attacker do?"},opts:[{uz:"Parolni oflayn buzishga urinadi",en:"Tries to crack the password offline"},{uz:"Routerni o'chiradi",en:"Turns off the router"},{uz:"IP beradi",en:"Hands out IPs"},{uz:"DNS ni tuzatadi",en:"Fixes DNS"}],correct:0,exp:{uz:"Ushlangan handshake parolning shifrlangan izini o'z ichiga oladi — hujumchi uni oflayn buzishga urinadi. Uzun parol buni deyarli imkonsiz qiladi.",en:"The captured handshake holds an encrypted trace of the password — the attacker tries to crack it offline. A long password makes this nearly impossible."}}));
@@ -2886,24 +2820,24 @@ function LessonL30(){
   const src=[[{uz:"Paket yozuvlari (PCAP)",en:"Packet captures (PCAP)"},{uz:"Aynan nima uzatilganini ko'rsatadi",en:"Show exactly what was transmitted"}],[{uz:"Firewall/IDS loglari",en:"Firewall/IDS logs"},{uz:"Bloklangan/ruxsat berilgan ulanishlar",en:"Blocked/allowed connections"}],[{uz:"Server loglari",en:"Server logs"},{uz:"Kirish urinishlari, so'rovlar, xatolar",en:"Login attempts, requests, errors"}],[{uz:"NetFlow",en:"NetFlow"},{uz:"Kim kim bilan qancha ma'lumot almashgani",en:"Who talked to whom and how much"}]];
   return React.createElement("section",null,
     React.createElement(NetAnimStyle),
-    React.createElement(H2,{num:"§1",id:"toc-L30-1"},t(lang,"Tarmoq forensikasi nima?","What is network forensics?")),
+    React.createElement(H2,{num:"§1"},t(lang,"Tarmoq forensikasi nima?","What is network forensics?")),
     React.createElement(P,null,t(lang,"Tarmoq forensikasi — hodisadan keyin tarmoq ma'lumotlarini tekshirib, nima bo'lganini aniqlash. Detektiv ishi kabi: paketlar, loglar va izlarni yig'ib, \"kim, qachon, qanday\" ga javob topiladi. Himoya (blue team) va incident response ning muhim qismi.","Network forensics examines network data after an incident to determine what happened. Like detective work: collect packets, logs and traces to answer \"who, when, how\". A key part of defense (blue team) and incident response.")),
-    React.createElement(H2,{num:"§2",id:"toc-L30-2"},t(lang,"Tekshiruv jarayoni","The investigation process")),
+    React.createElement(H2,{num:"§2"},t(lang,"Tekshiruv jarayoni","The investigation process")),
     React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"Forensika jarayoni",en:"Forensics process"},steps:[
       {icon:"📥",text:{uz:"Dalilni yig'ish (PCAP, loglar) — nusxadan ishlash",en:"Collect evidence (PCAP, logs) — work on a copy"}},
       {icon:"🔬",text:{uz:"Tahlil: filtrlar, oqimlar, vaqt chizig'i",en:"Analyze: filters, streams, timeline"}},
       {icon:"🧩",text:{uz:"\"Kim, qachon, qanday\" ni tiklash",en:"Reconstruct \"who, when, how\""}},
       {icon:"📝",text:{uz:"Hisobot + dalil zanjirini hujjatlash",en:"Report + document the chain of custody"}},
     ]}),
-    React.createElement(H2,{num:"§3",id:"toc-L30-3"},t(lang,"Interaktiv simulyator: dalil zanjiri — hash bormi, yo'qmi?","Interactive simulator: chain of custody — with or without a hash?")),
+    React.createElement(H2,{num:"§3"},t(lang,"Interaktiv simulyator: dalil zanjiri — hash bormi, yo'qmi?","Interactive simulator: chain of custody — with or without a hash?")),
     React.createElement(P,null,t(lang,"Xuddi shu PCAP dalilini ikki xil tekshiruvchi qo'lga oladi — biri hash olishni unutadi, ikkinchisi darhol muhrlaydi. Natija sudda tubdan farq qiladi:","The same PCAP evidence lands in two different investigators' hands — one forgets to hash it, the other seals it immediately. The outcome in court differs completely:")),
     React.createElement(ForensicsSim),
-    React.createElement(H2,{num:"§4",id:"toc-L30-4"},t(lang,"Dalil manbalari","Evidence sources")),
+    React.createElement(H2,{num:"§4"},t(lang,"Dalil manbalari","Evidence sources")),
     src.map(function(x,i){return React.createElement("div",{key:i,className:"na-rise",style:{display:"flex",gap:12,padding:"9px 14px",marginBottom:6,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:9,animationDelay:(i*0.05)+"s"}},
       React.createElement("span",{style:{fontSize:12.5,fontWeight:700,color:"var(--accent)",minWidth:150}},t(lang,x[0].uz,x[0].en)),
       React.createElement("span",{style:{fontSize:12,color:"var(--text-1)"}},t(lang,x[1].uz,x[1].en)));}),
     React.createElement(InfoBox,{color:"var(--accent)"},React.createElement("strong",null,t(lang,"Dalil zanjiri: ","Chain of custody: ")),t(lang,"dalil o'zgartirilmagani va kim unga tekkanligi hujjatlanishi shart — aks holda sudda kuchini yo'qotadi. Doim asl nusxadan ish nusxasi olib ishlanadi.","evidence must be documented as unaltered and who handled it recorded — otherwise it loses value in court. Always work on a copy, never the original.")),
-    React.createElement(H2,{num:"§5",id:"toc-L30-5"},t(lang,"Amaliyot: pcap tahlili","Practice: analyzing a pcap")),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: pcap tahlili","Practice: analyzing a pcap")),
     React.createElement(P,null,t(lang,"Forensika — hodisadan KEYIN dalilni yig'ish va tahlil qilish. Simulyatordagi «Hash bilan muhrlash» ssenariysi kabi: har fayl hashlanadi va kim tekkani yoziladi, shunda dalil sudda kuchga ega bo'ladi.","Forensics is collecting and analyzing evidence AFTER an incident. Just like the simulator's «Seal it with a hash» scenario: each file is hashed and every handler recorded, so the evidence holds up in court.")),
     React.createElement(Terminal,null,"sha256sum capture.pcap   # dalilni muhrlash\n# 9f2c...  capture.pcap\ntcpdump -r capture.pcap -nn 'port 4444'\n# 10.0.0.9.51002 > 10.0.0.5.4444  ← shubhali reverse shell"),
 React.createElement(Quiz,{q:{uz:"\"Dalil zanjiri\" (chain of custody) nima uchun muhim?",en:"Why is \"chain of custody\" important?"},opts:[{uz:"Tarmoqni tezlashtiradi",en:"Speeds up the network"},{uz:"Dalil o'zgartirilmagani va ishonchli ekanini isbotlaydi",en:"Proves the evidence is unaltered and trustworthy"},{uz:"Parolni shifrlaydi",en:"Encrypts the password"},{uz:"IP beradi",en:"Hands out IPs"}],correct:1,exp:{uz:"Dalil zanjiri dalil o'zgartirilmaganini va kim unga tekkanini hujjatlaydi — bu ishonchlilik va sud kuchini ta'minlaydi.",en:"Chain of custody documents that evidence is unaltered and who handled it — ensuring it's trustworthy and admissible."}}));
