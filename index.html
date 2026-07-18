@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="bg-grid"></div>
+<canvas id="bgCanvas"></canvas>
 <div class="bg-glow"></div>
 
 <header class="hero">
@@ -18,8 +18,14 @@
     <div class="brand-mark">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
     </div>
-    <div class="lang-switch">
-      <button id="langBtn" type="button">EN</button>
+    <div class="brand-actions">
+      <button id="profileBtn" class="ghost-btn" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        <span data-uz="Profil" data-en="Profile">Profil</span>
+      </button>
+      <div class="lang-switch">
+        <button id="langBtn" type="button">EN</button>
+      </div>
     </div>
   </div>
   <div class="badge"><span class="dot"></span><span data-uz="4 modul · O'zbek tilida · AI yordamchi" data-en="4 modules · Uzbek & English · AI assistant">4 modul · O'zbek tilida · AI yordamchi</span></div>
@@ -37,6 +43,38 @@
   <span data-uz="Ta'lim maqsadida — faqat ruxsat berilgan tizimlarda amaliyot qiling." data-en="For educational use — only practice on systems you are authorized to test.">Ta'lim maqsadida — faqat ruxsat berilgan tizimlarda amaliyot qiling.</span>
 </footer>
 
+<div class="modal-overlay" id="profileOverlay">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" data-uz="Profil" data-en="Profile">Profil</div>
+      <button class="modal-close" id="profileClose" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label data-uz="// ISM" data-en="// NAME">// ISM</label>
+        <input id="profileName" maxlength="30" autocomplete="off" />
+        <div class="field-hint" data-uz="Barcha 4 modulda ko'rinadi" data-en="Shown across all 4 modules">Barcha 4 modulda ko'rinadi</div>
+      </div>
+      <div class="field">
+        <label data-uz="// AI KALITLAR" data-en="// AI KEYS">// AI KALITLAR</label>
+        <div class="field-hint" data-uz="Har qaysi moduldagi AI muallim shu kalitlardan foydalanadi" data-en="The AI tutor in every module uses these keys">Har qaysi moduldagi AI muallim shu kalitlardan foydalanadi</div>
+        <div id="aiKeysList" class="ai-keys-list"></div>
+        <div id="aiAddForm" class="ai-add-form">
+          <div class="ai-prov-row" id="aiProvRow"></div>
+          <div class="ai-key-row">
+            <input id="aiKeyInput" type="password" placeholder="key..." autocomplete="off" />
+            <button id="aiKeyAdd" class="btn-mini" type="button" data-uz="Qo'shish" data-en="Add">Qo'shish</button>
+          </div>
+        </div>
+      </div>
+      <button id="profileSave" class="btn-save" type="button">
+        <span data-uz="Saqlash" data-en="Save">Saqlash</span>
+      </button>
+      <div id="profileSaved" class="saved-msg" data-uz="✓ Saqlandi" data-en="✓ Saved">✓ Saqlandi</div>
+    </div>
+  </div>
+</div>
+
 <script>
 const MODULES = [
   { id:"windows", href:"windows/index.html", key:"wa_progress", total:43, accent:"#4d8bff",
@@ -44,26 +82,51 @@ const MODULES = [
     dUz:"Windows ichki tuzilishi, kernel, jarayonlar, Active Directory va tizim xavfsizligi.",
     dEn:"Windows internals, kernel, processes, Active Directory and system security.",
     tagUz:"Ichki tuzilma & Xavfsizlik", tagEn:"Internals & Security",
-    icon:'<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>' },
+    icon:'<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>',
+    diagram:["shield","key","database"] },
   { id:"kali", href:"kali/index.html", key:"ka_progress", total:38, accent:"#a855f7",
     uz:"Kali Linux", en:"Kali Linux",
     dUz:"Kali Linux asoslari, buyruqlar qatori va pentest vositalari — Nmap, Metasploit, Hydra.",
     dEn:"Kali Linux basics, command line and pentest tools — Nmap, Metasploit, Hydra.",
     tagUz:"Pentest Distributivi", tagEn:"Pentest Distro",
-    icon:'<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>' },
+    icon:'<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>',
+    diagram:["terminal","bug","key"] },
   { id:"network", href:"network/index.html", key:"na_progress", total:30, accent:"#00d4ff",
     uz:"Network", en:"Network",
     dUz:"OSI modeli, TCP/IP, firewall, VPN va tarmoq hujumlari hamda himoyasi.",
     dEn:"OSI model, TCP/IP, firewalls, VPN and network attacks & defense.",
     tagUz:"Tarmoq Xavfsizligi", tagEn:"Network Security",
-    icon:'<circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="12" y2="11"/><path d="M12 11 5 17"/><path d="m12 11 7 6"/>' },
+    icon:'<circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="12" y2="11"/><path d="M12 11 5 17"/><path d="m12 11 7 6"/>',
+    diagram:["network","wifi","lock"] },
   { id:"web-pentest", href:"web-pentest/index.html", key:"wp_progress", total:28, accent:"#ff4444",
     uz:"Web-Pentest", en:"Web-Pentest",
     dUz:"HTTP, OWASP Top 10, SQL Injection, XSS va Burp Suite bilan veb ilovalarni test qilish.",
     dEn:"HTTP, OWASP Top 10, SQL Injection, XSS and testing web apps with Burp Suite.",
     tagUz:"Veb Xavfsizligi", tagEn:"Web Security",
-    icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/>' },
+    icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/>',
+    diagram:["bug","globe","database"] },
 ];
+
+const DIAGRAM_ICONS = {
+  shield:"M12 2L4 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-8-3z",
+  key:"M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z",
+  database:"M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zm0 14c-3.87 0-6-1.5-6-2v-1.5c1.26.83 3.5 1.5 6 1.5s4.74-.67 6-1.5V17c0 .5-2.13 2-6 2z",
+  terminal:"M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10zM6 10l1.4-1.4L11 12.2l-3.6 3.6L6 14.4l2.2-2.2L6 10zm6 4.5h5V16h-5z",
+  bug:"M20 8h-2.81c-.45-.78-1.07-1.45-1.82-1.96L17 4.41 15.59 3l-2.17 2.17C12.96 5.06 12.49 5 12 5c-.49 0-.96.06-1.41.17L8.41 3 7 4.41l1.62 1.63C7.88 6.55 7.26 7.22 6.81 8H4v2h2.09c-.05.33-.09.66-.09 1v1H4v2h2v1c0 .34.04.67.09 1H4v2h2.81c1.04 1.79 2.97 3 5.19 3s4.15-1.21 5.19-3H20v-2h-2.09c.05-.33.09-.66.09-1v-1h2v-2h-2v-1c0-.34-.04-.67-.09-1H20V8zm-6 8h-4v-2h4v2zm0-4h-4v-2h4v2z",
+  network:"M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z",
+  wifi:"M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4l2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z",
+  lock:"M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z",
+  globe:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z",
+};
+
+const PROVS = [
+  {id:"groq",label:"Groq",hint:"gsk_...",free:true},
+  {id:"openai",label:"OpenAI",hint:"sk-..."},
+  {id:"anthropic",label:"Claude",hint:"sk-ant-..."},
+  {id:"gemini",label:"Gemini",hint:"AIza..."},
+];
+const AI_KEYS_STORE = "wa_ai_keys", AI_ACTIVE_STORE = "wa_ai_active_id";
+const PROGRESS_KEYS = MODULES.map(m => m.key);
 
 let lang = localStorage.getItem("cs_lang") || "uz";
 
@@ -71,6 +134,22 @@ function doneCount(key){
   try{ const p = JSON.parse(localStorage.getItem(key)||"{}");
     return Array.isArray(p.completedLessons) ? p.completedLessons.length : 0; }
   catch(e){ return 0; }
+}
+
+function diagramSvg(name, size){
+  const d = DIAGRAM_ICONS[name] || DIAGRAM_ICONS.shield;
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="currentColor"><path d="${d}"/></svg>`;
+}
+
+function cardDiagram(m){
+  const angles = [0, 120, 240];
+  const orbits = m.diagram.map((iconName, i) => `
+    <div class="cd-orbit-static" style="transform:rotate(${angles[i]}deg)">
+      <div class="cd-orbit-spin">
+        <div class="cd-icon-wrap"><span class="cd-icon">${diagramSvg(iconName, 13)}</span></div>
+      </div>
+    </div>`).join("");
+  return `<div class="card-diagram" style="--c:${m.accent}"><div class="cd-core"></div>${orbits}</div>`;
 }
 
 function render(){
@@ -100,6 +179,7 @@ function render(){
         <div class="card-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${m.icon}</svg></div>
         <span class="card-tag">${lang==="uz"?m.tagUz:m.tagEn}</span>
       </div>
+      ${cardDiagram(m)}
       <h3 class="card-title">${lang==="uz"?m.uz:m.en}</h3>
       <p class="card-desc">${lang==="uz"?m.dUz:m.dEn}</p>
       <div class="card-prog">
@@ -121,6 +201,177 @@ document.getElementById("langBtn").addEventListener("click", ()=>{
 });
 
 render();
+
+/* ── Background: particle-network canvas (replaces the old grid mesh) ── */
+(function(){
+  const canvas = document.getElementById("bgCanvas");
+  const ctx = canvas.getContext("2d");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let w, h, particles, raf;
+  const COUNT = 64, MAXDIST = 135, SPEED = 0.18;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  function init(){
+    particles = Array.from({length: COUNT}, () => ({
+      x: Math.random()*w, y: Math.random()*h,
+      vx: (Math.random()-0.5)*SPEED, vy: (Math.random()-0.5)*SPEED,
+      r: 1 + Math.random()*1.6,
+    }));
+  }
+  function frame(){
+    ctx.clearRect(0,0,w,h);
+    for(const p of particles){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0 || p.x > w) p.vx *= -1;
+      if(p.y < 0 || p.y > h) p.vy *= -1;
+    }
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const a=particles[i], b=particles[j];
+        const dx=a.x-b.x, dy=a.y-b.y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist < MAXDIST){
+          ctx.strokeStyle = `rgba(120,150,255,${(1-dist/MAXDIST)*0.16})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+        }
+      }
+    }
+    for(const p of particles){
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = "rgba(160,190,255,0.85)";
+      ctx.shadowBlur = 7;
+      ctx.shadowColor = "rgba(91,139,255,0.9)";
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    if(!reduceMotion) raf = requestAnimationFrame(frame);
+  }
+
+  window.addEventListener("resize", ()=>{ resize(); init(); });
+  resize(); init(); frame();
+  if(reduceMotion) frame(); // draw one static frame only
+})();
+
+/* ── Profile + AI keys modal (shared across all 4 modules) ── */
+(function(){
+  const overlay = document.getElementById("profileOverlay");
+  const nameInput = document.getElementById("profileName");
+  const provRow = document.getElementById("aiProvRow");
+  const keyInput = document.getElementById("aiKeyInput");
+  const keysList = document.getElementById("aiKeysList");
+  const savedMsg = document.getElementById("profileSaved");
+  let selectedProv = "";
+
+  function loadKeys(){
+    try{ return JSON.parse(localStorage.getItem(AI_KEYS_STORE)||"[]"); }catch(e){ return []; }
+  }
+  function saveKeys(keys){
+    try{ localStorage.setItem(AI_KEYS_STORE, JSON.stringify(keys)); }catch(e){}
+  }
+  function getActiveId(){
+    try{ return localStorage.getItem(AI_ACTIVE_STORE)||""; }catch(e){ return ""; }
+  }
+  function setActiveId(id){
+    try{ localStorage.setItem(AI_ACTIVE_STORE, id); }catch(e){}
+  }
+  function maskKey(k){
+    return k.length>8 ? k.slice(0,4)+"****"+k.slice(-4) : "****";
+  }
+  function currentName(){
+    for(const key of PROGRESS_KEYS){
+      try{
+        const p = JSON.parse(localStorage.getItem(key)||"{}");
+        if(p.name && p.name !== "Student") return p.name;
+      }catch(e){}
+    }
+    return "Student";
+  }
+  function renderProvRow(){
+    provRow.innerHTML = PROVS.map(p => `
+      <button type="button" class="prov-btn${selectedProv===p.id?" active":""}" data-id="${p.id}">
+        ${p.label}${p.free?`<span class="prov-free">${lang==="uz"?"BEPUL":"FREE"}</span>`:""}
+      </button>`).join("");
+    provRow.querySelectorAll(".prov-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{ selectedProv = btn.dataset.id; renderProvRow(); });
+    });
+  }
+  function renderKeysList(){
+    const keys = loadKeys();
+    const activeId = getActiveId();
+    if(!keys.length){
+      keysList.innerHTML = `<div class="ai-empty">${lang==="uz"?"Hali kalit qo'shilmagan":"No keys added"}</div>`;
+      return;
+    }
+    keysList.innerHTML = keys.map(k=>{
+      const prov = PROVS.find(p=>p.id===k.provider);
+      const isActive = k.id===activeId;
+      return `
+      <div class="ai-key-item${isActive?" active":""}" data-id="${k.id}">
+        <span class="ai-key-dot"></span>
+        <span class="ai-key-label">${prov?prov.label:k.provider}</span>
+        <span class="ai-key-masked">${maskKey(k.key)}</span>
+        ${isActive
+          ? `<span class="ai-key-badge">${lang==="uz"?"FAOL":"ACTIVE"}</span>`
+          : `<button type="button" class="btn-mini ai-activate" data-id="${k.id}">${lang==="uz"?"Faollashtir":"Activate"}</button>`}
+        <button type="button" class="ai-remove" data-id="${k.id}">✕</button>
+      </div>`;
+    }).join("");
+    keysList.querySelectorAll(".ai-activate").forEach(btn=>{
+      btn.addEventListener("click", ()=>{ setActiveId(btn.dataset.id); renderKeysList(); });
+    });
+    keysList.querySelectorAll(".ai-remove").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id = btn.dataset.id;
+        const remaining = loadKeys().filter(k=>k.id!==id);
+        saveKeys(remaining);
+        if(getActiveId()===id) setActiveId(remaining[0]?remaining[0].id:"");
+        renderKeysList();
+      });
+    });
+  }
+  document.getElementById("aiKeyAdd").addEventListener("click", ()=>{
+    const val = keyInput.value.trim();
+    const keys = loadKeys();
+    if(!selectedProv || !val || keys.length>=3) return;
+    const entry = { id: Date.now().toString(), provider: selectedProv, key: val };
+    const updated = [...keys, entry];
+    saveKeys(updated);
+    if(!getActiveId()) setActiveId(entry.id);
+    keyInput.value = ""; selectedProv = "";
+    renderProvRow(); renderKeysList();
+  });
+
+  function openModal(){
+    nameInput.value = currentName();
+    selectedProv = "";
+    renderProvRow(); renderKeysList();
+    savedMsg.classList.remove("show");
+    overlay.classList.add("open");
+  }
+  function closeModal(){ overlay.classList.remove("open"); }
+
+  document.getElementById("profileBtn").addEventListener("click", openModal);
+  document.getElementById("profileClose").addEventListener("click", closeModal);
+  overlay.addEventListener("click", e => { if(e.target===overlay) closeModal(); });
+
+  document.getElementById("profileSave").addEventListener("click", ()=>{
+    const name = nameInput.value.trim() || "Student";
+    PROGRESS_KEYS.forEach(key=>{
+      try{
+        const p = JSON.parse(localStorage.getItem(key)||"{}");
+        p.name = name;
+        localStorage.setItem(key, JSON.stringify(p));
+      }catch(e){}
+    });
+    savedMsg.classList.add("show");
+    setTimeout(()=>savedMsg.classList.remove("show"), 1800);
+  });
+})();
 </script>
 </body>
 </html>
