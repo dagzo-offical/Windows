@@ -5,7 +5,7 @@
 const {useState,useEffect,useRef,useCallback,createContext,useContext}=React;
 
 // ── Constants ────────────────────────────────────────────────
-const PROG_KEY="ka_progress",ROUTE_KEY="ka_route",THEME_KEY="ka_theme",LANG_KEY="ka_lang";
+const PROG_KEY="ka_progress",ROUTE_KEY="ka_route",THEME_KEY="ka_theme",LANG_KEY="ka_lang",TIME_KEY="ka_time_spent";
 const AI_KEYS_STORE="wa_ai_keys",AI_ACTIVE_STORE="wa_ai_active_id";
 
 // ── AI helpers (shares keys with Windows/Network Academy) ─────
@@ -26,7 +26,7 @@ async function callAI(prompt){
 // ── Progress ─────────────────────────────────────────────────
 function todayStr(){return new Date().toISOString().slice(0,10);}
 function loadProgress(){try{const s=localStorage.getItem(PROG_KEY);if(s)return{...defaultProgress(),...JSON.parse(s)};}catch{}return defaultProgress();}
-function defaultProgress(){return{xp:0,level:1,completedLessons:[],name:"Student",lastLogin:null,streak:0};}
+function defaultProgress(){return{xp:0,level:1,completedLessons:[],name:"Student",lastLogin:null,streak:0,lessonDates:{}};}
 function saveProgress(p){try{localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch{}}
 function xpToLevel(xp){return Math.max(1,Math.floor(xp/500)+1);}
 
@@ -56,6 +56,18 @@ const ICONS={
   settings:"M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z",
   database:"M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zm0 14c-3.87 0-6-1.5-6-2v-1.5c1.26.83 3.5 1.5 6 1.5s4.74-.67 6-1.5V17c0 .5-2.13 2-6 2z",
   wifi:"M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4l2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z",
+  globe:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z",
+  flame:"M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z",
+  trophy:"M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.95V18H7v2h10v-2h-4v-2.11c1.63-.32 2.98-1.45 3.61-2.95C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z",
+  zap:"M7 2v11h3v9l7-12h-4l4-8z",
+  "shield-check":"M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2.09 15.28l-3.8-3.81 1.48-1.48 2.32 2.32 5.85-5.87 1.48 1.48-7.33 7.36z",
+  eye:"M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z",
+  clock:"M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z",
+  graph:"M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z",
+  play:"M8 5v14l11-7z",
+  book:"M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H6V4h5v8l2.5-1.5L16 12V4h2v16z",
+  "chevron-right":"M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z",
+  "arrow-left":"M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
 };
 function Icon({name,size=16,style={}}){const d=ICONS[name]||ICONS.star;return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",fill:"currentColor",style:{flexShrink:0,...style}},React.createElement("path",{d}));}
 
@@ -140,17 +152,421 @@ const LESSONS={
 const SECTIONS={
   1:{num:"01",uz:"Kali Asoslari",en:"Kali Basics",color:"var(--c-system)",icon:"terminal",count:10,
      descUz:"Kali'ni o'rnatish, Linux buyruq qatori, fayl tizimi, ruxsatlar, apt va bash skriptlashni o'rganing.",
-     descEn:"Learn Kali installation, the Linux command line, file system, permissions, apt and bash scripting."},
+     descEn:"Learn Kali installation, the Linux command line, file system, permissions, apt and bash scripting.",
+     instructorUz:"Bobur Aliyev — Offensive Security Consultant",instructorEn:"OSCP, eCPPT · Kali Linux contributor",
+     outcomesUz:["Kali Linux'ni virtual muhitda o'rnatish va sozlash","Linux buyruq qatori va fayl tizimini erkin boshqarish","Foydalanuvchi ruxsatlari va apt paket boshqaruvini tushunish","Bash skriptlash bilan vazifalarni avtomatlashtirish"],
+     outcomesEn:["Install and configure Kali Linux in a virtual environment","Freely navigate the Linux command line and file system","Understand user permissions and apt package management","Automate tasks with bash scripting"],
+     tooling:["Bash","apt","VirtualBox","VMware","systemctl"]},
   2:{num:"02",uz:"Ma'lumot To'plash & Skanerlash",en:"Recon & Scanning",color:"var(--c-defense)",icon:"target",count:10,
      descUz:"Nmap, Masscan, DNS enumeratsiya, theHarvester, Nikto va SMB skanerlash bilan nishon haqida ma'lumot to'plang.",
-     descEn:"Gather intel on targets with Nmap, Masscan, DNS enumeration, theHarvester, Nikto and SMB scanning."},
+     descEn:"Gather intel on targets with Nmap, Masscan, DNS enumeration, theHarvester, Nikto and SMB scanning.",
+     instructorUz:"Bobur Aliyev — Offensive Security Consultant",instructorEn:"OSCP, eCPPT · Kali Linux contributor",
+     outcomesUz:["Nmap bilan portlarni va xizmatlarni skanerlash","DNS va OSINT orqali maqsad haqida ma'lumot yig'ish","Veb-server va SMB zaifliklarini aniqlash","Wireshark bilan tarmoq trafigini tahlil qilish"],
+     outcomesEn:["Scan ports and services with Nmap","Gather target intel via DNS and OSINT","Identify web server and SMB vulnerabilities","Analyze network traffic with Wireshark"],
+     tooling:["Nmap","Masscan","theHarvester","Nikto","Wireshark","enum4linux"]},
   3:{num:"03",uz:"Ekspluatatsiya & Post",en:"Exploitation & Post",color:"var(--c-attack)",icon:"bug",count:10,
      descUz:"Metasploit, msfvenom, Hydra, John, Hashcat, Burp Suite va imtiyozlarni oshirish bilan ekspluatatsiyani o'rganing.",
-     descEn:"Master exploitation with Metasploit, msfvenom, Hydra, John, Hashcat, Burp Suite and privilege escalation."},
+     descEn:"Master exploitation with Metasploit, msfvenom, Hydra, John, Hashcat, Burp Suite and privilege escalation.",
+     instructorUz:"Bobur Aliyev — Offensive Security Consultant",instructorEn:"OSCP, eCPPT · Kali Linux contributor",
+     outcomesUz:["Metasploit Framework bilan ekspluatatsiya bajarish","msfvenom yordamida payload yaratish","Parol xeshlarini John va Hashcat bilan buzish","Burp Suite va Social Engineering texnikalarini qo'llash"],
+     outcomesEn:["Perform exploitation with the Metasploit Framework","Generate payloads with msfvenom","Crack password hashes with John and Hashcat","Apply Burp Suite and social engineering techniques"],
+     tooling:["Metasploit","msfvenom","Hydra","John the Ripper","Hashcat","Burp Suite","SET"]},
   4:{num:"04",uz:"Imtiyozlarni Oshirish",en:"Privilege Escalation",color:"var(--c-warn)",icon:"key",count:8,
      descUz:"Linux'da root'ga ko'tarilish: enumeratsiya, avtomatik vositalar, kernel exploits, sudo, LD_PRELOAD, SUID/SGID, capabilities, cron, PATH va NFS vektorlari.",
-     descEn:"Escalating to root on Linux: enumeration, automated tools, kernel exploits, sudo, LD_PRELOAD, SUID/SGID, capabilities, cron, PATH and NFS vectors."},
+     descEn:"Escalating to root on Linux: enumeration, automated tools, kernel exploits, sudo, LD_PRELOAD, SUID/SGID, capabilities, cron, PATH and NFS vectors.",
+     instructorUz:"Bobur Aliyev — Offensive Security Consultant",instructorEn:"OSCP, eCPPT · Kali Linux contributor",
+     outcomesUz:["Linux tizimida qo'lda va avtomatik enumeratsiya bajarish","Kernel exploit va sudo/LD_PRELOAD vektorlarini qo'llash","SUID/SGID va capabilities orqali imtiyoz oshirish","Cron va PATH hijacking zaifliklarini ekspluatatsiya qilish"],
+     outcomesEn:["Perform manual and automated Linux enumeration","Apply kernel exploit and sudo/LD_PRELOAD vectors","Escalate privileges via SUID/SGID and capabilities","Exploit cron and PATH hijacking vulnerabilities"],
+     tooling:["LinPEAS","LinEnum","GTFOBins","find","getcap"]},
 };
+
+// ── Gamification data (badges / skill tree / lesson icons) ─────
+const LESSON_ICON={1:"terminal",2:"play",3:"terminal",4:"database",5:"key",6:"settings",7:"code",8:"network",9:"settings",10:"layers",11:"target",12:"network",13:"zap",14:"network",15:"eye",16:"eye",17:"code",18:"database",19:"database",20:"graph",21:"zap",22:"bug",23:"target",24:"key",25:"lock",26:"cpu",27:"target",28:"spark",29:"shield-check",30:"eye",31:"shield-check",32:"terminal",33:"zap",34:"bug",35:"key",36:"lock",37:"settings",38:"network"};
+
+function klKey(n){return `ka_l${String(n).padStart(2,"0")}`;}
+function lessonFullKey(l){return `ka_l${l.num.slice(1)}`;}
+function sectionLessonKeys(secNum){return Object.values(LESSONS).filter(l=>l.sec===secNum).map(lessonFullKey);}
+function isSectionDone(secNum,completed){const keys=sectionLessonKeys(secNum);return keys.length>0&&keys.every(k=>completed.includes(k));}
+
+const ALL_BADGES=[
+  {icon:"target",uz:"Birinchi qadam",en:"First step",color:"var(--c-system)",unlock:c=>c.length>=1},
+  {icon:"flame",uz:"5 ta dars",en:"5 lessons",color:"var(--c-attack)",unlock:c=>c.length>=5},
+  {icon:"trophy",uz:"10 ta dars",en:"10 lessons",color:"var(--c-warn)",unlock:c=>c.length>=10},
+  {icon:"star",uz:"15 ta dars",en:"15 lessons",color:"var(--accent-2)",unlock:c=>c.length>=15},
+  {icon:"zap",uz:"20 ta dars",en:"20 lessons",color:"var(--accent)",unlock:c=>c.length>=20},
+  {icon:"spark",uz:"25 ta dars",en:"25 lessons",color:"var(--c-attack)",unlock:c=>c.length>=25},
+  {icon:"flame",uz:"30 ta dars",en:"30 lessons",color:"var(--c-warn)",unlock:c=>c.length>=30},
+  {icon:"check",uz:"Kurs tugallandi",en:"Course complete",color:"var(--c-defense)",unlock:c=>c.length>=38},
+  {icon:"terminal",uz:"Kali'ga birinchi qadam",en:"First steps in Kali",color:"var(--c-system)",unlock:c=>c.includes(klKey(1))},
+  {icon:"terminal",uz:"Terminal ustasi",en:"Terminal master",color:"var(--c-system)",unlock:c=>c.includes(klKey(3))},
+  {icon:"settings",uz:"Paket boshqaruvchisi",en:"Package manager",color:"var(--c-system)",unlock:c=>c.includes(klKey(6))},
+  {icon:"code",uz:"Bash skript yozuvchisi",en:"Bash scripter",color:"var(--c-user)",unlock:c=>c.includes(klKey(7))},
+  {icon:"network",uz:"Tarmoq bilimdoni",en:"Networking expert",color:"var(--c-user)",unlock:c=>c.includes(klKey(8))},
+  {icon:"layers",uz:"Vositalar kutubxonachisi",en:"Tools librarian",color:"var(--c-system)",unlock:c=>c.includes(klKey(10))},
+  {icon:"target",uz:"Nmap ovchisi",en:"Nmap hunter",color:"var(--c-defense)",unlock:c=>c.includes(klKey(11))},
+  {icon:"network",uz:"DNS tergovchisi",en:"DNS investigator",color:"var(--c-defense)",unlock:c=>c.includes(klKey(14))},
+  {icon:"eye",uz:"Nikto skaneri",en:"Nikto scanner",color:"var(--c-defense)",unlock:c=>c.includes(klKey(16))},
+  {icon:"database",uz:"SMB tekshiruvchisi",en:"SMB inspector",color:"var(--c-defense)",unlock:c=>c.includes(klKey(19))},
+  {icon:"graph",uz:"Wireshark tahlilchisi",en:"Wireshark analyst",color:"var(--c-defense)",unlock:c=>c.includes(klKey(20))},
+  {icon:"zap",uz:"Metasploit operatori",en:"Metasploit operator",color:"var(--c-attack)",unlock:c=>c.includes(klKey(21))},
+  {icon:"bug",uz:"Payload ustasi",en:"Payload master",color:"var(--c-attack)",unlock:c=>c.includes(klKey(22))},
+  {icon:"key",uz:"Hydra buzg'unchisi",en:"Hydra cracker",color:"var(--c-attack)",unlock:c=>c.includes(klKey(24))},
+  {icon:"cpu",uz:"Hashcat GPU ustasi",en:"Hashcat GPU master",color:"var(--c-attack)",unlock:c=>c.includes(klKey(26))},
+  {icon:"target",uz:"Burp Suite pro",en:"Burp Suite pro",color:"var(--c-attack)",unlock:c=>c.includes(klKey(27))},
+  {icon:"shield-check",uz:"PrivEsc izquvari",en:"PrivEsc tracker",color:"var(--c-warn)",unlock:c=>c.includes(klKey(29))},
+  {icon:"bug",uz:"Kernel exploit ustasi",en:"Kernel exploit master",color:"var(--c-warn)",unlock:c=>c.includes(klKey(34))},
+  {icon:"lock",uz:"SUID ovchisi",en:"SUID hunter",color:"var(--c-warn)",unlock:c=>c.includes(klKey(36))},
+  {icon:"network",uz:"Root darajasiga yetdi",en:"Reached root",color:"var(--c-warn)",unlock:c=>c.includes(klKey(38))},
+  {icon:"terminal",uz:"Kali Asoslari ustasi",en:"Kali Basics master",color:"var(--c-system)",unlock:c=>Array.from({length:10},(_,i)=>klKey(i+1)).every(k=>c.includes(k))},
+  {icon:"target",uz:"Recon ustasi",en:"Recon master",color:"var(--c-defense)",unlock:c=>Array.from({length:10},(_,i)=>klKey(i+11)).every(k=>c.includes(k))},
+  {icon:"zap",uz:"Ekspluatatsiya ustasi",en:"Exploitation master",color:"var(--c-attack)",unlock:c=>Array.from({length:10},(_,i)=>klKey(i+21)).every(k=>c.includes(k))},
+  {icon:"flame",uz:"Yarim yo'l",en:"Halfway there",color:"var(--c-warn)",unlock:c=>c.length>=19},
+  {icon:"spark",uz:"Qattiq ishladi",en:"Hard worker",color:"var(--c-attack)",unlock:c=>c.length>=30},
+];
+
+const SKILL_NODES=[
+  {id:"linux",uz:"Linux Asoslari",en:"Linux Foundations",icon:"terminal",color:"var(--c-system)",unlockAt:3},
+  {id:"scripting",uz:"Tarmoq & Skript",en:"Networking & Scripting",icon:"code",color:"var(--c-user)",unlockAt:8},
+  {id:"recon",uz:"Recon & Skanerlash",en:"Recon & Scanning",icon:"target",color:"var(--c-defense)",unlockAt:14},
+  {id:"exploit",uz:"Ekspluatatsiya",en:"Exploitation",icon:"bug",color:"var(--c-attack)",unlockAt:22},
+  {id:"passwords",uz:"Parol Hujumlari",en:"Password Attacks",icon:"key",color:"var(--c-warn)",unlockAt:28},
+  {id:"privesc",uz:"Imtiyoz Oshirish",en:"Privilege Escalation",icon:"shield-check",color:"var(--accent)",unlockAt:38},
+];
+
+function getTimeSpentAll(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(TIME_KEY)||"{}");
+    if(typeof raw!=="object"||Array.isArray(raw))return{};
+    const clean={};
+    for(const[k,v]of Object.entries(raw)){
+      if(/^L\d{2}$/.test(k)){const n=Number(v);if(Number.isFinite(n)&&n>=0)clean[k]=Math.min(Math.floor(n),14400);}
+    }
+    return clean;
+  }catch{return{};}
+}
+function fmtTimeShort(sec){
+  const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);
+  if(h>0)return `${h}h ${m}m`;
+  if(m>0)return `${m}m`;
+  return `${sec}s`;
+}
+function buildHeatmap(lessonDates={}){
+  const grid=Array.from({length:12},()=>Array(7).fill(0));
+  const now=Date.now();
+  Object.values(lessonDates).forEach(ts=>{
+    const daysAgo=Math.floor((now-ts)/86400000);
+    if(daysAgo<84){const week=Math.floor(daysAgo/7),day=daysAgo%7;grid[11-week][6-day]++;}
+  });
+  return grid;
+}
+function buildDayLessons(lessonDates={}){
+  const map={};
+  const now=Date.now();
+  Object.entries(lessonDates).forEach(([key,ts])=>{
+    const daysAgo=Math.floor((now-ts)/86400000);
+    if(daysAgo<84){
+      if(!map[daysAgo])map[daysAgo]=[];
+      const n=parseInt(String(key).replace(/\D/g,""))||0;
+      map[daysAgo].push(n);
+    }
+  });
+  return map;
+}
+
+function Progress({value,max=100,label,color,height=6,showVal=true}){
+  const pct=Math.min(100,Math.max(0,(value/max)*100));
+  const cc=color||"var(--accent)";
+  return React.createElement("div",{style:{width:"100%"}},
+    label&&React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},
+      React.createElement("span",{style:{fontSize:11.5,color:"var(--text-1)"}},label),
+      showVal&&React.createElement("span",{className:"mono",style:{fontSize:11,color:cc}},Math.round(pct)+"%")),
+    React.createElement("div",{style:{height,background:"rgba(255,255,255,0.06)",borderRadius:999,overflow:"hidden",position:"relative"}},
+      React.createElement("div",{style:{width:pct+"%",height:"100%",background:`linear-gradient(90deg, ${cc}, var(--accent-2))`,boxShadow:`0 0 12px ${cc}`,transition:"width 600ms cubic-bezier(.2,.8,.2,1)"}})));
+}
+
+function StatCard({icon,color,n,suffix,uz,en}){
+  const lang=useLang();
+  return React.createElement("div",{className:"glass",style:{padding:18,display:"flex",justifyContent:"space-between",alignItems:"flex-start"}},
+    React.createElement("div",{className:"stat"},
+      React.createElement("div",{className:"stat-n",style:{color}},n,suffix&&React.createElement("span",{style:{fontSize:18,color:"var(--text-2)",marginLeft:4}},suffix)),
+      React.createElement("div",{className:"stat-l"},t(lang,uz,en))),
+    React.createElement("div",{style:{width:34,height:34,borderRadius:8,background:color+"10",border:`1px solid ${color}33`,color,display:"grid",placeItems:"center"}},
+      React.createElement(Icon,{name:icon,size:16})));
+}
+
+function TodayStats({user}){
+  const lang=useLang();
+  const streak=user?.streak||0;
+  const today=todayStr();
+  const lessonDates=user?.lessonDates||{};
+  const todayCount=Object.values(lessonDates).filter(ts=>new Date(ts).toISOString().slice(0,10)===today).length;
+  const todayXP=todayCount*50;
+  const totalSec=(()=>{try{return Object.values(JSON.parse(localStorage.getItem(TIME_KEY)||"{}")).reduce((a,b)=>a+b,0);}catch{return 0;}})();
+  const timeStr=fmtTimeShort(totalSec);
+  const xpToNext=500-((user?.xp||0)%500);
+  const chip=(icon,color,label)=>React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,padding:"8px 14px",background:color+"0d",border:`1px solid ${color}33`,borderRadius:10,fontSize:12.5,fontFamily:"var(--font-mono)",color}},
+    React.createElement(Icon,{name:icon,size:13})," ",label);
+  return React.createElement("div",{style:{display:"flex",gap:10,flexWrap:"wrap",marginBottom:24}},
+    chip("flame","var(--c-attack)",streak>0?t(lang,`${streak} kunlik seriya 🔥`,`${streak}-day streak 🔥`):t(lang,"Seriya yo'q","No streak yet")),
+    chip("zap","var(--accent)",t(lang,`Bugun +${todayXP} XP`,`+${todayXP} XP today`)),
+    chip("clock","var(--c-auth)",t(lang,`Jami o'qish: ${timeStr}`,`${timeStr} total reading`)),
+    chip("spark","var(--c-user)",t(lang,`Keyingi darajagacha: ${xpToNext} XP`,`${xpToNext} XP to next level`)));
+}
+
+function ContinueCard({setRoute,user}){
+  const lang=useLang();
+  const completed=user?.completedLessons||[];
+  const totalLessons=Object.keys(LESSONS).length;
+  const progressPct=Math.round((completed.length/totalLessons)*100);
+  const nextNum=Array.from({length:totalLessons},(_,i)=>i+1).find(n=>!completed.includes(klKey(n)))||1;
+  const nextLesson=LESSONS[nextNum];
+  return React.createElement("div",{style:{position:"relative",borderRadius:16,overflow:"hidden",padding:"26px 28px",background:"linear-gradient(135deg, var(--accent-soft), rgba(13,19,36,0.6) 60%)",border:"1px solid var(--accent-border)"}},
+    React.createElement("div",{style:{position:"absolute",inset:0,background:"radial-gradient(ellipse at top right, var(--accent-soft), transparent 60%)",pointerEvents:"none"}}),
+    React.createElement("div",{style:{position:"relative",display:"grid",gridTemplateColumns:"1fr auto",gap:24,alignItems:"center"}},
+      React.createElement("div",null,
+        React.createElement("div",{className:"eyebrow",style:{display:"flex",alignItems:"center",gap:8}},
+          React.createElement(LiveDot,null),
+          t(lang,`SEC ${String(nextLesson.sec).padStart(2,"0")} · ${nextLesson.num} · ${completed.length>0?"DAVOM ETMOQDA":"BOSHLASH"}`,`SEC ${String(nextLesson.sec).padStart(2,"0")} · ${nextLesson.num} · ${completed.length>0?"IN PROGRESS":"START"}`)),
+        React.createElement("h2",{className:"display",style:{fontSize:26,margin:"10px 0 6px",letterSpacing:"-0.02em"}},t(lang,nextLesson.uz,nextLesson.en)),
+        React.createElement("div",{style:{marginTop:14,maxWidth:380}},
+          React.createElement(Progress,{value:progressPct,label:t(lang,"Kurs taraqqiyoti","Course progress")})),
+        React.createElement("div",{style:{marginTop:8,fontSize:12,color:"var(--text-3)",fontFamily:"var(--font-mono)"}},
+          `${completed.length} / ${totalLessons} `,t(lang,"dars yakunlandi","lessons done"))),
+      React.createElement("button",{className:"btn btn-primary",onClick:()=>setRoute({name:"lesson",num:nextNum})},
+        React.createElement(Icon,{name:"play",size:14}),t(lang,"Davom etish","Resume"))));
+}
+
+function SkillTreeCount({completed}){
+  const lang=useLang();
+  const count=SKILL_NODES.filter(s=>completed.length>=s.unlockAt).length;
+  return React.createElement("span",{className:"mono",style:{fontSize:11,color:"var(--text-2)"}},`${count}/6 `,t(lang,"ochildi","unlocked"));
+}
+
+function SkillTree({completed}){
+  const lang=useLang();
+  const doneCount=completed.length;
+  const nodeState=n=>{if(doneCount>=n.unlockAt)return"active";if(doneCount>=n.unlockAt-3)return"open";return"locked";};
+  const nodes=[
+    {...SKILL_NODES[0],x:300,y:180},
+    {...SKILL_NODES[1],x:150,y:90},
+    {...SKILL_NODES[2],x:450,y:90},
+    {...SKILL_NODES[3],x:150,y:270},
+    {...SKILL_NODES[4],x:450,y:270},
+    {...SKILL_NODES[5],x:60,y:180,small:true},
+  ];
+  const edges=[[0,1],[0,2],[0,3],[0,4],[1,5],[3,5]];
+  return React.createElement("div",{style:{position:"relative",height:360}},
+    React.createElement("svg",{viewBox:"0 0 600 360",style:{width:"100%",height:"100%"}},
+      React.createElement("defs",null,
+        React.createElement("filter",{id:"ka-st-glow",x:"-50%",y:"-50%",width:"200%",height:"200%"},
+          React.createElement("feGaussianBlur",{stdDeviation:"3",result:"b"}),
+          React.createElement("feMerge",null,React.createElement("feMergeNode",{in:"b"}),React.createElement("feMergeNode",{in:"SourceGraphic"})))),
+      edges.map(([a,b],i)=>{
+        const from=nodes[a],to=nodes[b];
+        const state=nodeState(from)==="active"&&nodeState(to)!=="locked"?"active":"locked";
+        return React.createElement("line",{key:i,x1:from.x,y1:from.y,x2:to.x,y2:to.y,
+          stroke:state==="active"?"var(--accent)":"var(--text-3)",
+          strokeWidth:state==="active"?1.6:1,
+          strokeDasharray:state==="locked"?"3 5":"0",
+          strokeOpacity:state==="locked"?0.4:0.7});
+      }),
+      React.createElement("g",{filter:"url(#ka-st-glow)"},
+        nodes.map(n=>{
+          const st=nodeState(n);
+          const label=t(lang,n.uz,n.en);
+          return React.createElement(SVGSkillNode,{key:n.id,x:n.x,y:n.y,state:st,icon:n.icon,label,
+            sub:st==="active"?t(lang,"Ochildi","Unlocked"):t(lang,"Qulflangan","Locked"),small:n.small,color:n.color});
+        }))));
+}
+
+function SVGSkillNode({x,y,state,icon,label,sub,small,color}){
+  const r=small?22:32;
+  const cfg={
+    active:{stroke:color||"var(--accent)",fill:"rgba(0,255,156,0.1)",text:color||"var(--accent)"},
+    open:{stroke:"var(--c-system)",fill:"var(--bg-2)",text:"var(--c-system)"},
+    locked:{stroke:"var(--text-3)",fill:"var(--bg-1)",text:"var(--text-3)"},
+  }[state];
+  return React.createElement("g",{style:{cursor:"pointer"}},
+    state==="active"&&React.createElement("circle",{cx:x,cy:y,r:r+8,fill:"none",stroke:cfg.stroke,strokeWidth:"1",opacity:"0.4"},
+      React.createElement("animate",{attributeName:"r",values:`${r+4};${r+14};${r+4}`,dur:"2.4s",repeatCount:"indefinite"}),
+      React.createElement("animate",{attributeName:"opacity",values:"0.5;0;0.5",dur:"2.4s",repeatCount:"indefinite"})),
+    React.createElement("circle",{cx:x,cy:y,r,fill:cfg.fill,stroke:cfg.stroke,strokeWidth:state==="active"?2.2:1.6}),
+    React.createElement("foreignObject",{x:x-r*0.4,y:y-r*0.4,width:r*0.8,height:r*0.8,style:{color:cfg.text}},
+      React.createElement(Icon,{name:state==="locked"?"lock":icon,size:r*0.8})),
+    label&&React.createElement("text",{x,y:y+r+14,fill:state==="locked"?"var(--text-3)":"var(--text-0)",fontSize:"11",fontFamily:"var(--font-display)",fontWeight:"600",textAnchor:"middle"},label),
+    sub&&React.createElement("text",{x,y:y+r+26,fill:"var(--text-3)",fontSize:"9",fontFamily:"var(--font-mono)",textAnchor:"middle",letterSpacing:"0.5"},sub.toUpperCase()));
+}
+
+function Heatmap({user}){
+  const lang=useLang();
+  const lessonDates=user?.lessonDates||{};
+  const data=buildHeatmap(lessonDates);
+  const dayLessons=buildDayLessons(lessonDates);
+  const activeDays=data.flat().filter(v=>v>0).length;
+  const [tooltip,setTooltip]=useState(null);
+  const cellColor=v=>v===0?"rgba(255,255,255,0.04)":v===1?"rgba(0,255,156,0.15)":v===2?"rgba(0,255,156,0.35)":v===3?"rgba(0,255,156,0.6)":"var(--accent)";
+  const columns=data.map((col,w)=>{
+    const cells=col.map((v,d)=>{
+      const daysAgo=(11-w)*7+(6-d);
+      const lessons=dayLessons[daysAgo]||[];
+      return React.createElement("div",{key:d,
+        onMouseEnter:()=>lessons.length>0&&setTooltip({w,d,lessons,daysAgo}),
+        onMouseLeave:()=>setTooltip(null),
+        style:{width:14,height:14,borderRadius:3,background:cellColor(v),border:"1px solid rgba(255,255,255,0.04)",boxShadow:v>=3?"0 0 8px var(--accent-glow)":"none",cursor:lessons.length>0?"pointer":"default"}});
+    });
+    return React.createElement("div",{key:w,style:{display:"flex",flexDirection:"column",gap:4}},cells);
+  });
+  return React.createElement("div",{className:"glass",style:{padding:22}},
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline"}},
+      React.createElement("div",null,
+        React.createElement("div",{className:"eyebrow"},"// ACTIVITY"),
+        React.createElement("h3",{style:{margin:"4px 0 0",fontFamily:"var(--font-display)",fontSize:18}},t(lang,"So'nggi 12 hafta","Last 12 weeks"))),
+      React.createElement("span",{className:"mono",style:{fontSize:11,color:"var(--text-2)"}},`${activeDays} `,t(lang,"faol kun","active days"))),
+    React.createElement("div",{style:{marginTop:16,position:"relative"}},
+      React.createElement("div",{style:{display:"flex",gap:4}},columns),
+      tooltip&&React.createElement("div",{style:{position:"absolute",bottom:"100%",left:`${tooltip.w*18}px`,
+        background:"var(--surface)",border:"1px solid var(--accent-border)",borderRadius:8,padding:"8px 12px",fontSize:11,
+        fontFamily:"var(--font-mono)",color:"var(--text-0)",pointerEvents:"none",zIndex:10,whiteSpace:"nowrap",
+        marginBottom:6,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}},
+        React.createElement("div",{style:{color:"var(--accent)",marginBottom:4}},
+          tooltip.daysAgo===0?t(lang,"Bugun","Today"):`${tooltip.daysAgo}d ${t(lang,"oldin","ago")}`),
+        tooltip.lessons.map(n=>{
+          const lesson=LESSONS[n];
+          return React.createElement("div",{key:n,style:{color:"var(--text-1)"}},
+            `L${String(n).padStart(2,"0")} — `,lesson?t(lang,lesson.uz,lesson.en):"");
+        }))),
+    React.createElement("div",{style:{marginTop:12,display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:10.5,color:"var(--text-2)"}},
+      React.createElement("span",{className:"mono"},t(lang,"12 hafta oldin","12 weeks ago")),
+      React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center"}},
+        React.createElement("span",null,t(lang,"kam","less")),
+        [0,1,2,3,4].map(v=>React.createElement("div",{key:v,style:{width:10,height:10,borderRadius:2,background:cellColor(v)}})),
+        React.createElement("span",null,t(lang,"ko'p","more")))));
+}
+
+function Achievements({completed}){
+  const lang=useLang();
+  const earned=ALL_BADGES.filter(b=>b.unlock(completed));
+  const display=ALL_BADGES.slice(0,12);
+  return React.createElement("div",{className:"glass",style:{padding:22}},
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:14}},
+      React.createElement("div",null,
+        React.createElement("div",{className:"eyebrow"},"// BADGES"),
+        React.createElement("h3",{style:{margin:"4px 0 0",fontFamily:"var(--font-display)",fontSize:18}},t(lang,"Yutuqlar","Achievements"))),
+      React.createElement("span",{className:"mono",style:{fontSize:11,color:"var(--text-2)"}},`${earned.length} / ${ALL_BADGES.length}`)),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(6, 1fr)",gap:8}},
+      display.map((a,i)=>{
+        const isEarned=a.unlock(completed);
+        return React.createElement("div",{key:i,title:t(lang,a.uz,a.en),style:{
+          aspectRatio:"1",
+          background:isEarned?`${a.color}12`:"var(--bg-2)",
+          border:`1px solid ${isEarned?a.color+"55":"var(--border)"}`,
+          color:isEarned?a.color:"var(--text-3)",
+          borderRadius:10,display:"grid",placeItems:"center",
+          boxShadow:isEarned?`0 0 12px ${a.color}33`:"none",
+          opacity:isEarned?1:0.5,cursor:"pointer",transition:"all 250ms"}},
+          React.createElement(Icon,{name:isEarned?a.icon:"lock",size:18}));
+      })),
+    earned.length>12&&React.createElement("div",{style:{marginTop:10,fontSize:11,color:"var(--text-3)",fontFamily:"var(--font-mono)",textAlign:"center"}},
+      `+${earned.length-12} `,t(lang,"ta yana","more earned")));
+}
+
+function UpcomingExam({user}){
+  const lang=useLang();
+  const completed=user?.completedLessons||[];
+  const sec1Keys=sectionLessonKeys(1);
+  const sec1Done=sec1Keys.filter(k=>completed.includes(k)).length;
+  const examUnlocked=sec1Done>=sec1Keys.length;
+  return React.createElement("div",{className:"glass",style:{padding:22,position:"relative",overflow:"hidden",opacity:examUnlocked?1:0.85}},
+    React.createElement("div",{style:{position:"absolute",top:-20,right:-20,width:100,height:100,background:`radial-gradient(circle, ${examUnlocked?"rgba(255,204,68,0.2)":"rgba(255,255,255,0.05)"}, transparent 70%)`}}),
+    React.createElement("div",{className:"eyebrow",style:{color:examUnlocked?"var(--c-warn)":"var(--text-3)"}},"// FINAL_EXAM_PREVIEW"),
+    React.createElement("h3",{style:{margin:"8px 0 6px",fontFamily:"var(--font-display)",fontSize:18}},t(lang,"01-bo'lim final imtihoni","Section 01 final")),
+    React.createElement("p",{style:{margin:0,color:"var(--text-2)",fontSize:12.5}},t(lang,`${sec1Keys.length} ta savol · 2 soat · 85% o'tish`,`${sec1Keys.length} questions · 2 hours · 85% to pass`)),
+    React.createElement("div",{style:{marginTop:14}},
+      React.createElement(Progress,{value:sec1Done,max:sec1Keys.length,label:t(lang,"S01 darslar yakunlangan","S01 lessons complete"),color:examUnlocked?"var(--c-warn)":"var(--text-3)"})),
+    React.createElement("button",{className:"btn",disabled:true,style:{marginTop:16,width:"100%",justifyContent:"center",
+      borderColor:examUnlocked?"rgba(255,204,68,0.35)":"var(--border)",
+      color:examUnlocked?"var(--c-warn)":"var(--text-3)",
+      cursor:"not-allowed",opacity:examUnlocked?1:0.6}},
+      React.createElement(Icon,{name:examUnlocked?"target":"lock",size:14}),
+      examUnlocked?t(lang,"Tez orada qo'shiladi ✨","Coming soon ✨"):t(lang,`${sec1Done}/${sec1Keys.length} dars tugatilganda ochiladi`,`Complete all ${sec1Keys.length} lessons to unlock (${sec1Done}/${sec1Keys.length})`)));
+}
+
+function SectionProgress({setRoute,completed}){
+  const lang=useLang();
+  const secNums=Object.keys(SECTIONS).map(Number).sort((a,b)=>a-b);
+  return React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
+    secNums.map(num=>{
+      const sec=SECTIONS[num];
+      const keys=sectionLessonKeys(num);
+      const done=keys.filter(k=>completed.includes(k)).length;
+      const total=keys.length;
+      const pct=total?(done/total)*100:0;
+      const locked=num>1&&!isSectionDone(num-1,completed);
+      return React.createElement("div",{key:num,onClick:()=>!locked&&setRoute({name:"section",sec:num}),
+        style:{display:"grid",gridTemplateColumns:"60px 1fr 80px 1fr 90px",gap:16,alignItems:"center",
+          padding:"12px 14px",borderRadius:10,background:"var(--bg-2)",border:"1px solid var(--border)",
+          cursor:locked?"not-allowed":"pointer",opacity:locked?0.5:1,transition:"all 200ms"},
+        onMouseEnter:e=>{if(!locked)e.currentTarget.style.borderColor=sec.color;},
+        onMouseLeave:e=>{if(!locked)e.currentTarget.style.borderColor="var(--border)";}},
+        React.createElement("div",{className:"mono",style:{color:sec.color,fontSize:12,letterSpacing:0.1}},"SEC "+sec.num),
+        React.createElement("div",{style:{fontWeight:500,fontSize:14}},t(lang,sec.uz,sec.en)),
+        React.createElement("div",{className:"mono",style:{fontSize:11.5,color:"var(--text-2)"}},`${done}/${total}`),
+        React.createElement(Progress,{value:pct,color:sec.color,height:4,showVal:false}),
+        React.createElement("div",{style:{textAlign:"right"}},
+          locked?React.createElement("span",{className:"mono",style:{fontSize:10,color:"var(--text-3)"}},React.createElement(Icon,{name:"lock",size:11})," LOCKED"):
+          pct===100?React.createElement("span",{className:"mono",style:{fontSize:10,color:sec.color}},React.createElement(Icon,{name:"check",size:11})," DONE"):
+          React.createElement("span",{className:"mono",style:{fontSize:10,color:sec.color}},"ACTIVE")));
+    }));
+}
+
+function MiniStat({labelUz,labelEn,value,sub,color,icon}){
+  const lang=useLang();
+  return React.createElement("div",{style:{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"12px 14px",display:"flex",alignItems:"center",gap:14}},
+    React.createElement("div",{style:{width:32,height:32,borderRadius:8,background:color+"12",border:`1px solid ${color}33`,color,display:"grid",placeItems:"center",flexShrink:0}},
+      React.createElement(Icon,{name:icon,size:14})),
+    React.createElement("div",{style:{flex:1,minWidth:0}},
+      React.createElement("div",{style:{fontSize:11,color:"var(--text-2)",letterSpacing:0.1,textTransform:"uppercase",fontFamily:"var(--font-mono)"}},t(lang,labelUz,labelEn)),
+      React.createElement("div",{style:{display:"flex",alignItems:"baseline",gap:8}},
+        React.createElement("span",{style:{fontSize:20,fontFamily:"var(--font-display)",fontWeight:600,color}},value),
+        React.createElement("span",{style:{fontSize:10.5,color:"var(--text-3)"}},sub))));
+}
+
+function LessonRow({l,idx,secNum,setRoute,completed,timeSpentAll}){
+  const lang=useLang();
+  const fullKey=lessonFullKey(l);
+  const isDone=completed.includes(fullKey);
+  const firstNotDone=idx===0;
+  const timeSpent=timeSpentAll[l.num]||0;
+  const icon=LESSON_ICON[parseInt(l.num.slice(1))]||"code";
+  const sec=SECTIONS[secNum];
+  return React.createElement("div",{onClick:()=>setRoute({name:"lesson",num:parseInt(l.num.slice(1))}),
+    style:{display:"grid",gridTemplateColumns:"auto 40px 1fr auto auto",gap:16,alignItems:"center",
+      padding:"16px 18px",borderRadius:10,
+      background:isDone?"transparent":`${sec.color}08`,
+      border:`1px solid ${isDone?"transparent":sec.color+"33"}`,
+      borderLeft:`2px solid ${isDone?"transparent":sec.color}`,
+      cursor:"pointer",transition:"all 200ms",marginBottom:4},
+    onMouseEnter:e=>{e.currentTarget.style.background=`${sec.color}10`;e.currentTarget.style.borderColor=sec.color+"33";},
+    onMouseLeave:e=>{e.currentTarget.style.background=isDone?"transparent":`${sec.color}08`;e.currentTarget.style.borderColor=isDone?"transparent":sec.color+"33";}},
+    React.createElement("div",{className:"mono",style:{fontSize:12,color:"var(--text-3)",letterSpacing:0.08,minWidth:32}},l.num),
+    React.createElement("div",{style:{width:36,height:36,borderRadius:8,
+      background:isDone?sec.color:`${sec.color}12`,
+      border:`1px solid ${sec.color}44`,
+      color:isDone?"#04060d":sec.color,
+      display:"grid",placeItems:"center"}},
+      React.createElement(Icon,{name:isDone?"check":icon,size:16})),
+    React.createElement("div",null,
+      React.createElement("div",{style:{fontWeight:600,fontSize:15,lineHeight:1.3}},t(lang,l.uz,l.en||l.uz)),
+      timeSpent>0&&React.createElement("div",{className:"mono",style:{fontSize:10.5,color:"var(--accent)",marginTop:3}},
+        t(lang,`Siz ushbu mavzuda ${fmtTimeShort(timeSpent)} faol bo'ldingiz`,`Active: ${fmtTimeShort(timeSpent)}`))),
+    React.createElement("div",{className:"mono",style:{fontSize:11,color:"var(--text-2)"}},
+      timeSpent>0?React.createElement("span",{style:{color:"var(--accent)"}},React.createElement(Icon,{name:"clock",size:11})," ",fmtTimeShort(timeSpent)):
+      React.createElement("span",null,l.sub)),
+    React.createElement("div",{style:{width:90,fontSize:10.5,fontFamily:"var(--font-mono)",color:sec.color,letterSpacing:0.08,textTransform:"uppercase",textAlign:"right"}},
+      isDone?React.createElement(React.Fragment,null,React.createElement(Icon,{name:"check",size:11})," DONE"):
+      firstNotDone?"ACTIVE":"AVAILABLE"),
+    React.createElement(Icon,{name:"chevron-right",size:16,style:{color:"var(--text-3)"}}));
+}
 
 // ── Lesson content: L01 What is Kali Linux ───────────────────
 // ── Animated-diagram engine (shared) ──────────────────────────
@@ -2023,79 +2439,123 @@ function HeroVisual(){
 function DashboardScreen({setRoute,user}){
   const lang=useLang();
   const completed=user?.completedLessons||[];
-  return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
-    React.createElement("div",{style:{marginBottom:28,display:"flex",alignItems:"center",justifyContent:"space-between"}},
-      React.createElement("div",null,
-        React.createElement("h1",{style:{fontFamily:"var(--font-display)",fontSize:24,fontWeight:800,margin:0}},
-          t(lang,"Kurslar","Courses")),
-        React.createElement("div",{style:{fontSize:12,color:"var(--text-2)",marginTop:4,fontFamily:"var(--font-mono)"}},
-          completed.length,"/38 ",t(lang,"dars bajarildi","lessons completed")
-        )
-      ),
-      React.createElement("div",{style:{textAlign:"right"}},
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:11,color:"var(--text-3)"}},"LVL "+xpToLevel(user?.xp||0)),
-        React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:16,fontWeight:900,color:"var(--accent)"}},(user?.xp||0)+" XP")
-      )
-    ),
-    Object.values(SECTIONS).map(sec=>React.createElement("div",{key:sec.num,
-      onClick:()=>setRoute({name:"section",sec:parseInt(sec.num)}),
-      style:{marginBottom:16,padding:20,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:16,cursor:"pointer",transition:"all 200ms"}},
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:14,marginBottom:10}},
-        React.createElement("div",{style:{width:44,height:44,borderRadius:12,background:sec.color+"22",border:`1px solid ${sec.color}44`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},
-          React.createElement(Icon,{name:sec.icon,size:20,style:{color:sec.color}})
-        ),
+  const totalLessons=Object.keys(LESSONS).length;
+  return React.createElement("div",{className:"page"},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:28,gap:20,flexWrap:"wrap"}},
         React.createElement("div",null,
-          React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:sec.color,fontWeight:700,letterSpacing:1}},
-            "SEC "+sec.num),
-          React.createElement("div",{style:{fontFamily:"var(--font-display)",fontSize:17,fontWeight:700,color:"var(--text-0)"}},
-            t(lang,sec.uz,sec.en)
-          )
-        ),
-        React.createElement("div",{style:{marginLeft:"auto",fontFamily:"var(--font-mono)",fontSize:11,color:"var(--text-3)"}},
-          sec.count+" "+t(lang,"dars","lessons"))
-      ),
-      React.createElement("p",{style:{fontSize:12.5,color:"var(--text-2)",margin:0,lineHeight:1.6}},
-        t(lang,sec.descUz,sec.descEn))
-    ))
-  );
+          React.createElement("div",{className:"eyebrow"},React.createElement(LiveDot,null)," OPERATOR_ID: ",(user?.name||"STUDENT").toUpperCase().replace(/\s/g,"_")," · XP: ",user?.xp||0," · LVL: ",xpToLevel(user?.xp||0)),
+          React.createElement("h1",{className:"display",style:{fontSize:32,margin:"10px 0 6px",letterSpacing:"-0.02em"}},
+            t(lang,`Xush kelibsiz, ${user?.name||"Talaba"}`,`Welcome back, ${user?.name||"Student"}`)),
+          React.createElement("p",{style:{color:"var(--text-2)",margin:0,fontSize:13}},
+            t(lang,`${xpToLevel(user?.xp||0)}-daraja · ${user?.xp||0} XP · ${completed.length} ta dars tugatildi`,`Level ${xpToLevel(user?.xp||0)} · ${user?.xp||0} XP · ${completed.length} lessons completed`))),
+        React.createElement("button",{className:"btn btn-primary",onClick:()=>{
+          const nextNum=Array.from({length:totalLessons},(_,i)=>i+1).find(n=>!completed.includes(klKey(n)))||1;
+          setRoute({name:"lesson",num:nextNum});
+        }},React.createElement(Icon,{name:"play",size:14}),
+          t(lang,"Davom etish","Continue"))),
+
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(4, 1fr)",gap:14,marginBottom:14}},
+        React.createElement(StatCard,{icon:"flame",color:"var(--c-attack)",n:xpToLevel(user?.xp||0),suffix:"lvl",uz:"Daraja",en:"Level"}),
+        React.createElement(StatCard,{icon:"zap",color:"var(--accent)",n:user?.xp||0,uz:"Tajriba",en:"Total XP"}),
+        React.createElement(StatCard,{icon:"trophy",color:"var(--c-warn)",n:completed.length,suffix:`/ ${totalLessons}`,uz:"Darslar",en:"Lessons done"}),
+        React.createElement(StatCard,{icon:"target",color:"var(--c-auth)",n:user?.streak||0,uz:"Kunlik seriya",en:"Day streak"})),
+
+      React.createElement(TodayStats,{user}),
+
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1.4fr 1fr",gap:18}},
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:18}},
+          React.createElement(ContinueCard,{setRoute,user}),
+          React.createElement("div",{className:"glass",style:{padding:22}},
+            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:18}},
+              React.createElement("div",null,
+                React.createElement("div",{className:"eyebrow"},"// SKILL_TREE"),
+                React.createElement("h3",{style:{margin:"4px 0 0",fontFamily:"var(--font-display)",fontSize:20}},t(lang,"Ko'nikma daraxti","Skill tree"))),
+              React.createElement(SkillTreeCount,{completed})),
+            React.createElement(SkillTree,{completed}))),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:18}},
+          React.createElement(Heatmap,{user}),
+          React.createElement(Achievements,{completed}),
+          React.createElement(UpcomingExam,{user}))),
+
+      React.createElement("div",{className:"glass",style:{padding:22,marginTop:18}},
+        React.createElement("div",{className:"eyebrow",style:{marginBottom:4}},"// CURRICULUM_MAP"),
+        React.createElement("h3",{style:{margin:"0 0 18px",fontFamily:"var(--font-display)",fontSize:20}},t(lang,"Bo'limlar bo'yicha o'sish","Progress by section")),
+        React.createElement(SectionProgress,{setRoute,completed})));
 }
 
 // ── Section Screen ─────────────────────────────────────────────
 function SectionScreen({setRoute,user,sec=1}){
   const lang=useLang();
-  const section=SECTIONS[sec];
-  const lessons=Object.values(LESSONS).filter(l=>l.sec===sec);
+  const secNum=sec;
+  const section=SECTIONS[secNum];
+  if(!section)return null;
   const completed=user?.completedLessons||[];
-  return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
-    React.createElement("button",{onClick:()=>setRoute("dashboard"),style:{appearance:"none",background:"none",border:"none",cursor:"pointer",color:"var(--text-2)",fontFamily:"var(--font-mono)",fontSize:11,marginBottom:16,padding:0,display:"flex",alignItems:"center",gap:6}},
-      "← ",t(lang,"Kurslar","Courses")
-    ),
-    React.createElement("div",{style:{marginBottom:24}},
-      React.createElement("div",{style:{fontFamily:"var(--font-mono)",fontSize:10,color:section.color,fontWeight:700,letterSpacing:1,marginBottom:6}},
-        "SEC "+section.num),
-      React.createElement("h1",{style:{fontFamily:"var(--font-display)",fontSize:26,fontWeight:800,margin:"0 0 8px"}},
-        t(lang,section.uz,section.en)),
-      React.createElement("p",{style:{fontSize:13,color:"var(--text-2)",margin:0}},
-        t(lang,section.descUz,section.descEn))
-    ),
-    lessons.map(l=>{
-      const key=`ka_l${l.num.slice(1)}`;
-      const done=completed.includes(key);
-      return React.createElement("div",{key:l.num,
-        onClick:()=>setRoute({name:"lesson",num:parseInt(l.num.slice(1))}),
-        style:{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",marginBottom:8,background:"var(--surface)",border:"1px solid var(--border)",borderRadius:12,cursor:"pointer",transition:"all 150ms"}},
-        React.createElement("div",{style:{width:32,height:32,borderRadius:8,background:done?"var(--accent-soft)":section.color+"22",border:`1px solid ${done?"var(--accent)":section.color+"44"}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:"var(--font-mono)",fontSize:10,fontWeight:700,color:done?"var(--accent)":section.color}},
-          done?React.createElement(Icon,{name:"check",size:14}):l.num.slice(1)
-        ),
-        React.createElement("div",{style:{flex:1}},
-          React.createElement("div",{style:{fontWeight:600,fontSize:13,color:"var(--text-0)"}},
-            t(lang,l.uz,l.en||l.uz)),
-          React.createElement("div",{style:{fontSize:11,color:"var(--text-3)",marginTop:2}},l.sub)
-        ),
-        React.createElement(Icon,{name:"arrow",size:14,style:{color:"var(--text-3)"}})
-      );
-    })
-  );
+
+  if(secNum>1&&!isSectionDone(secNum-1,completed)){
+    const prevKeys=sectionLessonKeys(secNum-1);
+    const prevDone=prevKeys.filter(k=>completed.includes(k)).length;
+    return React.createElement("div",{className:"page",style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"60vh",textAlign:"center",gap:16}},
+      React.createElement("div",{style:{fontSize:56,lineHeight:1}},"🔒"),
+      React.createElement("h2",{className:"display",style:{margin:0,fontSize:26}},t(lang,`0${secNum}-bo'lim qulflangan`,`Section 0${secNum} is locked`)),
+      React.createElement("p",{style:{color:"var(--text-2)",fontSize:14,maxWidth:420,lineHeight:1.65,margin:0}},
+        t(lang,`0${secNum-1}-bo'limdagi barcha ${prevKeys.length} ta darsni tugating. Holat: ${prevDone} / ${prevKeys.length}`,
+               `Complete all ${prevKeys.length} lessons in Section 0${secNum-1} to unlock this section. Progress: ${prevDone} / ${prevKeys.length}`)),
+      React.createElement("button",{className:"btn btn-primary",onClick:()=>setRoute({name:"section",sec:secNum-1})},
+        React.createElement(Icon,{name:"arrow-left",size:14}),t(lang,`0${secNum-1}-bo'limga o'tish`,`Go to Section 0${secNum-1}`)));
+  }
+
+  const secLessons=Object.values(LESSONS).filter(l=>l.sec===secNum);
+  const timeSpentAll=getTimeSpentAll();
+  const done=secLessons.filter(l=>completed.includes(lessonFullKey(l))).length;
+  const total=secLessons.length;
+  const firstNotDoneIdx=secLessons.findIndex(l=>!completed.includes(lessonFullKey(l)));
+
+  return React.createElement("div",{className:"page"},
+    React.createElement("div",{style:{position:"relative",borderRadius:24,overflow:"hidden",padding:"40px 40px 36px",
+      background:`linear-gradient(135deg, ${section.color}10, var(--bg-2) 60%)`,border:`1px solid ${section.color}33`,marginBottom:28}},
+      React.createElement("div",{style:{position:"absolute",inset:0,background:`radial-gradient(ellipse at top right, ${section.color}1a, transparent 60%)`,pointerEvents:"none"}}),
+      React.createElement("div",{style:{position:"relative",display:"grid",gridTemplateColumns:"1.4fr 1fr",gap:32,alignItems:"start"}},
+        React.createElement("div",null,
+          React.createElement("div",{className:"eyebrow",style:{color:section.color,marginBottom:14}},
+            t(lang,`// 0${secNum}-BO'LIM`,`// SECTION 0${secNum}`)),
+          React.createElement("h1",{className:"display",style:{fontSize:38,margin:"0 0 8px",letterSpacing:"-0.02em"}},t(lang,section.uz,section.en)),
+          React.createElement("p",{style:{color:"var(--text-1)",fontSize:13.5,lineHeight:1.65,maxWidth:600,margin:"14px 0 0"}},t(lang,section.descUz,section.descEn)),
+          React.createElement("div",{style:{display:"flex",gap:12,marginTop:22}},
+            React.createElement("button",{className:"btn btn-primary",onClick:()=>setRoute({name:"lesson",num:parseInt(secLessons[0].num.slice(1))})},
+              React.createElement(Icon,{name:"play",size:14}),t(lang,`Davom etish · ${secLessons[0].num}`,`Resume · ${secLessons[0].num}`)))),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12}},
+          React.createElement(MiniStat,{labelUz:"Darslar",labelEn:"Lessons",value:String(total),sub:t(lang,`${done}/${total} bajarildi`,`${done}/${total} done`),color:section.color,icon:"book"}),
+          React.createElement(MiniStat,{labelUz:"Vositalar",labelEn:"Tooling",value:String(section.tooling.length),sub:t(lang,"asboblar","tools"),color:"var(--c-user)",icon:"target"}),
+          React.createElement(MiniStat,{labelUz:"Yo'naltiruvchi natijalar",labelEn:"Learning outcomes",value:String(section.outcomesUz.length),sub:t(lang,"maqsad","goals"),color:"var(--c-system)",icon:"graph"}),
+          React.createElement(MiniStat,{labelUz:"Final imtihon",labelEn:"Final exam",value:total+"Q",sub:t(lang,"85% o'tish","85% pass"),color:"var(--c-warn)",icon:"target"}))),
+      React.createElement("div",{style:{position:"relative",marginTop:26,paddingTop:18,borderTop:`1px solid ${section.color}22`}},
+        React.createElement(Progress,{value:done,max:total,label:t(lang,"Bo'lim taraqqiyoti","Section progress"),color:section.color}))),
+
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 280px",gap:24,alignItems:"start"}},
+      React.createElement("div",null,
+        React.createElement("div",{style:{marginBottom:18}},
+          React.createElement("div",{className:"eyebrow"},"// LESSON_INDEX"),
+          React.createElement("h2",{style:{fontFamily:"var(--font-display)",margin:"4px 0 0",fontSize:22}},t(lang,"Darslar tarkibi","Lesson contents"))),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column"}},
+          secLessons.map((l,idx)=>React.createElement(LessonRow,{key:l.num,l,idx:idx-firstNotDoneIdx,secNum,setRoute,completed,timeSpentAll})))),
+      React.createElement("aside",{style:{position:"sticky",top:90,display:"flex",flexDirection:"column",gap:16}},
+        React.createElement("div",{className:"glass",style:{padding:20}},
+          React.createElement("div",{className:"eyebrow",style:{marginBottom:10}},"// INSTRUCTOR"),
+          React.createElement("div",{style:{display:"flex",gap:12,alignItems:"center"}},
+            React.createElement("div",{style:{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg, var(--c-attack), var(--c-warn))",color:"#04060d",fontWeight:700,display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontSize:14}},"BA"),
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontWeight:600,fontSize:13}},section.instructorUz.split(" — ")[0]),
+              React.createElement("div",{style:{fontSize:11,color:"var(--text-3)"}},section.instructorEn)))),
+        React.createElement("div",{className:"glass",style:{padding:20}},
+          React.createElement("div",{className:"eyebrow",style:{marginBottom:12}},"// YOU_WILL_LEARN"),
+          React.createElement("ul",{style:{listStyle:"none",padding:0,margin:0,display:"flex",flexDirection:"column",gap:10}},
+            (lang==="en"?section.outcomesEn:section.outcomesUz).map((o,i)=>React.createElement("li",{key:i,style:{display:"flex",gap:8,fontSize:12.5,lineHeight:1.5}},
+              React.createElement("span",{style:{color:section.color,flexShrink:0,marginTop:2}},React.createElement(Icon,{name:"check",size:12})),
+              React.createElement("span",{style:{color:"var(--text-0)"}},o))))),
+        React.createElement("div",{className:"glass",style:{padding:20}},
+          React.createElement("div",{className:"eyebrow",style:{marginBottom:10}},"// TOOLING"),
+          React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6}},
+            section.tooling.map(tool=>React.createElement("span",{key:tool,className:"chip chip-gray",style:{fontSize:9.5}},tool)))))));
 }
 
 // ── Lesson Screen ─────────────────────────────────────────────
@@ -2106,6 +2566,19 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
   const lessonKey=`ka_l${String(num).padStart(2,"0")}`;
   const alreadyDone=(user?.completedLessons||[]).includes(lessonKey);
   const sec=SECTIONS[lesson.sec];
+
+  useEffect(()=>{
+    const key=lesson.num;
+    const iv=setInterval(()=>{
+      if(typeof document!=="undefined"&&document.visibilityState==="hidden")return;
+      try{
+        const raw=JSON.parse(localStorage.getItem(TIME_KEY)||"{}");
+        raw[key]=Math.min((raw[key]||0)+10,14400);
+        localStorage.setItem(TIME_KEY,JSON.stringify(raw));
+      }catch{}
+    },10000);
+    return ()=>clearInterval(iv);
+  },[lesson.num]);
 
   const content=num===1?React.createElement(LessonL01):
     num===2?React.createElement(LessonL02):
@@ -2323,7 +2796,7 @@ function App(){
   const setLang=v=>{_setLang(v);try{localStorage.setItem(LANG_KEY,v);}catch{}};
   const [progress,_setProgress]=useState(loadProgress);
   const updateProgress=useCallback(patch=>{_setProgress(p=>{const n={...p,...patch};saveProgress(n);return n;});},[]);
-  const markComplete=useCallback(key=>{_setProgress(p=>{if((p.completedLessons||[]).includes(key))return p;const cl=[...(p.completedLessons||[]),key];const xp=(p.xp||0)+50;const n={...p,completedLessons:cl,xp,level:xpToLevel(xp)};saveProgress(n);return n;});},[]);
+  const markComplete=useCallback(key=>{_setProgress(p=>{if((p.completedLessons||[]).includes(key))return p;const cl=[...(p.completedLessons||[]),key];const xp=(p.xp||0)+50;const lessonDates={...(p.lessonDates||{}),[key]:Date.now()};const n={...p,completedLessons:cl,xp,level:xpToLevel(xp),lessonDates};saveProgress(n);return n;});},[]);
   const [route,_setRoute]=useState(()=>{try{const s=localStorage.getItem(ROUTE_KEY);if(s)return JSON.parse(s);}catch{}return"landing";});
   const setRoute=r=>{_setRoute(r);try{localStorage.setItem(ROUTE_KEY,JSON.stringify(r));}catch{};window.scrollTo({top:0,behavior:"instant"});};
   const [profileOpen,setProfileOpen]=useState(false);
