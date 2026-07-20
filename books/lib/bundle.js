@@ -36,6 +36,11 @@ const ICONS={
   phone:"M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z",
   shieldCheck:"M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z",
   eye:"M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z",
+  lock:"M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z",
+  key:"M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z",
+  database:"M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zm0 14c-3.87 0-6-1.5-6-2v-1.5c1.26.83 3.5 1.5 6 1.5s4.74-.67 6-1.5V17c0 .5-2.13 2-6 2z",
+  hash:"M20 10V8h-4V4h-2v4h-4V4H8v4H4v2h4v4H4v2h4v4h2v-4h4v4h2v-4h4v-2h-4v-4h4zm-6 4h-4v-4h4v4z",
+  fingerprint:"M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 5.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-1.47-6.54-1.47-9.4.01-1.36.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.39.21z",
 };
 function Icon({name,size=16,style={}}){const d=ICONS[name]||ICONS.book;return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",fill:"currentColor",style:{flexShrink:0,...style}},React.createElement("path",{d}));}
 
@@ -513,7 +518,303 @@ const SE_BOOK={
   ],
 };
 
-const BOOKS=[RE_BOOK,SE_BOOK];
+// ═══════════════════════════════════════════════════════════════
+//  BOOK DATA — Cryptography basics. Original bilingual explanation
+//  of universal, factual cryptographic concepts; open standards
+//  (NIST, OWASP) credited.
+// ═══════════════════════════════════════════════════════════════
+const CRYPTO_BOOK={
+  id:"crypto",
+  titleUz:"Kriptografiya asoslari",
+  titleEn:"Cryptography basics",
+  author:"Original (ochiq manbalar asosida)",
+  authorUz:"Original material (ochiq manbalar asosida)",
+  authorEn:"Original material (based on open references)",
+  license:"CC BY-SA 4.0",
+  coverAbbr:"CR", coverBy:"Asoslar", coverIcon:"lock",
+  refs:[
+    {label:"NIST CSRC — Cryptographic Standards",href:"https://csrc.nist.gov/"},
+    {label:"OWASP — Cryptographic Storage Cheat Sheet",href:"https://owasp.org/"},
+  ],
+  noteUz:"Bu — original o'quv material; kriptografiyaning universal, ilmiy tushunchalari o'z so'zlarim bilan yozilgan. Ochiq standartlar (NIST, OWASP) asosida, CC BY-SA 4.0 litsenziyasida.",
+  noteEn:"This is original educational material; the universal, scientific concepts of cryptography are written in my own words. Based on open standards (NIST, OWASP), under CC BY-SA 4.0.",
+  descUz:"Ma'lumotni matematika bilan himoyalash: simmetrik va asimmetrik shifrlash, xeshlash, raqamli imzo va sertifikatlar. Har bir tushuncha sodda misollar bilan.",
+  descEn:"Protecting data with mathematics: symmetric and asymmetric encryption, hashing, digital signatures and certificates. Every concept with simple examples.",
+  chapters:[
+    { uz:"Muqaddima", en:"Preface", subUz:"Kriptografiya nima uchun kerak", subEn:"Why cryptography matters",
+      blocks:[
+        {t:"p",uz:"**Kriptografiya** — ma'lumotni matematik usullar bilan himoyalash fani. U uchta narsani ta'minlaydi: **maxfiylik** (faqat kerakli odam o'qiy oladi), **butunlik** (ma'lumot o'zgartirilmagan) va **autentlik** (kim yuborganini isbotlash).",
+              en:"**Cryptography** is the science of protecting information using mathematics. It provides three things: **confidentiality** (only the intended person can read), **integrity** (the data hasn't been altered) and **authenticity** (proving who sent it)."},
+        {t:"colophon"},
+        {t:"note",uz:"Kriptografiya bugungi internetning poydevori: HTTPS, parollar, bank kartalari, xabar almashish ilovalari — barchasi shu asosda ishlaydi.",
+              en:"Cryptography is the foundation of today's internet: HTTPS, passwords, bank cards, messaging apps — all rely on it."},
+      ]},
+    { uz:"Simmetrik shifrlash", en:"Symmetric encryption", subUz:"Bitta maxfiy kalit", subEn:"One shared secret key",
+      blocks:[
+        {t:"p",uz:"**Simmetrik shifrlashda** shifrlash va deshifrlash uchun **bitta xil kalit** ishlatiladi. Eng mashhur zamonaviy algoritm — **AES**. U juda tez va katta ma'lumotlarni himoyalash uchun ideal.",
+              en:"In **symmetric encryption**, the **same single key** is used for both encryption and decryption. The most popular modern algorithm is **AES**. It is very fast and ideal for protecting large amounts of data."},
+        {t:"pipe",steps:[
+          {ic:"code",tUz:"Ochiq matn",tEn:"Plaintext",sUz:"\"Salom\"",sEn:"\"Hello\""},
+          {ic:"lock",tUz:"Shifrlash",tEn:"Encrypt",sUz:"kalit bilan",sEn:"with key"},
+          {ic:"database",tUz:"Shifrmatn",tEn:"Ciphertext",sUz:"o'qib bo'lmas",sEn:"unreadable"}]},
+        {t:"p",uz:"Muammo: shifrlangan xabarni yuborishdan oldin, ikkala tomon ham **bir xil maxfiy kalitni** bilishi kerak. Bu kalitni xavfsiz almashish — simmetrik shifrlashning asosiy qiyinchiligi.",
+              en:"The problem: before sending an encrypted message, both parties must know the **same secret key**. Exchanging that key securely is the main challenge of symmetric encryption."},
+      ]},
+    { uz:"Asimmetrik shifrlash", en:"Asymmetric encryption", subUz:"Ochiq va maxfiy kalit jufti", subEn:"A public and private key pair",
+      blocks:[
+        {t:"p",uz:"**Asimmetrik shifrlash** kalit almashish muammosini hal qiladi. Har bir odamda **ikkita kalit** bor: **ochiq kalit** (hammaga beriladi) va **maxfiy kalit** (hech kimga berilmaydi). Ochiq kalit bilan shifrlangan narsani faqat mos maxfiy kalit ocha oladi.",
+              en:"**Asymmetric encryption** solves the key-exchange problem. Each person has **two keys**: a **public key** (given to everyone) and a **private key** (never shared). Whatever is encrypted with the public key can only be opened by the matching private key."},
+        {t:"p",uz:"Mashhur algoritmlar — **RSA** va **ECC** (elliptik egri chiziqlar). Ular simmetrik shifrlashdan sekinroq, shuning uchun amalda ko'pincha ikkalasi birga ishlatiladi: asimmetrik bilan kalit xavfsiz almashinadi, keyin tez simmetrik AES bilan ma'lumot shifrlanadi.",
+              en:"Popular algorithms are **RSA** and **ECC** (elliptic curves). They are slower than symmetric encryption, so in practice both are often used together: the key is exchanged securely with asymmetric crypto, then the data is encrypted with fast symmetric AES."},
+        {t:"note",uz:"Aynan shu tamoyil **HTTPS** da ishlaydi: brauzer va server avval asimmetrik usulda umumiy kalit kelishib oladi, keyin butun aloqa tez simmetrik shifrda davom etadi.",
+              en:"This exact principle works in **HTTPS**: the browser and server first agree on a shared key asymmetrically, then the whole connection continues with fast symmetric encryption."},
+      ]},
+    { uz:"Xesh funksiyalar", en:"Hash functions", subUz:"Bir tomonlama barmoq izi", subEn:"A one-way fingerprint",
+      blocks:[
+        {t:"p",uz:"**Xesh funksiya** har qanday ma'lumotdan qat'iy uzunlikdagi noyob \"barmoq izi\" — **xesh** hosil qiladi. Uch muhim xususiyati bor: **bir tomonlama** (xeshdan asl ma'lumotni tiklab bo'lmaydi), **deterministik** (bir xil kirish → bir xil xesh) va kichik o'zgarish ham xeshni butunlay o'zgartiradi.",
+              en:"A **hash function** turns any data into a fixed-length unique \"fingerprint\" — the **hash**. It has three key properties: it is **one-way** (you cannot recover the original data from the hash), **deterministic** (same input → same hash), and even a tiny change completely alters the hash."},
+        {t:"code",lang:"text",cap:{uz:"SHA-256 misoli — kichik o'zgarish, butunlay boshqa xesh",en:"SHA-256 example — small change, completely different hash"},lines:[
+          "\"salom\"   -> 2b9f...c1a4   (namuna)",
+          "\"Salom\"   -> 8e21...77bf   (faqat bosh harf o'zgardi)"]},
+        {t:"p",uz:"Xesh funksiyalar (masalan **SHA-256**) **butunlikni** tekshirish (fayl o'zgarmaganini isbotlash) va **parollarni saqlash** uchun ishlatiladi — server parolni emas, uning xeshini saqlaydi.",
+              en:"Hash functions (e.g. **SHA-256**) are used to check **integrity** (proving a file hasn't changed) and to **store passwords** — the server stores the hash, not the password itself."},
+      ]},
+    { uz:"Raqamli imzo va sertifikatlar", en:"Digital signatures & certificates", subUz:"Kim yuborganini isbotlash", subEn:"Proving who sent it",
+      blocks:[
+        {t:"p",uz:"**Raqamli imzo** — asimmetrik kriptografiyaning teskari qo'llanilishi. Yuboruvchi xabarni o'z **maxfiy kaliti** bilan imzolaydi; har kim uning **ochiq kaliti** bilan imzoni tekshira oladi. Bu **autentlik** (haqiqatan o'sha odam yuborgan) va **butunlik**ni isbotlaydi.",
+              en:"A **digital signature** is the reverse use of asymmetric cryptography. The sender signs a message with their **private key**; anyone can verify the signature with their **public key**. This proves **authenticity** (it really came from that person) and **integrity**."},
+        {t:"p",uz:"Lekin ochiq kalit haqiqatan o'sha odamnikimi? Buni **sertifikatlar** va **PKI** (ochiq kalit infratuzilmasi) hal qiladi. Ishonchli **sertifikat markazi (CA)** kalit egasining kimligini tasdiqlaydi. Brauzeringiz HTTPS saytga kirganda aynan shu sertifikatni tekshiradi.",
+              en:"But is the public key really that person's? **Certificates** and **PKI** (public key infrastructure) solve this. A trusted **certificate authority (CA)** confirms the identity of the key's owner. Your browser checks exactly this certificate when you visit an HTTPS site."},
+      ]},
+    { uz:"Amaliy maslahatlar", en:"Practical advice", subUz:"Keng tarqalgan xatolar va to'g'ri yondashuv", subEn:"Common mistakes and the right approach",
+      blocks:[
+        {t:"note",warn:true,uz:"**Eng muhim qoida: o'zingiz kriptografiya algoritmi yozmang.** Kriptografiya nihoyatda nozik — kichik xato butun himoyani buzadi. Har doim sinovdan o'tgan, ishonchli kutubxonalarni ishlating.",
+              en:"**The most important rule: don't write your own cryptographic algorithm.** Cryptography is extremely delicate — a small mistake breaks the whole protection. Always use tested, trusted libraries."},
+        {t:"ul",uz:[
+          "Zamonaviy algoritmlarni tanlang: **AES** (simmetrik), **RSA/ECC** (asimmetrik), **SHA-256** (xesh).",
+          "Eskirgan algoritmlardan qoching: **MD5**, **SHA-1**, **DES** — ular buzilgan.",
+          "**Kalit boshqaruvi** — eng qiyin qism: kalitlarni xavfsiz saqlash va almashtirish.",
+          "Parollar uchun oddiy xesh emas, maxsus **bcrypt / Argon2** ni ishlating (keyingi kitobda)."],
+          en:[
+          "Choose modern algorithms: **AES** (symmetric), **RSA/ECC** (asymmetric), **SHA-256** (hash).",
+          "Avoid outdated algorithms: **MD5**, **SHA-1**, **DES** — they are broken.",
+          "**Key management** is the hardest part: storing and rotating keys securely.",
+          "For passwords, use dedicated **bcrypt / Argon2**, not a plain hash (see the next book)."]},
+        {t:"colophon"},
+      ]},
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  BOOK DATA — Passwords & authentication. Original, defence-oriented.
+// ═══════════════════════════════════════════════════════════════
+const AUTH_BOOK={
+  id:"auth",
+  titleUz:"Parollar va autentifikatsiya xavfsizligi",
+  titleEn:"Password & authentication security",
+  author:"Original (ochiq manbalar asosida)",
+  authorUz:"Original material (ochiq manbalar asosida)",
+  authorEn:"Original material (based on open references)",
+  license:"CC BY-SA 4.0",
+  coverAbbr:"AU", coverBy:"Parol", coverIcon:"key",
+  refs:[
+    {label:"NIST SP 800-63B — Digital Identity Guidelines",href:"https://pages.nist.gov/800-63-3/"},
+    {label:"OWASP — Authentication Cheat Sheet",href:"https://owasp.org/"},
+  ],
+  noteUz:"Bu — himoya uchun original material. Maqsad — parol va autentifikatsiyani to'g'ri sozlash. Ochiq manbalar (NIST SP 800-63, OWASP) asosida, CC BY-SA 4.0.",
+  noteEn:"This is original defence material. Its goal is to set up passwords and authentication correctly. Based on open references (NIST SP 800-63, OWASP), under CC BY-SA 4.0.",
+  descUz:"Parol qanday buziladi va undan qanday himoyalanish: kuchli parollar, parol menejeri, xeshlash va tuz, ko'p faktorli autentifikatsiya (MFA) va passkey'lar.",
+  descEn:"How passwords get cracked and how to defend: strong passwords, password managers, hashing and salt, multi-factor authentication (MFA) and passkeys.",
+  chapters:[
+    { uz:"Muqaddima", en:"Preface", subUz:"Autentifikatsiya — kimligingizni isbotlash", subEn:"Authentication — proving who you are",
+      blocks:[
+        {t:"p",uz:"**Autentifikatsiya** — tizimga \"men haqiqatan o'shaman\" deb isbotlash jarayoni. U uch xil dalilga tayanadi: **nimani bilasiz** (parol), **nimaga egasiz** (telefon, kalit) va **kimsiz** (barmoq izi, yuz). Parol — eng keng tarqalgan, lekin eng zaif usul.",
+              en:"**Authentication** is the process of proving to a system \"I really am who I claim to be\". It relies on three kinds of evidence: **something you know** (a password), **something you have** (a phone, a key) and **something you are** (fingerprint, face). Passwords are the most common but the weakest method."},
+        {t:"colophon"},
+      ]},
+    { uz:"Parol qanday buziladi", en:"How passwords get cracked", subUz:"Hujum usullarini bilib, himoyani tushunish", subEn:"Understand defence by knowing the attacks",
+      blocks:[
+        {t:"p",uz:"Parolni himoyalash uchun avval u qanday buzilishini bilish kerak. Asosiy usullar:",
+              en:"To protect a password, first understand how it gets broken. The main methods:"},
+        {t:"ul",uz:[
+          "**Brute-force** — barcha mumkin bo'lgan kombinatsiyalarni sinash. Qisqa parollar soniya ichida buziladi.",
+          "**Dictionary (lug'at)** — keng tarqalgan parollar ro'yxatini sinash ('123456', 'parol').",
+          "**Credential stuffing** — bir saytdan o'g'irlangan parolni boshqa saytlarda sinash (odamlar parolni takrorlaydi).",
+          "**Ma'lumot bazasi sizib chiqishi** — buzilgan saytdan millionlab parol xeshlari o'g'irlanadi."],
+          en:[
+          "**Brute-force** — trying all possible combinations. Short passwords fall in seconds.",
+          "**Dictionary** — trying a list of common passwords ('123456', 'password').",
+          "**Credential stuffing** — trying a password stolen from one site on other sites (people reuse passwords).",
+          "**Database leaks** — millions of password hashes are stolen from a breached site."]},
+        {t:"note",uz:"Shuning uchun **har bir sayt uchun alohida parol** — eng muhim qoida: bitta sayt buzilsa, qolganlari xavfsiz qoladi.",
+              en:"That's why a **unique password for every site** is the most important rule: if one site is breached, the others stay safe."},
+      ]},
+    { uz:"Kuchli parol va parol menejeri", en:"Strong passwords & password managers", subUz:"Uzunlik murakkablikdan muhimroq", subEn:"Length matters more than complexity",
+      blocks:[
+        {t:"p",uz:"Yaxshi parol — **uzun** parol. Zamonaviy tavsiya: murakkab, esda qolmaydigan 'P@ss1!' o'rniga, uzun lekin oson **parol-ibora** (passphrase) ishlating: bir nechta tasodifiy so'z. Uzunlik brute-force'ni eksponensial qiyinlashtiradi.",
+              en:"A good password is a **long** password. Modern guidance: instead of a complex, unmemorable 'P@ss1!', use a long but easy **passphrase**: several random words. Length makes brute-force exponentially harder."},
+        {t:"p",uz:"Lekin o'nlab uzun, noyob parolni eslab bo'lmaydi. Yechim — **parol menejeri**: u har sayt uchun kuchli, noyob parol yaratadi va shifrlangan holda saqlaydi. Siz faqat bitta asosiy parolni eslaysiz.",
+              en:"But you can't memorize dozens of long, unique passwords. The solution is a **password manager**: it generates a strong, unique password for each site and stores them encrypted. You only remember one master password."},
+        {t:"ul",uz:[
+          "Uzunlik **kamida 12–16 belgi** (parol-ibora yaxshiroq).",
+          "**Har saytga alohida** parol.",
+          "**Parol menejeri** ishlating (masalan ochiq kodli variantlar bor).",
+          "Shaxsiy ma'lumot (tug'ilgan sana, ism) — parol emas."],
+          en:[
+          "Length **at least 12–16 characters** (a passphrase is better).",
+          "A **unique** password per site.",
+          "Use a **password manager** (open-source options exist).",
+          "Personal info (birthday, name) is not a password."]},
+      ]},
+    { uz:"Server tomoni: xeshlash va tuz", en:"Server side: hashing & salt", subUz:"Parollarni hech qachon ochiq saqlamang", subEn:"Never store passwords in plaintext",
+      blocks:[
+        {t:"p",uz:"Yaxshi sayt sizning parolingizni **hech qachon ochiq (plaintext) saqlamaydi**. Uning o'rniga parolning **xeshini** saqlaydi. Siz kirganda, kiritgan parolingiz xeshlanadi va saqlangan xesh bilan solishtiriladi.",
+              en:"A good site **never stores your password in plaintext**. Instead it stores the password's **hash**. When you log in, your entered password is hashed and compared with the stored hash."},
+        {t:"p",uz:"Ammo oddiy xesh yetarli emas. **Tuz (salt)** — har parolga qo'shiladigan noyob tasodifiy qiymat — bir xil parollar bir xil xesh bermasligini ta'minlaydi va oldindan tayyorlangan jadval hujumlarini (rainbow table) to'xtatadi. Parollar uchun maxsus, ataylab **sekin** algoritmlar ishlatiladi: **bcrypt**, **scrypt** yoki **Argon2**.",
+              en:"But a plain hash isn't enough. A **salt** — a unique random value added to each password — ensures identical passwords don't produce identical hashes and stops precomputed-table (rainbow table) attacks. For passwords, deliberately **slow** algorithms are used: **bcrypt**, **scrypt** or **Argon2**."},
+        {t:"note",warn:true,uz:"Parollar uchun **MD5** yoki oddiy **SHA-256** ni ishlatmang — ular juda tez, ya'ni brute-force uchun oson. **bcrypt/Argon2** ataylab sekin qilingan.",
+              en:"Don't use **MD5** or plain **SHA-256** for passwords — they are too fast, i.e. easy to brute-force. **bcrypt/Argon2** are deliberately slow."},
+      ]},
+    { uz:"Ko'p faktorli autentifikatsiya (MFA)", en:"Multi-factor authentication (MFA)", subUz:"Paroldan tashqari ikkinchi qatlam", subEn:"A second layer beyond the password",
+      blocks:[
+        {t:"p",uz:"**MFA (ko'p faktorli autentifikatsiya)** — paroldan tashqari yana bir dalil so'raydi. Parol o'g'irlansa ham, hujumchi ikkinchi faktorsiz kira olmaydi. Bu — hisobingizni himoyalashning eng samarali usullaridan biri.",
+              en:"**MFA (multi-factor authentication)** asks for one more piece of evidence beyond the password. Even if the password is stolen, the attacker can't get in without the second factor. It is one of the most effective ways to protect your account."},
+        {t:"ul",uz:[
+          "**TOTP ilovalari** (Google/Microsoft Authenticator) — har 30 soniyada yangi kod. Yaxshi.",
+          "**SMS kod** — ishlaydi, lekin zaifroq (SIM almashtirish hujumlari). Yo'qdan ko'ra yaxshi.",
+          "**Apparat kalitlari** (FIDO2 / YubiKey) — eng kuchli, fishing'ga chidamli.",
+          "**Passkey'lar** — parolsiz kelajak: qurilmangizdagi kriptografik kalit."],
+          en:[
+          "**TOTP apps** (Google/Microsoft Authenticator) — a new code every 30 seconds. Good.",
+          "**SMS code** — works, but weaker (SIM-swap attacks). Better than nothing.",
+          "**Hardware keys** (FIDO2 / YubiKey) — the strongest, phishing-resistant.",
+          "**Passkeys** — the passwordless future: a cryptographic key on your device."]},
+        {t:"note",uz:"Kamida muhim hisoblaringizga (email, bank, ijtimoiy tarmoq) **MFA yoqing**. Email — eng muhimi, chunki u orqali boshqa parollar tiklanadi.",
+              en:"At least enable **MFA on your important accounts** (email, bank, social media). Email is the most important, because other passwords are reset through it."},
+      ]},
+    { uz:"Himoya va kelajak", en:"Defence & the future", subUz:"Parolsiz dunyoga qarab", subEn:"Toward a passwordless world",
+      blocks:[
+        {t:"p",uz:"Sanoat asta-sekin **parolsiz (passwordless)** autentifikatsiyaga o'tmoqda. **Passkey'lar** (FIDO2 standarti asosida) parolni butunlay yo'q qiladi: siz qurilmangizni barmoq izi yoki yuz bilan ochasiz, u esa saytga kriptografik isbot yuboradi. Fishing bunda ishlamaydi, chunki o'g'irlaydigan parol yo'q.",
+              en:"The industry is gradually moving to **passwordless** authentication. **Passkeys** (based on the FIDO2 standard) eliminate passwords entirely: you unlock your device with a fingerprint or face, and it sends a cryptographic proof to the site. Phishing doesn't work here, because there is no password to steal."},
+        {t:"ul",uz:[
+          "Bugun: **kuchli noyob parollar + parol menejeri + MFA**.",
+          "Imkon bo'lsa: **passkey'larga** o'ting.",
+          "Hech qachon parol yoki OTP'ni boshqalarga aytmang.",
+          "Parol sizib chiqqanini bilsangiz — darhol o'zgartiring."],
+          en:[
+          "Today: **strong unique passwords + a password manager + MFA**.",
+          "Where possible: switch to **passkeys**.",
+          "Never share a password or OTP with anyone.",
+          "If you learn a password has leaked — change it immediately."]},
+        {t:"colophon"},
+      ]},
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  BOOK DATA — OSINT & privacy. Defence-and-ethics oriented; original.
+// ═══════════════════════════════════════════════════════════════
+const OSINT_BOOK={
+  id:"osint",
+  titleUz:"OSINT — ochiq manba razvedkasi va maxfiylik",
+  titleEn:"OSINT — open-source intelligence & privacy",
+  author:"Original (ochiq manbalar asosida)",
+  authorUz:"Original material (ochiq manbalar asosida)",
+  authorEn:"Original material (based on open references)",
+  license:"CC BY-SA 4.0",
+  coverAbbr:"OS", coverBy:"Razvedka", coverIcon:"search",
+  refs:[
+    {label:"OSINT Framework",href:"https://osintframework.com/"},
+    {label:"SANS — OSINT resources",href:"https://www.sans.org/"},
+  ],
+  noteUz:"Bu — original material, ikki maqsadli: ochiq ma'lumotni tahlil qilish VA o'z raqamli izingni himoya qilish. Faqat qonuniy va axloqiy foydalanish uchun. CC BY-SA 4.0.",
+  noteEn:"This is original material with a dual purpose: analysing open information AND protecting your own digital footprint. For lawful and ethical use only. CC BY-SA 4.0.",
+  descUz:"Ochiq (ommaviy) manbalardan ma'lumot to'plash san'ati — va uning teskarisi: o'zingiz haqingizdagi ma'lumotni kamaytirib, maxfiylikni himoyalash.",
+  descEn:"The art of gathering information from open (public) sources — and its reverse: reducing what's known about you and protecting your privacy.",
+  chapters:[
+    { uz:"Muqaddima va axloq", en:"Preface & ethics", subUz:"Ikki tomonlama qurol", subEn:"A double-edged skill",
+      blocks:[
+        {t:"p",uz:"**OSINT** (Open-Source Intelligence) — ochiq, ommaviy manbalardan (internet, ijtimoiy tarmoqlar, ommaviy reyestrlar) ma'lumot to'plab, undan xulosa chiqarish. Bu — pentest, tergov, jurnalistika va xavfsizlik tahlilining muhim qismi.",
+              en:"**OSINT** (Open-Source Intelligence) is gathering information from open, public sources (the internet, social media, public records) and drawing conclusions from it. It is a key part of pentesting, investigation, journalism and security analysis."},
+        {t:"colophon"},
+        {t:"note",warn:true,uz:"**Axloq va qonun.** OSINT faqat **ochiq** ma'lumot bilan ishlaydi — tizimlarni buzish yoki begona hisoblarga kirish OSINT emas, jinoyat. Boshqalarni kuzatish yoki ta'qib qilish uchun ishlatish — qonunbuzarlik. Bu material himoya, tadqiqot va o'z maxfiyligingni tushunish uchun.",
+              en:"**Ethics and law.** OSINT works only with **open** information — breaking into systems or accessing others' accounts is not OSINT, it's a crime. Using it to stalk or harass people is illegal. This material is for defence, research and understanding your own privacy."},
+      ]},
+    { uz:"OSINT qayerda ishlatiladi", en:"Where OSINT is used", subUz:"Ma'lumot to'plash bosqichi", subEn:"The information-gathering phase",
+      blocks:[
+        {t:"p",uz:"Ko'p xavfsizlik jarayonlari OSINTdan boshlanadi. Masalan, pentest'da hujumchi (yoki himoyachi) nishon haqida ochiq ma'lumot to'playdi: domenlar, email manzillar, xodimlar, ishlatiladigan texnologiyalar. Bu **recon** (ma'lumot to'plash) bosqichi.",
+              en:"Many security processes begin with OSINT. For example, in a pentest the attacker (or defender) gathers open information about the target: domains, email addresses, employees, technologies in use. This is the **recon** (reconnaissance) phase."},
+        {t:"ul",uz:[
+          "**Pentest / Red team** — nishonni o'rganish (avvalgi ijtimoiy injeneriya kitobiga bog'liq).",
+          "**Tergov va huquq** — firibgarlik, yo'qolgan odamlar bo'yicha tekshiruv.",
+          "**Jurnalistika** — faktlarni tekshirish, tadqiqot.",
+          "**Xavfsizlik / Blue team** — o'z tashkiloting haqida internetda nima ochiq ekanini bilish."],
+          en:[
+          "**Pentest / Red team** — studying the target (connected to the earlier social engineering book).",
+          "**Investigation and law** — fraud, missing-persons inquiries.",
+          "**Journalism** — fact-checking, research.",
+          "**Security / Blue team** — knowing what about your own organisation is open on the internet."]},
+      ]},
+    { uz:"Ma'lumot manbalari", en:"Sources of information", subUz:"Ochiq ma'lumot qayerda bo'ladi", subEn:"Where open information lives",
+      blocks:[
+        {t:"p",uz:"OSINT'ning kuchi — ma'lumot manbalarini bilishda. Asosiy toifalar:",
+              en:"The power of OSINT is in knowing the sources. The main categories:"},
+        {t:"ul",uz:[
+          "**Qidiruv tizimlari** — Google, va maxsuslashtirilganlar (masalan, internetga ulangan qurilmalar uchun).",
+          "**Ijtimoiy tarmoqlar** — profil, joylashuv, aloqalar, qiziqishlar.",
+          "**Ommaviy reyestrlar** — domen ro'yxati (WHOIS), kompania ma'lumotlari.",
+          "**Metadata** — rasm va hujjatlardagi yashirin ma'lumot (joylashuv, qurilma, sana).",
+          "**Sizib chiqqan ma'lumot bazalari** — buzilgan saytlardagi ochiq ma'lumot (o'z email'ingiz sizib chiqqanini tekshirish uchun)."],
+          en:[
+          "**Search engines** — Google, and specialised ones (e.g. for internet-connected devices).",
+          "**Social networks** — profiles, location, connections, interests.",
+          "**Public records** — domain registration (WHOIS), company data.",
+          "**Metadata** — hidden information in images and documents (location, device, date).",
+          "**Leaked databases** — open data from breached sites (to check whether your own email has leaked)."]},
+        {t:"note",uz:"E'tibor bering: bu manbalarning ko'pchiligi **siz haqingizda ham** ma'lumot beradi. OSINT'ni o'rganish — o'zingni himoya qilishning birinchi qadami.",
+              en:"Note: most of these sources reveal information **about you too**. Learning OSINT is the first step to protecting yourself."},
+      ]},
+    { uz:"Texnikalar va vositalar", en:"Techniques & tools", subUz:"Aqlli qidiruv", subEn:"Searching smartly",
+      blocks:[
+        {t:"p",uz:"OSINT ko'proq **texnika**, kamroq vosita. Eng muhim ko'nikma — **aqlli qidiruv**. Masalan, qidiruv operatorlari (advanced search) natijalarni keskin toraytiradi: aniq sayt ichida, aniq fayl turida yoki aniq iborani qidirish.",
+              en:"OSINT is more about **technique** than tools. The most important skill is **searching smartly**. For example, search operators (advanced search) sharply narrow results: searching within a specific site, a specific file type, or an exact phrase."},
+        {t:"ul",uz:[
+          "**Qidiruv operatorlari** — `site:`, `filetype:`, qo'shtirnoq ichida aniq ibora.",
+          "**Teskari rasm qidiruvi** — rasm qaerdan kelganini topish.",
+          "**Username qidiruvi** — bir taxallusni turli platformalarda izlash.",
+          "**Metadata ko'ruvchilar** — rasm/hujjat ichidagi yashirin ma'lumotni ochish."],
+          en:[
+          "**Search operators** — `site:`, `filetype:`, an exact phrase in quotes.",
+          "**Reverse image search** — finding where an image came from.",
+          "**Username search** — looking for one alias across different platforms.",
+          "**Metadata viewers** — revealing hidden information inside an image/document."]},
+        {t:"note",uz:"Aynan shu operatorlar himoya uchun ham ishlatiladi: o'z tashkiloting haqida internetda nima ochiq turganini topib, uni yopish.",
+              en:"These same operators are also used for defence: finding what about your organisation is openly exposed on the internet, and locking it down."},
+      ]},
+    { uz:"Raqamli izingni himoya qilish", en:"Protecting your digital footprint", subUz:"OSINT'ning teskari tomoni", subEn:"The reverse side of OSINT",
+      blocks:[
+        {t:"p",uz:"OSINT'ni o'rganishning eng foydali tomoni — **o'zingni himoya qilish**. Hujumchi siz haqingizda qancha kam ma'lumot topsa, ijtimoiy injeneriya shuncha qiyin. Raqamli izingni kamaytirish:",
+              en:"The most useful side of learning OSINT is **protecting yourself**. The less information an attacker can find about you, the harder social engineering becomes. Reduce your digital footprint:"},
+        {t:"ul",uz:[
+          "Ijtimoiy tarmoqda **kam ma'lumot** ulashing; profillarni **shaxsiy** qiling.",
+          "Rasm joylashdan oldin **joylashuv (GPS) metadata**sini o'chiring.",
+          "Har saytga bir xil email/parol ishlatmang (avvalgi kitoblar).",
+          "O'z ismingizni vaqti-vaqti bilan qidirib, internetda nima ochiq turganini tekshiring.",
+          "Email'ingiz sizib chiqqanini tekshirib turing va o'zgartiring."],
+          en:[
+          "Share **less** on social media; make profiles **private**.",
+          "Remove **location (GPS) metadata** from images before posting.",
+          "Don't reuse the same email/password across sites (previous books).",
+          "Periodically search for your own name to see what's open about you.",
+          "Check whether your email has leaked and change credentials."]},
+        {t:"note",uz:"Bir jumla bilan: **OSINT'ni bilgan odam o'zini yaxshiroq himoya qiladi.** Hujumchi qanday ma'lumot izlashini bilsangiz, uni undan yashira olasiz.",
+              en:"In one sentence: **a person who understands OSINT protects themselves better.** If you know what information an attacker looks for, you can hide it from them."},
+        {t:"colophon"},
+      ]},
+  ],
+};
+
+const BOOKS=[RE_BOOK,SE_BOOK,CRYPTO_BOOK,AUTH_BOOK,OSINT_BOOK];
 
 // ── Colophon (attribution) block ──────────────────────────────
 function Colophon({book}){
