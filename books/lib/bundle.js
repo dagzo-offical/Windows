@@ -661,7 +661,147 @@ const SE_BOOK={
         {t:"note",uz:"Ko'p kompaniyalar xodimlarni **simulyatsiyalangan fishing** (test xatlari) bilan o'qitadi — bu jazolash uchun emas, xatoda o'rganish uchun. Bu — himoya-yo'nalishidagi eng samarali usullardan biri.",
               en:"Many companies train staff with **simulated phishing** (test emails) — not to punish, but to learn from mistakes safely. It's one of the most effective defensive methods."},
       ]},
-    // ── 7: Cases & next steps ──────────────────────────────────
+    // ── 7: BEC ────────────────────────────────────────────────────
+    { uz:"BEC — rahbar nomidan firibgarlik", en:"BEC — CEO fraud", subUz:"Eng qimmatga tushadigan ijtimoiy injeneriya hujumi", subEn:"The most expensive social engineering attack",
+      blocks:[
+        {t:"p",uz:"**BEC** (Business Email Compromise) — kompaniyalarga har yili milliardlab dollar zarar keltiradigan hujum turi. Hujumchi rahbar, moliya bo'limi yoki ishonchli hamkor nomidan **soxta email** yuborib, xodimni pul o'tkazishga yoki maxfiy ma'lumot yuborishga ko'ndiradi.",
+              en:"**BEC** (Business Email Compromise) is a category of attack that costs companies billions of dollars every year. The attacker sends a **fake email** posing as an executive, the finance department, or a trusted partner, convincing an employee to transfer money or send sensitive information."},
+        {t:"h",n:"7.1",uz:"Tipik ssenariy",en:"A typical scenario"},
+        {t:"pipe",steps:[
+          {ic:"search",tUz:"Kuzatish",tEn:"Recon",sUz:"rahbar kim, qachon sayohatda",sEn:"who's the exec, when traveling"},
+          {ic:"mail",tUz:"Soxta xat",tEn:"Fake email",sUz:"domen o'xshash yoki buzilgan",sEn:"lookalike or hacked domain"},
+          {ic:"alert",tUz:"Shoshilinch so'rov",tEn:"Urgent request",sUz:"\"hoziroq o'tkazing, maxfiy\"",sEn:"\"transfer now, confidential\""},
+          {ic:"arrowR",tUz:"Pul yo'qoladi",tEn:"Money is gone",sUz:"qaytarib bo'lmaydi",sEn:"unrecoverable"}]},
+        {t:"p",uz:"Hujumchi avval OSINT orqali (keyingi kitobda batafsil) kompaniya rahbarining kim ekanini, u qachon sayohatda bo'lishini biladi. Keyin rahbar **sayohatda, telefonga chiqolmaydigan** paytda, moliya bo'limi xodimiga \"Men hozir muzokarada, shoshilinch — quyidagi hisobga $50,000 o'tkazing, bu maxfiy shartnoma\" mazmunidagi xat yuboradi.",
+              en:"The attacker first learns via OSINT (covered in the next book) who the company's executive is and when they'll be traveling. Then, while the executive is **traveling and unreachable by phone**, they email a finance employee: \"I'm in a negotiation right now, urgent — transfer $50,000 to the account below, this is a confidential deal.\""},
+        {t:"h",n:"7.2",uz:"Nega ishlaydi",en:"Why it works"},
+        {t:"p",uz:"Bu — 2-bobdagi ta'sir tamoyillarining aynan qo'llanilishi: **avtoritet** (rahbar buyurmoqda), **shoshilinchlik** (\"hozir\"), va **tekshirish imkoniyati yo'q** (rahbar \"band\"). Xodim shubhalansa ham, rahbarga qarshi chiqishdan qo'rqadi.",
+              en:"This is a direct application of the influence principles from chapter 2: **authority** (the boss is ordering it), **urgency** (\"right now\"), and **no way to verify** (the boss is \"busy\"). Even if the employee has doubts, they're afraid to push back on the boss."},
+        {t:"note",warn:true,uz:"**Oltin qoida:** har qanday pul o'tkazmasi so'rovini, hatto \"rahbardan\" kelsa ham, **ikkinchi kanal orqali** (telefon qo'ng'irog'i, shaxsan) tasdiqlang — email orqali javob yozib emas. Ko'plab tashkilotlarda katta summalar uchun **ikki kishi tasdig'i** talab qilinadi — bu yakka xodimni himoya qiladi.",
+              en:"**Golden rule:** verify any money-transfer request — even one that appears to be from the boss — through **a second channel** (a phone call, in person), not by replying to the email. Many organizations require **two-person approval** for large sums — this protects any single employee."},
+      ]},
+    // ── 8: Physical security ────────────────────────────────────────
+    { uz:"Jismoniy xavfsizlik", en:"Physical security", subUz:"Ijtimoiy injeneriya ekrandan tashqarida", subEn:"Social engineering beyond the screen",
+      blocks:[
+        {t:"p",uz:"Eng kuchli raqamli himoya ham **ochiq eshik** oldida ojiz. Jismoniy ijtimoiy injeneriya — binoga, xonaga yoki cheklangan hududga ruxsatsiz kirish uchun ishonch va rolni ishlatish.",
+              en:"Even the strongest digital defence is powerless against **an open door**. Physical social engineering means using trust and role-play to gain unauthorized access to a building, room or restricted area."},
+        {t:"h",n:"8.1",uz:"Keng tarqalgan usullar",en:"Common techniques"},
+        {t:"ul",uz:[
+          "**Tailgating** — begona odam xodim ortidan, badge ko'rsatmasdan, eshikdan birga kiradi (\"qo'lim band, ushlab turing\").",
+          "**Rol o'ynash** — kuryer, ta'mirchi, yangi xodim yoki auditor sifatida kiyinib, ishonch qozonish.",
+          "**Badge klonlash** — ba'zi eski RFID kartalarni maxsus qurilma bilan nusxalash mumkin (fizik yaqinlikda).",
+          "**\"Piggybacking\" bilan farqi** — tailgating (xodim bilmaydi), piggybacking (xodim ataylab, xushmuomalalik yuzasidan eshikni ushlaydi)."],
+          en:[
+          "**Tailgating** — a stranger enters right behind an employee, without showing a badge, riding on the held door (\"my hands are full, hold it\").",
+          "**Role-play** — dressing as a courier, repair technician, new hire or auditor to gain trust.",
+          "**Badge cloning** — some older RFID cards can be copied with a special device (at close physical range).",
+          "**Difference from \"piggybacking\"** — tailgating is unnoticed by the employee; piggybacking is when the employee knowingly, out of politeness, holds the door."]},
+        {t:"h",n:"8.2",uz:"Himoya",en:"Defence"},
+        {t:"ul",uz:[
+          "Har bir kirishda **badge/karta talab qiling** — hatto tanish yuz bo'lsa ham.",
+          "Xushmuomalalikdan qo'rqmang: **\"Kechirasiz, badge'ingizni ko'rsata olasizmi?\"** — bu normal, ishning bir qismi.",
+          "Ish stolida qog'oz, parol yozuvlari qoldirmang (**clean desk** siyosati).",
+          "Shubhali odamni ko'rsangiz — **xavfsizlik xizmatiga xabar bering**, o'zingiz to'xtatishga urinmang."],
+          en:[
+          "**Require a badge/card** at every entry — even for a familiar face.",
+          "Don't be afraid to be polite about it: **\"Sorry, could you show your badge?\"** — this is normal, part of the job.",
+          "Don't leave papers or written passwords on your desk (**clean desk** policy).",
+          "If you see someone suspicious — **report it to security**, don't try to stop them yourself."]},
+      ]},
+    // ── 9: Deepfakes ──────────────────────────────────────────────
+    { uz:"Deepfake va ovoz taqlidi", en:"Deepfakes & voice cloning", subUz:"Sun'iy intellekt — yangi ijtimoiy injeneriya quroli", subEn:"AI — a new social engineering weapon",
+      blocks:[
+        {t:"p",uz:"Sun'iy intellekt ijtimoiy injeneriyaga yangi, xavotirli o'lchov qo'shdi: **deepfake** video va **ovoz klonlash**. Endi hujumchiga kimningdir ovozini taqlid qilish uchun bir necha soniyalik audio namuna yetarli.",
+              en:"Artificial intelligence has added a new, worrying dimension to social engineering: **deepfake** video and **voice cloning**. Now an attacker needs only a few seconds of audio sample to imitate someone's voice."},
+        {t:"h",n:"9.1",uz:"Real xavf",en:"The real danger"},
+        {t:"p",uz:"2019-2024 yillarda dunyo bo'ylab kompaniyalar rahbar ovozi (yoki hatto video qo'ng'iroqda yuzi) klonlangan holda firibgarlikka uchradi — moliya xodimi \"ishonchli\" ovozni eshitib, katta summani o'tkazib yubordi. Ijtimoiy tarmoqdagi ochiq intervyu yoki videolar bunday klonlash uchun yetarli material beradi.",
+              en:"Between 2019 and 2024, companies worldwide were defrauded via cloned executive voices (or even faces on a video call) — a finance employee heard a \"trusted\" voice and transferred a large sum. Public interviews or videos on social media provide more than enough material for such cloning."},
+        {t:"note",warn:true,uz:"Bu 7-bobdagi BEC xavfini yanada kuchaytiradi: endi hujumchi shunchaki yozmaydi — **qo'ng'iroq qiladi**, va ovoz aynan tanish eshitiladi.",
+              en:"This amplifies the BEC risk from chapter 7: the attacker no longer just writes — they **call**, and the voice sounds exactly familiar."},
+        {t:"h",n:"9.2",uz:"Himoya",en:"Defence"},
+        {t:"ul",uz:[
+          "**Ovoz yoki video — yagona dalil emas.** Muhim so'rovlarni (pul, parol) boshqa kanal orqali tasdiqlang.",
+          "Oila yoki jamoada **maxfiy \"kod so'z\"** kelishib oling — shoshilinch qo'ng'iroqda shu so'zni so'rang.",
+          "G'ayrioddiy so'rov (\"darhol pul yubor\", \"OTP ayt\") — ovoz kimniki bo'lishidan qat'iy nazar, to'xtab tekshiring qoidasi (4-bob) shu yerda ham ishlaydi.",
+          "Kompaniyalar uchun: yuqori-summali operatsiyalarga **ko'p bosqichli tasdiq** joriy qiling, faqat ovozga ishonmang."],
+          en:[
+          "**Voice or video is not sole proof.** Verify important requests (money, passwords) through another channel.",
+          "Agree on a **secret \"code word\"** with family or your team — ask for it on an urgent call.",
+          "For an unusual request (\"send money now\", \"tell me the OTP\") — the stop-and-verify rule from chapter 4 applies regardless of whose voice it is.",
+          "For companies: introduce **multi-step approval** for high-value transactions; don't trust voice alone."]},
+      ]},
+    // ── 10: Protecting family ──────────────────────────────────────
+    { uz:"Oila va keksalarni himoya qilish", en:"Protecting family & the elderly", subUz:"Eng zaif nishonlar — va ularga yordam", subEn:"The most vulnerable targets — and how to help them",
+      blocks:[
+        {t:"p",uz:"Ijtimoiy injeneriya faqat kompaniyalarga qaratilmagan — u eng ko'p oddiy odamlarga, ayniqsa **keksa yoshdagilar** va texnologiyadan uzoq odamlarga qaratiladi. Ular ko'proq **hurmat va ishonchga** asoslangan hujumlarga moyil.",
+              en:"Social engineering doesn't only target companies — it most often targets ordinary people, especially **the elderly** and those less familiar with technology. They are more susceptible to attacks built on **respect and trust**."},
+        {t:"h",n:"10.1",uz:"Keng tarqalgan sxemalar",en:"Common schemes"},
+        {t:"ul",uz:[
+          "**\"Nevarangiz muammoda\"** — qo'ng'iroq qiluvchi o'zini nevara yoki qarindosh qilib ko'rsatib, shoshilinch pul so'raydi.",
+          "**Soxta \"texnik yordam\"** — \"kompyuteringiz virusga chalingan\", masofaviy kirish yoki to'lov so'raydi.",
+          "**Soxta pensiya/nafaqa qo'ng'irog'i** — \"hujjatingizni yangilash uchun\" shaxsiy ma'lumot so'raydi.",
+          "**Romantik firibgarlik** — onlayn tanishuv orqali ishonch qozonib, pul so'rash."],
+          en:[
+          "**\"Your grandchild is in trouble\"** — the caller poses as a grandchild or relative, urgently asking for money.",
+          "**Fake \"tech support\"** — \"your computer has a virus\", asking for remote access or payment.",
+          "**Fake pension/benefits call** — asking for personal data \"to update your file\".",
+          "**Romance scams** — building trust via online dating, then asking for money."]},
+        {t:"h",n:"10.2",uz:"Oilaviy himoya",en:"Family-level defence"},
+        {t:"ul",uz:[
+          "Oilangizdagi keksa a'zolar bilan **oldindan gaplashing**: \"hech qachon shoshilinch pul yoki kod so'ralganda darhol bermang, menga qo'ng'iroq qiling\".",
+          "**Kod so'z** o'rnating (9-bobdagi kabi) — haqiqiy qarindosh ekanini tasdiqlash uchun.",
+          "Ularga **shoshilinchlik = xavf belgisi** ekanini sodda tilda tushuntiring.",
+          "Agar shubhali holat sodir bo'lsa — **ayblamang**, xotirjam yordam bering; qo'rqib, keyingi safar xabar bermasligi mumkin."],
+          en:[
+          "**Talk with older family members in advance**: \"if you're ever asked for urgent money or a code, don't give it — call me first\".",
+          "Set up a **code word** (as in chapter 9) to confirm it's really a relative.",
+          "Explain simply that **urgency = a warning sign**.",
+          "If something suspicious happens — **don't blame them**, help calmly; fear of blame may stop them reporting next time."]},
+      ]},
+    // ── 11: Job scams ────────────────────────────────────────────────
+    { uz:"Ish va rekruting firibgarligi", en:"Job & recruitment scams", subUz:"Soxta ish taklifi — pul yoki ma'lumot o'g'irlash usuli", subEn:"A fake job offer as a way to steal money or data",
+      blocks:[
+        {t:"p",uz:"Ish qidirish — hissiy jihatdan zaif payt, va hujumchilar buni biladi. **Soxta ish taklifi** orqali pul yoki shaxsiy ma'lumot o'g'irlash so'nggi yillarda keskin oshdi.",
+              en:"Job hunting is an emotionally vulnerable time, and attackers know it. Stealing money or personal data via **fake job offers** has sharply increased in recent years."},
+        {t:"h",n:"11.1",uz:"Tipik sxemalar",en:"Typical schemes"},
+        {t:"ul",uz:[
+          "**\"Uydan ishlash\" firibgarligi** — oson yuqori maosh va'da qilib, \"jihoz uchun\" oldindan to'lov so'raydi.",
+          "**Soxta suhbat** — real kompaniya nomidan, lekin haqiqiy bo'lmagan HR bilan messenjerda \"suhbat\", so'ng shaxsiy hujjat (pasport, karta) so'raladi.",
+          "**Ortiqcha chek firibgarligi** — sizga \"jihoz uchun\" katta chek yuboriladi, undan qaytim so'raladi; asl chek keyin qaytariladi (bekor bo'ladi) va siz zararga qolasiz.",
+          "**Malakangizni \"tekshirish\"** — ishga qabul qilishdan oldin ijtimoiy tarmoq parolingizni yoki bank ma'lumotingizni so'rash — hech qachon qonuniy emas."],
+          en:[
+          "**\"Work from home\" scam** — promising easy high pay, then asking for upfront payment \"for equipment\".",
+          "**Fake interview** — a messenger \"interview\" claiming to be from a real company but with a fake HR contact, followed by a request for personal documents (passport, card).",
+          "**Overpayment check scam** — you're sent a large check \"for equipment\", asked to refund the difference; the original check later bounces and you're left with the loss.",
+          "**\"Verifying\" your credentials** — asking for your social media password or bank details before hiring — never legitimate."]},
+        {t:"note",uz:"**Belgilar:** ish uchun oldindan to'lov so'ralishi, faqat messenjer orqali suhbat (hech qanday rasmiy sayt yoki qo'ng'iroq yo'q), juda yuqori maosh oson mehnat evaziga, va shoshilinch \"hoziroq qaror qiling\" bosimi.",
+              en:"**Red flags:** being asked to pay upfront for a job, an interview only via messenger (no official site or call), unusually high pay for easy work, and urgent \"decide right now\" pressure."},
+        {t:"p",uz:"Himoya: kompaniyani **mustaqil ravishda** (rasmiy sayt, LinkedIn) tekshiring, hech qachon ishga oldindan pul to'lamang, va shaxsiy hujjatlarni faqat rasmiy, tasdiqlangan kanal orqali yuboring.",
+              en:"Defence: verify the company **independently** (official site, LinkedIn), never pay upfront for a job, and only send personal documents through an official, verified channel."},
+      ]},
+    // ── 12: Awareness programs ───────────────────────────────────────
+    { uz:"Xavfsizlik xabardorligi dasturi", en:"Building a security awareness program", subUz:"Tashkilotda madaniyat qanday quriladi", subEn:"How to build a culture in an organization",
+      blocks:[
+        {t:"p",uz:"Yagona treningda hamma narsani o'rgatib bo'lmaydi. Samarali **xavfsizlik xabardorligi dasturi** — bu davomiy jarayon, bir martalik tadbir emas.",
+              en:"A single training session can't teach everything. An effective **security awareness program** is a continuous process, not a one-time event."},
+        {t:"h",n:"12.1",uz:"Dastur elementlari",en:"Program elements"},
+        {t:"ul",uz:[
+          "**Muntazam trening** — yiliga bir marta emas, muntazam qisqa modullar (masalan har chorakda).",
+          "**Simulyatsiyalangan fishing** — davriy test xatlari, natijalarni jazolamasdan tahlil qilish.",
+          "**Aniq xabar berish yo'li** — bitta tugma bilan shubhali xat haqida IT'ga xabar berish.",
+          "**Rahbariyat namunasi** — xavfsizlik qoidalariga rahbarlar ham amal qilishi kerak, aks holda madaniyat shakllanmaydi.",
+          "**O'lchash** — necha foiz xodim simulyatsiyada aldangani, necha foizi xabar bergani kuzatiladi."],
+          en:[
+          "**Regular training** — not once a year, but short recurring modules (e.g. quarterly).",
+          "**Simulated phishing** — periodic test emails, with results analysed rather than punished.",
+          "**A clear reporting path** — flagging a suspicious email to IT with one button.",
+          "**Leadership example** — executives must follow security rules too, or the culture never forms.",
+          "**Measurement** — tracking what percentage of staff fell for a simulation vs. reported it."]},
+        {t:"h",n:"12.2",uz:"Jazolash o'rniga o'rgatish",en:"Teach, don't punish"},
+        {t:"note",uz:"Eng samarali dasturlar **jazo emas, o'rganish** madaniyatiga tayanadi: xodim simulyatsiyada aldansa, darhol qisqa, do'stona tushuntirish ko'rsatiladi — nima uchun bu fishing ekani, keyingi safar nimaga e'tibor berish kerak. Qo'rquv xodimlarni xato haqida **yashirishga**, aksincha, ochiqlik esa **tezroq xabar berishga** undaydi.",
+              en:"The most effective programs rely on a culture of **learning, not punishment**: when an employee falls for a simulation, they immediately get a short, friendly explanation — why it was phishing, what to watch for next time. Fear makes employees **hide** mistakes; openness makes them **report faster**."},
+      ]},
+    // ── 13: Cases & next steps ──────────────────────────────────
     { uz:"Real hodisalar va keyingi qadamlar", en:"Real cases & next steps", subUz:"Ko'p uchraydigan sxemalar va qayerdan o'rganish", subEn:"Common schemes and where to learn more",
       blocks:[
         {t:"p",uz:"Ijtimoiy injeneriya — nazariy emas, **kunlik** tahdid. Mana eng ko'p uchraydigan sxemalar (umumiy, ta'lim maqsadida) — ularni tanib olsangiz, oldini olasiz:",
