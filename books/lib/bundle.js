@@ -31,6 +31,11 @@ const ICONS={
   shield:"M12 2L4 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-8-3z",
   bug:"M20 8h-2.81c-.45-.78-1.07-1.45-1.82-1.96L17 4.41 15.59 3l-2.17 2.17C12.96 5.06 12.49 5 12 5c-.49 0-.96.06-1.41.17L8.41 3 7 4.41l1.62 1.63C7.88 6.55 7.26 7.22 6.81 8H4v2h2.09c-.05.33-.09.66-.09 1v1H4v2h2v1c0 .34.04.67.09 1H4v2h2.81c1.04 1.79 2.97 3 5.19 3s4.15-1.21 5.19-3H20v-2h-2.09c.05-.33.09-.66.09-1v-1h2v-2h-2v-1c0-.34-.04-.67-.09-1H20V8zm-6 8h-4v-2h4v2zm0-4h-4v-2h4v2z",
   search:"M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z",
+  users:"M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z",
+  mail:"M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z",
+  phone:"M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z",
+  shieldCheck:"M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z",
+  eye:"M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z",
 };
 function Icon({name,size=16,style={}}){const d=ICONS[name]||ICONS.book;return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",fill:"currentColor",style:{flexShrink:0,...style}},React.createElement("path",{d}));}
 
@@ -60,6 +65,10 @@ const RE_BOOK={
   titleUz:"Teskari injeneriya — boshlang'ichlar uchun",
   titleEn:"Reverse Engineering for Beginners",
   author:"Dennis Yurichev",
+  origTitle:"Reverse Engineering for Beginners",
+  coverAbbr:"RE", coverBy:"Yurichev", coverIcon:"cpu",
+  noteUz:"Bu — o'zbek tilidagi original moslashma; asosiy tushunchalar CC BY-SA 4.0 litsenziyasi asosida qayta yozilgan va muallif ko'rsatilgan.",
+  noteEn:"This is an original Uzbek adaptation; the core concepts are rewritten under the CC BY-SA 4.0 license with attribution to the author.",
   license:"CC BY-SA 4.0",
   source:"https://beginners.re/",
   challenges:"https://challenges.re/",
@@ -281,7 +290,230 @@ const RE_BOOK={
   ],
 };
 
-const BOOKS=[RE_BOOK];
+// ═══════════════════════════════════════════════════════════════
+//  BOOK DATA — Social Engineering (human-factor security).
+//  Original, defence-and-awareness oriented material written to help
+//  people RECOGNISE and RESIST manipulation. Based on widely taught,
+//  factual security-awareness concepts; open references are credited.
+// ═══════════════════════════════════════════════════════════════
+const SE_BOOK={
+  id:"se",
+  titleUz:"Ijtimoiy injeneriya — inson omili xavfsizligi",
+  titleEn:"Social Engineering — the human factor",
+  author:"Original (ochiq manbalar asosida)",
+  authorUz:"Original material (ochiq manbalar asosida)",
+  authorEn:"Original material (based on open references)",
+  license:"CC BY-SA 4.0",
+  coverAbbr:"SE", coverBy:"Himoya", coverIcon:"users",
+  refs:[
+    {label:"CISA — Avoiding Social Engineering & Phishing Attacks",href:"https://www.cisa.gov/news-events/news/avoiding-social-engineering-and-phishing-attacks"},
+    {label:"NIST SP 800-50 (Security Awareness)",href:"https://csrc.nist.gov/"},
+    {label:"OWASP — Social Engineering",href:"https://owasp.org/"},
+  ],
+  noteUz:"Bu — himoya va xabardorlik uchun yozilgan original material. Maqsad — hujumlarni tanib olib, ulardan himoyalanish; hech kimni aldash uchun emas. Ochiq manbalar (CISA, NIST, OWASP) asosida, CC BY-SA 4.0 litsenziyasida.",
+  noteEn:"This is original material written for defence and awareness. Its purpose is to recognise and resist attacks — not to deceive anyone. Based on open references (CISA, NIST, OWASP), under the CC BY-SA 4.0 license.",
+  descUz:"Odamni ishontirib maxfiy ma'lumot yoki kirish olish — 'inson xakerlik'. Fishing, vishing, pretexting va manipulyatsiya psixologiyasini tanib olib, ulardan himoyalanishni o'rgatuvchi himoya-yo'nalishidagi kitob.",
+  descEn:"Manipulating a person into giving up secrets or access — 'hacking humans'. A defence-focused book that teaches you to recognise phishing, vishing, pretexting and the psychology of manipulation — and to protect against them.",
+  chapters:[
+    // ── 0: Preface & ethics ────────────────────────────────────
+    { uz:"Muqaddima va axloq", en:"Preface & ethics", subUz:"Bu kitob nima uchun — va nima uchun EMAS", subEn:"What this book is for — and what it is NOT for",
+      blocks:[
+        {t:"p",uz:"Eng mustahkam texnik himoya ham bitta narsa oldida ojiz qolishi mumkin: **aldangan odam**. **Ijtimoiy injeneriya** (social engineering) — bu texnik zaiflikdan emas, balki **inson psixologiyasidan** foydalanib, maxfiy ma'lumot yoki tizimga kirishni qo'lga kiritish san'ati.",
+              en:"Even the strongest technical defence can fail against one thing: **a deceived person**. **Social engineering** is the art of obtaining confidential information or access by exploiting **human psychology** rather than a technical flaw."},
+        {t:"colophon"},
+        {t:"note",warn:true,uz:"**Bu kitob himoya uchun.** Maqsad — bu hujumlar qanday ishlashini tushunib, ularni **tanib olish va ulardan himoyalanish**. Ijtimoiy injeneriyani real odamlarga qarshi ishlatish — bu **firibgarlik** (jinoyat) va axloqqa zid. Faqat yozma **ruxsat berilgan** test (masalan, ish beruvchi kompaniya buyurtmasi) qonuniy hisoblanadi.",
+              en:"**This book is for defence.** The goal is to understand how these attacks work in order to **recognise and defend against them**. Using social engineering against real people is **fraud** (a crime) and unethical. Only **authorised** testing in writing (e.g. commissioned by the target organisation) is legal."},
+        {t:"h",n:"§",uz:"Nega buni o'rganish kerak?",en:"Why learn this?"},
+        {t:"ul",uz:[
+          "Ko'pgina yirik buzilishlar (breach) texnik zaiflikdan emas, balki bitta **fishing xatidan** boshlanadi.",
+          "O'zingizni, oilangizni va jamoangizni aldov va firibgarlikdan himoya qilish uchun.",
+          "Tashkilotda **xavfsizlik madaniyati** va xabardorlikni yaratish uchun."],
+          en:[
+          "Many major breaches start not from a technical flaw but from a single **phishing email**.",
+          "To protect yourself, your family and your team from deception and fraud.",
+          "To build a **security culture** and awareness inside an organisation."]},
+        {t:"p",uz:"Keyingi boblarda: ijtimoiy injeneriya nima, **nega u ishlaydi** (psixologiya), asosiy hujum turlari (fishing, vishing, pretexting) va eng muhimi — **himoya usullari**.",
+              en:"In the next chapters: what social engineering is, **why it works** (psychology), the main attack types (phishing, vishing, pretexting), and most importantly — **defence methods**."},
+      ]},
+    // ── 1: What is SE ──────────────────────────────────────────
+    { uz:"Ijtimoiy injeneriya nima?", en:"What is social engineering?", subUz:"Nishon — texnika emas, odam", subEn:"The target is the human, not the technology",
+      blocks:[
+        {t:"p",uz:"**Ijtimoiy injeneriya** — odamni ishontirib, aldab yoki bosim o'tkazib, uni o'zi qilmasligi kerak bo'lgan narsani qildirish: parolni aytish, havolani bosish, pul o'tkazish yoki begonani binoga kiritish. Hujumchi **firewall'ni emas, odamni** \"buzadi\".",
+              en:"**Social engineering** is convincing, deceiving or pressuring a person into doing something they shouldn't: revealing a password, clicking a link, transferring money, or letting a stranger into a building. The attacker \"hacks\" the **human, not the firewall**."},
+        {t:"h",n:"1.1",uz:"Hujum bosqichlari",en:"The attack lifecycle"},
+        {t:"p",uz:"Ko'pchilik ijtimoiy injeneriya hujumlari bir xil bosqichlardan o'tadi. Buni bilish — hujumni erta bosqichda payqashga yordam beradi:",
+              en:"Most social engineering attacks go through the same stages. Knowing them helps you spot an attack early:"},
+        {t:"pipe",steps:[
+          {ic:"search",tUz:"Ma'lumot to'plash",tEn:"Recon",sUz:"OSINT, ijtimoiy tarmoq",sEn:"OSINT, socials"},
+          {ic:"users",tUz:"Ishonch qurish",tEn:"Build trust",sUz:"aloqa, rol o'ynash",sEn:"rapport, role"},
+          {ic:"alert",tUz:"Ekspluatatsiya",tEn:"Exploit",sUz:"so'rov, bosim",sEn:"the ask, pressure"},
+          {ic:"arrowR",tUz:"Chiqish",tEn:"Exit",sUz:"iz qoldirmay",sEn:"no trace"}]},
+        {t:"p",uz:"**1) Ma'lumot to'plash (recon):** hujumchi nishon haqida ochiq ma'lumot yig'adi — ish joyi, hamkasblar, qiziqishlar (ko'pincha ijtimoiy tarmoqlardan). **2) Ishonch qurish:** o'zini hamkasb, IT-yordam yoki bank xodimi qilib ko'rsatadi. **3) Ekspluatatsiya:** kerakli narsani so'raydi — odatda shoshilinchlik bilan. **4) Chiqish:** shubha uyg'otmay yo'qoladi.",
+              en:"**1) Recon:** the attacker gathers open information about the target — workplace, colleagues, interests (often from social media). **2) Build trust:** they pose as a colleague, IT support or a bank employee. **3) Exploit:** they make the request — usually with urgency. **4) Exit:** they disappear without raising suspicion."},
+        {t:"note",uz:"Eng kuchli qurol — **ochiq ma'lumot (OSINT)**. Ijtimoiy tarmoqlarda kam ma'lumot ulashish — birinchi himoya qatlami.",
+              en:"The strongest weapon is **open information (OSINT)**. Sharing less on social media is your first layer of defence."},
+      ]},
+    // ── 2: Psychology ──────────────────────────────────────────
+    { uz:"Nega u ishlaydi — psixologiya", en:"Why it works — psychology", subUz:"Miyamizning yorliqlaridan qanday foydalaniladi", subEn:"How our mental shortcuts get abused",
+      blocks:[
+        {t:"p",uz:"Ijtimoiy injeneriya ishlaydi, chunki miyamiz tez qaror qabul qilish uchun **yorliqlardan** (mental shortcuts) foydalanadi. Hujumchilar aynan shu avtomatik reaksiyalarni ishga soladi. Ularni bilsangiz — o'zingizda payqay olasiz.",
+              en:"Social engineering works because our brains use **mental shortcuts** to decide quickly. Attackers deliberately trigger these automatic reactions. If you know them, you can catch them in yourself."},
+        {t:"h",n:"2.1",uz:"Asosiy ta'sir tamoyillari",en:"Key principles of influence"},
+        {t:"ul",uz:[
+          "**Avtoritet** — biz \"boshliq\", \"politsiya\" yoki \"IT-bo'lim\" degan odamga bo'ysunishga moyilmiz.",
+          "**Shoshilinchlik va tanqislik** — \"faqat bugun\", \"24 soat ichida\" — o'ylashga vaqt qoldirmaydi.",
+          "**O'zaro yordam (reciprocity)** — kimdir bizga yaxshilik qilsa, qarzdek his qilamiz.",
+          "**Ijtimoiy dalil** — \"hamma shunday qildi\" degan tuyg'u qarshilikni sindiradi.",
+          "**Yoqtirish** — xushmuomala, tanish yoki 'o'ziniki'dek odamga ko'proq ishonamiz.",
+          "**Qo'rquv va qiziquvchanlik** — 'hisobingiz buzildi!' yoki 'siz yutdingiz!' — kuchli tugmalar."],
+          en:[
+          "**Authority** — we tend to obey someone who claims to be 'the boss', 'the police' or 'IT'.",
+          "**Urgency & scarcity** — 'today only', 'within 24 hours' — leaves no time to think.",
+          "**Reciprocity** — when someone does us a favour, we feel indebted.",
+          "**Social proof** — the feeling that 'everyone did it' breaks down resistance.",
+          "**Liking** — we trust a polite, familiar or 'one of us' person more.",
+          "**Fear & curiosity** — 'your account was hacked!' or 'you won!' are powerful triggers."]},
+        {t:"note",uz:"**Himoya qoidasi:** agar biror xabar sizni **shoshiltirayotgan**, **qo'rqitayotgan** yoki juda yaxshi taklif qilayotgan bo'lsa — bu aynan to'xtab, tekshirish kerak bo'lgan payt. His-tuyg'u bosimi — birinchi ogohlantiruvchi belgi.",
+              en:"**Defence rule:** if a message is **rushing** you, **frightening** you, or offering something too good — that is exactly the moment to stop and verify. Emotional pressure is the first warning sign."},
+      ]},
+    // ── 3: Phishing ────────────────────────────────────────────
+    { uz:"Fishing (Phishing)", en:"Phishing", subUz:"Soxta xatlar orqali hujum — va uni tanib olish", subEn:"Attacks via fake messages — and how to spot them",
+      blocks:[
+        {t:"p",uz:"**Fishing** — eng keng tarqalgan ijtimoiy injeneriya hujumi. Hujumchi ishonchli tashkilot (bank, ijtimoiy tarmoq, ish joyi) nomidan soxta xat yuborib, parol, karta ma'lumoti yoki bosishni so'raydi. Turlari: oddiy **fishing** (ommaviy), **spear phishing** (aniq shaxsga moslangan), **whaling** (rahbarlarga qaratilgan).",
+              en:"**Phishing** is the most common social engineering attack. The attacker sends a fake message impersonating a trusted organisation (a bank, social network, workplace) to ask for a password, card details or a click. Types: plain **phishing** (mass), **spear phishing** (tailored to a specific person), **whaling** (aimed at executives)."},
+        {t:"h",n:"3.1",uz:"Soxta xatni tanib oling",en:"Recognise a fake message"},
+        {t:"p",uz:"Quyida oddiy fishing xati va uning **xavf belgilari** (izohlarda). Ta'lim maqsadida — buni yozish uchun emas, **payqash** uchun:",
+              en:"Below is a simple phishing email with its **red flags** (in the comments). For education — to **spot** it, not to write it:"},
+        {t:"code",lang:"email",cap:{uz:"Fishing xati — xavf belgilarini toping",en:"Phishing email — spot the red flags"},lines:[
+          "Kimdan: security@paypa1-support.com   # domen soxta: 'paypa1' (L emas, 1 raqami)",
+          "Mavzu: SHOSHILINCH: hisobingiz bloklandi!  # sun'iy shoshilinchlik",
+          "",
+          "Hurmatli mijoz,                        # umumiy murojaat, ismingiz yo'q",
+          "",
+          "Hisobingizda shubhali kirish aniqlandi.",
+          "24 soat ichida tasdiqlamasangiz, hisob o'chiriladi.  # qo'rqitish + muddat",
+          "",
+          "[ Hisobni tasdiqlash ]                 # havola boshqa saytga olib boradi",
+          "                                       # (ustiga bosmasdan turib tekshiring)"]},
+        {t:"h",n:"3.2",uz:"Himoya",en:"Defence"},
+        {t:"ul",uz:[
+          "**Yuboruvchi manzilini** diqqat bilan tekshiring — harflar almashtirilgan bo'lishi mumkin.",
+          "**Havola ustiga bosmasdan** sichqonchani olib boring (hover) — haqiqiy manzilni ko'rasiz.",
+          "Shoshilinchlik va qo'rquvga **berilmang** — bank hech qachon parolni xatda so'ramaydi.",
+          "Shubha bo'lsa — havoladan emas, **rasmiy sayt yoki ilova**ga o'zingiz kirib tekshiring.",
+          "Ish joyida — bunday xatlarni **IT/xavfsizlik bo'limiga xabar qiling**."],
+          en:[
+          "Check the **sender address** carefully — letters may be swapped.",
+          "**Hover** over links without clicking — you'll see the real destination.",
+          "Don't **give in** to urgency and fear — a bank never asks for your password by email.",
+          "If in doubt — go to the **official site or app yourself**, not via the link.",
+          "At work — **report** such messages to IT/security."]},
+      ]},
+    // ── 4: Vishing & smishing ──────────────────────────────────
+    { uz:"Vishing va Smishing", en:"Vishing & smishing", subUz:"Telefon va SMS orqali aldov", subEn:"Deception by phone and SMS",
+      blocks:[
+        {t:"p",uz:"Aldov faqat xatda emas. **Vishing** — telefon qo'ng'irog'i orqali (voice + phishing), **smishing** — SMS orqali. Hujumchi qo'ng'iroq raqamini soxtalashtirishi (**caller-ID spoofing**) va ekranda haqiqiy bank raqami ko'rinishi mumkin.",
+              en:"Deception isn't only in email. **Vishing** is via a phone call (voice + phishing), **smishing** is via SMS. The attacker can spoof the calling number (**caller-ID spoofing**) so a real-looking bank number appears on your screen."},
+        {t:"h",n:"4.1",uz:"Tipik ssenariy",en:"A typical scenario"},
+        {t:"p",uz:"\"Bank xavfsizlik xizmati\"dan qo'ng'iroq: *\"Hisobingizdan shubhali to'lov amalga oshirilmoqda. Uni bekor qilish uchun telefoningizga kelgan **tasdiq kodini** ayting.\"* Aslida hujumchi aynan shu daqiqada sizning hisobingizga kirishga urinmoqda va OTP kod unga o'sha kirishni tasdiqlash uchun kerak.",
+              en:"A call from the \"bank security team\": *\"A suspicious payment is being made from your account. To cancel it, tell us the **confirmation code** sent to your phone.\"* In reality the attacker is trying to log into your account at that very moment, and the OTP code is what they need to confirm that login."},
+        {t:"note",warn:true,uz:"**Oltin qoida:** **tasdiq kodini (OTP) hech kimga aytmang** — hatto 'bank' so'rasa ham. Haqiqiy bank hech qachon telefonda to'liq parol yoki OTP so'ramaydi.",
+              en:"**Golden rule:** **never share a confirmation code (OTP) with anyone** — even a 'bank'. A real bank never asks for your full password or OTP over the phone."},
+        {t:"h",n:"4.2",uz:"Himoya",en:"Defence"},
+        {t:"ul",uz:[
+          "Qo'ng'iroqni **uzib**, kartangiz orqasidagi **rasmiy raqamga o'zingiz qo'ng'iroq qiling**.",
+          "Ekrandagi raqamga ishonmang — u soxtalashtirilgan bo'lishi mumkin.",
+          "Shoshilinch bosim — **firibgarlik belgisi**. Vaqt so'rang, o'ylang.",
+          "SMS'dagi havolalarni bosmang; rasmiy ilovadan tekshiring."],
+          en:[
+          "**Hang up** and **call the official number** on the back of your card yourself.",
+          "Don't trust the number on screen — it can be spoofed.",
+          "Urgent pressure is a **sign of fraud**. Ask for time, think.",
+          "Don't click links in SMS; check via the official app."]},
+      ]},
+    // ── 5: Pretexting & other ──────────────────────────────────
+    { uz:"Pretexting va boshqa usullar", en:"Pretexting & other techniques", subUz:"Soxta rol, o'lja va jismoniy hujumlar", subEn:"False roles, bait and physical attacks",
+      blocks:[
+        {t:"p",uz:"Ijtimoiy injeneriya faqat ekranda emas — u jismoniy dunyoda ham bor. Mana asosiy usullar (barchasini **tanib olish** uchun):",
+              en:"Social engineering isn't only on a screen — it exists in the physical world too. Here are the main techniques (all to **recognise**):"},
+        {t:"ul",uz:[
+          "**Pretexting** — hujumchi ishonchli **soxta ssenariy va shaxs** o'ylab topadi (masalan, 'yangi IT xodimiman'), keyin shu rolda ma'lumot so'raydi.",
+          "**Baiting (o'lja)** — qiziqtiruvchi narsa qoldiriladi: 'Maosh' deb yozilgan **USB fleshka** yoki bepul yuklab olish. Ochsangiz — zararli dastur.",
+          "**Quid pro quo** — 'yordam' evaziga narsa so'raladi: soxta 'IT yordam' qo'ng'iroq qilib, 'tuzatish' uchun parol so'raydi.",
+          "**Tailgating / piggybacking** — begona odam xodim ortidan **eshikdan birga** kiradi ('qo'lim band, eshikni ushlab turing').",
+          "**Dumpster diving** — axlatdan tashlangan hujjat va qog'ozlardan ma'lumot terish.",
+          "**Shoulder surfing** — yelka ortidan parol yoki PIN kodni ko'rib olish."],
+          en:[
+          "**Pretexting** — the attacker invents a believable **false scenario and identity** (e.g. 'I'm the new IT guy'), then requests information in that role.",
+          "**Baiting** — something tempting is left behind: a **USB stick** labelled 'Salary', or a free download. Open it and it's malware.",
+          "**Quid pro quo** — something is asked in exchange for 'help': a fake 'IT support' call asks for your password to 'fix' something.",
+          "**Tailgating / piggybacking** — a stranger walks in **through the door behind** an employee ('my hands are full, hold the door').",
+          "**Dumpster diving** — collecting information from documents and papers thrown in the trash.",
+          "**Shoulder surfing** — reading a password or PIN over your shoulder."]},
+        {t:"note",uz:"Umumiy himoya: **shaxsni tasdiqlang** ('sizga qayta qo'ng'iroq qilaman'), begonani binoga kiritmang, maxfiy hujjatlarni **maydalab** tashlang, PIN terganda ekranni to'sing.",
+              en:"General defence: **verify identity** ('I'll call you back'), don't let strangers into the building, **shred** confidential documents, and shield the screen when entering a PIN."},
+      ]},
+    // ── 6: Defence & awareness ─────────────────────────────────
+    { uz:"Himoya va xabardorlik", en:"Defence & awareness", subUz:"Shaxsiy odatlar va tashkiliy choralar", subEn:"Personal habits and organisational measures",
+      blocks:[
+        {t:"p",uz:"Ijtimoiy injeneriyaga qarshi eng yaxshi himoya — **texnologiya emas, odat va madaniyat**. Quyidagilar hujumlarning katta qismini to'xtatadi.",
+              en:"The best defence against social engineering is **not technology, but habits and culture**. The following stop a large share of attacks."},
+        {t:"h",n:"6.1",uz:"Shaxsiy odatlar",en:"Personal habits"},
+        {t:"ul",uz:[
+          "**Sekinlashing.** Shoshilinch so'rov — to'xtab, tekshirish signali.",
+          "**Tasdiqlang.** Har doim ma'lum, rasmiy kanal orqali qayta aloqa qiling (havoladan emas).",
+          "**MFA (ikki bosqichli tasdiq)** yoqing — parol o'g'irlansa ham himoya qatlami qoladi.",
+          "**Parol menejeri** ishlating; har saytga alohida, kuchli parol.",
+          "**OTP va parolni** hech kimga aytmang.",
+          "Ijtimoiy tarmoqda **kam ma'lumot** ulashing."],
+          en:[
+          "**Slow down.** An urgent request is a signal to stop and verify.",
+          "**Verify.** Always call back through a known, official channel (not the link).",
+          "Enable **MFA (two-factor)** — a layer of protection remains even if a password is stolen.",
+          "Use a **password manager**; a unique, strong password per site.",
+          "**Never** share an OTP or password with anyone.",
+          "Share **less information** on social media."]},
+        {t:"h",n:"6.2",uz:"Tashkilotda",en:"In an organisation"},
+        {t:"ul",uz:[
+          "Aniq **siyosat va protseduralar** (masalan, pul o'tkazmasini ikkinchi kanal orqali tasdiqlash).",
+          "**Eng kam imtiyoz** (least privilege) — har kimga faqat kerakli ruxsat.",
+          "Oson **xabar berish** yo'li — shubhali xatni bir tugma bilan xabar qilish.",
+          "**Xavfsizlik madaniyati** — xato qilishdan qo'rqmaslik, darhol xabar berish."],
+          en:[
+          "Clear **policies and procedures** (e.g. confirm any money transfer via a second channel).",
+          "**Least privilege** — everyone gets only the access they need.",
+          "An easy **reporting** path — flag a suspicious email with one button.",
+          "A **security culture** — not being afraid to make a mistake, reporting immediately."]},
+        {t:"note",uz:"Ko'p kompaniyalar xodimlarni **simulyatsiyalangan fishing** (test xatlari) bilan o'qitadi — bu jazolash uchun emas, xatoda o'rganish uchun. Bu — himoya-yo'nalishidagi eng samarali usullardan biri.",
+              en:"Many companies train staff with **simulated phishing** (test emails) — not to punish, but to learn from mistakes safely. It's one of the most effective defensive methods."},
+      ]},
+    // ── 7: Cases & next steps ──────────────────────────────────
+    { uz:"Real hodisalar va keyingi qadamlar", en:"Real cases & next steps", subUz:"Ko'p uchraydigan sxemalar va qayerdan o'rganish", subEn:"Common schemes and where to learn more",
+      blocks:[
+        {t:"p",uz:"Ijtimoiy injeneriya — nazariy emas, **kunlik** tahdid. Mana eng ko'p uchraydigan sxemalar (umumiy, ta'lim maqsadida) — ularni tanib olsangiz, oldini olasiz:",
+              en:"Social engineering is not theoretical — it's a **daily** threat. Here are the most common schemes (generic, for education) — recognise them and you can prevent them:"},
+        {t:"ul",uz:[
+          "**BEC (rahbar nomidan firibgarlik)** — soxta 'direktor' xatda shoshilinch pul o'tkazishni so'raydi. Himoya: ikkinchi kanal orqali tasdiq.",
+          "**Texnik yordam firibgarligi** — 'Microsoft'dan qo'ng'iroq, 'kompyuteringiz zararlangan' deb masofaviy kirish so'raydi.",
+          "**Hisob o'g'irlash** — fishing orqali parol olib, keyin hisobdan boshqalarga hujum qiladi.",
+          "**Sovg'a/yutuq firibgarligi** — 'siz yutdingiz', 'bepul sovg'a' — shaxsiy ma'lumot yoki to'lov so'raydi."],
+          en:[
+          "**BEC (CEO fraud)** — a fake 'director' email urgently requests a money transfer. Defence: confirm via a second channel.",
+          "**Tech-support scam** — a call 'from Microsoft' claims your computer is infected and asks for remote access.",
+          "**Account takeover** — a password stolen by phishing is then used to attack others from that account.",
+          "**Prize/gift scam** — 'you won', 'free gift' — asks for personal data or a payment."]},
+        {t:"h",n:"7.1",uz:"Yodda tuting",en:"Remember"},
+        {t:"note",uz:"Bitta jumla bilan: **shoshtirilsangiz — to'xtang, tekshiring.** Aksariyat ijtimoiy injeneriya hujumlari sizni o'ylashdan to'xtatishga tayanadi. Sekinlashish — eng kuchli himoyangiz.",
+              en:"In one sentence: **if you're being rushed — stop and verify.** Most social engineering attacks rely on stopping you from thinking. Slowing down is your strongest defence."},
+        {t:"h",n:"7.2",uz:"Qayerdan o'rganish",en:"Where to learn more"},
+        {t:"p",uz:"Chuqurroq o'rganish uchun ochiq va ishonchli manbalar: **CISA** (AQSH kiberxavfsizlik agentligi) xabardorlik qo'llanmalari, **NIST** xavfsizlik xabardorligi standartlari, va **OWASP** materiallari. Amaliy tomon — Kali modulidagi **L28: Social Engineering (SET)** darsi.",
+              en:"For deeper study, open and trusted sources: **CISA** (US cybersecurity agency) awareness guides, **NIST** security-awareness standards, and **OWASP** materials. For the practical side — the **L28: Social Engineering (SET)** lesson in the Kali module."},
+        {t:"colophon"},
+      ]},
+  ],
+};
+
+const BOOKS=[RE_BOOK,SE_BOOK];
 
 // ── Colophon (attribution) block ──────────────────────────────
 function Colophon({book}){
@@ -291,14 +523,16 @@ function Colophon({book}){
     href?React.createElement("a",{href,target:"_blank",rel:"noopener noreferrer"},v,React.createElement(Icon,{name:"external",size:11,style:{marginLeft:4,verticalAlign:"middle"}})):React.createElement("span",{className:"v"},v));
   return React.createElement("div",{className:"bk-colophon"},
     React.createElement("h4",null,t(lang,"// MANBA VA MUALLIF","// SOURCE & AUTHOR")),
-    row(t(lang,"Asl kitob","Original"),"Reverse Engineering for Beginners"),
-    row(t(lang,"Muallif","Author"),book.author),
+    book.origTitle&&row(t(lang,"Asl kitob","Original"),book.origTitle),
+    row(t(lang,"Muallif","Author"),t(lang,book.authorUz||book.author,book.authorEn||book.author)),
     row(t(lang,"Litsenziya","License"),book.license),
-    row(t(lang,"Manba","Source"),book.source.replace("https://",""),book.source),
+    book.source&&row(t(lang,"Manba","Source"),book.source.replace("https://",""),book.source),
+    (book.refs||[]).map((r,i)=>React.createElement("div",{key:i,className:"bk-colophon-row"},
+      React.createElement("span",{className:"k"},i===0?t(lang,"Adabiyot","References"):""),
+      r.href?React.createElement("a",{href:r.href,target:"_blank",rel:"noopener noreferrer"},r.label):React.createElement("span",{className:"v"},r.label))),
     React.createElement("div",{className:"bk-colophon-row",style:{marginTop:8}},
       React.createElement("span",{className:"v",style:{fontSize:12,color:"var(--text-2)"}},
-        t(lang,"Bu — o'zbek tilidagi original moslashma; asosiy tushunchalar CC BY-SA 4.0 litsenziyasi asosida qayta yozilgan va muallif ko'rsatilgan.",
-               "This is an original Uzbek adaptation; the core concepts are rewritten under the CC BY-SA 4.0 license with attribution to the author."))));
+        t(lang,book.noteUz,book.noteEn))));
 }
 
 // ── Content block renderer ────────────────────────────────────
@@ -373,10 +607,10 @@ function TopNav({onHome,lang,setLang,crumb}){
 // ── Library screen ────────────────────────────────────────────
 function BookCover({book}){
   return React.createElement("div",{className:"bk-cover"},
-    React.createElement("div",{className:"bk-cover-ico"},React.createElement(Icon,{name:"cpu",size:22})),
+    React.createElement("div",{className:"bk-cover-ico"},React.createElement(Icon,{name:book.coverIcon||"book",size:22})),
     React.createElement("div",null,
-      React.createElement("div",{className:"bk-cover-ttl"},"RE"),
-      React.createElement("div",{className:"bk-cover-auth"},"Yurichev")));
+      React.createElement("div",{className:"bk-cover-ttl"},book.coverAbbr||"?"),
+      React.createElement("div",{className:"bk-cover-auth"},book.coverBy||"")));
 }
 function LibraryScreen({onOpen,lang}){
   return React.createElement("div",{className:"page",style:{paddingTop:34}},
