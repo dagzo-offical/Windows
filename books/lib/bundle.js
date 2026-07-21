@@ -1659,8 +1659,8 @@ const SE_BOOK={
         {t:"h",n:"§",uz:"Nega bu muhim",en:"Why this matters"},
         {t:"p",uz:"Bu hujjatlar yo'q bo'lsa, \"test\" huquqiy jihatdan oddiy firibgarlikdan farq qilmaydi. Professional SE testchisi har doim shartnoma, doira va favqulodda aloqa rejasi bilan ishlaydi — bu 1-bobdagi axloqiy qoidaning amaliy, hujjatlashtirilgan ko'rinishi.",
               en:"Without this documentation, a \"test\" is legally no different from ordinary fraud. A professional SE tester always works with a contract, a defined scope, and an emergency contact plan — this is the practical, documented form of the ethical rule from chapter 1."},
-        {t:"note",uz:"Amalda: ruxsat doirasi (Rules of Engagement) tuzilishi haqida ko'proq bilish uchun — professional SE hamjamiyatining o'zi, se.community (Vishing Competition va SECTF'ni tashkil qiluvchi tashkilot), doira va axloq qoidalarini ochiq nashr etadi.",
-              en:"In practice: to learn more about Rules of Engagement structure — the professional SE community itself, se.community (the organization behind the Vishing Competition and SECTF), publishes its scope and ethics rules openly."},
+        {t:"note",uz:"Amalda: ruxsat doirasi (Rules of Engagement) tuzilishi haqida ko'proq bilish uchun — professional SE hamjamiyatining o'zi, se.community (Vishing Competition va SECTF'ni tashkil qiluvchi tashkilot), doira va axloq qoidalarini ochiq nashr etadi. Video: Chris Hadnagy DEF CON 23'da SECTF'ning ruxsat doirasi va qoidalari qanday shakllanganini so'zlab beradi: youtube.com/watch?v=O5lXUSMGQ2I.",
+              en:"In practice: to learn more about Rules of Engagement structure — the professional SE community itself, se.community (the organization behind the Vishing Competition and SECTF), publishes its scope and ethics rules openly. Video: Chris Hadnagy talks through how the SECTF's own rules of engagement and scope took shape at DEF CON 23: youtube.com/watch?v=O5lXUSMGQ2I."},
       ]},
     { uz:"Fishing simulyatsiya dasturini qurish", en:"Building a phishing simulation program", subUz:"Himoya tomonidan: butun tashkilotni sinash", subEn:"From the defense side: testing a whole organization",
       blocks:[
@@ -2216,6 +2216,8 @@ const SE_BOOK={
           "4. Save the whole graph as a report appendix (matching the reporting standards from chapter 23)."]},
         {t:"note",uz:"Community Edition (CE) bepul, cheklangan transform bilan — kichik ko'lamli, ruxsat etilgan testlar uchun yetarli. Har doim 14-bobdagi ruxsat doirasi (rules of engagement) OSINT ma'lumot to'plashni aniq qamrab olishi shart.",
               en:"The Community Edition (CE) is free with limited transforms — enough for small-scope, authorized tests. The rules of engagement from chapter 14 must always explicitly cover OSINT data collection."},
+        {t:"note",uz:"Amalda: TCM Security'ning bepul \"OSINT in 5 Hours\" kursida Maltego'ga o'xshash grafik razvedka vositalaridan amaliy foydalanish ko'rsatiladi: youtube.com/@TCMSecurityAcademy.",
+              en:"In practice: TCM Security's free \"OSINT in 5 Hours\" course demonstrates practical use of graph-based recon tools like Maltego: youtube.com/@TCMSecurityAcademy."},
       ]},
     { uz:"Tijorat SE platformalari: KnowBe4 va Proofpoint", en:"Commercial SE platforms: KnowBe4 & Proofpoint", subUz:"GoPhish'dan tashkiliy darajaga", subEn:"From GoPhish to enterprise scale",
       blocks:[
@@ -2232,6 +2234,8 @@ const SE_BOOK={
               en:"Strong on the email-security-gateway side — combines phishing simulation data with threat intelligence drawn from real blocked attacks."},
         {t:"note",uz:"Platforma tanlash — byudjet/ko'lam qarori, xavfsizlik sifati emas: GoPhish (27-bob) kichik dastur yoki ruxsat etilgan pentest topshirig'i uchun butunlay yetarli; tijorat vositalari doimiy, tashkilot bo'ylab madaniyat dasturlarida (12-bob) ustunlik qiladi.",
               en:"Choosing a platform is a budget/scale decision, not a security-quality one — GoPhish (chapter 27) remains perfectly adequate for a smaller program or an authorized pentest engagement; commercial tools shine in continuous, organization-wide culture programs (chapter 12)."},
+        {t:"note",uz:"Amalda: TCM Security kanalida korporativ xavfsizlik vositalari va dasturlarini tanlash mezonlari bo'yicha videolar bor: youtube.com/@TCMSecurityAcademy.",
+              en:"In practice: TCM Security's channel has videos on criteria for choosing enterprise security tools and programs: youtube.com/@TCMSecurityAcademy."},
       ]},
     { uz:"Ovoz klonlashni aniqlash — amaliy mudofaa", en:"Detecting voice cloning — practical defence", subUz:"Qulog'ingiz sizni har doim ham aldamaydi", subEn:"Your ears don't always fool you",
       blocks:[
@@ -2256,6 +2260,8 @@ const SE_BOOK={
               en:"Larger organizations, especially call centers (banks), are increasingly deploying specialized voice-liveness detection software — a layer that complements human vigilance, not a replacement for it."},
         {t:"note",uz:"Klonlash sifati oshgani sari, \"xavfsizlik so'zi\" protokoli \"qulog'ingizga ishonish\"dan **muhimroq** bo'lib boradi — bu idrok ko'nikmasi emas, jarayon nazorati, va shuning uchun texnologiya qanchalik yaxshilanmasin ishlayveradi.",
               en:"As cloning quality improves, the \"safe word\" protocol becomes **more important** than \"trusting your ear\" — it's a process control, not a perception skill, so it keeps working no matter how good the technology gets."},
+        {t:"note",uz:"Amalda: Rachel Tobac'ning AI ovoz klonlash namoyishi aynan shu bobdagi signallarni jonli eshittiradi: youtube.com/watch?v=IwORiLj-xqg.",
+              en:"In practice: Rachel Tobac's AI voice-cloning demonstration lets you hear this chapter's signals live: youtube.com/watch?v=IwORiLj-xqg."},
       ]},
     { uz:"LinkedIn orqali maqsadli razvedka — amaliy", en:"LinkedIn recon — practical", subUz:"Tashkilot tuzilishini ochiq profillardan chizish", subEn:"Mapping an org chart from public profiles",
       blocks:[
@@ -2275,6 +2281,8 @@ const SE_BOOK={
               en:"Comparing one or two publicly known email addresses (e.g. from a press release) against LinkedIn names to infer the company's `firstname.lastname@` email pattern — a classic recon technique."},
         {t:"note",uz:"Bu texnika **faqat** aniq ko'lamli, ruxsat etilgan test doirasida (14-bobdagi ruxsat doirasi) qonuniy. Xuddi shu texnikani roziliksiz real nishonga qarshi qo'llash — aynan shu kitob himoyasini o'rgatayotgan jinoyatning o'zi.",
               en:"This technique is legal **only** within a clearly scoped, authorized test (the rules of engagement from chapter 14). Applying the exact same technique against a real target without consent is the very crime this book teaches defence against."},
+        {t:"note",uz:"Amalda: NetworkChuck kanalida ijtimoiy tarmoq orqali ochiq razvedka texnikalarini boshlang'ich darajada tushuntiruvchi videolar bor: youtube.com/@NetworkChuck.",
+              en:"In practice: NetworkChuck's channel has beginner-level videos explaining open-source recon techniques via social media: youtube.com/@NetworkChuck."},
       ]},
     { uz:"Fishing sahifasining texnik anatomiyasi: domen va sertifikat", en:"Technical anatomy of a phishing page: domain & certificate", subUz:"Yashil qulf endi xavfsizlik belgisi emas", subEn:"The padlock is no longer a safety sign",
       blocks:[
@@ -2294,6 +2302,8 @@ const SE_BOOK={
           "**The domain text itself** — the reading skill from chapter 26, not the padlock icon."]},
         {t:"note",uz:"21-bobga bog'liq: himoyachilar sertifikat shaffofligi jurnallarini o'z brendlariga mos yangi sertifikatlar uchun proaktiv kuzatishi mumkin — bu birinchi fishing xati yuborilishidan **oldin**, kampaniya endi tayyorlanayotganidayoq ogohlantiruvchi erta signal beradi.",
               en:"Tied to chapter 21: defenders can proactively monitor Certificate Transparency logs for new certificates matching their brand — an early-warning signal **before** the first phishing email is even sent, while a campaign is still being set up."},
+        {t:"note",uz:"Amalda: John Hammond kanalida fishing sahifalarining texnik tuzilishini (domen, sertifikat, joylashtirilgan infratuzilma) jonli tahlil qiladigan videolar bor: youtube.com/@_JohnHammond.",
+              en:"In practice: John Hammond's channel has videos live-analyzing the technical structure of phishing pages (domain, certificate, hosting infrastructure): youtube.com/@_JohnHammond."},
       ]},
     { uz:"SE dasturi metrikalari va ROI", en:"SE program metrics & ROI", subUz:"Dasturingiz ishlayaptimi — qanday bilasiz", subEn:"Is your program working — how do you know",
       blocks:[
@@ -2310,6 +2320,8 @@ const SE_BOOK={
               en:"A rough framing: the cost of the program (platform + time) versus the estimated cost of one averted incident — a single successful BEC wire transfer from chapter 7 often costs more than years of an awareness program."},
         {t:"note",uz:"Metrikalar rahbariyatga bitta suratdek emas, **tendentsiya hikoyasi** sifatida taqdim etilishi kerak — bitta chorak raqami kam narsa aytadi; ikki yillik pasayuvchi bosish/ko'tariluvchi xabar tendentsiyasi — haqiqiy dalil.",
               en:"Metrics should be presented to leadership as a **trend story**, not a single snapshot — one quarter's number says little; a two-year falling-click/rising-report trend is the real proof."},
+        {t:"note",uz:"Amalda: Kevin Mitnick'ning professional xavfsizlik xabardorligi dasturi natijalarni o'lchash va rahbariyatga taqdim etishning haqiqiy namunasi: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw.",
+              en:"In practice: Kevin Mitnick's professional security awareness program is a real example of measuring and presenting results to leadership: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw."},
       ]},
     { uz:"Kengroq musobaqalar va qonuniy sinov maydonlari", en:"Broader competitions & legal practice grounds", subUz:"Ko'nikmani qonuniy tarzda sinash joylari", subEn:"Where to legally test the skill",
       blocks:[
@@ -2326,6 +2338,8 @@ const SE_BOOK={
               en:"Broad offensive-security platforms like TryHackMe and HackTheBox increasingly include phishing/SE-adjacent rooms — an additional practice source complementing the specialized venues above."},
         {t:"note",uz:"Har bir mashq maydonining umumiy qoidasi bir xil: **avval yozma ruxsat** — bu kitobdagi har bir texnikani jinoyatdan ajratib turadigan yagona qoida (0-bobdagi axloq bobiga qaytish, kitobni to'liq aylanaga yopadi).",
               en:"The rule is the same across every practice venue: **written authorization first** — the single rule separating every technique in this book from a crime (a callback to the ethics chapter 0, bringing the book full circle)."},
+        {t:"note",uz:"Amalda: SECTF'ning o'zi qanday ko'rinishini ko'rish uchun — DEF CON SECTF'ning 2017-yilgi g'olib qo'ng'irog'ining haqiqiy qayta sahnalashtirilishi: youtube.com/watch?v=yhE372sqURU.",
+              en:"In practice: to see what the SECTF itself actually looks like — a real recreation of DEF CON SECTF's 2017 winning call: youtube.com/watch?v=yhE372sqURU."},
       ]},
     { uz:"Qo'shimcha resurslar va sertifikatlar", en:"Further resources & certifications", subUz:"Bu kitobdan keyingi rasmiy o'rganish yo'llari", subEn:"Formal learning paths after this book",
       blocks:[
@@ -2344,6 +2358,8 @@ const SE_BOOK={
               en:"To test practical skills — the **OSINT book** in the library (a direct continuation) and **lesson L28 in the Kali module** (the SET tool). The fastest path to growth is continually pairing theory (this book) with practice (authorized CTF or lab exercises)."},
         {t:"note",uz:"Ushbu kitob — sayohatning boshlanishi, yakuni emas. Ijtimoiy injeneriya doimiy rivojlanadigan soha (9 va 20-boblardagi AI misolini eslang) — eng yaxshi himoya har doim **doimiy o'rganish** va **hushyorlik odati**dan iborat.",
               en:"This book is the beginning of the journey, not the end. Social engineering is a constantly evolving field (recall the AI example from chapters 9 and 20) — the best defence is always a habit of **continuous learning** and **vigilance**."},
+        {t:"note",uz:"Amalda: TCM Security kanalida sertifikatlash yo'llari va xavfsizlik sohasiga rasmiy kirish bo'yicha maxsus videolar bor: youtube.com/@TCMSecurityAcademy.",
+              en:"In practice: TCM Security's channel has dedicated videos on certification paths and formally entering the security field: youtube.com/@TCMSecurityAcademy."},
       ]},
     // ── 24: Cases & next steps ──────────────────────────────────
     { uz:"Real hodisalar va keyingi qadamlar", en:"Real cases & next steps", subUz:"Ko'p uchraydigan sxemalar va qayerdan o'rganish", subEn:"Common schemes and where to learn more",
@@ -2366,6 +2382,8 @@ const SE_BOOK={
         {t:"h",n:"7.2",uz:"Qayerdan o'rganish",en:"Where to learn more"},
         {t:"p",uz:"Chuqurroq o'rganish uchun ochiq va ishonchli manbalar: **CISA** (AQSH kiberxavfsizlik agentligi) xabardorlik qo'llanmalari, **NIST** xavfsizlik xabardorligi standartlari, va **OWASP** materiallari. Amaliy tomon — Kali modulidagi **L28: Social Engineering (SET)** darsi.",
               en:"For deeper study, open and trusted sources: **CISA** (US cybersecurity agency) awareness guides, **NIST** security-awareness standards, and **OWASP** materials. For the practical side — the **L28: Social Engineering (SET)** lesson in the Kali module."},
+        {t:"note",uz:"Amalda — kitobni yopish: bu kitob boshlagan safar aynan Kevin Mitnick — sobiq hujumchi, keyinchalik bu sohaning eng ta'sirli himoyachisiga aylangan shaxs — timsolida yakunlanadi: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw. Uning yo'li — bu kitobning o'zagi: bilim hujum uchun emas, himoya uchun ishlatilganda eng qimmatli bo'ladi.",
+              en:"In practice — closing the book: the journey this book started closes full circle with Kevin Mitnick — once an attacker, later one of the field's most influential defenders: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw. His path is this book's core idea: knowledge is most valuable when it's used for defence, not attack."},
         {t:"colophon"},
       ]},
   ],
