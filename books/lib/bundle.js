@@ -1770,6 +1770,8 @@ const SE_BOOK={
         {t:"h",n:"§",uz:"Keyingi kunlar — o'rganish",en:"The following days — learning"},
         {t:"p",uz:"Voqeadan so'ng, tashkilot **aybdorlikka emas, tizimga** e'tibor qaratishi kerak: qaysi jarayon yetishmadi (masalan ikkinchi kanal orqali tasdiqlash yo'q edi)? Bu — 12-bobdagi \"jazo emas, o'rganish\" madaniyatining eng qiyin, lekin eng muhim sinovi.",
               en:"After an incident, an organization should focus on **the system, not blame**: which process was missing (e.g. no second-channel verification)? This is the hardest, but most important, test of the \"learning, not punishment\" culture from chapter 12."},
+        {t:"note",uz:"Amaliy vosita: yirik tashkilotlar hodisaga javobni **SOAR (Security Orchestration, Automation and Response)** platformalari orqali avtomatlashtiradi — parolni bekor qilish, qurilmani izolyatsiya qilish kabi birinchi soat qadamlarini qo'lda emas, tugma bosish bilan bajaradi. Video: NetworkChuck kanalida \"hisobingiz buzilganda nima qilish kerak\" mavzusida boshlang'ich darajadagi amaliy videolar bor: youtube.com/@NetworkChuck.",
+              en:"A practical tool: larger organizations automate incident response through **SOAR (Security Orchestration, Automation and Response)** platforms — executing first-hour steps like password revocation and device isolation with a button press instead of manually. Video: NetworkChuck's channel has beginner-level practical videos on \"what to do when your account is compromised\": youtube.com/@NetworkChuck."},
       ]},
     { uz:"Ta'minot zanjiri va uchinchi tomon orqali hujumlar", en:"Supply chain & third-party attacks", subUz:"Sizni emas, hamkoringizni nishonga olish", subEn:"Targeting your partner, not you",
       blocks:[
@@ -1787,6 +1789,8 @@ const SE_BOOK={
           "**Third-party risk assessment** — vetting key partners' security practices, embedding security requirements in contracts.",
           "**Least privilege for partners too** — giving a contractor access only to systems needed for their work, not everything.",
           "**Verify \"trusted\" sources too** — even an unusual request from a familiar partner should follow the rule from chapter 4: stop, confirm via another channel."]},
+        {t:"note",uz:"Amalda — haqiqiy holat: 2020-yilgi SolarWinds hujumi bu naqshning eng yirik haqiqiy misoli — hujumchilar keng qo'llaniladigan tarmoq boshqaruv dasturining yangilanish kanaliga zararli kod joylashtirib, minglab tashkilotga (jumladan AQSH davlat idoralariga) \"ishonchli\" dastur yangilanishi orqali kirib borishgan — bu voqea xavfsizlik sohasida keng hujjatlashtirilgan. Video: bunday texnik buzilish hodisalarini John Hammond kanalida tez-tez tahlil qilinadi: youtube.com/@_JohnHammond.",
+              en:"In practice — a real case: the 2020 SolarWinds attack is the largest real-world example of this pattern — attackers planted malicious code in the update channel of a widely used network management tool, reaching thousands of organizations (including US government agencies) through a \"trusted\" software update — a widely documented event in the security field. Video: technical breach incidents like this are frequently analyzed on John Hammond's channel: youtube.com/@_JohnHammond."},
       ]},
     { uz:"Sun'iy intellekt davridagi SE — kengroq tahdidlar", en:"SE in the AI era — broader threats", subUz:"Ommaviy hujumlar endi shaxsiylashtirilgan", subEn:"Mass attacks are now personalized",
       blocks:[
@@ -1800,6 +1804,8 @@ const SE_BOOK={
               en:"The good news: modern email security systems also use language models to automatically detect inconsistencies (e.g. a sudden shift in writing style, or a mismatch with a domain's historical correspondence pattern). This is an ongoing \"arms race\" between attack and defense built around the same technology."},
         {t:"note",uz:"Amaliy xulosa o'zgarmaydi: grammatik xatolar endi ishonchli belgi **emas** (2026-yilga kelib AI matnlari deyarli mukammal), shuning uchun 4-6-boblardagi **xatti-harakat asosidagi** belgilarga (shoshilinchlik, g'ayrioddiy so'rov, tekshirish imkoniyati yo'qligi) tayaning — bular texnologiyadan qat'iy nazar o'zgarmaydi.",
               en:"The practical takeaway stays the same: grammar mistakes are no longer a reliable signal (by 2026, AI-generated text is nearly flawless), so rely on the **behavior-based** signals from chapters 4-6 (urgency, an unusual request, no way to verify) — these don't change regardless of the technology."},
+        {t:"note",uz:"Amalda: Rachel Tobac'ning AI yordamida vishing/fishing namoyishi aynan shu bobning mavzusini — AI ommaviy hujumlarni qanday shaxsiylashtirayotganini — jonli ko'rsatadi: youtube.com/watch?v=BNw_O6fMXo4.",
+              en:"In practice: Rachel Tobac's demonstration of AI-assisted vishing/phishing shows exactly this chapter's theme — how AI is personalizing mass attacks — live: youtube.com/watch?v=BNw_O6fMXo4."},
       ]},
     { uz:"Professional SE hisobotini yozish", en:"Writing a professional SE report", subUz:"Topilmalardan tavsiyagacha", subEn:"From findings to recommendations",
       blocks:[
@@ -1820,6 +1826,8 @@ const SE_BOOK={
           "**Recommendations** — concrete, actionable steps: a new protocol, additional training, technical controls (e.g. an email filter)."]},
         {t:"note",uz:"Eng muhim qoida — hisobot **hech qachon** individual xodimlarni sharmanda qilish yoki ayblash uchun ishlatilmasligi kerak; uning yagona maqsadi — tashkilotni kelajakda yaxshiroq himoyalash.",
               en:"The most important rule: a report should **never** be used to shame or blame individual employees; its sole purpose is to help protect the organization better in the future."},
+        {t:"note",uz:"Amaliy vosita: **PTES (Penetration Testing Execution Standard)** — real, ochiq metodologiya, hisobot tuzilishi uchun sanoat standarti sifatida keng qo'llaniladi. Video: TCM Security kanalida professional pentest/SE hisobotini yozish bo'yicha amaliy kurslar bor: youtube.com/@TCMSecurityAcademy.",
+              en:"A practical resource: **PTES (Penetration Testing Execution Standard)** — a real, open methodology widely used as an industry standard for report structure. Video: TCM Security's channel has practical courses on writing professional pentest/SE reports: youtube.com/@TCMSecurityAcademy."},
       ]},
     { uz:"Kasbiy yo'l: SE va xavfsizlik xabardorligi mutaxassisi", en:"Career path: SE & security awareness professional", subUz:"Bu kitobdan keyin qayerga borish kerak", subEn:"Where to go after this book",
       blocks:[
@@ -1840,6 +1848,8 @@ const SE_BOOK={
               en:"To deepen the practical side — the **OSINT book** (in the library) is a direct continuation, since every professional SE test begins with OSINT. On the technical side, the **L28 (Social Engineering/SET) lesson in the Kali module** demonstrates practical tools."},
         {t:"note",uz:"Yakuniy eslatma: bu kitobdagi barcha professional texnikalar (pretekst yaratish, vishing testi, jismoniy kirish) — **faqat yozma ruxsat va aniq belgilangan doira bilan** amaliy qo'llaniladi. Ruxsatsiz qo'llash — bu kitobning boshida aytilganidek, jinoyat.",
               en:"Final reminder: every professional technique in this book (building a pretext, vishing tests, physical access) is applied **only with written authorization and a clearly defined scope**. Without authorization, as stated at the start of this book, it's a crime."},
+        {t:"note",uz:"Amalda: TCM Security kanalida xavfsizlik sohasiga kirish, kasbiy yo'l tanlash va sertifikatlash bo'yicha maxsus videolar bor — kutubxonaning boshqa kitoblarida ham keltirilgan, ishonchli boshlang'ich nuqta: youtube.com/@TCMSecurityAcademy.",
+              en:"In practice: TCM Security's channel has dedicated videos on breaking into the security field, choosing a career track, and certification — a reliable starting point, also cited elsewhere in this library: youtube.com/@TCMSecurityAcademy."},
       ]},
     { uz:"Email sarlavhasini tekshirish: amaliy usul", en:"Inspecting email headers: a practical method", subUz:"Xat haqiqatan kimdan kelganini qanday isbotlash", subEn:"How to actually prove who sent an email",
       blocks:[
@@ -1864,6 +1874,8 @@ const SE_BOOK={
           "**DMARC** — combines the SPF and DKIM results, based on the domain owner's policy for \"what to do if they don't match\"."]},
         {t:"note",warn:true,uz:"`spf=pass` bo'lishi hali xat **xavfsiz** degani emas — u faqat \"bu domendan haqiqatan yuborilgan\" degani. Hujumchi o'ziga tegishli, yangi ro'yxatdan o'tgan domendan (masalan `paypa1-support.com`) to'g'ri SPF/DKIM bilan xat yuborishi mumkin. Shuning uchun bu tekshiruv — 3-bobdagi boshqa belgilar (domen imlosi, shoshilinchlik) bilan **birga** ishlatiladi, yagona javob sifatida emas.",
               en:"`spf=pass` doesn't mean the email is **safe** — it only means \"this really was sent from this domain\". An attacker can send mail with valid SPF/DKIM from their own freshly registered domain (e.g. `paypa1-support.com`). So this check is used **together** with the other signals from chapter 3 (domain spelling, urgency), not as a single verdict."},
+        {t:"note",uz:"Amalda: John Hammond'ning kanalida haqiqiy email sarlavhalarini jonli ochib, SPF/DKIM/DMARC natijalarini birma-bir tahlil qiladigan videolar bor: youtube.com/@_JohnHammond.",
+              en:"In practice: John Hammond's channel has videos opening real email headers live and walking through SPF/DKIM/DMARC results one by one: youtube.com/@_JohnHammond."},
       ]},
     { uz:"URL va domenni tekshirish amaliyoti", en:"Practical URL & domain inspection", subUz:"Havolaning haqiqiyligini bosmasdan bilish", subEn:"Knowing a link is genuine before clicking",
       blocks:[
@@ -1888,6 +1900,8 @@ const SE_BOOK={
           "**Character look-alikes (typosquatting)** — watch for tricks like \"rn\" resembling \"m\", or \"1\" swapped for \"l\" (recall the \"paypa1\" example from chapter 3)."]},
         {t:"note",uz:"Eng ishonchli usul — havolani umuman bosmaslik: shubhali xatdagi \"bankingizga kiring\" havolasi o'rniga, brauzerga **o'zingiz qo'lda** bank manzilini yozing yoki oldindan saqlangan xatcho'pdan foydalaning.",
               en:"The most reliable method is not clicking the link at all: instead of the \"log into your bank\" link in a suspicious email, type the bank's address **yourself** into the browser, or use a previously saved bookmark."},
+        {t:"note",uz:"Amalda: NetworkChuck kanalida URL tuzilishini, domen o'qishni va fishing havolalarini amaliy tarzda tekshirishni o'rgatuvchi boshlang'ich darajadagi videolar bor: youtube.com/@NetworkChuck.",
+              en:"In practice: NetworkChuck's channel has beginner-level videos teaching URL structure, reading domains, and practically inspecting phishing links: youtube.com/@NetworkChuck."},
       ]},
     { uz:"GoPhish bilan simulyatsiya qurish — amaliy qadamlar", en:"Building a simulation with GoPhish — practical steps", subUz:"Ochiq kodli fishing simulyatsiya platformasi", subEn:"An open-source phishing simulation platform",
       blocks:[
@@ -1911,6 +1925,8 @@ const SE_BOOK={
           "**4) Live tracking** — who opened the email, who clicked, who submitted data — all tracked in real time against the three metrics from chapter 12 (click/submit/report)."]},
         {t:"note",warn:true,uz:"GoPhish kabi vositalar **faqat o'z tashkilotingiz** yoki yozma ruxsat berilgan mijoz uchun ishlatiladi (10-bobdagi ruxsat doirasini eslang). Vositaning o'zi neytral — uni qonuniy yoki noqonuniy qilish, uni **kimga qarshi** ishlatilishiga bog'liq.",
               en:"Tools like GoPhish are used **only for your own organization** or a client with written authorization (recall the rules of engagement from chapter 10). The tool itself is neutral — what makes it lawful or unlawful depends on **who** it's used against."},
+        {t:"note",uz:"Amalda: TCM Security'ning keng pentesting kurslarida GoPhish'ga o'xshash fishing simulyatsiya vositalarini sozlash amaliy ko'rsatiladi: youtube.com/@TCMSecurityAcademy.",
+              en:"In practice: TCM Security's broader pentesting courses include hands-on setup of phishing simulation tools like GoPhish: youtube.com/@TCMSecurityAcademy."},
       ]},
     { uz:"Ijtimoiy tarmoq maxfiyligini sozlash — amaliy qo'llanma", en:"Hardening social media privacy — a practical guide", subUz:"Har bir sozlamaning nima uchun kerakligi", subEn:"Why each setting matters",
       blocks:[
@@ -1931,6 +1947,8 @@ const SE_BOOK={
           "**Tag restrictions** — set tagging to \"require approval\" — this reduces physical-location exposure from chapter 8."]},
         {t:"note",uz:"Bu qadamlarni **yiliga bir marta** emas, balki har safar yangi ilova o'rnatganda yoki yangi platformaga qo'shilganda takrorlang — sozlamalar vaqt o'tishi bilan yangilanadi va standart holatga qaytishi mumkin.",
               en:"Repeat these steps not just **once a year**, but every time you install a new app or join a new platform — settings change over time and can revert to defaults."},
+        {t:"note",uz:"Amalda: NetworkChuck kanalida asosiy ijtimoiy tarmoq va brauzer maxfiylik sozlamalarini qadam-baqadam ko'rsatuvchi amaliy videolar bor: youtube.com/@NetworkChuck.",
+              en:"In practice: NetworkChuck's channel has practical, step-by-step videos on hardening major social media and browser privacy settings: youtube.com/@NetworkChuck."},
       ]},
     { uz:"Apparat xavfsizlik kaliti va parol menejerini sozlash", en:"Setting up a hardware key & password manager", subUz:"9-bob va Parollar kitobini amalda birlashtirish", subEn:"Putting chapter 9 and the Passwords book into practice",
       blocks:[
@@ -1952,6 +1970,8 @@ const SE_BOOK={
           "**4)** Store backup codes somewhere safe and offline."]},
         {t:"note",uz:"Parol menejeri sozlashda ham xuddi shu tamoyil: bitta kuchli **asosiy parol** + MFA, so'ng menejerning o'zi qolgan barcha noyob parollarni yaratadi va saqlaydi (Parollar kitobidagi to'liq tushuntirish).",
               en:"The same principle applies when setting up a password manager: one strong **master password** + MFA, then the manager itself generates and stores all other unique passwords (fully explained in the Passwords book)."},
+        {t:"note",uz:"Amalda: NetworkChuck kanalida apparat xavfsizlik kaliti (YubiKey) va parol menejerini nolldan sozlashni ko'rsatuvchi amaliy videolar mavjud: youtube.com/@NetworkChuck.",
+              en:"In practice: NetworkChuck's channel has practical videos showing hardware security key (YubiKey) and password manager setup from scratch: youtube.com/@NetworkChuck."},
       ]},
     { uz:"Tashkilotda 'Xabar qilish' tugmasini joriy qilish", en:"Deploying a \"Report Phishing\" button", subUz:"Xabar berishni bir bosishga tushirish", subEn:"Turning reporting into a single click",
       blocks:[
