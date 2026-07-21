@@ -1304,6 +1304,8 @@ const SE_BOOK={
           "To build a **security culture** and awareness inside an organisation."]},
         {t:"p",uz:"Keyingi boblarda: ijtimoiy injeneriya nima, **nega u ishlaydi** (psixologiya), asosiy hujum turlari (fishing, vishing, pretexting) va eng muhimi — **himoya usullari**.",
               en:"In the next chapters: what social engineering is, **why it works** (psychology), the main attack types (phishing, vishing, pretexting), and most importantly — **defence methods**."},
+        {t:"note",uz:"Amalda: kitobni boshlashdan oldin, sohaning eng mashhur haqiqiy vakili — sobiq FBI \"eng ta'qib qilingan\" xaker, keyinchalik xavfsizlik maslahatchisiga aylangan Kevin Mitnick'ning o'z tilidan tinglang — rasmiy kanali: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw.",
+              en:"In practice: before starting the book, hear it from the field's most famous real figure — Kevin Mitnick, once the FBI's most-wanted hacker, later a security consultant — on his official channel: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw."},
       ]},
     // ── 1: What is SE ──────────────────────────────────────────
     { uz:"Ijtimoiy injeneriya nima?", en:"What is social engineering?", subUz:"Nishon — texnika emas, odam", subEn:"The target is the human, not the technology",
@@ -1322,6 +1324,8 @@ const SE_BOOK={
               en:"**1) Recon:** the attacker gathers open information about the target — workplace, colleagues, interests (often from social media). **2) Build trust:** they pose as a colleague, IT support or a bank employee. **3) Exploit:** they make the request — usually with urgency. **4) Exit:** they disappear without raising suspicion."},
         {t:"note",uz:"Eng kuchli qurol — **ochiq ma'lumot (OSINT)**. Ijtimoiy tarmoqlarda kam ma'lumot ulashish — birinchi himoya qatlami.",
               en:"The strongest weapon is **open information (OSINT)**. Sharing less on social media is your first layer of defence."},
+        {t:"note",uz:"Amalda: DEF CON'ning ochiq konferensiya videolari orqali haqiqiy misollarni ko'ring — Chris Pritchard'ning \"The Basics of Social Engineering\" (DEF CON 27 SE Village) videosi aynan shu bobdagi hujum bosqichlarini jonli ko'rsatadi: youtube.com/watch?v=tCRT3QFzwm8.",
+              en:"In practice: watch real examples via DEF CON's open conference videos — Chris Pritchard's \"The Basics of Social Engineering\" (DEF CON 27 SE Village) demonstrates this chapter's attack lifecycle live: youtube.com/watch?v=tCRT3QFzwm8."},
       ]},
     // ── 2: Psychology ──────────────────────────────────────────
     { uz:"Nega u ishlaydi — psixologiya", en:"Why it works — psychology", subUz:"Miyamizning yorliqlaridan qanday foydalaniladi", subEn:"How our mental shortcuts get abused",
@@ -1345,6 +1349,8 @@ const SE_BOOK={
           "**Fear & curiosity** — 'your account was hacked!' or 'you won!' are powerful triggers."]},
         {t:"note",uz:"**Himoya qoidasi:** agar biror xabar sizni **shoshiltirayotgan**, **qo'rqitayotgan** yoki juda yaxshi taklif qilayotgan bo'lsa — bu aynan to'xtab, tekshirish kerak bo'lgan payt. His-tuyg'u bosimi — birinchi ogohlantiruvchi belgi.",
               en:"**Defence rule:** if a message is **rushing** you, **frightening** you, or offering something too good — that is exactly the moment to stop and verify. Emotional pressure is the first warning sign."},
+        {t:"note",uz:"Amalda: bu bobdagi olti tamoyilni aynan shu tushunchani yaratgan olim — Robert Cialdini'ning o'z ovozidan tinglang, rasmiy \"Science of Persuasion\" animatsion videosida: youtube.com/watch?v=cFdCzN7RYbw. Sun'iy intellekt yordamida: shubhali xabarni AI chatbotiga (masalan Claude yoki ChatGPT) nusxalab, \"bu xabarda Cialdini'ning qaysi ta'sir tamoyillari ishlatilgan?\" deb so'rash — xabarni tezda tahlil qilishning amaliy usuli.",
+              en:"In practice: hear the six principles from the scientist who coined them — Robert Cialdini's own voice, in the official \"Science of Persuasion\" animated video: youtube.com/watch?v=cFdCzN7RYbw. With AI: pasting a suspicious message into an AI chatbot (e.g. Claude or ChatGPT) and asking \"which of Cialdini's influence principles does this message use?\" is a practical way to quickly analyze a message."},
       ]},
     // ── 3: Phishing ────────────────────────────────────────────
     { uz:"Fishing (Phishing)", en:"Phishing", subUz:"Soxta xatlar orqali hujum — va uni tanib olish", subEn:"Attacks via fake messages — and how to spot them",
@@ -1378,6 +1384,8 @@ const SE_BOOK={
           "Don't **give in** to urgency and fear — a bank never asks for your password by email.",
           "If in doubt — go to the **official site or app yourself**, not via the link.",
           "At work — **report** such messages to IT/security."]},
+        {t:"note",uz:"Amalda: John Hammond'ning kanalida haqiqiy fishing xatlarini jonli tahlil qiladigan ko'plab video bor — bu bobdagi xavf belgilarini real xatda ko'rish uchun: youtube.com/@_JohnHammond. Sun'iy intellekt yordamida: zamonaviy hujumchilar endi LLM'lardan (ChatGPT kabi) grammatik xatosiz fishing xatini yozish uchun foydalanadi — bu \"yomon grammatika\" kabi eski xavf belgisini yo'qqa chiqaradi; himoya tomonida esa AI-asoslangan email filtrlari yozuv uslubidan tashqari havola/domen naqshlarini tahlil qiladi.",
+              en:"In practice: John Hammond's channel has many videos analyzing real phishing emails live — to see this chapter's red flags in a real message: youtube.com/@_JohnHammond. With AI: modern attackers now use LLMs (like ChatGPT) to write grammatically perfect phishing emails — eliminating the old \"bad grammar\" red flag; on the defence side, AI-based email filters analyze link/domain patterns beyond just writing style."},
       ]},
     // ── 4: Vishing & smishing ──────────────────────────────────
     { uz:"Vishing va Smishing", en:"Vishing & smishing", subUz:"Telefon va SMS orqali aldov", subEn:"Deception by phone and SMS",
@@ -1400,6 +1408,8 @@ const SE_BOOK={
           "Don't trust the number on screen — it can be spoofed.",
           "Urgent pressure is a **sign of fraud**. Ask for time, think.",
           "Don't click links in SMS; check via the official app."]},
+        {t:"note",uz:"Amalda: haqiqiy SE mutaxassisi va DEF CON SECTF'ning bir necha martalik finalisti Rachel Tobac'ning AI yordamida vishing/fishing qanday amalga oshirilishini ko'rsatadigan videosi: youtube.com/watch?v=BNw_O6fMXo4. Sun'iy intellekt yordamida: bugun ovoz klonlash AI vositalari bir necha soniyalik audio namunadan ovozni taqlid qila oladi (43-bobda chuqurroq) — bu vishing'ni ancha ishonchli qiladi.",
+              en:"In practice: Rachel Tobac — a real SE professional and multiple-time DEF CON SECTF finalist — shows how AI is used in vishing/phishing in this video: youtube.com/watch?v=BNw_O6fMXo4. With AI: voice-cloning AI tools today can imitate a voice from a few seconds of audio sample (covered in more depth in chapter 43) — making vishing far more convincing."},
       ]},
     // ── 5: Pretexting & other ──────────────────────────────────
     { uz:"Pretexting va boshqa usullar", en:"Pretexting & other techniques", subUz:"Soxta rol, o'lja va jismoniy hujumlar", subEn:"False roles, bait and physical attacks",
@@ -1422,6 +1432,8 @@ const SE_BOOK={
           "**Shoulder surfing** — reading a password or PIN over your shoulder."]},
         {t:"note",uz:"Umumiy himoya: **shaxsni tasdiqlang** ('sizga qayta qo'ng'iroq qilaman'), begonani binoga kiritmang, maxfiy hujjatlarni **maydalab** tashlang, PIN terganda ekranni to'sing.",
               en:"General defence: **verify identity** ('I'll call you back'), don't let strangers into the building, **shred** confidential documents, and shield the screen when entering a PIN."},
+        {t:"note",uz:"Amalda: DEF CON SECTF'ning 2017-yilgi g'olib qo'ng'irog'ining haqiqiy qayta sahnalashtirilishini tinglang — Chris Kirsch va Chris Hadnagy tomonidan, pretexting qanday jonli ishlashini eshitish uchun: youtube.com/watch?v=yhE372sqURU.",
+              en:"In practice: listen to a real recreation of DEF CON SECTF's 2017 winning call — performed by Chris Kirsch and Chris Hadnagy, to hear pretexting work live: youtube.com/watch?v=yhE372sqURU."},
       ]},
     // ── 6: Defence & awareness ─────────────────────────────────
     { uz:"Himoya va xabardorlik", en:"Defence & awareness", subUz:"Shaxsiy odatlar va tashkiliy choralar", subEn:"Personal habits and organisational measures",
@@ -1456,6 +1468,8 @@ const SE_BOOK={
           "A **security culture** — not being afraid to make a mistake, reporting immediately."]},
         {t:"note",uz:"Ko'p kompaniyalar xodimlarni **simulyatsiyalangan fishing** (test xatlari) bilan o'qitadi — bu jazolash uchun emas, xatoda o'rganish uchun. Bu — himoya-yo'nalishidagi eng samarali usullardan biri.",
               en:"Many companies train staff with **simulated phishing** (test emails) — not to punish, but to learn from mistakes safely. It's one of the most effective defensive methods."},
+        {t:"note",uz:"Amalda: Kevin Mitnick'ning o'zi tashkilotlar uchun xavfsizlik xabardorligi treningini professional tarzda olib borgan (yiliga 1 milliondan ortiq xodim tomonidan tomosha qilingan) — uning kanalida shu yondashuv namunalarini ko'rish mumkin: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw.",
+              en:"In practice: Kevin Mitnick himself professionally ran security awareness training for organizations (watched by over a million employees a year) — his channel shows examples of this approach: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw."},
       ]},
     // ── 7: BEC ────────────────────────────────────────────────────
     { uz:"BEC — rahbar nomidan firibgarlik", en:"BEC — CEO fraud", subUz:"Eng qimmatga tushadigan ijtimoiy injeneriya hujumi", subEn:"The most expensive social engineering attack",
@@ -1475,6 +1489,8 @@ const SE_BOOK={
               en:"This is a direct application of the influence principles from chapter 2: **authority** (the boss is ordering it), **urgency** (\"right now\"), and **no way to verify** (the boss is \"busy\"). Even if the employee has doubts, they're afraid to push back on the boss."},
         {t:"note",warn:true,uz:"**Oltin qoida:** har qanday pul o'tkazmasi so'rovini, hatto \"rahbardan\" kelsa ham, **ikkinchi kanal orqali** (telefon qo'ng'irog'i, shaxsan) tasdiqlang — email orqali javob yozib emas. Ko'plab tashkilotlarda katta summalar uchun **ikki kishi tasdig'i** talab qilinadi — bu yakka xodimni himoya qiladi.",
               en:"**Golden rule:** verify any money-transfer request — even one that appears to be from the boss — through **a second channel** (a phone call, in person), not by replying to the email. Many organizations require **two-person approval** for large sums — this protects any single employee."},
+        {t:"note",uz:"Amalda — haqiqiy holatlar: Toyota kompaniyasi 2019-yilda bitta BEC hujumida $37 million yo'qotdi (hujumchi hamkor kompaniya vakili qiyofasida moliya bo'limiga xat yuborgan); Obinwanne Okeke ismli hujumchi bir necha yillik BEC sxemasi orqali $11 milliondan ortiq zarar keltirgan — ikkalasi ham sud hujjatlarida keng hujjatlashtirilgan. Sun'iy intellekt yordamida: hujumchilar endi rahbarning ochiq intervyu/nutqlaridan uning yozish uslubini AI bilan taqlid qilib, ancha ishonchli soxta xat yozadi. Video: Kevin Mitnick'ning xavfsizlik xabardorligi treningida BEC/CEO firibgarligi ham asosiy mavzulardan biri — youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw.",
+              en:"In practice — real cases: Toyota lost $37 million in a single 2019 BEC attack (the attacker posed as a partner company representative emailing the finance department); an attacker named Obinwanne Okeke caused over $11 million in damage through a multi-year BEC scheme — both are well documented in court records. With AI: attackers now use AI to mimic an executive's writing style from public interviews/speeches, producing far more convincing fake emails. Video: BEC/CEO fraud is also a core topic in Kevin Mitnick's security awareness training — youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw."},
       ]},
     // ── 8: Physical security ────────────────────────────────────────
     { uz:"Jismoniy xavfsizlik", en:"Physical security", subUz:"Ijtimoiy injeneriya ekrandan tashqarida", subEn:"Social engineering beyond the screen",
@@ -1503,6 +1519,8 @@ const SE_BOOK={
           "Don't be afraid to be polite about it: **\"Sorry, could you show your badge?\"** — this is normal, part of the job.",
           "Don't leave papers or written passwords on your desk (**clean desk** policy).",
           "If you see someone suspicious — **report it to security**, don't try to stop them yourself."]},
+        {t:"note",uz:"Amalda: Jayson Street — real dunyoda ko'plab kompaniya binolariga (ruxsat etilgan holda) muvaffaqiyatli kirib borgan taniqli fizik pentester — o'z texnikalarini DEF CON 32'da ko'rsatadi: youtube.com/watch?v=kc25CttuDmw.",
+              en:"In practice: Jayson Street — a well-known physical pentester who has successfully entered many real company buildings (with authorization) — demonstrates his techniques at DEF CON 32: youtube.com/watch?v=kc25CttuDmw."},
       ]},
     // ── 9: Deepfakes ──────────────────────────────────────────────
     { uz:"Deepfake va ovoz taqlidi", en:"Deepfakes & voice cloning", subUz:"Sun'iy intellekt — yangi ijtimoiy injeneriya quroli", subEn:"AI — a new social engineering weapon",
@@ -1525,6 +1543,8 @@ const SE_BOOK={
           "Agree on a **secret \"code word\"** with family or your team — ask for it on an urgent call.",
           "For an unusual request (\"send money now\", \"tell me the OTP\") — the stop-and-verify rule from chapter 4 applies regardless of whose voice it is.",
           "For companies: introduce **multi-step approval** for high-value transactions; don't trust voice alone."]},
+        {t:"note",uz:"Amalda: Rachel Tobac'ning sun'iy intellekt ijtimoiy injeneriyani qanday kuchaytirayotgani haqidagi jonli namoyishi, deepfake xavfini aynan ko'rsatib beradi: youtube.com/watch?v=IwORiLj-xqg. Sun'iy intellekt yordamida (mudofaa): ovoz/video haqiqiyligini tekshiruvchi AI-asoslangan aniqlash vositalari (masalan banklarda ishlatiladigan \"liveness detection\") inson quloq/ko'zi payqamaydigan raqamli artefaktlarni topadi — lekin 43-bobdagi \"xavfsizlik so'zi\" protokoli hali ham eng ishonchli, texnologiyaga bog'liq bo'lmagan himoya.",
+              en:"In practice: Rachel Tobac's live demonstration of how AI is supercharging social engineering shows the deepfake risk directly: youtube.com/watch?v=IwORiLj-xqg. With AI (defence): AI-based authenticity-detection tools (e.g. \"liveness detection\" used by banks) catch digital artifacts human ears/eyes can't — but the \"safe word\" protocol from chapter 43 remains the most reliable, technology-independent defence."},
       ]},
     // ── 10: Protecting family ──────────────────────────────────────
     { uz:"Oila va keksalarni himoya qilish", en:"Protecting family & the elderly", subUz:"Eng zaif nishonlar — va ularga yordam", subEn:"The most vulnerable targets — and how to help them",
