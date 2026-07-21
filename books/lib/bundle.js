@@ -1573,6 +1573,8 @@ const SE_BOOK={
           "Set up a **code word** (as in chapter 9) to confirm it's really a relative.",
           "Explain simply that **urgency = a warning sign**.",
           "If something suspicious happens — **don't blame them**, help calmly; fear of blame may stop them reporting next time."]},
+        {t:"note",uz:"Amalda: AARP (nafaqaxo'rlar manfaatini himoya qiluvchi yirik AQSH tashkiloti) \"nevara firibgarligi\"ni tushuntiruvchi haqiqiy ogohlantirish videosi: youtube.com/watch?v=Y2HpGukQRv0. Sun'iy intellekt yordamida (mudofaa): zamonaviy qo'ng'iroq skrining ilovalari AI yordamida robot qo'ng'iroq va firibgarlik naqshlarini avtomatik aniqlab, keksa foydalanuvchini ogohlantiradi.",
+              en:"In practice: AARP (a major US organization protecting older adults) has a real awareness video explaining the \"grandparent scam\": youtube.com/watch?v=Y2HpGukQRv0. With AI (defence): modern call-screening apps use AI to automatically detect robocall and fraud patterns, warning the elderly user."},
       ]},
     // ── 11: Job scams ────────────────────────────────────────────────
     { uz:"Ish va rekruting firibgarligi", en:"Job & recruitment scams", subUz:"Soxta ish taklifi — pul yoki ma'lumot o'g'irlash usuli", subEn:"A fake job offer as a way to steal money or data",
@@ -1594,6 +1596,8 @@ const SE_BOOK={
               en:"**Red flags:** being asked to pay upfront for a job, an interview only via messenger (no official site or call), unusually high pay for easy work, and urgent \"decide right now\" pressure."},
         {t:"p",uz:"Himoya: kompaniyani **mustaqil ravishda** (rasmiy sayt, LinkedIn) tekshiring, hech qachon ishga oldindan pul to'lamang, va shaxsiy hujjatlarni faqat rasmiy, tasdiqlangan kanal orqali yuboring.",
               en:"Defence: verify the company **independently** (official site, LinkedIn), never pay upfront for a job, and only send personal documents through an official, verified channel."},
+        {t:"note",uz:"Amalda: AQSH Federal Savdo Komissiyasi (FTC) rasmiy statistikasiga ko'ra, ish firibgarligi holatlari 2020-2024 yillar orasida deyarli uch baravar oshgan, zarar $90 milliondan $501 millionga yetgan (consumer.ftc.gov/all-scams/job-scams) — bu nazariy emas, tez o'sayotgan haqiqiy tahdid. Video: NetworkChuck kanalida onlayn firibgarlikdan umumiy himoyalanish bo'yicha boshlang'ich darajadagi tushuntiruvchi videolar bor: youtube.com/@NetworkChuck.",
+              en:"In practice: according to official US Federal Trade Commission (FTC) statistics, job scam incidents nearly tripled between 2020 and 2024, with losses reaching $501 million (consumer.ftc.gov/all-scams/job-scams) — not a theoretical risk, but a fast-growing real one. Video: NetworkChuck's channel has beginner-level explainer videos on general online fraud protection: youtube.com/@NetworkChuck."},
       ]},
     // ── 12: Awareness programs ───────────────────────────────────────
     { uz:"Xavfsizlik xabardorligi dasturi", en:"Building a security awareness program", subUz:"Tashkilotda madaniyat qanday quriladi", subEn:"How to build a culture in an organization",
@@ -1616,6 +1620,8 @@ const SE_BOOK={
         {t:"h",n:"12.2",uz:"Jazolash o'rniga o'rgatish",en:"Teach, don't punish"},
         {t:"note",uz:"Eng samarali dasturlar **jazo emas, o'rganish** madaniyatiga tayanadi: xodim simulyatsiyada aldansa, darhol qisqa, do'stona tushuntirish ko'rsatiladi — nima uchun bu fishing ekani, keyingi safar nimaga e'tibor berish kerak. Qo'rquv xodimlarni xato haqida **yashirishga**, aksincha, ochiqlik esa **tezroq xabar berishga** undaydi.",
               en:"The most effective programs rely on a culture of **learning, not punishment**: when an employee falls for a simulation, they immediately get a short, friendly explanation — why it was phishing, what to watch for next time. Fear makes employees **hide** mistakes; openness makes them **report faster**."},
+        {t:"note",uz:"Amalda: Kevin Mitnick'ning o'zi aynan shu turdagi xavfsizlik xabardorligi dasturini professional tarzda yuritgan — uning kanalida yondashuv namunalarini ko'rish mumkin: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw.",
+              en:"In practice: Kevin Mitnick himself professionally ran exactly this kind of security awareness program — his channel shows examples of the approach: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw."},
       ]},
     { uz:"Professional pretekst yaratish (ruxsat etilgan testlar uchun)", en:"Building a professional pretext (for authorized tests)", subUz:"Ishonchli, tekshirilgan rol qanday quriladi", subEn:"How a believable, vetted role is constructed",
       blocks:[
@@ -1632,6 +1638,8 @@ const SE_BOOK={
           "**Exit strategy** — a calm plan to leave the situation if suspicion arises, without escalating conflict."]},
         {t:"note",warn:true,uz:"Bunday testlar **faqat** tashkilotning yuqori rahbariyati imzolagan yozma ruxsat (\"get out of jail free\" xati) bilan, aniq belgilangan doirada o'tkaziladi. Ruxsatsiz — bu firibgarlik va binoga noqonuniy kirish, hech qanday \"test\" emas.",
               en:"Such tests are conducted **only** with written authorization signed by the organization's senior leadership (a \"get out of jail free\" letter), within a clearly defined scope. Without authorization, this is fraud and unlawful entry — not a \"test\" of any kind."},
+        {t:"note",uz:"Amalda: Chris Hadnagy — professional SECTF pretekst dasturining o'zini yaratgan mutaxassis — DEF CON 23'da uning evolyutsiyasi haqida so'zlaydi: youtube.com/watch?v=O5lXUSMGQ2I.",
+              en:"In practice: Chris Hadnagy — the professional who created the SECTF pretext program itself — talks about its evolution at DEF CON 23: youtube.com/watch?v=O5lXUSMGQ2I."},
       ]},
     { uz:"SE testini rejalashtirish va ruxsat doirasi", en:"Planning an SE test & rules of engagement", subUz:"Professional ijtimoiy injeneriya testining tuzilishi", subEn:"The structure of a professional social engineering engagement",
       blocks:[
@@ -1651,6 +1659,8 @@ const SE_BOOK={
         {t:"h",n:"§",uz:"Nega bu muhim",en:"Why this matters"},
         {t:"p",uz:"Bu hujjatlar yo'q bo'lsa, \"test\" huquqiy jihatdan oddiy firibgarlikdan farq qilmaydi. Professional SE testchisi har doim shartnoma, doira va favqulodda aloqa rejasi bilan ishlaydi — bu 1-bobdagi axloqiy qoidaning amaliy, hujjatlashtirilgan ko'rinishi.",
               en:"Without this documentation, a \"test\" is legally no different from ordinary fraud. A professional SE tester always works with a contract, a defined scope, and an emergency contact plan — this is the practical, documented form of the ethical rule from chapter 1."},
+        {t:"note",uz:"Amalda: ruxsat doirasi (Rules of Engagement) tuzilishi haqida ko'proq bilish uchun — professional SE hamjamiyatining o'zi, se.community (Vishing Competition va SECTF'ni tashkil qiluvchi tashkilot), doira va axloq qoidalarini ochiq nashr etadi.",
+              en:"In practice: to learn more about Rules of Engagement structure — the professional SE community itself, se.community (the organization behind the Vishing Competition and SECTF), publishes its scope and ethics rules openly."},
       ]},
     { uz:"Fishing simulyatsiya dasturini qurish", en:"Building a phishing simulation program", subUz:"Himoya tomonidan: butun tashkilotni sinash", subEn:"From the defense side: testing a whole organization",
       blocks:[
@@ -1667,6 +1677,8 @@ const SE_BOOK={
               en:"Many new programs only measure the \"click rate\" — which can be misleading. A more mature program tracks three metrics: the **click rate** (theoretical risk), the **credential-submission rate** (real risk — was a password entered), and — most importantly — the **reporting rate** (how many employees actively reported the suspicious email to IT). Over time, the goal is to raise the reporting rate, not just lower the click rate."},
         {t:"note",uz:"Qiyinlik darajasini bosqichma-bosqich oshiring: oddiy, keng tarqalgan naqshlardan boshlab (3-bobdagi kabi), keyin shaxsiylashtirilgan, spear-phishing darajasidagi shablonlarga o'ting — real hujumchilar ham xuddi shunday rivojlanadi.",
               en:"Increase difficulty gradually: start with simple, common patterns (like chapter 3), then move to personalized, spear-phishing-level templates — real attackers evolve the same way."},
+        {t:"note",uz:"Amalda: 27-bobda GoPhish vositasi bilan bunday dasturni haqiqiy qadamlar bilan qurish ko'rsatiladi — ochiq kodli, o'zingiz joylashtiradigan fishing simulyatsiya platformasi. Video: TCM Security kanalida xavfsizlik dasturlarini amaliy qurish bo'yicha keng kurslar bor: youtube.com/@TCMSecurityAcademy.",
+              en:"In practice: chapter 27 shows building exactly this kind of program with the GoPhish tool, step by step — a free, self-hosted phishing simulation platform. Video: TCM Security's channel has extensive courses on building security programs hands-on: youtube.com/@TCMSecurityAcademy."},
       ]},
     { uz:"Vishing testlari qanday olib boriladi", en:"How authorized vishing tests are run", subUz:"Telefon orqali sinov — professional metodologiya", subEn:"Phone-based testing — a professional methodology",
       blocks:[
@@ -1684,6 +1696,8 @@ const SE_BOOK={
         {t:"h",n:"§",uz:"Natijalarni to'g'ri qo'llash",en:"Applying results correctly"},
         {t:"p",uz:"Vishing testining maqsadi — **individual xodimni** aybdor qilish emas, balki **tizimli zaifliklarni** topish: masalan, qo'ng'iroq markazi xodimlari mijoz shaxsini tasdiqlash uchun aniq protokolga ega emasligi. Natija — ko'pincha yangi **tasdiqlash protokoli** yoki qo'shimcha trening bo'ladi, individual jazolash emas (6-bobdagi \"jazolash o'rniga o'rgatish\" tamoyili shu yerda ham qo'llanadi).",
               en:"The goal of a vishing test isn't to blame an **individual** employee, but to find **systemic** weaknesses: e.g. call-center staff lacking a clear protocol to verify customer identity. The outcome is usually a new **verification protocol** or additional training, not individual punishment (the \"teach, don't punish\" principle from chapter 6 applies here too)."},
+        {t:"note",uz:"Amalda: DEF CON SECTF'ning 2017-yilgi g'olib qo'ng'irog'ining haqiqiy qayta sahnalashtirilishi (Chris Kirsch va Chris Hadnagy) — professional, nazorat ostidagi vishing qanday olib borilishining jonli namunasi: youtube.com/watch?v=yhE372sqURU.",
+              en:"In practice: a real recreation of DEF CON SECTF's 2017 winning call (Chris Kirsch and Chris Hadnagy) — a live example of how professional, controlled vishing is conducted: youtube.com/watch?v=yhE372sqURU."},
       ]},
     { uz:"Jismoniy kirish testi metodologiyasi", en:"Physical penetration test methodology", subUz:"8-bobdan professional darajaga", subEn:"From chapter 8 to a professional level",
       blocks:[
@@ -1698,6 +1712,8 @@ const SE_BOOK={
         {t:"h",n:"§",uz:"Ushlanib qolganda",en:"If caught"},
         {t:"p",uz:"Har bir jismoniy testchi doim o'zi bilan **ruxsat xatini** olib yuradi — xodim shubhalanib, xavfsizlik yoki politsiyani chaqirsa, testchi darhol xatni ko'rsatadi va rahbariyatdagi tasdiqlovchi shaxsga qo'ng'iroq qilinishini so'raydi. Bu xat bo'lmasa — bu jinoyat, professional test emas.",
               en:"Every physical tester always carries an **authorization letter**. If an employee grows suspicious and calls security or the police, the tester immediately shows the letter and asks for a call to the confirming contact in management. Without this letter — it's a crime, not a professional test."},
+        {t:"note",uz:"Amalda: Jayson Street — ruxsat etilgan holda ko'plab haqiqiy kompaniya binosiga muvaffaqiyatli kirib borgan taniqli fizik pentester — DEF CON 32'da o'z metodologiyasini ko'rsatadi: youtube.com/watch?v=kc25CttuDmw.",
+              en:"In practice: Jayson Street — a well-known physical pentester who has successfully entered many real company buildings with authorization — demonstrates his methodology at DEF CON 32: youtube.com/watch?v=kc25CttuDmw."},
       ]},
     { uz:"Kognitiv og'ishlar chuqurroq", en:"Cognitive biases in depth", subUz:"Cialdini'dan tashqari yana olti tuzoq", subEn:"Six more traps beyond Cialdini",
       blocks:[
@@ -1716,6 +1732,8 @@ const SE_BOOK={
           "**Confirmation bias** — a person is less suspicious of a message that matches something they already expected (e.g. \"we really were expecting a new vendor\")."]},
         {t:"note",uz:"Himoya nuqtai nazaridan bularning barchasi bitta umumiy qoidaga tushadi (4-bobdagi \"oltin qoida\"): **his-tuyg'u bosimini sezsangiz — bu aynan to'xtash signali**, qaysi aniq og'ish ishlatilganidan qat'iy nazar.",
               en:"From a defensive standpoint, all of these reduce to one common rule (the \"golden rule\" from chapter 4): **feeling emotional pressure is exactly the signal to stop**, regardless of which specific bias is being exploited."},
+        {t:"note",uz:"Amalda: bu qo'shimcha og'ishlar ham Robert Cialdini o'rgangan xatti-harakat iqtisodiyoti sohasiga tegishli — rasmiy \"Science of Persuasion\" videosida (2-bobda keltirilgan: youtube.com/watch?v=cFdCzN7RYbw) asosiy tamoyillarni eshitib, keyin bu bobdagi qo'shimcha to'rttasini o'zingiz izlab toping. Sun'iy intellekt yordamida: AI chatbotidan \"anchoring va loss aversion orasidagi farqni oddiy misol bilan tushuntir\" deb so'rash — tushunchalarni mustahkamlashning tezkor usuli.",
+              en:"In practice: these additional biases also belong to the behavioral-economics field Robert Cialdini studied — hear the core principles in the official \"Science of Persuasion\" video (cited in chapter 2: youtube.com/watch?v=cFdCzN7RYbw), then look up the four additional ones from this chapter yourself. With AI: asking an AI chatbot to \"explain the difference between anchoring and loss aversion with a simple example\" is a quick way to reinforce these concepts."},
       ]},
     { uz:"Ichki tahdid (Insider Threat)", en:"Insider threats", subUz:"Hujumchi allaqachon ichkarida bo'lganda", subEn:"When the attacker is already inside",
       blocks:[
@@ -1731,6 +1749,8 @@ const SE_BOOK={
         {t:"h",n:"§",uz:"Himoya choralari",en:"Defensive measures"},
         {t:"p",uz:"Bu yerda ham 9-bobdagi **eng kam imtiyoz** tamoyili markaziy o'rin tutadi: hech bir xodim ishi uchun zarur bo'lmagan ma'lumotga kirish huquqiga ega bo'lmasligi kerak. Qo'shimcha: g'ayrioddiy xatti-harakatni kuzatish (odatdagidan ko'p ma'lumot yuklab olish), va **xavfsiz, jazosiz xabar berish kanali** — hamkasblar shubhali xatti-harakatni ko'rsa, qo'rqmasdan xabar bera olishi kerak.",
               en:"Here too, the **least privilege** principle from chapter 9 is central: no employee should have access to information unnecessary for their job. Additionally: monitoring for unusual behavior (downloading more data than normal), and a **safe, non-punitive reporting channel** — colleagues should be able to report suspicious behavior without fear."},
+        {t:"note",uz:"Amalda vosita: **UEBA (User & Entity Behavior Analytics)** tizimlari — sun'iy intellekt/mashinaviy o'rganish yordamida har bir xodimning \"odatiy\" xatti-harakat naqshini o'rganib, undan og'ishni (masalan tunda g'ayrioddiy ko'p fayl yuklab olish) avtomatik belgilaydi. Video: Kevin Mitnick'ning xavfsizlik xabardorligi treningida ichki tahdid mavzusi ham qamrab olinadi: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw.",
+              en:"A practical tool: **UEBA (User & Entity Behavior Analytics)** systems — using AI/machine learning to learn each employee's \"normal\" behavior pattern and automatically flag deviations (e.g. unusually large file downloads at night). Video: insider-threat topics are also covered in Kevin Mitnick's security awareness training: youtube.com/channel/UCcwpQQvcq-8fRFITzrKp8Hw."},
       ]},
     { uz:"SE hujumidan keyingi javob choralari", en:"Incident response after a successful SE attack", subUz:"Aldov muvaffaqiyatli bo'lganda nima qilish kerak", subEn:"What to do when the deception succeeds",
       blocks:[
