@@ -116,6 +116,14 @@ const LESSONS={
   34:{num:"L34",sec:3,uz:"tcpdump va Packet Crafting",en:"tcpdump & Packet Crafting",sub:"CLI ushlash, Scapy, hping3"},
   35:{num:"L35",sec:3,uz:"Pivoting va Tunneling",en:"Pivoting & Tunneling",sub:"SSH tunnel, proxychains, chisel"},
   36:{num:"L36",sec:3,uz:"IDS/Firewall Evazi",en:"IDS/Firewall Evasion",sub:"Fragmentatsiya, decoy, timing"},
+  37:{num:"L37",sec:4,uz:"ICMP",en:"ICMP",sub:"ping, traceroute va nazorat xabarlari"},
+  38:{num:"L38",sec:4,uz:"IPv6 chuqur",en:"IPv6 in depth",sub:"SLAAC, NDP, manzil turlari"},
+  39:{num:"L39",sec:4,uz:"Routing protokollari",en:"Routing Protocols",sub:"Static, OSPF, BGP"},
+  40:{num:"L40",sec:4,uz:"STP (Spanning Tree)",en:"STP (Spanning Tree)",sub:"L2 halqalarni oldini olish"},
+  41:{num:"L41",sec:4,uz:"QoS",en:"QoS",sub:"Trafik ustuvorligi va DSCP"},
+  42:{num:"L42",sec:4,uz:"SNMP va NTP",en:"SNMP & NTP",sub:"Monitoring va vaqt sinxronizatsiyasi"},
+  43:{num:"L43",sec:4,uz:"Email protokollari",en:"Email Protocols",sub:"SMTP, IMAP, POP3"},
+  44:{num:"L44",sec:4,uz:"Fayl protokollari",en:"File Protocols",sub:"FTP, SFTP, TFTP"},
 };
 
 const SECTIONS={
@@ -140,6 +148,13 @@ const SECTIONS={
      outcomesUz:["Nmap bilan portlarni va tarmoq elementlarini skanerlash","ARP spoofing va MITM hujumlarini tushuntirish va aniqlash","DNS spoofing va DoS/DDoS hujumlaridan himoyalanish","Wireshark bilan tarmoq sud-tibbiyoti tahlilini bajarish"],
      outcomesEn:["Scan ports and network elements with Nmap","Explain and detect ARP spoofing and MITM attacks","Defend against DNS spoofing and DoS/DDoS attacks","Perform network forensics analysis with Wireshark"],
      tooling:["Nmap","Wireshark","Ettercap","hping3","Aircrack-ng"]},
+  4:{num:"04",uz:"Ilg'or Protokollar",en:"Advanced Protocols",color:"var(--c-warn)",icon:"layers",count:8,
+     descUz:"ICMP, IPv6, routing protokollari (OSPF/BGP), STP, QoS va infratuzilma protokollarini chuqur o'rganing.",
+     descEn:"Go deep on ICMP, IPv6, routing protocols (OSPF/BGP), STP, QoS and infrastructure protocols.",
+     instructorUz:"Dilnoza Karimova — Network Security Architect",instructorEn:"CCNP Security, CompTIA Network+/Security+",
+     outcomesUz:["ICMP va IPv6 ning ishlash mexanizmini tushuntirish","OSPF va BGP routing protokollarini farqlash","STP va QoS ni amalda qo'llash","SNMP, NTP va email/fayl protokollarini bilish"],
+     outcomesEn:["Explain how ICMP and IPv6 work","Distinguish OSPF and BGP routing protocols","Apply STP and QoS in practice","Know SNMP, NTP and email/file protocols"],
+     tooling:["ping","traceroute","tcpdump","snmpwalk","iproute2"]},
 };
 
 // ── Gamification data (badges / skill tree / lesson icons) ─────
@@ -2389,6 +2404,14 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
     num===34?React.createElement(LessonL34):
     num===35?React.createElement(LessonL35):
     num===36?React.createElement(LessonL36):
+    num===37?React.createElement(LessonL37):
+    num===38?React.createElement(LessonL38):
+    num===39?React.createElement(LessonL39):
+    num===40?React.createElement(LessonL40):
+    num===41?React.createElement(LessonL41):
+    num===42?React.createElement(LessonL42):
+    num===43?React.createElement(LessonL43):
+    num===44?React.createElement(LessonL44):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
@@ -2403,7 +2426,7 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
       React.createElement("div",{style:{fontSize:12,color:"var(--text-2)"}},lesson.sub)
     ),
     content,
-    !alreadyDone&&!done&&num<=36&&React.createElement("button",{
+    !alreadyDone&&!done&&num<=44&&React.createElement("button",{
       onClick:()=>{markComplete&&markComplete(lessonKey);setDone(true);},
       style:{marginTop:24,padding:"12px 28px",borderRadius:10,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,boxShadow:"0 0 20px var(--accent-glow)"}
     },t(lang,"Darsni yakunlash ✓","Complete Lesson ✓")),
@@ -3432,6 +3455,151 @@ function LessonL36(){
     React.createElement(Terminal,null,"✓ To'liq paket qayta yig'uvchi IDS (fragmentatsiyani birlashtiradi)\n✓ Anomaliya-asosli aniqlash (faqat imzo emas)\n✓ Chegara/tezlik asosidagi ogohlantirish (sekin skanni ushlaydi)\n✓ Chuqurlashtirilgan himoya — bitta qatlamga ishonmaslik"),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Evazi vositalari faqat o'z tizimingizda yoki yozma ruxsat berilgan test doirasida ishlatiladi.","Evasion tools are used only on your own systems or within a written-authorized test scope.")),
     React.createElement(Quiz,{q:{uz:"«nmap -f» (fragmentatsiya) qanday ishlaydi?",en:"How does «nmap -f» (fragmentation) work?"},opts:[{uz:"Paketni mayda bo'laklarga bo'lib, imzo-asosli IDS ni chalg'itadi",en:"Splits packets into small fragments to confuse signature-based IDS"},{uz:"Parolni buzadi",en:"Cracks the password"},{uz:"Firewall ni o'chiradi",en:"Turns off the firewall"},{uz:"Tezlikni oshiradi",en:"Increases speed"}],correct:0,exp:{uz:"Fragmentatsiya paketni bo'laklarga bo'ladi — imzo faqat to'liq paketni qidiradigan IDS uni o'tkazib yuborishi mumkin. To'liq qayta yig'uvchi IDS bunga chidamli.",en:"Fragmentation splits a packet into pieces — an IDS whose signature looks only for a whole packet may miss it. A fully reassembling IDS resists this."}}));
+}
+function LessonL37(){
+  const lang=useLang();
+  const ty=[{n:"8/0",name:t(lang,"Echo Request/Reply","Echo Request/Reply"),color:"#4dabf7",desc:{uz:"ping aynan shu — «tirikmisan?» va javob.",en:"This is exactly ping — «are you alive?» and the reply."}},{n:"11",name:t(lang,"TTL Exceeded","TTL Exceeded"),color:"#69db7c",desc:{uz:"TTL tugadi — traceroute aynan shundan foydalanadi.",en:"TTL expired — traceroute relies on this."}},{n:"3",name:t(lang,"Destination Unreachable","Destination Unreachable"),color:"#ff6b6b",desc:{uz:"Manzil/port yetib bo'lmaydi — xato xabari.",en:"Host/port unreachable — an error message."}},{n:"5",name:t(lang,"Redirect","Redirect"),color:"#a855f7",desc:{uz:"«Yaxshiroq yo'l bor» — ba'zan suiiste'mol qilinadi.",en:"«There's a better route» — sometimes abused."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"ICMP nima?","What is ICMP?")),
+    React.createElement(P,null,t(lang,"ICMP — IP ning «xabar va nazorat» protokoli. U ma'lumot tashimaydi, balki tarmoq holati haqida xabar beradi: xato, yetib bo'lmaslik, vaqt tugashi. Har kuni ishlatadigan ping va traceroute aynan ICMP ustida qurilgan.","ICMP is IP's «messaging and control» protocol. It carries no data — it reports network status: errors, unreachability, timeouts. The ping and traceroute you use daily are built directly on ICMP.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy xabar turlari","Key message types")),
+    React.createElement(LayerStack,{layers:ty}),
+    React.createElement(H2,{num:"§3"},t(lang,"traceroute qanday ishlaydi","How traceroute works")),
+    React.createElement(FlowSteps,{color:"#4dabf7",title:{uz:"TTL bilan yo'lni ochish",en:"Mapping the path with TTL"},steps:[
+      {icon:"1️⃣",text:{uz:"TTL=1 bilan paket — 1-router uni tashlab, «TTL Exceeded» qaytaradi",en:"Packet with TTL=1 — the 1st router drops it and returns «TTL Exceeded»"}},
+      {icon:"2️⃣",text:{uz:"TTL=2 — 2-router javob beradi, va hokazo",en:"TTL=2 — the 2nd router replies, and so on"}},
+      {icon:"🗺️",text:{uz:"Har javobdan yo'ldagi routerlar ro'yxati tuziladi",en:"Each reply builds the list of routers along the path"}},
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"ping -c 3 8.8.8.8\n# 64 bytes from 8.8.8.8: icmp_seq=1 ttl=118 time=12.4 ms\ntraceroute 8.8.8.8\n#  1  192.168.1.1   1.2 ms\n#  2  10.20.0.1     8.7 ms   <- har router bitta 'hop'"),
+    React.createElement(H2,{num:"§5"},t(lang,"Xavfsizlik","Security")),
+    React.createElement(P,null,t(lang,"ICMP suiiste'mol qilinishi mumkin: ICMP flood (DoS), Smurf hujumi, va ICMP tunneling orqali ma'lumot o'g'irlash. Lekin ICMP ni butunlay bloklash yomon — u Path MTU aniqlash uchun zarur. To'g'ri yechim: tezlikni cheklash (rate-limit), butun bloklash emas.","ICMP can be abused: ICMP flood (DoS), the Smurf attack, and data exfiltration via ICMP tunneling. But fully blocking ICMP is bad — it's needed for Path MTU discovery. The right answer: rate-limit it, don't block it entirely.")),
+    React.createElement(Quiz,{q:{uz:"traceroute yo'ldagi routerlarni qanday aniqlaydi?",en:"How does traceroute discover routers along the path?"},opts:[{uz:"TTL ni bosqichma-bosqich oshirib, «TTL Exceeded» javoblaridan",en:"By incrementing TTL step by step, from «TTL Exceeded» replies"},{uz:"DNS so'rovlari bilan",en:"With DNS queries"},{uz:"Parolni buzib",en:"By cracking a password"},{uz:"ARP bilan",en:"With ARP"}],correct:0,exp:{uz:"Har paketda TTL bittaga oshiriladi — navbatdagi router uni tashlab «TTL Exceeded» qaytaradi, shu bilan yo'l qadamma-qadam ochiladi.",en:"Each packet's TTL is incremented by one — the next router drops it and returns «TTL Exceeded», mapping the path hop by hop."}}));
+}
+function LessonL38(){
+  const lang=useLang();
+  const ad=[{n:"fe80::",name:t(lang,"Link-local","Link-local"),color:"#69db7c",desc:{uz:"Faqat bitta segmentda — har interfeysda avtomatik bor.",en:"On one segment only — auto-present on every interface."}},{n:"2000::/3",name:t(lang,"Global unicast","Global unicast"),color:"#4dabf7",desc:{uz:"Internetga ochiq — IPv4 dagi ommaviy IP ekvivalenti.",en:"Internet-routable — the equivalent of a public IPv4."}},{n:"fc00::/7",name:t(lang,"ULA (xususiy)","ULA (private)"),color:"#a855f7",desc:{uz:"Ichki tarmoq — IPv4 dagi 192.168 ekvivalenti.",en:"Internal network — the 192.168 equivalent."}},{n:"ff00::/8",name:t(lang,"Multicast","Multicast"),color:"#ffd43b",desc:{uz:"Ko'pchilikka — IPv6 da broadcast o'rnini bosadi.",en:"To a group — replaces broadcast in IPv6."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Nega IPv6?","Why IPv6?")),
+    React.createElement(P,null,t(lang,"3-darsdagi IPv4 (32-bit, ~4.3 mlrd manzil) tugadi. IPv6 128-bit ishlatadi — deyarli cheksiz manzil. Lekin u shunchaki «uzunroq IP» emas: manzillar avtomatik beriladi, NAT (10-dars) kerak emas, va ARP (6-dars) o'rnini NDP bosadi.","IPv4 from lesson 3 (32-bit, ~4.3 billion addresses) ran out. IPv6 uses 128-bit — nearly unlimited addresses. But it isn't just «a longer IP»: addresses are auto-assigned, NAT (lesson 10) isn't needed, and NDP replaces ARP (lesson 6).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Manzil turlari","Address types")),
+    React.createElement(LayerStack,{layers:ad}),
+    React.createElement(H2,{num:"§3"},t(lang,"SLAAC va NDP","SLAAC and NDP")),
+    React.createElement(P,null,t(lang,"SLAAC (Stateless Address Autoconfiguration) — qurilma DHCP siz o'ziga manzil yaratadi. NDP (Neighbor Discovery Protocol) esa ARP ning IPv6 versiyasi: NS (so'rov) va NA (javob) xabarlari bilan qo'shni MAC manzilini topadi va router (RA) e'lonlarini tinglaydi.","SLAAC (Stateless Address Autoconfiguration) — a device creates its own address without DHCP. NDP (Neighbor Discovery Protocol) is the IPv6 version of ARP: it finds a neighbor's MAC via NS (query) and NA (answer) messages and listens for router advertisements (RA).")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"ip -6 addr show\n#  inet6 fe80::a2b:cdff:fe12:3456/64 scope link\n#  inet6 2001:db8::5/64 scope global\nping6 2001:4860:4860::8888   # Google DNS (IPv6)"),
+    React.createElement(H2,{num:"§5"},t(lang,"Xavfsizlik eslatmasi","A security note")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"IPv6 da NAT yo'q — har qurilma global manzilga ega bo'lishi mumkin, ya'ni to'g'ridan-to'g'ri internetdan yetib bo'ladi. Firewall qoidalari IPv6 uchun ham alohida yozilishi shart (58-darsda chuqurroq).","In IPv6 there's no NAT — every device can have a global address, i.e. be directly reachable from the internet. Firewall rules must be written for IPv6 separately too (covered deeper in lesson 58).")),
+    React.createElement(Quiz,{q:{uz:"IPv6 da ARP (6-dars) o'rnini nima bosadi?",en:"What replaces ARP (lesson 6) in IPv6?"},opts:[{uz:"NDP (Neighbor Discovery Protocol)",en:"NDP (Neighbor Discovery Protocol)"},{uz:"DNS",en:"DNS"},{uz:"DHCP",en:"DHCP"},{uz:"NAT",en:"NAT"}],correct:0,exp:{uz:"NDP — IPv6 ning qo'shni aniqlash protokoli. U NS/NA xabarlari bilan MAC manzilni topadi, xuddi ARP kabi, lekin ICMPv6 ustida.",en:"NDP is IPv6's neighbor discovery protocol. It finds MAC addresses via NS/NA messages, like ARP, but over ICMPv6."}}));
+}
+function LessonL39(){
+  const lang=useLang();
+  const rp=[{n:"static",name:t(lang,"Statik marshrut","Static route"),color:"#69db7c",desc:{uz:"Qo'lda yozilgan — kichik, o'zgarmas tarmoqlar uchun.",en:"Hand-written — for small, unchanging networks."}},{n:"RIP",name:t(lang,"RIP (distance-vector)","RIP (distance-vector)"),color:"#ffd43b",desc:{uz:"Hop soni bilan — sodda, lekin eski va sekin.",en:"By hop count — simple, but old and slow."}},{n:"OSPF",name:t(lang,"OSPF (link-state)","OSPF (link-state)"),color:"#4dabf7",desc:{uz:"Butun tarmoq xaritasi + eng qisqa yo'l — ichki tarmoqlar standarti.",en:"Full network map + shortest path — the internal-network standard."}},{n:"BGP",name:t(lang,"BGP (path-vector)","BGP (path-vector)"),color:"#ff6b6b",desc:{uz:"Internetning «magistral» protokoli — ISP lar orasida.",en:"The internet's «backbone» protocol — between ISPs."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Static va dynamic routing","Static and dynamic routing")),
+    React.createElement(P,null,t(lang,"8-dars routing asoslarini ko'rsatdi. Bu yerda chuqurroq: routerlar yo'lni QANDAY o'rganadi? Statik — administrator qo'lda yozadi. Dinamik — routerlar bir-biri bilan «gaplashib», yo'llarni avtomatik o'rganadi va tarmoq o'zgarganda moslashadi.","Lesson 8 covered routing basics. Here's the depth: HOW do routers learn paths? Static — an admin writes them by hand. Dynamic — routers «talk» to each other, learn routes automatically, and adapt when the network changes.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy protokollar","The main protocols")),
+    React.createElement(LayerStack,{layers:rp}),
+    React.createElement(H2,{num:"§3"},t(lang,"OSPF qanday yo'l topadi","How OSPF finds a path")),
+    React.createElement(FlowSteps,{color:"#4dabf7",title:{uz:"OSPF ish jarayoni",en:"The OSPF process"},steps:[
+      {icon:"🤝",text:{uz:"Qo'shni routerlarni topish (Hello paketlari)",en:"Discover neighbor routers (Hello packets)"}},
+      {icon:"🗺️",text:{uz:"Butun tarmoq xaritasini almashish (LSA)",en:"Exchange the full network map (LSA)"}},
+      {icon:"🧮",text:{uz:"Eng qisqa yo'lni hisoblash (Dijkstra/SPF)",en:"Compute the shortest path (Dijkstra/SPF)"}},
+      {icon:"✅",text:{uz:"Marshrut jadvaliga eng yaxshi yo'lni yozish",en:"Install the best route in the routing table"}},
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"ip route          # marshrut jadvalini ko'rish\n# default via 192.168.1.1 dev eth0\n# 10.0.0.0/8 via 192.168.1.2 dev eth0\n# (routerda) show ip ospf neighbor  <- OSPF qo'shnilarini ko'rish"),
+    React.createElement(H2,{num:"§5"},t(lang,"Nega BGP alohida","Why BGP is special")),
+    React.createElement(P,null,t(lang,"BGP — butun internetni ushlab turadigan protokol: u ISP lar (avtonom tizimlar) orasida qaysi yo'l orqali borishni kelishadi. Uning noto'g'ri sozlanishi butun mintaqani internetsiz qoldirishi mumkin — shuning uchun BGP xavfsizligi (masalan RPKI) juda muhim.","BGP is the protocol holding the whole internet together: it negotiates, between ISPs (autonomous systems), which path to take. A BGP misconfiguration can knock an entire region offline — which is why BGP security (e.g. RPKI) matters so much.")),
+    React.createElement(Quiz,{q:{uz:"Internetning «magistral» (backbone) routing protokoli qaysi?",en:"Which is the internet's «backbone» routing protocol?"},opts:[{uz:"BGP",en:"BGP"},{uz:"RIP",en:"RIP"},{uz:"ARP",en:"ARP"},{uz:"DHCP",en:"DHCP"}],correct:0,exp:{uz:"BGP avtonom tizimlar (ISP lar) orasida yo'llarni kelishadi — bu internetning global «magistral» routingi. OSPF esa ichki (bitta tashkilot) tarmoqlar uchun.",en:"BGP negotiates routes between autonomous systems (ISPs) — the internet's global backbone routing. OSPF is for internal (single-organization) networks."}}));
+}
+function LessonL40(){
+  const lang=useLang();
+  const st=[{n:"BLK",name:t(lang,"Blocking","Blocking"),color:"#ff6b6b",desc:{uz:"Halqani oldini olish uchun port bloklangan.",en:"Port blocked to prevent a loop."}},{n:"LRN",name:t(lang,"Learning","Learning"),color:"#ffd43b",desc:{uz:"MAC jadvalini o'rganmoqda, hali uzatmaydi.",en:"Learning the MAC table, not yet forwarding."}},{n:"FWD",name:t(lang,"Forwarding","Forwarding"),color:"#69db7c",desc:{uz:"Faol — trafikni uzatadi.",en:"Active — forwards traffic."}},{n:"RSTP",name:t(lang,"RSTP (tez)","RSTP (fast)"),color:"#4dabf7",desc:{uz:"Zamonaviy, tezroq versiya (sekundlar emas, millisekundlar).",en:"The modern, faster version (milliseconds, not seconds)."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"STP nima uchun kerak?","Why is STP needed?")),
+    React.createElement(P,null,t(lang,"Switchlar (9-dars) ishonchlilik uchun ko'pincha ortiqcha (redundant) kabellar bilan ulanadi. Lekin bu halqa (loop) hosil qiladi — broadcast paket cheksiz aylanib, tarmoqni «broadcast bo'roni» bilan o'ldiradi. STP (Spanning Tree Protocol) aynan shu halqalarni topib, ortiqcha yo'llarni bloklaydi.","Switches (lesson 9) are often connected with redundant cables for reliability. But that creates a loop — a broadcast packet circles forever, killing the network with a «broadcast storm». STP (Spanning Tree Protocol) finds these loops and blocks the redundant paths.")),
+    React.createElement(H2,{num:"§2"},t(lang,"STP qanday daraxt quradi","How STP builds a tree")),
+    React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"Halqasiz daraxt qurish",en:"Building a loop-free tree"},steps:[
+      {icon:"👑",text:{uz:"«Root bridge» (asosiy switch) saylanadi",en:"A «root bridge» (main switch) is elected"}},
+      {icon:"📏",text:{uz:"Har switch root ga eng qisqa yo'lni hisoblaydi",en:"Each switch computes its shortest path to the root"}},
+      {icon:"🚧",text:{uz:"Ortiqcha portlar BLOKLANADI (halqa yo'q)",en:"Redundant ports are BLOCKED (no loop)"}},
+      {icon:"🌳",text:{uz:"Natija: halqasiz «daraxt» — bitta faol yo'l",en:"Result: a loop-free «tree» — one active path"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Port holatlari","Port states")),
+    React.createElement(LayerStack,{layers:st}),
+    React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlik","Security")),
+    React.createElement(Terminal,null,"# Rogue switch o'zini root qilib, trafikni tortib olishi mumkin.\n# Himoya (Cisco):\n#  spanning-tree bpduguard enable   <- oxirgi portlarda BPDU ni rad et\n#  spanning-tree guard root          <- root ni himoyalash"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Hujumchi soxta «past» root ID bilan o'zini root bridge qilib ko'rsatib, trafikni o'zi orqali o'tkazishi mumkin. BPDU Guard va Root Guard buni to'xtatadi.","An attacker can pose as the root bridge with a forged «low» root ID to route traffic through themselves. BPDU Guard and Root Guard stop this.")),
+    React.createElement(Quiz,{q:{uz:"STP asosan qanday muammoni hal qiladi?",en:"What problem does STP primarily solve?"},opts:[{uz:"L2 halqa va broadcast bo'ronini oldini oladi",en:"Prevents L2 loops and broadcast storms"},{uz:"Parolni shifrlaydi",en:"Encrypts passwords"},{uz:"IP tarqatadi",en:"Hands out IPs"},{uz:"DNS ni tezlashtiradi",en:"Speeds up DNS"}],correct:0,exp:{uz:"Ortiqcha switch ulanishlari halqa hosil qiladi — broadcast cheksiz aylanadi. STP ortiqcha portlarni bloklab, halqasiz daraxt quradi.",en:"Redundant switch links create loops — broadcasts circle forever. STP blocks redundant ports to build a loop-free tree."}}));
+}
+function LessonL41(){
+  const lang=useLang();
+  const q=[{n:"mark",name:t(lang,"Classification/DSCP","Classification/DSCP"),color:"#4dabf7",desc:{uz:"Paketga «muhimlik» belgisi (DSCP) qo'yiladi.",en:"A packet is tagged with a «priority» mark (DSCP)."}},{n:"queue",name:t(lang,"Queuing","Queuing"),color:"#69db7c",desc:{uz:"Muhim trafik alohida, tezroq navbatga qo'yiladi.",en:"Important traffic goes into a separate, faster queue."}},{n:"shape",name:t(lang,"Policing/Shaping","Policing/Shaping"),color:"#ffd43b",desc:{uz:"Trafik tezligi cheklanadi yoki silliqlanadi.",en:"Traffic rate is limited or smoothed."}},{n:"prio",name:t(lang,"Priority","Priority"),color:"#ff6b6b",desc:{uz:"Real-vaqt (VoIP) hamma narsadan oldin o'tadi.",en:"Real-time (VoIP) goes ahead of everything."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"QoS nima?","What is QoS?")),
+    React.createElement(P,null,t(lang,"Barcha trafik teng emas. Fayl yuklab olish bir soniya kechiksa — muammo yo'q. Lekin VoIP qo'ng'iroq yoki video 100 millisekund kechiksa — ovoz uziladi. QoS (Quality of Service) muhim, kechikishga sezgir trafikni ustuvorlashtiradi.","Not all traffic is equal. A file download delayed by a second — no problem. But a VoIP call or video delayed by 100 milliseconds — the audio breaks up. QoS (Quality of Service) prioritizes important, delay-sensitive traffic.")),
+    React.createElement(H2,{num:"§2"},t(lang,"QoS mexanizmlari","QoS mechanisms")),
+    React.createElement(LayerStack,{layers:q}),
+    React.createElement(H2,{num:"§3"},t(lang,"Uch dushman: kechikish, jitter, yo'qotish","Three enemies: latency, jitter, loss")),
+    React.createElement(P,null,t(lang,"Real-vaqt trafik uchun uch narsa muhim: **kechikish (latency)** — paket qancha vaqtda yetadi; **jitter** — kechikishning bir tekis emasligi; **paket yo'qotish (loss)** — yetib bormagan paketlar. QoS bularning uchalasini ham muhim trafik uchun kamaytiradi.","For real-time traffic, three things matter: **latency** — how long a packet takes; **jitter** — variation in that delay; **packet loss** — packets that don't arrive. QoS reduces all three for priority traffic.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot (Linux tc)","Practice (Linux tc)")),
+    React.createElement(Terminal,null,"# tc — Linux trafik nazorati\ntc qdisc add dev eth0 root handle 1: htb\n# DSCP EF (46) = Expedited Forwarding — VoIP uchun eng yuqori ustuvorlik\n# marshrutlar bo'ylab har router bu belgini hurmat qiladi"),
+    React.createElement(Quiz,{q:{uz:"QoS qaysi turdagi trafik uchun eng muhim?",en:"For which kind of traffic does QoS matter most?"},opts:[{uz:"Real-vaqt (VoIP, video qo'ng'iroq)",en:"Real-time (VoIP, video calls)"},{uz:"Fayl zaxira nusxasi",en:"File backups"},{uz:"Email",en:"Email"},{uz:"Dastur yangilanishi",en:"Software updates"}],correct:0,exp:{uz:"VoIP va video real-vaqt — kechikish va jitterga o'ta sezgir. Fayl/email/yangilanish esa bir oz kechiksa ham sezilmaydi.",en:"VoIP and video are real-time — extremely sensitive to latency and jitter. Files/email/updates tolerate small delays unnoticed."}}));
+}
+function LessonL42(){
+  const lang=useLang();
+  const p=[{n:"GET",name:t(lang,"SNMP GET/SET","SNMP GET/SET"),color:"#4dabf7",desc:{uz:"Qurilma holatini o'qish/o'zgartirish (interfeys, yuk, xato).",en:"Read/change device state (interface, load, errors)."}},{n:"TRAP",name:t(lang,"SNMP TRAP","SNMP TRAP"),color:"#ff6b6b",desc:{uz:"Qurilma o'zi ogohlantiradi: «port o'chdi!»",en:"The device alerts on its own: «port down!»"}},{n:"v3",name:t(lang,"SNMPv3","SNMPv3"),color:"#69db7c",desc:{uz:"Shifrlangan va autentifikatsiyalangan versiya (v1/v2 emas).",en:"The encrypted, authenticated version (not v1/v2)."}},{n:"NTP",name:t(lang,"NTP","NTP"),color:"#ffd43b",desc:{uz:"Vaqtni sinxronlash — loglar va Kerberos uchun kritik.",en:"Time sync — critical for logs and Kerberos."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Ikki infratuzilma protokoli","Two infrastructure protocols")),
+    React.createElement(P,null,t(lang,"SNMP va NTP — «ko'rinmas», lekin tarmoqni ushlab turadigan protokollar. SNMP (Simple Network Management Protocol) qurilmalarni MONITORING qiladi. NTP (Network Time Protocol) barcha qurilmalar soatini SINXRONLAYDI — bu loglarni solishtirish va Kerberos (Parollar kitobi) uchun juda muhim.","SNMP and NTP are «invisible» but essential protocols. SNMP (Simple Network Management Protocol) MONITORS devices. NTP (Network Time Protocol) SYNCHRONIZES every device's clock — vital for correlating logs and for Kerberos (Passwords book).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy elementlar","Key elements")),
+    React.createElement(LayerStack,{layers:p}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"snmpwalk -v3 -l authPriv -u admin 10.0.0.1\n# IF-MIB::ifOperStatus.1 = up\n# IF-MIB::ifInErrors.1 = 0\nntpq -p     # NTP sinxronizatsiya holati (stratum, offset)"),
+    React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlik","Security")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"SNMP v1/v2 ochiq «community string» (ko'pincha standart «public») bilan ishlaydi — bu butun tarmoq holatini oshkor qiladi. Doim SNMPv3 (shifrlangan) ishlating. NTP esa amplifikatsiya DDoS (27-dars) uchun suiiste'mol qilinishi mumkin.","SNMP v1/v2 use a cleartext «community string» (often the default «public») — exposing the whole network's state. Always use SNMPv3 (encrypted). NTP, in turn, can be abused for amplification DDoS (lesson 27).")),
+    React.createElement(Quiz,{q:{uz:"SNMP v1/v2 dagi asosiy zaiflik nima?",en:"What is the main weakness in SNMP v1/v2?"},opts:[{uz:"Ochiq «community string» (masalan «public»)",en:"A cleartext «community string» (e.g. «public»)"},{uz:"Juda tez ishlaydi",en:"It runs too fast"},{uz:"IPv6 ni qo'llamaydi",en:"It doesn't support IPv6"},{uz:"Faqat Windows da",en:"Windows only"}],correct:0,exp:{uz:"SNMP v1/v2 autentifikatsiyani ochiq «community string» bilan qiladi — u tarmoqda tinglanishi mumkin. SNMPv3 shifrlash va autentifikatsiya qo'shadi.",en:"SNMP v1/v2 authenticate with a cleartext «community string» that can be sniffed on the network. SNMPv3 adds encryption and authentication."}}));
+}
+function LessonL43(){
+  const lang=useLang();
+  const p=[{n:"25/587",name:t(lang,"SMTP (yuborish)","SMTP (send)"),color:"#4dabf7",desc:{uz:"Xatni jo'natish va serverlar orasida uzatish.",en:"Sending mail and relaying between servers."}},{n:"143/993",name:t(lang,"IMAP","IMAP"),color:"#69db7c",desc:{uz:"Xatni serverda saqlab, bir necha qurilmada o'qish.",en:"Keep mail on the server, read on several devices."}},{n:"110/995",name:t(lang,"POP3","POP3"),color:"#a855f7",desc:{uz:"Xatni yuklab olib, serverdan o'chirish (eski uslub).",en:"Download mail and delete from server (older style)."}},{n:"TLS",name:t(lang,"STARTTLS","STARTTLS"),color:"#ffd43b",desc:{uz:"Ulanishni shifrlashga o'tkazish (15-dars).",en:"Upgrade the connection to encryption (lesson 15)."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Email qanday ishlaydi","How email works")),
+    React.createElement(P,null,t(lang,"Email ikki bosqichdan iborat: YUBORISH (SMTP) va OLISH (IMAP yoki POP3). Xatingizni SMTP jo'natadi va serverlar orasida uzatadi; keyin qabul qiluvchi IMAP/POP3 orqali uni oladi. Har biri o'z porti va shifrlangan variantiga ega.","Email has two stages: SENDING (SMTP) and RETRIEVING (IMAP or POP3). SMTP sends your message and relays it between servers; then the recipient retrieves it via IMAP/POP3. Each has its own port and an encrypted variant.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Protokollar va portlar","Protocols and ports")),
+    React.createElement(LayerStack,{layers:p}),
+    React.createElement(H2,{num:"§3"},t(lang,"Xat yo'li","The mail path")),
+    React.createElement(FlowSteps,{color:"#4dabf7",title:{uz:"Xat qanday yetib boradi",en:"How mail is delivered"},steps:[
+      {icon:"✉️",text:{uz:"Jo'natuvchi mijoz -> o'z SMTP serveriga",en:"Sender's client -> their SMTP server"}},
+      {icon:"🌐",text:{uz:"SMTP -> qabul qiluvchi domenning MX serveriga",en:"SMTP -> the recipient domain's MX server"}},
+      {icon:"📥",text:{uz:"Qabul qiluvchi IMAP/POP3 orqali oladi",en:"Recipient retrieves via IMAP/POP3"}},
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlik","Security")),
+    React.createElement(P,null,t(lang,"Email autentifikatsiyasi — SPF, DKIM, DMARC (Ijtimoiy injeneriya kitobida chuqur) soxta jo'natuvchini aniqlaydi. «Open relay» (hammaga xat uzatadigan server) spam uchun suiiste'mol qilinadi. Va har doim STARTTLS/TLS ishlating — aks holda parol va xat ochiq uzatiladi.","Email authentication — SPF, DKIM, DMARC (deep in the Social Engineering book) — detects a forged sender. An «open relay» (a server that relays mail for anyone) is abused for spam. And always use STARTTLS/TLS — otherwise the password and message travel in cleartext.")),
+    React.createElement(Quiz,{q:{uz:"Email YUBORISH uchun qaysi protokol ishlatiladi?",en:"Which protocol is used to SEND email?"},opts:[{uz:"SMTP",en:"SMTP"},{uz:"IMAP",en:"IMAP"},{uz:"POP3",en:"POP3"},{uz:"DNS",en:"DNS"}],correct:0,exp:{uz:"SMTP xatni jo'natadi va serverlar orasida uzatadi. IMAP va POP3 esa xatni OLISH (qabul qilish) uchun.",en:"SMTP sends mail and relays it between servers. IMAP and POP3 are for RETRIEVING (receiving) mail."}}));
+}
+function LessonL44(){
+  const lang=useLang();
+  const p=[{n:"21",name:t(lang,"FTP (ochiq!)","FTP (cleartext!)"),color:"#ff6b6b",desc:{uz:"Parol va fayl OCHIQ MATNDA — Wireshark bilan ko'rinadi (28-dars).",en:"Password and file in CLEARTEXT — visible in Wireshark (lesson 28)."}},{n:"22",name:t(lang,"SFTP (SSH)","SFTP (SSH)"),color:"#69db7c",desc:{uz:"SSH ustida — to'liq shifrlangan. Tavsiya etiladi.",en:"Over SSH — fully encrypted. Recommended."}},{n:"TLS",name:t(lang,"FTPS","FTPS"),color:"#4dabf7",desc:{uz:"FTP + TLS — shifrlangan, lekin SFTP dan farqli.",en:"FTP + TLS — encrypted, but different from SFTP."}},{n:"69",name:t(lang,"TFTP","TFTP"),color:"#ffd43b",desc:{uz:"Autentifikatsiyasiz, sodda — faqat ishonchli LAN da.",en:"No authentication, minimal — only on a trusted LAN."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Fayl uzatish protokollari","File transfer protocols")),
+    React.createElement(P,null,t(lang,"Fayllarni tarmoq orqali uzatishning bir necha usuli bor — va ular xavfsizlik bo'yicha tubdan farq qiladi. Farqni bilish muhim: ba'zilari parolni OCHIQ yuboradi, boshqalari to'liq shifrlangan.","There are several ways to transfer files over a network — and they differ fundamentally in security. Knowing the difference matters: some send the password in CLEARTEXT, others are fully encrypted.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Protokollar taqqoslash","Protocol comparison")),
+    React.createElement(LayerStack,{layers:p}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# XAVFSIZ: SFTP (SSH ustida)\nsftp user@10.0.0.5\n# sftp> put report.pdf\n\n# XAVFSIZ EMAS: FTP — parol tarmoqda ochiq ko'rinadi\n# tcpdump -i eth0 -A 'tcp port 21'  <- USER/PASS ochiq!"),
+    React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlik","Security")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"FTP parol va ma'lumotni ochiq matnda yuboradi — bir xil tarmoqdagi har kim uni Wireshark (28-dars) yoki tcpdump (34-dars) bilan o'qiy oladi. Zamonaviy tizimlarda FTP o'rniga SFTP ni ishlating.","FTP sends the password and data in cleartext — anyone on the same network can read it with Wireshark (lesson 28) or tcpdump (lesson 34). On modern systems, use SFTP instead of FTP.")),
+    React.createElement(Quiz,{q:{uz:"Qaysi fayl protokoli parolni OCHIQ MATNDA yuboradi?",en:"Which file protocol sends the password in CLEARTEXT?"},opts:[{uz:"FTP",en:"FTP"},{uz:"SFTP",en:"SFTP"},{uz:"FTPS",en:"FTPS"},{uz:"HTTPS",en:"HTTPS"}],correct:0,exp:{uz:"Oddiy FTP (21-port) autentifikatsiya va ma'lumotni shifrlamasdan yuboradi. SFTP (SSH) va FTPS (TLS) esa shifrlaydi.",en:"Plain FTP (port 21) sends authentication and data without encryption. SFTP (SSH) and FTPS (TLS) encrypt it."}}));
 }
 const root=ReactDOM.createRoot(document.getElementById("app"));
 root.render(React.createElement(App));
