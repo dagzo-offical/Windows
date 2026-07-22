@@ -124,6 +124,13 @@ const LESSONS={
   42:{num:"L42",sec:4,uz:"SNMP va NTP",en:"SNMP & NTP",sub:"Monitoring va vaqt sinxronizatsiyasi"},
   43:{num:"L43",sec:4,uz:"Email protokollari",en:"Email Protocols",sub:"SMTP, IMAP, POP3"},
   44:{num:"L44",sec:4,uz:"Fayl protokollari",en:"File Protocols",sub:"FTP, SFTP, TFTP"},
+  45:{num:"L45",sec:5,uz:"WAF",en:"WAF",sub:"Veb-ilova xavfsizlik devori"},
+  46:{num:"L46",sec:5,uz:"SIEM va NetFlow",en:"SIEM & NetFlow",sub:"Loglarni yig'ish va korrelyatsiya"},
+  47:{num:"L47",sec:5,uz:"Tarmoq segmentatsiyasi",en:"Network Segmentation",sub:"Microsegmentation va zona"},
+  48:{num:"L48",sec:5,uz:"DNS xavfsizligi",en:"DNS Security",sub:"DNSSEC, DoH, DoT"},
+  49:{num:"L49",sec:5,uz:"IPsec va WireGuard",en:"IPsec & WireGuard",sub:"Zamonaviy VPN yechimlari chuqur"},
+  50:{num:"L50",sec:5,uz:"Honeypot va deception",en:"Honeypots & Deception",sub:"Hujumchini o'ljaga tortish"},
+  51:{num:"L51",sec:5,uz:"Bulut tarmoq xavfsizligi",en:"Cloud Network Security",sub:"VPC, Security Groups, NACL"},
 };
 
 const SECTIONS={
@@ -155,6 +162,13 @@ const SECTIONS={
      outcomesUz:["ICMP va IPv6 ning ishlash mexanizmini tushuntirish","OSPF va BGP routing protokollarini farqlash","STP va QoS ni amalda qo'llash","SNMP, NTP va email/fayl protokollarini bilish"],
      outcomesEn:["Explain how ICMP and IPv6 work","Distinguish OSPF and BGP routing protocols","Apply STP and QoS in practice","Know SNMP, NTP and email/file protocols"],
      tooling:["ping","traceroute","tcpdump","snmpwalk","iproute2"]},
+  5:{num:"05",uz:"Ilg'or Mudofaa",en:"Advanced Defense",color:"var(--accent)",icon:"eye",count:7,
+     descUz:"WAF, SIEM, tarmoq segmentatsiyasi, DNS xavfsizligi va bulut mudofaasi — blue-team ilg'or himoyasi.",
+     descEn:"WAF, SIEM, network segmentation, DNS security and cloud defense — advanced blue-team protection.",
+     instructorUz:"Dilnoza Karimova — Network Security Architect",instructorEn:"CCNP Security, CompTIA Network+/Security+",
+     outcomesUz:["WAF va SIEM ni himoya arxitekturasiga joylash","Tarmoqni segmentatsiya va microsegmentatsiya qilish","DNS ni DNSSEC va DoH/DoT bilan himoyalash","IPsec/WireGuard va bulut xavfsizligini sozlash"],
+     outcomesEn:["Place WAF and SIEM in a defense architecture","Segment and microsegment a network","Secure DNS with DNSSEC and DoH/DoT","Configure IPsec/WireGuard and cloud security"],
+     tooling:["ModSecurity","Splunk/ELK","WireGuard","pfSense","AWS/Azure"]},
 };
 
 // ── Gamification data (badges / skill tree / lesson icons) ─────
@@ -2412,6 +2426,13 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
     num===42?React.createElement(LessonL42):
     num===43?React.createElement(LessonL43):
     num===44?React.createElement(LessonL44):
+    num===45?React.createElement(LessonL45):
+    num===46?React.createElement(LessonL46):
+    num===47?React.createElement(LessonL47):
+    num===48?React.createElement(LessonL48):
+    num===49?React.createElement(LessonL49):
+    num===50?React.createElement(LessonL50):
+    num===51?React.createElement(LessonL51):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
@@ -2426,7 +2447,7 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
       React.createElement("div",{style:{fontSize:12,color:"var(--text-2)"}},lesson.sub)
     ),
     content,
-    !alreadyDone&&!done&&num<=44&&React.createElement("button",{
+    !alreadyDone&&!done&&num<=51&&React.createElement("button",{
       onClick:()=>{markComplete&&markComplete(lessonKey);setDone(true);},
       style:{marginTop:24,padding:"12px 28px",borderRadius:10,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,boxShadow:"0 0 20px var(--accent-glow)"}
     },t(lang,"Darsni yakunlash ✓","Complete Lesson ✓")),
@@ -3600,6 +3621,135 @@ function LessonL44(){
     React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlik","Security")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"FTP parol va ma'lumotni ochiq matnda yuboradi — bir xil tarmoqdagi har kim uni Wireshark (28-dars) yoki tcpdump (34-dars) bilan o'qiy oladi. Zamonaviy tizimlarda FTP o'rniga SFTP ni ishlating.","FTP sends the password and data in cleartext — anyone on the same network can read it with Wireshark (lesson 28) or tcpdump (lesson 34). On modern systems, use SFTP instead of FTP.")),
     React.createElement(Quiz,{q:{uz:"Qaysi fayl protokoli parolni OCHIQ MATNDA yuboradi?",en:"Which file protocol sends the password in CLEARTEXT?"},opts:[{uz:"FTP",en:"FTP"},{uz:"SFTP",en:"SFTP"},{uz:"FTPS",en:"FTPS"},{uz:"HTTPS",en:"HTTPS"}],correct:0,exp:{uz:"Oddiy FTP (21-port) autentifikatsiya va ma'lumotni shifrlamasdan yuboradi. SFTP (SSH) va FTPS (TLS) esa shifrlaydi.",en:"Plain FTP (port 21) sends authentication and data without encryption. SFTP (SSH) and FTPS (TLS) encrypt it."}}));
+}
+function LessonL45(){
+  const lang=useLang();
+  const w=[{n:"L7",name:t(lang,"Ilova qatlami","Application layer"),color:"#4dabf7",desc:{uz:"So'rov MAZMUNINI ko'radi — nafaqat port (13-dars firewall port ko'radi).",en:"Sees the request CONTENT — not just the port (lesson 13's firewall sees ports)."}},{n:"CRS",name:t(lang,"OWASP CRS","OWASP CRS"),color:"#69db7c",desc:{uz:"Tayyor qoidalar to'plami — SQLi, XSS va boshqa hujum naqshlari.",en:"A ready ruleset — SQLi, XSS and other attack patterns."}},{n:"rate",name:t(lang,"Rate limiting","Rate limiting"),color:"#ffd43b",desc:{uz:"Bir manbadan ortiqcha so'rovni cheklash — bot/brute-force.",en:"Throttling excess requests from one source — bot/brute-force."}},{n:"model",name:t(lang,"Positive/Negative","Positive/Negative model"),color:"#a855f7",desc:{uz:"Ruxsat ro'yxati (positive) yoki taqiq ro'yxati (negative).",en:"Allow-list (positive) or block-list (negative)."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"WAF nima?","What is a WAF?")),
+    React.createElement(P,null,t(lang,"Oddiy firewall (13-dars) 4-qatlamda ishlaydi — u faqat IP va portni ko'radi. Lekin veb hujumlari (SQLi, XSS — Web-Pentest moduli) toza ko'rinadigan 443-port orqali o'tadi. WAF (Web Application Firewall) 7-qatlamda ishlaydi — u HTTP so'rovning MAZMUNINI o'qib, zararli naqshlarni bloklaydi.","An ordinary firewall (lesson 13) works at Layer 4 — it only sees IP and port. But web attacks (SQLi, XSS — the Web-Pentest module) pass through the innocent-looking port 443. A WAF (Web Application Firewall) works at Layer 7 — it reads the CONTENT of the HTTP request and blocks malicious patterns.")),
+    React.createElement(H2,{num:"§2"},t(lang,"WAF elementlari","WAF elements")),
+    React.createElement(LayerStack,{layers:w}),
+    React.createElement(H2,{num:"§3"},t(lang,"So'rov qanday tekshiriladi","How a request is inspected")),
+    React.createElement(FlowSteps,{color:"#4dabf7",title:{uz:"WAF tekshiruvi",en:"WAF inspection"},steps:[
+      {icon:"📨",text:{uz:"HTTP so'rov keladi (masalan ?id=1' OR 1=1)",en:"An HTTP request arrives (e.g. ?id=1' OR 1=1)"}},
+      {icon:"🔍",text:{uz:"WAF payloadni naqsh/qoidalar bilan solishtiradi",en:"WAF compares the payload against patterns/rules"}},
+      {icon:"🚫",text:{uz:"Zararli bo'lsa — bloklash + log",en:"If malicious — block + log"}},
+      {icon:"✅",text:{uz:"Toza bo'lsa — serverga o'tkazish",en:"If clean — pass to the server"}},
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# ModSecurity + OWASP Core Rule Set (CRS)\nSecRuleEngine On\nInclude /etc/modsecurity/crs/*.conf\n# SQLi urinishi -> 403 Forbidden + audit log"),
+    React.createElement(InfoBox,{color:"var(--c-system)"},React.createElement("strong",null,t(lang,"Eslatma: ","Note: ")),t(lang,"WAF — himoyaning bir qatlami, yagona yechim emas. U kodni tuzatmaydi; xavfsiz dasturlash (Web-Pentest moduli) baribir zarur.","A WAF is one layer of defense, not the whole answer. It doesn't fix the code; secure coding (the Web-Pentest module) is still required.")),
+    React.createElement(Quiz,{q:{uz:"WAF oddiy tarmoq firewall'idan nima bilan farq qiladi?",en:"How does a WAF differ from an ordinary network firewall?"},opts:[{uz:"HTTP so'rov MAZMUNINI (L7) ko'radi, faqat portni emas",en:"It sees the HTTP request CONTENT (L7), not just the port"},{uz:"Faqat IP manzilni bloklaydi",en:"It only blocks IP addresses"},{uz:"Parolni buzadi",en:"It cracks passwords"},{uz:"Wi-Fi ni boshqaradi",en:"It manages Wi-Fi"}],correct:0,exp:{uz:"Tarmoq firewall'i port/IP (L4) darajasida ishlaydi; WAF esa HTTP so'rovning mazmunini (L7) tahlil qilib, SQLi/XSS kabi veb hujumlarini bloklaydi.",en:"A network firewall works at the port/IP level (L4); a WAF analyzes the HTTP request content (L7) to block web attacks like SQLi/XSS."}}));
+}
+function LessonL46(){
+  const lang=useLang();
+  const s=[{n:"collect",name:t(lang,"Log yig'ish","Log collection"),color:"#4dabf7",desc:{uz:"Barcha manba (firewall, server, IDS) loglarini bir joyga.",en:"All source logs (firewall, server, IDS) into one place."}},{n:"correl",name:t(lang,"Korrelyatsiya","Correlation"),color:"#a855f7",desc:{uz:"Turli hodisalarni bog'lab, hujum naqshini topish.",en:"Linking events to reveal an attack pattern."}},{n:"alert",name:t(lang,"Ogohlantirish","Alerting"),color:"#ff6b6b",desc:{uz:"Shubhali naqsh topilsa — darhol xabar.",en:"On a suspicious pattern — an immediate alert."}},{n:"flow",name:t(lang,"NetFlow","NetFlow"),color:"#69db7c",desc:{uz:"Kim kim bilan, qancha ma'lumot almashdi (30-dars).",en:"Who talked to whom and how much (lesson 30)."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"SIEM nima?","What is a SIEM?")),
+    React.createElement(P,null,t(lang,"Har qurilma o'z logini yozadi — lekin ular tarqoq. Bitta hujum bir necha tizimda iz qoldiradi. SIEM (Security Information and Event Management) barcha loglarni bir joyga yig'ib, ularni KORRELYATSIYA qiladi va shubhali naqshda ogohlantiradi. Bu — blue-team ning «markaziy nervi».","Every device writes its own log — but they're scattered. A single attack leaves traces across several systems. A SIEM (Security Information and Event Management) collects all logs into one place, CORRELATES them, and alerts on suspicious patterns. It's the blue-team's «central nervous system».")),
+    React.createElement(H2,{num:"§2"},t(lang,"SIEM elementlari","SIEM elements")),
+    React.createElement(LayerStack,{layers:s}),
+    React.createElement(H2,{num:"§3"},t(lang,"Log oqimi","The log pipeline")),
+    React.createElement(FlowSteps,{color:"#a855f7",title:{uz:"SIEM oqimi",en:"The SIEM pipeline"},steps:[
+      {icon:"📥",text:{uz:"Loglar yig'iladi (firewall, server, IDS, endpoint)",en:"Logs collected (firewall, server, IDS, endpoint)"}},
+      {icon:"🧹",text:{uz:"Normallashtirish — bir formatga keltirish",en:"Normalization — into one format"}},
+      {icon:"🔗",text:{uz:"Korrelyatsiya qoidalari hujum naqshini topadi",en:"Correlation rules find the attack pattern"}},
+      {icon:"🚨",text:{uz:"Ogohlantirish -> tahlilchi tergovi",en:"Alert -> analyst investigation"}},
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"NetFlow va vaqt","NetFlow and time")),
+    React.createElement(P,null,t(lang,"NetFlow trafik METADATASINI (kim, kim bilan, qancha, qachon) yozadi — to'liq paket emas, shuning uchun arzon va keng ko'lamli. SIEM korrelyatsiyasi to'g'ri ishlashi uchun barcha soatlar NTP (42-dars) bilan sinxron bo'lishi shart — aks holda hodisalar vaqt bo'yicha mos kelmaydi.","NetFlow records traffic METADATA (who, with whom, how much, when) — not full packets, so it's cheap and scalable. For SIEM correlation to work, all clocks must be NTP-synced (lesson 42) — otherwise events won't line up in time.")),
+    React.createElement(Quiz,{q:{uz:"SIEM ning asosiy vazifasi nima?",en:"What is a SIEM's main job?"},opts:[{uz:"Tarqoq loglarni yig'ib, korrelyatsiya qilib, ogohlantirish",en:"Collecting scattered logs, correlating them, and alerting"},{uz:"Fayllarni shifrlash",en:"Encrypting files"},{uz:"IP tarqatish",en:"Handing out IPs"},{uz:"Wi-Fi parolini o'zgartirish",en:"Changing the Wi-Fi password"}],correct:0,exp:{uz:"SIEM turli manbalardan loglarni yig'adi, ularni bog'lab (korrelyatsiya) hujum naqshini topadi va tahlilchini ogohlantiradi.",en:"A SIEM aggregates logs from many sources, correlates them to reveal an attack pattern, and alerts an analyst."}}));
+}
+function LessonL47(){
+  const lang=useLang();
+  const g=[{n:"VLAN",name:t(lang,"VLAN segmentatsiya","VLAN segmentation"),color:"#4dabf7",desc:{uz:"Bo'lim/rolga qarab trafikni ajratish (9-dars).",en:"Separating traffic by department/role (lesson 9)."}},{n:"zone",name:t(lang,"Firewall zonalari","Firewall zones"),color:"#69db7c",desc:{uz:"DMZ (17-dars) kabi ishonch darajalari orasida qoidalar.",en:"Rules between trust levels like the DMZ (lesson 17)."}},{n:"micro",name:t(lang,"Microsegmentation","Microsegmentation"),color:"#a855f7",desc:{uz:"Har workload o'z «devor»i bilan — eng nozik daraja.",en:"Each workload with its own «wall» — the finest grain."}},{n:"E-W",name:t(lang,"East-West filtrlash","East-West filtering"),color:"#ffd43b",desc:{uz:"Ichki serverlar orasidagi trafikni ham nazorat qilish.",en:"Controlling traffic between internal servers too."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Nega segmentatsiya?","Why segment?")),
+    React.createElement(P,null,t(lang,"«Yassi» (flat) tarmoqda bitta qurilma buzilsa, hujumchi (35-dars pivoting) hamma joyga erkin o'tadi. Segmentatsiya tarmoqni bo'laklarga bo'ladi — har bo'lak orasida firewall qoidalari. Shunda bitta buzilish butun tarmoqqa tarqalmaydi.","In a «flat» network, if one device is compromised, the attacker (pivoting, lesson 35) moves freely everywhere. Segmentation splits the network into pieces — with firewall rules between them. Then one breach doesn't spread to the whole network.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Segmentatsiya darajalari","Levels of segmentation")),
+    React.createElement(LayerStack,{layers:g}),
+    React.createElement(H2,{num:"§3"},t(lang,"Lateral movement'ni to'xtatish","Stopping lateral movement")),
+    React.createElement(P,null,t(lang,"Hujumchining eng kuchli qadami — «lateral movement» (yon harakat): bitta buzilgan xostdan boshqalariga o'tish. Microsegmentatsiya har serverni o'z «kamera»siga qamaydi — hatto ichkarida ham har ulanish tekshiriladi. Bu Zero Trust (21-dars) tamoyilining amaliy ko'rinishi.","An attacker's most powerful move is «lateral movement»: hopping from one compromised host to others. Microsegmentation locks each server into its own «cell» — even inside, every connection is checked. This is the practical form of the Zero Trust principle (lesson 21).")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# Ichki firewall — faqat kerakli oqim (least privilege)\n# Web server -> DB faqat 5432 portda\niptables -A FORWARD -s 10.0.1.0/24 -d 10.0.2.5 -p tcp --dport 5432 -j ACCEPT\niptables -A FORWARD -s 10.0.1.0/24 -d 10.0.2.0/24 -j DROP"),
+    React.createElement(Quiz,{q:{uz:"Tarmoq segmentatsiyasi qaysi hujum bosqichini eng ko'p qiyinlashtiradi?",en:"Which attack stage does network segmentation most hinder?"},opts:[{uz:"Lateral movement (yon harakat / pivoting)",en:"Lateral movement (pivoting)"},{uz:"Parol yaratish",en:"Password creation"},{uz:"DNS so'rovi",en:"DNS lookup"},{uz:"Fayl yuklab olish",en:"File download"}],correct:0,exp:{uz:"Segmentatsiya bo'laklarni ajratadi — buzilgan xostdan boshqalariga o'tish (lateral movement) firewall qoidalariga urilib qoladi.",en:"Segmentation isolates pieces — moving from a compromised host to others (lateral movement) runs into firewall rules."}}));
+}
+function LessonL48(){
+  const lang=useLang();
+  const d=[{n:"DNSSEC",name:t(lang,"DNSSEC (butunlik)","DNSSEC (integrity)"),color:"#69db7c",desc:{uz:"Javoblarni raqamli imzolaydi — soxta javob rad etiladi.",en:"Digitally signs answers — a forged answer is rejected."}},{n:"853",name:t(lang,"DoT (DNS over TLS)","DoT (DNS over TLS)"),color:"#4dabf7",desc:{uz:"DNS so'rovini shifrlaydi (853-port).",en:"Encrypts the DNS query (port 853)."}},{n:"443",name:t(lang,"DoH (DNS over HTTPS)","DoH (DNS over HTTPS)"),color:"#a855f7",desc:{uz:"DNS ni HTTPS ichida yashiradi — maxfiylik.",en:"Hides DNS inside HTTPS — privacy."}},{n:"filter",name:t(lang,"DNS filtrlash","DNS filtering"),color:"#ffd43b",desc:{uz:"Zararli domenlarni bloklash (himoya qatlami).",en:"Blocking malicious domains (a defense layer)."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"DNS ning ikki zaifligi","DNS's two weaknesses")),
+    React.createElement(P,null,t(lang,"DNS (4-dars) ishonch asosida qurilgan va sukut bo'yicha na imzolangan, na shifrlangan. Shu sababli ikki muammo: (1) soxta javob (DNS spoofing, 26-dars) — BUTUNLIK muammosi; (2) so'rovlar ochiq — MAXFIYLIK muammosi. Uch texnologiya bularni hal qiladi.","DNS (lesson 4) is built on trust and by default is neither signed nor encrypted. Hence two problems: (1) forged answers (DNS spoofing, lesson 26) — an INTEGRITY problem; (2) queries in the clear — a PRIVACY problem. Three technologies address these.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Yechimlar","The solutions")),
+    React.createElement(LayerStack,{layers:d}),
+    React.createElement(H2,{num:"§3"},t(lang,"DNSSEC qanday ishonch quradi","How DNSSEC builds trust")),
+    React.createElement(FlowSteps,{color:"#69db7c",title:{uz:"DNSSEC tekshiruvi",en:"DNSSEC validation"},steps:[
+      {icon:"❓",text:{uz:"So'rov yuboriladi",en:"A query is sent"}},
+      {icon:"🖋️",text:{uz:"Javob raqamli imzo bilan qaytadi (Kriptografiya kitobi)",en:"The answer returns with a digital signature (Crypto book)"}},
+      {icon:"🔎",text:{uz:"Imzo tekshiriladi — mos kelmasa rad etiladi",en:"The signature is checked — rejected if it doesn't match"}},
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"Blue-team savdosi","The blue-team trade-off")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"DoH foydalanuvchiga maxfiylik beradi, lekin xavfsizlik jamoasi uchun DNS ni monitoring qilishni qiyinlashtiradi (zararli domenga so'rovni ko'rish qiyinlashadi). Korxonalar ko'pincha o'z ichki DoH serverini ishlatadi — maxfiylik va monitoringni muvozanatlaydi.","DoH gives users privacy but makes it harder for the security team to monitor DNS (spotting a query to a malicious domain gets harder). Enterprises often run their own internal DoH server — balancing privacy and monitoring.")),
+    React.createElement(Quiz,{q:{uz:"DNSSEC asosan nimani ta'minlaydi?",en:"What does DNSSEC primarily provide?"},opts:[{uz:"Javob butunligi/haqiqiyligi — soxtalashtirishni aniqlash",en:"Answer integrity/authenticity — detecting forgery"},{uz:"So'rovlar maxfiyligi",en:"Query privacy"},{uz:"Tezroq DNS",en:"Faster DNS"},{uz:"Parol shifrlash",en:"Password encryption"}],correct:0,exp:{uz:"DNSSEC javoblarni imzolaydi — bu BUTUNLIK ni ta'minlaydi (soxta javobni aniqlaydi). Maxfiylikni esa DoT/DoH beradi.",en:"DNSSEC signs answers — providing INTEGRITY (detecting forged answers). Privacy comes from DoT/DoH instead."}}));
+}
+function LessonL49(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Zamonaviy VPN chuqur","Modern VPN in depth")),
+    React.createElement(P,null,t(lang,"14-dars VPN asoslarini ko'rsatdi. Bu yerda ikki asosiy zamonaviy yechimni taqqoslaymiz: IPsec — sanoat standarti, kuchli lekin murakkab; WireGuard — yangi, sodda va tez. Ikkalasi ham trafikni shifrlangan «tunnel»ga o'raydi.","Lesson 14 covered VPN basics. Here we compare the two main modern solutions: IPsec — the industry standard, strong but complex; WireGuard — new, simple and fast. Both wrap traffic in an encrypted «tunnel».")),
+    React.createElement(H2,{num:"§2"},t(lang,"IPsec va WireGuard","IPsec vs WireGuard")),
+    React.createElement(CompareCols,{
+      left:{color:"#4dabf7",title:"IPsec",rows:[
+        {uz:"Sanoat standarti, keng qo'llaniladi",en:"Industry standard, widely used"},
+        {uz:"IKE + ESP — ko'p sozlama, murakkab",en:"IKE + ESP — many options, complex"},
+        {uz:"Tunnel va transport rejimlari",en:"Tunnel and transport modes"},
+        {uz:"Katta kod bazasi",en:"Large codebase"}]},
+      right:{color:"#69db7c",title:"WireGuard",rows:[
+        {uz:"Yangi, sodda, juda tez",en:"New, simple, very fast"},
+        {uz:"~4000 qator kod — oson audit",en:"~4000 lines of code — easy to audit"},
+        {uz:"Zamonaviy kriptografiya (sobit)",en:"Modern, fixed cryptography"},
+        {uz:"Kichik hujum yuzasi",en:"Small attack surface"}]}}),
+    React.createElement(H2,{num:"§3"},t(lang,"Nega WireGuard sodda","Why WireGuard is simple")),
+    React.createElement(P,null,t(lang,"IPsec o'nlab shifr to'plami va sozlamaga ega — bu moslashuvchan, lekin xato sozlash oson. WireGuard esa sobit, zamonaviy kriptografiyani (Kriptografiya kitobidagi tushunchalar) ishlatadi va ~4000 qator kod — butun kod bazasini qatma-qat tekshirish mumkin. Kichik kod = kichik hujum yuzasi.","IPsec has dozens of cipher suites and settings — flexible, but easy to misconfigure. WireGuard uses fixed, modern cryptography (concepts from the Crypto book) and ~4000 lines of code — the whole codebase can be audited line by line. Small code = small attack surface.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# WireGuard interfeys (soddaligiga e'tibor bering)\n[Interface]\nPrivateKey = <maxfiy kalit>\nAddress = 10.8.0.2/24\n[Peer]\nPublicKey = <server ochiq kaliti>\nEndpoint = vpn.example.com:51820\nAllowedIPs = 0.0.0.0/0"),
+    React.createElement(Quiz,{q:{uz:"Qaysi VPN kichik kod bazasi bilan zamonaviy, tez va oson auditlanadigan?",en:"Which VPN is modern, fast and easily auditable with a small codebase?"},opts:[{uz:"WireGuard",en:"WireGuard"},{uz:"IPsec",en:"IPsec"},{uz:"PPTP",en:"PPTP"},{uz:"Telnet",en:"Telnet"}],correct:0,exp:{uz:"WireGuard ~4000 qator kod, sobit zamonaviy kriptografiya va yuqori tezlik bilan ajralib turadi. IPsec kuchli, lekin ancha murakkab va katta.",en:"WireGuard stands out with ~4000 lines of code, fixed modern cryptography and high speed. IPsec is strong but much more complex and large."}}));
+}
+function LessonL50(){
+  const lang=useLang();
+  const h=[{n:"low",name:t(lang,"Low-interaction","Low-interaction"),color:"#4dabf7",desc:{uz:"Soxta xizmatni taqlid qiladi — arzon, xavfsiz.",en:"Emulates a fake service — cheap, safe."}},{n:"high",name:t(lang,"High-interaction","High-interaction"),color:"#ff6b6b",desc:{uz:"Haqiqiy tizim — chuqur o'rganish, lekin xavfliroq.",en:"A real system — deep insight, but riskier."}},{n:"net",name:t(lang,"Honeynet","Honeynet"),color:"#a855f7",desc:{uz:"Butun soxta tarmoq — hujumchi harakatini kuzatish.",en:"A whole fake network — watching the attacker's moves."}},{n:"token",name:t(lang,"Honeytoken","Honeytoken"),color:"#ffd43b",desc:{uz:"Soxta fayl/hisob — unga tegilsa darhol ogohlantirish.",en:"A fake file/account — touched, it alerts immediately."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Honeypot nima?","What is a honeypot?")),
+    React.createElement(P,null,t(lang,"Honeypot — ataylab «zaif» qilib qo'yilgan o'lja tizim. Uning yagona maqsadi — hujumchini o'ziga tortish. Chunki hech bir qonuniy foydalanuvchi unga ulanmaydi, unga har qanday tegish — DARHOL shubhali. Bu juda kam soxta-ijobiy (false positive) beruvchi erta ogohlantirish.","A honeypot is a decoy system deliberately made to look «weak». Its only purpose is to lure an attacker. Since no legitimate user ever connects to it, any touch is IMMEDIATELY suspicious. This makes it an early-warning system with very few false positives.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Honeypot turlari","Honeypot types")),
+    React.createElement(LayerStack,{layers:h}),
+    React.createElement(H2,{num:"§3"},t(lang,"Nega samarali","Why it's effective")),
+    React.createElement(P,null,t(lang,"Oddiy IDS (16-dars) haqiqiy trafik ichidan hujumni ajratishi kerak — ko'p soxta-ijobiy beradi. Honeypot esa teskari: unda HECH QANDAY qonuniy trafik yo'q, shuning uchun har bir paket = hujum signali. Honeytoken esa bundan-da nozik: ma'lumotlar bazasiga soxta «admin» hisobi qo'yiladi — kim uni ishlatsa, u ichki tahdid (SE insider) yoki buzg'unchi.","A regular IDS (lesson 16) must pick an attack out of real traffic — producing many false positives. A honeypot is the opposite: it has NO legitimate traffic, so every packet is an attack signal. A honeytoken is even finer: a fake «admin» account is planted in a database — whoever uses it is an insider threat (SE insider) or intruder.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlik","Security")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Honeypot ishlab chiqarish tarmog'idan qat'iy IZOLYATSIYA qilinishi shart (47-dars segmentatsiya). Aks holda hujumchi uni tramplin qilib (35-dars pivoting), haqiqiy tizimlarga o'tishi mumkin.","A honeypot must be strictly ISOLATED from the production network (lesson 47 segmentation). Otherwise an attacker could use it as a springboard (lesson 35 pivoting) to reach real systems.")),
+    React.createElement(Quiz,{q:{uz:"Honeypot nima uchun juda kam soxta-ijobiy (false positive) beradi?",en:"Why does a honeypot produce so few false positives?"},opts:[{uz:"Unda qonuniy trafik yo'q — har qanday tegish shubhali",en:"It has no legitimate traffic — any touch is suspicious"},{uz:"U parollarni shifrlaydi",en:"It encrypts passwords"},{uz:"U juda tez",en:"It's very fast"},{uz:"U IPv6 ishlatadi",en:"It uses IPv6"}],correct:0,exp:{uz:"Honeypot bilan hech bir qonuniy foydalanuvchi ishlamaydi — shuning uchun unga har qanday ulanish deyarli aniq hujum, va soxta-ijobiylar juda kam.",en:"No legitimate user interacts with a honeypot — so any connection to it is almost certainly an attack, and false positives are minimal."}}));
+}
+function LessonL51(){
+  const lang=useLang();
+  const cl=[{n:"VPC",name:t(lang,"VPC / VNet","VPC / VNet"),color:"#4dabf7",desc:{uz:"Bulutdagi izolyatsiyalangan xususiy tarmoq.",en:"An isolated private network in the cloud."}},{n:"SG",name:t(lang,"Security Groups","Security Groups"),color:"#69db7c",desc:{uz:"Instance darajasidagi dasturiy firewall.",en:"An instance-level software firewall."}},{n:"NACL",name:t(lang,"NACL","Network ACL"),color:"#a855f7",desc:{uz:"Subnet darajasidagi filtrlash.",en:"Subnet-level filtering."}},{n:"priv",name:t(lang,"Private endpoints","Private endpoints"),color:"#ffd43b",desc:{uz:"Xizmatlarga internetsiz, ichki ulanish.",en:"Reaching services internally, without the internet."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Bulutda tarmoq boshqacha","Networking is different in the cloud")),
+    React.createElement(P,null,t(lang,"Bulutda fizik switch va kabel yo'q — hamma narsa dasturiy. Firewall o'rniga «Security Groups», tarmoq o'rniga «VPC». Muhim: bulut buzilishlarining katta qismi hujumdan emas, NOTO'G'RI SOZLASHdan (masalan «hammaga ochiq» qoldirilgan ma'lumot ombori) kelib chiqadi.","In the cloud there are no physical switches or cables — everything is software. Instead of a firewall, «Security Groups»; instead of a network, a «VPC». Crucially: most cloud breaches come not from an attack but from MISCONFIGURATION (e.g. a data store left «open to everyone»).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Bulut tarmoq elementlari","Cloud network elements")),
+    React.createElement(LayerStack,{layers:cl}),
+    React.createElement(H2,{num:"§3"},t(lang,"Eng keng tarqalgan xato","The most common mistake")),
+    React.createElement(P,null,t(lang,"Bulut buzilishlarining eng keng tarqalgan sababi — ochiq qoldirilgan ma'lumot ombori yoki juda keng Security Group («0.0.0.0/0 dan hamma port»). Yechim: har xizmatga aniq, tor Security Group va «eng kam imtiyoz» (Parollar kitobi) — faqat kerakli oqim, standart «hamma ruxsat» emas.","The most common cause of cloud breaches is a data store left open or an overly broad Security Group («all ports from 0.0.0.0/0»). The fix: a specific, narrow Security Group per service and «least privilege» (Passwords book) — only the needed flow, not the default «allow all».")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# Yomon (xavfli): hamma joydan SSH ochiq\n# Security Group: allow tcp 22 from 0.0.0.0/0   <- XATO!\n\n# Yaxshi: faqat ofis IP dan SSH\n# allow tcp 22 from 203.0.113.10/32\n# allow tcp 443 from 0.0.0.0/0   (faqat veb ochiq)"),
+    React.createElement(Quiz,{q:{uz:"Bulut tarmoq buzilishlarining eng keng tarqalgan sababi nima?",en:"What is the most common cause of cloud network breaches?"},opts:[{uz:"Noto'g'ri sozlash (misconfiguration) — ochiq qoldirilgan resurs",en:"Misconfiguration — a resource left open"},{uz:"Zaif shifrlash algoritmi",en:"A weak encryption algorithm"},{uz:"Sekin internet",en:"Slow internet"},{uz:"Eski kabellar",en:"Old cables"}],correct:0,exp:{uz:"Bulutda ko'p buzilish hujumdan emas, noto'g'ri sozlashdan (juda keng Security Group yoki ochiq ma'lumot ombori) kelib chiqadi. Yechim — eng kam imtiyoz.",en:"Most cloud breaches stem not from an attack but from misconfiguration (an overly broad Security Group or an open data store). The fix is least privilege."}}));
 }
 const root=ReactDOM.createRoot(document.getElementById("app"));
 root.render(React.createElement(App));
