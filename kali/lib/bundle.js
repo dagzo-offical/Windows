@@ -594,7 +594,7 @@ function LayerStack({layers}){
   return React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8,margin:"6px 0 4px"}},
     layers.map((l,i)=>React.createElement("div",{key:l.n,className:"na-rise na-card",
       style:{display:"flex",gap:12,alignItems:"flex-start",padding:"11px 14px",background:"var(--surface)",border:`1px solid ${l.color}44`,borderLeft:`3px solid ${l.color}`,borderRadius:11,animationDelay:(i*0.06)+"s"}},
-      React.createElement("div",{style:{flexShrink:0,width:30,height:30,borderRadius:8,display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontWeight:900,fontSize:13,color:l.color,background:l.color+"22",border:`1.5px solid ${l.color}`}},l.n),
+      React.createElement("div",{style:{flexShrink:0,minWidth:30,height:30,padding:"0 6px",borderRadius:8,display:"grid",placeItems:"center",whiteSpace:"nowrap",fontFamily:"var(--font-mono)",fontWeight:900,fontSize:12,color:l.color,background:l.color+"22",border:`1.5px solid ${l.color}`}},l.n),
       React.createElement("div",{style:{flex:1}},
         React.createElement("div",{style:{fontWeight:700,fontSize:13.5,color:"var(--text-0)"}},l.name,l.uz&&React.createElement("span",{style:{fontWeight:400,fontSize:11.5,color:"var(--text-2)",marginLeft:8}},l.uz)),
         l.desc&&React.createElement("div",{style:{fontSize:12,color:"var(--text-1)",margin:"3px 0 4px",lineHeight:1.5}},t(lang,l.desc.uz,l.desc.en)),
