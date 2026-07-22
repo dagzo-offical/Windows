@@ -110,6 +110,12 @@ const LESSONS={
   28:{num:"L28",sec:3,uz:"Wireshark",en:"Wireshark",sub:"Tarmoq trafigini tahlil qilish"},
   29:{num:"L29",sec:3,uz:"Wireless Attacks",en:"Wireless Attacks",sub:"WiFi hujumlari va himoya usullari"},
   30:{num:"L30",sec:3,uz:"Network Forensics",en:"Network Forensics",sub:"Tarmoq sud-tibbiyoti tahlili"},
+  31:{num:"L31",sec:3,uz:"LLMNR/NBT-NS Poisoning",en:"LLMNR/NBT-NS Poisoning",sub:"Responder bilan NTLM hash ushlash"},
+  32:{num:"L32",sec:3,uz:"SMB/NTLM Relay",en:"SMB/NTLM Relay",sub:"Ushlangan autentifikatsiyani uzatish"},
+  33:{num:"L33",sec:3,uz:"VLAN Hopping va Rogue DHCP",en:"VLAN Hopping & Rogue DHCP",sub:"Kommutator qatlamidagi hujumlar"},
+  34:{num:"L34",sec:3,uz:"tcpdump va Packet Crafting",en:"tcpdump & Packet Crafting",sub:"CLI ushlash, Scapy, hping3"},
+  35:{num:"L35",sec:3,uz:"Pivoting va Tunneling",en:"Pivoting & Tunneling",sub:"SSH tunnel, proxychains, chisel"},
+  36:{num:"L36",sec:3,uz:"IDS/Firewall Evazi",en:"IDS/Firewall Evasion",sub:"Fragmentatsiya, decoy, timing"},
 };
 
 const SECTIONS={
@@ -127,7 +133,7 @@ const SECTIONS={
      outcomesUz:["Firewall va DMZ arxitekturasini loyihalash","VPN va SSL/TLS bilan xavfsiz ulanishlarni ta'minlash","IDS/IPS tizimlarining ishlash printsipini tushuntirish","Zero Trust arxitekturasi tamoyillarini qo'llash"],
      outcomesEn:["Design firewall and DMZ architecture","Secure connections with VPN and SSL/TLS","Explain how IDS/IPS systems work","Apply Zero Trust architecture principles"],
      tooling:["pfSense","OpenVPN","OpenSSL","Snort","Suricata"]},
-  3:{num:"03",uz:"Tarmoq Hujumlari",en:"Network Attacks",color:"var(--c-attack)",icon:"cpu",count:9,
+  3:{num:"03",uz:"Tarmoq Hujumlari",en:"Network Attacks",color:"var(--c-attack)",icon:"cpu",count:15,
      descUz:"Nmap, ARP spoofing, MITM, DDoS va boshqa tarmoq hujumlarini va ulardan himoyalanishni o'rganing.",
      descEn:"Learn Nmap, ARP spoofing, MITM, DDoS and other network attacks with defense techniques.",
      instructorUz:"Dilnoza Karimova — Network Security Architect",instructorEn:"CCNP Security, CompTIA Network+/Security+",
@@ -2377,6 +2383,12 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
     num===28?React.createElement(LessonL28):
     num===29?React.createElement(LessonL29):
     num===30?React.createElement(LessonL30):
+    num===31?React.createElement(LessonL31):
+    num===32?React.createElement(LessonL32):
+    num===33?React.createElement(LessonL33):
+    num===34?React.createElement(LessonL34):
+    num===35?React.createElement(LessonL35):
+    num===36?React.createElement(LessonL36):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
@@ -2391,7 +2403,7 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
       React.createElement("div",{style:{fontSize:12,color:"var(--text-2)"}},lesson.sub)
     ),
     content,
-    !alreadyDone&&!done&&num<=30&&React.createElement("button",{
+    !alreadyDone&&!done&&num<=36&&React.createElement("button",{
       onClick:()=>{markComplete&&markComplete(lessonKey);setDone(true);},
       style:{marginTop:24,padding:"12px 28px",borderRadius:10,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,boxShadow:"0 0 20px var(--accent-glow)"}
     },t(lang,"Darsni yakunlash ✓","Complete Lesson ✓")),
@@ -2877,7 +2889,7 @@ function LessonL11(){
     React.createElement(H2,{num:"§5"},t(lang,"Amaliyot: yetib borishni tekshirish","Practice: checking reachability")),
     React.createElement(P,null,t(lang,"ping qurilmaga yetib borish mumkinligini, traceroute yo'lni ko'rsatadi. Yulduz topologiyasida barcha yo'l markaziy qurilmadan o'tadi.","ping checks whether a device is reachable, traceroute shows the path. In a star topology every path goes through the central device.")),
     React.createElement(Terminal,null,"ping -c3 192.168.1.20\n# 64 bytes from 192.168.1.20: icmp_seq=1 ttl=64 time=0.8 ms\n# 3 packets transmitted, 3 received, 0% packet loss\nfping -a -g 192.168.1.0/24 2>/dev/null   # butun tarmoqni tez"),
-React.createElement(Quiz,{q:{uz:"Qaysi topologiyada bitta qurilma uzilsa ham qolganlari ishlayveradi va u eng keng tarqalgan?",en:"In which topology do the rest keep working if one device fails, and which is most common?"},opts:[{uz:"Bus",en:"Bus"},{uz:"Star (yulduz)",en:"Star"},{uz:"Ring (halqa)",en:"Ring"},{uz:"Hech qaysi",en:"None"}],correct:1,exp:{uz:"Star da hamma markaziy switchга ulanadi — bitta uzilса boshqalarga ta'sir qilmaydi. Shu sababli eng keng tarqalgan.",en:"In Star everyone connects to a central switch — one failure doesn't affect others. That's why it's most common."}}));
+React.createElement(Quiz,{q:{uz:"Qaysi topologiyada bitta qurilma uzilsa ham qolganlari ishlayveradi va u eng keng tarqalgan?",en:"In which topology do the rest keep working if one device fails, and which is most common?"},opts:[{uz:"Bus",en:"Bus"},{uz:"Star (yulduz)",en:"Star"},{uz:"Ring (halqa)",en:"Ring"},{uz:"Hech qaysi",en:"None"}],correct:1,exp:{uz:"Star da hamma markaziy switchga ulanadi — bitta uzilsa boshqalarga ta'sir qilmaydi. Shu sababli eng keng tarqalgan.",en:"In Star everyone connects to a central switch — one failure doesn't affect others. That's why it's most common."}}));
 }
 function LessonL12(){
   const lang=useLang();
@@ -3308,6 +3320,118 @@ function LessonL30(){
     React.createElement(P,null,t(lang,"Forensika — hodisadan KEYIN dalilni yig'ish va tahlil qilish. Simulyatordagi «Hash bilan muhrlash» ssenariysi kabi: har fayl hashlanadi va kim tekkani yoziladi, shunda dalil sudda kuchga ega bo'ladi.","Forensics is collecting and analyzing evidence AFTER an incident. Just like the simulator's «Seal it with a hash» scenario: each file is hashed and every handler recorded, so the evidence holds up in court.")),
     React.createElement(Terminal,null,"sha256sum capture.pcap   # dalilni muhrlash\n# 9f2c...  capture.pcap\ntcpdump -r capture.pcap -nn 'port 4444'\n# 10.0.0.9.51002 > 10.0.0.5.4444  ← shubhali reverse shell"),
 React.createElement(Quiz,{q:{uz:"\"Dalil zanjiri\" (chain of custody) nima uchun muhim?",en:"Why is \"chain of custody\" important?"},opts:[{uz:"Tarmoqni tezlashtiradi",en:"Speeds up the network"},{uz:"Dalil o'zgartirilmagani va ishonchli ekanini isbotlaydi",en:"Proves the evidence is unaltered and trustworthy"},{uz:"Parolni shifrlaydi",en:"Encrypts the password"},{uz:"IP beradi",en:"Hands out IPs"}],correct:1,exp:{uz:"Dalil zanjiri dalil o'zgartirilmaganini va kim unga tekkanini hujjatlaydi — bu ishonchlilik va sud kuchini ta'minlaydi.",en:"Chain of custody documents that evidence is unaltered and who handled it — ensuring it's trustworthy and admissible."}}));
+}
+function LessonL31(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"LLMNR/NBT-NS zaharlash nima?","What is LLMNR/NBT-NS poisoning?")),
+    React.createElement(P,null,t(lang,"Windows tarmoqlarida, agar DNS (4-dars) nomni topa olmasa, qurilma \"zaxira\" nom aniqlash — LLMNR va NBT-NS — orqali BUTUN tarmoqqa baqiradi: «SRV01 kim?». Hujumchi shunchaki «Men!» deb javob beradi, va qurbon unga o'z NTLMv2 hash (parol izi)ini yuboradi.","On Windows networks, if DNS (lesson 4) can't resolve a name, the device shouts to the WHOLE network via fallback name resolution — LLMNR and NBT-NS: «who is SRV01?». The attacker simply answers «Me!», and the victim sends it their NTLMv2 hash (a trace of the password).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Hujum oqimi","The attack flow")),
+    React.createElement(FlowSteps,{color:"#ff9145",title:{uz:"LLMNR zaharlash",en:"LLMNR poisoning"},steps:[
+      {icon:"📝",text:{uz:"Qurbon nomni xato yozadi yoki DNS topolmaydi",en:"Victim mistypes a name or DNS fails"}},
+      {icon:"📢",text:{uz:"Qurbon LLMNR/NBT-NS broadcast yuboradi: «X kim?»",en:"Victim broadcasts LLMNR/NBT-NS: «who is X?»"}},
+      {icon:"🎭",text:{uz:"Responder javob beradi: «Bu men!»",en:"Responder answers: «that's me!»"}},
+      {icon:"🔑",text:{uz:"Qurbon NTLMv2 hash ni hujumchiga yuboradi",en:"Victim sends its NTLMv2 hash to the attacker"}},
+      {icon:"💻",text:{uz:"Oflayn buzish (hashcat) yoki relay (keyingi dars)",en:"Offline crack (hashcat) or relay (next lesson)"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot: Responder","Practice: Responder")),
+    React.createElement(Terminal,null,"responder -I eth0\n# [+] Listening for events...\n# [SMB] NTLMv2-SSP Hash captured from 10.0.0.9\n#   Username: CORP\\jdoe\n#   Hash: jdoe::CORP:1122...  <- oflayn buzish uchun\nhashcat -m 5600 hash.txt rockyou.txt"),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
+    React.createElement(Terminal,null,"✓ LLMNR ni o'chirish (GPO: Turn OFF Multicast Name Resolution)\n✓ NBT-NS ni o'chirish (har bir adapterda)\n✓ SMB signing ni majburiy qilish (relay ni to'xtatadi)\n✓ Kuchli parol — oflayn buzishni imkonsiz qiladi"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Responder faqat yozma ruxsat berilgan pentestda ishlatiladi. Ruxsatsiz tarmoqda hash ushlash — jinoyat.","Responder is used only in a written-authorized pentest. Capturing hashes on a network without permission is a crime.")),
+    React.createElement(Quiz,{q:{uz:"LLMNR/NBT-NS zaharlashda hujumchi nimani qo'lga kiritadi?",en:"In LLMNR/NBT-NS poisoning, what does the attacker obtain?"},opts:[{uz:"Qurbonning NTLMv2 hash (parol izi)ini",en:"The victim's NTLMv2 hash (a password trace)"},{uz:"Ochiq parolni",en:"The plaintext password"},{uz:"IP manzilni",en:"An IP address"},{uz:"DNS serverni",en:"The DNS server"}],correct:0,exp:{uz:"Qurbon soxta javobga ishonib, o'z NTLMv2 hash ini yuboradi — uni oflayn buzish yoki relay qilish mumkin. To'g'ridan-to'g'ri ochiq parol emas.",en:"Trusting the fake answer, the victim sends its NTLMv2 hash — which can be cracked offline or relayed. Not the plaintext password directly."}}));
+}
+function LessonL32(){
+  const lang=useLang();
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"NTLM relay nima?","What is NTLM relay?")),
+    React.createElement(P,null,t(lang,"31-darsdagi ushlangan hash ni buzish o'rniga, hujumchi uni JONLI ravishda boshqa serverga UZATADI (relay). Qurbon autentifikatsiyasi hujumchi orqali o'tib, boshqa xostga «qurbon nomidan» kiradi — hash ni umuman buzmasdan.","Instead of cracking the captured hash from lesson 31, the attacker RELAYS it live to another server. The victim's authentication passes through the attacker and logs into a different host «as the victim» — without ever cracking the hash.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Zaharlash → Relay zanjiri","The poison → relay chain")),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"NTLM relay",en:"NTLM relay"},steps:[
+      {icon:"📢",text:{uz:"LLMNR zaharlash orqali autentifikatsiyani ushlash (31-dars)",en:"Capture the authentication via LLMNR poisoning (lesson 31)"}},
+      {icon:"🔁",text:{uz:"Uni nishon SMB serverga uzatish (ntlmrelayx)",en:"Relay it to a target SMB server (ntlmrelayx)"}},
+      {icon:"🔓",text:{uz:"Server qurbon nomidan kirishga ruxsat beradi",en:"The server grants login as the victim"}},
+      {icon:"💥",text:{uz:"Buyruq bajarish yoki SAM/hash dump",en:"Command execution or SAM/hash dump"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot: ntlmrelayx","Practice: ntlmrelayx")),
+    React.createElement(Terminal,null,"# Responder SMB/HTTP ni o'chiring (relay bilan to'qnashmaslik uchun)\nntlmrelayx.py -tf targets.txt -smb2support\n# [*] Authenticating against smb://10.0.0.20 as CORP/JDOE SUCCEED\n# [*] Dumping local SAM hashes\n# Administrator:500:aad3b...:31d6c...:::"),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
+    React.createElement(Terminal,null,"✓ SMB signing ni MAJBURIY qilish — relay ni butunlay to'xtatadi\n✓ NTLM ni o'chirib, Kerberos ga o'tish\n✓ LLMNR/NBT-NS ni o'chirish (31-dars)\n✓ Eng kam imtiyoz — hisob buzilsa ham zarar cheklangan"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Relay hujumi faqat yozma ruxsat bilan, kelishilgan doirada sinaladi.","A relay attack is tested only with written authorization, within an agreed scope.")),
+    React.createElement(Quiz,{q:{uz:"NTLM relay ni butunlay to'xtatadigan eng samarali chora qaysi?",en:"What single most effective control fully stops NTLM relay?"},opts:[{uz:"SMB signing ni majburiy qilish",en:"Enforcing SMB signing"},{uz:"Antivirus o'rnatish",en:"Installing antivirus"},{uz:"Parolni uzaytirish",en:"Lengthening the password"},{uz:"Wi-Fi ni o'chirish",en:"Disabling Wi-Fi"}],correct:0,exp:{uz:"Majburiy SMB signing uzatilgan (relay qilingan) autentifikatsiyani rad etadi, chunki imzo mos kelmaydi. Parol uzunligi relay ga ta'sir qilmaydi — hash umuman buzilmaydi.",en:"Mandatory SMB signing rejects relayed authentication because the signature won't match. Password length doesn't affect relay — the hash is never cracked."}}));
+}
+function LessonL33(){
+  const lang=useLang();
+  const at=[{n:"DTP",name:t(lang,"Switch spoofing","Switch spoofing"),color:"#ff9145",desc:{uz:"Hujumchi o'zini switch qilib ko'rsatib, trunk port oladi — barcha VLAN ga kirish.",en:"Attacker poses as a switch to negotiate a trunk port — access to all VLANs."}},{n:"2x tag",name:t(lang,"Ikki marta teglash","Double tagging"),color:"#ff3a5e",desc:{uz:"Ikki VLAN teg qo'yib, paketni boshqa VLAN ga «sakratish».",en:"Two VLAN tags let a packet «hop» into another VLAN."}},{n:"DHCP",name:t(lang,"Rogue DHCP","Rogue DHCP"),color:"#a855f7",desc:{uz:"Soxta DHCP server o'z gateway/DNS ini beradi — MITM (25-dars).",en:"A rogue DHCP server hands out its own gateway/DNS — MITM (lesson 25)."}},{n:"starve",name:t(lang,"DHCP starvation","DHCP starvation"),color:"#ffd43b",desc:{uz:"Barcha IP larni so'rab tugatish — haqiqiy DHCP ni ishdan chiqarish.",en:"Requesting all IPs to exhaust the pool — knocking out the real DHCP."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Kommutator qatlamidagi hujumlar","Switch-layer attacks")),
+    React.createElement(P,null,t(lang,"VLAN lar (9-dars) trafikni ajratadi, DHCP (7-dars) IP tarqatadi — lekin noto'g'ri sozlangan switch bu ajratishni buzishga imkon beradi. Bu hujumlar 2-qatlamda (Data Link) ishlaydi, shuning uchun router/firewall ularni ko'rmaydi.","VLANs (lesson 9) separate traffic and DHCP (lesson 7) hands out IPs — but a misconfigured switch lets an attacker break that separation. These attacks work at Layer 2 (Data Link), so routers/firewalls don't see them.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy usullar","The main techniques")),
+    React.createElement(LayerStack,{layers:at}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# Rogue DHCP + starvation (yersinia / dhcpstarv)\n# 1) haqiqiy DHCP ni tugatish\ndhcpstarv -i eth0\n# 2) o'z soxta DHCP ni ko'tarish -> gateway = hujumchi IP\n# -> endi barcha trafik hujumchi orqali o'tadi (MITM)"),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
+    React.createElement(Terminal,null,"✓ DTP ni o'chirish: switchport mode access (trunk auto emas)\n✓ DHCP snooping — faqat ishonchli portda DHCP javob\n✓ Dynamic ARP Inspection (DAI) — 24-darsni eslang\n✓ Ishlatilmagan portlarni o'chirish, native VLAN ni o'zgartirish"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Bu hujumlar faqat o'z laboratoriyangizda yoki ruxsat berilgan test tarmog'ida sinaladi.","These attacks are tested only in your own lab or an authorized test network.")),
+    React.createElement(Quiz,{q:{uz:"«Switch spoofing» (DTP) hujumini nima to'xtatadi?",en:"What stops a «switch spoofing» (DTP) attack?"},opts:[{uz:"Portni «access» rejimiga majburlash (trunk auto emas)",en:"Forcing the port to «access» mode (not trunk auto)"},{uz:"WiFi parolini o'zgartirish",en:"Changing the WiFi password"},{uz:"HTTPS ishlatish",en:"Using HTTPS"},{uz:"Antivirus",en:"Antivirus"}],correct:0,exp:{uz:"DTP avtomatik trunk kelishuviga tayanadi. Portni qat'iy «access» rejimiga qo'yish trunk kelishuvini o'chiradi, shu bilan switch spoofing imkonsiz bo'ladi.",en:"DTP relies on automatic trunk negotiation. Setting the port to strict «access» mode disables trunk negotiation, making switch spoofing impossible."}}));
+}
+function LessonL34(){
+  const lang=useLang();
+  const tl=[{n:"tcpdump",name:t(lang,"CLI ushlash","CLI capture"),color:"#4dabf7",desc:{uz:"Terminal orqali paket ushlash — GUI siz serverlarda (28-darsning CLI juftligi).",en:"Capture packets from the terminal — on GUI-less servers (the CLI companion to lesson 28)."}},{n:"tshark",name:t(lang,"Wireshark CLI","Wireshark CLI"),color:"#69db7c",desc:{uz:"Wiresharkning buyruq qatori versiyasi — filtrlash va tahlil.",en:"Wireshark's command-line version — filtering and analysis."}},{n:"Scapy",name:t(lang,"Paket yaratish","Packet crafting"),color:"#a855f7",desc:{uz:"Python bilan istalgan paketni qo'lda yaratish/o'zgartirish.",en:"Craft/modify any packet by hand with Python."}},{n:"hping3",name:t(lang,"TCP/ICMP crafting","TCP/ICMP crafting"),color:"#ffd43b",desc:{uz:"Maxsus TCP/UDP/ICMP paketlar yuborish — firewall test, skan.",en:"Send custom TCP/UDP/ICMP packets — firewall testing, scanning."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Nega CLI vositalar?","Why CLI tools?")),
+    React.createElement(P,null,t(lang,"Wireshark (28-dars) grafik va kuchli, lekin ko'p hollarda tarmoqni GUI siz serverda tekshirish yoki maxsus paket YARATISH kerak. tcpdump ushlaydi, Scapy va hping3 esa paketlarni noldan quradi — bu ham hujum, ham chuqur tahlil uchun zarur.","Wireshark (lesson 28) is graphical and powerful, but often you must inspect a network on a GUI-less server or CRAFT custom packets. tcpdump captures, while Scapy and hping3 build packets from scratch — essential for both attack and deep analysis.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Vositalar to'plami","The toolkit")),
+    React.createElement(LayerStack,{layers:tl}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot: ushlash va yaratish","Practice: capture and craft")),
+    React.createElement(Terminal,null,"# Ushlash — 80-portdagi trafikni faylga yozish\ntcpdump -i eth0 -nn 'tcp port 80' -w web.pcap\n\n# Yaratish — SYN paket yuborish (hping3)\nhping3 -S -p 80 -c 1 10.0.0.5\n\n# Scapy — bitta ICMP paket\n# python3: send(IP(dst='10.0.0.5')/ICMP())"),
+    React.createElement(H2,{num:"§4"},t(lang,"Mudofaa tomonida ham","On the defense side too")),
+    React.createElement(P,null,t(lang,"Xuddi shu vositalar blue-team uchun ham: tcpdump bilan shubhali trafikni ushlash, BPF filtrlar bilan aniq oqimni ajratish, va Scapy bilan aniqlash qoidalarini sinash. Vosita neytral — maqsad muhim.","The same tools serve blue-team too: capturing suspicious traffic with tcpdump, isolating a specific flow with BPF filters, and testing detection rules with Scapy. The tool is neutral — the purpose is what matters.")),
+    React.createElement(InfoBox,{color:"var(--c-system)"},React.createElement("strong",null,t(lang,"Maslahat: ","Tip: ")),t(lang,"tcpdump ning BPF filtri (masalan 'tcp port 80') Wireshark bilan bir xil — bir joyda o'rgansangiz, ikkalasida ham ishlaydi.","tcpdump's BPF filter (e.g. 'tcp port 80') is the same as Wireshark's — learn it once, use it in both.")),
+    React.createElement(Quiz,{q:{uz:"GUI siz serverda tarmoq trafigini ushlash uchun qaysi vosita eng mos?",en:"Which tool best captures traffic on a GUI-less server?"},opts:[{uz:"tcpdump",en:"tcpdump"},{uz:"Wireshark GUI",en:"Wireshark GUI"},{uz:"Brauzer",en:"A browser"},{uz:"Notepad",en:"Notepad"}],correct:0,exp:{uz:"tcpdump — buyruq qatori vositasi, grafik interfeys talab qilmaydi, shuning uchun masofaviy/serverli muhitda ideal. Wireshark GUI ni talab qiladi.",en:"tcpdump is a command-line tool needing no graphical interface, ideal for remote/server environments. Wireshark requires a GUI."}}));
+}
+function LessonL35(){
+  const lang=useLang();
+  const tn=[{n:"-L",name:t(lang,"SSH local forward","SSH local forward"),color:"#4dabf7",desc:{uz:"Mahalliy portni masofaviy xizmatga bog'lash.",en:"Bind a local port to a remote service."}},{n:"-R",name:t(lang,"SSH remote forward","SSH remote forward"),color:"#69db7c",desc:{uz:"Masofaviy portni o'z mashinangizga qaytarish.",en:"Bring a remote port back to your machine."}},{n:"-D",name:t(lang,"SSH dynamic (SOCKS)","SSH dynamic (SOCKS)"),color:"#a855f7",desc:{uz:"To'liq SOCKS proksi — barcha trafikni pivot orqali.",en:"A full SOCKS proxy — all traffic through the pivot."}},{n:"chisel",name:t(lang,"chisel / proxychains","chisel / proxychains"),color:"#ffd43b",desc:{uz:"Firewall orqali tunnel va boshqa vositalarni proksi orqali yo'naltirish.",en:"Tunnel through a firewall and route other tools via the proxy."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Pivoting nima?","What is pivoting?")),
+    React.createElement(P,null,t(lang,"Bitta xost buzilgach, hujumchi undan «tramplin» sifatida foydalanib, to'g'ridan-to'g'ri yetib bo'lmaydigan ichki tarmoqlarga o'tadi. Bu — segmentatsiya (21-dars) zaif bo'lganda uni yengish usuli. Tunnellar trafikni buzilgan xost orqali yo'naltiradi.","Once one host is compromised, the attacker uses it as a «springboard» to reach internal networks that aren't directly accessible. This is how weak segmentation (lesson 21) gets defeated. Tunnels route traffic through the compromised host.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Pivot oqimi","The pivot flow")),
+    React.createElement(FlowSteps,{color:"#ff3a5e",title:{uz:"Ichki tarmoqqa pivot",en:"Pivoting into an internal network"},steps:[
+      {icon:"💻",text:{uz:"A xostni buzish (internetga ochiq)",en:"Compromise host A (internet-facing)"}},
+      {icon:"🌐",text:{uz:"A orqali tunnel/proksi ko'tarish (ssh -D)",en:"Set up a tunnel/proxy through A (ssh -D)"}},
+      {icon:"🧭",text:{uz:"Vositalarni proksi orqali yo'naltirish (proxychains)",en:"Route tools through the proxy (proxychains)"}},
+      {icon:"🎯",text:{uz:"Faqat A ko'radigan ichki B tarmog'iga yetish",en:"Reach internal network B that only A can see"}},
+    ]}),
+    React.createElement(H2,{num:"§3"},t(lang,"Tunnel turlari","Tunnel types")),
+    React.createElement(LayerStack,{layers:tn}),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# A xost orqali SOCKS proksi\nssh -D 1080 user@10.0.0.5\n\n# proxychains bilan ichki tarmoqni skan qilish\nproxychains nmap -sT -Pn 172.16.5.0/24\n# -> endi B tarmog'i A orqali ko'rinadi"),
+    React.createElement(H2,{num:"§5"},t(lang,"Himoya","Defense")),
+    React.createElement(Terminal,null,"✓ Tarmoq segmentatsiyasi (21-dars) — pivot yo'lini cheklash\n✓ Egress (chiquvchi) filtrlash — kutilmagan tunnel portlarini bloklash\n✓ EDR — g'ayrioddiy tunnel jarayonlarini aniqlash\n✓ Eng kam imtiyoz — buzilgan xost imkoniyatini cheklash"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Pivoting faqat kelishilgan pentest doirasida, ruxsat berilgan xostlar orasida qo'llaniladi.","Pivoting is used only within an agreed pentest scope, between authorized hosts.")),
+    React.createElement(Quiz,{q:{uz:"«ssh -D 1080» buyrug'i nima yaratadi?",en:"What does «ssh -D 1080» create?"},opts:[{uz:"SOCKS proksi — trafikni pivot orqali yo'naltirish uchun",en:"A SOCKS proxy — to route traffic through the pivot"},{uz:"Yangi foydalanuvchi",en:"A new user"},{uz:"Firewall qoidasi",en:"A firewall rule"},{uz:"DNS yozuvi",en:"A DNS record"}],correct:0,exp:{uz:"«-D» dinamik port forwarding — mahalliy SOCKS proksi ochadi. proxychains kabi vositalar bu proksi orqali ichki tarmoqqa yetadi.",en:"«-D» is dynamic port forwarding — it opens a local SOCKS proxy. Tools like proxychains then reach the internal network through it."}}));
+}
+function LessonL36(){
+  const lang=useLang();
+  const ev=[{n:"-f",name:t(lang,"Fragmentatsiya","Fragmentation"),color:"#ff9145",desc:{uz:"Paketni mayda bo'laklarga bo'lib, imzo-asosli IDS ni chalg'itish.",en:"Split packets into tiny fragments to confuse signature-based IDS."}},{n:"-D",name:t(lang,"Decoy (aldov)","Decoys"),color:"#ff3a5e",desc:{uz:"Soxta manba IP lar orasiga yashirinish — haqiqiy manbani berkitish.",en:"Hide among fake source IPs — masking the real source."}},{n:"-T0",name:t(lang,"Sekin timing","Slow timing"),color:"#a855f7",desc:{uz:"Juda sekin skan — chegara/anomaliya aniqlagichini chetlab o'tish.",en:"Very slow scan — evading threshold/anomaly detection."}},{n:":53",name:t(lang,"Source port spoof","Source port spoof"),color:"#ffd43b",desc:{uz:"Ishonchli portdan (masalan DNS 53) kelayotgandek ko'rsatish.",en:"Appear to come from a trusted port (e.g. DNS 53)."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"IDS/Firewall ni chetlab o'tish","Evading IDS/Firewalls")),
+    React.createElement(P,null,t(lang,"Firewall (13-dars) va IDS/IPS (16-dars) — kuchli, lekin mukammal emas. Hujumchilar aniqlashdan qochish uchun turli usullar qo'llaydi. Bularni bilish himoyachiga aniqlashni SOZLASH va zaif joylarni yopish uchun kerak — bu «hujumchi kabi fikrlash» tamoyili.","Firewalls (lesson 13) and IDS/IPS (lesson 16) are strong but not perfect. Attackers use various techniques to avoid detection. Knowing them lets a defender TUNE detection and close gaps — the «think like an attacker» principle.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Keng tarqalgan evazi usullari","Common evasion techniques")),
+    React.createElement(LayerStack,{layers:ev}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot: Nmap evazi","Practice: Nmap evasion")),
+    React.createElement(Terminal,null,"# Fragmentatsiya + decoy + sekin timing + soxta uzunlik\nnmap -f -D RND:10 -T1 --data-length 25 10.0.0.5\n\n# Ishonchli source port (53 = DNS)\nnmap --source-port 53 -sS 10.0.0.5\n# -> ba'zi eski firewall qoidalarini chetlab o'tadi"),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
+    React.createElement(Terminal,null,"✓ To'liq paket qayta yig'uvchi IDS (fragmentatsiyani birlashtiradi)\n✓ Anomaliya-asosli aniqlash (faqat imzo emas)\n✓ Chegara/tezlik asosidagi ogohlantirish (sekin skanni ushlaydi)\n✓ Chuqurlashtirilgan himoya — bitta qatlamga ishonmaslik"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Evazi vositalari faqat o'z tizimingizda yoki yozma ruxsat berilgan test doirasida ishlatiladi.","Evasion tools are used only on your own systems or within a written-authorized test scope.")),
+    React.createElement(Quiz,{q:{uz:"«nmap -f» (fragmentatsiya) qanday ishlaydi?",en:"How does «nmap -f» (fragmentation) work?"},opts:[{uz:"Paketni mayda bo'laklarga bo'lib, imzo-asosli IDS ni chalg'itadi",en:"Splits packets into small fragments to confuse signature-based IDS"},{uz:"Parolni buzadi",en:"Cracks the password"},{uz:"Firewall ni o'chiradi",en:"Turns off the firewall"},{uz:"Tezlikni oshiradi",en:"Increases speed"}],correct:0,exp:{uz:"Fragmentatsiya paketni bo'laklarga bo'ladi — imzo faqat to'liq paketni qidiradigan IDS uni o'tkazib yuborishi mumkin. To'liq qayta yig'uvchi IDS bunga chidamli.",en:"Fragmentation splits a packet into pieces — an IDS whose signature looks only for a whole packet may miss it. A fully reassembling IDS resists this."}}));
 }
 const root=ReactDOM.createRoot(document.getElementById("app"));
 root.render(React.createElement(App));
