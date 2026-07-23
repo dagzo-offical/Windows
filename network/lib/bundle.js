@@ -131,6 +131,14 @@ const LESSONS={
   49:{num:"L49",sec:5,uz:"IPsec va WireGuard",en:"IPsec & WireGuard",sub:"Zamonaviy VPN yechimlari chuqur"},
   50:{num:"L50",sec:5,uz:"Honeypot va deception",en:"Honeypots & Deception",sub:"Hujumchini o'ljaga tortish"},
   51:{num:"L51",sec:5,uz:"Bulut tarmoq xavfsizligi",en:"Cloud Network Security",sub:"VPC, Security Groups, NACL"},
+  52:{num:"L52",sec:6,uz:"Bulut tarmog'i",en:"Cloud Networking",sub:"VPC, subnet, IGW/NAT gateway"},
+  53:{num:"L53",sec:6,uz:"Kubernetes tarmog'i",en:"Kubernetes Networking",sub:"Pod, Service, Network Policy"},
+  54:{num:"L54",sec:6,uz:"SD-WAN va SASE",en:"SD-WAN & SASE",sub:"Dasturiy WAN va bulut xavfsizligi"},
+  55:{num:"L55",sec:6,uz:"Zero Trust chuqur",en:"Zero Trust in depth",sub:"ZTNA va uzluksiz tekshiruv"},
+  56:{num:"L56",sec:6,uz:"QUIC va HTTP/3",en:"QUIC & HTTP/3",sub:"UDP ustidagi zamonaviy transport"},
+  57:{num:"L57",sec:6,uz:"Tarmoq avtomatlashtirish",en:"Network Automation",sub:"Python, Ansible, IaC"},
+  58:{num:"L58",sec:6,uz:"IPv6 xavfsizligi",en:"IPv6 Security",sub:"Rogue RA, DHCPv6, RA Guard"},
+  59:{num:"L59",sec:6,uz:"5G va IoT xavfsizligi",en:"5G & IoT Security",sub:"IoT segmentatsiya, network slicing"},
 };
 
 const SECTIONS={
@@ -169,6 +177,13 @@ const SECTIONS={
      outcomesUz:["WAF va SIEM ni himoya arxitekturasiga joylash","Tarmoqni segmentatsiya va microsegmentatsiya qilish","DNS ni DNSSEC va DoH/DoT bilan himoyalash","IPsec/WireGuard va bulut xavfsizligini sozlash"],
      outcomesEn:["Place WAF and SIEM in a defense architecture","Segment and microsegment a network","Secure DNS with DNSSEC and DoH/DoT","Configure IPsec/WireGuard and cloud security"],
      tooling:["ModSecurity","Splunk/ELK","WireGuard","pfSense","AWS/Azure"]},
+  6:{num:"06",uz:"Zamonaviy & Bulut",en:"Modern & Cloud",color:"var(--c-auth)",icon:"globe",count:8,
+     descUz:"Bulut va Kubernetes tarmog'i, SD-WAN/SASE, Zero Trust, QUIC, avtomatlashtirish va IoT/5G xavfsizligi.",
+     descEn:"Cloud and Kubernetes networking, SD-WAN/SASE, Zero Trust, QUIC, automation and IoT/5G security.",
+     instructorUz:"Dilnoza Karimova — Network Security Architect",instructorEn:"CCNP Security, CompTIA Network+/Security+",
+     outcomesUz:["Bulut va Kubernetes tarmog'ini loyihalash","SD-WAN, SASE va Zero Trust arxitekturasini tushunish","QUIC/HTTP3 va tarmoq avtomatlashtirishni bilish","IPv6, IoT va 5G xavfsizligini qo'llash"],
+     outcomesEn:["Design cloud and Kubernetes networking","Understand SD-WAN, SASE and Zero Trust architecture","Know QUIC/HTTP3 and network automation","Apply IPv6, IoT and 5G security"],
+     tooling:["AWS/Azure","Kubernetes","Terraform","Ansible","WireGuard"]},
 };
 
 // ── Gamification data (badges / skill tree / lesson icons) ─────
@@ -2433,6 +2448,14 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
     num===49?React.createElement(LessonL49):
     num===50?React.createElement(LessonL50):
     num===51?React.createElement(LessonL51):
+    num===52?React.createElement(LessonL52):
+    num===53?React.createElement(LessonL53):
+    num===54?React.createElement(LessonL54):
+    num===55?React.createElement(LessonL55):
+    num===56?React.createElement(LessonL56):
+    num===57?React.createElement(LessonL57):
+    num===58?React.createElement(LessonL58):
+    num===59?React.createElement(LessonL59):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
@@ -2447,7 +2470,7 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
       React.createElement("div",{style:{fontSize:12,color:"var(--text-2)"}},lesson.sub)
     ),
     content,
-    !alreadyDone&&!done&&num<=51&&React.createElement("button",{
+    !alreadyDone&&!done&&num<=59&&React.createElement("button",{
       onClick:()=>{markComplete&&markComplete(lessonKey);setDone(true);},
       style:{marginTop:24,padding:"12px 28px",borderRadius:10,cursor:"pointer",appearance:"none",background:"var(--accent)",border:"none",color:"#04060d",fontFamily:"var(--font-display)",fontSize:14,fontWeight:700,boxShadow:"0 0 20px var(--accent-glow)"}
     },t(lang,"Darsni yakunlash ✓","Complete Lesson ✓")),
@@ -3750,6 +3773,136 @@ function LessonL51(){
     React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
     React.createElement(Terminal,null,"# Yomon (xavfli): hamma joydan SSH ochiq\n# Security Group: allow tcp 22 from 0.0.0.0/0   <- XATO!\n\n# Yaxshi: faqat ofis IP dan SSH\n# allow tcp 22 from 203.0.113.10/32\n# allow tcp 443 from 0.0.0.0/0   (faqat veb ochiq)"),
     React.createElement(Quiz,{q:{uz:"Bulut tarmoq buzilishlarining eng keng tarqalgan sababi nima?",en:"What is the most common cause of cloud network breaches?"},opts:[{uz:"Noto'g'ri sozlash (misconfiguration) — ochiq qoldirilgan resurs",en:"Misconfiguration — a resource left open"},{uz:"Zaif shifrlash algoritmi",en:"A weak encryption algorithm"},{uz:"Sekin internet",en:"Slow internet"},{uz:"Eski kabellar",en:"Old cables"}],correct:0,exp:{uz:"Bulutda ko'p buzilish hujumdan emas, noto'g'ri sozlashdan (juda keng Security Group yoki ochiq ma'lumot ombori) kelib chiqadi. Yechim — eng kam imtiyoz.",en:"Most cloud breaches stem not from an attack but from misconfiguration (an overly broad Security Group or an open data store). The fix is least privilege."}}));
+}
+function LessonL52(){
+  const lang=useLang();
+  const cn=[{n:"VPC",name:t(lang,"VPC / VNet","VPC / VNet"),color:"#4dabf7",desc:{uz:"Bulutdagi izolyatsiyalangan virtual tarmoq.",en:"An isolated virtual network in the cloud."}},{n:"pub",name:t(lang,"Public subnet","Public subnet"),color:"#69db7c",desc:{uz:"Internetga ochiq — veb serverlar shu yerda.",en:"Internet-facing — web servers live here."}},{n:"priv",name:t(lang,"Private subnet","Private subnet"),color:"#a855f7",desc:{uz:"Internetdan yopiq — ma'lumotlar bazasi shu yerda.",en:"Closed from the internet — the database lives here."}},{n:"NAT",name:t(lang,"IGW / NAT gateway","IGW / NAT gateway"),color:"#ffd43b",desc:{uz:"Kirish/chiqish nazorati — private subnet NAT orqali chiqadi.",en:"In/out control — the private subnet exits via NAT."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Bulutda tarmoq","Networking in the cloud")),
+    React.createElement(P,null,t(lang,"Bulutda fizik switch va kabel yo'q — tarmoq dasturiy. Markazida VPC (Virtual Private Cloud) — sizning izolyatsiyalangan virtual tarmog'ingiz. Uni public va private subnetlarga bo'lasiz, va IGW (Internet Gateway) hamda NAT gateway bilan kirish/chiqishni boshqarasiz.","In the cloud there are no physical switches or cables — networking is software. At its center is a VPC (Virtual Private Cloud) — your isolated virtual network. You split it into public and private subnets and control in/out with an IGW (Internet Gateway) and a NAT gateway.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Bulut tarmoq elementlari","Cloud network elements")),
+    React.createElement(LayerStack,{layers:cn}),
+    React.createElement(H2,{num:"§3"},t(lang,"Tipik arxitektura","A typical architecture")),
+    React.createElement(FlowSteps,{color:"#4dabf7",title:{uz:"Uch qavatli bulut tarmog'i",en:"A three-tier cloud network"},steps:[
+      {icon:"🌐",text:{uz:"Internet -> IGW -> public subnet (veb server)",en:"Internet -> IGW -> public subnet (web server)"}},
+      {icon:"🔒",text:{uz:"Veb server -> private subnet (ma'lumotlar bazasi)",en:"Web server -> private subnet (database)"}},
+      {icon:"↩️",text:{uz:"Private subnet NAT orqali yangilanish oladi (kirish yo'q)",en:"Private subnet gets updates via NAT (no inbound)"}},
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# Public subnet:  0.0.0.0/0 -> IGW  (internetga ochiq)\n# Private subnet: 0.0.0.0/0 -> NAT  (faqat chiqish)\n# DB private subnetda -> internetdan to'g'ridan-to'g'ri yetib bo'lmaydi"),
+    React.createElement(Quiz,{q:{uz:"Bulutda ma'lumotlar bazasini qayerga joylash to'g'ri?",en:"Where should a database go in the cloud?"},opts:[{uz:"Private subnet — internetdan yopiq",en:"Private subnet — closed from the internet"},{uz:"Public subnet — hammaga ochiq",en:"Public subnet — open to everyone"},{uz:"Internet gateway'ga",en:"On the internet gateway"},{uz:"Farqi yo'q",en:"Doesn't matter"}],correct:0,exp:{uz:"Ma'lumotlar bazasi private subnetda bo'lishi kerak — internetdan to'g'ridan-to'g'ri yetib bo'lmaydi, faqat ichki veb server unga ulanadi.",en:"A database belongs in a private subnet — not directly reachable from the internet, only the internal web server connects to it."}}));
+}
+function LessonL53(){
+  const lang=useLang();
+  const kn=[{n:"pod",name:t(lang,"Pod network (CNI)","Pod network (CNI)"),color:"#4dabf7",desc:{uz:"Har pod o'z IP oladi — konteynerlar orasidagi tarmoq.",en:"Each pod gets its own IP — the network between containers."}},{n:"svc",name:t(lang,"Service","Service"),color:"#69db7c",desc:{uz:"O'zgaruvchan pod IP'lari uchun barqaror manzil.",en:"A stable address for changing pod IPs."}},{n:"ing",name:t(lang,"Ingress","Ingress"),color:"#a855f7",desc:{uz:"Tashqi HTTP trafikni ichki xizmatlarga yo'naltirish.",en:"Routes external HTTP traffic to internal services."}},{n:"netpol",name:t(lang,"Network Policy","Network Policy"),color:"#ff6b6b",desc:{uz:"Pod'lar orasidagi trafikni cheklash (segmentatsiya).",en:"Restricts traffic between pods (segmentation)."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Kubernetes tarmog'i","Kubernetes networking")),
+    React.createElement(P,null,t(lang,"Konteynerlar juda ko'p va o'zgaruvchan — ular doim yaratiladi va o'chadi, IP'lari o'zgaradi. Kubernetes tarmog'i buni boshqaradi: har pod o'z IP oladi, Service barqaror manzil beradi, va Network Policy pod'lar orasidagi trafikni cheklaydi.","Containers are numerous and dynamic — constantly created and destroyed, with changing IPs. Kubernetes networking manages this: each pod gets its own IP, a Service provides a stable address, and a Network Policy restricts traffic between pods.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy elementlar","Key elements")),
+    React.createElement(LayerStack,{layers:kn}),
+    React.createElement(H2,{num:"§3"},t(lang,"Konteynerlar uchun segmentatsiya","Segmentation for containers")),
+    React.createElement(P,null,t(lang,"Network Policy — 47-darsdagi microsegmentatsiyaning Kubernetes versiyasi: qaysi pod qaysi pod bilan gaplashishi mumkinligini aniqlaydi. Masalan «faqat frontend backend bilan gaplashsin, boshqa hech kim ma'lumotlar bazasiga bevosita ulanmasin».","A Network Policy is the Kubernetes version of chapter 47's microsegmentation: it defines which pod may talk to which. For example, «only the frontend may talk to the backend, and no one else connects directly to the database».")),
+    React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlik eslatmasi","A security note")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Kubernetes standart holatida HAMMA pod HAMMA pod bilan gaplashadi — bu «yassi» tarmoq. Network Policy qo'shilmaguncha, bitta buzilgan pod hammasiga o'tishi mumkin (35-dars pivoting). Doim least-privilege siyosat yozing.","By default in Kubernetes EVERY pod can talk to EVERY pod — a «flat» network. Until you add a Network Policy, one compromised pod can reach all of them (lesson 35 pivoting). Always write least-privilege policies.")),
+    React.createElement(Quiz,{q:{uz:"Kubernetes'da pod'lar orasidagi trafikni nima cheklaydi?",en:"What restricts traffic between pods in Kubernetes?"},opts:[{uz:"Network Policy",en:"Network Policy"},{uz:"DNS",en:"DNS"},{uz:"NAT",en:"NAT"},{uz:"DHCP",en:"DHCP"}],correct:0,exp:{uz:"Network Policy pod'lar orasidagi ruxsat etilgan trafikni belgilaydi — konteyner muhitidagi microsegmentatsiya. Usiz tarmoq «yassi» bo'ladi.",en:"A Network Policy defines the allowed traffic between pods — microsegmentation for containers. Without it, the network is «flat»."}}));
+}
+function LessonL54(){
+  const lang=useLang();
+  const sd=[{n:"SD-WAN",name:t(lang,"SD-WAN","SD-WAN"),color:"#4dabf7",desc:{uz:"Dasturiy boshqariladigan WAN — internet ustida, markaziy siyosat.",en:"Software-defined WAN — over the internet, central policy."}},{n:"SASE",name:t(lang,"SASE","SASE"),color:"#a855f7",desc:{uz:"SD-WAN + bulut xavfsizligi bitta xizmatda.",en:"SD-WAN + cloud security in one service."}},{n:"ZTNA",name:t(lang,"ZTNA","ZTNA"),color:"#69db7c",desc:{uz:"Zero Trust kirish — VPN o'rnini bosadi (55-dars).",en:"Zero Trust access — replaces the VPN (lesson 55)."}},{n:"SWG",name:t(lang,"SWG / CASB","SWG / CASB"),color:"#ffd43b",desc:{uz:"Bulut veb-shlyuz va bulut ilova nazorati.",en:"Cloud web gateway and cloud-app control."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Nega WAN o'zgardi","Why WAN changed")),
+    React.createElement(P,null,t(lang,"An'anaviy filial tarmog'i qimmat maxsus liniyalar (MPLS) va butun trafikni markaziy ofis (DC) orqali yuborishga tayanardi. Masofaviy ish va bulut bilan bu model sekin va qimmat bo'lib qoldi. SD-WAN internet ustida dasturiy boshqariladigan WAN quradi; SASE esa bunga bulut xavfsizligini birlashtiradi.","A traditional branch network relied on expensive dedicated lines (MPLS) and routing all traffic through the central office (DC). With remote work and the cloud, that model became slow and costly. SD-WAN builds a software-controlled WAN over the internet; SASE combines it with cloud security.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Elementlar","The elements")),
+    React.createElement(LayerStack,{layers:sd}),
+    React.createElement(H2,{num:"§3"},t(lang,"SASE g'oyasi","The SASE idea")),
+    React.createElement(P,null,t(lang,"SASE (Secure Access Service Edge) tarmoq (SD-WAN) va xavfsizlikni (firewall, SWG, ZTNA) bitta bulut xizmatiga birlashtiradi. Masofaviy ishchi endi to'g'ridan-to'g'ri bulutga xavfsiz ulanadi — trafik markaziy DC orqali «aylanmaydi». Bu tezroq va Zero Trust (55-dars) bilan mos.","SASE (Secure Access Service Edge) merges networking (SD-WAN) and security (firewall, SWG, ZTNA) into a single cloud service. A remote worker now connects securely straight to the cloud — traffic no longer «hairpins» through the central DC. It's faster and aligns with Zero Trust (lesson 55).")),
+    React.createElement(H2,{num:"§4"},t(lang,"Amaliy foyda","Practical benefit")),
+    React.createElement(InfoBox,{color:"var(--c-system)"},React.createElement("strong",null,t(lang,"Natija: ","Result: ")),t(lang,"masofaviy ishchi bulut ilovasiga to'g'ridan-to'g'ri, past kechikish bilan ulanadi — lekin har ulanish baribir tekshiriladi (Zero Trust). Tezlik va xavfsizlik birga.","a remote worker reaches a cloud app directly, with low latency — yet every connection is still verified (Zero Trust). Speed and security together.")),
+    React.createElement(Quiz,{q:{uz:"SASE nimani bitta xizmatga birlashtiradi?",en:"What does SASE combine into one service?"},opts:[{uz:"Tarmoq (SD-WAN) va bulut xavfsizligini",en:"Networking (SD-WAN) and cloud security"},{uz:"Faqat DNS ni",en:"Only DNS"},{uz:"Parol menejerini",en:"A password manager"},{uz:"Antivirusni",en:"An antivirus"}],correct:0,exp:{uz:"SASE SD-WAN (tarmoq) va bulut xavfsizligini (firewall, SWG, ZTNA) bitta yagona bulut xizmatiga birlashtiradi.",en:"SASE unifies SD-WAN (networking) and cloud security (firewall, SWG, ZTNA) into one single cloud service."}}));
+}
+function LessonL55(){
+  const lang=useLang();
+  const zt=[{n:"ID",name:t(lang,"Identity-centric","Identity-centric"),color:"#4dabf7",desc:{uz:"Ishonch joylashuvga emas, tasdiqlangan shaxsga asoslanadi.",en:"Trust is based on verified identity, not location."}},{n:"least",name:t(lang,"Least privilege","Least privilege"),color:"#69db7c",desc:{uz:"Faqat kerakli resursga, faqat kerakli vaqtda.",en:"Only the needed resource, only when needed."}},{n:"micro",name:t(lang,"Microsegmentation","Microsegmentation"),color:"#a855f7",desc:{uz:"Ichkarida ham har ulanish tekshiriladi (47-dars).",en:"Even inside, every connection is checked (lesson 47)."}},{n:"ZTNA",name:t(lang,"ZTNA","ZTNA"),color:"#ffd43b",desc:{uz:"Foydalanuvchi butun tarmoqqa emas, faqat bitta ilovaga kiradi.",en:"A user reaches one app, not the whole network."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Zero Trust chuqur","Zero Trust in depth")),
+    React.createElement(P,null,t(lang,"21-dars Zero Trust'ni tanishtirdi. Uning yuragi — «hech qachon ishonma, har doim tekshir». Eski «qal'a va handaq» modelida ichki tarmoq ishonchli deb hisoblanardi. Zero Trust'da esa JOYLASHUV ishonch bermaydi — har so'rov, hatto ichkaridan bo'lsa ham, shaxs, qurilma va kontekst bo'yicha tekshiriladi.","Lesson 21 introduced Zero Trust. Its heart is «never trust, always verify». In the old «castle and moat» model, the internal network was considered trusted. In Zero Trust, LOCATION grants no trust — every request, even from inside, is checked by identity, device and context.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy tamoyillar","Core principles")),
+    React.createElement(LayerStack,{layers:zt}),
+    React.createElement(H2,{num:"§3"},t(lang,"Har so'rov tekshiruvi","Verifying every request")),
+    React.createElement(FlowSteps,{color:"#4dabf7",title:{uz:"Zero Trust qarori",en:"The Zero Trust decision"},steps:[
+      {icon:"🙋",text:{uz:"Kim? — shaxsni tasdiqlash (MFA)",en:"Who? — verify identity (MFA)"}},
+      {icon:"💻",text:{uz:"Qaysi qurilma? — holatini tekshirish",en:"Which device? — check its posture"}},
+      {icon:"🧭",text:{uz:"Kontekst? — joylashuv, vaqt, xatti-harakat",en:"Context? — location, time, behavior"}},
+      {icon:"🎯",text:{uz:"Faqat kerakli resursga eng kam ruxsat",en:"Least access to only the needed resource"}},
+    ]}),
+    React.createElement(H2,{num:"§4"},t(lang,"ZTNA — VPN o'rnini bosadi","ZTNA — replacing the VPN")),
+    React.createElement(P,null,t(lang,"An'anaviy VPN (14-dars) foydalanuvchini BUTUN ichki tarmoqqa qo'yadi — bitta buzilgan hisob keng kirish beradi. ZTNA (Zero Trust Network Access) esa foydalanuvchini faqat KERAKLI ilovaga ulaydi, tarmoqning qolganini ko'rsatmaydi — lateral movement (47-dars) uchun joy qolmaydi.","A traditional VPN (lesson 14) drops a user onto the ENTIRE internal network — one compromised account grants broad access. ZTNA (Zero Trust Network Access) connects a user only to the NEEDED app, hiding the rest of the network — leaving no room for lateral movement (lesson 47).")),
+    React.createElement(Quiz,{q:{uz:"Zero Trust'ning asosiy tamoyili qaysi?",en:"What is Zero Trust's core principle?"},opts:[{uz:"Hech qachon ishonma, har doim tekshir — joylashuv ishonch bermaydi",en:"Never trust, always verify — location grants no trust"},{uz:"Ichki tarmoqqa to'liq ishon",en:"Fully trust the internal network"},{uz:"Firewall'ni o'chir",en:"Turn off the firewall"},{uz:"Hamma portni och",en:"Open all ports"}],correct:0,exp:{uz:"Zero Trust hech qanday joylashuv yoki tarmoqni o'z-o'zidan ishonchli deb hisoblamaydi — har so'rov shaxs, qurilma va kontekst bo'yicha alohida tekshiriladi.",en:"Zero Trust treats no location or network as trusted by default — every request is checked individually by identity, device and context."}}));
+}
+function LessonL56(){
+  const lang=useLang();
+  const q=[{n:"UDP",name:t(lang,"UDP-asosli","UDP-based"),color:"#4dabf7",desc:{uz:"TCP o'rniga UDP ustida — moslashuvchan, tez.",en:"Over UDP instead of TCP — flexible, fast."}},{n:"0-RTT",name:t(lang,"0-RTT","0-RTT"),color:"#69db7c",desc:{uz:"Deyarli darhol ulanish — handshake qisqartirilgan.",en:"Almost-instant connection — a shortened handshake."}},{n:"TLS1.3",name:t(lang,"O'rnatilgan TLS 1.3","Built-in TLS 1.3"),color:"#a855f7",desc:{uz:"Shifrlash transportga qurilgan — alohida bosqich yo'q.",en:"Encryption built into transport — no separate step."}},{n:"migrate",name:t(lang,"Connection migration","Connection migration"),color:"#ffd43b",desc:{uz:"WiFi -> mobil o'tganda ulanish uzilmaydi.",en:"Switching WiFi -> mobile doesn't drop the connection."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Nega TCP'dan keyin?","Why move past TCP?")),
+    React.createElement(P,null,t(lang,"TCP (2-dars) ishonchli, lekin eski: uch bosqichli qo'l berish (handshake) va «head-of-line blocking» uni sekinlashtiradi. QUIC — Google boshlagan, keyin standart bo'lgan yangi transport: u UDP ustida ishlaydi va TCP'ning kamchiliklarini hal qiladi. HTTP/3 aynan QUIC ustida quriladi.","TCP (lesson 2) is reliable but old: its three-way handshake and «head-of-line blocking» slow it down. QUIC — started by Google, then standardized — is a new transport: it runs over UDP and fixes TCP's shortcomings. HTTP/3 is built directly on QUIC.")),
+    React.createElement(H2,{num:"§2"},t(lang,"QUIC nima beradi","What QUIC brings")),
+    React.createElement(LayerStack,{layers:q}),
+    React.createElement(H2,{num:"§3"},t(lang,"Nega tez","Why it's fast")),
+    React.createElement(P,null,t(lang,"An'anaviy HTTPS uch bosqich talab qiladi: TCP handshake, keyin TLS handshake, keyin ma'lumot. QUIC ularni BIRLASHTIRADI — ulanish va shifrlash bitta bosqichda (yoki 0-RTT bilan darhol). Va connection migration tufayli, telefon WiFi'dan mobil internetga o'tsa ham video uzilmaydi.","Traditional HTTPS needs three steps: a TCP handshake, then a TLS handshake, then data. QUIC MERGES them — connection and encryption in one step (or instantly with 0-RTT). And thanks to connection migration, a video doesn't drop when a phone switches from WiFi to mobile data.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlik/monitoring","Security/monitoring")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"QUIC to'liq shifrlangan va UDP/443'da ishlaydi — eski firewall va IDS (16-dars) uni ko'ra olmasligi yoki bloklashi mumkin. Blue-team monitoring vositalari QUIC'ni tushunishga moslashishi kerak.","QUIC is fully encrypted and runs on UDP/443 — older firewalls and IDS (lesson 16) may fail to see or may block it. Blue-team monitoring tools must adapt to understand QUIC.")),
+    React.createElement(Quiz,{q:{uz:"HTTP/3 qaysi transport ustida ishlaydi?",en:"Which transport does HTTP/3 run on?"},opts:[{uz:"QUIC (UDP asosida)",en:"QUIC (over UDP)"},{uz:"TCP",en:"TCP"},{uz:"ICMP",en:"ICMP"},{uz:"ARP",en:"ARP"}],correct:0,exp:{uz:"HTTP/3 QUIC transporti ustida quriladi — QUIC esa TCP emas, UDP ustida ishlaydi va shifrlashni o'ziga qurgan.",en:"HTTP/3 is built on the QUIC transport — and QUIC runs over UDP (not TCP) with encryption built in."}}));
+}
+function LessonL57(){
+  const lang=useLang();
+  const au=[{n:"py",name:t(lang,"Python / Netmiko","Python / Netmiko"),color:"#4dabf7",desc:{uz:"Skript bilan ko'plab qurilmaga CLI buyruqlar.",en:"Scripted CLI commands to many devices."}},{n:"ans",name:t(lang,"Ansible","Ansible"),color:"#69db7c",desc:{uz:"Deklarativ — «qanday bo'lishi kerak»ni yozasiz.",en:"Declarative — you write «the desired state»."}},{n:"api",name:t(lang,"NETCONF/API","NETCONF/API"),color:"#a855f7",desc:{uz:"CLI o'rniga tuzilgan API orqali sozlash.",en:"Configuring via a structured API instead of the CLI."}},{n:"iac",name:t(lang,"IaC (Terraform)","IaC (Terraform)"),color:"#ffd43b",desc:{uz:"Butun infratuzilmani kod bilan yaratish/boshqarish.",en:"Create/manage the whole infrastructure as code."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Nega avtomatlashtirish?","Why automate?")),
+    React.createElement(P,null,t(lang,"100 ta routerni qo'lda bir xil sozlash — sekin va xatoga moyil. Tarmoq avtomatlashtirish tarmoqni KOD bilan boshqaradi (Infrastructure as Code): bitta skript minglab qurilmani izchil sozlaydi, o'zgarishlar versiya nazoratida saqlanadi, va inson xatosi keskin kamayadi.","Configuring 100 routers by hand identically is slow and error-prone. Network automation manages the network with CODE (Infrastructure as Code): one script configures thousands of devices consistently, changes are tracked in version control, and human error drops sharply.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Vositalar","The tools")),
+    React.createElement(LayerStack,{layers:au}),
+    React.createElement(H2,{num:"§3"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"# Ansible playbook — barcha switchda VLAN 20 yaratish\n- hosts: switches\n  tasks:\n    - name: VLAN 20 qo'shish\n      ios_vlan: { vlan_id: 20, name: SEC }\n# bitta buyruq -> 50 switch izchil sozlanadi"),
+    React.createElement(H2,{num:"§4"},t(lang,"Xavfsizlikda ham","In security too")),
+    React.createElement(P,null,t(lang,"Avtomatlashtirish ikki tomon uchun ham: blue-team firewall qoidalari va yamalarni izchil tarqatadi; red-team esa skanerlash va tekshiruvlarni avtomatlashtiradi. Kod sifatida saqlangan konfiguratsiya, shuningdek, o'zgarishlarni audit qilish (kim, qachon, nima o'zgartirdi) imkonini beradi.","Automation serves both sides: blue-team distributes firewall rules and patches consistently; red-team automates scanning and checks. Configuration stored as code also enables auditing changes (who changed what, when).")),
+    React.createElement(Quiz,{q:{uz:"Tarmoqni «kod bilan» boshqarish yondashuvi qanday ataladi?",en:"What is the approach of managing a network «with code» called?"},opts:[{uz:"Infrastructure as Code (IaC) / avtomatlashtirish",en:"Infrastructure as Code (IaC) / automation"},{uz:"DNS spoofing",en:"DNS spoofing"},{uz:"Port scanning",en:"Port scanning"},{uz:"Handshake",en:"Handshake"}],correct:0,exp:{uz:"Infrastructure as Code (IaC) — tarmoq va infratuzilmani kod bilan tavsiflab, izchil va takrorlanadigan tarzda yaratish/boshqarish yondashuvi.",en:"Infrastructure as Code (IaC) — describing network and infrastructure in code to create/manage it consistently and repeatably."}}));
+}
+function LessonL58(){
+  const lang=useLang();
+  const v=[{n:"RA",name:t(lang,"Rogue RA","Rogue RA"),color:"#ff6b6b",desc:{uz:"Soxta router e'loni — o'zini default gateway qilib ko'rsatish (MITM).",en:"Fake router advertisement — posing as the default gateway (MITM)."}},{n:"DHCPv6",name:t(lang,"DHCPv6 spoofing","DHCPv6 spoofing"),color:"#a855f7",desc:{uz:"Soxta DHCPv6 server — soxta DNS/gateway berish.",en:"A rogue DHCPv6 server — handing out fake DNS/gateway."}},{n:"SLAAC",name:t(lang,"SLAAC suiiste'moli","SLAAC abuse"),color:"#ffd43b",desc:{uz:"Avtomatik manzillashni chalg'itish.",en:"Abusing automatic addressing."}},{n:"tunnel",name:t(lang,"IPv6 tunneling","IPv6 tunneling"),color:"#4dabf7",desc:{uz:"IPv4-only firewallni chetlab o'tish.",en:"Bypassing an IPv4-only firewall."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"IPv6 yangi hujum yuzalari","IPv6's new attack surfaces")),
+    React.createElement(P,null,t(lang,"38-dars IPv6 asoslarini ko'rsatdi. Lekin IPv6 yangi xavfsizlik muammolari ham keltiradi — ayniqsa ko'p tarmoqda u «yoqilgan, lekin himoyalanmagan». Eng muhimi: NDP (38-dars) autentifikatsiyasiz, shuning uchun ARP spoofing'ning (24-dars) IPv6 varianti mavjud.","Lesson 38 covered IPv6 basics. But IPv6 also brings new security problems — especially where it's «enabled but unprotected». Most importantly: NDP (lesson 38) has no authentication, so there's an IPv6 equivalent of ARP spoofing (lesson 24).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy hujumlar","The main attacks")),
+    React.createElement(LayerStack,{layers:v}),
+    React.createElement(H2,{num:"§3"},t(lang,"Rogue RA — IPv6 MITM","Rogue RA — IPv6 MITM")),
+    React.createElement(P,null,t(lang,"«Rogue RA» hujumida hujumchi soxta «Router Advertisement» yuborib, o'zini tarmoqning default gateway'i qilib e'lon qiladi — endi qurbonlar trafigi u orqali o'tadi. Bu aynan ARP spoofing (24-dars) ning IPv6 versiyasi va MITM (25-dars) ga olib keladi.","In a «Rogue RA» attack, the attacker sends a fake «Router Advertisement» declaring itself the network's default gateway — now victims' traffic flows through them. This is exactly the IPv6 version of ARP spoofing (lesson 24) and leads to MITM (lesson 25).")),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
+    React.createElement(Terminal,null,"# Switch himoyasi (IPv6 first-hop security)\n#  RA Guard      -> ruxsatsiz portdan Router Advertisement ni bloklaydi\n#  DHCPv6 Guard  -> soxta DHCPv6 serverni bloklaydi\n# + IPv6 uchun ALOHIDA firewall qoidalari (NAT yo'q, 38-dars)"),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"Agar IPv6 ni ishlatmasangiz ham, u ko'pincha standart yoqilgan — hujumchi undan foydalanishi mumkin. Uni to'g'ri sozlang yoki tegishli joyda o'chiring.","Even if you don't use IPv6, it's often enabled by default — an attacker can exploit it. Configure it properly, or disable it where appropriate.")),
+    React.createElement(Quiz,{q:{uz:"«Rogue RA» hujumi IPv4 dagi qaysi hujumga o'xshaydi?",en:"Which IPv4 attack does «Rogue RA» resemble?"},opts:[{uz:"ARP spoofing / soxta gateway (MITM)",en:"ARP spoofing / fake gateway (MITM)"},{uz:"SQL injection",en:"SQL injection"},{uz:"Parol brute-force",en:"Password brute-force"},{uz:"Phishing",en:"Phishing"}],correct:0,exp:{uz:"Rogue RA soxta router e'loni bilan o'zini gateway qilib ko'rsatadi — bu ARP spoofing (24-dars) ning IPv6 ekvivalenti va MITM ga olib keladi. Himoya: RA Guard.",en:"Rogue RA poses as the gateway via a fake router advertisement — the IPv6 equivalent of ARP spoofing (lesson 24), leading to MITM. Defense: RA Guard."}}));
+}
+function LessonL59(){
+  const lang=useLang();
+  const io=[{n:"weak",name:t(lang,"Zaif IoT","Weak IoT"),color:"#ff6b6b",desc:{uz:"Standart parol, yamalmagan proshivka — oson nishon.",en:"Default passwords, unpatched firmware — an easy target."}},{n:"slice",name:t(lang,"5G network slicing","5G network slicing"),color:"#4dabf7",desc:{uz:"Bitta 5G tarmog'ini mantiqiy bo'laklarga ajratish.",en:"Splitting one 5G network into logical slices."}},{n:"edge",name:t(lang,"Edge computing","Edge computing"),color:"#69db7c",desc:{uz:"Hisoblashni foydalanuvchiga yaqinlashtirish — yangi yuza.",en:"Moving compute near the user — a new surface."}},{n:"seg",name:t(lang,"IoT segmentatsiya","IoT segmentation"),color:"#ffd43b",desc:{uz:"IoT ni alohida VLAN ga ajratish (47-dars) — asosiy himoya.",en:"Isolating IoT into a separate VLAN (lesson 47) — the key defense."}}];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Yangi tarmoq turlari","New network types")),
+    React.createElement(P,null,t(lang,"IoT (millionlab «aqlli» qurilma) va 5G (yuqori tezlikli mobil) tarmoqqa yangi xavfsizlik muammolari keltiradi. Eng zaif bo'g'in — IoT: ko'p qurilma standart parol bilan chiqadi va deyarli hech qachon yamalmaydi.","IoT (millions of «smart» devices) and 5G (high-speed mobile) bring new security problems to the network. The weakest link is IoT: many devices ship with default passwords and are almost never patched.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy tushunchalar","Key concepts")),
+    React.createElement(LayerStack,{layers:io}),
+    React.createElement(H2,{num:"§3"},t(lang,"IoT — DDoS manbai","IoT — a DDoS source")),
+    React.createElement(P,null,t(lang,"Zaif IoT qurilmalari (kamera, router) ommaviy buzilib, botnetga aylanadi — bu botnetlar ulkan DDoS hujumlarini (27-dars) uyushtiradi. Mashhur misol: standart parolli IoT qurilmalarni yig'gan botnet tarixdagi eng katta DDoS hujumlaridan birini amalga oshirgan.","Weak IoT devices (cameras, routers) get compromised en masse and turned into a botnet — these botnets launch massive DDoS attacks (lesson 27). A famous example: a botnet of default-password IoT devices carried out one of the largest DDoS attacks in history.")),
+    React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
+    React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"IoT qurilmalarini ALOHIDA segmentga/VLAN ga (47-dars) ajrating va standart parolni o'zgartiring. Shunda kamerangiz buzilsa ham, hujumchi asosiy tarmog'ingizga o'ta olmaydi.","Put IoT devices on a SEPARATE segment/VLAN (lesson 47) and change the default password. Then even if your camera is compromised, the attacker can't reach your main network.")),
+    React.createElement(Quiz,{q:{uz:"IoT qurilmalarini himoyalashning eng amaliy usuli qaysi?",en:"What is the most practical way to secure IoT devices?"},opts:[{uz:"Alohida VLAN/segmentga ajratish + standart parolni o'zgartirish",en:"Isolate on a separate VLAN/segment + change the default password"},{uz:"Ularni o'chirib qo'yish",en:"Turning them off"},{uz:"IPv6 ni yoqish",en:"Enabling IPv6"},{uz:"Ko'proq kabel qo'shish",en:"Adding more cables"}],correct:0,exp:{uz:"IoT ni alohida segmentga ajratish (47-dars) buzilgan qurilmaning asosiy tarmoqqa o'tishini to'xtatadi; standart parolni o'zgartirish esa dastlabki buzilishni qiyinlashtiradi.",en:"Isolating IoT on a separate segment (lesson 47) stops a compromised device from reaching the main network; changing the default password makes the initial compromise harder."}}));
 }
 const root=ReactDOM.createRoot(document.getElementById("app"));
 root.render(React.createElement(App));
