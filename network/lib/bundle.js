@@ -776,7 +776,7 @@ function DMZSim(){
             fwbox(rIntf,t(lang,"Ichki Firewall","Inner Firewall"),fwInt,D,t(lang,"Qat'iy nazorat","Strict control"))),
           zone(A+"14",A+"55",[
             React.createElement("div",{key:"t",style:{color:A,fontWeight:800,fontSize:13,textAlign:"center",marginBottom:2}},t(lang,"🛡 LAN (Ichki Tarmoq)","🛡 LAN (Internal)")),
-            nodeBox(rDb,"🗄",t(lang,"Ma'lumotlar Bazasi","Database"),t(lang,"Yopiq server","Closed server"),"#fca5a5"),
+            React.cloneElement(nodeBox(rDb,"🗄",t(lang,"Ma'lumotlar Bazasi","Database"),t(lang,"Yopiq server","Closed server"),"#fca5a5"),{key:"db"}),
             React.createElement("div",{key:"pc",ref:rPc,style:{background:SL,border:"1px solid "+A+"44",borderRadius:10,padding:"9px 6px",textAlign:"center"}},
               React.createElement("div",{style:{fontSize:20}},"💻"),React.createElement("div",{style:{fontSize:11,color:"#e2e8f0",marginTop:2}},t(lang,"Xodim Kompyuteri","Staff PC")),
               React.createElement("div",{style:{display:"flex",gap:4,marginTop:6,justifyContent:"center"}},
@@ -787,7 +787,7 @@ function DMZSim(){
     React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:14}},
       React.createElement("div",{style:{background:SL,border:"1px solid rgba(148,163,184,.2)",borderRadius:12,padding:14}},
         React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#93c5fd",marginBottom:10}},t(lang,"Ssenariylarni tanlang","Choose a scenario")),
-        SCEN.map(s=>React.createElement("button",{key:s.k,onClick:()=>start(s.k),style:{width:"100%",textAlign:"left",padding:"9px 11px",marginBottom:7,background:run===s.k?s.c+"22":SL2,border:"1px solid "+(run===s.k?s.c:"rgba(148,163,184,.15)"),borderLeft:"4px solid "+s.c,borderRadius:8,cursor:"pointer"}},
+        SCEN.map(s=>React.createElement("button",{key:s.k,onClick:()=>start(s.k),style:{width:"100%",textAlign:"left",padding:"9px 11px",marginBottom:7,background:run===s.k?s.c+"22":SL2,borderTop:"1px solid "+(run===s.k?s.c:"rgba(148,163,184,.15)"),borderRight:"1px solid "+(run===s.k?s.c:"rgba(148,163,184,.15)"),borderBottom:"1px solid "+(run===s.k?s.c:"rgba(148,163,184,.15)"),borderLeft:"4px solid "+s.c,borderRadius:8,cursor:"pointer"}},
           React.createElement("div",{style:{fontWeight:600,fontSize:12,color:"#e2e8f0"}},t(lang,s.uz,s.en)),
           React.createElement("div",{style:{fontSize:10.5,color:"#94a3b8",marginTop:2}},t(lang,s.duz,s.den))))),
       React.createElement("div",{style:{background:SL,border:"1px solid rgba(148,163,184,.2)",borderRadius:12,padding:14,display:"flex",flexDirection:"column"}},
