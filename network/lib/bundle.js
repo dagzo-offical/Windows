@@ -192,7 +192,7 @@ const LESSON_ICON={1:"layers",2:"network",3:"network",4:"globe",5:"code",6:"targ
 function naKey(n){return `na_l${String(n).padStart(2,"0")}`;}
 function lessonFullKey(l){return `na_l${l.num.slice(1)}`;}
 function sectionLessonKeys(secNum){return Object.values(LESSONS).filter(l=>l.sec===secNum).map(lessonFullKey);}
-function isSectionDone(secNum,completed){const keys=sectionLessonKeys(secNum);return keys.length>0&&keys.every(k=>completed.includes(k));}
+function isSectionDone(secNum,completed){return true;/* unlock-all: barcha bo'limlar ochiq (asl: keys.length>0&&keys.every(k=>completed.includes(k))) */}
 
 const ALL_BADGES=[
   {icon:"target",uz:"Birinchi qadam",en:"First step",color:"var(--c-system)",unlock:c=>c.length>=1},
