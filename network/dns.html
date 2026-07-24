@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNS — Domain Name System · Chuqur qo'llanma</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='88'%3E%F0%9F%8C%90%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#05070f; --bg2:#0a0e1a; --surface:#0f1626; --surface2:#0b1220;
+    --border:rgba(148,163,184,.16); --border2:rgba(148,163,184,.28);
+    --t0:#eef3fb; --t1:#c7d2e0; --t2:#93a2b8; --t3:#5f6f86;
+    --cyan:#38bdf8; --blue:#4dabf7; --green:#34d399; --purple:#a855f7;
+    --amber:#f59e0b; --pink:#f472b6; --red:#f0506e; --accent:var(--cyan);
+    --mono:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(1200px 700px at 80% -10%,rgba(56,189,248,.10),transparent 55%),radial-gradient(1000px 600px at -10% 10%,rgba(168,85,247,.08),transparent 50%),var(--bg);
+    color:var(--t1);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:15px}
+  .e{display:none}
+  body.lang-en .u{display:none}
+  body.lang-en .e{display:inline}
+  a{color:var(--cyan)}
+  .wrap{max-width:960px;margin:0 auto;padding:0 22px}
+
+  /* top bar */
+  header.bar{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+    background:rgba(5,7,15,.72);border-bottom:1px solid var(--border)}
+  .bar .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:700;letter-spacing:.02em;color:var(--t0)}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  .brand small{color:var(--t3);font-weight:500;font-size:11px}
+  .toggle{display:flex;border:1px solid var(--border2);border-radius:999px;overflow:hidden;font-family:var(--mono);font-size:12px}
+  .toggle button{appearance:none;border:0;background:transparent;color:var(--t2);padding:6px 13px;cursor:pointer;font-family:inherit}
+  .toggle button.on{background:var(--cyan);color:#04121c;font-weight:700}
+
+  /* hero */
+  .hero{padding:64px 0 34px;position:relative}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+  h1.title{font-size:clamp(44px,8vw,76px);line-height:.98;margin:0 0 14px;letter-spacing:-.03em;color:var(--t0);font-weight:800}
+  .lede{font-size:clamp(16px,2.4vw,20px);color:var(--t1);max-width:640px}
+  .hero .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+  .chip{font-family:var(--mono);font-size:11.5px;color:var(--t2);border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:6px 12px}
+
+  /* sections */
+  section.blk{padding:30px 0;border-top:1px solid var(--border)}
+  .snum{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.1em;font-weight:700}
+  h2{font-size:clamp(24px,4vw,32px);margin:8px 0 14px;letter-spacing:-.02em;color:var(--t0);font-weight:750}
+  h3{font-size:18px;color:var(--t0);margin:26px 0 8px}
+  p{margin:0 0 14px}
+  .muted{color:var(--t2)}
+  strong{color:var(--t0)}
+  code.ic{font-family:var(--mono);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1px 6px;font-size:.86em;color:var(--cyan)}
+
+  /* callout */
+  .note{border:1px solid var(--border);border-left:3px solid var(--cyan);background:linear-gradient(90deg,rgba(56,189,248,.06),transparent);border-radius:10px;padding:14px 16px;margin:16px 0;font-size:14px}
+  .note.warn{border-left-color:var(--amber);background:linear-gradient(90deg,rgba(245,158,11,.07),transparent)}
+  .note.danger{border-left-color:var(--red);background:linear-gradient(90deg,rgba(240,80,110,.07),transparent)}
+  .note.good{border-left-color:var(--green);background:linear-gradient(90deg,rgba(52,211,153,.07),transparent)}
+  .note b{color:var(--t0)}
+
+  /* simulator */
+  .sim{margin:18px 0 6px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,var(--surface),var(--surface2));padding:18px}
+  .sim .ctrls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+  .sim input[type=text]{flex:1 1 220px;min-width:0;font-family:var(--mono);font-size:14px;background:#060b16;border:1px solid var(--border2);color:var(--t0);border-radius:9px;padding:10px 12px}
+  .btn{appearance:none;border:1px solid var(--cyan);background:var(--cyan);color:#04121c;font-weight:700;border-radius:9px;padding:10px 16px;cursor:pointer;font-family:var(--mono);font-size:13px;transition:.15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent;color:var(--cyan)}
+  .btn.ghost.on{background:var(--cyan);color:#04121c}
+  .stage-scroll{overflow-x:auto;padding-bottom:4px}
+  .stage{position:relative;min-width:640px;height:300px;margin:6px 0 4px}
+  .node{position:absolute;transform:translate(-50%,-50%);width:118px;background:#0b1322;border:1px solid var(--border2);border-radius:12px;padding:11px 8px;text-align:center;transition:box-shadow .25s,border-color .25s,background .25s}
+  .node .ico{font-size:22px;line-height:1}
+  .node .nm{font-size:12px;font-weight:700;color:var(--t0);margin-top:4px}
+  .node .sub{font-family:var(--mono);font-size:9.5px;color:var(--t3);margin-top:2px}
+  .node.hot{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 0 22px rgba(56,189,248,.35);background:#0e1b2c}
+  .node.answered{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 0 18px rgba(52,211,153,.3)}
+  .wireC{position:absolute;inset:0;pointer-events:none;z-index:0}
+  .packet{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--amber);border:2px solid #fff;
+    box-shadow:0 0 16px var(--amber);transform:translate(-50%,-50%);opacity:0;z-index:5;transition:left .8s ease-in-out,top .8s ease-in-out,opacity .3s,background .2s}
+  .packet.back{background:var(--green);box-shadow:0 0 16px var(--green)}
+  .simgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+  @media(max-width:640px){.simgrid{grid-template-columns:1fr}}
+  .panel{background:#070d18;border:1px solid var(--border);border-radius:11px;padding:13px}
+  .panel h4{margin:0 0 9px;font-family:var(--mono);font-size:12px;color:var(--cyan);font-weight:700;letter-spacing:.03em}
+  .log{font-family:var(--mono);font-size:11.6px;line-height:1.7;min-height:132px;color:var(--t1)}
+  .log .row{opacity:0;transform:translateY(4px);animation:rise .35s forwards}
+  .log .n{color:var(--cyan)}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .verdict{margin-top:10px;font-family:var(--mono);font-size:12.5px;font-weight:700}
+  .verdict.ok{color:var(--green)}
+  .kv{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.6px;padding:5px 0;border-bottom:1px dashed var(--border)}
+  .kv:last-child{border-bottom:0}
+  .kv span:first-child{color:var(--t2)}
+  .kv span:last-child{color:var(--t0)}
+
+  /* record cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px;margin:16px 0}
+  .rec{border:1px solid var(--border);border-radius:12px;padding:13px;background:var(--surface);transition:.15s}
+  .rec:hover{border-color:var(--border2);transform:translateY(-2px)}
+  .rec .tag{font-family:var(--mono);font-weight:800;font-size:15px;padding:2px 9px;border-radius:7px;display:inline-block}
+  .rec p{font-size:12.5px;margin:9px 0 0;color:var(--t2)}
+  .rec .ex{font-family:var(--mono);font-size:10.5px;color:var(--t3);margin-top:7px;word-break:break-all}
+
+  /* hierarchy */
+  .tree{display:flex;flex-direction:column;gap:9px;margin:16px 0}
+  .lvl{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--border);border-radius:12px;padding:13px 15px;background:var(--surface)}
+  .lvl .b{flex-shrink:0;width:36px;height:36px;border-radius:9px;display:grid;place-items:center;font-family:var(--mono);font-weight:800;font-size:14px}
+  .lvl .nm{font-weight:700;color:var(--t0);font-size:14.5px}
+  .lvl .ds{font-size:13px;color:var(--t2);margin-top:2px}
+
+  /* terminal */
+  .term{background:#060a14;border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin:14px 0;font-family:var(--mono)}
+  .term .top{display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:1px solid var(--border);background:#0a1120}
+  .term .top i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .term .top .r{background:#ff5f57}.term .top .y{background:#febc2e}.term .top .g{background:#28c840}
+  .term .top span{margin-left:6px;font-size:11px;color:var(--t3)}
+  .term pre{margin:0;padding:14px 15px;font-size:12.5px;line-height:1.65;color:var(--t1);overflow-x:auto;white-space:pre}
+  .term .c{color:var(--green)}    /* command */
+  .term .o{color:var(--t3)}       /* comment/output */
+  .term .hl{color:var(--cyan)}
+
+  /* quiz */
+  .quiz{border:1px solid var(--border);border-radius:14px;background:var(--surface);padding:18px;margin:16px 0}
+  .quiz .q{font-weight:700;color:var(--t0);font-size:15.5px;margin-bottom:12px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--border2);background:#0a1120;color:var(--t1);
+    border-radius:10px;padding:11px 14px;margin-bottom:9px;cursor:pointer;font-family:inherit;font-size:14px;transition:.15s}
+  .opt:hover{border-color:var(--cyan)}
+  .opt.correct{border-color:var(--green);background:rgba(52,211,153,.12);color:#d7fbe9}
+  .opt.wrong{border-color:var(--red);background:rgba(240,80,110,.12);color:#ffdbe3}
+  .opt.dim{opacity:.5}
+  .exp{margin-top:10px;font-size:13.5px;color:var(--t1);border-left:3px solid var(--green);padding:8px 13px;background:rgba(52,211,153,.06);border-radius:8px;display:none}
+  .exp.show{display:block}
+
+  footer{padding:34px 0 60px;border-top:1px solid var(--border);color:var(--t3);font-size:12.5px;font-family:var(--mono)}
+  .fade{opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s}
+  .fade.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>DNS <small>· Network Academy</small></div>
+    <div class="toggle" id="langToggle">
+      <button data-l="uz" class="on">UZ</button><button data-l="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">Domain Name System</div>
+    <h1 class="title">DNS</h1>
+    <p class="lede">
+      <span class="u">Internetning telefon kitobi. Odam eslaydigan nom (<b>google.com</b>) mashina tushunadigan IP manzilga (<b>142.250.187.206</b>) qanday aylanadi — boshidan oxirigacha, interaktiv.</span>
+      <span class="e">The internet's phone book. How a human-friendly name (<b>google.com</b>) becomes a machine address (<b>142.250.187.206</b>) — end to end, interactively.</span>
+    </p>
+    <div class="chips">
+      <span class="chip">resolution</span><span class="chip">Root · TLD · Authoritative</span>
+      <span class="chip">A / AAAA / MX / CNAME</span><span class="chip">cache &amp; TTL</span>
+      <span class="chip">DNSSEC · DoH · DoT</span><span class="chip">dig · nslookup</span>
+    </div>
+  </div>
+
+  <!-- §1 -->
+  <section class="blk fade">
+    <div class="snum">§1</div>
+    <h2><span class="u">DNS nima? — Telefon kitobi analogiyasi</span><span class="e">What is DNS? — the phone-book analogy</span></h2>
+    <p>
+      <span class="u"><b>DNS (Domain Name System)</b> — internetning telefon kitobi. Odamlar nomlarni eslab qolishadi (<code class="ic">google.com</code>), lekin kompyuterlar bir-biriga faqat IP manzillar orqali murojaat qiladi (<code class="ic">142.250.187.206</code>). DNS nomni IP ga aylantiradi — bu jarayon <b>«resolution»</b> (hal qilish) deyiladi.</span>
+      <span class="e"><b>DNS (Domain Name System)</b> is the internet's phone book. People remember names (<code class="ic">google.com</code>), but computers only address each other by IP (<code class="ic">142.250.187.206</code>). DNS translates a name into an IP — a process called <b>«resolution»</b>.</span>
+    </p>
+    <p>
+      <span class="u">Deyarli har bir internet amaliyoti — sayt ochish, email yuborish, ilova ulanishi — DNS so'rovidan boshlanadi. Agar DNS ishlamasa, internet «ishlamaydi» ga o'xshaydi, garchi serverlar tirik bo'lsa ham: siz raqamni bilmaysiz, faqat ismni bilasiz.</span>
+      <span class="e">Almost every internet action — opening a site, sending mail, an app connecting — starts with a DNS query. If DNS breaks, the internet "feels down" even while servers are alive: you know the name, not the number.</span>
+    </p>
+    <div class="note good">
+      <span class="u"><b>Asosiy g'oya:</b> DNS markazlashmagan, daraxt shaklidagi, keshlanadigan tizim. Hech bir server hamma javobni bilmaydi — har biri faqat <b>keyingi qadamni</b> ko'rsatadi.</span>
+      <span class="e"><b>Core idea:</b> DNS is a decentralized, tree-shaped, cached system. No single server knows every answer — each only points to the <b>next step</b>.</span>
+    </div>
+  </section>
+
+  <!-- §2 interactive -->
+  <section class="blk fade">
+    <div class="snum">§2</div>
+    <h2><span class="u">Interaktiv simulyator: so'rov qanday hal bo'ladi</span><span class="e">Interactive simulator: how a query resolves</span></h2>
+    <p class="muted">
+      <span class="u">Domenni yozing va <b>«Hal qilish»</b> ni bosing — paket qaysi serverga borishini va har biri nima deyishini jonli ko'ring. Keyin <b>«Keshdan»</b> rejimini yoqib, ikkinchi so'rov qanchalik tez ekanini solishtiring.</span>
+      <span class="e">Type a domain and press <b>«Resolve»</b> — watch the packet travel and what each server says. Then turn on <b>«From cache»</b> and compare how fast the second query is.</span>
+    </p>
+
+    <div class="sim">
+      <div class="ctrls">
+        <input type="text" id="domain" value="google.com" spellcheck="false" autocomplete="off">
+        <button class="btn" id="resolveBtn"><span class="u">▶ Hal qilish</span><span class="e">▶ Resolve</span></button>
+        <button class="btn ghost" id="cacheBtn"><span class="u">⚡ Keshdan</span><span class="e">⚡ From cache</span></button>
+      </div>
+
+      <div class="stage-scroll">
+        <div class="stage" id="stage">
+          <svg class="wireC" id="wires" preserveAspectRatio="none"></svg>
+          <div class="node" id="n_you"   style="left:12%;top:50%"><div class="ico">🧑‍💻</div><div class="nm"><span class="u">Siz</span><span class="e">You</span></div><div class="sub">browser</div></div>
+          <div class="node" id="n_res"   style="left:38%;top:50%"><div class="ico">🧭</div><div class="nm"><span class="u">Resolver</span><span class="e">Resolver</span></div><div class="sub">1.1.1.1</div></div>
+          <div class="node" id="n_root"  style="left:74%;top:16%"><div class="ico">🌐</div><div class="nm">Root</div><div class="sub">"."</div></div>
+          <div class="node" id="n_tld"   style="left:74%;top:50%"><div class="ico">🏷️</div><div class="nm">TLD</div><div class="sub">.com</div></div>
+          <div class="node" id="n_auth"  style="left:74%;top:84%"><div class="ico">📇</div><div class="nm"><span class="u">Authoritative</span><span class="e">Authoritative</span></div><div class="sub">ns.google</div></div>
+          <div class="packet" id="packet"></div>
+        </div>
+      </div>
+
+      <div class="simgrid">
+        <div class="panel">
+          <h4><span class="u">So'rov jurnali</span><span class="e">Query log</span></h4>
+          <div class="log" id="log"><div class="row muted"><span class="u">Boshlash uchun «Hal qilish» ni bosing.</span><span class="e">Press «Resolve» to start.</span></div></div>
+          <div class="verdict" id="verdict"></div>
+        </div>
+        <div class="panel">
+          <h4><span class="u">Natija</span><span class="e">Result</span></h4>
+          <div class="kv"><span>domain</span><span id="r_dom">—</span></div>
+          <div class="kv"><span>A record (IP)</span><span id="r_ip">—</span></div>
+          <div class="kv"><span><span class="u">bosqichlar</span><span class="e">hops</span></span><span id="r_hops">—</span></div>
+          <div class="kv"><span><span class="u">manba</span><span class="e">source</span></span><span id="r_src">—</span></div>
+          <div class="kv"><span>TTL</span><span id="r_ttl">—</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="muted" style="font-size:12.5px">
+      <span class="u">IP manzillar namoyish uchun; haqiqiy qiymatlar vaqt bilan o'zgaradi. Resolver butun zanjirni <b>siz o'rniga</b> yuradi (rekursiv), keyin javobni keshlaydi.</span>
+      <span class="e">IP addresses are illustrative; real values change over time. The resolver walks the whole chain <b>on your behalf</b> (recursive), then caches the answer.</span>
+    </p>
+  </section>
+
+  <!-- §3 hierarchy -->
+  <section class="blk fade">
+    <div class="snum">§3</div>
+    <h2><span class="u">Ierarxiya: Root → TLD → Authoritative</span><span class="e">The hierarchy: Root → TLD → Authoritative</span></h2>
+    <p>
+      <span class="u">DNS teskari daraxt: yuqorida ildiz (root), pastda alohida domenlar. Har daraja faqat keyingi darajani biladi — bu tizimni miqyoslanuvchi va chidamli qiladi.</span>
+      <span class="e">DNS is an inverted tree: the root at the top, individual domains at the bottom. Each level only knows the next — which makes the system scalable and resilient.</span>
+    </p>
+    <div class="tree">
+      <div class="lvl"><div class="b" style="background:rgba(168,85,247,.16);color:var(--purple)">.</div>
+        <div><div class="nm">Root server (<code class="ic">.</code>)</div>
+        <div class="ds"><span class="u">Dunyoda 13 ta mantiqiy manzil (A–M), yuzlab nusxa sifatida anycast bilan tarqatilgan. Faqat TLD serverlariga yo'naltiradi.</span><span class="e">13 logical addresses worldwide (A–M), mirrored as hundreds via anycast. Only refers you to the TLD servers.</span></div></div></div>
+      <div class="lvl"><div class="b" style="background:rgba(245,158,11,.16);color:var(--amber)">T</div>
+        <div><div class="nm">TLD server (<code class="ic">.com</code>, <code class="ic">.uz</code>, <code class="ic">.org</code>)</div>
+        <div class="ds"><span class="u">Har bir yuqori darajali zona uchun alohida. O'sha zonadagi domenning authoritative NS serverlarini biladi.</span><span class="e">One per top-level zone. Knows the authoritative NS servers for domains in that zone.</span></div></div></div>
+      <div class="lvl"><div class="b" style="background:rgba(244,114,182,.16);color:var(--pink)">A</div>
+        <div><div class="nm"><span class="u">Authoritative NS</span><span class="e">Authoritative NS</span></div>
+        <div class="ds"><span class="u">Muayyan domen (google.com) uchun YAKUNIY javobni beradigan yagona manba. Zonaning haqiqiy yozuvlari shu yerda.</span><span class="e">The single source of the FINAL answer for a specific domain (google.com). The zone's real records live here.</span></div></div></div>
+      <div class="lvl"><div class="b" style="background:rgba(56,189,248,.16);color:var(--cyan)">⚡</div>
+        <div><div class="nm"><span class="u">Recursive resolver</span><span class="e">Recursive resolver</span></div>
+        <div class="ds"><span class="u">Ierarxiyaning bir qismi emas, lekin kalit o'yinchi: client o'rniga butun zanjirni yuradi va natijani keshlaydi (1.1.1.1, 8.8.8.8, ISP resolveri).</span><span class="e">Not part of the hierarchy but the key player: walks the whole chain for the client and caches the result (1.1.1.1, 8.8.8.8, your ISP's resolver).</span></div></div></div>
+    </div>
+    <div class="note">
+      <span class="u"><b>Rekursiv vs iterativ:</b> client resolverga <b>rekursiv</b> so'rov beradi («menga to'liq javob top»). Resolver esa Root→TLD→Authoritative bilan <b>iterativ</b> ishlaydi (har biridan «keyingi kim?» deb so'raydi).</span>
+      <span class="e"><b>Recursive vs iterative:</b> the client asks the resolver <b>recursively</b> ("get me the full answer"). The resolver then works <b>iteratively</b> with Root→TLD→Authoritative (asking each "who's next?").</span>
+    </div>
+  </section>
+
+  <!-- §4 record types -->
+  <section class="blk fade">
+    <div class="snum">§4</div>
+    <h2><span class="u">DNS yozuv turlari</span><span class="e">DNS record types</span></h2>
+    <p><span class="u">Bir domen ko'p turdagi yozuvlarga ega. Eng muhimlari:</span><span class="e">A single domain carries many record types. The most important:</span></p>
+    <div class="grid">
+      <div class="rec"><span class="tag" style="background:rgba(77,171,247,.16);color:var(--blue)">A</span>
+        <p><span class="u">Nomni IPv4 manzilga bog'laydi — eng ko'p ishlatiladigan yozuv.</span><span class="e">Maps a name to an IPv4 address — the most common record.</span></p>
+        <div class="ex">example.com → 93.184.216.34</div></div>
+      <div class="rec"><span class="tag" style="background:rgba(52,211,153,.16);color:var(--green)">AAAA</span>
+        <p><span class="u">Nomni IPv6 manzilga bog'laydi.</span><span class="e">Maps a name to an IPv6 address.</span></p>
+        <div class="ex">example.com → 2606:2800:220:1::</div></div>
+      <div class="rec"><span class="tag" style="background:rgba(168,85,247,.16);color:var(--purple)">MX</span>
+        <p><span class="u">Domen uchun pochta serverini ko'rsatadi (ustuvorlik raqami bilan).</span><span class="e">Points to the mail server for the domain (with a priority number).</span></p>
+        <div class="ex">10 mail.example.com</div></div>
+      <div class="rec"><span class="tag" style="background:rgba(245,158,11,.16);color:var(--amber)">CNAME</span>
+        <p><span class="u">Taxallus — bir nomni boshqa nomga yo'naltiradi.</span><span class="e">An alias — points one name to another.</span></p>
+        <div class="ex">www → example.com</div></div>
+      <div class="rec"><span class="tag" style="background:rgba(240,80,110,.16);color:var(--red)">NS</span>
+        <p><span class="u">Domen uchun qaysi serverlar authoritative ekanini ko'rsatadi.</span><span class="e">Shows which servers are authoritative for the domain.</span></p>
+        <div class="ex">ns1.example.com</div></div>
+      <div class="rec"><span class="tag" style="background:rgba(244,114,182,.16);color:var(--pink)">TXT</span>
+        <p><span class="u">Erkin matn — ko'pincha SPF/DKIM email tekshiruvi uchun.</span><span class="e">Free-form text — often for SPF/DKIM email checks.</span></p>
+        <div class="ex">v=spf1 include:_spf... -all</div></div>
+      <div class="rec"><span class="tag" style="background:rgba(56,189,248,.16);color:var(--cyan)">SOA</span>
+        <p><span class="u">Zona haqida asosiy ma'lumot: asosiy NS, serial, yangilanish vaqtlari.</span><span class="e">Zone metadata: primary NS, serial, refresh timers.</span></p>
+        <div class="ex">ns1 admin 2024010101 ...</div></div>
+      <div class="rec"><span class="tag" style="background:rgba(148,163,184,.18);color:var(--t1)">PTR</span>
+        <p><span class="u">Teskari qidiruv — IP manzildan nomga (reverse DNS).</span><span class="e">Reverse lookup — from IP back to a name (reverse DNS).</span></p>
+        <div class="ex">34.216.184.93.in-addr.arpa</div></div>
+    </div>
+  </section>
+
+  <!-- §5 cache & ttl -->
+  <section class="blk fade">
+    <div class="snum">§5</div>
+    <h2><span class="u">Keshlash va TTL — nega ikkinchi so'rov tez?</span><span class="e">Caching and TTL — why is the second query fast?</span></h2>
+    <p>
+      <span class="u">Har bir javob <b>TTL (Time To Live)</b> bilan keladi — necha soniya saqlash mumkinligini bildiradi. Resolver (va sizning brauzeringiz, OS) javobni shu muddatga keshlaydi. Shuning uchun <b>birinchi</b> so'rov butun zanjirni yuradi, <b>ikkinchi</b> so'rov esa to'g'ridan-to'g'ri keshdan keladi — millisekundlarda.</span>
+      <span class="e">Every answer comes with a <b>TTL (Time To Live)</b> — how many seconds it may be stored. The resolver (and your browser, OS) cache the answer for that long. So the <b>first</b> query walks the whole chain, while the <b>second</b> comes straight from cache — in milliseconds.</span>
+    </p>
+    <div class="note">
+      <span class="u"><b>Katta TTL</b> = tezroq va serverga kam yuk, lekin o'zgarish sekin tarqaladi. <b>Kichik TTL</b> = tez yangilanish (masalan migratsiya oldidan), lekin ko'proq so'rov. Migratsiyadan oldin TTL ni pasaytirish — klassik amaliyot.</span>
+      <span class="e"><b>High TTL</b> = faster and less server load, but changes propagate slowly. <b>Low TTL</b> = quick updates (e.g. before a migration), but more queries. Lowering the TTL before a migration is a classic move.</span>
+    </div>
+  </section>
+
+  <!-- §6 security -->
+  <section class="blk fade">
+    <div class="snum">§6</div>
+    <h2><span class="u">DNS xavfsizligi</span><span class="e">DNS security</span></h2>
+    <p><span class="u">DNS dastlab ishonchga qurilgan va shifrlanmagan edi — shuning uchun bir nechta hujum turi bor:</span><span class="e">DNS was originally built on trust and unencrypted — hence several attack classes:</span></p>
+
+    <h3><span class="u">Cache poisoning / spoofing</span><span class="e">Cache poisoning / spoofing</span></h3>
+    <p class="muted"><span class="u">Hujumchi resolver keshiga soxta javob «tiqadi» — foydalanuvchini soxta IP ga (fishing sayti) yo'naltiradi. Klassik Kaminsky hujumi shu zaiflikni ochgan.</span><span class="e">An attacker injects a forged answer into the resolver's cache — redirecting the user to a fake IP (a phishing site). The classic Kaminsky attack exposed this.</span></p>
+
+    <h3>DNSSEC</h3>
+    <p class="muted"><span class="u">Yozuvlarni raqamli imzo bilan tasdiqlaydi (RRSIG). Resolver imzoni tekshirib, javob soxtalashtirilmaganiga ishonch hosil qiladi. Maxfiylikni emas — <b>yaxlitlikni</b> himoya qiladi.</span><span class="e">Signs records cryptographically (RRSIG). The resolver validates the signature to trust the answer wasn't forged. Protects <b>integrity</b>, not privacy.</span></p>
+
+    <h3>DoH / DoT</h3>
+    <p class="muted"><span class="u"><b>DNS over HTTPS (DoH)</b> va <b>DNS over TLS (DoT)</b> — DNS so'rovlarini shifrlaydi, shu bilan tarmoqdagi kuzatuvchi qaysi saytlarga kirayotganingizni ko'ra olmaydi. Bu <b>maxfiylikni</b> himoya qiladi.</span><span class="e"><b>DNS over HTTPS (DoH)</b> and <b>DNS over TLS (DoT)</b> encrypt DNS queries, so an on-path observer can't see which sites you visit. This protects <b>privacy</b>.</span></p>
+
+    <div class="note danger">
+      <span class="u"><b>DNS amplifikatsiya (DDoS):</b> hujumchi kichik so'rovni <b>qurbon IP</b> nomidan (soxtalashtirilgan manba) ochiq resolverga yuboradi; resolver katta javobni qurbonga qaytaradi. Kichik so'rov → katta javob = kuchaytirish. Ochiq rekursiv resolverlar shuning uchun xavfli.</span>
+      <span class="e"><b>DNS amplification (DDoS):</b> the attacker sends a small query with a <b>spoofed source</b> (the victim's IP) to an open resolver; the resolver sends a large answer to the victim. Small query → big answer = amplification. This is why open recursive resolvers are dangerous.</span>
+    </div>
+  </section>
+
+  <!-- §7 tools -->
+  <section class="blk fade">
+    <div class="snum">§7</div>
+    <h2><span class="u">Amaliyot: dig, nslookup, host</span><span class="e">Practice: dig, nslookup, host</span></h2>
+    <p><span class="u"><code class="ic">dig +trace</code> butun ierarxiyani (Root → TLD → Authoritative) qadam-baqadam ko'rsatadi — simulyatordagi jarayonni haqiqiy buyruqda ko'rasiz.</span><span class="e"><code class="ic">dig +trace</code> shows the whole hierarchy (Root → TLD → Authoritative) step by step — the simulator's process as a real command.</span></p>
+
+    <div class="term">
+      <div class="top"><i class="r"></i><i class="y"></i><i class="g"></i><span>bash — dig</span></div>
+<pre><span class="c">$ dig example.com A +short</span>
+<span class="o"># 93.184.216.34</span>
+
+<span class="c">$ dig example.com MX +short</span>
+<span class="o"># 10 mail.example.com.</span>
+
+<span class="c">$ dig +trace example.com</span>
+<span class="o">.            IN NS  a.root-servers.net.        <span class="hl">← Root</span>
+com.         IN NS  a.gtld-servers.net.        <span class="hl">← TLD (.com)</span>
+example.com. IN NS  a.iana-servers.net.        <span class="hl">← Authoritative</span>
+example.com. IN A   93.184.216.34              <span class="hl">← final answer</span></span></pre>
+    </div>
+
+    <div class="term">
+      <div class="top"><i class="r"></i><i class="y"></i><i class="g"></i><span>bash — nslookup / host</span></div>
+<pre><span class="c">$ nslookup example.com</span>
+<span class="o">Server:  1.1.1.1
+Address: 93.184.216.34</span>
+
+<span class="c">$ nslookup -type=MX example.com</span>
+<span class="o"># example.com  mail exchanger = 10 mail.example.com.</span>
+
+<span class="c">$ host -a example.com</span>
+<span class="o"># example.com has address 93.184.216.34
+# example.com mail is handled by 10 mail.example.com.</span></pre>
+    </div>
+
+    <div class="note good">
+      <span class="u"><b>Maslahat:</b> keshni chetlab o'tib to'g'ridan-to'g'ri authoritative serverdan so'rash uchun <code class="ic">dig @ns1.example.com example.com</code>. TTL ni ko'rish uchun <code class="ic">+short</code> siz oddiy <code class="ic">dig</code> ni ishlating — javobdagi ikkinchi ustun TTL.</span>
+      <span class="e"><b>Tip:</b> to bypass cache and ask the authoritative server directly, <code class="ic">dig @ns1.example.com example.com</code>. To see the TTL, run plain <code class="ic">dig</code> without <code class="ic">+short</code> — the second column of the answer is the TTL.</span>
+    </div>
+  </section>
+
+  <!-- quiz -->
+  <section class="blk fade">
+    <div class="snum">✓</div>
+    <h2><span class="u">Bilimni tekshiring</span><span class="e">Check your knowledge</span></h2>
+    <div class="quiz" id="quiz">
+      <div class="q"><span class="u">Root DNS server so'rovga qanday javob beradi?</span><span class="e">How does a Root DNS server respond to a query?</span></div>
+      <button class="opt" data-c="0"><span class="u">Har doim yakuniy IP manzilni qaytaradi</span><span class="e">It always returns the final IP address</span></button>
+      <button class="opt" data-c="1"><span class="u">Yakuniy javobni bilmaydi — tegishli TLD serverga yo'naltiradi</span><span class="e">It doesn't know the final answer — it refers to the right TLD server</span></button>
+      <button class="opt" data-c="0"><span class="u">So'rovni bloklaydi</span><span class="e">It blocks the query</span></button>
+      <button class="opt" data-c="0"><span class="u">Faqat email manzillarga javob beradi</span><span class="e">It only answers for email addresses</span></button>
+      <div class="exp" id="exp"><span class="u">To'g'ri: Root server yakuniy javobni bilmaydi — u faqat tegishli TLD (masalan <code class="ic">.com</code>) serverlarining manzilini ko'rsatadi (referral). Yakuniy javobni faqat authoritative server beradi.</span><span class="e">Correct: a Root server doesn't know the final answer — it only points to the right TLD (e.g. <code class="ic">.com</code>) servers (a referral). Only the authoritative server gives the final answer.</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="u">Network Academy · DNS chuqur qo'llanma · o'quv maqsadida · IP/qiymatlar namoyish uchun soddalashtirilgan.</div>
+    <div class="e">Network Academy · DNS deep-dive · for learning · IPs/values simplified for illustration.</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- language toggle ---------- */
+  var lt=document.getElementById('langToggle');
+  lt.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    var en=b.dataset.l==='en';
+    document.body.classList.toggle('lang-en',en);
+    [].forEach.call(lt.children,function(x){x.classList.toggle('on',x===b);});
+  });
+  function isEN(){return document.body.classList.contains('lang-en');}
+  function T(uz,en){return isEN()?en:uz;}
+
+  /* ---------- reveal on scroll ---------- */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);} });
+  },{threshold:.12});
+  [].forEach.call(document.querySelectorAll('.fade'),function(el){io.observe(el);});
+
+  /* ---------- quiz ---------- */
+  var quiz=document.getElementById('quiz'), exp=document.getElementById('exp'), answered=false;
+  [].forEach.call(quiz.querySelectorAll('.opt'),function(opt){
+    opt.addEventListener('click',function(){
+      if(answered)return; answered=true;
+      var correct=opt.dataset.c==='1';
+      [].forEach.call(quiz.querySelectorAll('.opt'),function(o){
+        if(o.dataset.c==='1')o.classList.add('correct');
+        else if(o===opt)o.classList.add('wrong');
+        else o.classList.add('dim');
+      });
+      exp.classList.add('show');
+    });
+  });
+
+  /* ---------- DNS resolution simulator ---------- */
+  var stage=document.getElementById('stage'), packet=document.getElementById('packet'),
+      wires=document.getElementById('wires'), logEl=document.getElementById('log'),
+      verdict=document.getElementById('verdict'),
+      resolveBtn=document.getElementById('resolveBtn'), cacheBtn=document.getElementById('cacheBtn'),
+      domainIn=document.getElementById('domain');
+  var N={you:'n_you',res:'n_res',root:'n_root',tld:'n_tld',auth:'n_auth'};
+  var cacheMode=false, running=false, timers=[];
+
+  cacheBtn.addEventListener('click',function(){
+    cacheMode=!cacheMode; cacheBtn.classList.toggle('on',cacheMode);
+  });
+
+  function center(id){
+    var el=document.getElementById(id), s=stage.getBoundingClientRect(), r=el.getBoundingClientRect();
+    return {x:(r.left-s.left+r.width/2), y:(r.top-s.top+r.height/2)};
+  }
+  function drawWires(){
+    var s=stage.getBoundingClientRect();
+    wires.setAttribute('viewBox','0 0 '+s.width+' '+s.height);
+    var pairs=[['you','res'],['res','root'],['res','tld'],['res','auth']], svg='';
+    pairs.forEach(function(p){
+      var a=center(N[p[0]]), b=center(N[p[1]]);
+      svg+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="rgba(148,163,184,.22)" stroke-width="1.5" stroke-dasharray="5 5"/>';
+    });
+    wires.innerHTML=svg;
+  }
+  function place(id,instant){
+    var c=center(id);
+    if(instant){var t=packet.style.transition; packet.style.transition='none'; packet.style.left=c.x+'px'; packet.style.top=c.y+'px'; packet.offsetHeight; packet.style.transition=t; }
+    else{ packet.style.left=c.x+'px'; packet.style.top=c.y+'px'; }
+  }
+  function hot(id,cls){var el=document.getElementById(id); el.classList.add(cls||'hot'); }
+  function clearHot(){['you','res','root','tld','auth'].forEach(function(k){var e=document.getElementById(N[k]); e.classList.remove('hot');e.classList.remove('answered');});}
+  function addLog(html){var d=document.createElement('div'); d.className='row'; d.innerHTML=html; logEl.appendChild(d); logEl.scrollTop=logEl.scrollHeight; }
+  function setRes(dom,ip,hops,src,ttl){
+    document.getElementById('r_dom').textContent=dom;
+    document.getElementById('r_ip').textContent=ip;
+    document.getElementById('r_hops').textContent=hops;
+    document.getElementById('r_src').textContent=src;
+    document.getElementById('r_ttl').textContent=ttl;
+  }
+  function fakeIP(dom){ /* deterministic pseudo-IP from domain, illustrative — unsigned so octets stay 0-255 */
+    var h=0; for(var i=0;i<dom.length;i++){h=(h*31+dom.charCodeAt(i))>>>0;}
+    return '142.'+(h%200+20)+'.'+((h>>>8)%200+10)+'.'+((h>>>16)%200+5);
+  }
+  function reset(){
+    timers.forEach(clearTimeout); timers=[]; running=false;
+    resolveBtn.removeAttribute('disabled');
+    clearHot(); packet.style.opacity=0; verdict.textContent=''; verdict.className='verdict';
+    logEl.innerHTML='';
+  }
+  function step(delay,fn){ timers.push(setTimeout(fn,delay)); }
+
+  function run(){
+    if(running)return; reset(); running=true; resolveBtn.setAttribute('disabled','');
+    var dom=(domainIn.value||'example.com').trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'')||'example.com';
+    var tld=(dom.split('.').pop()||'com'), ip=fakeIP(dom);
+    document.getElementById('n_tld').querySelector('.sub').textContent='.'+tld;
+    drawWires(); place(N.you,true); packet.style.opacity=1; packet.classList.remove('back');
+
+    if(cacheMode){
+      hot(N.you);
+      addLog('<span class="n">1.</span> '+T('Siz → Resolver: <b>'+dom+'</b> A? ','You → Resolver: <b>'+dom+'</b> A? '));
+      step(500,function(){ place(N.res); hot(N.res); });
+      step(1250,function(){ addLog('<span class="n">2.</span> '+T('Resolver: keshda bor ✓ (TTL hali tugamagan) — zanjir kerak emas.','Resolver: cache hit ✓ (TTL still valid) — no chain needed.')); document.getElementById(N.res).classList.add('answered'); packet.classList.add('back'); });
+      step(1800,function(){ place(N.you); });
+      step(2650,function(){
+        addLog('<span class="n">3.</span> '+T('Resolver → Siz: <b>'+ip+'</b> ⚡ (keshdan)','Resolver → You: <b>'+ip+'</b> ⚡ (from cache)'));
+        setRes(dom,ip,'1 hop',T('kesh','cache'),'~180s');
+        verdict.className='verdict ok'; verdict.textContent=T('✓ Keshdan — millisekundlarda hal bo\'ldi.','✓ From cache — resolved in milliseconds.');
+        running=false; resolveBtn.removeAttribute('disabled');
+      });
+      return;
+    }
+
+    /* uncached full recursion */
+    hot(N.you);
+    addLog('<span class="n">1.</span> '+T('Siz → Resolver: <b>'+dom+'</b> ning IP si kerak.','You → Resolver: I need the IP for <b>'+dom+'</b>.'));
+    step(550,function(){ place(N.res); hot(N.res); });
+    step(1300,function(){ addLog('<span class="n">2.</span> '+T('Resolver → Root: <b>'+dom+'</b> qayerda?','Resolver → Root: where is <b>'+dom+'</b>?')); place(N.root); hot(N.root); });
+    step(2200,function(){ document.getElementById(N.root).classList.add('answered'); addLog('<span class="n">3.</span> '+T('Root → Resolver: bilmayman, lekin <b>.'+tld+'</b> TLD serveridan so\'ra.','Root → Resolver: I don\'t know, but ask the <b>.'+tld+'</b> TLD server.')); });
+    step(2800,function(){ place(N.res); });
+    step(3400,function(){ addLog('<span class="n">4.</span> '+T('Resolver → TLD (.'+tld+'): <b>'+dom+'</b>?','Resolver → TLD (.'+tld+'): <b>'+dom+'</b>?')); place(N.tld); hot(N.tld); });
+    step(4300,function(){ document.getElementById(N.tld).classList.add('answered'); addLog('<span class="n">5.</span> '+T('TLD → Resolver: authoritative NS — <b>ns.'+dom+'</b>.','TLD → Resolver: authoritative NS is <b>ns.'+dom+'</b>.')); });
+    step(4900,function(){ place(N.res); });
+    step(5500,function(){ addLog('<span class="n">6.</span> '+T('Resolver → Authoritative: <b>'+dom+'</b> A?','Resolver → Authoritative: <b>'+dom+'</b> A?')); place(N.auth); hot(N.auth); });
+    step(6400,function(){ document.getElementById(N.auth).classList.add('answered'); addLog('<span class="n">7.</span> '+T('Authoritative → Resolver: <b>'+ip+'</b> (TTL 300).','Authoritative → Resolver: <b>'+ip+'</b> (TTL 300).')); packet.classList.add('back'); });
+    step(7000,function(){ place(N.res); });
+    step(7700,function(){ place(N.you); });
+    step(8500,function(){
+      addLog('<span class="n">8.</span> '+T('Resolver → Siz: <b>'+ip+'</b> ✓ (keshladi, TTL 300s)','Resolver → You: <b>'+ip+'</b> ✓ (cached, TTL 300s)'));
+      setRes(dom,ip,'4 '+T('bosqich','hops'),T('to\'liq zanjir','full chain'),'300s');
+      verdict.className='verdict ok'; verdict.textContent=T('✓ Hal bo\'ldi. Endi «Keshdan» ni yoqib qayta sinang.','✓ Resolved. Now enable «From cache» and try again.');
+      running=false; resolveBtn.removeAttribute('disabled');
+    });
+  }
+
+  resolveBtn.addEventListener('click',run);
+  domainIn.addEventListener('keydown',function(e){ if(e.key==='Enter')run(); });
+  window.addEventListener('resize',function(){ drawWires(); if(!running)packet.style.opacity=0; });
+  drawWires();
+})();
+</script>
+</body>
+</html>
