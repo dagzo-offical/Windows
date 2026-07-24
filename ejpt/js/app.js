@@ -44,7 +44,44 @@ const LS = {
   settings: "ejpt_settings",
   activeExam: "ejpt_exam_active",
   practice: "ejpt_practice_stats",
+  labFlags: "ejpt_lab_flags",
 };
+
+// ---- Amaliy Lab (Docker poligoni) ----
+// flag qiymatlari repo'da (lab/WALKTHROUGH.md); bu yerda faqat SHA-256 tekshiruv uchun.
+const LAB = {
+  repo: "https://github.com/dagzo-offical/Windows/tree/main/lab",
+  machines: [
+    { id: "web-01", name: "web-01", alias: "acme.lab", ip: "172.20.0.10", diff: "medium",
+      services: ["HTTP/80", "SSH/22"], tools: ["nmap", "dirb", "sqlmap", "burp"],
+      obj: "SQL injection va cheklovsiz fayl upload orqali shell oling (www-data), so'ng sysadmin + sudo bilan root'ga ko'taring. Bu mashina ichki tarmoqqa ham ulangan — pivot nuqtasi.",
+      flags: [
+        { id: "web-01-user", label: "User flag", hash: "6c1c823759ea58d6a2a16157c96b48dc3df8bc42814d860b66f3a7d7c40a89a8" },
+        { id: "web-01-root", label: "Root flag", hash: "2df2c2f22462bbea71c598ea7c7df3c6d2e521baf69d7ac91ab2b1c90facb5ba" },
+      ] },
+    { id: "linux-02", name: "linux-02", alias: "backend", ip: "172.20.0.20", diff: "easy",
+      services: ["FTP/21", "SSH/22"], tools: ["nmap", "ftp", "hydra"],
+      obj: "Anonim FTP'dagi maslahat yoki Hydra bilan zaif SSH parolini toping (bob), so'ng SUID find (GTFOBins) bilan root'ga chiqing.",
+      flags: [
+        { id: "linux-02-user", label: "User flag", hash: "93e51fbb4d17f4dad11cb6f40616f7ec452a3e718598358883ef6b5ee2f7e129" },
+        { id: "linux-02-root", label: "Root flag", hash: "84eac80080d69599f852d12cad5d230df9a87578b49b4d9319189848f6276900" },
+      ] },
+    { id: "smb-03", name: "smb-03", alias: "fileserver", ip: "172.20.0.30", diff: "medium",
+      services: ["SMB/445", "SSH/22"], tools: ["nmap", "smbclient", "enum4linux"],
+      obj: "Null-session SMB share'idan credential o'g'irlang (carol), SSH bilan kiring, so'ng root ishga tushiradigan yoziladigan skript orqali root'ga ko'taring.",
+      flags: [
+        { id: "smb-03-user", label: "User flag", hash: "7490ab7a5b913d64bc9a86507ad9a952c5518d1d2966761dfb9a4be1e8e6bd35" },
+        { id: "smb-03-root", label: "Root flag", hash: "0a6622afbe8693faf2f93bfa3e6b19f5df6ac7b22d7d48c5ba3644754dccb72d" },
+      ] },
+    { id: "internal-04", name: "internal-04", alias: "vault", ip: "10.10.10.20 (ichki)", diff: "hard",
+      services: ["HTTP/8080"], tools: ["pivoting", "proxychains", "curl"],
+      obj: "Bu mashina FAQAT ichki tarmoqda — to'g'ridan-to'g'ri yeta olmaysiz. Avval web-01'ni egallab, o'sha host orqali PIVOT qiling, so'ng command injection bilan final flag'ni oling.",
+      flags: [
+        { id: "internal-04-final", label: "Final flag", hash: "eafcf4163e79f086a2642cf1e27f03f2efbd9ba1d530c19e3968207d2f31401d" },
+      ] },
+  ],
+};
+const LAB_TOTAL_FLAGS = LAB.machines.reduce((n, m) => n + m.flags.length, 0);
 
 /* ---------------- storage helpers (all guarded) ---------------- */
 function lsGet(key, fallback) {
@@ -227,6 +264,7 @@ function render() {
     case "examResult": r.innerHTML = topbar(false) + examResultView(); drawRing(); animateBars(); break;
     case "practiceConfig": r.innerHTML = topbar(true) + practiceConfigView(); break;
     case "practice": r.innerHTML = topbar(false) + practiceView(); break;
+    case "labs": r.innerHTML = topbar(true) + labsView(); drawRing(); break;
     case "history": r.innerHTML = topbar(true) + historyView(); break;
     default: r.innerHTML = topbar(false) + homeView();
   }
@@ -293,6 +331,12 @@ function homeView() {
         <h3>Mashq rejimi</h3>
         <p>Domen tanlab, cheksiz mashq. Har savoldan keyin darhol to'g'ri/noto'g'ri va izoh ko'rsatiladi.</p>
         <div class="m-go">Mashqni boshlash ${svg("arrowR", 15)}</div>
+      </button>
+      <button class="mode" style="--mode-c:var(--green);--mode-soft:var(--green-soft)" onclick="EJPT.go('labs')">
+        <div class="m-ico">${svg("target", 22)}</div>
+        <h3>Amaliy Lab <span class="mono" style="font-size:11px;color:var(--green)">DOCKER</span></h3>
+        <p>4 ta haqiqiy zaif mashinani buzing — enumeration, exploit, privilege escalation, pivoting va ${LAB_TOTAL_FLAGS} flag.</p>
+        <div class="m-go">Mashinalarni ko'rish ${svg("arrowR", 15)}</div>
       </button>
     </div>
   </div>
@@ -745,6 +789,110 @@ function historyView() {
   ${footer()}`;
 }
 
+/* ================= AMALIY LAB (Docker) ================= */
+function labFlagsSolved() {
+  const s = lsGet(LS.labFlags, []);
+  return new Set(Array.isArray(s) ? s : []);
+}
+function labsView() {
+  const solved = labFlagsSolved();
+  const done = solved.size;
+  const pct = Math.round((done / LAB_TOTAL_FLAGS) * 100);
+  const col = done === LAB_TOTAL_FLAGS ? "var(--green)" : "var(--orange)";
+  const diffCls = { easy: "diff-easy", medium: "diff-medium", hard: "diff-hard" };
+
+  const machines = LAB.machines.map((m) => {
+    const flagsHtml = m.flags.map((f) => {
+      const ok = solved.has(f.id);
+      return `<div class="labflag ${ok ? "solved" : ""}">
+        <span class="lf-label">${svg(ok ? "check" : "flag", 14)} ${esc(f.label)}</span>
+        ${ok
+          ? `<span class="lf-ok">Topildi ✓</span>`
+          : `<span class="lf-in"><input id="lf_${f.id}" placeholder="EJPT{...}" spellcheck="false" autocomplete="off"
+               onkeydown="if(event.key==='Enter')EJPT.submitLabFlag('${f.id}')">
+             <button class="btn sm blue" onclick="EJPT.submitLabFlag('${f.id}')">Tekshirish</button></span>`}
+      </div>`;
+    }).join("");
+    const allSolved = m.flags.every((f) => solved.has(f.id));
+    return `<div class="labcard ${allSolved ? "done" : ""}">
+      <div class="labcard-top">
+        <div><span class="labname">${esc(m.name)}</span>
+          <span class="labalias mono">${esc(m.alias)}</span>
+          <span class="mono" style="color:var(--t3);font-size:12px">· ${esc(m.ip)}</span></div>
+        <span class="difftag ${diffCls[m.diff]}">${esc(m.diff)}</span>
+      </div>
+      <div class="labsvc">
+        ${m.services.map((s) => `<span class="tag" style="color:var(--blue);border-color:var(--blue)">${esc(s)}</span>`).join("")}
+        ${m.tools.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}
+      </div>
+      <p class="labobj">${esc(m.obj)}</p>
+      <div class="labflags">${flagsHtml}</div>
+    </div>`;
+  }).join("");
+
+  const circ = (2 * Math.PI * 64).toFixed(1);
+  return `
+  <div class="hero rise">
+    <div class="eyebrow">${svg("target", 13)} Amaliy Laboratoriya · Docker</div>
+    <h1>Haqiqiy mashinalarni <span class="grad-o">buzing</span></h1>
+    <p class="lede">4 ta zaif mashina — ularni haqiqatan buzib, imtiyozni oshirib (privilege escalation),
+      flag'larni toping. Docker orqali izolyatsiya qilingan; asosiy hostga zarar yetmaydi.</p>
+    <div class="ring-wrap" style="margin-top:18px">
+      <div class="ring" id="ring" data-pct="${pct}" data-color="${col}">
+        <svg width="150" height="150" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="64" fill="none" stroke="var(--border)" stroke-width="11"/>
+          <circle class="rc" cx="75" cy="75" r="64" fill="none" stroke="${col}" stroke-width="11"
+            stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
+        </svg>
+        <div class="rlabel"><div class="rp" style="color:${col}">${done}/${LAB_TOTAL_FLAGS}</div><div class="rs">flag</div></div>
+      </div>
+      <div style="flex:1;min-width:280px">
+        <h3>O'rnatish (Docker)</h3>
+        <div class="term"><div class="term-top"><i class="r"></i><i class="y"></i><i class="g"></i><span class="lbl">bash</span></div>
+<pre>git clone https://github.com/dagzo-offical/Windows
+cd Windows/lab
+docker compose up -d --build
+docker exec -it ejpt-attacker bash   # hujum qutisi</pre></div>
+        <p class="small muted">Qo'llanma: <a href="${LAB.repo}" target="_blank" rel="noopener">lab/ (GitHub)</a> · host discovery: <span class="mono">nmap -sn 172.20.0.0/24</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Mashinalar</h2>
+    <p class="muted small">Topgan flag'ni tegishli maydonga kiriting — tizim tekshiradi. <b>internal-04</b>'ga faqat web-01 orqali <b>pivot</b> bilan yetiladi.</p>
+    <div class="labgrid">${machines}</div>
+  </div>
+
+  <div class="section" style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn ghost" onclick="EJPT.go('home')">${svg("home", 15)} Bosh sahifa</button>
+    ${done > 0 ? `<button class="btn ghost sm" onclick="EJPT.resetLab()">${svg("trash", 15)} Lab progressini tozalash</button>` : ""}
+  </div>
+  ${footer()}`;
+}
+async function submitLabFlag(flagId) {
+  const inp = document.getElementById("lf_" + flagId);
+  if (!inp) return;
+  const val = inp.value.trim();
+  if (!val) return;
+  let expected = null;
+  LAB.machines.forEach((m) => m.flags.forEach((f) => { if (f.id === flagId) expected = f.hash; }));
+  if (!expected) return;
+  let hex = null;
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(val));
+    hex = Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  } catch (e) { hex = null; }
+  if (hex === expected) {
+    const s = lsGet(LS.labFlags, []);
+    const arr = Array.isArray(s) ? s : [];
+    if (arr.indexOf(flagId) === -1) { arr.push(flagId); lsSet(LS.labFlags, arr); }
+    render(); drawRing();
+  } else {
+    inp.classList.add("no"); inp.value = ""; inp.placeholder = "Noto'g'ri — qayta urining";
+  }
+}
+
 /* ================= shared bits ================= */
 function footer() {
   return `<div class="foot">
@@ -813,6 +961,9 @@ const EJPT = {
     render();
   },
   // practice answering is routed through answerMCQ/submitText depending on view:
+  // labs
+  submitLabFlag(id) { submitLabFlag(id); },
+  resetLab() { if (confirm("Lab flag progressini tozalaysizmi?")) { lsDel(LS.labFlags); render(); } },
   // history
   clearHistory() {
     if (confirm("Barcha imtihon tarixini o'chirasizmi?")) { lsDel(LS.history); lsDel(LS.practice); render(); }

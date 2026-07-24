@@ -120,7 +120,7 @@ p{margin:0 0 13px}
 .dbar .dbar-topics{font-size:12px;color:var(--t3);margin-top:5px;font-family:var(--mono)}
 
 /* mode cards */
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:16px;margin-top:8px}
 .mode{position:relative;border:1px solid var(--border);background:linear-gradient(180deg,var(--card),var(--card-2));
   border-radius:var(--r-lg);padding:22px;cursor:pointer;transition:.18s;overflow:hidden;text-align:left;color:inherit;font:inherit}
 .mode:hover{transform:translateY(-3px);border-color:var(--mode-c,var(--orange))}
@@ -290,3 +290,25 @@ p{margin:0 0 13px}
 @media(prefers-reduced-motion:reduce){
   *{animation:none !important;transition:none !important}
 }
+
+/* ---------- Amaliy Lab ---------- */
+.labgrid{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.labcard{border:1px solid var(--border);background:var(--card);border-radius:var(--r);padding:18px;transition:.15s}
+.labcard.done{border-color:var(--green);background:linear-gradient(180deg,var(--green-soft),var(--card))}
+.labcard-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.labname{font-weight:700;color:var(--t0);font-size:17px}
+.labalias{color:var(--blue);font-size:13px;margin-left:6px}
+.labsvc{display:flex;flex-wrap:wrap;gap:6px;margin:11px 0}
+.labobj{color:var(--t1);font-size:13.5px;line-height:1.6;margin:6px 0 14px}
+.labflags{display:flex;flex-direction:column;gap:8px}
+.labflag{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--card-2);border:1px solid var(--border);border-radius:10px;padding:9px 12px}
+.labflag.solved{border-color:var(--green);background:var(--green-soft)}
+.lf-label{font-size:13px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:6px}
+.labflag.solved .lf-label{color:var(--green)}
+.lf-ok{font-family:var(--mono);font-size:12px;color:var(--green);font-weight:700}
+.lf-in{display:flex;gap:8px;align-items:center}
+.lf-in input{font-family:var(--mono);font-size:13px;background:#060b16;border:1px solid var(--border-lit);
+  color:var(--t0);border-radius:8px;padding:7px 10px;width:200px;max-width:44vw}
+.lf-in input:focus{outline:none;border-color:var(--blue)}
+.lf-in input.no{border-color:var(--red)}
