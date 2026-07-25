@@ -19,7 +19,6 @@ a{color:#60a5fa}code{color:#93c5fd}</style></head>
 <body><div class="wrap">
 <h2 style="color:#60a5fa">Mahsulot qidiruvi</h2>
 <form method="get"><input name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="masalan: Acme"> <button>Qidirish</button></form>
-<?php if($sql) echo '<p style="color:#6b7280;font-size:12px">Query: <code>'.htmlspecialchars($sql).'</code></p>'; ?>
 <?php if($rows): ?>
 <table><tr><th>Nomi</th><th>Narxi</th></tr>
 <?php foreach($rows as $r){ echo '<tr><td>'.htmlspecialchars($r['name']).'</td><td>'.htmlspecialchars($r['price']).'</td></tr>'; } ?>

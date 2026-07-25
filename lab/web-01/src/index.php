@@ -5,10 +5,10 @@ $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $u = $_POST['username'] ?? '';
   $p = $_POST['password'] ?? '';
-  // ZAIF: foydalanuvchi kiritmasi to'g'ridan-to'g'ri so'rovga qo'shiladi (SQLi)
-  $sql = "SELECT * FROM users WHERE username = '$u' AND password = '$p'";
+  // ZAIF: username to'g'ridan-to'g'ri so'rovga qo'shiladi (SQLi). Parol md5crypt bilan tekshiriladi.
+  $sql = "SELECT * FROM users WHERE username = '$u'";
   $row = db()->query($sql)->fetch(PDO::FETCH_ASSOC);
-  if ($row) {
+  if ($row && crypt($p, $row['password']) === $row['password']) {
     $_SESSION['user'] = $row['username'];
     $_SESSION['role'] = $row['role'] ?? 'user';
     header('Location: dashboard.php');
@@ -32,5 +32,5 @@ button{width:100%;padding:10px;border:0;border-radius:8px;background:#2563eb;col
   <input name="password" type="password" placeholder="Password" autocomplete="off">
   <button type="submit">Kirish</button>
 </form>
-<div class="foot">Mahsulot qidiruvi: <a href="search.php" style="color:#60a5fa">search.php</a></div>
+<div class="foot">© 2024 Acme Corp · Internal Portal v2.4</div>
 </div></body></html>

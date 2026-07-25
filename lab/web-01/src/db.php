@@ -1,20 +1,24 @@
 <?php
 // ACME CMS — ma'lumotlar bazasi qatlami (SQLite).
-// DIQQAT: bu ataylab zaif qilingan o'quv ilovasi. So'rovlar prepared statement
-// ISHLATMAYDI — SQL injection namoyishi uchun.
+// DIQQAT: ataylab zaif o'quv ilovasi (SQL injection namoyishi).
+// Parollar md5crypt ($1$) hash sifatida saqlanadi — SQLi bilan sizib chiqqach,
+// ular john bilan BUZILISHI (crack) kerak, so'ng SSH uchun ishlatiladi.
 function db() {
   $path = __DIR__ . '/data.db';
   $pdo = new PDO('sqlite:' . $path);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
-  // idempotent seed
   $pdo->exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT, role TEXT)");
   $pdo->exec("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, price TEXT)");
   $cnt = $pdo->query("SELECT COUNT(*) c FROM users")->fetch(PDO::FETCH_ASSOC);
   if ((int)$cnt['c'] === 0) {
-    $pdo->exec("INSERT INTO users (username,password,role) VALUES
-      ('admin','S3cr3t2025!','admin'),
-      ('sysadmin','Ac3m3S3rv3r!','operator'),
-      ('editor','Summer2025!','editor')");
+    // nowdoc — PHP $ ni talqin qilmaydi, hash butun qoladi.
+    // admin=S3cr3t2025!  sysadmin=Ac3m3S3rv3r! (SSH)  editor=Summer2025!
+    $pdo->exec(<<<'SQL'
+INSERT INTO users (username,password,role) VALUES
+ ('admin','$1$acme01$LKXfufFStU2JIHhZ8jBW2/','admin'),
+ ('sysadmin','$1$acme02$uiKoWRDnmr5mUs9ngQm3C.','operator'),
+ ('editor','$1$acme03$xE1wR2RXoF42CJ0i6pHPh/','editor')
+SQL);
     $pdo->exec("INSERT INTO products (name,price) VALUES
       ('Acme Firewall','1200'),
       ('Acme VPN Gateway','800'),

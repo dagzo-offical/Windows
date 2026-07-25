@@ -41,7 +41,7 @@ Poligonni umumiy serverda (VPS/ichki server) ishga tushiring — bir nechta o'qu
 
 | Mashina | IP | Xizmatlar | Kill-chain | Flaglar |
 |---|---|---|---|---|
-| **web-01** (`acme.lab`) | 172.20.0.10 | HTTP(80), SSH(22) | SQLi + fayl upload → `www-data` → `sysadmin` (sudo) → **root** | user + root |
+| **web-01** (`acme.lab`) | 172.20.0.10 | HTTP(80), SSH(22) | web SQLi → parol **hash** sizadi → **crack (john)** → SSH → sudo → **root** | user + root |
 | **linux-02** (`backend`) | 172.20.0.20 | FTP(21), SSH(22) | anon FTP hint + zaif SSH → `bob` → SUID `find` → **root** | user + root |
 | **smb-03** (`fileserver`) | 172.20.0.30 | SMB(445), SSH(22) | null-session SMB → cred → `carol` → yoziladigan root skript → **root** | user + root |
 | **internal-04** (`vault`) | 10.10.10.20 | HTTP(8080) | **FAQAT web-01 orqali pivot** → command injection → **final** | final |

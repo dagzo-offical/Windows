@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       smbclient samba-common-bin \
       ftp \
       hydra \
+      john \
       dirb \
       iputils-ping dnsutils net-tools \
       jq less vim-tiny procps \

