@@ -1,0 +1,77 @@
+# ============================================================
+#  CyberSecurity Platform — to'liq stack
+#  backend (auth/admin/RBAC/VM-restart/terminal-proxy)
+#  + attacker (ttyd web-terminal) + 4 zaif VM (izolyatsiya qilingan tarmoq)
+#  Ishga tushirish:  docker compose up -d --build
+#  So'ng brauzerda:  http://localhost:8080   (birinchi ro'yxatdan o'tgan = admin)
+# ============================================================
+name: ejpt-platform
+
+networks:
+  labnet:
+    driver: bridge
+    ipam: { config: [{ subnet: 172.20.0.0/24 }] }
+  internalnet:
+    driver: bridge
+    internal: true
+    ipam: { config: [{ subnet: 10.10.10.0/24 }] }
+
+volumes:
+  platform-data:
+
+services:
+
+  backend:
+    build: .
+    container_name: ejpt-backend
+    ports: ["8080:8080"]
+    volumes:
+      - ../:/repo:ro                                 # modullar (windows/, kali/, ...) shu yerdan uzatiladi
+      - platform-data:/data                          # foydalanuvchilar/sessiya
+      - /var/run/docker.sock:/var/run/docker.sock    # VM restart uchun
+    networks: [labnet]
+    restart: unless-stopped
+
+  attacker:
+    build: ../lab/attacker
+    container_name: ejpt-attacker
+    hostname: kali-lite
+    cap_add: [NET_ADMIN, NET_RAW]
+    networks:
+      labnet: { ipv4_address: 172.20.0.5 }
+    # brauzer terminali (backend /terminal orqali proxy qiladi)
+    command: ["ttyd", "-p", "7681", "-b", "/terminal", "-W", "-t", "titleFixed=eJPT Lab Terminal", "bash"]
+    restart: unless-stopped
+
+  web-01:
+    build: ../lab/web-01
+    container_name: ejpt-web-01
+    hostname: acme-web
+    networks:
+      labnet: { ipv4_address: 172.20.0.10, aliases: [acme.lab, www.acme.lab] }
+      internalnet: { ipv4_address: 10.10.10.10 }
+    restart: unless-stopped
+
+  linux-02:
+    build: ../lab/linux-02
+    container_name: ejpt-linux-02
+    hostname: backend
+    networks:
+      labnet: { ipv4_address: 172.20.0.20 }
+    restart: unless-stopped
+
+  smb-03:
+    build: ../lab/smb-03
+    container_name: ejpt-smb-03
+    hostname: fileserver
+    networks:
+      labnet: { ipv4_address: 172.20.0.30 }
+    restart: unless-stopped
+
+  internal-04:
+    build: ../lab/internal-04
+    container_name: ejpt-internal-04
+    hostname: vault
+    networks:
+      internalnet: { ipv4_address: 10.10.10.20 }
+    restart: unless-stopped

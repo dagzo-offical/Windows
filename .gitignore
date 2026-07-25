@@ -12,3 +12,6 @@ node_modules/
 package.json
 package-lock.json
 node_modules/
+
+# platform runtime data (users, secret)
+platform/data/

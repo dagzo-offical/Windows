@@ -1,0 +1,75 @@
+# ============================================================
+#  eJPT Amaliy Lab — Docker orqali izolyatsiya qilingan poligon
+#  4 ta zaif mashina + attacker konteyner.
+#  labnet    : hujumchi va tashqi mashinalar (172.20.0.0/24)
+#  internalnet: faqat ichki — web-01 orqali PIVOT qilib kiriladi (10.10.10.0/24)
+#  Asosiy hostga zarar yetmaydi: hammasi bridge tarmoqda, host tarmog'i ishlatilmaydi.
+# ============================================================
+name: ejpt-lab
+
+networks:
+  labnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+  internalnet:
+    driver: bridge
+    internal: true          # tashqi marshrut yo'q — faqat pivot orqali kiriladi
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+
+services:
+
+  # -------- Hujumchi (o'z-o'zicha yetarli; Kali shart emas) --------
+  attacker:
+    build: ./attacker
+    container_name: ejpt-attacker
+    hostname: kali-lite
+    cap_add: [NET_ADMIN, NET_RAW]     # nmap SYN-scan / proxychains uchun
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.5
+    tty: true
+    stdin_open: true
+    command: ["sleep", "infinity"]
+
+  # -------- 1) web-01: zaif veb ilova -> www-data -> root; ichki pivot --------
+  web-01:
+    build: ./web-01
+    container_name: ejpt-web-01
+    hostname: acme-web
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.10
+        aliases: [acme.lab, www.acme.lab]
+      internalnet:
+        ipv4_address: 10.10.10.10       # ikki tarmoqli (dual-homed) — pivot nuqtasi
+
+  # -------- 2) linux-02: anon FTP + zaif SSH -> user -> SUID find -> root --------
+  linux-02:
+    build: ./linux-02
+    container_name: ejpt-linux-02
+    hostname: backend
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.20
+
+  # -------- 3) smb-03: null-session Samba -> cred -> SSH -> writable script -> root --------
+  smb-03:
+    build: ./smb-03
+    container_name: ejpt-smb-03
+    hostname: fileserver
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.30
+
+  # -------- 4) internal-04: FAQAT ichki tarmoqda — command injection -> final flag --------
+  internal-04:
+    build: ./internal-04
+    container_name: ejpt-internal-04
+    hostname: vault
+    networks:
+      internalnet:
+        ipv4_address: 10.10.10.20

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin panel · CyberSecurity Platform</title><link rel="stylesheet" href="/app/app.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='84'%3E%F0%9F%9B%A1%EF%B8%8F%3C/text%3E%3C/svg%3E">
+</head><body>
+<div class="top"><div class="wrap">
+  <div class="brand"><span class="logo">🛡️</span><span>CyberSecurity<small>Admin panel</small></span></div>
+  <div class="who"><a class="btn sm" href="/dashboard">← Boshqaruv</a><button class="btn sm" onclick="logout()">Chiqish</button></div>
+</div></div>
+<div class="wrap" style="padding-top:26px">
+  <h1>Admin panel</h1>
+  <p class="muted">Foydalanuvchilarni tasdiqlang va ularga qaysi modul/lab/terminalga kirishni bering. Virtual mashinalarni restart qiling.</p>
+
+  <div class="section">
+    <h2>Foydalanuvchilar</h2>
+    <div id="usersWrap" style="overflow-x:auto"><table id="users"><thead><tr>
+      <th>Login</th><th>Rol</th><th>Holat</th><th>Ruxsatlar (bosib bering/oling)</th><th>Amallar</th>
+    </tr></thead><tbody id="ubody"></tbody></table></div>
+  </div>
+
+  <div class="section">
+    <h2>Virtual mashinalar (Docker)</h2>
+    <p class="muted small">Holatni yangilash va restart qilish. (Backend Docker socket'ga ega bo'lishi kerak.)</p>
+    <div id="vmsWrap" style="overflow-x:auto"><table id="vms"><thead><tr>
+      <th>Mashina</th><th>IP</th><th>Konteyner</th><th>Holat</th><th>Amal</th>
+    </tr></thead><tbody id="vbody"></tbody></table></div>
+    <div style="margin-top:12px"><button class="btn sm" onclick="loadVms()">↻ Holatni yangilash</button></div>
+  </div>
+  <div class="foot">Faqat administratorlar uchun.</div>
+</div>
+<script>
+let CAT={modules:[],vms:[],grantable:[]}, ME=null;
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+async function api(path,body){const r=await fetch(path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});return {ok:r.ok,d:await r.json().catch(()=>({}))};}
+function resLabel(id){const m=CAT.modules.find(x=>x.id===id);return m?m.name:(id==='terminal'?'Web Terminal':id);}
+
+async function boot(){
+  const me=await api('/api/me'); if(!me.ok||!me.d.user||me.d.user.role!=='admin'){location.replace('/dashboard');return;}
+  ME=me.d.user;
+  CAT=(await api('/api/catalog')).d;
+  loadUsers(); loadVms();
+}
+async function loadUsers(){
+  const {d}=await api('/api/admin/users');
+  const rows=(d.users||[]).map(u=>{
+    const perms=u.permissions||[];
+    const chips=CAT.grantable.map(g=>{
+      const on=u.role==='admin'||perms.indexOf(g)!==-1;
+      const dis=u.role==='admin';
+      return `<span class="pill ${on?'on':'off'}" ${dis?'style="opacity:.5;cursor:default"':`onclick="toggle('${u.id}','${g}',${on})"`} title="${esc(resLabel(g))}">${esc(g)}</span>`;
+    }).join(' ');
+    const acts=[];
+    if(u.status==='pending') acts.push(`<button class="btn sm green" onclick="setStatus('${u.id}','active')">Tasdiqlash</button>`);
+    else if(u.status==='active'&&u.id!==ME.id) acts.push(`<button class="btn sm" onclick="setStatus('${u.id}','disabled')">Bloklash</button>`);
+    else if(u.status==='disabled') acts.push(`<button class="btn sm green" onclick="setStatus('${u.id}','active')">Faollashtirish</button>`);
+    if(u.id!==ME.id) acts.push(`<button class="btn sm" onclick="setRole('${u.id}','${u.role==='admin'?'user':'admin'}')">${u.role==='admin'?'User qilish':'Admin qilish'}</button>`);
+    if(u.id!==ME.id) acts.push(`<button class="btn sm red" onclick="del('${u.id}','${esc(u.username)}')">O'chirish</button>`);
+    return `<tr>
+      <td><b style="color:var(--t0)">${esc(u.username)}</b>${u.id===ME.id?' <span class="muted small">(siz)</span>':''}</td>
+      <td><span class="pill ${u.role==='admin'?'active':''}">${u.role}</span></td>
+      <td><span class="pill ${u.status}">${u.status}</span></td>
+      <td><div class="chips">${chips}</div></td>
+      <td><div class="row">${acts.join('')}</div></td></tr>`;
+  }).join('');
+  document.getElementById('ubody').innerHTML=rows||'<tr><td colspan="5" class="muted">Foydalanuvchi yo\'q.</td></tr>';
+}
+async function toggle(id,res,on){ await api(on?'/api/admin/revoke':'/api/admin/grant',{userId:id,resource:res}); loadUsers(); }
+async function setStatus(id,st){ await api('/api/admin/user/status',{userId:id,status:st}); loadUsers(); }
+async function setRole(id,role){ await api('/api/admin/user/role',{userId:id,role}); loadUsers(); }
+async function del(id,name){ if(confirm(name+" ni o'chirasizmi?")){ await api('/api/admin/user/delete',{userId:id}); loadUsers(); } }
+
+async function loadVms(){
+  document.getElementById('vbody').innerHTML='<tr><td colspan="5" class="muted">Yuklanmoqda…</td></tr>';
+  const {d}=await api('/api/admin/vms');
+  const rows=(d.vms||[]).map(v=>{
+    const up=/running/i.test(v.state);
+    return `<tr><td><b style="color:var(--t0)">${esc(v.name)}</b></td><td class="mono">${esc(v.ip)}</td>
+      <td class="mono small">${esc(v.container)}</td>
+      <td><span class="pill ${up?'active':'disabled'}">${esc(v.state)}</span></td>
+      <td><button class="btn sm" onclick="restart('${v.id}',this)">↻ Restart</button></td></tr>`;
+  }).join('');
+  document.getElementById('vbody').innerHTML=rows||'<tr><td colspan="5" class="muted">Mashina yo\'q.</td></tr>';
+}
+async function restart(id,btn){ btn.disabled=true; btn.textContent='...'; const r=await api('/api/admin/vm/restart',{vm:id});
+  if(!r.ok)alert(r.d.error||'Restart xatosi'); setTimeout(loadVms,1500); }
+async function logout(){await fetch('/api/logout',{method:'POST'});location.href='/login';}
+boot();
+</script>
+</body></html>

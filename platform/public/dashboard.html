@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boshqaruv · CyberSecurity Platform</title><link rel="stylesheet" href="/app/app.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='84'%3E%F0%9F%9B%A1%EF%B8%8F%3C/text%3E%3C/svg%3E">
+</head><body>
+<div class="top"><div class="wrap">
+  <div class="brand"><span class="logo">🛡️</span><span>CyberSecurity<small>Learning Platform</small></span></div>
+  <div class="who" id="who"></div>
+</div></div>
+<div class="wrap" style="padding-top:26px">
+  <h1>Xush kelibsiz, <span id="uname">…</span></h1>
+  <p class="muted">Sizga ochilgan modullar va laboratoriyalar. Ruxsatlarni administrator boshqaradi.</p>
+  <div class="grid" id="grid"></div>
+  <div class="foot">CyberSecurity Platform · o'quv maqsadida · ruxsat berilgan tizimlarda amaliyot qiling.</div>
+</div>
+<script>
+const ICON={windows:'🪟',kali:'🐉',network:'🌐','web-pentest':'🕸️',books:'📚',ejpt:'🎯',terminal:'🖥️'};
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+fetch('/api/me').then(r=>r.ok?r.json():Promise.reject()).then(d=>{
+  const u=d.user; const perms=u.permissions||[]; const isAdmin=u.role==='admin';
+  document.getElementById('uname').textContent=u.username;
+  document.getElementById('who').innerHTML=
+    `<span class="badge ${isAdmin?'admin':''}">${isAdmin?'ADMIN':'user'}</span>`+
+    (isAdmin?`<a class="btn sm" href="/admin">Admin panel</a>`:'')+
+    `<button class="btn sm" onclick="logout()">Chiqish</button>`;
+  const has=id=>isAdmin||perms.indexOf(id)!==-1;
+  let html='';
+  d.modules.forEach(m=>{
+    const ok=has(m.id);
+    html+=`<div class="tile ${ok?'':'locked'}">
+      <div class="ic">${ICON[m.id]||'📦'}</div>
+      <h3>${esc(m.name)}</h3>
+      <p>${ok?'Kirish ochiq':'Kirish huquqi yo\'q'}</p>
+      ${ok?`<div class="go"><a class="btn sm primary" href="${m.path}">Ochish →</a></div>`
+          :`<span class="tag-lock">🔒 yopiq</span>`}
+    </div>`;
+  });
+  // web terminal (lab hujum qutisi)
+  const t=has('terminal');
+  html+=`<div class="tile ${t?'':'locked'}">
+    <div class="ic">🖥️</div><h3>Web Terminal <span class="mono small" style="color:var(--cyan)">LAB</span></h3>
+    <p>${t?'Virtual mashinalarga hujum qilish uchun to\'liq terminal':'Kirish huquqi yo\'q'}</p>
+    ${t?`<div class="go"><a class="btn sm primary" href="/terminal" target="_blank" rel="noopener">Terminalni ochish →</a></div>`
+        :`<span class="tag-lock">🔒 yopiq</span>`}
+  </div>`;
+  document.getElementById('grid').innerHTML=html;
+}).catch(()=>location.replace('/login'));
+async function logout(){await fetch('/api/logout',{method:'POST'});location.href='/login';}
+</script>
+</body></html>

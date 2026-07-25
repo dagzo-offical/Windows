@@ -1,0 +1,14 @@
+admin
+login
+uploads
+upload
+config
+backup
+dashboard
+assets
+images
+css
+js
+robots.txt
+db
+includes
