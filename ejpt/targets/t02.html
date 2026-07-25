@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DevBlog — Engineering notes</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Georgia,"Times New Roman",serif;background:#faf8f5;color:#2b2b2b}
+.ipbadge{position:fixed;top:12px;right:14px;font-family:ui-monospace,monospace;font-size:12px;color:#8a8a8a;background:#fff;border:1px solid #e2ddd5;border-radius:8px;padding:5px 10px}
+header{background:#1b2a2a;color:#e8efe9;padding:26px 0}
+.wrap{max-width:720px;margin:0 auto;padding:0 22px}
+header h1{margin:0;font-size:26px;let-spacing:-.5px}header small{color:#9fc0b3}
+nav a{color:#9fc0b3;text-decoration:none;font-size:13px;margin-right:14px;font-family:sans-serif}
+article{padding:26px 0;border-bottom:1px solid #ece7df}
+article h2{margin:0 0 6px;font-size:21px}article .meta{color:#9a9488;font-size:13px;margin-bottom:10px;font-family:sans-serif}
+article p{line-height:1.7;color:#3d3d3d}
+.staff{background:#fff;border:1px solid #e2ddd5;border-radius:12px;padding:20px;margin:26px 0;font-family:sans-serif}
+.staff h3{margin:0 0 10px}.staff input{width:100%;padding:9px;margin:5px 0;border:1px solid #d8d2c8;border-radius:7px;font-family:inherit}
+.staff button{margin-top:8px;padding:9px 16px;border:0;border-radius:7px;background:#1b2a2a;color:#fff;cursor:pointer}
+.msg{margin-top:10px;font-size:14px;font-family:ui-monospace,monospace}.err{color:#c0392b}.ok{color:#1a7a3c;word-break:break-all}
+.foot{color:#9a9488;font-size:12px;padding:24px 0;font-family:sans-serif}
+</style></head>
+<body>
+<div class="ipbadge">10.10.10.8 · :80</div>
+<header><div class="wrap"><nav><a href="#">Home</a><a href="#">Archive</a><a href="#">Team</a></nav>
+<h1>DevBlog</h1><small>Ichki muhandislik yozuvlari</small></div></header>
+<div class="wrap">
+  <article><h2>Yangi CI quvuri ishga tushdi</h2><div class="meta">2024-11-03 · admin</div>
+    <p>Bu hafta biz build tizimini yangiladik. Deploy vaqti 40% qisqardi. Keyingi bosqichda staging muhitini avtomatlashtiramiz.</p></article>
+  <article><h2>Staging serverga kirish</h2><div class="meta">2024-10-21 · support</div>
+    <p>Jamoa a'zolari staging paneliga xodim hisobi bilan kirishlari mumkin. Agar parolni unutgan bo'lsangiz, IT bo'limiga murojaat qiling.</p>
+    <!-- FIXME: staging default account still active, rotate ASAP -> support / Sup3rp0rt2024 -->
+  </article>
+  <div class="staff">
+    <h3>Xodim paneli</h3>
+    <input id="u" placeholder="username" autocomplete="off">
+    <input id="p" type="password" placeholder="password" autocomplete="off">
+    <button onclick="go()">Kirish</button>
+    <div class="msg" id="m"></div>
+  </div>
+  <div class="foot">© 2024 DevBlog · internal use only</div>
+</div>
+<script>
+var FC="Fj8gZwkDAAcGUQNtV2MRQ2weQwQZCQ==";
+function rv(b64,key){try{var s=atob(b64),o='';for(var i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^key.charCodeAt(i%key.length));return o.slice(0,5)==='EJPT{'?o:null;}catch(e){return null;}}
+function go(){
+  var u=document.getElementById('u').value.trim(),p=document.getElementById('p').value,m=document.getElementById('m');
+  if(u.toLowerCase()!=='support'){m.className='msg err';m.textContent="Login noto'g'ri.";return;}
+  var f=rv(FC,p);
+  if(f){m.className='msg ok';m.innerHTML="Kirildi ✓ Flag: <b>"+f+"</b>";}
+  else{m.className='msg err';m.textContent="Parol noto'g'ri.";}
+}
+</script>
+</body></html>

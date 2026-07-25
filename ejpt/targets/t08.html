@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OldPortal</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#f7f7f4;color:#232320}
+.ipbadge{position:fixed;top:12px;right:14px;font-family:ui-monospace,monospace;font-size:12px;color:#8a8a80;background:#fff;border:1px solid #e0e0d8;border-radius:8px;padding:5px 10px}
+.wrap{max-width:720px;margin:0 auto;padding:24px 22px}
+.bar{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e0e0d8;border-radius:8px;padding:8px;margin-bottom:18px}
+.bar .host{font-family:ui-monospace,monospace;font-size:13px;color:#8a8a80}
+.bar input{flex:1;padding:7px 10px;border:1px solid #dcdcd2;border-radius:6px;font-family:ui-monospace,monospace;font-size:13px}
+.bar button{padding:7px 12px;border:0;border-radius:6px;background:#7c6f4f;color:#fff;cursor:pointer}
+.dir{font-family:ui-monospace,monospace;font-size:13px;line-height:1.9}.dir a{color:#2453b8;cursor:pointer;text-decoration:none}
+.view{background:#20201c;color:#d7e0c8;border-radius:10px;padding:16px;font-family:ui-monospace,monospace;font-size:12.5px;white-space:pre-wrap;margin-top:12px}
+.card{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:20px;margin-top:18px}
+label{display:block;font-size:13px;color:#66665c;margin:10px 0 5px}input.f{width:100%;padding:9px;border:1px solid #dcdcd2;border-radius:7px}
+.card button{margin-top:12px;padding:9px 16px;border:0;border-radius:7px;background:#7c6f4f;color:#fff;cursor:pointer}
+.msg{margin-top:10px;font-family:ui-monospace,monospace;font-size:14px}.err{color:#b23b3b}.ok{color:#2e7d32;word-break:break-all}
+h3{margin:0 0 6px}small{color:#8a8a80}
+</style></head>
+<body>
+<div class="ipbadge">10.10.10.33 · :80</div>
+<div class="wrap">
+  <div class="bar"><span class="host">http://10.10.10.33</span><input id="path" value="/" spellcheck="false"><button onclick="go()">Ochish</button></div>
+  <div id="page"></div>
+  <div class="card">
+    <h3>OldPortal — administrator kirishi</h3><small>Legacy tizim (v1.2)</small>
+    <label>Login</label><input class="f" id="u" autocomplete="off" placeholder="username">
+    <label>Parol</label><input class="f" id="p" type="password" autocomplete="off" placeholder="parol">
+    <button onclick="login()">Kirish</button>
+    <div class="msg" id="m"></div>
+  </div>
+</div>
+<script>
+var FC="AXkmEBkydBAYR0BtUnVfRRsBInMXAE8=";
+function rv(b64,key){try{var s=atob(b64),o='';for(var i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^key.charCodeAt(i%key.length));return o.slice(0,5)==='EJPT{'?o:null;}catch(e){return null;}}
+var LIST='<h3>Index of /</h3><div class="dir">'+
+ '<a onclick="nav(\'/index.html\')">index.html</a><br>'+
+ '<a onclick="nav(\'/style.css\')">style.css</a><br>'+
+ '<a onclick="nav(\'/config.php.bak\')">config.php.bak</a> <small>&lt;-- 2.1 KB</small><br>'+
+ '<a onclick="nav(\'/uploads/\')">uploads/</a></div>';
+var BAK="<?php\n// OldPortal DB configuration (backup)\n$DB_HOST = 'localhost';\n$DB_NAME = 'oldportal';\n$DB_USER = 'dbadmin';\n$DB_PASS = 'D3vDbP@ss2024';   // reused for admin panel\n?>";
+function nav(p){document.getElementById('path').value=p;go();}
+function go(){
+  var raw=document.getElementById('path').value.trim(), norm=raw.replace(/^\/+|\/+$/g,'').toLowerCase(), page=document.getElementById('page');
+  if(norm===''){page.innerHTML=LIST;return;}
+  if(norm==='config.php.bak'){page.innerHTML='<div class="view">'+BAK.replace(/</g,'&lt;')+'</div>';return;}
+  if(norm==='index.html'){page.innerHTML='<div class="view">OldPortal v1.2 — under maintenance</div>';return;}
+  page.innerHTML='<div class="view">404 Not Found — '+raw+'</div>';
+}
+function login(){
+  var u=document.getElementById('u').value.trim(),p=document.getElementById('p').value,m=document.getElementById('m');
+  if(u.toLowerCase()!=='admin'){m.className='msg err';m.textContent="Login noto'g'ri (admin).";return;}
+  var f=rv(FC,p);
+  if(f){m.className='msg ok';m.innerHTML="Kirildi ✓ Flag: <b>"+f+"</b>";}
+  else{m.className='msg err';m.textContent="Parol noto'g'ri.";}
+}
+document.addEventListener('DOMContentLoaded',function(){document.getElementById('page').innerHTML=LIST;});
+</script>
+</body></html>

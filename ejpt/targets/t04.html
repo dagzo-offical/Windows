@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MemberZone</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#eef2f7;color:#22303f}
+.ipbadge{position:fixed;top:12px;right:14px;font-family:ui-monospace,monospace;font-size:12px;color:#7a8699;background:#fff;border:1px solid #dbe2ec;border-radius:8px;padding:5px 10px}
+.top{background:#14b8a6;color:#022;padding:16px 0}.wrap{max-width:720px;margin:0 auto;padding:0 22px}
+.top b{font-size:20px}
+.panel{background:#fff;border:1px solid #dbe2ec;border-radius:14px;padding:22px;margin:20px 0}
+.sess{font-family:ui-monospace,monospace;font-size:13px;background:#f1f5f9;border:1px dashed #cbd5e1;border-radius:8px;padding:10px 12px;color:#475569}
+button{padding:10px 16px;border:0;border-radius:9px;background:#0f766e;color:#fff;cursor:pointer;font-size:14px;margin-top:12px}
+.msg{margin-top:14px;font-family:ui-monospace,monospace;font-size:14px}.err{color:#dc2626}.ok{color:#16a34a;word-break:break-all}
+h3{margin:0 0 8px}small{color:#64748b}
+</style></head>
+<body>
+<div class="ipbadge">10.10.10.15 · :80</div>
+<div class="top"><div class="wrap"><b>MemberZone</b> &nbsp;<small style="color:#044">Ichki xodimlar portali</small></div></div>
+<div class="wrap">
+  <div class="panel">
+    <h3>Xush kelibsiz, <span id="who">guest</span></h3>
+    <small>Sizning sessiyangiz (cookie):</small>
+    <div class="sess" id="sess"></div>
+  </div>
+  <div class="panel">
+    <h3>Admin Hisobotlari</h3>
+    <small>Bu bo'lim faqat administratorlar uchun.</small><br>
+    <button onclick="reports()">Hisobotni ochish</button>
+    <div class="msg" id="m"></div>
+  </div>
+</div>
+<script>
+var FC="JC49PRVHDVUFPhEeWhwpWxg=";
+function rv(b64,key){try{var s=atob(b64),o='';for(var i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^key.charCodeAt(i%key.length));return o.slice(0,5)==='EJPT{'?o:null;}catch(e){return null;}}
+function getCookie(n){var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}
+if(!getCookie('role')){document.cookie='role=user; path=/';}
+if(!getCookie('uid')){document.cookie='uid=1002; path=/';}
+function refresh(){document.getElementById('sess').textContent=document.cookie||'(bo\'sh)';document.getElementById('who').textContent=getCookie('role')==='admin'?'administrator':'guest (user)';}
+function reports(){
+  var m=document.getElementById('m'); refresh();
+  if(getCookie('role')==='admin'){
+    var f=rv(FC,'adminview');
+    m.className='msg ok'; m.innerHTML="Admin hisoboti ochildi ✓<br>Flag: <b>"+f+"</b>";
+  } else {
+    m.className='msg err'; m.textContent="403 Forbidden — sizning rolingiz: "+(getCookie('role')||'user');
+  }
+}
+refresh();
+</script>
+</body></html>

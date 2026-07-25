@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nexora Cloud — Sign in</title>
+<!-- Nexora Cloud Console v2.4.1 -->
+<style>
+:root{--a:#6d5efc}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#0e1020;color:#e8eaf6;display:grid;place-items:center;min-height:100vh}
+.ipbadge{position:fixed;top:12px;right:14px;font-family:ui-monospace,monospace;font-size:12px;color:#8b93c9;background:#171a33;border:1px solid #262a4d;border-radius:8px;padding:5px 10px}
+.card{width:360px;background:#151833;border:1px solid #262a4d;border-radius:16px;padding:30px;box-shadow:0 20px 60px -20px #000}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.logo .d{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--a),#a99bff)}
+.logo b{font-size:19px}small{color:#8b93c9}
+label{display:block;font-size:13px;color:#a6adde;margin:14px 0 5px}
+input{width:100%;padding:11px 12px;border-radius:9px;border:1px solid #2d3260;background:#0e1126;color:#e8eaf6;font-size:14px}
+input:focus{outline:none;border-color:var(--a)}
+button{width:100%;margin-top:18px;padding:11px;border:0;border-radius:9px;background:var(--a);color:#fff;font-weight:600;font-size:14px;cursor:pointer}
+.msg{margin-top:12px;font-size:13px;min-height:18px}
+.err{color:#ff6b83}.ok{color:#4ade80;font-family:ui-monospace,monospace;word-break:break-all}
+.foot{margin-top:16px;font-size:11px;color:#5a608f}
+</style></head>
+<body>
+<div class="ipbadge">10.10.10.5 · :80</div>
+<div class="card">
+  <div class="logo"><span class="d"></span><b>Nexora</b> <small>Cloud Console</small></div>
+  <small>Xodimlar paneliga kiring.</small>
+  <label>Foydalanuvchi nomi</label>
+  <input id="u" autocomplete="off" placeholder="username">
+  <label>Parol</label>
+  <input id="p" type="password" autocomplete="off" placeholder="••••••••">
+  <button onclick="login()">Kirish</button>
+  <div class="msg" id="m"></div>
+  <div class="foot">© 2024 Nexora Systems · v2.4.1</div>
+</div>
+<script>
+// Nexora auth service
+var FC="NSsjJwwYQQVaLxFHAAQYQhZVLwMBBgNcFhk=";
+function rv(b64,key){try{var s=atob(b64),o='';for(var i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^key.charCodeAt(i%key.length));return o.slice(0,5)==='EJPT{'?o:null;}catch(e){return null;}}
+function login(){
+  var u=document.getElementById('u').value.trim(), p=document.getElementById('p').value, m=document.getElementById('m');
+  // known accounts lookup
+  if(u.toLowerCase()!=='admin'){ m.className='msg err'; m.textContent="Bunday foydalanuvchi topilmadi."; return; }
+  var f=rv(FC,p);
+  if(f){ m.className='msg ok'; m.innerHTML="Muvaffaqiyatli kirildi ✓<br>Flag: <b>"+f+"</b>"; }
+  else { m.className='msg err'; m.textContent="admin uchun parol noto'g'ri."; }
+}
+document.getElementById('p').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
+</script>
+</body></html>

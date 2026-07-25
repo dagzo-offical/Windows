@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>APIVault Console</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#0b0f14;color:#d7e0ea}
+.ipbadge{position:fixed;top:12px;right:14px;font-family:ui-monospace,monospace;font-size:12px;color:#6b7d92;background:#111823;border:1px solid #1e2a38;border-radius:8px;padding:5px 10px}
+.wrap{max-width:680px;margin:0 auto;padding:26px 22px}
+.brand b{font-size:21px;color:#fff}.brand small{color:#6b7d92}
+.card{background:#111823;border:1px solid #1e2a38;border-radius:14px;padding:20px;margin:16px 0}
+.tok{font-family:ui-monospace,monospace;font-size:12px;color:#7dd3fc;background:#0b0f14;border:1px solid #1e2a38;border-radius:8px;padding:11px;word-break:break-all}
+textarea{width:100%;height:64px;font-family:ui-monospace,monospace;font-size:12px;background:#0b0f14;color:#d7e0ea;border:1px solid #24344a;border-radius:8px;padding:10px}
+button{margin-top:10px;padding:10px 16px;border:0;border-radius:8px;background:#0ea5e9;color:#04121c;font-weight:700;cursor:pointer}
+.decoded{font-family:ui-monospace,monospace;font-size:12px;color:#93c5fd;margin-top:8px}
+.msg{margin-top:10px;font-family:ui-monospace,monospace;font-size:14px}.err{color:#f87171}.ok{color:#4ade80;word-break:break-all}
+h3{margin:0 0 6px}small{color:#6b7d92}
+</style></head>
+<body>
+<div class="ipbadge">10.10.10.30 · :80</div>
+<div class="wrap">
+  <div class="brand"><b>APIVault</b> <small>Developer Console</small></div>
+  <div class="card">
+    <h3>Sizning sessiya token'ingiz (JWT)</h3>
+    <div class="tok" id="cur"></div>
+    <div class="decoded" id="dec"></div>
+  </div>
+  <div class="card">
+    <h3>Token'ni yangilash</h3>
+    <small>Yangi token'ni joylashtiring va "Qo'llash"ni bosing.</small>
+    <textarea id="nt" spellcheck="false"></textarea>
+    <button onclick="apply()">Qo'llash</button>
+    <div class="msg" id="m"></div>
+  </div>
+</div>
+<script>
+var FC="JC49PRUeGB86AFEKXjZaGAgW";
+function rv(b64,key){try{var s=atob(b64),o='';for(var i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^key.charCodeAt(i%key.length));return o.slice(0,5)==='EJPT{'?o:null;}catch(e){return null;}}
+function b64u(s){return btoa(s).replace(/=+$/,'').replace(/\+/g,'-').replace(/\//g,'_');}
+function ub64u(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return atob(s);}
+var CUR=b64u('{"alg":"none","typ":"JWT"}')+'.'+b64u('{"user":"guest","role":"user"}')+'.';
+function show(){
+  document.getElementById('cur').textContent=CUR;
+  document.getElementById('nt').value=CUR;
+  try{var parts=CUR.split('.');document.getElementById('dec').textContent='header: '+ub64u(parts[0])+'   payload: '+ub64u(parts[1]);}catch(e){}
+}
+function apply(){
+  var t=document.getElementById('nt').value.trim(),m=document.getElementById('m');
+  try{
+    var parts=t.split('.'); var hdr=JSON.parse(ub64u(parts[0])); var pl=JSON.parse(ub64u(parts[1]));
+    if((hdr.alg||'').toLowerCase()!=='none'){m.className='msg err';m.textContent="Imzo tekshiruvi muvaffaqiyatsiz (alg).";return;}
+    if(pl.role==='admin'){var f=rv(FC,'admintoken');m.className='msg ok';m.innerHTML="Admin token qabul qilindi ✓<br>Flag: <b>"+f+"</b>";}
+    else{m.className='msg err';m.textContent="Token qabul qilindi, lekin role='"+pl.role+"' (admin emas).";}
+  }catch(e){m.className='msg err';m.textContent="Token formati noto'g'ri.";}
+}
+show();
+</script>
+</body></html>

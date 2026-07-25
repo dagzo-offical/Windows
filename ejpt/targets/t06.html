@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GateKeeper — Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#101014;color:#e6e6ea;display:grid;place-items:center;min-height:100vh}
+.ipbadge{position:fixed;top:12px;right:14px;font-family:ui-monospace,monospace;font-size:12px;color:#8a8a95;background:#18181f;border:1px solid #2a2a35;border-radius:8px;padding:5px 10px}
+.card{width:380px;background:#18181f;border:1px solid #2a2a35;border-radius:14px;padding:28px}
+.h{display:flex;align-items:center;gap:10px;margin-bottom:4px}.h .d{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#22d3ee,#3b82f6)}
+.h b{font-size:19px}small{color:#8a8a95}
+label{display:block;font-size:13px;color:#b7b7c2;margin:13px 0 5px}
+input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #33333f;background:#101014;color:#e6e6ea;font-family:ui-monospace,monospace}
+input:focus{outline:none;border-color:#3b82f6}
+button{width:100%;margin-top:16px;padding:11px;border:0;border-radius:8px;background:#3b82f6;color:#fff;font-weight:600;cursor:pointer}
+.q{margin-top:12px;font-family:ui-monospace,monospace;font-size:11.5px;color:#71717a;background:#101014;border:1px solid #2a2a35;border-radius:8px;padding:9px;word-break:break-all}
+.msg{margin-top:10px;font-family:ui-monospace,monospace;font-size:14px}.err{color:#f87171}.ok{color:#4ade80;word-break:break-all}
+</style></head>
+<body>
+<div class="ipbadge">10.10.10.25 · :80</div>
+<div class="card">
+  <div class="h"><span class="d"></span><b>GateKeeper</b></div>
+  <small>Boshqaruv paneliga kirish</small>
+  <label>Login</label><input id="u" autocomplete="off" placeholder="username">
+  <label>Parol</label><input id="p" autocomplete="off" placeholder="password">
+  <button onclick="go()">Autentifikatsiya</button>
+  <div class="q" id="q">SELECT * FROM users WHERE ...</div>
+  <div class="msg" id="m"></div>
+</div>
+<script>
+var FC="KjhhaUoRCBxQLB9fFQBTbgAAAFUAABI=";
+function rv(b64,key){try{var s=atob(b64),o='';for(var i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^key.charCodeAt(i%key.length));return o.slice(0,5)==='EJPT{'?o:null;}catch(e){return null;}}
+function go(){
+  var u=document.getElementById('u').value,p=document.getElementById('p').value,m=document.getElementById('m'),q=document.getElementById('q');
+  var sql="SELECT * FROM users WHERE user='"+u+"' AND pass='"+p+"'";
+  q.textContent=sql;
+  // zaif so'rov — tautologiya / komment bilan aylanib o'tiladi
+  var inj=/'\s*(or|\|\|)\s+/i.test(u)||/'\s*(or|\|\|)\s+/i.test(p)||/'\s*(--|#)/.test(u)||/'\s*(--|#)/.test(p)||/'\s*or\s*'?1'?\s*=\s*'?1/i.test(u+p);
+  if(inj){var f=rv(FC,'or1=1bypass');m.className='msg ok';m.innerHTML="Autentifikatsiya aylanib o'tildi ✓<br>Flag: <b>"+f+"</b>";return;}
+  if(u==='admin'&&p==='S3cure!Adm1n'){m.className='msg ok';m.textContent="Kirildi (lekin bu yo'l emas).";return;}
+  m.className='msg err';m.textContent="Kirish rad etildi.";
+}
+</script>
+</body></html>

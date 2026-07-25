@@ -47,41 +47,38 @@ const LS = {
   labFlags: "ejpt_lab_flags",
 };
 
-// ---- Amaliy Lab (Docker poligoni) ----
-// flag qiymatlari repo'da (lab/WALKTHROUGH.md); bu yerda faqat SHA-256 tekshiruv uchun.
+// ---- Web CTF poligoni (brauzerda ishlaydigan nishonlar) ----
+// Har nishon — o'zicha ochiladigan zaif sayt (ejpt/targets/*.html). Zaiflik AYTILMAYDI.
+// hash = kutilgan flag'ning SHA-256'si (tekshiruv uchun).
 const LAB = {
-  repo: "https://github.com/dagzo-offical/Windows/tree/main/lab",
-  machines: [
-    { id: "web-01", name: "web-01", alias: "acme.lab", ip: "172.20.0.10", diff: "medium",
-      services: ["HTTP/80", "SSH/22"], tools: ["nmap", "dirb", "sqlmap", "burp"],
-      obj: "SQL injection va cheklovsiz fayl upload orqali shell oling (www-data), so'ng sysadmin + sudo bilan root'ga ko'taring. Bu mashina ichki tarmoqqa ham ulangan — pivot nuqtasi.",
-      flags: [
-        { id: "web-01-user", label: "User flag", hash: "6c1c823759ea58d6a2a16157c96b48dc3df8bc42814d860b66f3a7d7c40a89a8" },
-        { id: "web-01-root", label: "Root flag", hash: "2df2c2f22462bbea71c598ea7c7df3c6d2e521baf69d7ac91ab2b1c90facb5ba" },
-      ] },
-    { id: "linux-02", name: "linux-02", alias: "backend", ip: "172.20.0.20", diff: "easy",
-      services: ["FTP/21", "SSH/22"], tools: ["nmap", "ftp", "hydra"],
-      obj: "Anonim FTP'dagi maslahat yoki Hydra bilan zaif SSH parolini toping (bob), so'ng SUID find (GTFOBins) bilan root'ga chiqing.",
-      flags: [
-        { id: "linux-02-user", label: "User flag", hash: "93e51fbb4d17f4dad11cb6f40616f7ec452a3e718598358883ef6b5ee2f7e129" },
-        { id: "linux-02-root", label: "Root flag", hash: "84eac80080d69599f852d12cad5d230df9a87578b49b4d9319189848f6276900" },
-      ] },
-    { id: "smb-03", name: "smb-03", alias: "fileserver", ip: "172.20.0.30", diff: "medium",
-      services: ["SMB/445", "SSH/22"], tools: ["nmap", "smbclient", "enum4linux"],
-      obj: "Null-session SMB share'idan credential o'g'irlang (carol), SSH bilan kiring, so'ng root ishga tushiradigan yoziladigan skript orqali root'ga ko'taring.",
-      flags: [
-        { id: "smb-03-user", label: "User flag", hash: "7490ab7a5b913d64bc9a86507ad9a952c5518d1d2966761dfb9a4be1e8e6bd35" },
-        { id: "smb-03-root", label: "Root flag", hash: "0a6622afbe8693faf2f93bfa3e6b19f5df6ac7b22d7d48c5ba3644754dccb72d" },
-      ] },
-    { id: "internal-04", name: "internal-04", alias: "vault", ip: "10.10.10.20 (ichki)", diff: "hard",
-      services: ["HTTP/8080"], tools: ["pivoting", "proxychains", "curl"],
-      obj: "Bu mashina FAQAT ichki tarmoqda — to'g'ridan-to'g'ri yeta olmaysiz. Avval web-01'ni egallab, o'sha host orqali PIVOT qiling, so'ng command injection bilan final flag'ni oling.",
-      flags: [
-        { id: "internal-04-final", label: "Final flag", hash: "eafcf4163e79f086a2642cf1e27f03f2efbd9ba1d530c19e3968207d2f31401d" },
-      ] },
+  targets: [
+    { id: "t01", ip: "10.10.10.5",  name: "Nexora Cloud", diff: "easy",
+      goal: "Xodim (admin) paneliga kiring va flag'ni oling.",
+      hash: "657b35d32e1a2bd210be6d4452414ab485e475303da5fb876b96c4751fa112cc" },
+    { id: "t02", ip: "10.10.10.8",  name: "DevBlog", diff: "easy",
+      goal: "Xodim paneliga kirish uchun maxfiy hisobni toping.",
+      hash: "b23a9048681c6980319c3f02e84ee355804cb2ed705a589eb34f455635e90423" },
+    { id: "t03", ip: "10.10.10.12", name: "CloudStore", diff: "easy",
+      goal: "Yashirin sahifadagi maxfiy faylni toping.",
+      hash: "f690ccb20954510baa436bd40828333100825950d184465a7f25169426dad6df" },
+    { id: "t04", ip: "10.10.10.15", name: "MemberZone", diff: "medium",
+      goal: "Admin hisobotlariga kiring.",
+      hash: "41c2b89ce1f52e0c8aa0ee8d5941b81d09c42d1bbe5815e0edce4fc1bd89ef0a" },
+    { id: "t05", ip: "10.10.10.20", name: "SecureBank", diff: "medium",
+      goal: "admin hisobiga kirib flag'ni oling.",
+      hash: "40f5acd3f4e9b8fd15b9649024d64c2d8e61512ada19958d6affa50bd9d218d5" },
+    { id: "t06", ip: "10.10.10.25", name: "GateKeeper", diff: "medium",
+      goal: "Boshqaruv paneli himoyasini aylanib o'ting.",
+      hash: "75a2e25ad3a819bc305dda90cf065d9962a7dbec9f0b488ae2ba7e71b1a09020" },
+    { id: "t07", ip: "10.10.10.30", name: "APIVault", diff: "hard",
+      goal: "Admin sessiyasiga ega bo'ling.",
+      hash: "5c0b75146b9305e1e2ff21197cc11ab0b896e29ade44ff02e1f6accf5010385b" },
+    { id: "t08", ip: "10.10.10.33", name: "OldPortal", diff: "medium",
+      goal: "Legacy administrator paneliga kiring.",
+      hash: "d3d86fb377d49799643553f7b8426282aea01ce1ddc24c579e89a7965e54c1b5" },
   ],
 };
-const LAB_TOTAL_FLAGS = LAB.machines.reduce((n, m) => n + m.flags.length, 0);
+const LAB_TOTAL_FLAGS = LAB.targets.length;
 
 /* ---------------- storage helpers (all guarded) ---------------- */
 function lsGet(key, fallback) {
@@ -334,9 +331,9 @@ function homeView() {
       </button>
       <button class="mode" style="--mode-c:var(--green);--mode-soft:var(--green-soft)" onclick="EJPT.go('labs')">
         <div class="m-ico">${svg("target", 22)}</div>
-        <h3>Amaliy Lab <span class="mono" style="font-size:11px;color:var(--green)">DOCKER</span></h3>
-        <p>4 ta haqiqiy zaif mashinani buzing — enumeration, exploit, privilege escalation, pivoting va ${LAB_TOTAL_FLAGS} flag.</p>
-        <div class="m-go">Mashinalarni ko'rish ${svg("arrowR", 15)}</div>
+        <h3>Web CTF <span class="mono" style="font-size:11px;color:var(--green)">BRAUZER</span></h3>
+        <p>${LAB_TOTAL_FLAGS} ta zaif saytni to'g'ridan-to'g'ri brauzerda buzing — yashirin ma'lumot, hash/parol, oddiy parollarni toping. Terminal shart emas.</p>
+        <div class="m-go">Nishonlarni ko'rish ${svg("arrowR", 15)}</div>
       </button>
     </div>
   </div>
@@ -801,42 +798,44 @@ function labsView() {
   const col = done === LAB_TOTAL_FLAGS ? "var(--green)" : "var(--orange)";
   const diffCls = { easy: "diff-easy", medium: "diff-medium", hard: "diff-hard" };
 
-  const machines = LAB.machines.map((m) => {
-    const flagsHtml = m.flags.map((f) => {
-      const ok = solved.has(f.id);
-      return `<div class="labflag ${ok ? "solved" : ""}">
-        <span class="lf-label">${svg(ok ? "check" : "flag", 14)} ${esc(f.label)}</span>
-        ${ok
-          ? `<span class="lf-ok">Topildi ✓</span>`
-          : `<span class="lf-in"><input id="lf_${f.id}" placeholder="EJPT{...}" spellcheck="false" autocomplete="off"
-               onkeydown="if(event.key==='Enter')EJPT.submitLabFlag('${f.id}')">
-             <button class="btn sm blue" onclick="EJPT.submitLabFlag('${f.id}')">Tekshirish</button></span>`}
-      </div>`;
-    }).join("");
-    const allSolved = m.flags.every((f) => solved.has(f.id));
-    return `<div class="labcard ${allSolved ? "done" : ""}">
+  // host-discovery style IP ro'yxati
+  const hosts = LAB.targets.map((t) =>
+    `Host <span class="hl">${t.ip.padEnd(13)}</span> up   <span style="color:var(--t3)">(${esc(t.name)})</span>`).join("\n");
+
+  const cards = LAB.targets.map((t) => {
+    const ok = solved.has(t.id);
+    return `<div class="labcard ${ok ? "done" : ""}">
       <div class="labcard-top">
-        <div><span class="labname">${esc(m.name)}</span>
-          <span class="labalias mono">${esc(m.alias)}</span>
-          <span class="mono" style="color:var(--t3);font-size:12px">· ${esc(m.ip)}</span></div>
-        <span class="difftag ${diffCls[m.diff]}">${esc(m.diff)}</span>
+        <div><span class="labname">${esc(t.name)}</span>
+          <span class="labalias mono">${esc(t.ip)}</span></div>
+        <span class="difftag ${diffCls[t.diff]}">${esc(t.diff)}</span>
       </div>
-      <div class="labsvc">
-        ${m.services.map((s) => `<span class="tag" style="color:var(--blue);border-color:var(--blue)">${esc(s)}</span>`).join("")}
-        ${m.tools.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}
+      <p class="labobj"><span class="mono" style="color:var(--t3)">MAQSAD:</span> ${esc(t.goal)}</p>
+      <div class="labflags">
+        <div class="labflag" style="border:0;background:transparent;padding:0 0 4px">
+          <button class="btn sm blue" onclick="window.open('targets/${t.id}.html','_blank','noopener')">${svg("target", 14)} Saytni ochish (${esc(t.ip)})</button>
+          <span class="mono small muted">brauzerda ochiladi</span>
+        </div>
+        <div class="labflag ${ok ? "solved" : ""}">
+          <span class="lf-label">${svg(ok ? "check" : "flag", 14)} Flag</span>
+          ${ok
+            ? `<span class="lf-ok">Topildi ✓</span>`
+            : `<span class="lf-in"><input id="lf_${t.id}" placeholder="EJPT{...}" spellcheck="false" autocomplete="off"
+                 onkeydown="if(event.key==='Enter')EJPT.submitLabFlag('${t.id}')">
+               <button class="btn sm blue" onclick="EJPT.submitLabFlag('${t.id}')">Tekshirish</button></span>`}
+        </div>
       </div>
-      <p class="labobj">${esc(m.obj)}</p>
-      <div class="labflags">${flagsHtml}</div>
     </div>`;
   }).join("");
 
   const circ = (2 * Math.PI * 64).toFixed(1);
   return `
   <div class="hero rise">
-    <div class="eyebrow">${svg("target", 13)} Amaliy Laboratoriya · Docker</div>
-    <h1>Haqiqiy mashinalarni <span class="grad-o">buzing</span></h1>
-    <p class="lede">4 ta zaif mashina — ularni haqiqatan buzib, imtiyozni oshirib (privilege escalation),
-      flag'larni toping. Docker orqali izolyatsiya qilingan; asosiy hostga zarar yetmaydi.</p>
+    <div class="eyebrow">${svg("target", 13)} Web CTF Poligoni · brauzerda</div>
+    <h1>Zaif saytlarni <span class="grad-o">buzing</span></h1>
+    <p class="lede">${LAB_TOTAL_FLAGS} ta haqiqiy ko'rinishli sayt. Terminal yoki o'rnatish kerak emas — har birini
+      brauzerda oching, zaiflikni <b>o'zingiz toping</b> (yashirin ma'lumot, hash/parol, oddiy parol...),
+      flag'ni oling va pastda topshiring. Qanday zaiflik ekani aytilmaydi.</p>
     <div class="ring-wrap" style="margin-top:18px">
       <div class="ring" id="ring" data-pct="${pct}" data-color="${col}">
         <svg width="150" height="150" viewBox="0 0 150 150">
@@ -847,36 +846,33 @@ function labsView() {
         <div class="rlabel"><div class="rp" style="color:${col}">${done}/${LAB_TOTAL_FLAGS}</div><div class="rs">flag</div></div>
       </div>
       <div style="flex:1;min-width:280px">
-        <h3>O'rnatish (Docker)</h3>
-        <div class="term"><div class="term-top"><i class="r"></i><i class="y"></i><i class="g"></i><span class="lbl">bash</span></div>
-<pre>git clone https://github.com/dagzo-offical/Windows
-cd Windows/lab
-docker compose up -d --build
-docker exec -it ejpt-attacker bash   # hujum qutisi</pre></div>
-        <p class="small muted">Qo'llanma: <a href="${LAB.repo}" target="_blank" rel="noopener">lab/ (GitHub)</a> · host discovery: <span class="mono">nmap -sn 172.20.0.0/24</span></p>
+        <h3>Topilgan xostlar</h3>
+        <div class="term"><div class="term-top"><i class="r"></i><i class="y"></i><i class="g"></i><span class="lbl">host discovery</span></div>
+<pre>$ scan 10.10.10.0/24
+${hosts}</pre></div>
       </div>
     </div>
   </div>
 
   <div class="section">
-    <h2>Mashinalar</h2>
-    <p class="muted small">Topgan flag'ni tegishli maydonga kiriting — tizim tekshiradi. <b>internal-04</b>'ga faqat web-01 orqali <b>pivot</b> bilan yetiladi.</p>
-    <div class="labgrid">${machines}</div>
+    <h2>Nishonlar</h2>
+    <p class="muted small">Saytni oching → zaiflikni toping → flag'ni shu yerga kiriting (tizim tekshiradi). Maslahat: sahifa manbasini (view-source), cookie'larni va yashirin yo'llarni tekshiring.</p>
+    <div class="labgrid">${cards}</div>
   </div>
 
   <div class="section" style="display:flex;gap:10px;flex-wrap:wrap">
     <button class="btn ghost" onclick="EJPT.go('home')">${svg("home", 15)} Bosh sahifa</button>
-    ${done > 0 ? `<button class="btn ghost sm" onclick="EJPT.resetLab()">${svg("trash", 15)} Lab progressini tozalash</button>` : ""}
+    ${done > 0 ? `<button class="btn ghost sm" onclick="EJPT.resetLab()">${svg("trash", 15)} Progressni tozalash</button>` : ""}
   </div>
   ${footer()}`;
 }
-async function submitLabFlag(flagId) {
-  const inp = document.getElementById("lf_" + flagId);
+async function submitLabFlag(targetId) {
+  const inp = document.getElementById("lf_" + targetId);
   if (!inp) return;
   const val = inp.value.trim();
   if (!val) return;
   let expected = null;
-  LAB.machines.forEach((m) => m.flags.forEach((f) => { if (f.id === flagId) expected = f.hash; }));
+  LAB.targets.forEach((t) => { if (t.id === targetId) expected = t.hash; });
   if (!expected) return;
   let hex = null;
   try {
@@ -886,7 +882,7 @@ async function submitLabFlag(flagId) {
   if (hex === expected) {
     const s = lsGet(LS.labFlags, []);
     const arr = Array.isArray(s) ? s : [];
-    if (arr.indexOf(flagId) === -1) { arr.push(flagId); lsSet(LS.labFlags, arr); }
+    if (arr.indexOf(targetId) === -1) { arr.push(targetId); lsSet(LS.labFlags, arr); }
     render(); drawRing();
   } else {
     inp.classList.add("no"); inp.value = ""; inp.placeholder = "Noto'g'ri — qayta urining";
