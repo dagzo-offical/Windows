@@ -12,11 +12,12 @@ function db() {
   $cnt = $pdo->query("SELECT COUNT(*) c FROM users")->fetch(PDO::FETCH_ASSOC);
   if ((int)$cnt['c'] === 0) {
     // nowdoc — PHP $ ni talqin qilmaydi, hash butun qoladi.
-    // admin=S3cr3t2025!  sysadmin=Ac3m3S3rv3r! (SSH)  editor=Summer2025!
+    // sysadmin paroli rockyou'da bor (chuqurroqda) -> john+rockyou bilan buziladi.
+    // admin/editor — chalg'ituvchi (rockyou bilan tez buzilmaydi).
     $pdo->exec(<<<'SQL'
 INSERT INTO users (username,password,role) VALUES
  ('admin','$1$acme01$LKXfufFStU2JIHhZ8jBW2/','admin'),
- ('sysadmin','$1$acme02$uiKoWRDnmr5mUs9ngQm3C.','operator'),
+ ('sysadmin','$1$acme02$eJjYQgCVKMy0cZ59zFG9E.','operator'),
  ('editor','$1$acme03$xE1wR2RXoF42CJ0i6pHPh/','editor')
 SQL);
     $pdo->exec("INSERT INTO products (name,price) VALUES

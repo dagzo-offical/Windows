@@ -11,7 +11,7 @@ chmod 600 /root/root.txt
 
 # ---- sysadmin tizim hisobi (SSH + privesc) ----
 useradd -m -s /bin/bash sysadmin 2>/dev/null || true
-echo 'sysadmin:Ac3m3S3rv3r!' | chpasswd
+echo 'sysadmin:jimmyis22' | chpasswd
 # Privesc: NOPASSWD python3 (GTFOBins -> root)
 echo 'sysadmin ALL=(root) NOPASSWD: /usr/bin/python3' > /etc/sudoers.d/sysadmin
 chmod 440 /etc/sudoers.d/sysadmin

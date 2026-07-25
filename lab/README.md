@@ -42,6 +42,11 @@ Poligonni umumiy serverda (VPS/ichki server) ishga tushiring — bir nechta o'qu
 Har mashina turli **zaiflik** va turli **qiyinlik** — lekin oqim bir xil:
 **web zaifligi → SSH cred/hash → SSH → oddiy user → root.**
 
+> 🔑 **Wordlistlar** (attacker qutisida, imtihondagidek standart yo'llarda):
+> parol/hash crack — `/usr/share/wordlists/rockyou.txt`; katalog/parametr fuzzing —
+> `/usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt`.
+> Parollar ro'yxatning chuqurrog'ida — crack/brute bir necha daqiqa oladi (ataylab).
+
 | Mashina | Daraja | IP | Xizmatlar | Kill-chain | Flaglar |
 |---|---|---|---|---|---|
 | **web-easy** (`shopzone`) | 🟢 EASY | 10.10.20.40 | HTTP(80), SSH(22) | ochiq `config.old` (info disclosure) → SSH `deploy` → `sudo bash` → **root** | user + root |

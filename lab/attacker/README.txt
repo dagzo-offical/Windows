@@ -11,8 +11,19 @@ Mashinalar (har xil daraja, har xil zaiflik — oqim: web -> SSH -> root):
 Boshlash:
   nmap -sn 10.10.20.0/24            # host discovery (6 mashina)
   nmap -sV -p- 10.10.20.40          # xizmatlarni aniqlash
-  dirb http://10.10.20.10 /root/dirs.txt
-  hydra -l bob -P /root/wordlist.txt ssh://10.10.20.20
 
-Wordlist: /root/wordlist.txt   Kataloglar: /root/dirs.txt
+Standart wordlistlar (imtihondagidek):
+  Parol/hash crack:  /usr/share/wordlists/rockyou.txt
+  Katalog/parametr:  /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt
+
+Namuna:
+  # katalog/fayl qidirish (kengaytmalar bilan)
+  dirb http://10.10.20.10 /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt -X .php,.old,.txt,.bak
+  gobuster dir -u http://10.10.20.50 -w /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt -x php,old,txt
+  # hash crack (web-01 SQLi'dan)
+  john --format=md5crypt --wordlist=/usr/share/wordlists/rockyou.txt hash.txt
+  # SSH brute (linux-02)
+  hydra -l bob -P /usr/share/wordlists/rockyou.txt ssh://10.10.20.20
+
+Eslatma: bu ro'yxatlar KATTA — crack/fuzzing bir necha daqiqa olishi mumkin (bu normal).
 Flaglarni portalda (Amaliy Lab sahifasi) topshiring.

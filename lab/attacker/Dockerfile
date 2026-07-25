@@ -24,9 +24,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY ttyd /usr/local/bin/ttyd
 RUN chmod +x /usr/local/bin/ttyd && /usr/local/bin/ttyd --version
 
-# Kichik wordlist (lab parollarini o'z ichiga oladi — hydra/dirb ishlashi uchun)
-COPY wordlist.txt /root/wordlist.txt
-COPY dirs.txt /root/dirs.txt
+# ---- Standart wordlistlar (haqiqiy Kali yo'llarida — imtihondagidek) ----
+# Kataloglar/parametrlar: dirbuster medium list (vendored, ~1.8MB).
+COPY directory-list-lowercase-2.3-medium.txt /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt
+RUN ln -sf /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt /usr/share/wordlists/directory-list-lowercase-2.3-medium.txt 2>/dev/null || \
+    (mkdir -p /usr/share/wordlists && ln -sf /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt /usr/share/wordlists/directory-list-lowercase-2.3-medium.txt)
+
+# Parol crack: rockyou.txt (build vaqtida yuklab olinadi — git'da saqlanmaydi).
+# Yuklab bo'lmasa build to'xtamaydi (ogohlantirish beriladi); foydalanuvchi
+# mashinasida (internet bor) muvaffaqiyatli tushadi.
+RUN mkdir -p /usr/share/wordlists && \
+    ( wget -q --tries=3 --timeout=60 -O /usr/share/wordlists/rockyou.txt \
+        "https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt" \
+      && echo "rockyou.txt: $(wc -l < /usr/share/wordlists/rockyou.txt) qator" ) || \
+    echo "!!! rockyou.txt yuklanmadi (internet yo'qmi?). Keyin qo'lda: wget -O /usr/share/wordlists/rockyou.txt <url>"
+
 COPY README.txt /root/README.txt
 
 WORKDIR /root

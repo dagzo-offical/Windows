@@ -3,7 +3,7 @@ set -e
 
 # ---- bob foydalanuvchisi (zaif parol -> hydra crackable / FTP hint) ----
 useradd -m -s /bin/bash bob 2>/dev/null || true
-echo 'bob:football' | chpasswd
+echo 'bob:coconut' | chpasswd
 
 # ---- Flaglar ----
 echo 'EJPT{ftp_ssh_cr4ck_f00th0ld}' > /home/bob/user.txt
@@ -15,8 +15,9 @@ chmod 600 /root/root.txt
 mkdir -p /srv/ftp
 cat > /srv/ftp/note_to_bob.txt <<'NOTE'
 Bob,
-Serverga o'tishni tugatdim. SSH hisobing tayyor.
-Iltimos parolingni o'zgartir — 'football' juda oddiy!
+Serverga o'tishni tugatdim. SSH hisobing tayyor (login: bob).
+Iltimos parolingni o'zgartir — hozirgisi oddiy lug'atdagi so'z,
+wordlist (rockyou) bilan osongina topib olishadi!
 -- admin
 NOTE
 chmod -R a+r /srv/ftp

