@@ -45,16 +45,16 @@ Platforma bilan birga **6 ta haqiqiy zaif mashina** ishga tushadi (izolyatsiya q
 
 | Mashina | Daraja | IP | Zaiflik → kirish |
 |---|---|---|---|
-| web-easy (shopzone) | 🟢 easy | 172.20.0.40 | ochiq `config.old` (info disclosure) → SSH → `sudo bash` → root |
-| linux-02 (backend) | 🟢 easy | 172.20.0.20 | anon FTP + zaif SSH → SUID `find` → root |
-| web-01 (acme.lab) | 🟡 medium | 172.20.0.10 | web SQLi → parol **hash** sizadi → john bilan crack → SSH → root; **pivot nuqtasi** |
-| smb-03 (fileserver) | 🟡 medium | 172.20.0.30 | SMB null-session → cred → yoziladigan root skript → root |
-| web-hard (monitorpanel) | 🔴 hard | 172.20.0.50 | **LFI** → SSH cred sizadi → SSH → `perl` **cap_setuid** → root |
+| web-easy (shopzone) | 🟢 easy | 10.10.20.40 | ochiq `config.old` (info disclosure) → SSH → `sudo bash` → root |
+| linux-02 (backend) | 🟢 easy | 10.10.20.20 | anon FTP + zaif SSH → SUID `find` → root |
+| web-01 (acme.lab) | 🟡 medium | 10.10.20.10 | web SQLi → parol **hash** sizadi → john bilan crack → SSH → root; **pivot nuqtasi** |
+| smb-03 (fileserver) | 🟡 medium | 10.10.20.30 | SMB null-session → cred → yoziladigan root skript → root |
+| web-hard (monitorpanel) | 🔴 hard | 10.10.20.50 | **LFI** → SSH cred sizadi → SSH → `perl` **cap_setuid** → root |
 | internal-04 (vault) | 🔴 hard | 10.10.10.20 | **faqat web-01 orqali pivot** → command injection → final |
 
 Jami **11 ta flag**. Terminaldan hujum: `docker exec` shart emas — **Web Terminal**ni oching (dashboard'da) va:
 ```bash
-nmap -sn 172.20.0.0/24
+nmap -sn 10.10.20.0/24
 ```
 To'liq yechim: [`../lab/WALKTHROUGH.md`](../lab/WALKTHROUGH.md).
 

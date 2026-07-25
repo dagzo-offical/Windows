@@ -47,43 +47,42 @@ const LS = {
   labFlags: "ejpt_lab_flags",
 };
 
-// ---- Web CTF poligoni (brauzerda ishlaydigan nishonlar) ----
-// Har nishon — o'zicha ochiladigan zaif sayt (ejpt/targets/*.html). Zaiflik AYTILMAYDI.
-// hash = kutilgan flag'ning SHA-256'si (tekshiruv uchun).
+// ---- Amaliy Lab (haqiqiy Docker mashinalari, Web Terminal orqali) ----
+// hash = kutilgan flag'ning SHA-256'si (mijoz tomonida tekshiriladi).
 const LAB = {
   // Haqiqiy Docker virtual mashinalari. Dashboard'dagi Web Terminal orqali buziladi:
   // nmap -> web/xizmat zaifligi -> SSH cred/hash -> SSH -> oddiy user -> root.
   // Har mashina TURLI daraja va TURLI zaiflik turi. Flaglar mashina ichida.
   machines: [
-    { id: "web-easy", name: "web-easy · shopzone", ip: "172.20.0.40", diff: "easy",
+    { id: "web-easy", name: "web-easy · shopzone", ip: "10.10.20.40", diff: "easy",
       vuln: "Ochiq zaxira fayl (info disclosure)",
       path: "Ochiq faylni toping → SSH ma'lumoti sizadi → SSH → sudo bash → root",
       flags: [
         { id: "we_user", label: "user", hash: "1f8c81f45669893bee5c124cb4e2e9684cfea68927bc1127171450ca5c084f04" },
         { id: "we_root", label: "root", hash: "f0d91df6dc331019b8e0b0cf2955587466062de41567cad14a276dffcc130dd9" },
       ] },
-    { id: "linux-02", name: "linux-02 · backend", ip: "172.20.0.20", diff: "easy",
+    { id: "linux-02", name: "linux-02 · backend", ip: "10.10.20.20", diff: "easy",
       vuln: "Anonim FTP + zaif SSH parol",
       path: "FTP'dagi maslahat → zaif SSH parol → SUID find → root",
       flags: [
         { id: "lx_user", label: "user", hash: "93e51fbb4d17f4dad11cb6f40616f7ec452a3e718598358883ef6b5ee2f7e129" },
         { id: "lx_root", label: "root", hash: "84eac80080d69599f852d12cad5d230df9a87578b49b4d9319189848f6276900" },
       ] },
-    { id: "web-01", name: "web-01 · acme.lab", ip: "172.20.0.10", diff: "medium",
+    { id: "web-01", name: "web-01 · acme.lab", ip: "10.10.20.10", diff: "medium",
       vuln: "Web SQLi → parol HASH sizadi",
       path: "UNION SQLi → md5crypt hash → john bilan crack → SSH → sudo → root",
       flags: [
         { id: "w1_user", label: "user", hash: "6c1c823759ea58d6a2a16157c96b48dc3df8bc42814d860b66f3a7d7c40a89a8" },
         { id: "w1_root", label: "root", hash: "2df2c2f22462bbea71c598ea7c7df3c6d2e521baf69d7ac91ab2b1c90facb5ba" },
       ] },
-    { id: "smb-03", name: "smb-03 · fileserver", ip: "172.20.0.30", diff: "medium",
+    { id: "smb-03", name: "smb-03 · fileserver", ip: "10.10.20.30", diff: "medium",
       vuln: "SMB null-session (parolsiz share)",
       path: "null-session → cred sizadi → SSH → yoziladigan root skript → root",
       flags: [
         { id: "sm_user", label: "user", hash: "7490ab7a5b913d64bc9a86507ad9a952c5518d1d2966761dfb9a4be1e8e6bd35" },
         { id: "sm_root", label: "root", hash: "0a6622afbe8693faf2f93bfa3e6b19f5df6ac7b22d7d48c5ba3644754dccb72d" },
       ] },
-    { id: "web-hard", name: "web-hard · monitorpanel", ip: "172.20.0.50", diff: "hard",
+    { id: "web-hard", name: "web-hard · monitorpanel", ip: "10.10.20.50", diff: "hard",
       vuln: "LFI / path traversal",
       path: "view.php?page= LFI → SSH cred sizadi → SSH → perl cap_setuid → root",
       flags: [
@@ -869,7 +868,7 @@ function labsView() {
       <div style="flex:1;min-width:280px">
         <h3>Tarmoq xaritasi (IP)</h3>
         <div class="term"><div class="term-top"><i class="r"></i><i class="y"></i><i class="g"></i><span class="lbl">host discovery</span></div>
-<pre>$ nmap -sn 172.20.0.0/24
+<pre>$ nmap -sn 10.10.20.0/24
 ${hosts}</pre></div>
       </div>
     </div>

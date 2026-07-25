@@ -23,7 +23,7 @@ Hujum qutisiga (o'z-o'zicha yetarli, Kali shart emas) kiring:
 docker exec -it ejpt-attacker bash
 # ichkarida:
 cat /root/README.txt
-nmap -sn 172.20.0.0/24
+nmap -sn 10.10.20.0/24
 ```
 
 To'xtatish / tozalash:
@@ -44,18 +44,18 @@ Har mashina turli **zaiflik** va turli **qiyinlik** — lekin oqim bir xil:
 
 | Mashina | Daraja | IP | Xizmatlar | Kill-chain | Flaglar |
 |---|---|---|---|---|---|
-| **web-easy** (`shopzone`) | 🟢 EASY | 172.20.0.40 | HTTP(80), SSH(22) | ochiq `config.old` (info disclosure) → SSH `deploy` → `sudo bash` → **root** | user + root |
-| **linux-02** (`backend`) | 🟢 easy | 172.20.0.20 | FTP(21), SSH(22) | anon FTP hint + zaif SSH → `bob` → SUID `find` → **root** | user + root |
-| **web-01** (`acme.lab`) | 🟡 MEDIUM | 172.20.0.10 | HTTP(80), SSH(22) | web SQLi → parol **hash** sizadi → **crack (john)** → SSH → sudo → **root** | user + root |
-| **smb-03** (`fileserver`) | 🟡 medium | 172.20.0.30 | SMB(445), SSH(22) | null-session SMB → cred → `carol` → yoziladigan root skript → **root** | user + root |
-| **web-hard** (`monitorpanel`) | 🔴 HARD | 172.20.0.50 | HTTP(80), SSH(22) | **LFI** → SSH cred sizadi → SSH `webadmin` → `perl` **cap_setuid** → **root** | user + root |
+| **web-easy** (`shopzone`) | 🟢 EASY | 10.10.20.40 | HTTP(80), SSH(22) | ochiq `config.old` (info disclosure) → SSH `deploy` → `sudo bash` → **root** | user + root |
+| **linux-02** (`backend`) | 🟢 easy | 10.10.20.20 | FTP(21), SSH(22) | anon FTP hint + zaif SSH → `bob` → SUID `find` → **root** | user + root |
+| **web-01** (`acme.lab`) | 🟡 MEDIUM | 10.10.20.10 | HTTP(80), SSH(22) | web SQLi → parol **hash** sizadi → **crack (john)** → SSH → sudo → **root** | user + root |
+| **smb-03** (`fileserver`) | 🟡 medium | 10.10.20.30 | SMB(445), SSH(22) | null-session SMB → cred → `carol` → yoziladigan root skript → **root** | user + root |
+| **web-hard** (`monitorpanel`) | 🔴 HARD | 10.10.20.50 | HTTP(80), SSH(22) | **LFI** → SSH cred sizadi → SSH `webadmin` → `perl` **cap_setuid** → **root** | user + root |
 | **internal-04** (`vault`) | 🔴 hard | 10.10.10.20 | HTTP(8080) | **FAQAT web-01 orqali pivot** → command injection → **final** | final |
 
 `internal-04` alohida **ichki tarmoqda** (`internalnet`, 10.10.10.0/24) — hujumchi unga **to'g'ridan-to'g'ri yeta olmaydi**. Uni buzish uchun avval **web-01**ni egallab, o'sha host orqali **pivot** qilishingiz kerak (eJPT'ning eng muhim ko'nikmasi).
 
 ## Maqsadlar (objectives)
 
-1. **Host discovery** — 172.20.0.0/24 da tirik mashinalarni toping.
+1. **Host discovery** — 10.10.20.0/24 da tirik mashinalarni toping.
 2. **Enumeration** — har mashinada xizmat va versiyalarni aniqlang.
 3. **web-01** — veb zaifligidan foydalanib shell oling, `www-data` → root, 2 flag.
 4. **linux-02** — FTP/SSH orqali foothold, SUID bilan root, 2 flag.

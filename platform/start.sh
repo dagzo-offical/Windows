@@ -47,7 +47,7 @@ cat <<'TIP'
    2) Admin panel (/admin) — qolgan foydalanuvchilarni TASDIQLANG va
       ularga RUXSAT bering (masalan: ejpt, network, terminal).
    3) Dashboard → «Web Terminal» → terminalda:
-         nmap -sn 172.20.0.0/24        # 6 mashinani toping
+         nmap -sn 10.10.20.0/24        # 6 mashinani toping
       har mashinani buzing: web zaifligi → SSH → oddiy user → root.
       To'liq yechim:  ../lab/WALKTHROUGH.md
 

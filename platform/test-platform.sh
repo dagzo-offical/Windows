@@ -33,7 +33,7 @@ RR=$(curl -s -b $JA -X POST $B/api/admin/vm/restart -H 'Content-Type: applicatio
 echo "$RR" | grep -q '"ok":true' && { echo "  [PASS] restart linux-02"; pass=$((pass+1)); } || { echo "  [FAIL] restart: $RR"; fail=$((fail+1)); }
 
 echo "### terminal reaches VMs (from attacker via ttyd host)"
-NM=$(docker exec ejpt-attacker sh -c "nmap -sn 172.20.0.0/24 2>/dev/null | grep -c 'Host is up'" 2>/dev/null)
+NM=$(docker exec ejpt-attacker sh -c "nmap -sn 10.10.20.0/24 2>/dev/null | grep -c 'Host is up'" 2>/dev/null)
 chk "attacker sees >=3 hosts" "$([ "${NM:-0}" -ge 3 ] && echo yes || echo no)" yes
 
 echo ""

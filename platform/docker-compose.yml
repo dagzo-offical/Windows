@@ -10,7 +10,7 @@ name: ejpt-platform
 networks:
   labnet:
     driver: bridge
-    ipam: { config: [{ subnet: 172.20.0.0/24 }] }
+    ipam: { config: [{ subnet: 10.10.20.0/24 }] }
   internalnet:
     driver: bridge
     internal: true
@@ -38,7 +38,7 @@ services:
     hostname: kali-lite
     cap_add: [NET_ADMIN, NET_RAW]
     networks:
-      labnet: { ipv4_address: 172.20.0.5 }
+      labnet: { ipv4_address: 10.10.20.5 }
     # brauzer terminali (backend /terminal orqali proxy qiladi)
     command: ["ttyd", "-p", "7681", "-b", "/terminal", "-W", "-t", "titleFixed=eJPT Lab Terminal", "bash"]
     restart: unless-stopped
@@ -48,7 +48,7 @@ services:
     container_name: ejpt-web-01
     hostname: acme-web
     networks:
-      labnet: { ipv4_address: 172.20.0.10, aliases: [acme.lab, www.acme.lab] }
+      labnet: { ipv4_address: 10.10.20.10, aliases: [acme.lab, www.acme.lab] }
       internalnet: { ipv4_address: 10.10.10.10 }
     restart: unless-stopped
 
@@ -57,7 +57,7 @@ services:
     container_name: ejpt-linux-02
     hostname: backend
     networks:
-      labnet: { ipv4_address: 172.20.0.20 }
+      labnet: { ipv4_address: 10.10.20.20 }
     restart: unless-stopped
 
   smb-03:
@@ -65,7 +65,7 @@ services:
     container_name: ejpt-smb-03
     hostname: fileserver
     networks:
-      labnet: { ipv4_address: 172.20.0.30 }
+      labnet: { ipv4_address: 10.10.20.30 }
     restart: unless-stopped
 
   web-easy:
@@ -73,7 +73,7 @@ services:
     container_name: ejpt-web-easy
     hostname: shopzone
     networks:
-      labnet: { ipv4_address: 172.20.0.40 }
+      labnet: { ipv4_address: 10.10.20.40 }
     restart: unless-stopped
 
   web-hard:
@@ -81,7 +81,7 @@ services:
     container_name: ejpt-web-hard
     hostname: monitorpanel
     networks:
-      labnet: { ipv4_address: 172.20.0.50 }
+      labnet: { ipv4_address: 10.10.20.50 }
     restart: unless-stopped
 
   internal-04:
