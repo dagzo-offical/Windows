@@ -51,34 +51,54 @@ const LS = {
 // Har nishon — o'zicha ochiladigan zaif sayt (ejpt/targets/*.html). Zaiflik AYTILMAYDI.
 // hash = kutilgan flag'ning SHA-256'si (tekshiruv uchun).
 const LAB = {
-  targets: [
-    { id: "t01", ip: "10.10.10.5",  name: "Nexora Cloud", diff: "easy",
-      goal: "Xodim (admin) paneliga kiring va flag'ni oling.",
-      hash: "657b35d32e1a2bd210be6d4452414ab485e475303da5fb876b96c4751fa112cc" },
-    { id: "t02", ip: "10.10.10.8",  name: "DevBlog", diff: "easy",
-      goal: "Xodim paneliga kirish uchun maxfiy hisobni toping.",
-      hash: "b23a9048681c6980319c3f02e84ee355804cb2ed705a589eb34f455635e90423" },
-    { id: "t03", ip: "10.10.10.12", name: "CloudStore", diff: "easy",
-      goal: "Yashirin sahifadagi maxfiy faylni toping.",
-      hash: "f690ccb20954510baa436bd40828333100825950d184465a7f25169426dad6df" },
-    { id: "t04", ip: "10.10.10.15", name: "MemberZone", diff: "medium",
-      goal: "Admin hisobotlariga kiring.",
-      hash: "41c2b89ce1f52e0c8aa0ee8d5941b81d09c42d1bbe5815e0edce4fc1bd89ef0a" },
-    { id: "t05", ip: "10.10.10.20", name: "SecureBank", diff: "medium",
-      goal: "admin hisobiga kirib flag'ni oling.",
-      hash: "40f5acd3f4e9b8fd15b9649024d64c2d8e61512ada19958d6affa50bd9d218d5" },
-    { id: "t06", ip: "10.10.10.25", name: "GateKeeper", diff: "medium",
-      goal: "Boshqaruv paneli himoyasini aylanib o'ting.",
-      hash: "75a2e25ad3a819bc305dda90cf065d9962a7dbec9f0b488ae2ba7e71b1a09020" },
-    { id: "t07", ip: "10.10.10.30", name: "APIVault", diff: "hard",
-      goal: "Admin sessiyasiga ega bo'ling.",
-      hash: "5c0b75146b9305e1e2ff21197cc11ab0b896e29ade44ff02e1f6accf5010385b" },
-    { id: "t08", ip: "10.10.10.33", name: "OldPortal", diff: "medium",
-      goal: "Legacy administrator paneliga kiring.",
-      hash: "d3d86fb377d49799643553f7b8426282aea01ce1ddc24c579e89a7965e54c1b5" },
+  // Haqiqiy Docker virtual mashinalari. Dashboard'dagi Web Terminal orqali buziladi:
+  // nmap -> web/xizmat zaifligi -> SSH cred/hash -> SSH -> oddiy user -> root.
+  // Har mashina TURLI daraja va TURLI zaiflik turi. Flaglar mashina ichida.
+  machines: [
+    { id: "web-easy", name: "web-easy · shopzone", ip: "172.20.0.40", diff: "easy",
+      vuln: "Ochiq zaxira fayl (info disclosure)",
+      path: "Ochiq faylni toping → SSH ma'lumoti sizadi → SSH → sudo bash → root",
+      flags: [
+        { id: "we_user", label: "user", hash: "1f8c81f45669893bee5c124cb4e2e9684cfea68927bc1127171450ca5c084f04" },
+        { id: "we_root", label: "root", hash: "f0d91df6dc331019b8e0b0cf2955587466062de41567cad14a276dffcc130dd9" },
+      ] },
+    { id: "linux-02", name: "linux-02 · backend", ip: "172.20.0.20", diff: "easy",
+      vuln: "Anonim FTP + zaif SSH parol",
+      path: "FTP'dagi maslahat → zaif SSH parol → SUID find → root",
+      flags: [
+        { id: "lx_user", label: "user", hash: "93e51fbb4d17f4dad11cb6f40616f7ec452a3e718598358883ef6b5ee2f7e129" },
+        { id: "lx_root", label: "root", hash: "84eac80080d69599f852d12cad5d230df9a87578b49b4d9319189848f6276900" },
+      ] },
+    { id: "web-01", name: "web-01 · acme.lab", ip: "172.20.0.10", diff: "medium",
+      vuln: "Web SQLi → parol HASH sizadi",
+      path: "UNION SQLi → md5crypt hash → john bilan crack → SSH → sudo → root",
+      flags: [
+        { id: "w1_user", label: "user", hash: "6c1c823759ea58d6a2a16157c96b48dc3df8bc42814d860b66f3a7d7c40a89a8" },
+        { id: "w1_root", label: "root", hash: "2df2c2f22462bbea71c598ea7c7df3c6d2e521baf69d7ac91ab2b1c90facb5ba" },
+      ] },
+    { id: "smb-03", name: "smb-03 · fileserver", ip: "172.20.0.30", diff: "medium",
+      vuln: "SMB null-session (parolsiz share)",
+      path: "null-session → cred sizadi → SSH → yoziladigan root skript → root",
+      flags: [
+        { id: "sm_user", label: "user", hash: "7490ab7a5b913d64bc9a86507ad9a952c5518d1d2966761dfb9a4be1e8e6bd35" },
+        { id: "sm_root", label: "root", hash: "0a6622afbe8693faf2f93bfa3e6b19f5df6ac7b22d7d48c5ba3644754dccb72d" },
+      ] },
+    { id: "web-hard", name: "web-hard · monitorpanel", ip: "172.20.0.50", diff: "hard",
+      vuln: "LFI / path traversal",
+      path: "view.php?page= LFI → SSH cred sizadi → SSH → perl cap_setuid → root",
+      flags: [
+        { id: "wh_user", label: "user", hash: "4b2fae9e4be8ad86487d129f0de31bfc45e36d9883232a43d8150b44eca5002c" },
+        { id: "wh_root", label: "root", hash: "9aac51377f1cb711f3e172742fed6b1325ab25642dd6ea116ac4c20575a6f8b2" },
+      ] },
+    { id: "internal-04", name: "internal-04 · vault", ip: "10.10.10.20", diff: "hard",
+      vuln: "PIVOT + command injection (ichki tarmoq)",
+      path: "FAQAT web-01 orqali pivot → command injection → final flag",
+      flags: [
+        { id: "in_final", label: "final", hash: "eafcf4163e79f086a2642cf1e27f03f2efbd9ba1d530c19e3968207d2f31401d" },
+      ] },
   ],
 };
-const LAB_TOTAL_FLAGS = LAB.targets.length;
+const LAB_TOTAL_FLAGS = LAB.machines.reduce((n, m) => n + m.flags.length, 0);  // 11
 
 /* ---------------- storage helpers (all guarded) ---------------- */
 function lsGet(key, fallback) {
@@ -331,9 +351,9 @@ function homeView() {
       </button>
       <button class="mode" style="--mode-c:var(--green);--mode-soft:var(--green-soft)" onclick="EJPT.go('labs')">
         <div class="m-ico">${svg("target", 22)}</div>
-        <h3>Web CTF <span class="mono" style="font-size:11px;color:var(--green)">BRAUZER</span></h3>
-        <p>${LAB_TOTAL_FLAGS} ta zaif saytni to'g'ridan-to'g'ri brauzerda buzing — yashirin ma'lumot, hash/parol, oddiy parollarni toping. Terminal shart emas.</p>
-        <div class="m-go">Nishonlarni ko'rish ${svg("arrowR", 15)}</div>
+        <h3>Amaliy Lab <span class="mono" style="font-size:11px;color:var(--green)">TERMINAL</span></h3>
+        <p>${LAB.machines.length} ta haqiqiy zaif mashina (${LAB_TOTAL_FLAGS} flag). Web Terminal orqali buzing: web zaifligi → SSH → root. Har xil daraja va har xil zaiflik.</p>
+        <div class="m-go">Mashinalarni ko'rish ${svg("arrowR", 15)}</div>
       </button>
     </div>
   </div>
@@ -798,44 +818,45 @@ function labsView() {
   const col = done === LAB_TOTAL_FLAGS ? "var(--green)" : "var(--orange)";
   const diffCls = { easy: "diff-easy", medium: "diff-medium", hard: "diff-hard" };
 
-  // host-discovery style IP ro'yxati
-  const hosts = LAB.targets.map((t) =>
-    `Host <span class="hl">${t.ip.padEnd(13)}</span> up   <span style="color:var(--t3)">(${esc(t.name)})</span>`).join("\n");
+  // host-discovery: labnet IP xaritasi (internal-04 faqat pivot orqali)
+  const hosts = LAB.machines.map((m) => {
+    const via = m.ip.indexOf("10.10.10.") === 0 ? "   (pivot orqali — web-01 dan)" : "";
+    return `Host <span class="hl">${m.ip.padEnd(13)}</span> up   <span style="color:var(--t3)">${esc(m.name)}${via}</span>`;
+  }).join("\n");
 
-  const cards = LAB.targets.map((t) => {
-    const ok = solved.has(t.id);
-    return `<div class="labcard ${ok ? "done" : ""}">
-      <div class="labcard-top">
-        <div><span class="labname">${esc(t.name)}</span>
-          <span class="labalias mono">${esc(t.ip)}</span></div>
-        <span class="difftag ${diffCls[t.diff]}">${esc(t.diff)}</span>
-      </div>
-      <p class="labobj"><span class="mono" style="color:var(--t3)">MAQSAD:</span> ${esc(t.goal)}</p>
-      <div class="labflags">
-        <div class="labflag" style="border:0;background:transparent;padding:0 0 4px">
-          <button class="btn sm blue" onclick="window.open('targets/${t.id}.html','_blank','noopener')">${svg("target", 14)} Saytni ochish (${esc(t.ip)})</button>
-          <span class="mono small muted">brauzerda ochiladi</span>
-        </div>
-        <div class="labflag ${ok ? "solved" : ""}">
-          <span class="lf-label">${svg(ok ? "check" : "flag", 14)} Flag</span>
+  const cards = LAB.machines.map((m) => {
+    const flags = m.flags.map((f) => {
+      const ok = solved.has(f.id);
+      return `<div class="labflag ${ok ? "solved" : ""}">
+          <span class="lf-label">${svg(ok ? "check" : "flag", 14)} ${esc(f.label)}</span>
           ${ok
             ? `<span class="lf-ok">Topildi ✓</span>`
-            : `<span class="lf-in"><input id="lf_${t.id}" placeholder="EJPT{...}" spellcheck="false" autocomplete="off"
-                 onkeydown="if(event.key==='Enter')EJPT.submitLabFlag('${t.id}')">
-               <button class="btn sm blue" onclick="EJPT.submitLabFlag('${t.id}')">Tekshirish</button></span>`}
-        </div>
+            : `<span class="lf-in"><input id="lf_${f.id}" placeholder="EJPT{...}" spellcheck="false" autocomplete="off"
+                 onkeydown="if(event.key==='Enter')EJPT.submitLabFlag('${f.id}')">
+               <button class="btn sm blue" onclick="EJPT.submitLabFlag('${f.id}')">Tekshirish</button></span>`}
+        </div>`;
+    }).join("");
+    return `<div class="labcard">
+      <div class="labcard-top">
+        <div><span class="labname">${esc(m.name)}</span>
+          <span class="labalias mono">${esc(m.ip)}</span></div>
+        <span class="difftag ${diffCls[m.diff]}">${esc(m.diff)}</span>
       </div>
+      <p class="labobj"><span class="mono" style="color:var(--t3)">ZAIFLIK:</span> ${esc(m.vuln)}</p>
+      <p class="labobj"><span class="mono" style="color:var(--t3)">YO'L:</span> ${esc(m.path)}</p>
+      <div class="labflags">${flags}</div>
     </div>`;
   }).join("");
 
   const circ = (2 * Math.PI * 64).toFixed(1);
   return `
   <div class="hero rise">
-    <div class="eyebrow">${svg("target", 13)} Web CTF Poligoni · brauzerda</div>
-    <h1>Zaif saytlarni <span class="grad-o">buzing</span></h1>
-    <p class="lede">${LAB_TOTAL_FLAGS} ta haqiqiy ko'rinishli sayt. Terminal yoki o'rnatish kerak emas — har birini
-      brauzerda oching, zaiflikni <b>o'zingiz toping</b> (yashirin ma'lumot, hash/parol, oddiy parol...),
-      flag'ni oling va pastda topshiring. Qanday zaiflik ekani aytilmaydi.</p>
+    <div class="eyebrow">${svg("target", 13)} Amaliy Lab · haqiqiy Docker mashinalari</div>
+    <h1>Virtual mashinalarni <span class="grad-o">buzing</span></h1>
+    <p class="lede">${LAB.machines.length} ta haqiqiy zaif mashina, ${LAB_TOTAL_FLAGS} ta flag.
+      Dashboard'dagi <b>«Web Terminal»</b>ni oching → <span class="mono">nmap</span> bilan skanerlang →
+      web zaifligidan SSH ma'lumoti (parol yoki <b>hash</b>) oling → SSH → oddiy user → <b>root</b>.
+      Har mashina turli daraja va turli zaiflik.</p>
     <div class="ring-wrap" style="margin-top:18px">
       <div class="ring" id="ring" data-pct="${pct}" data-color="${col}">
         <svg width="150" height="150" viewBox="0 0 150 150">
@@ -846,17 +867,17 @@ function labsView() {
         <div class="rlabel"><div class="rp" style="color:${col}">${done}/${LAB_TOTAL_FLAGS}</div><div class="rs">flag</div></div>
       </div>
       <div style="flex:1;min-width:280px">
-        <h3>Topilgan xostlar</h3>
+        <h3>Tarmoq xaritasi (IP)</h3>
         <div class="term"><div class="term-top"><i class="r"></i><i class="y"></i><i class="g"></i><span class="lbl">host discovery</span></div>
-<pre>$ scan 10.10.10.0/24
+<pre>$ nmap -sn 172.20.0.0/24
 ${hosts}</pre></div>
       </div>
     </div>
   </div>
 
   <div class="section">
-    <h2>Nishonlar</h2>
-    <p class="muted small">Saytni oching → zaiflikni toping → flag'ni shu yerga kiriting (tizim tekshiradi). Maslahat: sahifa manbasini (view-source), cookie'larni va yashirin yo'llarni tekshiring.</p>
+    <h2>Mashinalar</h2>
+    <p class="muted small">Web Terminal'ni oching → mashinani skanerlang → web zaifligidan foydalanib SSH ma'lumotini (parol yoki hash) oling → SSH → root'ga ko'tariling. Topgan flaglaringizni shu yerga kiriting.</p>
     <div class="labgrid">${cards}</div>
   </div>
 
@@ -866,13 +887,13 @@ ${hosts}</pre></div>
   </div>
   ${footer()}`;
 }
-async function submitLabFlag(targetId) {
-  const inp = document.getElementById("lf_" + targetId);
+async function submitLabFlag(flagId) {
+  const inp = document.getElementById("lf_" + flagId);
   if (!inp) return;
   const val = inp.value.trim();
   if (!val) return;
   let expected = null;
-  LAB.targets.forEach((t) => { if (t.id === targetId) expected = t.hash; });
+  LAB.machines.forEach((m) => m.flags.forEach((f) => { if (f.id === flagId) expected = f.hash; }));
   if (!expected) return;
   let hex = null;
   try {

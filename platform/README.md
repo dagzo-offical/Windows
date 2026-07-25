@@ -4,10 +4,17 @@ Bu — o'quv platformasining **backend** qismi: foydalanuvchi **ro'yxatdan o'tis
 
 > ⚠️ Bularning hammasi **server (backend)** talab qiladi — statik GitHub Pages'da ishlamaydi. Uni o'z kompyuteringizda yoki serveringizda `docker compose` bilan ishga tushiring.
 
-## Ishga tushirish
+## Ishga tushirish (bir buyruq)
 
 ```bash
 cd platform
+./start.sh          # Docker'ni tekshiradi, quradi, ishga tushiradi, URL beradi
+```
+
+To'xtatish: `./stop.sh`
+
+Yoki qo'lda:
+```bash
 docker compose up -d --build
 ```
 
@@ -34,16 +41,18 @@ docker compose down -v         # foydalanuvchilarni ham o'chiradi
 
 ## Virtual mashinalar (lab)
 
-Platforma bilan birga 4 ta **haqiqiy zaif mashina** ishga tushadi (izolyatsiya qilingan Docker tarmog'ida):
+Platforma bilan birga **6 ta haqiqiy zaif mashina** ishga tushadi (izolyatsiya qilingan Docker tarmog'ida). Har biri **turli daraja** va **turli zaiflik** — lekin oqim bir xil: **web/xizmat zaifligi → SSH cred/hash → SSH → oddiy user → root**.
 
-| Mashina | IP | Kirish |
-|---|---|---|
-| web-01 (acme.lab) | 172.20.0.10 | web zaifligi → root; ichki tarmoqqa **pivot** |
-| linux-02 | 172.20.0.20 | FTP/SSH → SUID → root |
-| smb-03 | 172.20.0.30 | SMB null-session → root |
-| internal-04 | 10.10.10.20 | **faqat web-01 orqali pivot** |
+| Mashina | Daraja | IP | Zaiflik → kirish |
+|---|---|---|---|
+| web-easy (shopzone) | 🟢 easy | 172.20.0.40 | ochiq `config.old` (info disclosure) → SSH → `sudo bash` → root |
+| linux-02 (backend) | 🟢 easy | 172.20.0.20 | anon FTP + zaif SSH → SUID `find` → root |
+| web-01 (acme.lab) | 🟡 medium | 172.20.0.10 | web SQLi → parol **hash** sizadi → john bilan crack → SSH → root; **pivot nuqtasi** |
+| smb-03 (fileserver) | 🟡 medium | 172.20.0.30 | SMB null-session → cred → yoziladigan root skript → root |
+| web-hard (monitorpanel) | 🔴 hard | 172.20.0.50 | **LFI** → SSH cred sizadi → SSH → `perl` **cap_setuid** → root |
+| internal-04 (vault) | 🔴 hard | 10.10.10.20 | **faqat web-01 orqali pivot** → command injection → final |
 
-Terminaldan hujum: `docker exec` shart emas — **Web Terminal**ni oching (dashboard'da) va:
+Jami **11 ta flag**. Terminaldan hujum: `docker exec` shart emas — **Web Terminal**ni oching (dashboard'da) va:
 ```bash
 nmap -sn 172.20.0.0/24
 ```
@@ -67,6 +76,6 @@ platform/
 ├── server.js            # pure-Node backend (auth, admin, RBAC, VM restart, terminal proxy)
 ├── public/              # frontend: login, register, dashboard, admin
 ├── Dockerfile
-├── docker-compose.yml   # backend + attacker(ttyd) + 4 VM
+├── docker-compose.yml   # backend + attacker(ttyd) + 6 VM
 └── data/                # users.json, secret (volume)
 ```
