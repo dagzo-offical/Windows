@@ -33,10 +33,12 @@ const MODULES = [
   { id: "ejpt", name: "eJPT Practice", path: "/ejpt/index.html" },
 ];
 const VMS = [
-  { id: "web-01", container: "ejpt-web-01", name: "web-01 (acme.lab)", ip: "172.20.0.10" },
-  { id: "linux-02", container: "ejpt-linux-02", name: "linux-02 (backend)", ip: "172.20.0.20" },
-  { id: "smb-03", container: "ejpt-smb-03", name: "smb-03 (fileserver)", ip: "172.20.0.30" },
-  { id: "internal-04", container: "ejpt-internal-04", name: "internal-04 (vault, pivot)", ip: "10.10.10.20" },
+  { id: "web-easy", container: "ejpt-web-easy", name: "web-easy (shopzone) — EASY", ip: "172.20.0.40" },
+  { id: "linux-02", container: "ejpt-linux-02", name: "linux-02 (backend) — easy", ip: "172.20.0.20" },
+  { id: "web-01", container: "ejpt-web-01", name: "web-01 (acme.lab) — MEDIUM", ip: "172.20.0.10" },
+  { id: "smb-03", container: "ejpt-smb-03", name: "smb-03 (fileserver) — medium", ip: "172.20.0.30" },
+  { id: "web-hard", container: "ejpt-web-hard", name: "web-hard (monitorpanel) — HARD", ip: "172.20.0.50" },
+  { id: "internal-04", container: "ejpt-internal-04", name: "internal-04 (vault, pivot) — hard", ip: "10.10.10.20" },
 ];
 const MODULE_IDS = MODULES.map((m) => m.id);
 // resources the admin can grant: modules + the web terminal

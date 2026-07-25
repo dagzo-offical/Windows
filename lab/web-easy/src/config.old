@@ -1,0 +1,12 @@
+; ShopZone legacy configuration (BACKUP FILE — o'chirish kerak edi!)
+[database]
+db_host = 127.0.0.1
+db_name = shopzone
+db_user = shop
+db_pass = shopDB#2024
+
+[deploy]
+; rsync/ssh deploy hisobi
+ssh_host = 127.0.0.1
+ssh_user = deploy
+ssh_pass = D3ploy2024!

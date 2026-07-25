@@ -1,0 +1,2 @@
+MonitorPanel — server monitoring dashboard.
+Hujjatlar view.php orqali ko'rsatiladi (?page=...).

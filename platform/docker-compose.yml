@@ -68,6 +68,22 @@ services:
       labnet: { ipv4_address: 172.20.0.30 }
     restart: unless-stopped
 
+  web-easy:
+    build: ../lab/web-easy
+    container_name: ejpt-web-easy
+    hostname: shopzone
+    networks:
+      labnet: { ipv4_address: 172.20.0.40 }
+    restart: unless-stopped
+
+  web-hard:
+    build: ../lab/web-hard
+    container_name: ejpt-web-hard
+    hostname: monitorpanel
+    networks:
+      labnet: { ipv4_address: 172.20.0.50 }
+    restart: unless-stopped
+
   internal-04:
     build: ../lab/internal-04
     container_name: ejpt-internal-04

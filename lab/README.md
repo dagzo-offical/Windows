@@ -39,12 +39,17 @@ Poligonni umumiy serverda (VPS/ichki server) ishga tushiring — bir nechta o'qu
 
 ## Mashinalar (tarmoq xaritasi)
 
-| Mashina | IP | Xizmatlar | Kill-chain | Flaglar |
-|---|---|---|---|---|
-| **web-01** (`acme.lab`) | 172.20.0.10 | HTTP(80), SSH(22) | web SQLi → parol **hash** sizadi → **crack (john)** → SSH → sudo → **root** | user + root |
-| **linux-02** (`backend`) | 172.20.0.20 | FTP(21), SSH(22) | anon FTP hint + zaif SSH → `bob` → SUID `find` → **root** | user + root |
-| **smb-03** (`fileserver`) | 172.20.0.30 | SMB(445), SSH(22) | null-session SMB → cred → `carol` → yoziladigan root skript → **root** | user + root |
-| **internal-04** (`vault`) | 10.10.10.20 | HTTP(8080) | **FAQAT web-01 orqali pivot** → command injection → **final** | final |
+Har mashina turli **zaiflik** va turli **qiyinlik** — lekin oqim bir xil:
+**web zaifligi → SSH cred/hash → SSH → oddiy user → root.**
+
+| Mashina | Daraja | IP | Xizmatlar | Kill-chain | Flaglar |
+|---|---|---|---|---|---|
+| **web-easy** (`shopzone`) | 🟢 EASY | 172.20.0.40 | HTTP(80), SSH(22) | ochiq `config.old` (info disclosure) → SSH `deploy` → `sudo bash` → **root** | user + root |
+| **linux-02** (`backend`) | 🟢 easy | 172.20.0.20 | FTP(21), SSH(22) | anon FTP hint + zaif SSH → `bob` → SUID `find` → **root** | user + root |
+| **web-01** (`acme.lab`) | 🟡 MEDIUM | 172.20.0.10 | HTTP(80), SSH(22) | web SQLi → parol **hash** sizadi → **crack (john)** → SSH → sudo → **root** | user + root |
+| **smb-03** (`fileserver`) | 🟡 medium | 172.20.0.30 | SMB(445), SSH(22) | null-session SMB → cred → `carol` → yoziladigan root skript → **root** | user + root |
+| **web-hard** (`monitorpanel`) | 🔴 HARD | 172.20.0.50 | HTTP(80), SSH(22) | **LFI** → SSH cred sizadi → SSH `webadmin` → `perl` **cap_setuid** → **root** | user + root |
+| **internal-04** (`vault`) | 🔴 hard | 10.10.10.20 | HTTP(8080) | **FAQAT web-01 orqali pivot** → command injection → **final** | final |
 
 `internal-04` alohida **ichki tarmoqda** (`internalnet`, 10.10.10.0/24) — hujumchi unga **to'g'ridan-to'g'ri yeta olmaydi**. Uni buzish uchun avval **web-01**ni egallab, o'sha host orqali **pivot** qilishingiz kerak (eJPT'ning eng muhim ko'nikmasi).
 
@@ -57,7 +62,7 @@ Poligonni umumiy serverda (VPS/ichki server) ishga tushiring — bir nechta o'qu
 5. **smb-03** — SMB enumeration → cred → root, 2 flag.
 6. **PIVOT** — web-01 orqali `internal-04`ga o'ting, command injection bilan **final flag**.
 
-Jami **7 ta flag**. Ularni portalning **«Amaliy Lab»** sahifasida topshiring.
+Jami **11 ta flag**. Ularni portalning **«Amaliy Lab»** sahifasida topshiring.
 
 ## Xavfsizlik va etika
 

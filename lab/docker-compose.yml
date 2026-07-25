@@ -65,6 +65,24 @@ services:
       labnet:
         ipv4_address: 172.20.0.30
 
+  # -------- EASY web: ochiq config sizadi -> SSH -> sudo bash -> root --------
+  web-easy:
+    build: ./web-easy
+    container_name: ejpt-web-easy
+    hostname: shopzone
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.40
+
+  # -------- HARD web: LFI -> SSH cred sizadi -> SSH -> perl cap_setuid -> root --------
+  web-hard:
+    build: ./web-hard
+    container_name: ejpt-web-hard
+    hostname: monitorpanel
+    networks:
+      labnet:
+        ipv4_address: 172.20.0.50
+
   # -------- 4) internal-04: FAQAT ichki tarmoqda — command injection -> final flag --------
   internal-04:
     build: ./internal-04

