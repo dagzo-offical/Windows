@@ -9,13 +9,24 @@ cd "$(dirname "$0")"
 
 # 1) Docker ishlayaptimi?
 if ! docker info >/dev/null 2>&1; then
-  echo "❌ Docker ishlamayapti."
-  echo "   Docker Desktop'ni oching (Windows/Mac) yoki Linux'da:  sudo systemctl start docker"
+  echo "❌ Docker ishlamayapti (yoki ruxsat yo'q)."
+  echo "   Linux'da:  sudo systemctl start docker   — yoki ./start.sh ni 'sudo' bilan ishga tushiring."
+  echo "   Docker Desktop (Windows/Mac) — dasturni oching."
   echo "   So'ng qayta urining:  ./start.sh"
   exit 1
 fi
 
-echo "🐳 Platforma + 6 ta zaif virtual mashina quriladi va ishga tushiriladi."
+# 2) Eski holatni AVTOMATIK tozalash (qo'lda buyruq yozmaslik uchun)
+echo "🧹 Eski konteynerlar tozalanmoqda (foydalanuvchilar saqlanadi)..."
+docker compose down --remove-orphans >/dev/null 2>&1 || true
+# Platforma (8000) va CTF nishoni (8085) portlarini bo'shatish — Burp (8080) ga TEGILMAYDI.
+if command -v fuser >/dev/null 2>&1; then
+  fuser -k 8000/tcp >/dev/null 2>&1 || true
+  fuser -k 8085/tcp >/dev/null 2>&1 || true
+fi
+
+# 3) Qurish va ishga tushirish
+echo "🐳 Platforma + zaif VM'lar + CTF nishoni quriladi va ishga tushiriladi."
 echo "   (Birinchi marta ~2-4 daqiqa — imijlar yuklab olinadi/quriladi.)"
 echo ""
 docker compose up -d --build
