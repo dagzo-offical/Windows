@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="uz"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CTF Poligoni · Nimbus Reports</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='84'%3E%F0%9F%9A%A9%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#070c18;--panel:#111a2e;--panel2:#0d1526;--border:#203050;--text:#e7edf9;
+  --muted:#8ea0c4;--green:#22d3a6;--blue:#2d7aff;--orange:#ff8a3d;--red:#ff5c72;--warn:#ffb454;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1100px 560px at 75% -10%,#132449 0,var(--bg) 55%);
+  color:var(--text);font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+header.top{border-bottom:1px solid var(--border);background:rgba(6,10,22,.7);backdrop-filter:blur(8px)}
+header.top .wrap{display:flex;align-items:center;gap:12px;height:60px}
+.logo{font-weight:800;font-size:19px}.logo span{color:var(--green)}
+.top a.back{margin-left:auto;color:var(--muted);font-size:14px;text-decoration:none}
+.top a.back:hover{color:var(--text)}
+.hero{padding:36px 0 6px}
+.eyebrow{color:var(--green);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+h1{font-size:34px;line-height:1.12;margin:.25em 0}
+h1 .g{background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lede{color:var(--muted);font-size:17px;max-width:680px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.card h3{margin:0 0 6px;font-size:16px}
+.mono{font-family:var(--mono)}.muted{color:var(--muted)}
+.term{background:#050a14;border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+  font:13px/1.7 var(--mono);color:#cfe0ff;overflow-x:auto;white-space:pre}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;padding:3px 9px;border-radius:999px;text-transform:uppercase}
+.tag.med{background:#2a2408;color:var(--warn);border:1px solid #5c5015}
+h2{font-size:22px;margin:32px 0 6px}
+.chal{border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin:14px 0;background:var(--panel2)}
+.chal.solved{border-color:#155e46;background:linear-gradient(180deg,#0c2a20,#0d1526)}
+.chal .head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chal .num{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:14px;background:#0a1730;border:1px solid var(--border);color:var(--green)}
+.chal h3{margin:0;font-size:17px}
+.chal .type{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.chal p{color:var(--muted);font-size:14px;margin:10px 0}
+.chal .hint{font-size:13px;color:#a9b8d6;border-left:3px solid var(--border);padding-left:12px;margin:8px 0}
+.row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+input[type=text]{flex:1;min-width:220px;background:#0a1124;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font:14px var(--mono)}
+input.bad{border-color:var(--red);animation:sh .25s}
+@keyframes sh{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+button{background:linear-gradient(180deg,var(--green),#14b892);color:#04241b;border:0;border-radius:10px;padding:11px 18px;font-weight:700;cursor:pointer}
+.ok{color:var(--green);font-weight:700}
+.prog{display:flex;align-items:center;gap:14px;margin:8px 0 4px}
+.bar{flex:1;height:12px;background:#0a1124;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--blue));width:0;transition:width .5s}
+.foot{color:var(--muted);font-size:13px;border-top:1px solid var(--border);margin-top:36px;padding:18px 0 50px}
+.warn{border-left:3px solid var(--warn);background:#1a1608;color:#ffe0a3;padding:10px 14px;border-radius:8px;font-size:13.5px;margin:14px 0}
+</style></head>
+<body>
+<header class="top"><div class="wrap"><div class="logo">🚩 CTF<span>Poligoni</span></div>
+<a class="back" href="/dashboard">← Boshqaruv paneli</a></div></header>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Web CTF · bitta haqiqiy sayt · <span class="tag med">MEDIUM</span></div>
+    <h1>«Nimbus Reports» ni <span class="g">buzing</span></h1>
+    <p class="lede">Haqiqiy ko'rinishli SaaS saytida <b>4 ta web zaiflik</b> yashiringan:
+      IDOR, information disclosure, reflected XSS (WAF bypass) va SSRF. Har birini toping, flagni oling
+      va pastda topshiring. Zaifliklar aytilmaydi — o'zingiz aniqlaysiz.</p>
+  </section>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>🎯 Nishon</h3>
+      <p class="muted" style="font-size:14px;margin:.3em 0">Sayt host portida ishlaydi:</p>
+      <div class="term">http://&lt;HOST-IP&gt;:8085/</div>
+      <p class="muted" style="font-size:13px;margin-top:10px">Shu kompyuterda: <span class="mono">http://localhost:8085</span> ·
+        tarmoqdagilar: <span class="mono">http://&lt;server-ip&gt;:8085</span>.
+        Brauzer + <b>Burp Suite</b> bilan hujum qiling.</p>
+    </div>
+    <div class="card">
+      <h3>🔎 Recon (Web Terminal)</h3>
+      <div class="term">gobuster dir -u http://&lt;IP&gt;:8085/ \
+  -w /usr/share/wordlists/dirb/common.txt -x php,txt
+
+# hammasi bitta ro'yxatda emas — kattaroq ro'yxatni ham sinang:
+gobuster dir -u http://&lt;IP&gt;:8085/ \
+  -w .../directory-list-2.3-medium.txt -x php,txt</div>
+      <p class="muted" style="font-size:13px;margin-top:10px">Maslahat: <span class="mono">-x php,txt</span> shart.
+        robots.txt va sahifa manbasini ham o'qing.</p>
+    </div>
+  </div>
+
+  <div class="warn">⚠️ «Nimbus Reports» — <b>ataylab zaif</b> o'quv sayti. Faqat shu izolyatsiya qilingan labda,
+    ruxsat berilgan tarmoqda ishlating — internetga ochmang.</div>
+
+  <div class="prog">
+    <div class="bar"><i id="bar"></i></div>
+    <div class="mono" id="pct" style="color:var(--green);font-weight:700">0/4</div>
+  </div>
+
+  <h2>Vazifalar</h2>
+  <div id="chals"></div>
+
+  <div class="foot">CTF Poligoni · o'quv maqsadida · flag qiymatlari mijoz tomonida (SHA-256) tekshiriladi.
+    Progress shu brauzerda saqlanadi.</div>
+</div>
+
+<script>
+const CHALS = [
+  { id:"idor", type:"IDOR / Broken Access Control", title:"№0 hisobot",
+    desc:"«My Reports» sahifasi hisobotlarni #1–12 yuklab olishga ruxsat beradi. Lekin arxivda #0 ham bor — brauzer uni hech qachon ko'rsatmaydi.",
+    hint:"So'rovni o'zgartiring (Burp). ID qayerda yuboriladi — URL da emas...",
+    hash:"bc83cd5ee11656407ce553a70cbad3762222ac0c7d1d4b95f9c13b57c84a407d" },
+  { id:"info", type:"Information Disclosure", title:"Ochiq qolgan sir",
+    desc:"Ops jamoasi nimadir ochiq qoldirgan. Kataloglarni sinchiklab enumeratsiya qiling — bu path oddiy ro'yxatlarda yo'q, kattarog'i kerak. Topilgan narsa ko'z bilan o'qilmaydi — kodlangan.",
+    hint:"directory-list-2.3-medium bilan qidiring. Topgan matn base64 — dekodlang.",
+    hash:"f37a42c8e2bf32dc0edc5a3fee861d3254df493c47b104cdf9b649c1db1e4243" },
+  { id:"xss", type:"Reflected XSS · WAF bypass", title:"WAF ni aylanib o'ting",
+    desc:"Eski qidiruv endpointi kiritilgan matnni qaytaradi (reflected). Oddiy XSS'ni «WAF» bloklaydi. Uni aylanib o'tib, faqat same-origin so'rovga javob beradigan /flag.php ni JS bilan o'qing.",
+    hint:"<script> va onerror bloklangan — boshqa vektor (masalan <svg onload=...>) ishlaydi. fetch('/flag.php').then(r=>r.text()).then(alert)",
+    hash:"15cb0296b85b70a29dd0e55e2a80634650f038b23fc11b89a0b91e895e3d290f" },
+  { id:"ssrf", type:"SSRF · decimal-IP bypass", title:"Ichki endpointga yeting",
+    desc:"«URL preview» funksiyasi havolani server tomonda yuklaydi. U localhost/127.0.0.1 ni bloklaydi — lekin sodda satr bo'yicha. Ichki metrics endpointiga yeting.",
+    hint:"127.0.0.1 ni o'nlik (decimal) songa aylantiring: http://2130706433/ ...",
+    hash:"50e0efb0391ac60f9d5f2ca916595815b9bbf7e96af222f15e43c0a8e2f69acb" },
+];
+const LS = "ctf_nimbus_solved";
+function getSolved(){ try{ const a=JSON.parse(localStorage.getItem(LS)); return new Set(Array.isArray(a)?a:[]);}catch(e){return new Set();} }
+function setSolved(s){ try{ localStorage.setItem(LS, JSON.stringify([...s])); }catch(e){} }
+async function sha256(str){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+function render(){
+  const solved = getSolved();
+  document.getElementById("chals").innerHTML = CHALS.map((c,i)=>{
+    const ok = solved.has(c.id);
+    return `<div class="chal ${ok?"solved":""}">
+      <div class="head"><span class="num">${ok?"✓":i+1}</span>
+        <h3>${esc(c.title)}</h3><span class="type">· ${esc(c.type)}</span></div>
+      <p>${esc(c.desc)}</p>
+      <div class="hint">💡 ${esc(c.hint)}</div>
+      ${ok ? `<div class="ok">Flag topildi ✓</div>`
+        : `<div class="row">
+             <input type="text" id="in_${c.id}" placeholder="EJPT{...}" spellcheck="false" autocomplete="off"
+               onkeydown="if(event.key==='Enter')submit('${c.id}')">
+             <button onclick="submit('${c.id}')">Tekshirish</button>
+           </div>`}
+    </div>`;
+  }).join("");
+  const n = CHALS.filter(c=>solved.has(c.id)).length;
+  document.getElementById("bar").style.width = (n/CHALS.length*100)+"%";
+  document.getElementById("pct").textContent = n+"/"+CHALS.length;
+}
+async function submit(id){
+  const inp = document.getElementById("in_"+id); if(!inp) return;
+  const v = inp.value.trim(); if(!v) return;
+  const c = CHALS.find(x=>x.id===id);
+  const h = await sha256(v);
+  if(h === c.hash){ const s=getSolved(); s.add(id); setSolved(s); render(); }
+  else { inp.classList.add("bad"); inp.value=""; inp.placeholder="Noto'g'ri — qayta urining"; setTimeout(()=>inp.classList.remove("bad"),300); }
+}
+render();
+</script>
+</body></html>

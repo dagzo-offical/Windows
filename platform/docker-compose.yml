@@ -84,6 +84,16 @@ services:
       labnet: { ipv4_address: 10.10.20.50 }
     restart: unless-stopped
 
+  # MEDIUM web CTF (Nimbus Reports): IDOR · info-disclosure · XSS(WAF) · SSRF — brauzer/Burp uchun host portida
+  ctf-web:
+    build: ../lab/ctf-web
+    container_name: ejpt-ctf-web
+    hostname: nimbus-reports
+    ports: ["8085:80"]
+    networks:
+      labnet: { ipv4_address: 10.10.20.60 }
+    restart: unless-stopped
+
   internal-04:
     build: ../lab/internal-04
     container_name: ejpt-internal-04

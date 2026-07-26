@@ -58,6 +58,18 @@ Har mashina turli **zaiflik** va turli **qiyinlik** — lekin oqim bir xil:
 
 `internal-04` alohida **ichki tarmoqda** (`internalnet`, 10.10.10.0/24) — hujumchi unga **to'g'ridan-to'g'ri yeta olmaydi**. Uni buzish uchun avval **web-01**ni egallab, o'sha host orqali **pivot** qilishingiz kerak (eJPT'ning eng muhim ko'nikmasi).
 
+### Web CTF — «Nimbus Reports» (brauzer + Burp)
+
+Yuqoridagi SSH-mashinalardan **farqli** — bu **sof web** nishoni: SSH/root yo'q, `10.10.20.60` da
+va **host portida `8085`** (brauzer + **Burp Suite** uchun). Bitta haqiqiy ko'rinishli saytda **4 xil
+web zaiflik**; path'lar **gobuster** bilan (`-x php,txt`) topiladi.
+
+| Nishon | Daraja | IP · port | Zaifliklar | Flaglar |
+|---|---|---|---|---|
+| **ctf-web** (`Nimbus Reports`) | 🟡 MEDIUM | 10.10.20.60 · **:8085** | IDOR · information disclosure (encoded) · reflected XSS (WAF bypass) · SSRF (decimal) | 4 |
+
+Flaglar portalning **«CTF»** sahifasida topshiriladi. To'liq yechim: [`ctf-web/README.md`](ctf-web/README.md) va [`WALKTHROUGH.md`](WALKTHROUGH.md).
+
 ## Maqsadlar (objectives)
 
 1. **Host discovery** — 10.10.20.0/24 da tirik mashinalarni toping.

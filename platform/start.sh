@@ -49,6 +49,7 @@ if [ "$ok" = "1" ]; then
   else
     echo "     • Tarmoqdagi boshqalar:   http://<IP>:8080   (IP'ni 'ip addr' bilan toping)"
   fi
+  echo "     • CTF nishoni (Burp):     http://${LAN:-localhost}:8085   (Nimbus Reports)"
 else
   echo "⚠️  Backend hali javob bermayapti. Tekshiring:  docker compose ps  /  docker compose logs backend"
 fi
@@ -61,14 +62,15 @@ cat <<TIP
         tarmoqdagi boshqalar:  http://${LAN:-<IP>}:8080/register
       ⚑ BIRINCHI ro'yxatdan o'tgan foydalanuvchi = ADMIN (darhol faol).
    2) Admin panel (/admin) — qolgan foydalanuvchilarni TASDIQLANG va
-      ularga RUXSAT bering (masalan: ejpt, network, terminal).
-   3) Dashboard → «Web Terminal» → terminalda:
-         nmap -sn 10.10.20.0/24        # 6 mashinani toping
-      har mashinani buzing: web zaifligi → SSH → oddiy user → root.
-      To'liq yechim:  ../lab/WALKTHROUGH.md
+      ularga RUXSAT bering (masalan: ctf, network, terminal).
+   3a) CTF: Dashboard → «CTF» → nishon http://${LAN:-localhost}:8085 ni
+      brauzer + Burp bilan buzing (IDOR · info-disclosure · XSS · SSRF).
+   3b) Mashinalar: Dashboard → «Web Terminal» → terminalda:
+         nmap -sn 10.10.20.0/24        # mashinalarni toping
+      web zaifligi → SSH → oddiy user → root.  Yechim: ../lab/WALKTHROUGH.md
 
-  Tarmoqdan ulanmasa — xost devori (firewall) 8080-portni ochsin:
-      Kali/Ubuntu:  sudo ufw allow 8080/tcp
+  Tarmoqdan ulanmasa — xost devori (firewall) portlarni ochsin:
+      Kali/Ubuntu:  sudo ufw allow 8080/tcp && sudo ufw allow 8085/tcp
   (Foydalanuvchilar bir xil Wi-Fi / LAN da bo'lishi kerak.)
 
   TO'XTATISH:  ./stop.sh

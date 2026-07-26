@@ -83,6 +83,16 @@ services:
       labnet:
         ipv4_address: 10.10.20.50
 
+  # -------- MEDIUM web CTF: IDOR · info-disclosure · XSS(WAF) · SSRF (brauzer+Burp orqali) --------
+  ctf-web:
+    build: ./ctf-web
+    container_name: ejpt-ctf-web
+    hostname: nimbus-reports
+    ports: ["8085:80"]          # host portida — brauzer/Burp + tarmoqdagilar uchun (ataylab zaif -> faqat LAN)
+    networks:
+      labnet:
+        ipv4_address: 10.10.20.60
+
   # -------- 4) internal-04: FAQAT ichki tarmoqda — command injection -> final flag --------
   internal-04:
     build: ./internal-04

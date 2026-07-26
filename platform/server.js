@@ -30,9 +30,11 @@ const MODULES = [
   { id: "network", name: "Network", path: "/network/index.html" },
   { id: "web-pentest", name: "Web-Pentest", path: "/web-pentest/index.html" },
   { id: "books", name: "Kutubxona", path: "/books/index.html" },
-  { id: "ejpt", name: "eJPT Practice", path: "/ejpt/index.html" },
+  { id: "ctf", name: "CTF", path: "/ctf/index.html" },
+  // { id: "ejpt", name: "eJPT Practice", path: "/ejpt/index.html" },  // vaqtincha yashirilgan
 ];
 const VMS = [
+  { id: "ctf-web", container: "ejpt-ctf-web", name: "ctf-web (Nimbus Reports) — MEDIUM", ip: "10.10.20.60" },
   { id: "web-easy", container: "ejpt-web-easy", name: "web-easy (shopzone) — EASY", ip: "10.10.20.40" },
   { id: "linux-02", container: "ejpt-linux-02", name: "linux-02 (backend) — easy", ip: "10.10.20.20" },
   { id: "web-01", container: "ejpt-web-01", name: "web-01 (acme.lab) — MEDIUM", ip: "10.10.20.10" },

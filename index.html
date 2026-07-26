@@ -105,14 +105,14 @@ const MODULES = [
     tagUz:"Veb Xavfsizligi", tagEn:"Web Security",
     icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/>',
     diagram:["bug","globe","database"] },
-  { id:"ejpt", href:"ejpt/index.html", type:"exam", accent:"#ff6b2b",
-    uz:"eJPT Test", en:"eJPT Practice",
-    dUz:"INE Junior Penetration Tester imtihoniga tayyorgarlik — interaktiv mock imtihon va cheksiz mashq testlari, o'zbek tilida.",
-    dEn:"Prep for the INE Junior Penetration Tester — an interactive mock exam and unlimited practice tests, in Uzbek.",
-    tagUz:"Mock Imtihon", tagEn:"Mock Exam",
-    questions:166, examQ:45,
-    icon:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/>',
-    diagram:["bug","terminal","key"] },
+  { id:"ctf", href:"ctf/index.html", type:"lab", accent:"#22d3a6",
+    uz:"CTF Poligoni", en:"CTF Lab",
+    dUz:"Haqiqiy ko'rinishli zaif veb-sayt — IDOR, information disclosure, XSS (WAF bypass) va SSRF. Burp Suite bilan buzing, flaglarni toping.",
+    dEn:"A realistic vulnerable website — IDOR, information disclosure, XSS (WAF bypass) and SSRF. Break it with Burp Suite, capture the flags.",
+    tagUz:"Web CTF", tagEn:"Web CTF",
+    flags:4,
+    icon:'<path d="M4 21V4h13l-2 4 2 4H4"/>',
+    diagram:["bug","globe","key"] },
   { id:"books", href:"books/index.html", type:"library", accent:"#f5b843",
     uz:"Kutubxona", en:"Library",
     dUz:"Ochiq litsenziyali kiberxavfsizlik kitoblari — o'zbek tiliga moslashtirilgan. Reverse Engineering'dan boshlanadi.",
@@ -180,7 +180,7 @@ function render(){
 
   // stats
   let totalLessons=0, totalDone=0, moduleCount=0;
-  MODULES.forEach(m=>{ if(m.type==="library"||m.type==="exam") return; moduleCount++; totalLessons+=m.total; totalDone+=Math.min(doneCount(m.key), m.total); });
+  MODULES.forEach(m=>{ if(m.type==="library"||m.type==="exam"||m.type==="lab") return; moduleCount++; totalLessons+=m.total; totalDone+=Math.min(doneCount(m.key), m.total); });
   const sr = document.getElementById("statRow");
   sr.innerHTML = `
     <div class="stat"><div class="stat-n">${moduleCount}</div><div class="stat-l">${lang==="uz"?"modul":"modules"}</div></div>
@@ -214,6 +214,14 @@ function render(){
              <div class="card-prog-head">
                <span>${m.examQ} ${lang==="uz"?"savol imtihon":"question exam"} · ${m.questions} ${lang==="uz"?"bazada":"in bank"}</span>
                <span style="color:var(--c)">70% ${lang==="uz"?"o'tish":"pass"}</span>
+             </div>
+             <div class="bar"><div class="bar-fill" style="width:100%;opacity:.4"></div></div>
+           </div>`
+        : m.type==="lab"
+        ? `<div class="card-prog">
+             <div class="card-prog-head">
+               <span>${m.flags} ${lang==="uz"?"zaiflik · flag":"vulns · flags"}</span>
+               <span style="color:var(--c)">Docker</span>
              </div>
              <div class="bar"><div class="bar-fill" style="width:100%;opacity:.4"></div></div>
            </div>`

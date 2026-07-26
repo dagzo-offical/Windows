@@ -14,7 +14,7 @@
   <div class="foot">CyberSecurity Platform · o'quv maqsadida · ruxsat berilgan tizimlarda amaliyot qiling.</div>
 </div>
 <script>
-const ICON={windows:'🪟',kali:'🐉',network:'🌐','web-pentest':'🕸️',books:'📚',ejpt:'🎯',terminal:'🖥️'};
+const ICON={windows:'🪟',kali:'🐉',network:'🌐','web-pentest':'🕸️',books:'📚',ctf:'🚩',ejpt:'🎯',terminal:'🖥️'};
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 fetch('/api/me').then(r=>r.ok?r.json():Promise.reject()).then(d=>{
   const u=d.user; const perms=u.permissions||[]; const isAdmin=u.role==='admin';
