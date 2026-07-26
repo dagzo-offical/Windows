@@ -57,10 +57,10 @@ const CTFS = [
       "EJPT{ssrf_d3c1m4l_2_l0c4l}",
     ],
     hints: [
-      "Recon — eng muhimi. Menyudagi havolalar hammasi emas: gobuster/dirb bilan yashirin sahifa va fayllarni qidiring (-x php,txt). robots.txt va HTML manbasini ham o'qing.",
-      "Bitta wordlist yetmasligi mumkin — kattarog'ini sinang. Topilgan har sahifani sinchiklab tekshiring: tugmalar, parametrlar, so'rov tanasi.",
-      "Burp bilan so'rovlarni ushlab, ularni o'zgartiring — ID, parametr yoki manzilni. Server ba'zan juda ko'p narsaga ishonadi.",
-      "Filtrlar ko'pincha to'liq emas — bloklanmagan variantni izlang. Ochiq qolgan ma'lumot kodlangan (masalan base64) bo'lishi mumkin.",
+      "Recon avval. Menyudagi havolalar hammasi emas — gobuster/dirb bilan yashirin sahifa va fayllarni toping (`-x php,txt`); robots.txt va sahifa manbasini (view-source) o'qing. Bitta wordlist yetmasa, kattarog'ini (directory-list-2.3-medium) sinang.",
+      "Topgan har sahifada funksiyani sinang: tugma, qidiruv maydoni, so'rov TANASI (Burp bilan ushlang). Ketma-ket ID/raqamlarni chegaradan tashqariga (masalan eng kichigidan pastga) o'zgartirib ko'ring — server ularni ishonib qabul qilishi mumkin.",
+      "Ba'zi endpointlar to'g'ridan-to'g'ri kirsangiz **403** qaytaradi — ular faqat ILOVA ICHIDAN ochiladi. Ikki yo'l: (a) server sizning o'rningizga so'rov yuborsa (havola yuklovchi/preview funksiya), yoki (b) brauzeringizda o'sha sayt ichida siz kiritgan kod ishlab ketsa (kiritma aks etadigan joy).",
+      "Filtrlar ko'pincha to'liq emas — bitta vektor bloklansa, boshqasini sinang (XSS cheat-sheet: `<svg>`, `<img>`, `<body>`...). Manzil filtri localhost'ni SATR bo'yicha tekshirsa — o'sha IP'ni boshqacha yozing. Ko'z bilan o'qilmaydigan matn kodlangan (base64) bo'lishi mumkin.",
     ],
   },
 ];
