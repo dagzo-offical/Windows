@@ -62,9 +62,24 @@ const CTFS = [
       "Ba'zi endpointlar to'g'ridan-to'g'ri kirsangiz **403** qaytaradi — ular faqat ILOVA ICHIDAN ochiladi. Ikki yo'l: (a) server sizning o'rningizga so'rov yuborsa (havola yuklovchi/preview funksiya), yoki (b) brauzeringizda o'sha sayt ichida siz kiritgan kod ishlab ketsa (kiritma aks etadigan joy).",
       "Filtrlar ko'pincha to'liq emas — bitta vektor bloklansa, boshqasini sinang (XSS cheat-sheet: `<svg>`, `<img>`, `<body>`...). Manzil filtri localhost'ni SATR bo'yicha tekshirsa — o'sha IP'ni boshqacha yozing. Ko'z bilan o'qilmaydigan matn kodlangan (base64) bo'lishi mumkin.",
     ],
+    // Bonus hint: qolgan flaglarni topib, faqat mana shu bittasi qolsa ko'rsatiladi.
+    // Payload SKELETI beriladi, lekin ENDPOINT yashirin — foydalanuvchi o'zi topadi.
+    bonus: {
+      flagIndex: 2,        // XSS flag (flags[] dagi indeks)
+      needSolved: 3,       // shu ko'p flag topilib, XSS qolsa
+      payload: "<svg onload=\"fetch('/????').then(r=>r.text()).then(alert)\">",
+      note: "Ajoyib — 3 tasini topding, XSS qoldi! Mana ishlaydigan payload SKELETI (WAF'ni <svg onload> aylanib o'tadi). `/????` o'rniga TO'G'RI endpointni O'ZING qo'y — u recon bilan topiladi va to'g'ridan-to'g'ri kirsang 403 qaytaradi (uni faqat ilova ichidan, XSS bilan o'qisang bo'ladi).",
+    },
   },
 ];
 const CTF_BY_ID = Object.fromEntries(CTFS.map((c) => [c.id, c]));
+// Bonus hint faqat kerakli shartda: qolganlari topilgan, mo'ljaldagi flag hali topilmagan.
+function ctfBonus(c, solved) {
+  if (c.bonus && solved.length >= c.bonus.needSolved && solved.indexOf(c.bonus.flagIndex) === -1) {
+    return { payload: c.bonus.payload, note: c.bonus.note };
+  }
+  return null;
+}
 const MODULE_IDS = MODULES.map((m) => m.id);
 // resources the admin can grant: modules + the web terminal
 const GRANTABLE = MODULE_IDS.concat(["terminal"]);
@@ -317,6 +332,7 @@ async function apiCtf(req, res, p, url) {
     return json(res, 200, {
       id: c.id, name: c.name, difficulty: c.difficulty, targetPort: c.targetPort,
       flagCount: c.flags.length, hints: c.hints, solved: ((me.ctf || {})[c.id] || []).length,
+      bonus: ctfBonus(c, (me.ctf || {})[c.id] || []),
     });
   }
 
@@ -333,7 +349,7 @@ async function apiCtf(req, res, p, url) {
     me.ctf = me.ctf || {}; me.ctf[c.id] = me.ctf[c.id] || []; me.ctfTs = me.ctfTs || {};
     const already = me.ctf[c.id].indexOf(idx) !== -1;
     if (!already) { me.ctf[c.id].push(idx); me.ctfTs[c.id] = Date.now(); writeUsers(users); }
-    return json(res, 200, { ok: true, correct: true, already, solved: me.ctf[c.id].length, total: c.flags.length });
+    return json(res, 200, { ok: true, correct: true, already, solved: me.ctf[c.id].length, total: c.flags.length, bonus: ctfBonus(c, me.ctf[c.id]) });
   }
 
   if (p === "/api/ctf/leaderboard" && method === "GET") {
