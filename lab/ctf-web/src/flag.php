@@ -11,6 +11,5 @@ if ($sfs === 'same-origin') {
     echo $flag !== false ? trim($flag) : 'flag unavailable';
 } else {
     http_response_code(403);
-    echo "Forbidden: this endpoint only answers same-origin requests.\n";
-    echo "Hint: you'll need to run JavaScript in this site's origin (reflected XSS on /search.php).";
+    echo "403 Forbidden";
 }

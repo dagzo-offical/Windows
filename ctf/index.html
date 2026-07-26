@@ -103,21 +103,21 @@ gobuster dir -u http://&lt;IP&gt;:8085/ \
 
 <script>
 const CHALS = [
-  { id:"idor", type:"IDOR / Broken Access Control", title:"№0 hisobot",
-    desc:"«My Reports» sahifasi hisobotlarni #1–12 yuklab olishga ruxsat beradi. Lekin arxivda #0 ham bor — brauzer uni hech qachon ko'rsatmaydi.",
-    hint:"So'rovni o'zgartiring (Burp). ID qayerda yuboriladi — URL da emas...",
+  { id:"idor", type:"Broken Access Control", title:"Sizniki bo'lmagan ma'lumot",
+    desc:"Saytda o'z hisobotlaringizni yuklab olasiz. Lekin ruxsat nazorati puxta bo'lmasa, boshqasiniki ham qo'lga tushishi mumkin.",
+    hint:"So'rovda nima yuboriladi va server uni qanchalik ishonib qabul qiladi? Proksi (Burp) foydali.",
     hash:"bc83cd5ee11656407ce553a70cbad3762222ac0c7d1d4b95f9c13b57c84a407d" },
-  { id:"info", type:"Information Disclosure", title:"Ochiq qolgan sir",
-    desc:"Ops jamoasi nimadir ochiq qoldirgan. Kataloglarni sinchiklab enumeratsiya qiling — bu path oddiy ro'yxatlarda yo'q, kattarog'i kerak. Topilgan narsa ko'z bilan o'qilmaydi — kodlangan.",
-    hint:"directory-list-2.3-medium bilan qidiring. Topgan matn base64 — dekodlang.",
+  { id:"info", type:"Information Disclosure", title:"Ochiq qolgan narsa",
+    desc:"Saytning biror burchagida ochiq qolib ketgan ma'lumot bo'lishi mumkin. Uni faqat yaxshi enumeratsiya topadi.",
+    hint:"Bitta wordlist yetmasligi mumkin — kattarog'ini sinang. Topilgan narsa ko'z bilan o'qilmasa, kodlangan bo'lishi mumkin.",
     hash:"f37a42c8e2bf32dc0edc5a3fee861d3254df493c47b104cdf9b649c1db1e4243" },
-  { id:"xss", type:"Reflected XSS · WAF bypass", title:"WAF ni aylanib o'ting",
-    desc:"Eski qidiruv endpointi kiritilgan matnni qaytaradi (reflected). Oddiy XSS'ni «WAF» bloklaydi. Uni aylanib o'tib, faqat same-origin so'rovga javob beradigan /flag.php ni JS bilan o'qing.",
-    hint:"<script> va onerror bloklangan — boshqa vektor (masalan <svg onload=...>) ishlaydi. fetch('/flag.php').then(r=>r.text()).then(alert)",
+  { id:"xss", type:"Reflected XSS", title:"Kod bajarilishiga erishing",
+    desc:"Kiritgan ma'lumotingiz qayerdadir sahifaga qaytariladi. Uni brauzerda bajariladigan qila olasizmi?",
+    hint:"Ba'zi teglar filtrlanadi, ba'zilari e'tibordan chetda. Maqsad — himoyalangan, faqat sayt origini ichidan o'qiladigan resursni olish.",
     hash:"15cb0296b85b70a29dd0e55e2a80634650f038b23fc11b89a0b91e895e3d290f" },
-  { id:"ssrf", type:"SSRF · decimal-IP bypass", title:"Ichki endpointga yeting",
-    desc:"«URL preview» funksiyasi havolani server tomonda yuklaydi. U localhost/127.0.0.1 ni bloklaydi — lekin sodda satr bo'yicha. Ichki metrics endpointiga yeting.",
-    hint:"127.0.0.1 ni o'nlik (decimal) songa aylantiring: http://2130706433/ ...",
+  { id:"ssrf", type:"SSRF", title:"Serverni ichkariga qarating",
+    desc:"Sayt siz bergan tashqi havolani server tomonda yuklaydi. Uni faqat ichkaridan ochiladigan resursga yo'naltira olasizmi?",
+    hint:"Filtr manzilni qanday tekshiradi? Bir xil IP ni boshqacha yozish mumkinmi?",
     hash:"50e0efb0391ac60f9d5f2ca916595815b9bbf7e96af222f15e43c0a8e2f69acb" },
 ];
 const LS = "ctf_nimbus_solved";

@@ -13,9 +13,10 @@ function nb_head($title, $active = '') {
   echo '<a class="brand" href="/">☁️ Nimbus<span>Reports</span></a>';
   echo '<nav><a href="/"' . $a('home') . '>Overview</a>';
   echo '<a href="/about.php"' . $a('about') . '>Product</a>';
+  echo '<a href="/blog.php"' . $a('blog') . '>Blog</a>';
+  echo '<a href="/help.php"' . $a('help') . '>Help</a>';
   echo '<a href="/pricing.php"' . $a('pricing') . '>Pricing</a>';
   echo '<a href="/download.php"' . $a('reports') . '>My Reports</a>';
-  echo '<a href="/contact.php"' . $a('contact') . '>Contact</a>';
   echo '<a class="btn" href="/login.php">Sign in</a>';
   echo '</nav></div></header><main class="wrap">';
 }

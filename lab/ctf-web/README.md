@@ -16,8 +16,10 @@ qatlami. Brauzer + **Burp Suite** bilan buziladi; path'lar **gobuster** bilan to
 | 3 | **Reflected XSS** + WAF bypass | `/search.php?q=` | `common.txt` | `<script>`/`onerror` bloklangan → `<svg onload=...>` bilan `fetch('/flag.php')` (same-origin) | `EJPT{w4f_byp4ss_x55_r3fl3ct}` |
 | 4 | **SSRF** + decimal bypass | `/fetch.php?url=` | `common.txt` | `127.0.0.1` bloklangan → `http://2130706433/admin-metrics.php` | `EJPT{ssrf_d3c1m4l_2_l0c4l}` |
 
-Chalg'ituvchi (zaif emas) sahifalar: `/`, `about.php`, `pricing.php`, `login.php`, `contact.php` —
-haqiqiy saytdek ko'rinadi.
+Chalg'ituvchi (zaif emas) sahifalar: `/`, `about.php`, `pricing.php`, `blog.php`, `help.php`,
+`login.php`, `contact.php` — haqiqiy SaaS saytdek to'liq kontent. **Zaif sahifalar ham hech qanday
+"nima qilish kerak" matnini ko'rsatmaydi** (WAF banneri yo'q; qidiruv/import — oddiy funksiyalar;
+filtrlar jim ishlaydi) — foydalanuvchi zaiflikni o'zi aniqlaydi.
 
 ## Ichki tuzilishi (maintainer uchun)
 

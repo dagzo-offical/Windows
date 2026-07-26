@@ -45,5 +45,6 @@ $months = ['January','February','March','April','May','June','July','August','Se
     <?php endfor; ?>
   </table>
 </div>
-<p class="muted" style="font-size:13px">Reports are private to your workspace. Older archives (pre-2024) are retained per your data-retention policy.</p>
+<p class="muted" style="font-size:13px">Reports are private to your workspace.
+  Need to bring in an external report? <a href="/fetch.php">Import a dashboard from a URL</a>.</p>
 <?php nb_foot(); ?>
