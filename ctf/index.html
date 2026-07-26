@@ -1,161 +1,195 @@
 <!doctype html>
 <html lang="uz"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CTF Poligoni · Nimbus Reports</title>
+<title>CTF Poligoni</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='84'%3E%F0%9F%9A%A9%3C/text%3E%3C/svg%3E">
 <style>
-:root{--bg:#070c18;--panel:#111a2e;--panel2:#0d1526;--border:#203050;--text:#e7edf9;
-  --muted:#8ea0c4;--green:#22d3a6;--blue:#2d7aff;--orange:#ff8a3d;--red:#ff5c72;--warn:#ffb454;
+:root{--bg:#070c18;--panel:#111a2e;--panel2:#0d1526;--border:#213050;--text:#e7edf9;
+  --muted:#8ea0c4;--green:#22d3a6;--blue:#4d9bff;--yellow:#ffc234;--red:#ff5c72;
   --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;--r:14px}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(1100px 560px at 75% -10%,#132449 0,var(--bg) 55%);
-  color:var(--text);font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+  color:var(--text);font:15.5px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:940px;margin:0 auto;padding:0 22px}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
 header.top{border-bottom:1px solid var(--border);background:rgba(6,10,22,.7);backdrop-filter:blur(8px)}
 header.top .wrap{display:flex;align-items:center;gap:12px;height:60px}
 .logo{font-weight:800;font-size:19px}.logo span{color:var(--green)}
-.top a.back{margin-left:auto;color:var(--muted);font-size:14px;text-decoration:none}
-.top a.back:hover{color:var(--text)}
-.hero{padding:36px 0 6px}
+.top .r{margin-left:auto;color:var(--muted);font-size:14px}
+.hero{padding:32px 0 6px}
 .eyebrow{color:var(--green);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
-h1{font-size:34px;line-height:1.12;margin:.25em 0}
-h1 .g{background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.lede{color:var(--muted);font-size:17px;max-width:680px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
-@media(max-width:760px){.grid2{grid-template-columns:1fr}}
-.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:var(--r);padding:20px}
-.card h3{margin:0 0 6px;font-size:16px}
+h1{font-size:32px;line-height:1.12;margin:.25em 0}
+.lede{color:var(--muted);font-size:16px;max-width:640px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin:22px 0}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);
+  border-radius:var(--r);padding:20px;cursor:pointer;transition:border-color .15s,transform .15s;display:block}
+.card:hover{border-color:#2f4c7d;transform:translateY(-2px);text-decoration:none}
+.card h3{margin:.1em 0 .5em;font-size:19px}
+.badge{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px}
+.badge.easy{background:#0a2a20;color:var(--green);border:1px solid #17513e}
+.badge.medium{background:#2a2408;color:var(--yellow);border:1px solid #5c5015}
+.badge.hard{background:#2c0d14;color:var(--red);border:1px solid #5e1a26}
+.prog{display:flex;align-items:center;gap:10px;margin-top:14px}
+.bar{flex:1;height:9px;background:#0a1124;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--blue));width:0;transition:width .5s}
+.pmono{font-family:var(--mono);font-size:13px;color:var(--green)}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin:16px 0}
+h2{font-size:21px;margin:28px 0 6px}
 .mono{font-family:var(--mono)}.muted{color:var(--muted)}
+.btn{background:linear-gradient(180deg,var(--green),#14b892);color:#04241b;border:0;border-radius:10px;
+  padding:11px 18px;font-weight:700;cursor:pointer;font-size:14px;display:inline-block}
+.btn.blue{background:linear-gradient(180deg,var(--blue),#1e5fd0);color:#fff}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
 .term{background:#050a14;border:1px solid var(--border);border-radius:10px;padding:12px 14px;
-  font:13px/1.7 var(--mono);color:#cfe0ff;overflow-x:auto;white-space:pre}
-.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;padding:3px 9px;border-radius:999px;text-transform:uppercase}
-.tag.med{background:#2a2408;color:var(--warn);border:1px solid #5c5015}
-h2{font-size:22px;margin:32px 0 6px}
-.chal{border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin:14px 0;background:var(--panel2)}
-.chal.solved{border-color:#155e46;background:linear-gradient(180deg,#0c2a20,#0d1526)}
-.chal .head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.chal .num{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:14px;background:#0a1730;border:1px solid var(--border);color:var(--green)}
-.chal h3{margin:0;font-size:17px}
-.chal .type{font-size:12px;color:var(--muted);font-family:var(--mono)}
-.chal p{color:var(--muted);font-size:14px;margin:10px 0}
-.chal .hint{font-size:13px;color:#a9b8d6;border-left:3px solid var(--border);padding-left:12px;margin:8px 0}
-.row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-input[type=text]{flex:1;min-width:220px;background:#0a1124;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font:14px var(--mono)}
+  font:13px/1.6 var(--mono);color:#cfe0ff;overflow-x:auto;word-break:break-all}
+input[type=text]{width:100%;background:#0a1124;color:var(--text);border:1px solid var(--border);
+  border-radius:10px;padding:11px 13px;font:14px var(--mono)}
 input.bad{border-color:var(--red);animation:sh .25s}
 @keyframes sh{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-button{background:linear-gradient(180deg,var(--green),#14b892);color:#04241b;border:0;border-radius:10px;padding:11px 18px;font-weight:700;cursor:pointer}
-.ok{color:var(--green);font-weight:700}
-.prog{display:flex;align-items:center;gap:14px;margin:8px 0 4px}
-.bar{flex:1;height:12px;background:#0a1124;border:1px solid var(--border);border-radius:999px;overflow:hidden}
-.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--blue));width:0;transition:width .5s}
+.hintrow{border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:8px 0;background:var(--panel2)}
+.hintrow .h{color:#a9b8d6;font-size:14px;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+tr.you td{color:var(--green)}
+.rank{width:34px;color:var(--muted);font-family:var(--mono)}
+.res{margin-top:10px;font-size:14px;font-weight:600}
+.res.ok{color:var(--green)}.res.no{color:var(--red)}
 .foot{color:var(--muted);font-size:13px;border-top:1px solid var(--border);margin-top:36px;padding:18px 0 50px}
-.warn{border-left:3px solid var(--warn);background:#1a1608;color:#ffe0a3;padding:10px 14px;border-radius:8px;font-size:13.5px;margin:14px 0}
 </style></head>
 <body>
 <header class="top"><div class="wrap"><div class="logo">🚩 CTF<span>Poligoni</span></div>
-<a class="back" href="/dashboard">← Boshqaruv paneli</a></div></header>
-
-<div class="wrap">
-  <section class="hero">
-    <div class="eyebrow">Web CTF · bitta haqiqiy sayt · <span class="tag med">MEDIUM</span></div>
-    <h1>«Nimbus Reports» ni <span class="g">buzing</span></h1>
-    <p class="lede">Haqiqiy ko'rinishli SaaS saytida <b>4 ta web zaiflik</b> yashiringan:
-      IDOR, information disclosure, reflected XSS (WAF bypass) va SSRF. Har birini toping, flagni oling
-      va pastda topshiring. Zaifliklar aytilmaydi — o'zingiz aniqlaysiz.</p>
-  </section>
-
-  <div class="grid2">
-    <div class="card">
-      <h3>🎯 Nishon</h3>
-      <p class="muted" style="font-size:14px;margin:.3em 0">Sayt host portida ishlaydi:</p>
-      <div class="term">http://&lt;HOST-IP&gt;:8085/</div>
-      <p class="muted" style="font-size:13px;margin-top:10px">Shu kompyuterda: <span class="mono">http://localhost:8085</span> ·
-        tarmoqdagilar: <span class="mono">http://&lt;server-ip&gt;:8085</span>.
-        Brauzer + <b>Burp Suite</b> bilan hujum qiling.</p>
-    </div>
-    <div class="card">
-      <h3>🔎 Recon (Web Terminal)</h3>
-      <div class="term">gobuster dir -u http://&lt;IP&gt;:8085/ \
-  -w /usr/share/wordlists/dirb/common.txt -x php,txt
-
-# hammasi bitta ro'yxatda emas — kattaroq ro'yxatni ham sinang:
-gobuster dir -u http://&lt;IP&gt;:8085/ \
-  -w .../directory-list-2.3-medium.txt -x php,txt</div>
-      <p class="muted" style="font-size:13px;margin-top:10px">Maslahat: <span class="mono">-x php,txt</span> shart.
-        robots.txt va sahifa manbasini ham o'qing.</p>
-    </div>
-  </div>
-
-  <div class="warn">⚠️ «Nimbus Reports» — <b>ataylab zaif</b> o'quv sayti. Faqat shu izolyatsiya qilingan labda,
-    ruxsat berilgan tarmoqda ishlating — internetga ochmang.</div>
-
-  <div class="prog">
-    <div class="bar"><i id="bar"></i></div>
-    <div class="mono" id="pct" style="color:var(--green);font-weight:700">0/4</div>
-  </div>
-
-  <h2>Vazifalar</h2>
-  <div id="chals"></div>
-
-  <div class="foot">CTF Poligoni · o'quv maqsadida · flag qiymatlari mijoz tomonida (SHA-256) tekshiriladi.
-    Progress shu brauzerda saqlanadi.</div>
+<a class="r" href="/dashboard">← Boshqaruv paneli</a></div></header>
+<div class="wrap"><div id="app"></div>
+  <div class="foot">CTF Poligoni · o'quv maqsadida · flaglar server tomonda tekshiriladi.</div>
 </div>
 
 <script>
-const CHALS = [
-  { id:"idor", type:"Broken Access Control", title:"Sizniki bo'lmagan ma'lumot",
-    desc:"Saytda o'z hisobotlaringizni yuklab olasiz. Lekin ruxsat nazorati puxta bo'lmasa, boshqasiniki ham qo'lga tushishi mumkin.",
-    hint:"So'rovda nima yuboriladi va server uni qanchalik ishonib qabul qiladi? Proksi (Burp) foydali.",
-    hash:"bc83cd5ee11656407ce553a70cbad3762222ac0c7d1d4b95f9c13b57c84a407d" },
-  { id:"info", type:"Information Disclosure", title:"Ochiq qolgan narsa",
-    desc:"Saytning biror burchagida ochiq qolib ketgan ma'lumot bo'lishi mumkin. Uni faqat yaxshi enumeratsiya topadi.",
-    hint:"Bitta wordlist yetmasligi mumkin — kattarog'ini sinang. Topilgan narsa ko'z bilan o'qilmasa, kodlangan bo'lishi mumkin.",
-    hash:"f37a42c8e2bf32dc0edc5a3fee861d3254df493c47b104cdf9b649c1db1e4243" },
-  { id:"xss", type:"Reflected XSS", title:"Kod bajarilishiga erishing",
-    desc:"Kiritgan ma'lumotingiz qayerdadir sahifaga qaytariladi. Uni brauzerda bajariladigan qila olasizmi?",
-    hint:"Ba'zi teglar filtrlanadi, ba'zilari e'tibordan chetda. Maqsad — himoyalangan, faqat sayt origini ichidan o'qiladigan resursni olish.",
-    hash:"15cb0296b85b70a29dd0e55e2a80634650f038b23fc11b89a0b91e895e3d290f" },
-  { id:"ssrf", type:"SSRF", title:"Serverni ichkariga qarating",
-    desc:"Sayt siz bergan tashqi havolani server tomonda yuklaydi. Uni faqat ichkaridan ochiladigan resursga yo'naltira olasizmi?",
-    hint:"Filtr manzilni qanday tekshiradi? Bir xil IP ni boshqacha yozish mumkinmi?",
-    hash:"50e0efb0391ac60f9d5f2ca916595815b9bbf7e96af222f15e43c0a8e2f69acb" },
-];
-const LS = "ctf_nimbus_solved";
-function getSolved(){ try{ const a=JSON.parse(localStorage.getItem(LS)); return new Set(Array.isArray(a)?a:[]);}catch(e){return new Set();} }
-function setSolved(s){ try{ localStorage.setItem(LS, JSON.stringify([...s])); }catch(e){} }
-async function sha256(str){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
-  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+const app = document.getElementById("app");
+let pollTimer = null;
+function stopPoll(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } }
 
-function render(){
-  const solved = getSolved();
-  document.getElementById("chals").innerHTML = CHALS.map((c,i)=>{
-    const ok = solved.has(c.id);
-    return `<div class="chal ${ok?"solved":""}">
-      <div class="head"><span class="num">${ok?"✓":i+1}</span>
-        <h3>${esc(c.title)}</h3><span class="type">· ${esc(c.type)}</span></div>
-      <p>${esc(c.desc)}</p>
-      <div class="hint">💡 ${esc(c.hint)}</div>
-      ${ok ? `<div class="ok">Flag topildi ✓</div>`
-        : `<div class="row">
-             <input type="text" id="in_${c.id}" placeholder="EJPT{...}" spellcheck="false" autocomplete="off"
-               onkeydown="if(event.key==='Enter')submit('${c.id}')">
-             <button onclick="submit('${c.id}')">Tekshirish</button>
-           </div>`}
-    </div>`;
+async function api(path, opts){
+  const r = await fetch(path, Object.assign({ headers:{ "Content-Type":"application/json" } }, opts||{}));
+  if(r.status === 401){ location.href = "/login"; throw new Error("auth"); }
+  return r.json();
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function badge(d){ return `<span class="badge ${d}">${esc(d)}</span>`; }
+
+/* ---------- LIST ---------- */
+async function renderList(){
+  stopPoll();
+  const d = await api("/api/ctf/list");
+  const cards = (d.ctfs||[]).map(c=>{
+    const pct = c.flagCount ? Math.round(c.solved/c.flagCount*100) : 0;
+    return `<a class="card" href="?id=${encodeURIComponent(c.id)}">
+      <div style="display:flex;justify-content:space-between;align-items:center">${badge(c.difficulty)}
+        <span class="pmono">${c.solved}/${c.flagCount}</span></div>
+      <h3>${esc(c.name)}</h3>
+      <div class="muted" style="font-size:13.5px">Web CTF · flaglarni toping va topshiring</div>
+      <div class="prog"><div class="bar"><i style="width:${pct}%"></i></div></div>
+    </a>`;
   }).join("");
-  const n = CHALS.filter(c=>solved.has(c.id)).length;
-  document.getElementById("bar").style.width = (n/CHALS.length*100)+"%";
-  document.getElementById("pct").textContent = n+"/"+CHALS.length;
+  app.innerHTML = `
+    <section class="hero"><div class="eyebrow">🚩 Bayroqni qo'lga kirit</div>
+      <h1>CTF Poligoni</h1>
+      <p class="lede">Quyidagi CTF'lardan birini tanlang. Har biri haqiqiy zaif tizim —
+        zaifliklarni <b>o'zingiz toping</b>, flaglarni oling va topshiring.</p></section>
+    <div class="grid">${cards || '<p class="muted">Hozircha CTF yo\'q.</p>'}</div>`;
 }
-async function submit(id){
-  const inp = document.getElementById("in_"+id); if(!inp) return;
+
+/* ---------- DETAIL ---------- */
+async function renderDetail(id){
+  stopPoll();
+  const c = await api("/api/ctf/get?id="+encodeURIComponent(id));
+  const targetURL = "http://" + location.hostname + ":" + c.targetPort + "/";
+  const hints = (c.hints||[]).map((h,i)=>`
+    <div class="hintrow">
+      <button class="btn ghost" style="padding:6px 12px;font-size:13px" onclick="var e=this.nextElementSibling;e.style.display=e.style.display==='none'?'block':'none';this.textContent=e.style.display==='none'?'💡 Hint ${i+1} — ochish':'💡 Hint ${i+1} — yashirish'">💡 Hint ${i+1} — ochish</button>
+      <div class="h" style="display:none">${esc(h)}</div>
+    </div>`).join("");
+  app.innerHTML = `
+    <section class="hero">
+      <a href="/ctf/index.html" class="muted" style="font-size:13px">← Barcha CTF'lar</a>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:8px">${badge(c.difficulty)}
+        <h1 style="margin:0">${esc(c.name)}</h1></div>
+      <p class="lede">Haqiqiy zaif veb-sayt. Recon qiling, zaifliklarni toping, flaglarni oling.
+        Qanday zaifliklar borligi aytilmaydi — o'zingiz aniqlaysiz.</p>
+    </section>
+
+    <div class="panel">
+      <h2 style="margin-top:0">🎯 Nishon</h2>
+      <p class="muted" style="margin:.2em 0 .6em">Zaif sayt shu manzilda ishlaydi:</p>
+      <div class="term" id="turl">${esc(targetURL)}</div>
+      <p style="margin-top:12px"><a class="btn blue" href="${esc(targetURL)}" target="_blank" rel="noopener">🎯 Nishonni ochish →</a>
+        <span class="muted" style="font-size:13px;margin-left:8px">brauzer + Burp bilan hujum qiling</span></p>
+    </div>
+
+    <h2>💡 Hintlar</h2>
+    <p class="muted" style="font-size:13.5px;margin-top:0">Kerak bo'lsa oching — lekin avval o'zingiz urinib ko'ring.</p>
+    ${hints}
+
+    <div class="panel">
+      <h2 style="margin-top:0">🚩 Flag topshirish</h2>
+      <p class="muted" style="font-size:13.5px">Topgan istalgan flagni shu yerga kiriting — tizim tekshiradi.
+        Jami <b>${c.flagCount}</b> ta flag.</p>
+      <div class="prog"><div class="bar"><i id="pbar" style="width:${c.flagCount?Math.round(c.solved/c.flagCount*100):0}%"></i></div>
+        <span class="pmono" id="pnum">${c.solved}/${c.flagCount}</span></div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <input type="text" id="flagin" placeholder="EJPT{...}" spellcheck="false" autocomplete="off"
+          onkeydown="if(event.key==='Enter')submitFlag('${esc(id)}')">
+        <button class="btn" onclick="submitFlag('${esc(id)}')">Topshirish</button>
+      </div>
+      <div class="res" id="res"></div>
+    </div>
+
+    <div class="panel">
+      <h2 style="margin-top:0">🏆 Reyting <span class="muted" style="font-size:13px;font-weight:400">— real vaqtda</span></h2>
+      <div id="lb"><p class="muted">Yuklanmoqda…</p></div>
+    </div>`;
+  loadLeaderboard(id);
+  pollTimer = setInterval(()=>loadLeaderboard(id), 5000);
+}
+
+async function submitFlag(id){
+  const inp = document.getElementById("flagin");
+  const res = document.getElementById("res");
   const v = inp.value.trim(); if(!v) return;
-  const c = CHALS.find(x=>x.id===id);
-  const h = await sha256(v);
-  if(h === c.hash){ const s=getSolved(); s.add(id); setSolved(s); render(); }
-  else { inp.classList.add("bad"); inp.value=""; inp.placeholder="Noto'g'ri — qayta urining"; setTimeout(()=>inp.classList.remove("bad"),300); }
+  let d;
+  try { d = await api("/api/ctf/submit", { method:"POST", body: JSON.stringify({ id, flag:v }) }); }
+  catch(e){ return; }
+  if(d.correct){
+    document.getElementById("pnum").textContent = d.solved+"/"+d.total;
+    document.getElementById("pbar").style.width = (d.total?Math.round(d.solved/d.total*100):0)+"%";
+    res.className = "res ok";
+    res.textContent = d.already ? `Bu flag allaqachon topilgan (${d.solved}/${d.total}) ✓` : `✓ To'g'ri! Flag qabul qilindi — ${d.solved}/${d.total}`;
+    inp.value = "";
+    loadLeaderboard(id);
+  } else {
+    res.className = "res no"; res.textContent = "✗ Noto'g'ri flag — qayta urining";
+    inp.classList.add("bad"); setTimeout(()=>inp.classList.remove("bad"),300);
+  }
 }
-render();
+
+async function loadLeaderboard(id){
+  let d;
+  try { d = await api("/api/ctf/leaderboard?id="+encodeURIComponent(id)); } catch(e){ return; }
+  const lb = document.getElementById("lb"); if(!lb) return;
+  if(!d.rows || !d.rows.length){ lb.innerHTML = '<p class="muted">Hali hech kim flag topmagan — birinchi bo\'ling!</p>'; return; }
+  lb.innerHTML = `<table><tr><th class="rank">#</th><th>Foydalanuvchi</th><th>Flaglar</th></tr>` +
+    d.rows.map((r,i)=>`<tr class="${r.username===d.you?'you':''}">
+      <td class="rank">${i+1}</td>
+      <td>${esc(r.username)}${r.username===d.you?' <span class="muted">(siz)</span>':''}</td>
+      <td class="pmono">${r.solved}/${d.total}</td></tr>`).join("") + `</table>`;
+}
+
+/* ---------- router ---------- */
+function route(){
+  const id = new URLSearchParams(location.search).get("id");
+  (id ? renderDetail(id) : renderList()).catch(e=>{ if(e.message!=="auth") app.innerHTML='<p class="muted">Xatolik yuz berdi.</p>'; });
+}
+window.addEventListener("popstate", route);
+route();
 </script>
 </body></html>
