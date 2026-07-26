@@ -33,7 +33,7 @@ printf 'Nimbus Reports — INTERNAL archive export (report #0)\nWorkspace: acme-
 # ---- XSS flag (flag.php faqat same-origin so'rovga beradi) ----
 printf 'EJPT{w4f_byp4ss_x55_r3fl3ct}\n' > /opt/ctf/xflag.txt
 
-# ---- SSRF flag (admin-metrics.php faqat 127.0.0.1 ga beradi) ----
+# ---- SSRF flag (internal.php faqat 127.0.0.1 ga beradi) ----
 printf 'EJPT{ssrf_d3c1m4l_2_l0c4l}\n' > /opt/ctf/ssrf.txt
 
 chmod -R a+rX /opt/ctf

