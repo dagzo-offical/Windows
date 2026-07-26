@@ -43,11 +43,11 @@ fi
 echo ""
 if [ "$ok" = "1" ]; then
   echo "✅ TAYYOR! Kirish manzillari:"
-  echo "     • Shu kompyuterda:        http://localhost:8080"
+  echo "     • Shu kompyuterda:        http://localhost:8000"
   if [ -n "$LAN" ]; then
-    echo "     • Tarmoqdagi boshqalar:   http://$LAN:8080"
+    echo "     • Tarmoqdagi boshqalar:   http://$LAN:8000"
   else
-    echo "     • Tarmoqdagi boshqalar:   http://<IP>:8080   (IP'ni 'ip addr' bilan toping)"
+    echo "     • Tarmoqdagi boshqalar:   http://<IP>:8000   (IP'ni 'ip addr' bilan toping)"
   fi
   echo "     • CTF nishoni (Burp):     http://${LAN:-localhost}:8085   (Nimbus Reports)"
 else
@@ -58,8 +58,8 @@ cat <<TIP
 
   ──────────────────────────────────────────────────────────
   KEYINGI QADAMLAR
-   1) Ro'yxatdan o'ting:  http://localhost:8080/register
-        tarmoqdagi boshqalar:  http://${LAN:-<IP>}:8080/register
+   1) Ro'yxatdan o'ting:  http://localhost:8000/register
+        tarmoqdagi boshqalar:  http://${LAN:-<IP>}:8000/register
       ⚑ BIRINCHI ro'yxatdan o'tgan foydalanuvchi = ADMIN (darhol faol).
    2) Admin panel (/admin) — qolgan foydalanuvchilarni TASDIQLANG va
       ularga RUXSAT bering (masalan: ctf, network, terminal).
@@ -70,7 +70,7 @@ cat <<TIP
       web zaifligi → SSH → oddiy user → root.  Yechim: ../lab/WALKTHROUGH.md
 
   Tarmoqdan ulanmasa — xost devori (firewall) portlarni ochsin:
-      Kali/Ubuntu:  sudo ufw allow 8080/tcp && sudo ufw allow 8085/tcp
+      Kali/Ubuntu:  sudo ufw allow 8000/tcp && sudo ufw allow 8085/tcp
   (Foydalanuvchilar bir xil Wi-Fi / LAN da bo'lishi kerak.)
 
   TO'XTATISH:  ./stop.sh

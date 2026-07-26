@@ -3,7 +3,8 @@
 #  backend (auth/admin/RBAC/VM-restart/terminal-proxy)
 #  + attacker (ttyd web-terminal) + 4 zaif VM (izolyatsiya qilingan tarmoq)
 #  Ishga tushirish:  docker compose up -d --build
-#  So'ng brauzerda:  http://localhost:8080   (birinchi ro'yxatdan o'tgan = admin)
+#  So'ng brauzerda:  http://localhost:8000   (birinchi ro'yxatdan o'tgan = admin)
+#  Portlar:  platforma 8000 · CTF nishoni 8085 · (Burp 8080 bilan to'qnashmaydi)
 # ============================================================
 name: ejpt-platform
 
@@ -24,7 +25,7 @@ services:
   backend:
     build: .
     container_name: ejpt-backend
-    ports: ["8080:8080"]
+    ports: ["8000:8080"]        # host 8000 (Burp 8080 bilan to'qnashmaslik uchun) -> konteyner 8080
     volumes:
       - ../:/repo:ro                                 # modullar (windows/, kali/, ...) shu yerdan uzatiladi
       - platform-data:/data                          # foydalanuvchilar/sessiya

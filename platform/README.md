@@ -18,7 +18,7 @@ Yoki qo'lda:
 docker compose up -d --build
 ```
 
-So'ng brauzerda: **http://localhost:8080**
+So'ng brauzerda: **http://localhost:8000**
 
 - Birinchi **ro'yxatdan o'tgan** foydalanuvchi avtomatik **administrator** bo'ladi (darhol faol).
 - Keyingi ro'yxatdan o'tganlar **"pending"** (kutish) holatida — administrator ularni **tasdiqlashi** va **ruxsat berishi** kerak.
