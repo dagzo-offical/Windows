@@ -213,6 +213,7 @@ const server = http.createServer(async (req, res) => {
     /* ---- API ---- */
     if (p === "/api/register" && method === "POST") return apiRegister(req, res);
     if (p === "/api/login" && method === "POST") return apiLogin(req, res);
+    if (p === "/api/guest" && method === "POST") return apiGuest(req, res);
     if (p === "/api/logout" && method === "POST") return apiLogout(req, res);
     if (p === "/api/me" && method === "GET") return apiMe(req, res);
     if (p === "/api/catalog" && method === "GET") return json(res, 200, { modules: MODULES, vms: VMS, grantable: GRANTABLE });
@@ -275,7 +276,8 @@ async function apiRegister(req, res) {
   if (!/^[a-z0-9_.-]{3,24}$/.test(username)) return json(res, 400, { error: "Login 3-24 belgi: harflar, raqamlar, _.-" });
   if (password.length < 6) return json(res, 400, { error: "Parol kamida 6 belgi bo'lishi kerak." });
   const users = readUsers();
-  if (users.find((x) => x.username === username)) return json(res, 409, { error: "Bu login band." });
+  // Nom (case-insensitive) band bo'lmasin — ro'yxatdan o'tgan yoki mehmon niki bilan to'qnashmasin.
+  if (users.find((x) => (x.username || "").toLowerCase() === username)) return json(res, 409, { error: "Bu login band." });
   const first = users.length === 0;
   const user = {
     id: crypto.randomUUID(), username, pass: hashPassword(password),
@@ -299,6 +301,34 @@ async function apiLogin(req, res) {
   const tok = signToken({ uid: user.id, exp: Date.now() + 7 * 24 * 3600 * 1000 });
   res.writeHead(200, { "Set-Cookie": `sid=${tok}; HttpOnly; Path=/; Max-Age=${7 * 24 * 3600}; SameSite=Lax`, "Content-Type": "application/json" });
   res.end(JSON.stringify({ ok: true, user: publicUser(user) }));
+}
+/* Mehmon (guest) kirishi — ro'yxatdan o'tmasdan, faqat nik bilan.
+   Mehmonga FAQAT "ctf" moduliga ruxsat beriladi (parol yo'q). Bir xil nik bilan
+   qayta kirilsa — o'sha mehmon hisobiga (progres/leaderboard saqlanadi) qaytadi. */
+async function apiGuest(req, res) {
+  const b = await readBody(req);
+  const raw = String(b.nickname || "").trim().replace(/\s+/g, " ");
+  // HTML metabelgilar (< > " ' &) ataylab taqiqlangan — leaderboard'da xavfsiz ko'rsatiladi.
+  if (!/^[A-Za-z0-9][A-Za-z0-9 _.\-]{1,23}$/.test(raw))
+    return json(res, 400, { error: "Nik 2-24 belgi: harflar, raqamlar, bo'sh joy va _ . -" });
+  const key = raw.toLowerCase();
+  const users = readUsers();
+  // Ro'yxatdan o'tgan (parolli) foydalanuvchi nomini mehmon egallay olmaydi.
+  if (users.find((x) => !x.guest && (x.username || "").toLowerCase() === key))
+    return json(res, 409, { error: "Bu nom ro'yxatdan o'tgan foydalanuvchiga tegishli. Boshqa nik tanlang." });
+  let me = users.find((x) => x.guest && x.nick === key);
+  const isNew = !me;
+  if (isNew) {
+    me = {
+      id: crypto.randomUUID(), username: raw, nick: key, guest: true,
+      role: "guest", status: "active", permissions: ["ctf"],   // faqat CTF
+      created: new Date().toISOString(),
+    };
+    users.push(me); writeUsers(users);
+  }
+  const tok = signToken({ uid: me.id, exp: Date.now() + 7 * 24 * 3600 * 1000 });
+  res.writeHead(200, { "Set-Cookie": `sid=${tok}; HttpOnly; Path=/; Max-Age=${7 * 24 * 3600}; SameSite=Lax`, "Content-Type": "application/json" });
+  res.end(JSON.stringify({ ok: true, user: publicUser(me), resumed: !isNew }));
 }
 function apiLogout(req, res) {
   res.writeHead(200, { "Set-Cookie": "sid=; HttpOnly; Path=/; Max-Age=0", "Content-Type": "application/json" });
