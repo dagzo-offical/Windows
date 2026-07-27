@@ -42,8 +42,8 @@ olmasligi mumkin. Mustaqil Python server esa xostning **haqiqiy** tarmoq interfe
 
 ```bash
 cd lab/ctf-web
-./start-ctf.sh              # 0.0.0.0:8085  (boshqa port:  ./start-ctf.sh 9000)
-# yoki to'g'ridan:  python3 ctf_server.py --host 0.0.0.0 --port 8085
+python3 app.py             # 0.0.0.0:8085  (boshqa port:  python3 app.py --port 9000)
+# yoki qulaylik uchun:  ./start-ctf.sh
 ```
 
 Ishga tushgach ekranda tarmoq manzili chiqadi (`http://<LAN-IP>:8085`) — o'quvchilar

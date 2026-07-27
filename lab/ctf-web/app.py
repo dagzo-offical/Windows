@@ -10,8 +10,8 @@
 #  xostning HAQIQIY tarmoq interfeysiga (0.0.0.0:8085) to'g'ridan-to'g'ri
 #  bog'lanadi — oradagi Docker qatlamisiz. Bitta buyruq:
 #
-#       python3 ctf_server.py            # 0.0.0.0:8085 da ishga tushadi
-#       python3 ctf_server.py --port 9000
+#       python3 app.py                   # 0.0.0.0:8085 da ishga tushadi
+#       python3 app.py --port 9000
 #
 #  Ichida 4 web zaiflik (Docker versiyasi bilan bir xil flaglar):
 #    1) IDOR / broken access  — POST /download.php  (report_id=0 → flag)

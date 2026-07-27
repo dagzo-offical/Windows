@@ -26,4 +26,4 @@ fi
 echo "🚀 Nimbus Reports CTF ishga tushmoqda (0.0.0.0:${PORT})..."
 echo "   (To'xtatish: Ctrl+C)"
 echo ""
-exec python3 ctf_server.py --host 0.0.0.0 --port "$PORT"
+exec python3 app.py --host 0.0.0.0 --port "$PORT"

@@ -71,30 +71,6 @@ const CTFS = [
       note: "Ajoyib — 3 tasini topding, XSS qoldi! Mana ishlaydigan payload SKELETI (WAF'ni <svg onload> aylanib o'tadi). `/????` o'rniga TO'G'RI endpointni O'ZING qo'y — u recon bilan topiladi va to'g'ridan-to'g'ri kirsang 403 qaytaradi (uni faqat ilova ichidan, XSS bilan o'qisang bo'ladi).",
     },
   },
-  {
-    id: "orbit",
-    name: "Orbit Ops",
-    difficulty: "hard",
-    targetPort: 8086,               // mustaqil Python nishoni (lab/hard-ctf)
-    flags: [
-      "EJPT{un10n_c0mment_byp4ss_5qli}",   // 1) filtered UNION SQLi
-      "EJPT{h3x_ip_ssrf_1nt3rn4l_piv0t}",  // 2) SSRF -> internal
-      "EJPT{tr4v3rs3_2_0rb1t_s3cr3t_cfg}", // 3) LFI via SSRF
-      "EJPT{r00t_rce_d3pl0y_ch41n_pwn3d}", // 4) command injection (master)
-    ],
-    hints: [
-      "Recon: /docs.html va Console sahifa manbasi public API'ni ko'rsatadi; /robots.txt esa 'host-only' /internal/ oilasini oshkor qiladi (to'g'ridan-to'g'ri kirsang 401). Zaifliklar zanjiri shu endpointlar atrofida quriladi.",
-      "Node lookup id'ni raqamli SQL kontekstida ishonib qabul qiladi, lekin sodda inyeksiya filtrlanadi (probel va ba'zi kalit so'zlar bloklangan). Filtr ko'pincha SQL komenti bilan aylanib o'tiladi — probel o'rniga /**/ ishlating; oddiy id javobi ustunlar sonini beradi, UNION bilan boshqa jadvalni o'qing.",
-      "URL-fetcher aniq loopback satrlarini — hatto decimalni (2130706433) — rad etadi. 127.0.0.1 ni boshqa asosda yozish mumkin (hex yoki octal). U bilan host-only /internal API'ga o'ting; uning bosh sahifasi qolgan ichki yo'llarni sanab beradi.",
-      "Ichki log endpointi faylni yo'lga QO'SHADI — katalogdan chiqish (../) bilan maxfiy configni o'qing. So'ng deploy endpointiga SQLi'dan olingan token kerak; u 'image' tegini shell buyrug'i ichida ishonib ishlatadi — buyruqni ; bilan ajratib root faylini o'qing, qolganini # bilan komment qiling.",
-    ],
-    bonus: {
-      flagIndex: 3,        // command injection (master) flag
-      needSolved: 3,       // qolgan 3 tasi topilib, shu bittasi qolsa
-      payload: "POST /api/v1/deploy — image=app:1.0; <BUYRUQ> #   (token: SQLi'dan olingan deploy_token)",
-      note: "Zo'r — 3 tasini topding! Oxirgisi command injection. Deploy 'image' qiymatini shell buyrug'iga qo'shadi: ; bilan o'z buyrug'ingizni ulang, # bilan qolganini komment qiling. <BUYRUQ> o'rniga root flag faylini O'QIYDIGAN buyruqni O'ZING yozing (masalan cat bilan).",
-    },
-  },
 ];
 const CTF_BY_ID = Object.fromEntries(CTFS.map((c) => [c.id, c]));
 // Bonus hint faqat kerakli shartda: qolganlari topilgan, mo'ljaldagi flag hali topilmagan.
