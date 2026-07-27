@@ -31,7 +31,32 @@ filtrlar jim ishlaydi) — foydalanuvchi zaiflikni o'zi aniqlaydi.
   beradi — diapazon tekshirilmaydi (0 ham ishlaydi), path traversal (int cast) yopiq.
 - `storage-backup/` uchun `Options +Indexes` (Dockerfile) — ochiq katalog ro'yxati.
 
-## Ishga tushirish (lab tarkibida)
+## Ishga tushirish
+
+### A) Mustaqil Python server — **tarmoq uchun tavsiya etiladi** (Docker kerak emas)
+
+Docker'ning e'lon qilingan portlari ba'zi mashinalarda (ayniqsa Docker Desktop,
+Windows/Mac) LAN'ga chiqmaydi — shu sabab tarmoqdagi o'quvchilar `:8085` ga ulana
+olmasligi mumkin. Mustaqil Python server esa xostning **haqiqiy** tarmoq interfeysiga
+(`0.0.0.0:8085`) to'g'ridan-to'g'ri bog'lanadi:
+
+```bash
+cd lab/ctf-web
+./start-ctf.sh              # 0.0.0.0:8085  (boshqa port:  ./start-ctf.sh 9000)
+# yoki to'g'ridan:  python3 ctf_server.py --host 0.0.0.0 --port 8085
+```
+
+Ishga tushgach ekranda tarmoq manzili chiqadi (`http://<LAN-IP>:8085`) — o'quvchilar
+shu manzilga brauzer + Burp bilan ulanadi. Tekshirish:  `./test-ctf-py.sh`.
+
+- Sof Python 3 (standart kutubxona) — hech qanday kutubxona/o'rnatish shart emas.
+- 4 zaiflik va flaglar Docker versiyasi bilan **bir xil**; portal (CTF moduli)
+  flaglarni server tomonda tekshiradi.
+- Firewall LAN'ni bloklasa:  `sudo ufw allow 8085/tcp`.
+- ⚠️ Docker `ctf-web` va Python serverni **bir vaqtda 8085 da** ishlatmang (port
+  to'qnashadi). `start-ctf.sh` eski `ejpt-ctf-web` konteynerini avtomatik olib tashlaydi.
+
+### B) Docker (to'liq lab tarkibida)
 
 ```bash
 cd platform && docker compose up -d --build ctf-web    # yoki butun stack
