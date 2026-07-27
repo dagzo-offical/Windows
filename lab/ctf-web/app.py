@@ -46,6 +46,23 @@ INFO_B64 = base64.b64encode(FLAG_INFO.encode()).decode()  # -> RUpQVHszbmMwZDNkX
 
 SERVE_PORT = 8085  # bind()'dan keyin haqiqiy port bilan yangilanadi (SSRF self-fetch uchun)
 
+# ---- Flag-check sahifasi (/flag_check) — flaglar SERVER tomonda tekshiriladi + hintlar ----
+# Referencedagi /submit_flag kabi, lekin 4 flag + progres + bosqichma-bosqich hintlar + bonus.
+# Flag qiymatlari klientga YUBORILMAYDI; faqat server solishtiradi.
+CHECK_FLAGS = [FLAG_IDOR, FLAG_INFO, FLAG_XSS, FLAG_SSRF]
+CTF_HINTS = [
+    "Recon avval. Menyudagi havolalar hammasi emas — gobuster/dirb bilan yashirin sahifa va fayllarni toping (`-x php,txt`); robots.txt va sahifa manbasini (view-source) o'qing. Bitta wordlist yetmasa, kattarog'ini (directory-list-2.3-medium) sinang.",
+    "Topgan har sahifada funksiyani sinang: tugma, qidiruv maydoni, so'rov TANASI (Burp bilan ushlang). Ketma-ket ID/raqamlarni chegaradan tashqariga (masalan eng kichigidan pastga) o'zgartirib ko'ring — server ularni ishonib qabul qilishi mumkin.",
+    "Ba'zi endpointlar to'g'ridan-to'g'ri kirsangiz **403** qaytaradi — ular faqat ILOVA ICHIDAN ochiladi. Ikki yo'l: (a) server sizning o'rningizga so'rov yuborsa (havola yuklovchi/preview funksiya), yoki (b) brauzeringizda o'sha sayt ichida siz kiritgan kod ishlab ketsa (kiritma aks etadigan joy).",
+    "Filtrlar ko'pincha to'liq emas — bitta vektor bloklansa, boshqasini sinang (XSS cheat-sheet: `<svg>`, `<img>`, `<body>`...). Manzil filtri localhost'ni SATR bo'yicha tekshirsa — o'sha IP'ni boshqacha yozing. Ko'z bilan o'qilmaydigan matn kodlangan (base64) bo'lishi mumkin.",
+]
+CTF_BONUS = {
+    "flag_index": 2,      # XSS flag (CHECK_FLAGS dagi indeks)
+    "need_solved": 3,     # shu ko'p flag topilib, XSS qolsa ko'rsatiladi
+    "payload": "<svg onload=\"fetch('/????').then(r=>r.text()).then(alert)\">",
+    "note": "Ajoyib — 3 tasini topding, XSS qoldi! Mana ishlaydigan payload SKELETI (WAF'ni <svg onload> aylanib o'tadi). `/????` o'rniga TO'G'RI endpointni O'ZING qo'y — u recon bilan topiladi va to'g'ridan-to'g'ri kirsang 403 qaytaradi (uni faqat ilova ichidan, XSS bilan o'qisang bo'ladi).",
+}
+
 # ---------------------------------------------------------------------------
 #  Umumiy sarlavha/futer (inc.php ekvivalenti) — haqiqiy SaaS ko'rinishi
 # ---------------------------------------------------------------------------
@@ -493,6 +510,125 @@ def page_404():
         '<a href="/">overview</a>.</p></section>') + foot()
 
 
+# ---- /flag_check — flaglarni tekshirish + hintlar (referencedagi /submit_flag kabi) ----
+def md_lite(s):
+    """Xavfsiz: avval HTML-escape, keyin **qalin** va `kod` ni belgilaydi."""
+    s = esc(s)
+    s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    s = re.sub(r"`(.+?)`", r"<code>\1</code>", s)
+    return s
+
+
+FC_CSS = """
+body{background:radial-gradient(900px 500px at 70% -10%,#132146 0,#0b1020 55%);
+  color:#e6ecf7;font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0}
+.fcw{max-width:680px;margin:0 auto;padding:30px 20px 60px}
+.fc-top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.fc-top h1{font-size:24px;margin:0}
+.fc-sub{color:#8ea0c4;font-size:14px;margin:2px 0 20px}
+.fc-card{background:#121a30;border:1px solid #213050;border-radius:14px;padding:20px;margin:16px 0}
+.fc-bar{height:10px;background:#0a1124;border:1px solid #213050;border-radius:999px;overflow:hidden;margin:8px 0 4px}
+.fc-bar>i{display:block;height:100%;background:linear-gradient(90deg,#22d3a6,#2d7aff)}
+.fc-count{color:#8ea0c4;font-size:13px}
+.fc-slots{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.fc-slot{flex:1;min-width:120px;display:flex;align-items:center;gap:8px;background:#0f1728;
+  border:1px solid #213050;border-radius:10px;padding:10px 12px;font-size:14px}
+.fc-slot.on{border-color:#14513e;background:#07231e;color:#8ff0d3}
+.fc-slot.off span{color:#8ea0c4}
+.fc-row{display:flex;gap:10px;margin-top:6px}
+.fc-row input{flex:1;background:#0a1124;color:#e6ecf7;border:1px solid #213050;border-radius:10px;
+  padding:11px 13px;font:14px ui-monospace,Menlo,Consolas,monospace}
+.fc-btn{background:linear-gradient(180deg,#22d3a6,#14b892);color:#04241b;border:0;border-radius:10px;
+  padding:11px 18px;font-weight:700;cursor:pointer;font-size:14px}
+.fc-msg{margin:12px 0;padding:10px 14px;border-radius:9px;font-size:14px}
+.fc-msg.ok{background:#07231e;border:1px solid #14513e;color:#9ff0d3}
+.fc-msg.warn{background:#1c1608;border:1px solid #5a4a1a;color:#ffe0a3}
+.fc-msg.err{background:#2a0f14;border:1px solid #63202a;color:#ffb3bd}
+.fc-done{background:#07231e;border:1px solid #14513e;color:#9ff0d3;border-radius:10px;
+  padding:14px;text-align:center;font-weight:700;margin:14px 0}
+details.fc-hint{background:#0f1728;border:1px solid #213050;border-radius:10px;padding:4px 14px;margin:8px 0}
+details.fc-hint summary{cursor:pointer;padding:8px 0;font-weight:700;color:#4dabf7}
+details.fc-hint>div{color:#c7d3ea;font-size:14px;padding:2px 0 10px}
+.fc-hint code,.fc-bonus code{background:#0a1124;border:1px solid #213050;border-radius:5px;padding:1px 5px;font-size:13px}
+.fc-bonus{background:#1c1608;border:1px solid #5a4a1a;border-radius:12px;padding:16px;margin:16px 0}
+.fc-bonus-h{color:#ffd166;font-weight:800;margin-bottom:8px}
+.fc-bonus pre{background:#0a1124;border:1px solid #3a2f10;border-radius:8px;padding:12px;overflow:auto;
+  color:#ffe6ad;font:13px ui-monospace,Menlo,Consolas,monospace}
+.fc-bonus p{color:#ffe0a3;font-size:14px;margin:8px 0 0}
+.fc-foot{color:#6f80a4;font-size:13px;margin-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.fc-foot a{color:#4dabf7;text-decoration:none}
+"""
+
+
+def page_flag_check(solved, flash=None, fidx=""):
+    total = len(CHECK_FLAGS)
+    n = len(solved)
+    pct = int(round(n * 100.0 / total)) if total else 0
+
+    def slot_num(x):
+        try:
+            return str(int(x) + 1)
+        except (TypeError, ValueError):
+            return "?"
+
+    fmsg = ""
+    if flash == "ok":
+        fmsg = '<div class="fc-msg ok">✓ To\'g\'ri! Flag #%s qabul qilindi.</div>' % slot_num(fidx)
+    elif flash == "already":
+        fmsg = '<div class="fc-msg warn">Bu flag (#%s) allaqachon topilgan.</div>' % slot_num(fidx)
+    elif flash == "wrong":
+        fmsg = '<div class="fc-msg err">✗ Xato flag. Diqqat bilan qaytadan urinib ko\'ring.</div>'
+
+    slots = ""
+    for i in range(total):
+        on = i in solved
+        slots += ('<div class="fc-slot %s">%s <span>Flag&nbsp;#%d</span></div>'
+                  % ("on" if on else "off", "🚩" if on else "🔒", i + 1))
+
+    hints = ""
+    for i, h in enumerate(CTF_HINTS):
+        hints += ('<details class="fc-hint"><summary>Hint %d</summary><div>%s</div></details>'
+                  % (i + 1, md_lite(h)))
+
+    bonus = ""
+    if n >= CTF_BONUS["need_solved"] and CTF_BONUS["flag_index"] not in solved:
+        bonus = ('<div class="fc-bonus"><div class="fc-bonus-h">★ Bonus hint</div>'
+                 '<pre>%s</pre><p>%s</p></div>'
+                 % (esc(CTF_BONUS["payload"]), md_lite(CTF_BONUS["note"])))
+
+    done = '<div class="fc-done">🎉 BARAKALLA! %d/%d flag — CTF yakunlandi.</div>' % (total, total) if n >= total else ""
+
+    return (
+        '<!doctype html><html lang="uz"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        '<title>Flag Check · Nimbus Reports CTF</title>'
+        '<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 '
+        'viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%9A%A9%3C/text%3E%3C/svg%3E">'
+        '<style>' + FC_CSS + '</style></head><body><div class="fcw">'
+        '<div class="fc-top"><span style="font-size:26px">🚩</span>'
+        '<h1>Nimbus Reports — Flag Check</h1></div>'
+        '<div class="fc-sub">Topgan flaglaringizni shu yerda tekshiring. Tekshiruv '
+        '<b>server tomonda</b> bo\'ladi · jami <b>' + str(total) + '</b> flag.</div>'
+        + done +
+        '<div class="fc-card">'
+        '<div class="fc-count">' + str(n) + ' / ' + str(total) + ' topildi</div>'
+        '<div class="fc-bar"><i style="width:' + str(pct) + '%"></i></div>'
+        '<div class="fc-slots">' + slots + '</div>'
+        + fmsg +
+        '<form method="post" action="/flag_check">'
+        '<div class="fc-row">'
+        '<input name="flag" placeholder="EJPT{...}" autofocus autocomplete="off" spellcheck="false">'
+        '<button class="fc-btn" type="submit">Tekshirish</button>'
+        '</div></form></div>'
+        '<div class="fc-card"><div style="font-weight:700;margin-bottom:2px">Hintlar</div>'
+        '<div class="fc-sub" style="margin:2px 0 8px">Kerak bo\'lsa oching — to\'g\'ridan-to\'g\'ri javob bermaydi.</div>'
+        + hints + bonus + '</div>'
+        '<div class="fc-foot"><a href="/">← Saytga qaytish</a>'
+        '<a href="/flag_check?reset=1" onclick="return confirm(\'Progress tozalansinmi?\')">Progressni tozalash</a>'
+        '</div></div></body></html>'
+    )
+
+
 # ---- storage-backup ochiq katalog ro'yxati (Apache Options +Indexes ko'rinishi) ----
 def page_dir_listing():
     return (
@@ -639,6 +775,12 @@ class Handler(BaseHTTPRequestHandler):
         if path == '/storage-backup/' + BACKUP_NAME:
             return self._text(200, BACKUP_SQL)
 
+        if path in ('/flag_check', '/flag_check.html'):
+            if qs.get('reset'):
+                return self._fc_redirect('/flag_check', clear=True)
+            solved = self._fc_cookie()
+            return self._send(200, page_flag_check(solved, qs.get('r', [None])[0], qs.get('i', [''])[0]))
+
         return self._send(404, page_404())
 
     def do_HEAD(self):
@@ -662,6 +804,19 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, page_login(err=True))
         if path == '/contact.php':
             return self._send(200, page_contact(sent=True))
+
+        if path == '/flag_check':
+            if form.get('reset'):
+                return self._fc_redirect('/flag_check', clear=True)
+            flag = form.get('flag', [''])[0].strip()
+            solved = self._fc_cookie()
+            if flag in CHECK_FLAGS:
+                idx = CHECK_FLAGS.index(flag)
+                r = 'already' if idx in solved else 'ok'
+                solved.add(idx)
+            else:
+                idx, r = -1, 'wrong'
+            return self._fc_redirect('/flag_check?r=%s&i=%d' % (r, idx), solved=solved)
 
         return self._send(404, page_404())
 
@@ -691,6 +846,36 @@ class Handler(BaseHTTPRequestHandler):
         return self._text(403, out)
 
     # ---- yordamchi ----
+    # ---- /flag_check holati (cookie orqali, server-side) ----
+    def _fc_cookie(self):
+        raw = self.headers.get('Cookie', '') or ''
+        solved = set()
+        for part in raw.split(';'):
+            if '=' in part:
+                k, v = part.strip().split('=', 1)
+                if k == 'fc':
+                    for x in v.split(','):
+                        if x.isdigit():
+                            i = int(x)
+                            if 0 <= i < len(CHECK_FLAGS):
+                                solved.add(i)
+        return solved
+
+    def _fc_redirect(self, location, solved=None, clear=False):
+        if clear:
+            cookie = 'fc=; Path=/flag_check; Max-Age=0; SameSite=Lax'
+        else:
+            val = ','.join(str(i) for i in sorted(solved or set()))
+            cookie = 'fc=%s; Path=/flag_check; Max-Age=%d; SameSite=Lax' % (val, 30 * 24 * 3600)
+        try:
+            self.send_response(303)
+            self.send_header('Location', location)
+            self.send_header('Set-Cookie', cookie)
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
     def _read_form(self):
         try:
             n = int(self.headers.get('Content-Length', 0))
@@ -756,6 +941,7 @@ def main():
     print(line)
     print("  4 zaiflik: IDOR · info-disclosure · XSS(WAF) · SSRF")
     print("  Brauzer + Burp bilan buzing; path'larni gobuster/dirb topadi (-x php,txt).")
+    print("  🚩 Flag tekshirish + hintlar:  http://localhost:%d/flag_check" % SERVE_PORT)
     print("  ⚠️  Ataylab zaif — faqat izolyatsiya qilingan lab tarmog'ida. Internetga ochmang.")
     if args.host != '0.0.0.0' and args.host not in ('::',):
         print("  Eslatma: tarmoqdan ulanish uchun --host 0.0.0.0 bo'lsin (hozir: %s)." % args.host)

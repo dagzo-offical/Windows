@@ -49,6 +49,11 @@ python3 app.py             # 0.0.0.0:8085  (boshqa port:  python3 app.py --port 
 Ishga tushgach ekranda tarmoq manzili chiqadi (`http://<LAN-IP>:8085`) — o'quvchilar
 shu manzilga brauzer + Burp bilan ulanadi. Tekshirish:  `./test-ctf-py.sh`.
 
+**🚩 Flag tekshirish + hintlar:** `http://<LAN-IP>:8085/flag_check` — 4 flagni shu
+yerda tekshiring (tekshiruv **server tomonda**; flaglar klientga yuborilmaydi), progres
+(4 slot), bosqichma-bosqich **hintlar** va 3/4 topilganda **bonus hint**. Portal
+(«CTF» moduli) kerak emas — bu sahifa `app.py`ning o'zida, mustaqil ishlaydi.
+
 - Sof Python 3 (standart kutubxona) — hech qanday kutubxona/o'rnatish shart emas.
 - 4 zaiflik va flaglar Docker versiyasi bilan **bir xil**; portal (CTF moduli)
   flaglarni server tomonda tekshiradi.
