@@ -51,9 +51,9 @@ SERVE_PORT = 8085  # bind()'dan keyin haqiqiy port bilan yangilanadi (SSRF self-
 # Flag qiymatlari klientga YUBORILMAYDI; faqat server solishtiradi.
 CHECK_FLAGS = [FLAG_IDOR, FLAG_INFO, FLAG_XSS, FLAG_SSRF]
 CTF_HINTS = [
-    "Recon avval. Menyudagi havolalar hammasi emas — gobuster/dirb bilan yashirin sahifa va fayllarni toping (`-x php,txt`); robots.txt va sahifa manbasini (view-source) o'qing. Bitta wordlist yetmasa, kattarog'ini (directory-list-2.3-medium) sinang.",
-    "Topgan har sahifada funksiyani sinang: tugma, qidiruv maydoni, so'rov TANASI (Burp bilan ushlang). Ketma-ket ID/raqamlarni chegaradan tashqariga (masalan eng kichigidan pastga) o'zgartirib ko'ring — server ularni ishonib qabul qilishi mumkin.",
-    "Ba'zi endpointlar to'g'ridan-to'g'ri kirsangiz **403** qaytaradi — ular faqat ILOVA ICHIDAN ochiladi. Ikki yo'l: (a) server sizning o'rningizga so'rov yuborsa (havola yuklovchi/preview funksiya), yoki (b) brauzeringizda o'sha sayt ichida siz kiritgan kod ishlab ketsa (kiritma aks etadigan joy).",
+    "Recon avval. Menyudagi havolalar hammasi emas — gobuster/dirb bilan yashirin sahifa va fayllarni toping (`-x php,txt`); robots.txt va sahifa manbasini (view-source) o'qing. Bitta wordlist yetmasa, boshqasidan foydalaning.",
+    "So'rovni brauzer yuborgan holicha qoldirmang — uni (metod, parametrlar va so'rov TANASI) qo'lda ushlab, o'zgartirib qayta yuboring. Ilova sizga ko'rsatgan qiymatlar — serverga yuborsa bo'ladiganlarning hammasi emas; kutilmagan qiymatlarni ham sinab ko'ring.",
+    "Ba'zi javoblar to'g'ridan-to'g'ri so'ralganda 403 beradi — ular faqat 'ichkaridan' kelgan so'rovga ishonadi (kim va qayerdan so'ralayotgani muhim). O'sha ishonchni qanday qo'lga kiritish mumkinligini o'ylang: nishonning o'zi (yoki uning biror qismi) siz to'g'ridan yeta olmagan narsaga sizning nomingizdan yeta oladimi?",
     "Filtrlar ko'pincha to'liq emas — bitta vektor bloklansa, boshqasini sinang (XSS cheat-sheet: `<svg>`, `<img>`, `<body>`...). Manzil filtri localhost'ni SATR bo'yicha tekshirsa — o'sha IP'ni boshqacha yozing. Ko'z bilan o'qilmaydigan matn kodlangan (base64) bo'lishi mumkin.",
 ]
 CTF_BONUS = {
