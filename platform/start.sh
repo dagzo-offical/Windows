@@ -74,14 +74,20 @@ cat <<TIP
       ⚑ BIRINCHI ro'yxatdan o'tgan foydalanuvchi = ADMIN (darhol faol).
    2) Admin panel (/admin) — qolgan foydalanuvchilarni TASDIQLANG va
       ularga RUXSAT bering (masalan: ctf, network, terminal).
-   3a) CTF: Dashboard → «CTF» → nishon http://${LAN:-localhost}:8085 ni
-      brauzer + Burp bilan buzing (IDOR · info-disclosure · XSS · SSRF).
+   3a) CTF (MEDIUM — Nimbus Reports): Dashboard → «CTF» → nishon
+      http://${LAN:-localhost}:8085 ni brauzer + Burp bilan buzing
+      (IDOR · info-disclosure · XSS · SSRF).
+   3a+) CTF (HARD — Orbit Ops, zanjirli): mustaqil, OFLAYN, Docker'siz —
+      cd ../lab/hard-ctf && ./start-hard-ctf.sh   → nishon :8086
+      (filtered SQLi → SSRF → LFI → command injection).
+      Eslatma: tarmoqda ulanish muammo bo'lsa, MEDIUM ni ham mustaqil
+      ishga tushiring:  cd ../lab/ctf-web && ./start-ctf.sh   (:8085).
    3b) Mashinalar: Dashboard → «Web Terminal» → terminalda:
          nmap -sn 10.10.20.0/24        # mashinalarni toping
       web zaifligi → SSH → oddiy user → root.  Yechim: ../lab/WALKTHROUGH.md
 
   Tarmoqdan ulanmasa — xost devori (firewall) portlarni ochsin:
-      Kali/Ubuntu:  sudo ufw allow 8000/tcp && sudo ufw allow 8085/tcp
+      Kali/Ubuntu:  sudo ufw allow 8000/tcp && sudo ufw allow 8085/tcp && sudo ufw allow 8086/tcp
   (Foydalanuvchilar bir xil Wi-Fi / LAN da bo'lishi kerak.)
 
   TO'XTATISH:  ./stop.sh
