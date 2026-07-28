@@ -40,6 +40,9 @@ services:
     cap_add: [NET_ADMIN, NET_RAW]
     networks:
       labnet: { ipv4_address: 10.10.20.5 }
+    # ttyd faqat localhost'ga e'lon qilinadi — NATIVE backend (start-native.sh) shu port
+    # orqali /terminal ni proxy qiladi. Docker backend esa ejpt-attacker DNS orqali topadi.
+    ports: ["127.0.0.1:7681:7681"]
     # brauzer terminali (backend /terminal orqali proxy qiladi)
     command: ["ttyd", "-p", "7681", "-b", "/terminal", "-W", "-t", "titleFixed=eJPT Lab Terminal", "bash"]
     restart: unless-stopped

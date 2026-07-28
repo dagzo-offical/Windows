@@ -4,7 +4,27 @@ Bu — o'quv platformasining **backend** qismi: foydalanuvchi **ro'yxatdan o'tis
 
 > ⚠️ Bularning hammasi **server (backend)** talab qiladi — statik GitHub Pages'da ishlamaydi. Uni o'z kompyuteringizda yoki serveringizda `docker compose` bilan ishga tushiring.
 
-## Ishga tushirish (bir buyruq)
+## Ishga tushirish
+
+### A) Tarmoq (LAN) uchun — **NATIVE, tavsiya etiladi**
+
+Docker'ning e'lon qilingan portlari ba'zi mashinalarda (ayniqsa **Docker Desktop** yoki
+**rootless Docker**) xostning haqiqiy LAN interfeysiga chiqmaydi — shu sabab tarmoqdagi
+foydalanuvchilar `:8000` ga **ulana olmaydi**. NATIVE ishga tushirish backend'ni
+(`server.js` — sof Node) va CTF nishonini (`app.py` — sof Python) to'g'ridan-to'g'ri
+`0.0.0.0` ga bog'laydi → tarmoqda bemalol ochiladi (onlayn ham, oflayn tarmoqda ham):
+
+```bash
+cd platform
+./start-native.sh          # portal :8000 + CTF :8085 → LAN'da ochiladi
+```
+
+Ishga tushgach ekranda tarmoq manzili chiqadi (`http://<LAN-IP>:8000`). Talab: **Node.js**
+(`sudo apt install -y nodejs`) + **Python3**. **Docker ixtiyoriy** — bo'lsa, web-terminal
+va zaif mashinalar ham avtomatik yoqiladi (backend baribir native ishlaydi). Firewall:
+`sudo ufw allow 8000/tcp && sudo ufw allow 8085/tcp`.
+
+### B) Faqat shu kompyuterda (localhost) — to'liq Docker
 
 ```bash
 cd platform

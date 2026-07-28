@@ -87,6 +87,12 @@ cat <<TIP
       Kali/Ubuntu:  sudo ufw allow 8000/tcp && sudo ufw allow 8085/tcp
   (Foydalanuvchilar bir xil Wi-Fi / LAN da bo'lishi kerak.)
 
+  ⚠️  TARMOQDAGILAR ULANA OLMASA (ko'pincha Docker Desktop yoki rootless Docker'da
+      e'lon qilingan portlar LAN'ga CHIQMAYDI) — NATIVE ishga tushiring:
+          ./start-native.sh
+      (backend + CTF to'g'ridan-to'g'ri 0.0.0.0 ga bog'lanadi → LAN'da ochiladi.
+       Talab: Node.js + Python3; Docker ixtiyoriy — bo'lsa terminal/mashinalar ham yoqiladi.)
+
   TO'XTATISH:  ./stop.sh
   ──────────────────────────────────────────────────────────
 TIP
