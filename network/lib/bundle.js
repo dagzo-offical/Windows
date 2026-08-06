@@ -139,6 +139,8 @@ const LESSONS={
   57:{num:"L57",sec:6,uz:"Tarmoq avtomatlashtirish",en:"Network Automation",sub:"Python, Ansible, IaC"},
   58:{num:"L58",sec:6,uz:"IPv6 xavfsizligi",en:"IPv6 Security",sub:"Rogue RA, DHCPv6, RA Guard"},
   59:{num:"L59",sec:6,uz:"5G va IoT xavfsizligi",en:"5G & IoT Security",sub:"IoT segmentatsiya, network slicing"},
+  60:{num:"L60",sec:1,uz:"Netmask (Subnet mask)",en:"Netmask (Subnet mask)",sub:"Tarmoq va xost bitlari, CIDR, AND amali"},
+  61:{num:"L61",sec:1,uz:"Subnetting",en:"Subnetting",sub:"Tarmoqni bo'lish, bit qarz olish, VLSM"},
 };
 
 const SECTIONS={
@@ -187,7 +189,7 @@ const SECTIONS={
 };
 
 // ── Gamification data (badges / skill tree / lesson icons) ─────
-const LESSON_ICON={1:"layers",2:"network",3:"network",4:"globe",5:"code",6:"target",7:"settings",8:"network",9:"layers",10:"network",11:"graph",12:"wifi",13:"shield",14:"lock",15:"lock",16:"eye",17:"shield-check",18:"key",19:"target",20:"globe",21:"shield-check",22:"target",23:"eye",24:"bug",25:"bug",26:"bug",27:"zap",28:"graph",29:"wifi",30:"eye"};
+const LESSON_ICON={1:"layers",2:"network",3:"network",4:"globe",5:"code",6:"target",7:"settings",8:"network",9:"layers",10:"network",11:"graph",12:"wifi",13:"shield",14:"lock",15:"lock",16:"eye",17:"shield-check",18:"key",19:"target",20:"globe",21:"shield-check",22:"target",23:"eye",24:"bug",25:"bug",26:"bug",27:"zap",28:"graph",29:"wifi",30:"eye",60:"network",61:"layers"};
 
 function naKey(n){return `na_l${String(n).padStart(2,"0")}`;}
 function lessonFullKey(l){return `na_l${l.num.slice(1)}`;}
@@ -2456,6 +2458,8 @@ function LessonScreen({setRoute,user,markComplete,num=1}){
     num===57?React.createElement(LessonL57):
     num===58?React.createElement(LessonL58):
     num===59?React.createElement(LessonL59):
+    num===60?React.createElement(LessonL60):
+    num===61?React.createElement(LessonL61):
     React.createElement(ComingSoon,{lesson});
 
   return React.createElement("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 16px"}},
@@ -3903,6 +3907,81 @@ function LessonL59(){
     React.createElement(H2,{num:"§4"},t(lang,"Himoya","Defense")),
     React.createElement(InfoBox,{color:"var(--c-warn)"},React.createElement("strong",null,"⚠ "),t(lang,"IoT qurilmalarini ALOHIDA segmentga/VLAN ga (47-dars) ajrating va standart parolni o'zgartiring. Shunda kamerangiz buzilsa ham, hujumchi asosiy tarmog'ingizga o'ta olmaydi.","Put IoT devices on a SEPARATE segment/VLAN (lesson 47) and change the default password. Then even if your camera is compromised, the attacker can't reach your main network.")),
     React.createElement(Quiz,{q:{uz:"IoT qurilmalarini himoyalashning eng amaliy usuli qaysi?",en:"What is the most practical way to secure IoT devices?"},opts:[{uz:"Alohida VLAN/segmentga ajratish + standart parolni o'zgartirish",en:"Isolate on a separate VLAN/segment + change the default password"},{uz:"Ularni o'chirib qo'yish",en:"Turning them off"},{uz:"IPv6 ni yoqish",en:"Enabling IPv6"},{uz:"Ko'proq kabel qo'shish",en:"Adding more cables"}],correct:0,exp:{uz:"IoT ni alohida segmentga ajratish (47-dars) buzilgan qurilmaning asosiy tarmoqqa o'tishini to'xtatadi; standart parolni o'zgartirish esa dastlabki buzilishni qiyinlashtiradi.",en:"Isolating IoT on a separate segment (lesson 47) stops a compromised device from reaching the main network; changing the default password makes the initial compromise harder."}}));
+}
+function LessonL60(){
+  const lang=useLang();
+  const masks=[
+    ["/8","255.0.0.0","16,777,214",{uz:"Juda katta",en:"Very large"},"#69db7c"],
+    ["/16","255.255.0.0","65,534",{uz:"Katta tarmoq",en:"Large network"},"#4dabf7"],
+    ["/24","255.255.255.0","254",{uz:"Odatiy LAN",en:"Typical LAN"},"#9775fa"],
+    ["/26","255.255.255.192","62",{uz:"Kichik bo'lim",en:"Small segment"},"#ffd43b"],
+    ["/30","255.255.255.252","2",{uz:"Router-router ulanish",en:"Router-to-router link"},"#ff6b6b"]
+  ];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Niqob (netmask) nima?","What is a netmask?")),
+    React.createElement(P,null,t(lang,"IP manzil ikki qismdan iborat: TARMOQ qismi (qaysi tarmoqda) va XOST qismi (o'sha tarmoqdagi aniq qurilma). Subnet niqobi (netmask) — aynan qayerda tarmoq tugab, xost boshlanishini ko'rsatuvchi «chiziq». Xuddi pochta manzilidagidek: bir qismi ko'cha (tarmoq), bir qismi uy raqami (xost).","An IP address has two parts: the NETWORK part (which network) and the HOST part (the exact device on it). The subnet mask (netmask) is the «line» that marks exactly where the network ends and the host begins. Like a postal address: part is the street (network), part is the house number (host).")),
+    React.createElement(H2,{num:"§2"},t(lang,"Tuzilishi: 1 = tarmoq, 0 = xost","Structure: 1 = network, 0 = host")),
+    React.createElement(P,null,t(lang,"Niqob ham 32 bit — lekin u ketma-ket 1 lardan so'ng ketma-ket 0 lardan iborat. 1 turgan joy — TARMOQ biti, 0 turgan joy — XOST biti. Eng keng tarqalgani 255.255.255.0:","A mask is also 32 bits — but it's a run of 1s followed by a run of 0s. Where there's a 1 it's a NETWORK bit; where there's a 0 it's a HOST bit. The most common is 255.255.255.0:")),
+    React.createElement(Terminal,null,"IP:     192.168.1.10   = 11000000.10101000.00000001.00001010\nMask:   255.255.255.0  = 11111111.11111111.11111111.00000000\n                         |------- tarmoq (24 bit) ------|- xost -|"),
+    React.createElement(H2,{num:"§3"},t(lang,"CIDR yozuvi va keng tarqalgan niqoblar","CIDR notation and common masks")),
+    React.createElement(P,null,t(lang,"CIDR (/N) — niqobdagi 1 lar sonini qisqacha yozish usuli. /24 = 24 ta 1 = 255.255.255.0. Qancha xost biti qolsa, shuncha ko'p manzil sig'adi (2 ta manzil har doim band: tarmoq va broadcast).","CIDR (/N) is shorthand for the number of 1s in the mask. /24 = 24 ones = 255.255.255.0. The more host bits remain, the more addresses fit (2 are always reserved: network and broadcast).")),
+    React.createElement("div",{style:{margin:"8px 0 14px"}},
+      masks.map(function(m,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:12,alignItems:"center",padding:"9px 13px",marginBottom:6,background:"var(--surface)",border:"1px solid "+m[4]+"44",borderLeft:"3px solid "+m[4],borderRadius:10,animationDelay:(i*0.06)+"s"}},
+        React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:13,fontWeight:800,color:m[4],minWidth:44}},m[0]),
+        React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontSize:11.5,color:"var(--text-2)",minWidth:140}},m[1]),
+        React.createElement("span",{style:{fontSize:12,color:"var(--text-1)",flex:1}},t(lang,"xostlar: ","hosts: ")+m[2]),
+        React.createElement("span",{style:{fontSize:11,color:"var(--text-2)"}},t(lang,m[3].uz,m[3].en)));})),
+    React.createElement(H2,{num:"§4"},t(lang,"Niqob nima uchun kerak? (AND amali)","Why the mask matters (the AND operation)")),
+    React.createElement(P,null,t(lang,"Qurilma biror manzilga jo'natmoqchi bo'lganda, u O'Z IP si va MANZIL IP sini niqob bilan «AND» qiladi. Natijalar bir xil bo'lsa — manzil SHU tarmoqda (to'g'ridan-to'g'ri jo'natadi); har xil bo'lsa — boshqa tarmoqda (default gateway/router orqali). Ya'ni niqob har bir paket qayerga borishini hal qiladi.","When a device wants to send to some address, it «AND»s both its OWN IP and the DESTINATION IP with the mask. If the results match, the destination is on THIS network (send directly); if they differ, it's on another network (send via the default gateway/router). So the mask decides where every packet goes.")),
+    React.createElement(Terminal,null,"192.168.1.10  AND  255.255.255.0  =  192.168.1.0    (mening tarmog'im)\n192.168.1.50  AND  255.255.255.0  =  192.168.1.0    -> BIR XIL -> lokal\n8.8.8.8       AND  255.255.255.0  =  8.8.8.0        -> HAR XIL -> router orqali"),
+    React.createElement(H2,{num:"§5"},t(lang,"Amaliyot","Practice")),
+    React.createElement(Terminal,null,"ip a\n# inet 192.168.1.10/24   <- /24 = 255.255.255.0\nipcalc 192.168.1.10/24\n# Network:   192.168.1.0/24\n# HostMin:   192.168.1.1\n# HostMax:   192.168.1.254\n# Broadcast: 192.168.1.255"),
+    React.createElement(InfoBox,{color:"var(--c-system)"},React.createElement("strong",null,"◆ "),t(lang,"Xulosa: niqob — IP ni «tarmoq» va «xost» ga ajratuvchi chiziq. /24 (255.255.255.0) eng keng tarqalgan: 254 ta xost. Qurilma niqob orqali manzil lokalmi yoki uzoqmi ekanini aniqlaydi.","Takeaway: the mask is the line that splits an IP into «network» and «host». /24 (255.255.255.0) is the most common: 254 hosts. A device uses the mask to decide whether a destination is local or remote.")),
+    React.createElement(Quiz,{q:{uz:"255.255.255.0 (/24) niqobi nimani bildiradi?",en:"What does the mask 255.255.255.0 (/24) mean?"},opts:[{uz:"Birinchi 24 bit — tarmoq, oxirgi 8 bit — xostlar (254 ta)",en:"First 24 bits are network, last 8 are hosts (254)"},{uz:"254 ta alohida tarmoq bor",en:"There are 254 separate networks"},{uz:"Faqat IPv6 da ishlaydi",en:"It only works in IPv6"},{uz:"Manzil ommaviy ekanini",en:"That the address is public"}],correct:0,exp:{uz:"/24 = niqobda 24 ta 1 (255.255.255.0). Birinchi 24 bit tarmoqni, oxirgi 8 bit xostlarni belgilaydi: 2^8 - 2 = 254 ta ishlatsa bo'ladigan manzil (tarmoq va broadcast band).",en:"/24 = 24 ones in the mask (255.255.255.0). The first 24 bits set the network, the last 8 the hosts: 2^8 - 2 = 254 usable addresses (network and broadcast are reserved)."}}));
+}
+function LessonL61(){
+  const lang=useLang();
+  const steps=[
+    {uz:"Boshlanish: 192.168.1.0/24 — 1 ta tarmoq, 254 xost",en:"Start: 192.168.1.0/24 — 1 network, 254 hosts",c:"#4dabf7"},
+    {uz:"2 bit «qarz olamiz» -> /26 — endi 4 ta kichik tarmoq (subnet)",en:"Borrow 2 bits -> /26 — now 4 smaller subnets",c:"#9775fa"},
+    {uz:"Har subnetda 6 xost biti qoladi -> 2^6 - 2 = 62 ta xost",en:"Each subnet keeps 6 host bits -> 2^6 - 2 = 62 hosts",c:"#ffd43b"},
+    {uz:"Natija: 4 × 62 — tartibli, xavfsiz, boshqariladigan bo'laklar",en:"Result: 4 × 62 — tidy, secure, manageable pieces",c:"#69db7c"}
+  ];
+  const subs=[
+    ["192.168.1.0/26",".1 – .62","192.168.1.63"],
+    ["192.168.1.64/26",".65 – .126","192.168.1.127"],
+    ["192.168.1.128/26",".129 – .190","192.168.1.191"],
+    ["192.168.1.192/26",".193 – .254","192.168.1.255"]
+  ];
+  return React.createElement("section",null,
+    React.createElement(NetAnimStyle),
+    React.createElement(H2,{num:"§1"},t(lang,"Subnetting nima va nega kerak?","What is subnetting and why?")),
+    React.createElement(P,null,t(lang,"Subnetting — bitta katta tarmoqni kichik «pod-tarmoqlarga» (subnet) bo'lish. Nega kerak? (1) Xavfsizlik — bo'limlarni ajratib, biridagi buzilish boshqasiga o'tmasin; (2) Tartib — har bo'lim/qavat o'z tarmog'ida; (3) Tejash — kerakli o'lchamdagi blok berib, manzilni behuda sarflamaslik; (4) Samaradorlik — broadcast (translyatsiya) hududini kichraytirish.","Subnetting means splitting one big network into smaller «sub-networks» (subnets). Why? (1) Security — separate departments so a breach in one doesn't spread; (2) Order — each floor/team on its own network; (3) Efficiency — hand out right-sized blocks instead of wasting addresses; (4) Performance — shrink the broadcast domain.")),
+    React.createElement(H2,{num:"§2"},t(lang,"Asosiy g'oya: bit «qarz olish»","The core idea: borrowing bits")),
+    React.createElement(P,null,t(lang,"Subnet yasash uchun XOST bitlaridan bir nechtasini olib, ularni TARMOQ bitiga aylantiramiz («qarz olish»). Har qarz olingan bit subnetlar sonini 2 barobar oshiradi va har subnetdagi xostlar sonini yarmiga kamaytiradi. Muvozanat: ko'proq subnet — kamroq xost.","To create subnets you take some HOST bits and turn them into NETWORK bits («borrowing»). Each borrowed bit doubles the number of subnets and halves the hosts per subnet. It's a trade-off: more subnets means fewer hosts.")),
+    React.createElement("div",{style:{margin:"8px 0 14px"}},
+      steps.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{display:"flex",gap:10,alignItems:"center",padding:"9px 13px",marginBottom:6,background:"var(--surface)",border:"1px solid "+s.c+"44",borderLeft:"3px solid "+s.c,borderRadius:10,animationDelay:(i*0.06)+"s"}},
+        React.createElement("span",{style:{fontFamily:"var(--font-mono)",fontWeight:800,color:s.c,minWidth:20}},String(i+1)),
+        React.createElement("span",{style:{fontSize:12.5,color:"var(--text-1)"}},t(lang,s.uz,s.en)));})),
+    React.createElement(H2,{num:"§3"},t(lang,"Hisoblash formulalari","The formulas")),
+    React.createElement(Terminal,null,"Subnetlar soni    = 2 ^ (qarz olingan bitlar)\nHar subnet xosti  = 2 ^ (qolgan xost bitlari) - 2\n\nMisol: 192.168.1.0/24 -> /26   (2 bit qarz)\n  subnetlar : 2^2 = 4\n  xostlar   : 2^6 - 2 = 62      (-2: tarmoq va broadcast manzillari)"),
+    React.createElement(H2,{num:"§4"},t(lang,"To'liq bo'linish: 192.168.1.0/24 -> 4 × /26","Full split: 192.168.1.0/24 -> 4 × /26")),
+    React.createElement(P,null,t(lang,"Har subnetning uch muhim manzili bor: TARMOQ manzili (barcha xost biti 0 — subnetning «nomi»), BROADCAST (barcha xost biti 1 — hammaga xabar), va ular orasidagi ISHLATILADIGAN manzillar.","Every subnet has three key addresses: the NETWORK address (all host bits 0 — the subnet's «name»), the BROADCAST (all host bits 1 — «to everyone»), and the USABLE addresses in between.")),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:10,margin:"8px 0 14px"}},
+      subs.map(function(s,i){return React.createElement("div",{key:i,className:"na-rise na-card",style:{padding:"11px 13px",background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,animationDelay:(i*0.06)+"s"}},
+        React.createElement("code",{style:{fontFamily:"var(--font-mono)",fontWeight:800,fontSize:12.5,color:"#4dabf7"}},s[0]),
+        React.createElement("div",{style:{fontSize:11,color:"var(--text-2)",marginTop:5}},t(lang,"Ishlatiladigan: ","Usable: "),React.createElement("code",{style:{color:"#69db7c"}},s[1])),
+        React.createElement("div",{style:{fontSize:11,color:"var(--text-2)",marginTop:2}},t(lang,"Broadcast: ","Broadcast: "),React.createElement("code",{style:{color:"#ff6b6b"}},s[2])));})),
+    React.createElement(H2,{num:"§5"},t(lang,"VLSM — har bo'limga o'z o'lchami","VLSM — right-sizing each subnet")),
+    React.createElement(P,null,t(lang,"Barcha subnetni bir xil o'lchamda qilish shart emas. VLSM (Variable Length Subnet Mask) — har bo'limga ehtiyojiga qarab boshqa-boshqa niqob berish: 100 xostli bo'limga /25, 2 xostli router-ulanishga /30. Bu manzillarni maksimal tejaydi.","Subnets don't all have to be the same size. VLSM (Variable Length Subnet Mask) gives each department a different mask by need: /25 for a 100-host team, /30 for a 2-host router link. This wastes the fewest addresses.")),
+    React.createElement(CompareCols,{
+      left:{title:{uz:"Bir xil (FLSM)",en:"Equal size (FLSM)"},color:"#8390a8",rows:[{uz:"Hamma subnet bir xil",en:"All subnets identical"},{uz:"Oddiy, lekin isrofgar",en:"Simple, but wasteful"},{uz:"Kichik bo'limga ham katta blok",en:"Big block even for a tiny team"}]},
+      right:{title:{uz:"O'lchamli (VLSM)",en:"Right-sized (VLSM)"},color:"#69db7c",rows:[{uz:"Har blok ehtiyojga mos",en:"Each block fits the need"},{uz:"Manzil tejaladi",en:"Saves addresses"},{uz:"Router-ulanishga /30",en:"/30 for a router link"}]}}),
+    React.createElement(H2,{num:"§6"},t(lang,"Amaliyot: ipcalc","Practice: ipcalc")),
+    React.createElement(Terminal,null,"# 192.168.1.0/24 ni teng bo'lish\nipcalc 192.168.1.0/24 -s 62 62 62 62\n\n# yoki bitta subnetni tekshirish\nipcalc 192.168.1.64/26\n# Network:   192.168.1.64/26\n# HostMin:   192.168.1.65\n# HostMax:   192.168.1.126\n# Broadcast: 192.168.1.127"),
+    React.createElement(InfoBox,{color:"var(--c-system)"},React.createElement("strong",null,"◆ "),t(lang,"Xulosa: subnetting — xost bitlarini «qarz olib» katta tarmoqni kichik, boshqariladigan bo'laklarga bo'lish. Subnetlar = 2^qarz; xostlar = 2^qolgan - 2. Har subnetda tarmoq va broadcast manzili band bo'ladi.","Takeaway: subnetting borrows host bits to split a big network into small, manageable pieces. Subnets = 2^borrowed; hosts = 2^remaining - 2. Each subnet reserves a network and a broadcast address.")),
+    React.createElement(Quiz,{q:{uz:"192.168.1.0/24 ni /26 ga bo'lsak, nechta subnet va har birida nechta ishlatiladigan xost bo'ladi?",en:"If you split 192.168.1.0/24 into /26, how many subnets and usable hosts each?"},opts:[{uz:"4 ta subnet, har birida 62 xost",en:"4 subnets, 62 hosts each"},{uz:"2 ta subnet, har birida 128 xost",en:"2 subnets, 128 hosts each"},{uz:"8 ta subnet, har birida 30 xost",en:"8 subnets, 30 hosts each"},{uz:"1 ta subnet, 254 xost",en:"1 subnet, 254 hosts"}],correct:0,exp:{uz:"/24 dan /26 ga o'tish — 2 bit qarz olish: 2^2 = 4 subnet. Har subnetda 6 xost biti qoladi: 2^6 - 2 = 62 xost (-2: tarmoq va broadcast).",en:"Going from /24 to /26 borrows 2 bits: 2^2 = 4 subnets. Each keeps 6 host bits: 2^6 - 2 = 62 hosts (-2: network and broadcast)."}}));
 }
 const root=ReactDOM.createRoot(document.getElementById("app"));
 root.render(React.createElement(App));
