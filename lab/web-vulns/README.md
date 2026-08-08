@@ -28,6 +28,23 @@ Bosh sahifada mashqlar ro'yxati; `/flag_check` da progres + **hintlar**.
 | 5 | **SSTI** | `/ssti?name=` | `{{7*7}}`→49 tasdiq, so'ng `{{flag}}` |
 | 6 | **File Upload** | `/upload` | filtr faqat `.php` ni bloklaydi → `.phtml` / `.pHp` |
 
+## Mashqlar (batch 2 — 3 mavzu × 3 daraja)
+
+Har bir mavzu **oson / o'rta / qiyin** darajada. Texnikasi real (Burp bilan bajariladi),
+ta'siri xavfsiz qamalgan. Darsliklar: L38 (NoSQL), L39 (JWT), L40 (Business Logic).
+
+| # | Zaiflik | Daraja | Yo'l | Yechim (qisqa) |
+|---|---|---|---|---|
+| 7 | **NoSQL — Auth bypass** | oson | `/nosql` | `password[$ne]=x` yoki `{"$ne":null}` operator obyekti |
+| 8 | **NoSQL — Blind regex** | o'rta | `/nosql/blind` | `password[$regex]=^M…` bilan parolni belgima-belgi chiqarish |
+| 9 | **NoSQL — $where leak** | qiyin | `/nosql/search` | `filter={"public":{"$ne":true}}` yoki `{"$where":"1==1"}` |
+| 10 | **JWT — alg:none** | oson | `/jwt` | `alg:none`, `role:admin`, imzo bo'sh |
+| 11 | **JWT — weak secret** | o'rta | `/jwt/hs` | HS256 sirini (`secret`) buzib, admin token qayta imzolash |
+| 12 | **JWT — embedded JWK** | qiyin | `/jwt/jwk` | header ichiga o'z kalitni joylab, o'sha kalit bilan imzolash |
+| 13 | **Logic — negative qty** | oson | `/biz` | manfiy miqdor → manfiy jami («refund») |
+| 14 | **Logic — coupon stack** | o'rta | `/biz/coupon` | bitta kuponni ko'p marta qo'llash → narx ≤ 0 |
+| 15 | **Logic — workflow bypass** | qiyin | `/biz/premium` | `/biz/confirm?item=premium&paid=1` (forced browsing) |
+
 ## Xavfsizlik dizayni
 
 Bu ilova **native** (Docker'siz) ishlagani uchun zaifliklar **ta'siri qamalgan**, lekin
@@ -39,6 +56,11 @@ Bu ilova **native** (Docker'siz) ishlagani uchun zaifliklar **ta'siri qamalgan**
   bajarilmaydi (`cat/ls/id/...` faqat jail fayllarini ko'radi).
 - **SSTI** cheklangan **baholovchi** (Python `eval` EMAS) — RCE/sandbox-escape imkoni yo'q.
 - **SQLi** vaqtinchalik SQLite'da; **File Upload** faqat nomni tekshiradi (fayl bajarilmaydi).
+- **NoSQL** — soxta hujjatlar ustida sof-Python operator-baholovchi; `$where` real JavaScript EMAS
+  (faqat tavtologiya tan olinadi) — RCE imkoni yo'q.
+- **JWT** — stdlib `hmac`/`hashlib` bilan HS256; zaifliklar (alg:none, zaif sir, o'rnatilgan JWK)
+  ataylab, lekin faqat lab tokenlariga ta'sir qiladi.
+- **Business Logic** — sof arifmetika va holat; host yoki tashqi tizimga ta'sir yo'q.
 
 ⚠️ **Ataylab zaif** — faqat izolyatsiya qilingan o'quv tarmog'ida. Internetga ochmang.
 

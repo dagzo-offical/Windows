@@ -18,6 +18,11 @@
 #    5) SSTI (Template Injection)         /ssti
 #    6) File Upload (filtr bypass)        /upload
 #
+#  Batch 2 (3 mavzu × 3 daraja — oson/o'rta/qiyin):
+#    7-9)  NoSQL Injection    /nosql · /nosql/blind · /nosql/search
+#   10-12) JWT Attacks        /jwt · /jwt/hs · /jwt/jwk
+#   13-15) Business Logic     /biz · /biz/coupon · /biz/premium
+#
 #  ⚠️  ATAYLAB ZAIF — faqat izolyatsiya qilingan o'quv tarmog'ida. Internetga ochmang.
 #  XAVFSIZLIK: fayl o'qish (LFI) SOXTA jail katalogiga qamalgan; «buyruq bajarish»
 #  (cmdi) ichki SIMULYATSIYA; SSTI cheklangan baholovchi — real host'ga ta'sir yo'q.
@@ -25,7 +30,11 @@
 """Web Vulns Lab — offline, exploitable web-vulnerability practice (pure stdlib)."""
 
 import argparse
+import base64
+import hashlib
+import hmac
 import html
+import json as jsonlib
 import os
 import re
 import shutil
@@ -43,6 +52,16 @@ FLAG_LFI = "EJPT{lf1_tr4v3rs3_t0_s3cr3t}"
 FLAG_CMDI = "EJPT{cmd_1nj_sh3ll_pwn3d}"
 FLAG_SSTI = "EJPT{5st1_t3mpl4t3_3v4l}"
 FLAG_UPLOAD = "EJPT{upl04d_f1lt3r_byp4ss}"
+# Batch 2 — 3 mavzu × 3 daraja
+FLAG_NOSQL1 = "EJPT{n05ql_0p3r4t0r_4uth_byp4ss}"
+FLAG_NOSQL2 = "EJPT{n05ql_r3g3x_bl1nd_3xtr4ct}"
+FLAG_NOSQL3 = "EJPT{n05ql_wh3r3_l34k_h1dd3n_d0c}"
+FLAG_JWT1 = "EJPT{jwt_4lg_n0n3_f0rg3d_4dm1n}"
+FLAG_JWT2 = "EJPT{jwt_w34k_s3cr3t_cr4ck3d}"
+FLAG_JWT3 = "EJPT{jwt_3mb3dd3d_jwk_tru5t3d}"
+FLAG_BIZ1 = "EJPT{b1z_n3g4t1v3_qty_r3fund}"
+FLAG_BIZ2 = "EJPT{b1z_c0up0n_st4ck_t0_z3r0}"
+FLAG_BIZ3 = "EJPT{b1z_w0rkfl0w_p4y_byp4ss}"
 
 SERVE_PORT = 8087
 DB_PATH = None
@@ -79,6 +98,57 @@ CHALLENGES = [
      "descu": "Filtrni aldab bajariladigan fayl yuklang.", "desce": "Upload an executable file past the filter.",
      "hintu": "Filtr faqat aniq '.php' bilan tugaydigan (katta-kichik harfga sezgir) nomni bloklaydi. Muqobil bajariladigan kengaytma (.phtml, .php5) yoki harf registrini (.pHp) sinang.",
      "hinte": "The filter only blocks names ending in exactly '.php' (case-sensitive). Try an alternative executable extension (.phtml, .php5) or change the case (.pHp)."},
+
+    # ── NoSQL Injection (L38) — 3 daraja ──
+    {"id": "nosql1", "path": "/nosql", "name": "NoSQL — Auth bypass", "diff": "easy", "icon": "🍃",
+     "flag": FLAG_NOSQL1,
+     "descu": "Operator kiritish orqali admin sifatida kiring.", "desce": "Log in as admin via operator injection.",
+     "hintu": "Login MongoDB uslubidagi so'rov quradi. Parolni oddiy satr emas, OPERATOR obyekti qiling. Burp bilan parametr nomini `password[$ne]=x` ga o'zgartiring yoki qiymatga `{\"$ne\":\"x\"}` JSON yuboring — `$ne` (teng emas) shartni har doim rost qiladi.",
+     "hinte": "The login builds a MongoDB-style query. Make the password an OPERATOR object, not a plain string. With Burp rename the param to `password[$ne]=x` or send the value `{\"$ne\":\"x\"}` — `$ne` (not-equal) makes the condition always true."},
+    {"id": "nosql2", "path": "/nosql/blind", "name": "NoSQL — Blind regex", "diff": "medium", "icon": "🍃",
+     "flag": FLAG_NOSQL2,
+     "descu": "Admin parolini $regex bilan belgima-belgi chiqaring.", "desce": "Extract the admin password char-by-char with $regex.",
+     "hintu": "Endpoint faqat «mos/mos emas» deb javob beradi (bulyan orakul). `username=admin&password[$regex]=^S` yuboring: mos kelsa parol S bilan boshlanadi. Prefiksni uzaytirib to'liq parolni yig'ing, so'ng oddiy parol bilan kiring.",
+     "hinte": "The endpoint only answers «match / no match» (a boolean oracle). Send `username=admin&password[$regex]=^S`: a match means the password starts with S. Grow the prefix to recover the full password, then log in with it plainly."},
+    {"id": "nosql3", "path": "/nosql/search", "name": "NoSQL — $where leak", "diff": "hard", "icon": "🍃",
+     "flag": FLAG_NOSQL3,
+     "descu": "Yashirin (public bo'lmagan) hujjatni operator bilan oshkor qiling.", "desce": "Reveal a hidden (non-public) document via operator injection.",
+     "hintu": "Qidiruv `{\"name\":{\"$regex\":q},\"public\":true}` so'rovini quradi. `filter` parametri orqali xom JSON qo'shiladi va mavjud kalitlarni ustiga yozadi. `filter={\"public\":{\"$ne\":true}}` yoki `filter={\"$where\":\"1==1\"}` bilan `public:true` cheklovini olib tashlang.",
+     "hinte": "Search builds `{\"name\":{\"$regex\":q},\"public\":true}`. The `filter` param injects raw JSON that overrides existing keys. Drop the `public:true` restriction with `filter={\"public\":{\"$ne\":true}}` or `filter={\"$where\":\"1==1\"}`."},
+
+    # ── JWT Attacks (L39) — 3 daraja ──
+    {"id": "jwt1", "path": "/jwt", "name": "JWT — alg:none", "diff": "easy", "icon": "🎫",
+     "flag": FLAG_JWT1,
+     "descu": "Imzosiz (alg:none) token bilan admin bo'ling.", "desce": "Become admin with an unsigned (alg:none) token.",
+     "hintu": "Guest token beriladi. Uni 3 qismga ajrating (base64url), header `alg` ni `none` qiling, payload `role` ni `admin` qiling, imzoni (uchinchi qism) BO'SH qoldiring (`header.payload.`). Server alg:none ni ishonib qabul qiladi.",
+     "hinte": "You get a guest token. Split it (base64url), set header `alg` to `none`, set payload `role` to `admin`, and leave the signature (third part) EMPTY (`header.payload.`). The server trusts alg:none."},
+    {"id": "jwt2", "path": "/jwt/hs", "name": "JWT — weak secret", "diff": "medium", "icon": "🎫",
+     "flag": FLAG_JWT2,
+     "descu": "HS256 zaif maxfiy kalitini toping va admin token soxtalashtiring.", "desce": "Crack the weak HS256 secret and forge an admin token.",
+     "hintu": "Token HS256 (imzoli) — maxfiy kalit juda zaif (keng tarqalgan wordlist'da bor). Tokenni `hashcat -m 16500` yoki `jwt_tool` bilan buzing (kalit — oddiy so'z). Topgan kalit bilan `role:admin` tokenni imzolang.",
+     "hinte": "The token is HS256 (signed) but the secret is very weak (in any common wordlist). Crack it with `hashcat -m 16500` or `jwt_tool` (the key is a common word). Sign a `role:admin` token with the recovered secret."},
+    {"id": "jwt3", "path": "/jwt/jwk", "name": "JWT — embedded JWK", "diff": "hard", "icon": "🎫",
+     "flag": FLAG_JWT3,
+     "descu": "Header ichiga o'z kalitingizni joylab tokenni o'zingiz imzolang.", "desce": "Embed your own key in the header and self-sign the token.",
+     "hintu": "Zaif tekshiruvchi token HEADER ichidagi `jwk` (o'rnatilgan kalit) ni ISHONADI. Header'ga `\"jwk\":{\"kty\":\"oct\",\"k\":\"<siz-tanlagan-kalit>\"}` qo'shing, `role:admin` payload'ni o'sha kalit bilan HS256 imzolang — server sizning kalitingiz bilan tekshiradi.",
+     "hinte": "The vulnerable verifier TRUSTS a `jwk` (embedded key) inside the token HEADER. Add `\"jwk\":{\"kty\":\"oct\",\"k\":\"<your-key>\"}` to the header and HS256-sign a `role:admin` payload with that key — the server verifies with your own key."},
+
+    # ── Business Logic (L40) — 3 daraja ──
+    {"id": "biz1", "path": "/biz", "name": "Logic — negative qty", "diff": "easy", "icon": "🧮",
+     "flag": FLAG_BIZ1,
+     "descu": "Manfiy miqdor bilan «pul qaytarish» mantig'ini buzing.", "desce": "Abuse the refund logic with a negative quantity.",
+     "hintu": "Jami = narx × miqdor. Server miqdorning musbatligini tekshirmaydi. Miqdorni MANFIY (masalan -5) qiling — jami manfiy chiqadi, ya'ni do'kon sizga «qaytaradi».",
+     "hinte": "Total = price × quantity. The server never checks that quantity is positive. Set quantity NEGATIVE (e.g. -5) — the total goes negative, i.e. the shop «refunds» you."},
+    {"id": "biz2", "path": "/biz/coupon", "name": "Logic — coupon stack", "diff": "medium", "icon": "🧮",
+     "flag": FLAG_BIZ2,
+     "descu": "Bitta kuponni qayta-qayta qo'llab narxni nolga tushiring.", "desce": "Stack one coupon repeatedly to drop the price to zero.",
+     "hintu": "`SAVE20` kuponi har safar 20% chegirma beradi, lekin server uni FAQAT bir marta ishlatilganini tekshirmaydi. Bitta so'rovda kuponni ko'p marta yuboring (`coupon=SAVE20&coupon=SAVE20&...`) — chegirmalar yig'ilib narx ≤ 0 bo'ladi.",
+     "hinte": "The `SAVE20` coupon gives 20% off each time, but the server never checks it's used only ONCE. Send the coupon many times in one request (`coupon=SAVE20&coupon=SAVE20&...`) — the discounts add up until the price is ≤ 0."},
+    {"id": "biz3", "path": "/biz/premium", "name": "Logic — workflow bypass", "diff": "hard", "icon": "🧮",
+     "flag": FLAG_BIZ3,
+     "descu": "To'lov bosqichini o'tkazib yuborib premium hisobotni oling.", "desce": "Skip the payment step and grab the premium report.",
+     "hintu": "Oqim: savat → to'lov → tasdiq. `/biz/confirm` esa to'lov HAQIQATAN bo'lganini server tomonda tekshirmaydi — u faqat `paid=1` parametriga ishonadi. To'g'ridan-to'g'ri `/biz/confirm?item=premium&paid=1` ga boring (forced browsing).",
+     "hinte": "Flow: cart → pay → confirm. But `/biz/confirm` never verifies payment server-side — it just trusts a `paid=1` param. Go straight to `/biz/confirm?item=premium&paid=1` (forced browsing)."},
 ]
 FLAGS = [c["flag"] for c in CHALLENGES]
 
@@ -381,6 +451,348 @@ def page_upload(msg="", cls="note"):
     return body + foot()
 
 
+# ===========================================================================
+#  Batch 2 — NoSQL Injection · JWT · Business Logic
+#  Har biri REAL zaiflik mantig'i; XAVFSIZ (haqiqiy Mongo/eval/host-crypto yo'q).
+# ===========================================================================
+
+# ---- NoSQL: soxta hujjatlar + xavfsiz operator-baholovchi (Python eval YO'Q) ----
+NOSQL_ADMIN_PW = "Mongo2024"
+NOSQL_USERS = [
+    {"username": "admin", "password": NOSQL_ADMIN_PW, "role": "admin"},
+    {"username": "guest", "password": "guest", "role": "user"},
+]
+NOSQL_DOCS = [
+    {"name": "Quarterly Report 2024-Q1", "public": True, "note": "Revenue up 8%."},
+    {"name": "Quarterly Report 2024-Q2", "public": True, "note": "Revenue up 11%."},
+    {"name": "INTERNAL - Executive Salaries", "public": False, "note": FLAG_NOSQL3},
+]
+
+
+def _num(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return float("-inf")
+
+
+def _cmp(field_val, cond):
+    """Bitta maydon shartini baholaydi: skalyar (tenglik) yoki {operator: qiymat}."""
+    if isinstance(cond, dict):
+        for op, val in cond.items():
+            if op == "$eq" and not (field_val == val):
+                return False
+            elif op == "$ne" and not (field_val != val):
+                return False
+            elif op == "$gt" and not (_num(field_val) > _num(val)):
+                return False
+            elif op == "$gte" and not (_num(field_val) >= _num(val)):
+                return False
+            elif op == "$lt" and not (_num(field_val) < _num(val)):
+                return False
+            elif op == "$in" and not (isinstance(val, list) and field_val in val):
+                return False
+            elif op == "$regex":
+                try:
+                    if re.search(str(val), str(field_val)) is None:
+                        return False
+                except re.error:
+                    return False
+            elif op not in ("$eq", "$ne", "$gt", "$gte", "$lt", "$in", "$regex"):
+                return False   # noma'lum operator -> mos emas
+        return True
+    return field_val == cond
+
+
+def _where_taut(expr):
+    """$where — Python eval EMAS: faqat tavtologiyani (1==1, true, ...) tan oladi."""
+    e = re.sub(r"\s+", "", str(expr)).lower().rstrip(";")
+    return e in ("true", "1==1", "1", "'a'=='a'", '"a"=="a"',
+                 "returntrue", "return1==1", "return!0", "!0", "0==0")
+
+
+def _query_match(doc, query):
+    if not isinstance(query, dict):
+        return False
+    for field, cond in query.items():
+        if field == "$where":
+            if not _where_taut(cond):
+                return False
+        elif field == "$or":
+            if not any(_query_match(doc, sub) for sub in (cond or [])):
+                return False
+        elif field == "$and":
+            if not all(_query_match(doc, sub) for sub in (cond or [])):
+                return False
+        elif not _cmp(doc.get(field), cond):
+            return False
+    return True
+
+
+def nosql_find(docs, query):
+    return [d for d in docs if _query_match(d, query)]
+
+
+def build_nosql_query(params):
+    """`password[$ne]=x` (bracket) yoki `{"$ne":"x"}` (JSON qiymat) -> Mongo so'rov dict."""
+    q = {}
+    for k, vs in params.items():
+        v = vs[0] if isinstance(vs, list) else vs
+        m = re.match(r"^([^\[\]]+)\[(\$[a-zA-Z]+)\]$", k)
+        if m:
+            field, op = m.group(1), m.group(2)
+            if not isinstance(q.get(field), dict):
+                q[field] = {}
+            q[field][op] = v
+        else:
+            vv = v
+            if isinstance(v, str) and v.strip().startswith("{"):
+                try:
+                    parsed = jsonlib.loads(v)
+                    if isinstance(parsed, dict):
+                        vv = parsed
+                except Exception:
+                    pass
+            if k not in q:
+                q[k] = vv
+    return q
+
+
+# ---- JWT: base64url + HS256 (stdlib hmac/hashlib) — soxta host-crypto yo'q ----
+JWT_MAIN_SECRET = "n0b0dy-w1ll-gu3ss-th1s-R00t-k3y-8842"   # server asosiy kaliti (topib bo'lmaydi)
+JWT_WEAK_SECRET = "secret"                                 # medium: ataylab zaif
+
+
+def _b64url(data):
+    if isinstance(data, str):
+        data = data.encode("utf-8")
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
+
+
+def _b64url_dec(seg):
+    seg = seg + "=" * (-len(seg) % 4)
+    return base64.urlsafe_b64decode(seg.encode("ascii"))
+
+
+def _hs256(signing_input, secret):
+    if isinstance(secret, str):
+        secret = secret.encode("utf-8")
+    return _b64url(hmac.new(secret, signing_input.encode("ascii"), hashlib.sha256).digest())
+
+
+def jwt_make(payload, secret, alg="HS256", extra_header=None):
+    header = {"alg": alg, "typ": "JWT"}
+    if extra_header:
+        header.update(extra_header)
+    si = (_b64url(jsonlib.dumps(header, separators=(",", ":"))) + "."
+          + _b64url(jsonlib.dumps(payload, separators=(",", ":"))))
+    sig = "" if alg == "none" else _hs256(si, secret)
+    return si + "." + sig
+
+
+def jwt_parts(token):
+    try:
+        h, p, s = token.split(".")
+        return jsonlib.loads(_b64url_dec(h)), jsonlib.loads(_b64url_dec(p)), h + "." + p, s
+    except Exception:
+        return None, None, None, None
+
+
+JWT_GUEST_NONE = jwt_make({"user": "guest", "role": "user"}, JWT_MAIN_SECRET)
+JWT_GUEST_HS = jwt_make({"user": "guest", "role": "user"}, JWT_WEAK_SECRET)
+JWT_GUEST_JWK = jwt_make({"user": "guest", "role": "user"}, JWT_MAIN_SECRET, extra_header={"kid": "main"})
+
+
+def jwt_verify_none(token):
+    header, payload, si, sig = jwt_parts(token)
+    if header is None:
+        return {"ok": False, "msg": "Token yaroqsiz (parse xato)."}
+    alg = str(header.get("alg", "")).lower()
+    if alg == "none":
+        ok = True                                            # ZAIF: imzosiz qabul qilinadi
+    elif alg == "hs256":
+        ok = hmac.compare_digest(sig, _hs256(si, JWT_MAIN_SECRET))
+    else:
+        return {"ok": False, "msg": "Qo'llab-quvvatlanmaydigan alg."}
+    if not ok:
+        return {"ok": False, "msg": "Imzo tekshiruvi muvaffaqiyatsiz."}
+    role = str(payload.get("role", "user")) if isinstance(payload, dict) else "user"
+    if role == "admin":
+        return {"ok": True, "flag": FLAG_JWT1, "msg": "alg:none qabul qilindi - admin token soxtalashtirildi!"}
+    return {"ok": True, "msg": "Token yaroqli (rol: " + role + ") - admin emas."}
+
+
+def jwt_verify_hs(token):
+    header, payload, si, sig = jwt_parts(token)
+    if header is None:
+        return {"ok": False, "msg": "Token yaroqsiz."}
+    if str(header.get("alg", "")).lower() != "hs256":
+        return {"ok": False, "msg": "Faqat HS256 qabul qilinadi."}
+    if not hmac.compare_digest(sig, _hs256(si, JWT_WEAK_SECRET)):     # ZAIF kalit
+        return {"ok": False, "msg": "Imzo noto'g'ri (kalit mos emas)."}
+    role = str(payload.get("role", "user")) if isinstance(payload, dict) else "user"
+    if role == "admin":
+        return {"ok": True, "flag": FLAG_JWT2, "msg": "Zaif kalit bilan imzolangan admin token qabul qilindi!"}
+    return {"ok": True, "msg": "Token yaroqli (rol: " + role + ")."}
+
+
+def jwt_verify_jwk(token):
+    header, payload, si, sig = jwt_parts(token)
+    if header is None:
+        return {"ok": False, "msg": "Token yaroqsiz."}
+    if str(header.get("alg", "")).lower() != "hs256":
+        return {"ok": False, "msg": "Faqat HS256."}
+    jwk = header.get("jwk") or {}
+    k = jwk.get("k") if isinstance(jwk, dict) else None
+    secret = k if k else JWT_MAIN_SECRET                             # ZAIF: header'dagi kalitga ishonadi
+    if not hmac.compare_digest(sig, _hs256(si, secret)):
+        return {"ok": False, "msg": "Imzo noto'g'ri."}
+    role = str(payload.get("role", "user")) if isinstance(payload, dict) else "user"
+    if role == "admin" and k:
+        return {"ok": True, "flag": FLAG_JWT3, "msg": "Header'ga o'rnatilgan JWK bilan imzolangan admin token qabul qilindi!"}
+    if role == "admin":
+        return {"ok": True, "flag": FLAG_JWT3, "msg": "Admin token qabul qilindi!"}
+    return {"ok": True, "msg": "Token yaroqli (rol: " + role + ")."}
+
+
+# ---- Batch 2 sahifalari ----
+def _flag_panel(flag):
+    return '<div class="flag">🚩 FLAG: ' + esc(flag) + '</div>'
+
+
+def page_nosql(result=None, attempted=False):
+    body = head("NoSQL - Auth bypass") + '<h1>🍃 Mongo Members - Sign in</h1><p class="mut">A\'zolar zonasi. Demo hisob: guest / guest.</p>'
+    if result == "admin":
+        body += '<div class="flag">✓ Admin sifatida kirdingiz (operator injection)!</div>' + _flag_panel(FLAG_NOSQL1)
+    elif result == "user":
+        body += '<div class="note">Kirdingiz (rol: user) - lekin admin emas.</div>'
+    elif attempted:
+        body += '<div class="err">Login yoki parol noto\'g\'ri.</div>'
+    body += ('<div class="panel"><form method="get" action="/nosql">'
+             '<label>Login</label><input type="text" name="username" value="guest">'
+             '<label>Parol</label><input type="text" name="password" value="">'
+             '<button class="btn" type="submit">Kirish</button></form>'
+             '<p class="mut" style="font-size:12px;margin-top:8px">Server: '
+             '<code>db.users.findOne({username, password})</code> - kiritma tozalanmaydi.</p></div>')
+    return body + foot()
+
+
+def page_nosql_blind(oracle=None, cracked=False):
+    body = head("NoSQL - Blind regex") + '<h1>🍃 Identity verification</h1><p class="mut">Foydalanuvchi va parolni tasdiqlang. Tizim faqat «mos / mos emas» deydi.</p>'
+    if cracked:
+        body += '<div class="flag">✓ Admin paroli tiklandi va kirish tasdiqlandi!</div>' + _flag_panel(FLAG_NOSQL2)
+    elif oracle == "match":
+        body += '<div class="note">✓ Mos keldi - shu shart uchun yozuv mavjud.</div>'
+    elif oracle == "nomatch":
+        body += '<div class="err">✗ Mos kelmadi - bunday yozuv yo\'q.</div>'
+    body += ('<div class="panel"><form method="get" action="/nosql/blind">'
+             '<label>Login</label><input type="text" name="username" value="admin">'
+             '<label>Parol (yoki $regex)</label><input type="text" name="password" value="">'
+             '<button class="btn" type="submit">Tasdiqlash</button></form>'
+             '<p class="mut" style="font-size:12px;margin-top:8px">Burp bilan: '
+             '<code>password[$regex]=^M</code> ... prefiksni uzaytiring.</p></div>')
+    return body + foot()
+
+
+def page_nosql_search(q="", results=None, leaked=False):
+    body = head("NoSQL - $where leak") + '<h1>🍃 Document search</h1><p class="mut">Hujjat nomi bo\'yicha qidiring (odatda faqat public hujjatlar).</p>'
+    body += ('<div class="panel"><form method="get" action="/nosql/search">'
+             '<label>Qidiruv (name)</label><input type="text" name="q" value="' + esc(q) + '">'
+             '<button class="btn" type="submit">Qidirish</button></form>'
+             '<p class="mut" style="font-size:12px;margin-top:8px">So\'rov: '
+             '<code>find({name:{$regex:q}, public:true})</code> - qo\'shimcha <code>filter</code> JSON standart so\'rovni almashtiradi.</p></div>')
+    if results is not None:
+        rows = ""
+        for d in results:
+            rows += ('<tr><td>' + esc(d["name"]) + '</td><td>' + ("public" if d.get("public") else "INTERNAL")
+                     + '</td><td>' + esc(d.get("note", "")) + '</td></tr>')
+        body += ('<div class="panel"><table><tr><th>Nomi</th><th>Ko\'rinish</th><th>Izoh</th></tr>'
+                 + (rows or '<tr><td colspan="3" class="mut">Hech narsa topilmadi.</td></tr>') + '</table></div>')
+        if leaked:
+            body += '<div class="flag">✓ Yashirin (public bo\'lmagan) hujjat oshkor bo\'ldi!</div>' + _flag_panel(FLAG_NOSQL3)
+    return body + foot()
+
+
+def _jwt_common(title, intro, guest_token, result):
+    body = head(title) + '<h1>🎫 ' + esc(title) + '</h1><p class="mut">' + intro + '</p>'
+    body += ('<div class="panel"><div class="mut" style="font-size:12px">Boshlang\'ich (guest) token:</div>'
+             '<pre style="white-space:pre-wrap;word-break:break-all">' + esc(guest_token) + '</pre>'
+             '<div class="mut" style="font-size:12px;margin-top:8px">Tokenni o\'zgartiring va shu yerda tekshiring '
+             '(yoki <code>?token=...</code>):</div>'
+             '<form method="get" style="margin-top:8px"><input type="text" name="token" value="" '
+             'placeholder="header.payload.signature"><button class="btn" type="submit">Tekshirish</button></form></div>')
+    if result:
+        if result.get("flag"):
+            body += '<div class="flag">✓ ' + esc(result["msg"]) + '</div>' + _flag_panel(result["flag"])
+        elif result.get("ok"):
+            body += '<div class="note">' + esc(result["msg"]) + '</div>'
+        else:
+            body += '<div class="err">' + esc(result["msg"]) + '</div>'
+    return body + foot()
+
+
+def page_biz(qty=None, total=None):
+    body = head("Logic - negative qty") + '<h1>🧮 Gadget Store</h1><p class="mut">Mahsulot: <b>Wireless Mouse</b> - <b>$25</b> / dona.</p>'
+    body += ('<div class="panel"><form method="get" action="/biz">'
+             '<label>Miqdor</label><input type="text" name="qty" value="1">'
+             '<button class="btn" type="submit">Buyurtma berish</button></form></div>')
+    if total is not None:
+        body += '<div class="panel">Miqdor: ' + esc(str(qty)) + ' × $25 = <b>$' + esc(str(total)) + '</b>'
+        if total < 0:
+            body += ' - <span style="color:#8ff0d3">hisobingizga $' + esc(str(-total)) + ' qaytarildi</span>'
+        body += '</div>'
+        if total < 0:
+            body += _flag_panel(FLAG_BIZ1)
+    return body + foot()
+
+
+def page_biz_coupon(coupons=None, final=None):
+    body = head("Logic - coupon stack") + '<h1>🧮 Checkout</h1><p class="mut">Savat jami: <b>$50</b>. Kupon <code>SAVE20</code> = 20% chegirma.</p>'
+    body += ('<div class="panel"><form method="get" action="/biz/coupon">'
+             '<label>Kupon kodi</label><input type="text" name="coupon" value="SAVE20">'
+             '<button class="btn" type="submit">Qo\'llash</button></form>'
+             '<p class="mut" style="font-size:12px;margin-top:8px">Ko\'p kupon: '
+             '<code>?coupon=SAVE20&coupon=SAVE20&...</code></p></div>')
+    if final is not None:
+        applied = len([c for c in (coupons or []) if c.strip().upper() == "SAVE20"])
+        body += ('<div class="panel">Qo\'llangan kuponlar: ' + str(applied) + ' × 20% (-$10) = -$'
+                 + esc(str(applied * 10)) + '<br>Yakuniy narx: <b>$' + esc(str(final)) + '</b></div>')
+        if final <= 0:
+            body += '<div class="note">Narx nol yoki manfiy - to\'lov talab qilinmaydi.</div>' + _flag_panel(FLAG_BIZ2)
+    return body + foot()
+
+
+def page_biz_premium():
+    body = head("Logic - workflow bypass") + '<h1>🧮 Premium Reports</h1><p class="mut">Premium hisobot to\'lovdan keyin ochiladi.</p>'
+    body += ('<div class="panel"><b>Xarid oqimi (3 bosqich):</b>'
+             '<ol style="color:#8ea0c4;margin:8px 0"><li>Savat - <code>/biz/premium</code></li>'
+             '<li>To\'lov - <code>/biz/pay?item=premium</code></li>'
+             '<li>Tasdiq - <code>/biz/confirm?item=premium&amp;paid=1</code></li></ol>'
+             '<a class="btn" href="/biz/pay?item=premium">To\'lovga o\'tish</a></div>'
+             '<p class="mut" style="font-size:12px">Server har bosqich holatini qanday tekshiradi? Tasdiq bosqichini to\'g\'ridan-to\'g\'ri sinab ko\'ring.</p>')
+    return body + foot()
+
+
+def page_biz_pay(item):
+    body = head("Logic - payment") + '<h1>🧮 Payment</h1>'
+    body += ('<div class="panel">«' + esc(item) + '» uchun to\'lov sahifasi. To\'lov shlyuzi demo rejimida ishlamayapti.'
+             '<br><br><a class="btn" href="/biz/confirm?item=' + esc(item) + '&amp;paid=1">To\'lovni yakunlash</a></div>')
+    return body + foot()
+
+
+def page_biz_confirm(item, paid):
+    body = head("Logic - confirm") + '<h1>🧮 Order confirmation</h1>'
+    if paid == "1":
+        body += '<div class="note">Buyurtma tasdiqlandi: «' + esc(item) + '».</div>'
+        if item == "premium":
+            body += ('<div class="panel"><b>PREMIUM HISOBOT</b><br>Q4 strategik tahlil (odatda faqat to\'lovchilar uchun).</div>'
+                     '<div class="flag">✓ To\'lov haqiqatan amalga oshdimi - server tekshirmadi (forced browsing)!</div>'
+                     + _flag_panel(FLAG_BIZ3))
+    else:
+        body += '<div class="err">To\'lov tasdiqlanmagan (paid ≠ 1).</div>'
+    return body + foot()
+
+
 # ---- flag_check (Nimbus uslubi: server tekshiruvi + cookie progress + hintlar) ----
 def md_min(s):
     return esc(s)
@@ -504,6 +916,87 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, page_ssti(name=name, rendered=ssti_render(name)))
         if p == "/upload":
             return self._send(200, page_upload())
+        # ── Batch 2: NoSQL ──
+        if p == "/nosql":
+            if not any(k.split("[")[0] in ("username", "password") for k in qs):
+                return self._send(200, page_nosql())
+            sub = {k: v for k, v in qs.items() if k.split("[")[0] in ("username", "password")}
+            query = build_nosql_query(sub)
+            found = nosql_find(NOSQL_USERS, query) if query else []
+            if any(u["role"] == "admin" for u in found):
+                return self._send(200, page_nosql(result="admin"))
+            if found:
+                return self._send(200, page_nosql(result="user"))
+            return self._send(200, page_nosql(attempted=True))
+        if p == "/nosql/blind":
+            if not any(k.split("[")[0] in ("username", "password") for k in qs):
+                return self._send(200, page_nosql_blind())
+            sub = {k: v for k, v in qs.items() if k.split("[")[0] in ("username", "password")}
+            query = build_nosql_query(sub)
+            pw = query.get("password")
+            if isinstance(pw, str) and query.get("username") == "admin" and pw == NOSQL_ADMIN_PW:
+                return self._send(200, page_nosql_blind(cracked=True))
+            found = nosql_find(NOSQL_USERS, query) if query else []
+            hit = any(u["role"] == "admin" for u in found)
+            return self._send(200, page_nosql_blind(oracle=("match" if hit else "nomatch")))
+        if p == "/nosql/search":
+            if "q" not in qs and "filter" not in qs:
+                return self._send(200, page_nosql_search())
+            q = qs.get("q", [""])[0]
+            query = {"name": {"$regex": re.escape(q)}, "public": True}
+            if "filter" in qs:
+                try:
+                    extra = jsonlib.loads(qs.get("filter", ["{}"])[0])
+                    if isinstance(extra, dict):
+                        query = extra                    # ZAIF: foydalanuvchi filtri standart so'rovni almashtiradi
+                except Exception:
+                    pass
+            results = nosql_find(NOSQL_DOCS, query)
+            leaked = any(not d.get("public") for d in results)
+            return self._send(200, page_nosql_search(q=q, results=results, leaked=leaked))
+        # ── Batch 2: JWT ──
+        if p == "/jwt":
+            tok = qs.get("token", [""])[0]
+            res = jwt_verify_none(tok) if tok else None
+            return self._send(200, _jwt_common("JWT - alg:none",
+                "Zaif tekshiruvchi <code>alg:none</code> tokenni imzosiz qabul qiladi. Guest tokenni oling, payload "
+                "<code>role</code> ni <code>admin</code>, header <code>alg</code> ni <code>none</code> qiling, imzoni bo\'sh qoldiring.",
+                JWT_GUEST_NONE, res))
+        if p == "/jwt/hs":
+            tok = qs.get("token", [""])[0]
+            res = jwt_verify_hs(tok) if tok else None
+            return self._send(200, _jwt_common("JWT - weak secret",
+                "Token HS256 bilan imzolangan, lekin maxfiy kalit juda zaif (keng tarqalgan so\'z). Kalitni buzing "
+                "(<code>hashcat -m 16500</code> / <code>jwt_tool</code>) va <code>role:admin</code> tokenni imzolang.",
+                JWT_GUEST_HS, res))
+        if p == "/jwt/jwk":
+            tok = qs.get("token", [""])[0]
+            res = jwt_verify_jwk(tok) if tok else None
+            return self._send(200, _jwt_common("JWT - embedded JWK",
+                "Zaif tekshiruvchi token HEADER ichidagi <code>jwk.k</code> (o\'rnatilgan kalit) ga ISHONADI. "
+                "Header\'ga o\'z kalitingizni joylang va <code>role:admin</code> payload\'ni o\'sha kalit bilan HS256 imzolang.",
+                JWT_GUEST_JWK, res))
+        # ── Batch 2: Business Logic ──
+        if p == "/biz":
+            if "qty" not in qs:
+                return self._send(200, page_biz())
+            try:
+                qv = int(qs.get("qty", ["1"])[0])
+            except ValueError:
+                qv = 1
+            return self._send(200, page_biz(qty=qv, total=25 * qv))
+        if p == "/biz/coupon":
+            if "coupon" not in qs:
+                return self._send(200, page_biz_coupon())
+            coupons = qs.get("coupon", [])
+            applied = len([c for c in coupons if c.strip().upper() == "SAVE20"])
+            return self._send(200, page_biz_coupon(coupons=coupons, final=50 - 10 * applied))
+        if p == "/biz/premium":
+            return self._send(200, page_biz_premium())
+        if p == "/biz/pay":
+            return self._send(200, page_biz_pay(qs.get("item", ["premium"])[0]))
+        if p == "/biz/confirm":
+            return self._send(200, page_biz_confirm(qs.get("item", [""])[0], qs.get("paid", ["0"])[0]))
         if p in ("/flag_check", "/flag_check.html"):
             if qs.get("reset"):
                 return self._fc_redirect(clear=True)
@@ -651,7 +1144,7 @@ def main():
     for ip in lan_ips():
         print("  Tarmoqdagi o'quvchilar: http://%s:%d" % (ip, SERVE_PORT))
     print(ln)
-    print("  %d ta mashq: SQLi · IDOR · LFI · Command Injection · SSTI · File Upload" % len(CHALLENGES))
+    print("  %d ta mashq: SQLi · IDOR · LFI · CmdInj · SSTI · Upload · NoSQL · JWT · BizLogic" % len(CHALLENGES))
     print("  Flag topshirish:  /flag_check")
     print("  ⚠️  Ataylab zaif — faqat izolyatsiya qilingan lab. Xavfsiz: RCE jail/simulyatsiya.")
     print("  To'xtatish: Ctrl+C")
