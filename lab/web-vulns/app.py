@@ -23,6 +23,10 @@
 #   10-12) JWT Attacks        /jwt · /jwt/hs · /jwt/jwk
 #   13-15) Business Logic     /biz · /biz/coupon · /biz/premium
 #
+#  Batch 3 (2 mavzu × 3 daraja):
+#   16-18) Subdomain Takeover /takeover/easy|medium|hard  (provider fingerprint simulyatsiya)
+#   19-21) CSP Bypass         /csp/easy|medium|hard  (HAQIQIY brauzer CSP'sini majbur qiladi)
+#
 #  ⚠️  ATAYLAB ZAIF — faqat izolyatsiya qilingan o'quv tarmog'ida. Internetga ochmang.
 #  XAVFSIZLIK: fayl o'qish (LFI) SOXTA jail katalogiga qamalgan; «buyruq bajarish»
 #  (cmdi) ichki SIMULYATSIYA; SSTI cheklangan baholovchi — real host'ga ta'sir yo'q.
@@ -62,6 +66,13 @@ FLAG_JWT3 = "EJPT{jwt_3mb3dd3d_jwk_tru5t3d}"
 FLAG_BIZ1 = "EJPT{b1z_n3g4t1v3_qty_r3fund}"
 FLAG_BIZ2 = "EJPT{b1z_c0up0n_st4ck_t0_z3r0}"
 FLAG_BIZ3 = "EJPT{b1z_w0rkfl0w_p4y_byp4ss}"
+# Batch 3 — Subdomain Takeover + CSP Bypass
+FLAG_TKO1 = "EJPT{5ub_t4k30v3r_s3_buck3t}"
+FLAG_TKO2 = "EJPT{5ub_t4k30v3r_g1thub_p4g3s}"
+FLAG_TKO3 = "EJPT{5ub_t4k30v3r_h3r0ku_4pp}"
+FLAG_CSP1 = "EJPT{csp_uns4f3_1nl1n3_run}"
+FLAG_CSP2 = "EJPT{csp_s3lf_js0np_byp4ss}"
+FLAG_CSP3 = "EJPT{csp_uns4f3_3v4l_g4dg3t}"
 
 SERVE_PORT = 8087
 DB_PATH = None
@@ -149,6 +160,40 @@ CHALLENGES = [
      "descu": "To'lov bosqichini o'tkazib yuborib premium hisobotni oling.", "desce": "Skip the payment step and grab the premium report.",
      "hintu": "Oqim: savat → to'lov → tasdiq. `/biz/confirm` esa to'lov HAQIQATAN bo'lganini server tomonda tekshirmaydi — u faqat `paid=1` parametriga ishonadi. To'g'ridan-to'g'ri `/biz/confirm?item=premium&paid=1` ga boring (forced browsing).",
      "hinte": "Flow: cart → pay → confirm. But `/biz/confirm` never verifies payment server-side — it just trusts a `paid=1` param. Go straight to `/biz/confirm?item=premium&paid=1` (forced browsing)."},
+
+    # ── Subdomain Takeover (L53) — 3 daraja (simulyatsiya) ──
+    {"id": "tko1", "path": "/takeover/easy", "name": "Subdomain Takeover — S3", "diff": "easy", "icon": "🌐",
+     "flag": FLAG_TKO1,
+     "descu": "Dangling (egasiz) S3 CNAME topib, bucket'ni claim qiling.", "desce": "Find a dangling S3 CNAME and claim the bucket.",
+     "hintu": "Har subdomenni «check» qiling: CNAME va HTTP javobini ko'rasiz. `NoSuchBucket` fingerprint'i egasiz S3 bucket'ni bildiradi. CNAME'dan bucket nomini oling va provayder=`s3`, resurs=<bucket> bilan claim qiling.",
+     "hinte": "«Check» each subdomain: you see its CNAME and HTTP response. A `NoSuchBucket` fingerprint means a dangling S3 bucket. Take the bucket name from the CNAME and claim with provider=`s3`, resource=<bucket>."},
+    {"id": "tko2", "path": "/takeover/medium", "name": "Subdomain Takeover — GitHub Pages", "diff": "medium", "icon": "🌐",
+     "flag": FLAG_TKO2,
+     "descu": "Bir nechta subdomen orasidan egasiz GitHub Pages'ni toping.", "desce": "Among several subdomains, find the dangling GitHub Pages one.",
+     "hintu": "Faqat bittasi egasiz. GitHub Pages fingerprint'i: «There isn't a GitHub Pages site here». CNAME `<user>.github.io.lab` dan `<user>` ni oling; provayder=`github`, resurs=<user>.",
+     "hinte": "Only one is dangling. The GitHub Pages fingerprint is «There isn't a GitHub Pages site here». Take `<user>` from the CNAME `<user>.github.io.lab`; provider=`github`, resource=<user>."},
+    {"id": "tko3", "path": "/takeover/hard", "name": "Subdomain Takeover — Heroku", "diff": "hard", "icon": "🌐",
+     "flag": FLAG_TKO3,
+     "descu": "Takeover'ga yopiq provayderlarni chetlab, egasiz Heroku app'ni claim qiling.", "desce": "Skipping takeover-safe providers, claim the dangling Heroku app.",
+     "hintu": "Ba'zi 404'lar takeover'ga YOPIQ (statuspage, googlehosted) — ular egasiz emas. Heroku fingerprint'i: «No such app». CNAME `<app>.herokuapp.lab` dan `<app>` ni oling; provayder=`heroku`, resurs=<app>.",
+     "hinte": "Some 404s are takeover-SAFE (statuspage, googlehosted) — not claimable. The Heroku fingerprint is «No such app». Take `<app>` from `<app>.herokuapp.lab`; provider=`heroku`, resource=<app>."},
+
+    # ── CSP Bypass (L54) — 3 daraja (haqiqiy brauzer CSP'sini majbur qiladi) ──
+    {"id": "csp1", "path": "/csp/easy", "name": "CSP Bypass — unsafe-inline", "diff": "easy", "icon": "🛡️",
+     "flag": FLAG_CSP1,
+     "descu": "unsafe-inline'li CSP ostida inline skript ishga tushiring.", "desce": "Run an inline script under a CSP with unsafe-inline.",
+     "hintu": "Siyosatda `script-src ... 'unsafe-inline'` bor — demak inline `<script>` ishlaydi. `name` tozalanmasdan aks etadi. `<script>` bilan JS ishga tushiring: u `window.CSP_FLAG_TOKEN` ni `/csp/easy/win?t=` ga yuborsin (masalan `new Image().src=...`), so'ng sahifani yangilang.",
+     "hinte": "The policy has `script-src ... 'unsafe-inline'` — so inline `<script>` runs. `name` is reflected unsanitized. Use `<script>` to run JS that sends `window.CSP_FLAG_TOKEN` to `/csp/easy/win?t=` (e.g. `new Image().src=...`), then reload."},
+    {"id": "csp2", "path": "/csp/medium", "name": "CSP Bypass — JSONP", "diff": "medium", "icon": "🛡️",
+     "flag": FLAG_CSP2,
+     "descu": "script-src 'self' ni same-origin JSONP orqali aylanib o'ting.", "desce": "Bypass script-src 'self' via a same-origin JSONP endpoint.",
+     "hintu": "Inline bloklangan (`'unsafe-inline'` yo'q), lekin `'self'` same-origin skriptlarga ruxsat beradi. `/csp/jsonp?callback=` — callback nomini JS sifatida aks ettiradi. `<script src=\"/csp/jsonp?callback=<sizning JS>\">` in'ektsiya qiling; JS `window.CSP_FLAG_TOKEN` ni `/csp/medium/win?t=` ga yuborsin.",
+     "hinte": "Inline is blocked (no `'unsafe-inline'`), but `'self'` allows same-origin scripts. `/csp/jsonp?callback=` reflects the callback name as JS. Inject `<script src=\"/csp/jsonp?callback=<your JS>\">`; the JS should send `window.CSP_FLAG_TOKEN` to `/csp/medium/win?t=`."},
+    {"id": "csp3", "path": "/csp/hard", "name": "CSP Bypass — unsafe-eval", "diff": "hard", "icon": "🛡️",
+     "flag": FLAG_CSP3,
+     "descu": "nonce + unsafe-eval: eval-gadget orqali skript ishga tushiring.", "desce": "nonce + unsafe-eval: run script via an eval gadget.",
+     "hintu": "Siyosat `script-src 'nonce-...' 'unsafe-eval'` — inline va `'self'` yuklash bloklangan (nonce har safar tasodifiy), lekin sahifaning ISHONCHLI skripti `?x=` parametrini `eval` qiladi. In'ektsiya kerak emas: `/csp/hard?x=<sizning JS>` ga boring; JS `window.CSP_FLAG_TOKEN` ni `/csp/hard/win?t=` ga yuborsin.",
+     "hinte": "The policy is `script-src 'nonce-...' 'unsafe-eval'` — inline and `'self'` loading are blocked (the nonce is random each time), but the page's TRUSTED script `eval`s the `?x=` param. No injection needed: go to `/csp/hard?x=<your JS>`; the JS should send `window.CSP_FLAG_TOKEN` to `/csp/hard/win?t=`."},
 ]
 FLAGS = [c["flag"] for c in CHALLENGES]
 
@@ -793,6 +838,153 @@ def page_biz_confirm(item, paid):
     return body + foot()
 
 
+# ===========================================================================
+#  Batch 3 — Subdomain Takeover (simulyatsiya) + CSP Bypass (haqiqiy brauzer)
+# ===========================================================================
+
+# ---- Subdomain Takeover: soxta DNS/provider muhiti ----
+TAKEOVER = {
+    "easy": {
+        "org": "acme-corp.lab", "flag": FLAG_TKO1,
+        "provider": "s3", "provider_syn": ("s3", "aws", "amazon", "amazon-s3", "amazons3"),
+        "resource": "acme-corp-assets",
+        "subs": [
+            {"host": "www.acme-corp.lab", "cname": "acme-lb-1.webhost.lab", "dangling": False,
+             "fp": "HTTP/1.1 200 OK\nServer: nginx\n\n<html><title>ACME Corp</title>..."},
+            {"host": "shop.acme-corp.lab", "cname": "acme.myshopify.lab", "dangling": False,
+             "fp": "HTTP/1.1 200 OK\n\n<html><title>ACME Shop — Shopify</title>..."},
+            {"host": "assets.acme-corp.lab", "cname": "acme-corp-assets.s3.amazonaws.lab", "dangling": True,
+             "fp": "HTTP/1.1 404 Not Found\n\n<Error><Code>NoSuchBucket</Code>"
+                   "<Message>The specified bucket does not exist</Message></Error>"},
+        ],
+    },
+    "medium": {
+        "org": "acme-corp.lab", "flag": FLAG_TKO2,
+        "provider": "github", "provider_syn": ("github", "github-pages", "githubpages", "gh", "gh-pages"),
+        "resource": "acmecorp",
+        "subs": [
+            {"host": "docs.acme-corp.lab", "cname": "acme-docs.gitbook.lab", "dangling": False,
+             "fp": "HTTP/1.1 200 OK\n\n<html><title>ACME Docs — GitBook</title>..."},
+            {"host": "blog.acme-corp.lab", "cname": "acmecorp.github.io.lab", "dangling": True,
+             "fp": "HTTP/1.1 404 Not Found\n\n<html><body><h1>404</h1>"
+                   "<p>There isn't a GitHub Pages site here.</p></body></html>"},
+            {"host": "cdn.acme-corp.lab", "cname": "d31j9x2.cloudfront.lab", "dangling": False,
+             "fp": "HTTP/1.1 200 OK\nVia: CloudFront\n\n(static asset)"},
+            {"host": "careers.acme-corp.lab", "cname": "acme.greenhouse.lab", "dangling": False,
+             "fp": "HTTP/1.1 200 OK\n\n<html><title>ACME Careers</title>..."},
+        ],
+    },
+    "hard": {
+        "org": "acme-corp.lab", "flag": FLAG_TKO3,
+        "provider": "heroku", "provider_syn": ("heroku", "heroku-app", "herokuapp"),
+        "resource": "acme-api-staging",
+        "subs": [
+            {"host": "status.acme-corp.lab", "cname": "acme.statuspage.lab", "dangling": False,
+             "fp": "HTTP/1.1 404 Not Found\n\n(Statuspage — bu provayder takeover'ga YOPIQ)"},
+            {"host": "mail.acme-corp.lab", "cname": "ghs.googlehosted.lab", "dangling": False,
+             "fp": "HTTP/1.1 404 Not Found\n\n(Google — egalik tasdiqlanmagan, takeover'ga YOPIQ)"},
+            {"host": "api-staging.acme-corp.lab", "cname": "acme-api-staging.herokuapp.lab", "dangling": True,
+             "fp": "HTTP/1.1 404 Not Found\n\n<html><body><iframe src=\"//www.herokucdn.lab/error-pages/no-such-app.html\">"
+                   "</iframe><!-- No such app --></body></html>"},
+        ],
+    },
+}
+
+
+def takeover_sub(tier, host):
+    cfg = TAKEOVER.get(tier)
+    if not cfg:
+        return None
+    for s in cfg["subs"]:
+        if s["host"] == host:
+            return s
+    return None
+
+
+def takeover_claim(tier, provider, resource):
+    cfg = TAKEOVER.get(tier)
+    if not cfg:
+        return False
+    ok_p = (provider or "").strip().lower() in cfg["provider_syn"]
+    ok_r = (resource or "").strip().lower() == cfg["resource"].lower()
+    return ok_p and ok_r
+
+
+def page_takeover(tier, checked=None, claim_msg="", solved=False):
+    cfg = TAKEOVER[tier]
+    body = head("Subdomain Takeover — " + tier) + '<h1>🌐 Subdomain Takeover — ' + tier + '</h1>'
+    body += ('<p class="mut"><b>' + esc(cfg["org"]) + '</b> subdomenlarini tekshiring. '
+             'Egasiz (dangling) CNAME topib, o\'sha resursni provayderda «claim» qiling. '
+             'Har bir subdomenni bosib HTTP javob (fingerprint)ni ko\'ring.</p>')
+    rows = ""
+    for s in cfg["subs"]:
+        rows += ('<tr><td><a href="/takeover/' + tier + '?check=' + esc(s["host"]) + '">' + esc(s["host"]) + '</a></td>'
+                 '<td class="mut" style="font-family:monospace;font-size:12px">CNAME → ' + esc(s["cname"]) + '</td></tr>')
+    body += '<div class="panel"><table><tr><th>Subdomen</th><th>CNAME (DNS)</th></tr>' + rows + '</table></div>'
+    if checked is not None:
+        body += ('<div class="panel"><div class="mut" style="font-size:12px">HTTP javob — ' + esc(checked["host"])
+                 + ' (' + esc(checked["cname"]) + '):</div><pre>' + esc(checked["fp"]) + '</pre></div>')
+    body += ('<div class="panel"><h2 style="margin-top:0">Provayderda claim qilish</h2>'
+             '<form method="get" action="/takeover/' + tier + '">'
+             '<label>Provayder (masalan s3 / github / heroku)</label>'
+             '<input type="text" name="claim_provider" placeholder="s3" autocomplete="off">'
+             '<label>Resurs nomi (CNAME dan olingan bucket/user/app)</label>'
+             '<input type="text" name="claim_resource" placeholder="..." autocomplete="off">'
+             '<button class="btn" type="submit">Claim</button></form></div>')
+    if claim_msg:
+        body += claim_msg
+    if solved:
+        body += _flag_panel(cfg["flag"])
+    return body + foot()
+
+
+# ---- CSP Bypass: har daraja HAQIQIY CSP sarlavhasi bilan xizmat qilinadi ----
+CSP_TOKEN = {"easy": "csp-e-8f21c0", "medium": "csp-m-4a7c9d", "hard": "csp-h-1d9e33"}
+CSP_FLAG = {"easy": FLAG_CSP1, "medium": FLAG_CSP2, "hard": FLAG_CSP3}
+
+
+def render_csp(tier, name, solved_flag=None):
+    """(policy, html) qaytaradi. RAW reflection — bu labning ATAYLAB in'ektsiya nuqtasi."""
+    if tier == "hard":
+        nonce = base64.b16encode(os.urandom(8)).decode().lower()   # har javobda tasodifiy nonce
+        policy = ("script-src 'nonce-" + nonce + "' 'unsafe-eval'; img-src 'self'; "
+                  "style-src 'unsafe-inline'; default-src 'self'")
+        scripts = ('<script nonce="' + nonce + '" src="/csp/token.js?tier=hard"></script>'
+                   '<script nonce="' + nonce + '" src="/csp/gadget.js"></script>')
+    elif tier == "medium":
+        policy = "script-src 'self'; img-src 'self'; style-src 'unsafe-inline'; default-src 'self'"
+        scripts = '<script src="/csp/token.js?tier=medium"></script>'
+    else:
+        policy = "script-src 'self' 'unsafe-inline'; img-src 'self'; style-src 'unsafe-inline'; default-src 'self'"
+        scripts = '<script src="/csp/token.js?tier=easy"></script>'
+    reflected = name if name is not None else "mehmon"
+    solved = ('<div class="f">✓ CSP aylanib o\'tildi va JS ishga tushdi! FLAG: ' + esc(solved_flag) + '</div>') if solved_flag else ''
+    html = (
+        '<!doctype html><html lang="uz"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        '<title>CSP ' + tier + ' · Web Vulns Lab</title>' + scripts +
+        '<style>body{font-family:system-ui,-apple-system,sans-serif;background:#0b1020;color:#e6ecf7;padding:22px;line-height:1.6;max-width:820px;margin:0 auto}'
+        'a{color:#5eb0ff}.b{background:#121a30;border:1px solid #213050;border-radius:10px;padding:14px;margin:12px 0}'
+        'code{color:#8ff0d3;word-break:break-all}h1{font-size:24px}'
+        '.f{background:#07231e;border:1px solid #14513e;color:#8ff0d3;padding:12px;border-radius:9px;margin:12px 0}'
+        'input{width:100%;box-sizing:border-box;background:#0a1124;color:#e6ecf7;border:1px solid #213050;border-radius:8px;padding:9px;font-family:monospace}'
+        '.btn{background:#22d3a6;color:#04241b;border:0;border-radius:8px;padding:9px 16px;font-weight:700;margin-top:10px;cursor:pointer}</style>'
+        '</head><body>'
+        '<p><a href="/">← Mashqlar</a> · <a href="/flag_check">🚩 Flag check</a></p>'
+        '<h1>🛡️ CSP Bypass — ' + tier + '</h1>' + solved +
+        '<div class="b">Amaldagi siyosat (server sarlavhasi):<br><code>Content-Security-Policy: ' + esc(policy) + '</code></div>'
+        '<form method="get"><label style="font-size:13px;color:#8ea0c4">name (tozalanmaydi — in\'ektsiya shu yerda):</label>'
+        '<input type="text" name="name" value="' + esc(reflected) + '">'
+        '<button class="btn" type="submit">Yubor</button></form>'
+        '<div class="b">Salom, ' + reflected + '</div>'
+        '<div class="b" style="font-size:13px;color:#8ea0c4">Maqsad: CSP\'ni aylanib o\'tuvchi payload bilan JS ishga tushiring. '
+        'Bajarilgan JS <code>window.CSP_FLAG_TOKEN</code> ni <code>/csp/' + tier + '/win?t=</code> ga yuborsin '
+        '(masalan <code>new Image().src=&#39;/csp/' + tier + '/win?t=&#39;+window.CSP_FLAG_TOKEN</code>), so\'ng sahifani yangilang.</div>'
+        '</body></html>'
+    )
+    return policy, html
+
+
 # ---- flag_check (Nimbus uslubi: server tekshiruvi + cookie progress + hintlar) ----
 def md_min(s):
     return esc(s)
@@ -997,6 +1189,48 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, page_biz_pay(qs.get("item", ["premium"])[0]))
         if p == "/biz/confirm":
             return self._send(200, page_biz_confirm(qs.get("item", [""])[0], qs.get("paid", ["0"])[0]))
+        # ── Batch 3: Subdomain Takeover ──
+        if p.startswith("/takeover/"):
+            tier = p[len("/takeover/"):].strip("/")
+            if tier not in TAKEOVER:
+                return self._send(404, head("404") + "<h1>404</h1><p class=mut>Noma'lum daraja.</p>" + foot())
+            cp, cr = qs.get("claim_provider", [None])[0], qs.get("claim_resource", [None])[0]
+            if cp is not None or cr is not None:
+                if takeover_claim(tier, cp, cr):
+                    return self._send(200, page_takeover(tier,
+                        claim_msg='<div class="note">✓ Resurs provayderda claim qilindi — subdomen endi sizniki!</div>', solved=True))
+                return self._send(200, page_takeover(tier,
+                    claim_msg='<div class="err">✗ Bunday egasiz (dangling) resurs topilmadi. Provayder yoki resurs nomini tekshiring.</div>'))
+            ch = qs.get("check", [None])[0]
+            if ch:
+                sub = takeover_sub(tier, ch)
+                if sub:
+                    return self._send(200, page_takeover(tier, checked=sub))
+                return self._send(200, page_takeover(tier, claim_msg='<div class="err">Bunday subdomen yo\'q.</div>'))
+            return self._send(200, page_takeover(tier))
+        # ── Batch 3: CSP Bypass (yordamchi endpointlar oldin) ──
+        if p == "/csp/token.js":
+            tok = CSP_TOKEN.get(qs.get("tier", ["easy"])[0], "")
+            return self._send(200, 'window.CSP_FLAG_TOKEN="' + tok + '";',
+                              ctype="application/javascript; charset=utf-8")
+        if p == "/csp/gadget.js":
+            # ISHONCHLI gadget (faqat hard sahifada nonce bilan yuklanadi): ?x= ni eval qiladi
+            js = ("try{var _x=new URLSearchParams(location.search).get('x');if(_x){eval(_x);}}catch(e){}")
+            return self._send(200, js, ctype="application/javascript; charset=utf-8")
+        if p == "/csp/jsonp":
+            cb = qs.get("callback", ["callback"])[0]
+            return self._send(200, cb + '({"ok":true});', ctype="application/javascript; charset=utf-8")
+        if p in ("/csp/easy/win", "/csp/medium/win", "/csp/hard/win"):
+            tier = p.split("/")[2]
+            if qs.get("t", [""])[0] == CSP_TOKEN.get(tier):
+                return self._send(200, "OK", ctype="text/plain; charset=utf-8",
+                                  extra={"Set-Cookie": "csp_%s=1; Path=/csp; SameSite=Lax" % tier})
+            return self._send(200, "no", ctype="text/plain; charset=utf-8")
+        if p in ("/csp/easy", "/csp/medium", "/csp/hard"):
+            tier = p.split("/")[2]
+            solved = ("csp_%s=1" % tier) in (self.headers.get("Cookie", "") or "")
+            policy, page = render_csp(tier, qs.get("name", [None])[0], CSP_FLAG[tier] if solved else None)
+            return self._send(200, page, extra={"Content-Security-Policy": policy})
         if p in ("/flag_check", "/flag_check.html"):
             if qs.get("reset"):
                 return self._fc_redirect(clear=True)
@@ -1145,6 +1379,7 @@ def main():
         print("  Tarmoqdagi o'quvchilar: http://%s:%d" % (ip, SERVE_PORT))
     print(ln)
     print("  %d ta mashq: SQLi · IDOR · LFI · CmdInj · SSTI · Upload · NoSQL · JWT · BizLogic" % len(CHALLENGES))
+    print("               · Subdomain Takeover · CSP Bypass")
     print("  Flag topshirish:  /flag_check")
     print("  ⚠️  Ataylab zaif — faqat izolyatsiya qilingan lab. Xavfsiz: RCE jail/simulyatsiya.")
     print("  To'xtatish: Ctrl+C")

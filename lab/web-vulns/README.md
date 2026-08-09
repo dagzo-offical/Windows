@@ -45,6 +45,23 @@ ta'siri xavfsiz qamalgan. Darsliklar: L38 (NoSQL), L39 (JWT), L40 (Business Logi
 | 14 | **Logic — coupon stack** | o'rta | `/biz/coupon` | bitta kuponni ko'p marta qo'llash → narx ≤ 0 |
 | 15 | **Logic — workflow bypass** | qiyin | `/biz/premium` | `/biz/confirm?item=premium&paid=1` (forced browsing) |
 
+## Mashqlar (batch 3 — 2 mavzu × 3 daraja)
+
+Darsliklar: L53 (Subdomain Takeover), L54 (CSP Bypass). CSP labi **haqiqiy brauzer CSP'sini**
+majbur qiladi (payloadni Chrome/Firefox'da sinang); takeover provayder fingerprintlarini simulyatsiya qiladi.
+
+| # | Zaiflik | Daraja | Yo'l | Yechim (qisqa) |
+|---|---|---|---|---|
+| 16 | **Subdomain Takeover — S3** | oson | `/takeover/easy` | `NoSuchBucket` dangling bucket → provider=s3, resource=bucket |
+| 17 | **Subdomain Takeover — GitHub** | o'rta | `/takeover/medium` | «There isn't a GitHub Pages site here» → provider=github, resource=`<user>` |
+| 18 | **Subdomain Takeover — Heroku** | qiyin | `/takeover/hard` | takeover-safe 404'larni chetlab, «No such app» → provider=heroku |
+| 19 | **CSP Bypass — unsafe-inline** | oson | `/csp/easy` | `'unsafe-inline'` bor → inline `<script>` ishlaydi |
+| 20 | **CSP Bypass — JSONP** | o'rta | `/csp/medium` | `script-src 'self'` → `/csp/jsonp?callback=<JS>` orqali |
+| 21 | **CSP Bypass — unsafe-eval** | qiyin | `/csp/hard` | random nonce + `'unsafe-eval'` → `?x=` eval-gadget |
+
+CSP labida: bajarilgan JS `window.CSP_FLAG_TOKEN` ni `/csp/<tier>/win?t=` ga yuboradi (Image/fetch),
+so'ng sahifani yangilaganda flag chiqadi. Payload CSP'ni aylanib o'tmasa — brauzer uni bloklaydi.
+
 ## Xavfsizlik dizayni
 
 Bu ilova **native** (Docker'siz) ishlagani uchun zaifliklar **ta'siri qamalgan**, lekin
@@ -61,6 +78,10 @@ Bu ilova **native** (Docker'siz) ishlagani uchun zaifliklar **ta'siri qamalgan**
 - **JWT** — stdlib `hmac`/`hashlib` bilan HS256; zaifliklar (alg:none, zaif sir, o'rnatilgan JWK)
   ataylab, lekin faqat lab tokenlariga ta'sir qiladi.
 - **Business Logic** — sof arifmetika va holat; host yoki tashqi tizimga ta'sir yo'q.
+- **Subdomain Takeover** — soxta DNS/provider muhiti **simulyatsiyasi**; haqiqiy DNS/bulut
+  provayderiga tegilmaydi (real takeover DNS + bulut hisob talab qiladi).
+- **CSP Bypass** — `?name=` **ataylab** tozalanmasdan aks etadi (in'ektsiya nuqtasi), lekin bu
+  faqat izolyatsiya qilingan lab; CSP sarlavhasi haqiqiy — brauzer uni majburlaydi.
 
 ⚠️ **Ataylab zaif** — faqat izolyatsiya qilingan o'quv tarmog'ida. Internetga ochmang.
 
