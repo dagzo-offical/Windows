@@ -151,6 +151,13 @@ console.log('Bundle: ' + (bundle.length >> 10) + ' KB');
 
 
 def main():
+    # Never let a console encoding problem stop the server from starting.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
     parser = argparse.ArgumentParser(description=f"Run {ACADEMY_NAME} locally")
     parser.add_argument("port", nargs="?", type=int, default=DEFAULT_PORT,
                         help=f"Port number (default: {DEFAULT_PORT})")
@@ -179,18 +186,20 @@ def main():
     url = f"http://localhost:{port}"
 
     print()
-    print(f"  ╔══════════════════════════════════════════╗")
-    print(f"  ║   {ACADEMY_NAME}                    ║")
-    print(f"  ╠══════════════════════════════════════════╣")
-    print(f"  ║  Local:   {url:<31}║")
-    print(f"  ║  Root:    {str(root)[:31]:<31}║")
-    print(f"  ║  Press    Ctrl+C to stop                 ║")
-    print(f"  ╚══════════════════════════════════════════╝")
+    # ASCII-only banner: Windows consoles / redirected output may use a
+    # legacy code page (cp1252, cp866...) that cannot encode box-drawing chars.
+    print(f"  +------------------------------------------+")
+    print(f"  |{('   ' + ACADEMY_NAME):<42}|")
+    print(f"  +------------------------------------------+")
+    print(f"  |  Local:   {url:<31}|")
+    print(f"  |  Root:    {str(root)[:31]:<31}|")
+    print(f"  |  Press    Ctrl+C to stop                 |")
+    print(f"  +------------------------------------------+")
     print()
 
     if not args.no_browser:
         open_browser(url)
-        print(f"  → Browser will open at {url}")
+        print(f"  -> Browser will open at {url}")
         print()
 
     server = HTTPServer(("0.0.0.0", port), AcademyHandler)
